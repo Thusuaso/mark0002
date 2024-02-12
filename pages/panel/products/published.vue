@@ -28,6 +28,7 @@
       :visible.sync="panel_form_dialog"
       :header="'Ürün Id ' + getPanelProductId"
       modal
+      maximizable
     >
       <panelProductForm
         :model="model"

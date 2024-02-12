@@ -77,7 +77,7 @@
       />
     </div>
     <div class="col-3">
-      <JsonExcel
+      <!-- <JsonExcel
         class="btn w-100"
         :data="getProductList"
         :fields="selectionListExcelFields"
@@ -90,7 +90,94 @@
           icon="pi pi-file-excel"
           label="Seleksiyon"
         />
-      </JsonExcel>
+      </JsonExcel> -->
+      <!-- <Button
+        type="button"
+        class="p-button-info w-100"
+        icon="pi pi-file-excel"
+        label="Excel"
+        @click="download"
+      />
+      <div>
+        <vue-excel-editor v-model="getProductList" ref="download">
+          <vue-excel-column field="KasaNo" label="Kasa No" type="string" width="80px" />
+          <vue-excel-column
+            field="OcakAdi"
+            label="Ocak Adı"
+            type="string"
+            width="150px"
+          />
+          <vue-excel-column
+            field="FirmaAdi"
+            label="Firma Adı"
+            type="string"
+            width="150px"
+          />
+          <vue-excel-column
+            field="KategoriAdi"
+            label="Kategori Adı"
+            type="string"
+            width="150px"
+          />
+          <vue-excel-column field="UrunAdi" label="Ürün" type="string" width="150px" />
+          <vue-excel-column
+            field="YuzeyIslemAdi"
+            label="Yüzey"
+            type="string"
+            width="150px"
+          />
+          <vue-excel-column field="En" label="En" type="string" width="150px" />
+          <vue-excel-column field="Boy" label="Boy" type="string" width="150px" />
+          <vue-excel-column field="Kenar" label="Kenar" type="string" width="150px" />
+          <vue-excel-column
+            field="KutuAdet"
+            label="Kutu Adet"
+            type="string"
+            width="150px"
+          />
+          <vue-excel-column
+            field="KutuIciAdet"
+            label="Kutu İçi Adet"
+            type="string"
+            width="150px"
+          />
+          <vue-excel-column field="Adet" label="Adet" type="string" width="150px" />
+          <vue-excel-column
+            field="UrunBirimAdi"
+            label="Birim"
+            type="number"
+            width="150px"
+          />
+          <vue-excel-column field="Miktar" label="Miktar" type="number" width="130px" />
+          <vue-excel-column
+            field="SiparisAciklama"
+            label="Po"
+            type="string"
+            width="150px"
+          />
+          <vue-excel-column
+            field="Aciklama"
+            label="Açıklama"
+            type="string"
+            width="150px"
+          />
+        </vue-excel-editor>
+      </div> -->
+      <vue-excel-xlsx
+        :data="getProductList"
+        :columns="excelColumnsField"
+        :file-name="'filename'"
+        :file-type="'xlsx'"
+        :sheet-name="'sheetname'"
+        style="border: none; background-color: white"
+      >
+        <Button
+          type="button"
+          class="p-button-info w-100"
+          icon="pi pi-file-excel"
+          label="Excel"
+        />
+      </vue-excel-xlsx>
       <br />
 
       <Dropdown
@@ -161,6 +248,73 @@ export default {
   },
   data() {
     return {
+      excelColumnsField: [
+        {
+          label: "Kasa No",
+          field: "KasaNo",
+        },
+        {
+          label: "Ocak Adı",
+          field: "OcakAdi",
+        },
+        {
+          label: "Firma Adı",
+          field: "FirmaAdi",
+        },
+        {
+          label: "Kategori",
+          field: "KategoriAdi",
+        },
+        {
+          label: "Urun",
+          field: "UrunAdi",
+        },
+        {
+          label: "Yuzey",
+          field: "YuzeyIslemAdi",
+        },
+        {
+          label: "En",
+          field: "En",
+        },
+        {
+          label: "Boy",
+          field: "Boy",
+        },
+        {
+          label: "Kenar",
+          field: "Kenar",
+        },
+        {
+          label: "Kutu Adet",
+          field: "KutuAdet",
+        },
+        {
+          label: "Kutu Ici Adet",
+          field: "KutuIciAdet",
+        },
+        {
+          label: "Adet",
+          field: "Adet",
+        },
+        {
+          label: "Ürün Birim",
+          field: "UrunBirimAdi",
+        },
+        {
+          label: "Miktar",
+          field: "Miktar",
+          dataFormat: this.formatDecimal,
+        },
+        {
+          label: "Po",
+          field: "SiparisAciklama",
+        },
+        {
+          label: "Açıklama",
+          field: "Aciklama",
+        },
+      ],
       ticketDate: new Date(),
       selectedCity: null,
       cities: [],
@@ -194,6 +348,12 @@ export default {
     };
   },
   methods: {
+    download(event) {
+      const format = "xlsx";
+      const exportSelectedOnly = false;
+      const filename = "test";
+      this.$refs.download.exportTable(format, exportSelectedOnly, filename);
+    },
     ticketDateSelect(event) {
       const date = new Date(event);
       const year = date.getFullYear();
@@ -204,6 +364,10 @@ export default {
     newForm() {
       this.$store.dispatch("setSelectionProductionButtonStatus", true);
       this.$emit("selection_production_dialog", true);
+    },
+    formatDecimal(value) {
+      const data = value.toString().replace(".", ",");
+      return data;
     },
   },
 };

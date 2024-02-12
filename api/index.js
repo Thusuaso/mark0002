@@ -35,7 +35,6 @@ app.post('/login',(req,res)=>{
     if(req.body){
         const sql = `select * from KullaniciTB where KullaniciAdi='${req.body.username}' and YSifre='${req.body.password}'`;
         mssql.query(sql,(err,results)=>{
-            console.log('/login', err);
             const user = results.recordset[0];
             if(results.recordset.length == 0){
                 res.status(200).json({
@@ -668,6 +667,7 @@ app.post('/selection/production/save',(req,res)=>{
 app.put('/selection/production/update',(req,res)=>{
     const sql = `
     update UretimTB SET Tarih='${req.body.Tarih}',
+    KutuAdet='${req.body.KutuAdet}',
     KasaNo='${req.body.KasaNo}',
     UrunKartID='${req.body.UrunKartID}',
     TedarikciID='${req.body.TedarikciID}',
@@ -5482,9 +5482,7 @@ app.put('/panel/product/update', (req, res) => {
 
             where Id = '${req.body.Id}'
     `;
-    console.log(updateProductSql)
     mssql.query(updateProductSql, (err, product) => {
-
         if(product.rowsAffected[0] == 1){
             res.status(200).json({'status':true});
         } else{

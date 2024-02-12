@@ -38,7 +38,7 @@
         <label for="ingredient4" class="ml-2">Hepsi</label>
       </div>
       <div class="flex align-items-center">
-        <JsonExcel
+        <!-- <JsonExcel
           class="w-100"
           :data="getReportsMekmerStockList"
           :fields="reportsMekmerStockListExcelFields"
@@ -51,7 +51,22 @@
             icon="pi pi-file-excel"
             label="Excel"
           />
-        </JsonExcel>
+        </JsonExcel> -->
+        <vue-excel-xlsx
+          :data="getReportsMekmerStockList"
+          :columns="reportsMekmerStockListExcelFields2"
+          :file-name="'Stock'"
+          :file-type="'xlsx'"
+          :sheet-name="'sheetname'"
+          style="border: none; background-color: white"
+        >
+          <Button
+            type="button"
+            class="p-button-info w-100"
+            icon="pi pi-file-excel"
+            label="Excel"
+          />
+        </vue-excel-xlsx>
       </div>
     </div>
 
@@ -96,12 +111,26 @@ export default {
         "Kasa Sayısı": "KasaSayisi",
         "Toplam Miktar": "Toplam",
       },
+      reportsMekmerStockListExcelFields2: [
+        { label: "Kategori", field: "KategoriAdi" },
+        { label: "Urün", field: "UrunAdi" },
+        { label: "Yüzey", field: "YuzeyIslemAdi" },
+        { label: "En", field: "En" },
+        { label: "Boy", field: "Boy" },
+        { label: "Kenar", field: "Kenar" },
+        { label: "Kasa Sayısı", field: "KasaSayisi" },
+        { label: "Toplam Miktar", field: "Toplam", dataFormat: this.formatDecimal },
+      ],
     };
   },
   created() {
     this.$store.dispatch("setReportsMekmerStockList");
   },
   methods: {
+    formatDecimal(value) {
+      const data = value.toString().replace(".", ",");
+      return data;
+    },
     reportsMekmerStockListSelected(event) {
       if (this.ingredient == "All") {
         this.$store.dispatch("setReportsAllStockListDetail", event.data);

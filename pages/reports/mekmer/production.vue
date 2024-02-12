@@ -28,7 +28,7 @@
         />
       </div>
       <div class="col">
-        <JsonExcel
+        <!-- <JsonExcel
           class="w-100"
           :data="getReportsMekmerProductionList"
           :fields="reportsMekmerProductionListExcelFields"
@@ -41,7 +41,22 @@
             icon="pi pi-file-excel"
             label="Excel"
           />
-        </JsonExcel>
+        </JsonExcel> -->
+        <vue-excel-xlsx
+          :data="getReportsMekmerProductionList"
+          :columns="reportsMekmerProductionListExcelFields2"
+          :file-name="'Production'"
+          :file-type="'xlsx'"
+          :sheet-name="'sheetname'"
+          style="border: none; background-color: white"
+        >
+          <Button
+            type="button"
+            class="p-button-info w-100"
+            icon="pi pi-file-excel"
+            label="Excel"
+          />
+        </vue-excel-xlsx>
       </div>
     </div>
     <reportsMekmerProductionList
@@ -81,12 +96,33 @@ export default {
         Po: "SiparisAciklama",
         Aciklama: "Aciklama",
       },
+      reportsMekmerProductionListExcelFields2: [
+        { label: "Tarih", field: "Tarih" },
+        { label: "Firma Adı", field: "FirmaAdi" },
+        { label: "Kategori Adı", field: "KategoriAdi" },
+        { label: "Kasa No", field: "KasaNo" },
+        { label: "Urun", field: "UrunAdi" },
+        { label: "Ocak Adı", field: "OcakAdi" },
+        { label: "Yüzey", field: "YuzeyIslemAdi" },
+        { label: "En", field: "En" },
+
+        { label: "Boy", field: "Boy" },
+        { label: "Miktar Sayısı", field: "Miktar", dataFormat: this.formatDecimal },
+        { label: "Adet", field: "Adet" },
+        { label: "Birim Adı", field: "BirimAdi" },
+        { label: "Po", field: "SiparisAciklama" },
+        { label: "Aciklama", field: "Aciklama" },
+      ],
     };
   },
   created() {
     this.$store.dispatch("setReportsMekmerProductionList");
   },
   methods: {
+    formatDecimal(value) {
+      const data = value.toString().replace(".", ",");
+      return data;
+    },
     searchDateList() {
       const date1 = this.selectedDates[0];
       const date2 = this.selectedDates[1];

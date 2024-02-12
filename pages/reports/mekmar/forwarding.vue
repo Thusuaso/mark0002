@@ -28,7 +28,7 @@
         />
       </div>
       <div class="col">
-        <JsonExcel
+        <!-- <JsonExcel
           :data="getreportsMekmarForwardingList"
           :fields="reportsMekmerForwardingListExcelFields"
           worksheet="Forwarding"
@@ -40,7 +40,22 @@
             icon="pi pi-file-excel"
             label="Excel"
           />
-        </JsonExcel>
+        </JsonExcel> -->
+        <vue-excel-xlsx
+          :data="getreportsMekmarForwardingList"
+          :columns="reportsMekmerForwardingListExcelFields2"
+          :file-name="'Forwarding'"
+          :file-type="'xlsx'"
+          :sheet-name="'sheetname'"
+          style="border: none; background-color: white; width: 100%"
+        >
+          <Button
+            type="button"
+            class="p-button-info w-100"
+            icon="pi pi-file-excel"
+            label="Excel"
+          />
+        </vue-excel-xlsx>
       </div>
     </div>
     <reportsMekmarForwardingList
@@ -84,12 +99,41 @@ export default {
         "Birim Fiyat": "BirimFiyat",
         Toplam: "Toplam",
       },
+      reportsMekmerForwardingListExcelFields2: [
+        { label: "Tarih", field: "Tarih" },
+        { label: "Firma Adi", field: "FirmaAdi" },
+        { label: "Tedarikci", field: "TedarikciAdi" },
+        { label: "UrunKartId", field: "UrunKartId" },
+        { label: "Kasa No", field: "KasaNo" },
+        { label: "Ocak", field: "OcakAdi" },
+        { label: "Kategori", field: "KategoriAdi" },
+        { label: "Ürün", field: "UrunAdi" },
+        { label: "Yuzey", field: "YuzeyIslemAdi" },
+        { label: "En", field: "En" },
+        { label: "Boy", field: "Boy" },
+        { label: "Kenar", field: "Kenar" },
+        { label: "Kutu Adet", field: "KutuAdet" },
+        { label: "Adet", field: "Adet" },
+        { label: "Miktar", field: "Miktar", dataFormat: this.formatDecimal },
+        { label: "Birim", field: "BirimAdi" },
+        { label: "Po", field: "SiparisAciklama" },
+        { label: "Birim Fiyat", field: "BirimFiyat", dataFormat: this.formatDecimal },
+        { label: "Toplam", field: "Toplam", dataFormat: this.formatDecimal },
+      ],
     };
   },
   created() {
     this.$store.dispatch("setReportsMekmarForwardingList");
   },
   methods: {
+    formatDecimal(value) {
+      if (value == null || value == undefined || value == "" || value == " ") {
+        return 0;
+      } else {
+        let val = (value / 1).toFixed(2).replace(".", ",");
+        return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+    },
     searchDateList() {
       const date1 = this.selectedDates[0];
       const date2 = this.selectedDates[1];

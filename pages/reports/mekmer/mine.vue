@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <JsonExcel
+    <!-- <JsonExcel
       class="w-100"
       :data="getReportsMekmerMineList"
       :fields="getReportsMekmerMineExcelFields"
@@ -13,7 +13,22 @@
         icon="pi pi-file-excel"
         label="Excel"
       />
-    </JsonExcel>
+    </JsonExcel> -->
+    <vue-excel-xlsx
+      :data="getReportsMekmerMineList"
+      :columns="getReportsMekmerMineExcelFields2"
+      :file-name="'Mine'"
+      :file-type="'xlsx'"
+      :sheet-name="'sheetname'"
+      style="border: none; background-color: white; width: 100%"
+    >
+      <Button
+        type="button"
+        class="p-button-info w-100"
+        icon="pi pi-file-excel"
+        label="Excel"
+      />
+    </vue-excel-xlsx>
     <reportsMekmerMineList :list="getReportsMekmerMineList" :loading="getLoading" />
   </div>
 </template>
@@ -32,6 +47,13 @@ export default {
         Adet: "Adet",
         "Kasa Adedi": "KasaAdedi",
       },
+      getReportsMekmerMineExcelFields2: [
+        { label: "Ocak Adı", field: "OcakAdi" },
+        { label: "M2", field: "M2" },
+        { label: "MT", field: "MT" },
+        { label: "Adet", field: "Adet" },
+        { label: "Kasa Adedi", field: "KasaAdedi" },
+      ],
     };
   },
   created() {

@@ -8,7 +8,7 @@
       @row-click="$emit('order_selected_list_emit', $event.data)"
       :loading="loading"
     >
-      <template #header> {{ year }} Sipariş Özet</template>
+      <template #header> {{ year }} {{ status }} Özet</template>
       <Column field="Month" header="Ay">
         <template #body="slotProps">
           {{ slotProps.data.Month | monthToString }}
@@ -50,6 +50,10 @@ export default {
     },
     loading: {
       type: Boolean,
+      required: false,
+    },
+    status: {
+      type: String,
       required: false,
     },
   },
