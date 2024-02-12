@@ -1,0 +1,149 @@
+<template>
+  <div>
+    <div class="row container">
+      <div class="col">
+        <Dropdown
+          v-model="selectedYear"
+          :options="getReportsMekmarAyoYearList"
+          optionLabel="Yil"
+          class="w-100"
+          @change="yearSelected($event)"
+        />
+      </div>
+      <div class="col">
+        <Dropdown
+          v-model="selectedMonth"
+          :options="getReportsMekmarAyoMonthList"
+          optionLabel="Ay"
+          class="w-100"
+          @change="monthSelected($event)"
+        />
+      </div>
+      <div class="col">
+        <JsonExcel
+          :data="getReportsMekmarAyoList"
+          :fields="reportsMekmarAyoListExcelField"
+          worksheet="Ayo"
+          name="ayo.xls"
+          :stringifyLongNum="true"
+          escapeCsv
+          type="csv"
+        >
+          <Button
+            type="button"
+            class="p-button-info w-100"
+            icon="pi pi-file-excel"
+            label="Excel"
+          />
+        </JsonExcel>
+      </div>
+      <div class="col">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Profit ($)</th>
+              <th scope="col">Profit (₺)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Toplam</th>
+              <td>{{ getReportsMekmarAyoListTotal.profitUsd | formatPriceUsd }}</td>
+              <td>{{ getReportsMekmarAyoListTotal.profitTl | formatPriceTl }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <reportsMekmarAyoList
+      :list="getReportsMekmarAyoList"
+      :total="getReportsMekmarAyoListTotal"
+      :loading="getLoading"
+    />
+  </div>
+</template>
+<script>
+import { mapGetters } from "vuex";
+export default {
+  computed: {
+    ...mapGetters([
+      "getReportsMekmarAyoList",
+      "getReportsMekmarAyoYearList",
+      "getReportsMekmarAyoMonthList",
+      "getReportsMekmarAyoListTotal",
+      "getLoading",
+    ]),
+  },
+  data() {
+    return {
+      selectedYear: { Yil: new Date().getFullYear() },
+      selectedMonth: { Ay: new Date().getMonth() + 1 },
+      reportsMekmarAyoListExcelField: {
+        Temsilci: "SiparisSahibi",
+        Operasyon: "Operasyon",
+        "Firma Adi": "FirmaAdi",
+        "Siparis No": "SiparisNo",
+        "Fatura Adi": "FaturaAdi",
+        "Siparis Tarihi": "SiparisTarihi",
+        "Yukleme Tarihi": "YuklemeTarihi",
+        "Ulke Adi": "UlkeAdi",
+        "Teslim Tur": "TeslimTur",
+        Proforma: "Proforma",
+        "Mekmer Satis": "MekmerSatis",
+        "Mekmoz Satis": "MekmozSatis",
+        "Dis Satis": "DisSatis",
+        Nakliye: "Nakliye",
+        Gumruk: "Gumruk",
+        Ilaclama: "Ilaclama",
+        Liman: "Liman",
+        "Sigorta Alış": "SigortaAlis",
+        "Sigorta Satış": "SigortaSatis",
+        "Navlun Alış": "NavlunAlis",
+        Lashing: "Lashing",
+        Booking: "Booking",
+        Spanzlet: "Spanzlet",
+        "Detay Alış 1": "DetayAlis1",
+        "Detay Alış 2": "DetayAlis2",
+        "Detay Alış 3": "DetayAlis3",
+        Mekus: "Mekus",
+        "Özel İşçilik": "OzelIscilik",
+        "Banka Masraf": "BankaMasraf",
+        Kurye: "Kurye",
+        "Masraf Toplam": "MasrafToplam",
+        "Profit Usd": "ProfitUsd",
+        "Profit Tl": "ProfitTl",
+      },
+      json_meta: [
+        {
+          key: "charset",
+          value: "utf-8",
+        },
+      ],
+    };
+  },
+  created() {
+    this.$store.dispatch("setReportsMekmarAyoYearList");
+    this.$store.dispatch("setReportsMekmarAyoMonthList", new Date().getFullYear());
+    const date = {
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+    };
+
+    this.$store.dispatch("setReportsMekmarAyoList", date);
+  },
+  methods: {
+    yearSelected(event) {
+      this.$store.dispatch("setReportsMekmarAyoListYear", event.value.Yil);
+    },
+    monthSelected(event) {
+      let date = {
+        year: this.selectedYear.Yil,
+        month: event.value.Ay,
+      };
+      this.$store.dispatch("setReportsMekmarAyoListMonth", date);
+    },
+  },
+};
+</script>

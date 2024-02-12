@@ -1,0 +1,723 @@
+<template>
+  <div class="row mt-3">
+    <div class="col-10">
+      <div class="row">
+        <div class="col">
+          <div class="p-float-label mb-4">
+            <Dropdown
+              v-model="selectedSource"
+              inputId="source"
+              :options="sources"
+              optionLabel="source"
+              class="w-100"
+              @change="sourceSelected($event)"
+            />
+            <label for="source">Kaynak</label>
+          </div>
+          <div class="p-float-label mb-4">
+            <Dropdown
+              v-model="selectedOfferType"
+              inputId="type"
+              :options="offerTypes"
+              optionLabel="type"
+              class="w-100"
+              @change="offerTypeSelected($event)"
+            />
+            <label for="type">Teklif Yeri</label>
+          </div>
+          <div class="p-float-label mb-4">
+            <Dropdown
+              v-model="selectedPriority"
+              inputId="priority"
+              :options="priorities"
+              optionLabel="priority"
+              class="w-100"
+              @change="prioritySelected($event)"
+            />
+            <label for="priority">Öncelik</label>
+          </div>
+        </div>
+        <div class="col">
+          <TabView>
+            <TabPanel header="Teklif Açıklama">
+              <Textarea
+                v-model="model.Aciklama"
+                autoResize
+                rows="5"
+                cols="30"
+                class="w-100"
+              />
+            </TabPanel>
+            <TabPanel header="Hatırlatma Belge">
+              <p class="m-0">
+                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
+                doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo
+                inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
+                fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem
+                sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius
+                modi.
+              </p>
+            </TabPanel>
+            <TabPanel header="Proforma - Numune">
+              <p class="m-0">
+                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis
+                praesentium voluptatum deleniti atque corrupti quos dolores et quas
+                molestias excepturi sint occaecati cupiditate non provident, similique
+                sunt in culpa qui officia deserunt mollitia animi, id est laborum et
+                dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.
+                Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil
+                impedit quo minus.
+              </p>
+            </TabPanel>
+          </TabView>
+        </div>
+      </div>
+      <div>
+        <div class="row">
+          <div class="col">
+            <span class="p-float-label">
+              <Calendar
+                v-model="offerProductDate"
+                inputId="offer_product_date"
+                @date-select="offerProductDateSelected($event)"
+                :disabled="id == 0"
+              />
+              <label for="offer_product_date">Tarih</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <AutoComplete
+                v-model="selectedCategory"
+                inputId="category"
+                :suggestions="filteredCategoryList"
+                @complete="searchCategory($event)"
+                field="KategoriAdi"
+                @item-select="categoryListSelected($event)"
+                :disabled="id == 0"
+              />
+              <label for="category">Kategori</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <AutoComplete
+                v-model="selectedProduct"
+                inputId="product"
+                :suggestions="filteredProductList"
+                @complete="searchProduct($event)"
+                field="UrunAdi"
+                @item-select="productListSelected($event)"
+                :disabled="id == 0"
+              />
+              <label for="product">Ürün</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <AutoComplete
+                v-model="selectedSize"
+                inputId="size"
+                :suggestions="filteredSizeList"
+                @complete="searchSize($event)"
+                field="EnBoy"
+                @item-select="sizeListSelected($event)"
+                :disabled="id == 0"
+              />
+              <label for="size">EnxBoy</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <AutoComplete
+                v-model="selectedThickness"
+                inputId="thickness"
+                :suggestions="filteredThicknessList"
+                @complete="searchThickness($event)"
+                field="Kalinlik"
+                @item-select="thicknessListSelected($event)"
+                :disabled="id == 0"
+              />
+              <label for="thickness">Kalınlık</label>
+            </span>
+          </div>
+          <div class="col mt-3">
+            <span class="p-float-label">
+              <AutoComplete
+                v-model="selectedSurface"
+                inputId="surface"
+                :suggestions="filteredSurfaceList"
+                @complete="searchSurface($event)"
+                field="IslemAdi"
+                @item-select="surfaceListSelected($event)"
+                :disabled="id == 0"
+              />
+              <label for="surface">Yüzey</label>
+            </span>
+          </div>
+          <div class="col mt-3">
+            <div class="p-float-label">
+              <Dropdown
+                v-model="selectedUnit"
+                inputId="unit"
+                :options="unit"
+                optionLabel="Birim"
+                @change="unitSelected($event)"
+                :disabled="id == 0"
+              />
+              <label for="unit">Birim Seç</label>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col">
+            <span class="p-float-label">
+              <InputText
+                id="fob"
+                v-model="modelProduct.FobFiyat"
+                @input="modelProduct.FobFiyat = formatPoint($event)"
+                :disabled="id == 0"
+              />
+              <label for="fob">Fob</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <InputText
+                id="fca"
+                v-model="modelProduct.FcaFiyat"
+                @input="modelProduct.FcaFiyat = formatPoint($event)"
+                :disabled="id == 0"
+              />
+              <label for="fca">Fca</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <InputText
+                id="c"
+                v-model="modelProduct.CFiyat"
+                @input="modelProduct.CFiyat = formatPoint($event)"
+                :disabled="id == 0"
+              />
+              <label for="c">C</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <InputText
+                id="d"
+                v-model="modelProduct.DFiyat"
+                @input="modelProduct.DFiyat = formatPoint($event)"
+                :disabled="id == 0"
+              />
+              <label for="d">D</label>
+            </span>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <Button
+              type="button"
+              class="p-button-success w-100"
+              label="Ekle"
+              @click="addProduct"
+              :disabled="id == 0"
+            />
+          </div>
+          <div class="col">
+            <Button
+              type="button"
+              class="p-button-warning w-100"
+              label="Değiştir"
+              @click="updateProduct"
+              :disabled="id == 0"
+            />
+          </div>
+          <div class="col">
+            <Button
+              type="button"
+              class="p-button-error w-100"
+              label="Sil"
+              @click="deleteProduct"
+              :disabled="id == 0"
+            />
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <DataTable
+              :value="productsList"
+              :selection.sync="selectedProductsList"
+              selectionMode="single"
+              @row-click="productsListSelected($event)"
+            >
+              <Column field="Tarih" header="Tarih">
+                <template #body="slotProps">
+                  {{ slotProps.data.Tarih | dateToString }}
+                </template>
+              </Column>
+              <Column field="KategoriAdi" header="Kategori"></Column>
+              <Column field="UrunAdi" header="Ürün"></Column>
+              <Column field="IslemAdi" header="Yüzey"></Column>
+              <Column field="EnBoy" header="Ebat"></Column>
+              <Column field="Kalinlik" header="Kalınlık"></Column>
+              <Column field="Birim" header="Birim"></Column>
+
+              <Column field="FobFiyat" header="Fob">
+                <template #body="slotProps">
+                  {{ slotProps.data.FobFiyat | formatPriceUsd }}
+                </template>
+              </Column>
+              <Column field="FcaFiyat" header="Fca">
+                <template #body="slotProps">
+                  {{ slotProps.data.FcaFiyat | formatPriceUsd }}
+                </template>
+              </Column>
+              <Column field="CFiyat" header="C">
+                <template #body="slotProps">
+                  {{ slotProps.data.CFiyat | formatPriceUsd }}
+                </template>
+              </Column>
+              <Column field="DFiyat" header="D">
+                <template #body="slotProps">
+                  {{ slotProps.data.DFiyat | formatPriceUsd }}
+                </template>
+              </Column>
+            </DataTable>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="row">
+        <div class="col">
+          <Button
+            type="button"
+            class="p-button-success w-100 mb-4"
+            label="Kaydet"
+            @click="process"
+          />
+        </div>
+        <div class="col" v-if="!status">
+          <Button
+            type="button"
+            class="p-button-danger w-100"
+            label="Sil"
+            @click="deleteProcess"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-content-center gap-3 mb-4">
+        <div class="flex align-items-center">
+          <Checkbox v-model="model.TakipEt" inputId="follow" binary />
+          <label for="follow" class="ml-2"> Takip </label>
+        </div>
+        <div class="flex align-items-center">
+          <Checkbox v-model="model.BList" inputId="follow" binary />
+          <label for="follow" class="ml-2"> B Listesi </label>
+        </div>
+      </div>
+      <span class="p-float-label mb-4">
+        <Calendar
+          v-model="offerDate"
+          inputId="offer_date"
+          class="w-100"
+          @date-select="offerDateSelected($event)"
+        />
+        <label for="offer_date">Tarih</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <AutoComplete
+          v-model="selectedCustomer"
+          inputId="customer"
+          :suggestions="filteredCustomer"
+          @complete="searchCustomer($event)"
+          field="MusteriAdi"
+          @item-select="customerSelected($event)"
+          @input="customerInput($event)"
+        />
+        <label for="customer">Müşteri</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <AutoComplete
+          v-model="selectedCountry"
+          inputId="country"
+          :suggestions="filteredCountry"
+          @complete="searchCountry($event)"
+          field="UlkeAdi"
+          @item-select="countrySelected($event)"
+        />
+        <label for="country">Ülke</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <InputText id="company" v-model="customerModel.Company" />
+        <label for="company">Şirket</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <InputText id="mail" v-model="customerModel.Mail" />
+        <label for="mail">Mail</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <InputText id="phone" v-model="customerModel.Phone" />
+        <label for="phone">Telefon</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <InputText id="adress" v-model="customerModel.Adress" />
+        <label for="adress">Adres</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <Textarea v-model="customerModel.Description" rows="5" class="w-100" />
+        <label>Açıklama</label>
+      </span>
+    </div>
+  </div>
+</template>
+<script>
+import date from "../../plugins/date";
+import Cookies from "js-cookie";
+
+export default {
+  props: {
+    model: {
+      type: Object,
+      required: true,
+    },
+    category: {
+      type: Array,
+      required: true,
+    },
+    product: {
+      type: Array,
+      required: true,
+    },
+    size: {
+      type: Array,
+      required: true,
+    },
+    thickness: {
+      type: Array,
+      required: true,
+    },
+    surface: {
+      type: Array,
+      required: true,
+    },
+    unit: {
+      type: Array,
+      required: true,
+    },
+    productsList: {
+      type: Array,
+      required: false,
+    },
+    modelProduct: {
+      type: Object,
+      required: false,
+    },
+    status: {
+      type: Boolean,
+      required: true,
+    },
+    customer: {
+      type: Array,
+      required: true,
+    },
+    country: {
+      type: Array,
+      required: true,
+    },
+    customerModel: {
+      type: Object,
+      required: true,
+    },
+    id: {
+      type: Number,
+      required: false,
+    },
+  },
+  data() {
+    return {
+      selectedCountry: null,
+      filteredCountry: null,
+      selectedProductsList: null,
+      offerDate: null,
+      selectedSource: null,
+      sources: [
+        { id: 1, source: "Portföy" },
+        { id: 2, source: "Site" },
+        { id: 3, source: "Stone Contact" },
+        { id: 4, source: "Fuar" },
+        { id: 5, source: "Email" },
+        { id: 6, source: "BGP Network" },
+        { id: 7, source: "Ziyaret" },
+        { id: 8, source: "Stone Add" },
+      ],
+      selectedOfferType: null,
+      offerTypes: [
+        { id: 1, type: "Mail" },
+        { id: 2, type: "WhatsApp" },
+        { id: 3, type: "Mail-Efes" },
+      ],
+      offerProductDate: null,
+      selectedCategory: null,
+      selectedProduct: null,
+      selectedSize: null,
+      selectedThickness: null,
+      selectedSurface: null,
+      selectedUnit: null,
+      filteredCategoryList: null,
+      filteredProductList: null,
+      filteredSizeList: null,
+      filteredThicknessList: null,
+      filteredSurfaceList: null,
+      filteredUnitList: null,
+      selectedPriority: null,
+      priorities: [
+        { id: 1, priority: "A" },
+        { id: 2, priority: "B" },
+        { id: 3, priority: "C" },
+        { id: 4, priority: "Toplantı" },
+      ],
+      selectedCustomer: null,
+      filteredCustomer: null,
+    };
+  },
+  created() {
+    if (!this.status) {
+      this.createdProcess();
+    }
+  },
+  methods: {
+    deleteProcess() {
+      this.$emit("offer_delete_emit", this.model.Id);
+    },
+    customerInput(event) {
+      this.customerModel.MusteriAdi = event;
+    },
+    process() {
+      this.customerModel.Kullanici = Cookies.get("userId");
+      this.model.KullaniciId = Cookies.get("userId");
+      this.model.TakipEt = true;
+      this.model.Tarih = date.dateToString(this.offerDate);
+      const data = { offer: this.model, customer: this.customerModel };
+      this.$emit("offer_process_emit", data);
+    },
+    countrySelected(event) {
+      this.customerModel.UlkeId = event.value.Id;
+    },
+    customerSelected(event) {
+      this.selectedCountry = this.country.find((x) => x.Id == event.value.UlkeId);
+      this.model.MusteriId = event.value.Id;
+      this.customerModel.Id = event.value.Id;
+      this.customerModel.UlkeId = event.value.UlkeId;
+      this.customerModel.MusteriAdi = event.value.MusteriAdi;
+      this.customerModel.Company = event.value.Company;
+      this.customerModel.Mail = event.value.Mail;
+      this.customerModel.Phone = event.value.Phone;
+      this.customerModel.Adress = event.value.Adress;
+      this.customerModel.Description = event.value.Description;
+    },
+    searchCountry(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.country;
+      } else {
+        results = this.country.filter((x) => {
+          return x.UlkeAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredCountry = results;
+    },
+    searchCustomer(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.customer;
+      } else {
+        results = this.customer.filter((x) => {
+          return x.MusteriAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredCustomer = results;
+    },
+    offerDateSelected(event) {
+      this.model.Tarih = date.dateToString(event);
+    },
+    prioritySelected(event) {
+      this.model.TeklifOncelik = event.value.priority;
+    },
+    offerTypeSelected(event) {
+      this.model.TeklifYeri = event.value.type;
+    },
+    sourceSelected(event) {
+      this.model.KaynakYeri = event.value.source;
+    },
+    createdProcess() {
+      this.selectedSource = this.sources.find((x) => x.source == this.model.KaynakYeri);
+      this.selectedOfferType = this.offerTypes.find(
+        (x) => x.type == this.model.TeklifYeri
+      );
+      this.selectedPriority = this.priorities.find(
+        (x) => x.priority == this.model.TeklifOncelik
+      );
+      this.offerDate = date.stringToDate(this.model.Tarih);
+      this.selectedCustomer = this.customer.find((x) => x.Id == this.model.MusteriId);
+      this.selectedCountry = this.country.find(
+        (x) => x.Id == this.selectedCustomer.UlkeId
+      );
+
+      this.customerModel.Id = this.selectedCustomer.Id;
+      this.customerModel.MusteriAdi = this.selectedCustomer.MusteriAdi;
+      this.customerModel.UlkeId = this.selectedCustomer.UlkeId;
+      this.customerModel.Company = this.selectedCustomer.Company;
+      this.customerModel.Mail = this.selectedCustomer.Mail;
+      this.customerModel.Phone = this.selectedCustomer.Phone;
+      this.customerModel.Adress = this.selectedCustomer.Adress;
+      this.customerModel.Description = this.selectedCustomer.Description;
+    },
+    productReset() {
+      this.offerProductDate = null;
+      this.selectedCategory = null;
+      this.selectedProduct = null;
+      this.selectedSize = null;
+      this.selectedThickness = null;
+      this.selectedSurface = null;
+      this.selectedUnit = null;
+      this.selectedProductsList = null;
+    },
+    productsListSelected(event) {
+      this.offerProductDate = date.stringToDate(event.data.Tarih);
+      this.selectedCategory = this.category.find((x) => x.Id == event.data.KategoriId);
+      this.selectedProduct = this.product.find((x) => x.Id == event.data.UrunId);
+      this.selectedSize = this.size.find((x) => x.id == event.data.EnBoyId);
+      this.selectedThickness = this.thickness.find((x) => x.id == event.data.KalinlikId);
+      this.selectedSurface = this.surface.find((x) => x.Id == event.data.YuzeyIslemId);
+      this.selectedUnit = this.unit.find((x) => x.Birim == event.data.Birim);
+      this.modelProduct = event.data;
+      if (event.data.FobFiyat == null || event.data.FobFiyat == 0) {
+        this.modelProduct.FobFiyat = 0;
+      } else {
+        this.modelProduct.FobFiyat = event.data.FobFiyat;
+      }
+      if (event.data.FcaFiyat == null || event.data.FcaFiyat == 0) {
+        this.modelProduct.FcaFiyat = 0;
+      } else {
+        this.modelProduct.FcaFiyat = event.data.FcaFiyat;
+      }
+      if (event.data.CFiyat == null || event.data.CFiyat == 0) {
+        this.modelProduct.CFiyat = 0;
+      } else {
+        this.modelProduct.CFiyat = event.data.CFiyat;
+      }
+      if (event.data.DFiyat == null || event.data.DFiyat == 0) {
+        this.modelProduct.DFiyat = 0;
+      } else {
+        this.modelProduct.DFiyat = event.data.DFiyat;
+      }
+    },
+    offerProductDateSelected(event) {
+      this.modelProduct.Tarih = date.dateToString(event);
+    },
+    deleteProduct() {
+      this.$store.dispatch("setOfferDetailProductsDelete", this.modelProduct.Id);
+      this.productReset();
+    },
+    updateProduct() {
+      this.$store.dispatch("setOfferDetailProductsUpdate", this.modelProduct);
+      this.productReset();
+    },
+    addProduct() {
+      this.modelProduct.TeklifId = this.id;
+      this.$store.dispatch("setOfferDetailProductsAdd", this.modelProduct);
+      this.productReset();
+    },
+    formatPoint(value) {
+      if (value == null || value == " ") {
+        return 0;
+      } else {
+        return value.replace(",", ".");
+      }
+    },
+    unitSelected(event) {
+      this.modelProduct.Birim = event.value.Birim;
+    },
+    surfaceListSelected(event) {
+      this.modelProduct.YuzeyIslemId = event.value.Id;
+      this.modelProduct.IslemAdi = event.value.IslemAdi;
+    },
+    thicknessListSelected(event) {
+      this.modelProduct.KalinlikId = event.value.id;
+      this.modelProduct.Kalinlik = event.value.Kalinlik;
+    },
+    sizeListSelected(event) {
+      this.modelProduct.EnBoyId = event.value.id;
+      this.modelProduct.EnBoy = event.value.EnBoy;
+    },
+    productListSelected(event) {
+      this.modelProduct.UrunId = event.value.Id;
+      this.modelProduct.UrunAdi = event.value.UrunAdi;
+    },
+    categoryListSelected(event) {
+      this.modelProduct.KategoriId = event.value.Id;
+      this.modelProduct.KategoriAdi = event.value.KategoriAdi;
+    },
+    searchSurface(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.surface;
+      } else {
+        results = this.surface.filter((x) => {
+          return x.IslemAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredSurfaceList = results;
+    },
+    searchThickness(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.thickness;
+      } else {
+        results = this.thickness.filter((x) => {
+          return x.Kalinlik.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredThicknessList = results;
+    },
+    searchSize(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.size;
+      } else {
+        results = this.size.filter((x) => {
+          return x.EnBoy.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredSizeList = results;
+    },
+    searchProduct(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.product;
+      } else {
+        results = this.product.filter((x) => {
+          return x.UrunAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredProductList = results;
+    },
+    searchCategory(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.category;
+      } else {
+        results = this.category.filter((x) => {
+          return x.KategoriAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredCategoryList = results;
+    },
+  },
+};
+</script>

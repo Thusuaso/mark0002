@@ -1,0 +1,101 @@
+<template>
+  <div>
+    <div class="container row">
+      <div class="col">
+        <Calendar
+          v-model="selectedDates"
+          selectionMode="range"
+          :manualInput="false"
+          placeholder="Tarih Aralığı Seçiniz"
+          class="w-100"
+        />
+      </div>
+      <div class="col">
+        <Button
+          type="button"
+          class="p-button-secondary w-100"
+          label="Temizle"
+          @click="selectedDates = null"
+        />
+      </div>
+
+      <div class="col">
+        <Button
+          type="button"
+          class="p-button-success w-100"
+          label="Ara"
+          @click="searchDateList"
+        />
+      </div>
+      <div class="col">
+        <JsonExcel
+          class="w-100"
+          :data="getReportsMekmerProductionList"
+          :fields="reportsMekmerProductionListExcelFields"
+          worksheet="Production"
+          name="Production.xls"
+        >
+          <Button
+            type="button"
+            class="p-button-info w-100"
+            icon="pi pi-file-excel"
+            label="Excel"
+          />
+        </JsonExcel>
+      </div>
+    </div>
+    <reportsMekmerProductionList
+      :list="getReportsMekmerProductionList"
+      :total="getReportsMekmerProductionListTotal"
+      :loading="getLoading"
+    />
+  </div>
+</template>
+<script>
+import { mapGetters } from "vuex";
+export default {
+  computed: {
+    ...mapGetters([
+      "getReportsMekmerProductionList",
+      "getReportsMekmerProductionListTotal",
+      "getLoading",
+    ]),
+  },
+  data() {
+    return {
+      selectedDates: null,
+      reportsMekmerProductionListExcelFields: {
+        Tarih: "Tarih",
+        "Firma Adı": "FirmaAdi",
+        "Kategori Adı": "KategoriAdi",
+        "Kasa No": "KasaNo",
+        Urun: "UrunAdi",
+        "Ocak Adı": "OcakAdi",
+        Yüzey: "YuzeyIslemAdi",
+        En: "En",
+
+        Boy: "Boy",
+        "Miktar Sayısı": "Miktar",
+        Adet: "Adet",
+        "Birim Adı": "BirimAdi",
+        Po: "SiparisAciklama",
+        Aciklama: "Aciklama",
+      },
+    };
+  },
+  created() {
+    this.$store.dispatch("setReportsMekmerProductionList");
+  },
+  methods: {
+    searchDateList() {
+      const date1 = this.selectedDates[0];
+      const date2 = this.selectedDates[1];
+      const payload = {
+        date1: date1,
+        date2: date2,
+      };
+      this.$store.dispatch("setReportsMekmerProductionDate", payload);
+    },
+  },
+};
+</script>

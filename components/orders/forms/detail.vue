@@ -1,0 +1,473 @@
+<template>
+  <div class="row mt-3">
+    <div class="col-10">
+      <TabView>
+        <TabPanel header="Sipariş">
+          <orderDetailOrderForm
+            :model="modelProduct"
+            :products="productsList"
+            :supplier="supplier"
+            :unit="unit"
+            :po="po"
+            :detailProductTotal="detailProductTotal"
+            @workerman_selected_emit="$emit('workerman_selected_emit', $event)"
+          />
+        </TabPanel>
+        <TabPanel header="Proforma">
+          <orderDetailProformaForm
+            :model="modelProduction"
+            :delivery="delivery"
+            :payment="payment"
+            :status="status"
+            :country="country"
+            :invoice="invoice"
+            :po="po"
+          />
+        </TabPanel>
+        <TabPanel header="Masraf">
+          <orderDetailCostForm :cost="cost" :total="costTotal" />
+        </TabPanel>
+        <TabPanel header="Tedarikçi">
+          <orderDetailSupplierForm
+            :modelProduction="modelProduction"
+            :productSupplier="productSupplier"
+            :invoice="invoice"
+            :supplierDelivery="supplierDelivery"
+            :po="po"
+            :supplierProduct="supplierProduct"
+          />
+        </TabPanel>
+        <TabPanel header="Evraklar">
+          <orderDetailDocumentForm :list="document" />
+        </TabPanel>
+        <TabPanel header="Çeki">
+          <orderDetailCheckForm :list="check" :total="checkTotal" />
+        </TabPanel>
+      </TabView>
+    </div>
+    <div class="col-2">
+      <Button
+        type="button"
+        class="p-button-success w-100 mb-3"
+        label="Kaydet"
+        @click="$emit('process')"
+      />
+      <Button
+        type="button"
+        class="p-button-danger w-100 mb-4"
+        label="Çık"
+        @click="$emit('close_production_form_emit')"
+      />
+      <span class="p-float-label mb-4">
+        <InputText
+          id="po"
+          v-model="modelProduction.SiparisNo"
+          class="w-100"
+          :disabled="!status"
+        />
+        <label for="po">Po</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <Calendar
+          v-model="order_date"
+          inputId="order_date"
+          class="w-100"
+          @date-select="orderDateSelected($event)"
+          :disabled="!status"
+        />
+        <label for="order_date">Sipariş Tarihi</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <Calendar
+          v-model="guess_loading_date"
+          inputId="guess_loading_date"
+          class="w-100"
+          @date-select="guessLoadingDateSelected($event)"
+          :disabled="!status"
+        />
+        <label for="guess_loading_date">Tahmini Yükleme Tarihi</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <AutoComplete
+          v-model="selectedCustomer"
+          inputId="customer"
+          :suggestions="filteredCustomer"
+          @complete="searchCustomer($event)"
+          field="FirmaAdi"
+          @item-select="customerSelected($event)"
+        />
+        <label for="customer">Müşteri</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <AutoComplete
+          v-model="selectedOrderer"
+          inputId="user"
+          :suggestions="filteredOrderer"
+          @complete="searchOrderer($event)"
+          field="KullaniciAdi"
+          @item-select="ordererSelected($event)"
+        />
+        <label for="user">Satışçı</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <AutoComplete
+          v-model="selectedOperation"
+          inputId="operation"
+          :suggestions="filteredOperation"
+          @complete="searchOperation($event)"
+          field="KullaniciAdi"
+          @item-select="operationSelected($event)"
+        />
+        <label for="operation">Operasyon</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <AutoComplete
+          v-model="selectedFinanceman"
+          inputId="financeman"
+          :suggestions="filteredFinanceman"
+          @complete="searchFinanceman($event)"
+          field="KullaniciAdi"
+          @item-select="financemanSelected($event)"
+        />
+        <label for="financeman">Finansman</label>
+      </span>
+      <CustomInput
+        :value="modelProduction.Pesinat"
+        text="Peşinat"
+        @onInput="modelProduction.Pesinat = $event"
+        :disabled="true"
+      />
+      <table class="table mb-4">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Toplam</th>
+            <td>{{ productCalculation | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Navlun</th>
+            <td>{{ freightCalculation | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Detay</th>
+            <td>{{ detailCalculation | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">G.Toplam</th>
+            <td>
+              {{
+                (productCalculation + freightCalculation + detailCalculation)
+                  | formatPriceUsd
+              }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <span class="p-float-label mb-4">
+        <Calendar v-model="load_date" inputId="load_date" class="w-100" disabled />
+        <label for="load_date">Yükleme Tarihi</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <Calendar v-model="eta_date" inputId="eta_date" class="w-100" disabled />
+        <label for="eta_date">Eta Tarihi</label>
+      </span>
+      <span class="p-float-label mb-4">
+        <InputText
+          id="container"
+          v-model="modelProduction.KonteynerNo"
+          class="w-100"
+          disabled
+        />
+        <label for="container">Konteyner No</label>
+      </span>
+      <table class="table mb-4">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Üretici</th>
+            <td>{{ detailProductCost.supplier | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">İşçilik</th>
+            <td>{{ detailProductCost.workerman | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Navlun A.</th>
+            <td>{{ detailProductCost.freight | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Diğer A.</th>
+            <td>
+              {{ detailProductCost.detail | formatPriceUsd }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Komisyon</th>
+            <td>{{ detailProductCost.brokerage | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Fob</th>
+            <td>{{ detailProductCost.fob | formatPriceUsd }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Genel</th>
+            <td>
+              {{
+                (detailProductCost.supplier +
+                  detailProductCost.workerman +
+                  detailProductCost.freight +
+                  detailProductCost.detail +
+                  detailProductCost.brokerage +
+                  detailProductCost.fob)
+                  | formatPriceUsd
+              }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Profit</th>
+            <td>
+              {{
+                (productCalculation +
+                  freightCalculation +
+                  detailCalculation -
+                  (detailProductCost.supplier +
+                    detailProductCost.workerman +
+                    detailProductCost.freight +
+                    detailProductCost.detail +
+                    detailProductCost.brokerage +
+                    detailProductCost.fob))
+                  | formatPriceUsd
+              }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+<script>
+import date from "../../../plugins/date";
+export default {
+  props: {
+    modelProduction: {
+      type: Object,
+      required: true,
+    },
+    modelProduct: {
+      type: Object,
+      required: true,
+    },
+    status: {
+      type: Boolean,
+      required: true,
+    },
+    customer: {
+      type: Array,
+      required: true,
+    },
+    user: {
+      type: Array,
+      required: true,
+    },
+    productsList: {
+      type: Array,
+      required: false,
+    },
+    supplier: {
+      type: Array,
+      required: false,
+    },
+    unit: {
+      type: Array,
+      required: false,
+    },
+    po: {
+      type: String,
+      required: false,
+    },
+    delivery: {
+      type: Array,
+      required: true,
+    },
+    payment: {
+      type: Array,
+      required: true,
+    },
+    country: {
+      type: Array,
+      required: true,
+    },
+    invoice: {
+      type: Array,
+      required: true,
+    },
+    cost: {
+      type: Array,
+      required: false,
+    },
+    costTotal: {
+      type: Number,
+      required: false,
+    },
+    supplierDelivery: {
+      type: Array,
+      required: true,
+    },
+    productSupplier: {
+      type: Array,
+      required: true,
+    },
+    supplierProduct: {
+      type: Array,
+      required: false,
+    },
+    document: {
+      type: Array,
+      required: false,
+    },
+    check: {
+      type: Array,
+      required: false,
+    },
+    checkTotal: {
+      type: Object,
+      required: false,
+    },
+    productCalculation: {
+      type: Number,
+      required: false,
+    },
+    freightCalculation: {
+      type: Number,
+      required: false,
+    },
+    detailCalculation: {
+      type: Number,
+      required: false,
+    },
+    detailProductTotal: {
+      type: Object,
+      required: false,
+    },
+    detailProductCost: {
+      type: Object,
+      required: false,
+    },
+  },
+  data() {
+    return {
+      guess_loading_date: null,
+      order_date: null,
+      filteredCustomer: null,
+      selectedCustomer: null,
+      selectedOrderer: null,
+      filteredOrderer: null,
+      selectedOperation: null,
+      filteredOperation: null,
+      selectedFinanceman: null,
+      filteredFinanceman: null,
+      load_date: null,
+      eta_date: null,
+    };
+  },
+  created() {
+    if (!this.status) {
+      this.createdProcess();
+    }
+  },
+  methods: {
+    guessLoadingDateSelected(event) {
+      this.modelProduction.SiparisTarihi = date.dateToString(event);
+    },
+    orderDateSelected(event) {
+      this.modelProduction.TahminiYuklemeTarihi = date.dateToString(event);
+    },
+    financemanSelected(event) {
+      this.modelProduction.Finansman = event.value.ID;
+    },
+    searchFinanceman(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.user;
+      } else {
+        results = this.user.filter((x) => {
+          return x.KullaniciAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredFinanceman = results;
+    },
+    operationSelected(event) {
+      this.modelProduction.Operasyon = event.value.ID;
+    },
+    searchOperation(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.user;
+      } else {
+        results = this.user.filter((x) => {
+          return x.KullaniciAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredOperation = results;
+    },
+    searchOrderer(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.user;
+      } else {
+        results = this.user.filter((x) => {
+          return x.KullaniciAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredOrderer = results;
+    },
+    ordererSelected(event) {
+      this.modelProduction.SiparisSahibi = event.value.ID;
+    },
+    customerSelected(event) {
+      this.modelProduction.MusteriID = event.value.ID;
+    },
+    searchCustomer(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.customer;
+      } else {
+        results = this.customer.filter((x) => {
+          return x.FirmaAdi.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+      this.filteredCustomer = results;
+    },
+    createdProcess() {
+      this.guess_loading_date = date.stringToDate(
+        this.modelProduction.TahminiYuklemeTarihi
+      );
+      this.order_date = date.stringToDate(this.modelProduction.SiparisTarihi);
+      this.selectedCustomer = this.customer.find(
+        (x) => x.ID == this.modelProduction.MusteriID
+      );
+      this.selectedOrderer = this.user.find(
+        (x) => x.ID == this.modelProduction.SiparisSahibi
+      );
+      this.selectedOperation = this.user.find(
+        (x) => x.ID == this.modelProduction.Operasyon
+      );
+      this.selectedFinanceman = this.user.find(
+        (x) => x.ID == this.modelProduction.Finansman
+      );
+      this.load_date = date.stringToDate(this.modelProduction.YuklemeTarihi);
+      this.eta_date = date.stringToDate(this.modelProduction.Eta);
+    },
+  },
+  watch: {},
+};
+</script>
