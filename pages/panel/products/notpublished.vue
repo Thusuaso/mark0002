@@ -96,7 +96,7 @@ export default {
       "getPanelProductStyleModel",
       "getPanelProductMaterialModel",
       "getPanelProductSuggestedList",
-      "getLoading"
+      "getLoading",
     ]),
   },
   data() {
@@ -126,7 +126,6 @@ export default {
     },
     update(event) {
       this.$store.dispatch("setPanelProductsUpdate", event);
-      this.panel_form_dialog = false;
     },
     process(event) {
       if (this.getPanelProductButtonStatus) {

@@ -15,6 +15,8 @@
       filterDisplay="row"
       :filters.sync="filtersOrders"
       v-if="status == 'Shipped'"
+      @page="onPage($event)"
+      @sort="onSort($event)"
     >
       <Column header="#" headerStyle="width:3rem">
         <template #body="slotProps">
@@ -286,6 +288,19 @@
         </template>
       </Column>
       <Column field="UrunFirmaAdi" header="Tedarikçi" :showFilterMenu="false">
+        <template #body="slotProps">
+          <div
+            v-if="
+              slotProps.data.FaturaKesimTurID == 1 || slotProps.data.FaturaKesimTurID == 5
+            "
+            :style="{ color: slotProps.data.Isf > 0 ? 'black' : 'red' }"
+          >
+            {{ slotProps.data.UrunFirmaAdi }}
+          </div>
+          <div v-else>
+            {{ slotProps.data.UrunFirmaAdi }}
+          </div>
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -311,7 +326,7 @@
           </div>
           <div
             v-else-if="slotProps.data.Uretim > slotProps.data.Miktar"
-            style="background-color: red; color: white"
+            style="background-color: black; color: white"
           >
             {{ slotProps.data.Uretim | formatDecimal }}
           </div>
@@ -321,6 +336,7 @@
           >
             {{ slotProps.data.Uretim | formatDecimal }}
           </div>
+
           <div v-else>
             {{ slotProps.data.Uretim | formatDecimal }}
           </div>

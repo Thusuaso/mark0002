@@ -162,6 +162,11 @@ export default {
           username: Cookies.get("username"),
           userId: Cookies.get("userId"),
           date: date.dateToString(new Date()),
+          supplier: this.selectedSupplier.TedarikciID,
+          deliveryDate: date.dateToString(this.supplier_date),
+          m4: this.m4,
+          m5: this.m5,
+          productionDate: date.dateToString(this.modelProduction.SiparisTarihi),
         };
         this.$store.dispatch("setProductionProductSupplierIsfSave", value);
       });

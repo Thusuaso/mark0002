@@ -24,22 +24,30 @@
             </div>
           </div>
         </div>
-        <div class="row mb-3">
-          <div class="col">
+        <div class="row mb-3 m-auto">
+          <div class="col-6">
             <span class="p-float-label">
-              <Textarea v-model="model.aciklama_en" rows="5" class="w-100" />
+              <Textarea v-model="model.aciklama_en" rows="10" class="w-100" />
+
               <label>Açıklama</label>
             </span>
           </div>
-          <div class="col">
+          <!-- <div class="col">
             <span class="p-float-label">
-              <Textarea v-model="model.anahtarlar_en" rows="5" class="w-100" />
+              <Chips v-model="keywords_en" />
+              {{ keywords_en }}
+
+              <Textarea v-model="model.anahtarlar_en" rows="7" cols="50" />
               <label>Anahtarlar</label>
             </span>
-          </div>
-          <div class="col">
+          </div> -->
+          <div class="col-6">
+            <span class="p-float-label mb-4">
+              <Chips v-model="anahtarlar_en" class="w-100" />
+              <label>Anahtarlar</label>
+            </span>
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_en" rows="5" class="w-100" />
+              <Textarea v-model="model.keywords_en" rows="7" class="w-100" />
               <label>Başlık Etiketleri</label>
             </span>
           </div>
@@ -116,19 +124,18 @@
         <div class="row mb-3">
           <div class="col">
             <span class="p-float-label">
-              <Textarea v-model="model.aciklama_fr" rows="5" class="w-100" />
+              <Textarea v-model="model.aciklama_fr" rows="10" class="w-100" />
               <label>Açıklama</label>
             </span>
           </div>
+
           <div class="col">
-            <span class="p-float-label">
-              <Textarea v-model="model.anahtarlar_fr" rows="5" class="w-100" />
+            <span class="p-float-label mb-4">
+              <Chips v-model="anahtarlar_fr" class="w-100" />
               <label>Anahtarlar</label>
             </span>
-          </div>
-          <div class="col">
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_fr" rows="5" class="w-100" />
+              <Textarea v-model="model.keywords_fr" rows="7" class="w-100" />
               <label>Başlık Etiketleri</label>
             </span>
           </div>
@@ -171,19 +178,18 @@
         <div class="row mb-3">
           <div class="col">
             <span class="p-float-label">
-              <Textarea v-model="model.aciklama_es" rows="5" class="w-100" />
+              <Textarea v-model="model.aciklama_es" rows="10" class="w-100" />
               <label>Açıklama</label>
             </span>
           </div>
+
           <div class="col">
-            <span class="p-float-label">
-              <Textarea v-model="model.anahtarlar_es" rows="5" class="w-100" />
+            <span class="p-float-label mb-4">
+              <Chips v-model="anahtarlar_es" class="w-100" />
               <label>Anahtarlar</label>
             </span>
-          </div>
-          <div class="col">
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_es" rows="5" class="w-100" />
+              <Textarea v-model="model.keywords_es" rows="7" class="w-100" />
               <label>Başlık Etiketleri</label>
             </span>
           </div>
@@ -226,19 +232,18 @@
         <div class="row mb-3">
           <div class="col">
             <span class="p-float-label">
-              <Textarea v-model="model.aciklama_ru" rows="5" class="w-100" />
+              <Textarea v-model="model.aciklama_ru" rows="10" class="w-100" />
               <label>Açıklama</label>
             </span>
           </div>
+
           <div class="col">
-            <span class="p-float-label">
-              <Textarea v-model="model.anahtarlar_ru" rows="5" class="w-100" />
+            <span class="p-float-label mb-4">
+              <Chips v-model="anahtarlar_ru" class="w-100" />
               <label>Anahtarlar</label>
             </span>
-          </div>
-          <div class="col">
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_ru" rows="5" class="w-100" />
+              <Textarea v-model="model.keywords_ru" rows="7" class="w-100" />
               <label>Başlık Etiketleri</label>
             </span>
           </div>
@@ -823,6 +828,11 @@ export default {
   },
   data() {
     return {
+      anahtarlar_en: [],
+      anahtarlar_fr: [],
+      anahtarlar_es: [],
+      anahtarlar_ru: [],
+
       selectedCategory: null,
       selectedStoneType: null,
       selectedSize: null,
@@ -1088,11 +1098,52 @@ export default {
     createdProcess() {
       this.selectedCategory = this.category.find((x) => x.Id == this.model.kategori_id);
       this.selectedStoneType = this.category.find((x) => x.Id == this.model.stonetype);
+      if (this.model.anahtarlar_en) {
+        this.model.anahtarlar_en.split(",").forEach((x) => {
+          this.anahtarlar_en.push(x);
+        });
+      }
+      if (this.model.anahtarlar_fr) {
+        this.model.anahtarlar_fr.split(",").forEach((x) => {
+          this.anahtarlar_fr.push(x);
+        });
+      }
+      if (this.model.anahtarlar_es) {
+        this.model.anahtarlar_es.split(",").forEach((x) => {
+          this.anahtarlar_es.push(x);
+        });
+      }
+      if (this.model.anahtarlar_ru) {
+        this.model.anahtarlar_ru.split(",").forEach((x) => {
+          this.anahtarlar_ru.push(x);
+        });
+      }
     },
     deleteForm() {
       this.$emit("delete_emit", this.model.urunid);
     },
     process() {
+      if (this.anahtarlar_en) {
+        this.model.anahtarlar_en = this.anahtarlar_en.join(",");
+      } else {
+        this.model.anahtarlar_en = "";
+      }
+      if (this.anahtarlar_fr) {
+        this.model.anahtarlar_fr = this.anahtarlar_fr.join(",");
+      } else {
+        this.model.anahtarlar_fr = "";
+      }
+      if (this.anahtarlar_es) {
+        this.model.anahtarlar_es = this.anahtarlar_es.join(",");
+      } else {
+        this.model.anahtarlar_es = "";
+      }
+      if (this.anahtarlar_ru) {
+        this.model.anahtarlar_ru = this.anahtarlar_ru.join(",");
+      } else {
+        this.model.anahtarlar_ru = "";
+      }
+
       if (this.status) {
         this.productSaveButtonDisabled = true;
       }

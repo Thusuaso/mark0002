@@ -10,6 +10,8 @@
             :unit="unit"
             :po="po"
             :detailProductTotal="detailProductTotal"
+            :status="status"
+            :saveButtonStatus="saveButtonStatus"
             @workerman_selected_emit="$emit('workerman_selected_emit', $event)"
           />
         </TabPanel>
@@ -22,6 +24,7 @@
             :country="country"
             :invoice="invoice"
             :po="po"
+            :saveButtonStatus="saveButtonStatus"
           />
         </TabPanel>
         <TabPanel header="Masraf">
@@ -51,6 +54,7 @@
         class="p-button-success w-100 mb-3"
         label="Kaydet"
         @click="$emit('process')"
+        :disabled="saveButtonStatus"
       />
       <Button
         type="button"
@@ -362,6 +366,10 @@ export default {
       type: Object,
       required: false,
     },
+    saveButtonStatus: {
+      type: Object,
+      required: false,
+    },
   },
   data() {
     return {
@@ -407,6 +415,7 @@ export default {
     },
     operationSelected(event) {
       this.modelProduction.Operasyon = event.value.ID;
+      this.modelProduction.operationMail = event.value.MailAdres;
     },
     searchOperation(event) {
       let results;
@@ -432,6 +441,8 @@ export default {
     },
     ordererSelected(event) {
       this.modelProduction.SiparisSahibi = event.value.ID;
+
+      this.modelProduction.representativeMail = event.value.MailAdres;
     },
     customerSelected(event) {
       this.modelProduction.MusteriID = event.value.ID;

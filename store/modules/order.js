@@ -42,6 +42,7 @@ const state = {
     orderProductionProductDetailFobCostTotal: 0,
     orderProductionProductDetailWorkermanList: [],
     orderProductionYearsList:[],
+    orderProductionSaveButtonStatus:false
     
 
 
@@ -60,7 +61,7 @@ const actions = {
                 } 
             });
     },
-        setOrderProductionListYear(vuexContext, year) {
+    setOrderProductionListYear(vuexContext, year) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/order/production/list/year/${year}`)
             .then(response => {
@@ -84,7 +85,7 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                 };
             });
     },
-        setOrderShippedListYear(vuexContext, year) {
+    setOrderShippedListYear(vuexContext, year) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/order/shipped/list/year/${year}`)
             .then(response => {
@@ -182,6 +183,7 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
             .then(response => {
                 if (response.data.status) {
                     this.$toast.success('Başarıyla Yüklendi');
+                    vuexContext.dispatch('setOrderProductionDocumentList',payload.po);
                 } else {
                     this.$toast.error('Yükleme Başarısız');
                 }
@@ -341,6 +343,7 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
             });
     },
     setProductionProductSaveMail(vuexContext, production) {
+        console.log(production);
         this.$axios.post('/order/production/product/save/mail', production)
             .then(response => {
                 if(response.data.status){
@@ -355,6 +358,9 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
     setProductionProductMailReset(vuexContext) {
         vuexContext.commit('setProductionProductMailReset');
     },
+    setOrderProductionSaveButtonStatus(vuexContext,status){
+        vuexContext.commit('setOrderProductionSaveButtonStatus',status)
+    }
 
 
 
@@ -633,6 +639,9 @@ const mutations = {
     },
     setOrderProductionYearsList(state,payload) {
         state.orderProductionYearsList = payload;
+    },
+    setOrderProductionSaveButtonStatus(state,payload){
+        state.orderProductionSaveButtonStatus = payload;
     }
 
 
@@ -710,6 +719,9 @@ const getters = {
     },
     getOrderListAll(state) {
         return state.orderListAll;
+    },
+    getOrderProductionSaveButtonStatus(state){
+        return state.orderProductionSaveButtonStatus;
     }
 
 };

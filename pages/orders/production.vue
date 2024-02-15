@@ -110,6 +110,7 @@
         :detailCalculation="getOrderProductionDetailTotal"
         :detailProductTotal="getOrderProductionProductDetailTotal"
         :detailProductCost="getOrderProductionProductDetailCostTotal"
+        :saveButtonStatus="getOrderProductionSaveButtonStatus"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
         "
@@ -172,6 +173,7 @@ export default {
       "getOrderProductDeleted",
       "getLoading",
       "getOrderProductionYearsList",
+      "getOrderProductionSaveButtonStatus",
     ]),
   },
   data() {
@@ -242,6 +244,8 @@ export default {
         added: this.getOrderProductAdded,
         updated: this.getOrderProductUpdated,
         deleted: this.getOrderProductDeleted,
+        operation: this.productionModel.operationMail,
+        representative: this.productionModel.representativeMail,
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
@@ -262,6 +266,7 @@ export default {
       this.$store.dispatch("setOrderProductionUpdate", this.productionModel);
     },
     save() {
+      this.$store.dispatch("setOrderProductionSaveButtonStatus", true);
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");
       this.$store.dispatch("setOrderProductionSave", this.productionModel);
@@ -294,7 +299,7 @@ export default {
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
-
+      this.$store.dispatch("setOrderProductionSaveButtonStatus", false);
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
       this.production_detail_form = true;

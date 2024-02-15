@@ -363,6 +363,8 @@ const state = {
         MalBedeli: 0,
         sigorta_tutar_satis: 0,
         Vade: '',
+        operationMail:'',
+        representativeMail:''
     },
     orderProductModel: {
         ID: 0,
@@ -833,6 +835,8 @@ const actions = {
             MalBedeli: 0,
             sigorta_tutar_satis: 0,
             Vade: '',
+            operationMail:'',
+            representativeMail:''
         };
         vuexContext.commit('setOrderProductionModel',orderProductionModel)
     },

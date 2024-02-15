@@ -35,6 +35,11 @@
           :editingRows.sync="edditingProjectPhotoName"
           @row-edit-save="projectPhotoNameEditing($event)"
         >
+          <Column field="ImageLink" header="Image">
+            <template #body="slotProps">
+              <img :src="slotProps.data.ImageLink" style="width: 100px; height: 100px" />
+            </template>
+          </Column>
           <Column field="ID" header="Id">
             <template #body="slotProps">
               {{ slotProps.data.ID }}
@@ -219,6 +224,9 @@ export default {
     this.$store.dispatch("setPanelProjectList");
   },
   methods: {
+    projectChangeNameMouseOver() {
+      console.log("projectChangeNameMouseOver");
+    },
     saveProject() {
       this.project_save_button_disabled = true;
       this.$store.dispatch("setPanelProjectSave", this.getPanelProductProjectModel);

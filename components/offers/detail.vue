@@ -7,8 +7,8 @@
       :selection.sync="selectedOfferDetailListForm"
       selectionMode="single"
       @row-click="$emit('offer_detail_list_form_selected_emit', $event.data)"
-      sortField="TeklifOncelik"
-      :sortOrder="1"
+      :sortField="['TeklifOncelik', 'Sira']"
+      sortOrder="-1"
       :rowClass="offerClass"
       :loading="loading"
     >

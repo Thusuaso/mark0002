@@ -430,7 +430,7 @@ app.put('/sales/bgp/detail/update',(req,res)=>{
 
 /*Sales Todos */
 app.get('/sales/todos/list',(req,res)=>{
-    const sql = 'select y.ID,y.Yapilacak,y.Yapildi,y.GirisTarihi,y.YapildiTarihi,y.YapilacakOncelik,y.Acil,y.Sira,y.OrtakGorev from Yapilacaklar y where y.Yapildi=0';
+    const sql = 'select y.ID,y.Yapilacak,y.Yapildi,y.GirisTarihi,y.YapildiTarihi,y.YapilacakOncelik,y.Acil,y.Sira,y.OrtakGorev from Yapilacaklar y where y.Yapildi=0 order by y.GirisTarihi' ;
     mssql.query(sql,(err,todo)=>{
         const listA = todo.recordset.filter(todo=>todo.YapilacakOncelik == 'A' || todo.YapilacakOncelik == 'B');
         const listMail = todo.recordset.filter(todo=>todo.YapilacakOncelik == 'C');
@@ -4566,14 +4566,17 @@ where YEAR(n.NumuneTarihi) = ${req.params.year} and n.MusteriID= ${req.params.cu
 /*Offer */
 app.get('/offer/main/list', (req, res) => {
     const offerByRepresentativeSql = `
-            select
-            (select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as TeklifSahibi,
-            count(yt.Id) as TeklifSayisi,
-            yt.KullaniciId
-            from YeniTeklifTB yt
-            where yt.TakipEt=1
-            group by yt.KullaniciId
-            order by count(yt.Id) desc
+    select
+	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as TeklifSahibi,
+	count(yt.Id) as TeklifSayisi,
+	dbo.Offers_A_List_Total(yt.KullaniciId) as TeklifSayisiB,
+	dbo.Offers_B_List_Total(yt.KullaniciId) as TeklifSayisiA,
+	yt.KullaniciId
+			
+from YeniTeklifTB yt
+where yt.TakipEt=1
+group by yt.KullaniciId
+order by count(yt.Id) desc
     `;
     mssql.query(offerByRepresentativeSql, (err, offerByRepresentative) => {
         const offerByCountrySql = `
@@ -5362,6 +5365,10 @@ from MekmarCom_Products mp
 where mp.kategori_id = ${req.params.id} and mp.yayinla = 0
 order by urunid desc
         `;
+
+        const test = "lorem ${}"
+
+
         mssql.query(publishedSql, (err, published) => {
             res.status(200).json({
                 'list': published.recordset,
@@ -6826,6 +6833,8 @@ s.DetayAciklama_4,
 s.sigorta_Tutar,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
 s.SiparisSahibi,
 s.Operasyon,
 s.Finansman,
@@ -6864,7 +6873,8 @@ s.KonteynerNo,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim
+    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+    dbo.Production_Isf_Document_Control3(su.SiparisNo,su.TedarikciID) as Isf
 
 
 from SiparisUrunTB su
@@ -6963,6 +6973,8 @@ s.DetayAciklama_4,
 s.sigorta_Tutar,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
 s.SiparisSahibi,
 s.Operasyon,
 s.Finansman,
@@ -7001,7 +7013,8 @@ s.KonteynerNo,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim
+    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+    dbo.Production_Isf_Document_Control3(su.SiparisNo,su.TedarikciID) as Isf
 
 
 from SiparisUrunTB su
@@ -7090,6 +7103,8 @@ s.DetayAciklama_4,
 s.sigorta_Tutar,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
 s.SiparisSahibi,
 s.Operasyon,
 s.Finansman,
@@ -7129,7 +7144,6 @@ s.KonteynerNo,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum
 
-
 from SiparisUrunTB su
 inner join SiparislerTB s on s.SiparisNo = su.SiparisNo
 inner join TedarikciTB t on t.ID = su.TedarikciID
@@ -7158,7 +7172,6 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
     mssql.query(ordersListSql, (err, orders) => {
- 
                mssql.query(orderYearListSql, (err, years) => {
             let customYearList = [{ 'Yil': 'Hepsi' }];
             years.recordset.forEach(x => {
@@ -7227,6 +7240,8 @@ s.DetayAciklama_4,
 s.sigorta_Tutar,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
 s.SiparisSahibi,
 s.Operasyon,
 s.Finansman,
@@ -7354,6 +7369,8 @@ s.DetayAciklama_4,
 s.sigorta_Tutar,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
 s.SiparisSahibi,
 s.Operasyon,
 s.Finansman,
@@ -7392,7 +7409,8 @@ s.KonteynerNo,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim
+    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+    dbo.Production_Isf_Document_Control3(su.SiparisNo,su.TedarikciID) as Isf
 
 
 from SiparisUrunTB su
@@ -7493,6 +7511,8 @@ s.DetayAciklama_4,
 s.sigorta_Tutar,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
 (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
 s.SiparisSahibi,
 s.Operasyon,
 s.Finansman,
@@ -7531,7 +7551,8 @@ s.KonteynerNo,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim
+    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+    dbo.Production_Isf_Document_Control3(su.SiparisNo,su.TedarikciID) as Isf
 
 
 from SiparisUrunTB su
@@ -7900,9 +7921,32 @@ app.post('/order/production/supplier/isf/save', (req, res) => {
                      values
                     ('${req.body.date}','0','0', '${req.body.po}','0','3','${isfDocId}','2','${req.body.date}','${req.body.doc}','${req.body.userId}','1')
     `;
+    const productSupplierSql = `
+    insert into SiparisUrunTedarikciFormTB (
+        SiparisNo,
+        TedarikciID,
+        TedarikciSiparisFaturaTurID,
+        TedarikciTeslimTurID,
+        SiparisTarihi,
+        TeslimTarihi,
+        Madde4,
+        Madde5
+    )
+    VALUES(
+    '${req.body.po}',
+    '${req.body.supplier}',
+    '${1}',
+    '${1}',
+    '${req.body.productionDate}',
+    '${req.body.deliveryDate}',
+    '${req.body.m4}',
+    '${req.body.m5}')
+    `
+
 
     mssql.query(sql, (err, isf) => {
         if(isf.rowsAffected[0] == 1){
+            mssql.query(productSupplierSql);
             res.status(200).json({ 'status': true });
 
         } else {
@@ -8522,13 +8566,28 @@ function addedSendMail(payload) {
             </tr>`
         });
         content = content + '</table>';
-        
-        transporter.sendMail({
-            to: 'bilgiislem@mekmar.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
+        // if(payload.operation == payload.representative){
+        //     transporter.sendMail({
+        //         to: payload.representative,
+        //         from: 'gozmek@mekmar.com',
+        //         subject: 'Yeni Sipariş Girişi',
+        //         html: content
+        //     });
+        // } else{
+        //     transporter.sendMail({
+        //         to: payload.operation,
+        //         from: 'gozmek@mekmar.com',
+        //         subject: 'Yeni Sipariş Girişi',
+        //         html: content
+        //     });
+        //     transporter.sendMail({
+        //         to: payload.representative,
+        //         from: 'gozmek@mekmar.com',
+        //         subject: 'Yeni Sipariş Girişi',
+        //         html: content
+        //     });
+        // }
+
         // transporter.sendMail({
         //     to: 'export1@mekmar.com',
         //     from: 'gozmek@mekmar.com',
@@ -8547,6 +8606,44 @@ function addedSendMail(payload) {
         //     subject: 'Yeni Sipariş Girişi',
         //     html: content
         // });
+        transporter.sendMail({
+            to: 'bilgiislem@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+
+
+        transporter.sendMail({
+            to: 'export@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'export1@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'export2@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'mehmet@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'huseyin@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
         resolve(true);
     });
 
@@ -8579,12 +8676,27 @@ function deletedSendMail(payload) {
         });
         content = content + '</table>';
         
-        transporter.sendMail({
-            to: 'bilgiislem@mekmar.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Sipariş Kalemi Silme',
-            html: content
-        });
+        if(payload.operation == payload.representative){
+            transporter.sendMail({
+                to: payload.representative,
+                from: 'gozmek@mekmar.com',
+                subject: 'Sipariş Ürün Silme',
+                html: content
+            });
+        } else{
+            transporter.sendMail({
+                to: payload.operation,
+                from: 'gozmek@mekmar.com',
+                subject: 'Sipariş Ürün Silme',
+                html: content
+            });
+            transporter.sendMail({
+                to: payload.representative,
+                from: 'gozmek@mekmar.com',
+                subject: 'Sipariş Ürün Silme',
+                html: content
+            });
+        }
         resolve(true);
     });
 
@@ -8616,12 +8728,27 @@ function updatedSendMail(payload) {
         });
         content = content + '</table>';
         
-        transporter.sendMail({
-            to: 'bilgiislem@mekmar.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Sipariş Kalemi Güncelleme',
-            html: content
-        });
+        if(payload.operation == payload.representative){
+            transporter.sendMail({
+                to: payload.representative,
+                from: 'gozmek@mekmar.com',
+                subject: 'Sipariş Ürün Güncelleme',
+                html: content
+            });
+        } else{
+            transporter.sendMail({
+                to: payload.operation,
+                from: 'gozmek@mekmar.com',
+                subject: 'Sipariş Ürün Güncelleme',
+                html: content
+            });
+            transporter.sendMail({
+                to: payload.representative,
+                from: 'gozmek@mekmar.com',
+                subject: 'Sipariş Ürün Güncelleme',
+                html: content
+            });
+        }
         resolve(true);
 
     });
@@ -8670,7 +8797,7 @@ app.get('/country',(req,res)=>{
     });
 });
 app.get('/users',(req,res)=>{
-    const sql = 'select ID,KullaniciAdi,MailAdres from KullaniciTB'
+    const sql = 'select ID,KullaniciAdi,MailAdres,YSifre from KullaniciTB where Aktif=1'
     mssql.query(sql,(err,users)=>{
        res.status(200).json({
            'users':users.recordset,

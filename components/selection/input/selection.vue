@@ -166,7 +166,7 @@
       <vue-excel-xlsx
         :data="getProductList"
         :columns="excelColumnsField"
-        :file-name="'filename'"
+        :file-name="'Seleksiyon'"
         :file-type="'xlsx'"
         :sheet-name="'sheetname'"
         style="border: none; background-color: white"
@@ -359,7 +359,6 @@ export default {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      console.log(year, month, day);
     },
     newForm() {
       this.$store.dispatch("setSelectionProductionButtonStatus", true);

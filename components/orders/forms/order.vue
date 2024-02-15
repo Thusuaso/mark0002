@@ -218,6 +218,8 @@
       :selection.sync="selectedOrderProducts"
       selectionMode="single"
       @row-click="orderProductsSelected($event)"
+      :sortField="'SiraNo'"
+      sortOrder="1"
     >
       <Column field="SiraNo" header="#"></Column>
       <Column field="FirmaAdi" header="Kimden"></Column>
@@ -320,6 +322,10 @@ export default {
       type: Object,
       required: false,
     },
+    status: {
+      type: Boolean,
+      required: false,
+    },
   },
   data() {
     return {
@@ -420,6 +426,7 @@ export default {
       this.cancel_button_disabled = false;
       this.add_button_disabled = false;
       this.product_form_disabled = false;
+      this.model.SiraNo = this.products.length + 1;
     },
     orderProductsSelected(event) {
       this.product_form_disabled = false;

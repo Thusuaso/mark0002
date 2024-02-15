@@ -22,7 +22,7 @@
             type="button"
             class="p-button-info"
             label="Yapıldı"
-            @click="$emit('todo_done_emit',slotProps.data)"
+            @click="$emit('todo_done_emit', slotProps.data)"
           />
         </template>
       </Column>

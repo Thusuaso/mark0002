@@ -1,10 +1,14 @@
 <template>
   <div class="container m-auto w-50 mt-5">
-    <authForm @onSubmit="onSubmit($event)" />
+    <authForm @onSubmit="onSubmit($event)" :users="getUserList" />
   </div>
 </template>
 <script>
+import { mapGetters } from "vuex";
 export default {
+  computed: {
+    ...mapGetters(["getUserList"]),
+  },
   methods: {
     onSubmit(user) {
       this.$store.dispatch("login", user);

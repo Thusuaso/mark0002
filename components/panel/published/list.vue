@@ -12,6 +12,8 @@
       selectionMode="single"
       @row-click="panelPublishedListSelected($event.data)"
       :loading="loading"
+      sortField="sira"
+      sortOrder="1"
     >
       <Column field="sira" header="Sıra" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">

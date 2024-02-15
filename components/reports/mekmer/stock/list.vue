@@ -6,16 +6,15 @@
       scrollHeight="650px"
       :filters.sync="filters1"
       filterDisplay="row"
-      resizableColumns
-      columnResizeMode="fit"
-      showGridlines
       @filter="reportsMekmerStockFilter($event)"
       :selection="selectedReportsMekmerStockList"
       selectionMode="single"
       @row-click="$emit('reports_mekmer_stock_list_selected_emit', $event)"
       :loading="loading"
+      class="p-datatable-sm"
+      style="font-size: 90%"
     >
-      <Column field="En" header="En" :showFilterMenu="false">
+      <Column field="En" header="En" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -25,7 +24,7 @@
           />
         </template>
       </Column>
-      <Column field="Boy" header="Boy" :showFilterMenu="false">
+      <Column field="Boy" header="Boy" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -35,7 +34,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar" :showFilterMenu="false">
+      <Column field="Kenar" header="Kenar" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -45,7 +44,7 @@
           />
         </template>
       </Column>
-      <Column field="KategoriAdi" header="Kategori" :showFilterMenu="false">
+      <Column field="KategoriAdi" header="Kategori" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -55,7 +54,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -65,7 +64,12 @@
           />
         </template>
       </Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey" :showFilterMenu="false">
+      <Column field="YuzeyIslemAdi" header="Yüzey" :showFilterMenu="false" sortable>
+        <template #body="slotProps">
+          <div style="word-break: break-word">
+            {{ slotProps.data.YuzeyIslemAdi }}
+          </div>
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

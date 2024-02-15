@@ -138,6 +138,7 @@
           customUpload
           @select="uploadInvoiceDocument($event)"
           chooseLabel="Proforma Yükle"
+          :disabled="!saveButtonStatus"
         />
       </div>
     </div>
@@ -375,6 +376,10 @@ export default {
     },
     po: {
       type: String,
+      required: false,
+    },
+    saveButtonStatus: {
+      type: Boolean,
       required: false,
     },
   },

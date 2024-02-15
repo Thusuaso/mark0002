@@ -227,6 +227,7 @@ import PickList from 'primevue/picklist';
 import OverlayPanel from 'primevue/overlaypanel';
 import BadgeDirective from 'primevue/badgedirective';
 import Sidebar from 'primevue/sidebar';
+import Chips from 'primevue/chips';
 
 
 
@@ -252,6 +253,8 @@ Vue.component('Card', Card);
 Vue.component('PickList', PickList);
 Vue.component('OverlayPanel', OverlayPanel);
 Vue.component('Sidebar', Sidebar);
+Vue.component('Chips', Chips);
+
 
 Vue.directive('badge', BadgeDirective);
 

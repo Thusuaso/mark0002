@@ -10,6 +10,8 @@
       >
         <Column field="TeklifSahibi" header="Teklif Sahibi"></Column>
         <Column field="TeklifSayisi" header="Teklif Sayısı"></Column>
+        <Column field="TeklifSayisiA" header="Teklif Sayısı A"></Column>
+        <Column field="TeklifSayisiB" header="Teklif Sayısı B"></Column>
       </DataTable>
     </div>
     <div class="col">
