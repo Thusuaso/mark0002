@@ -8,6 +8,9 @@
   "CardsList": {
     "description": "Auto imported from components/cards/list.vue"
   },
+  "Home": {
+    "description": "Auto imported from components/home/home.vue"
+  },
   "OffersDetail": {
     "description": "Auto imported from components/offers/detail.vue"
   },
@@ -16,9 +19,6 @@
   },
   "OffersList": {
     "description": "Auto imported from components/offers/list.vue"
-  },
-  "Home": {
-    "description": "Auto imported from components/home/home.vue"
   },
   "PanelForm": {
     "description": "Auto imported from components/panel/form.vue"
