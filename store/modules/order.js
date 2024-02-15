@@ -219,6 +219,9 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                 .then(response => {
                     if (response.data.status) {
                         this.$toast.success('Başarıyla Kaydedildi.');
+                        vuexContext.dispatch('setOrderProductionList');
+                        vuexContext.dispatch('setOrderProductionDocumentList', payload.po);
+
                     } else {
                         this.$toast.error('Kaydetme Başarısız.');
                     };
