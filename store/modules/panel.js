@@ -112,8 +112,8 @@ const actions = {
     setPanelProductId(vuexContext, id) {
         vuexContext.commit('setPanelProductId', id);
     },
-    setPanelProductFiltersList(vuexContext, productId) {
-        this.$axios.get(`/panel/product/filtered/list/${productId}`)
+    setPanelProductFiltersList(vuexContext, data) {
+        this.$axios.post(`/panel/product/filtered/list`,data)
             .then(response => {
                         vuexContext.commit('setPanelProductFiltersList',response.data);
             });
@@ -648,6 +648,23 @@ const actions = {
 
             }
         });
+    },
+    setPanelProjectSuggestedReset(vuexContext){
+        vuexContext.commit('setPanelProjectSuggestedReset');
+    },
+    setPanelProductsSizeListUpdate(vuexContext,sizes){
+        vuexContext.commit('setPanelProductsSizeListUpdate',sizes);
+    },
+    setpanelProductsSizeChangeQueue(vuexContext,sizes){
+        this.$axios.post('/panel/products/size/change/queue',sizes)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success("Ürün Ölçü Sırası Başarıyla Değiştirildi.");
+            } else{
+                this.$toast.success("Ürün Ölçü Sırası Değiştirme Başarısız.");
+            
+            }
+        });
     }
 
 
@@ -763,6 +780,10 @@ const mutations = {
         state.panelProjectVideo = payload.video;
     
     },
+    setPanelProjectSuggestedReset(state){
+        state.panelProjectSuggested = [[],[]];
+
+    },
     setPanelProjectButtonStatus(state, payload) {
         state.panelProjectButtonStatus = payload;
     },
@@ -783,6 +804,9 @@ const mutations = {
     },
     setPanelUsaStockButtonStatus(state,payload){
         state.panelUsaStockButtonStatus = payload;
+    },
+    setPanelProductsSizeListUpdate(state,payload){
+        state.panelProductSizeList = payload;
     }
 
 
@@ -865,7 +889,8 @@ const getters = {
     },
     getPanelUsaStockButtonStatus(state){
         return state.panelUsaStockButtonStatus
-    }
+    },
+
 
 };
 export default {

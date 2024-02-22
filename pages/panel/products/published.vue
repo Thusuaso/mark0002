@@ -121,7 +121,11 @@ export default {
   methods: {
     panelPublishedListSelected(event) {
       this.$store.dispatch("setPanelProductId", event.urunid);
-      this.$store.dispatch("setPanelProductFiltersList", event.urunid);
+      const data = {
+        productId: event.urunid,
+        categoryId: this.selectedCategory.Id,
+      };
+      this.$store.dispatch("setPanelProductFiltersList", data);
       this.$store.dispatch("setPanelProductButtonStatus", false);
       this.model = event;
       this.panel_form_dialog = true;
@@ -133,6 +137,7 @@ export default {
     __stringCharacterChange(event) {
       const data = event.split("'");
       let value = "";
+
       data.forEach((x) => {
         value += x + "''";
       });
@@ -140,27 +145,27 @@ export default {
       return value2;
     },
     save(event) {
-      event.aciklama_fr = this.__stringCharacterChange(event.aciklama_fr);
-      event.anahtarlar_fr = this.__stringCharacterChange(event.anahtarlar_fr);
-      event.keywords_fr = this.__stringCharacterChange(event.keywords_fr);
-      event.aciklama_en = this.__stringCharacterChange(event.aciklama_en);
-      event.anahtarlar_en = this.__stringCharacterChange(event.anahtarlar_en);
-      event.keywords_en = this.__stringCharacterChange(event.keywords_en);
-      event.aciklama_es = this.__stringCharacterChange(event.aciklama_es);
-      event.anahtarlar_es = this.__stringCharacterChange(event.anahtarlar_es);
-      event.keywords_es = this.__stringCharacterChange(event.keywords_es);
+      event.aciklama_fr2 = this.__stringCharacterChange(event.aciklama_fr);
+      event.anahtarlar_fr2 = this.__stringCharacterChange(event.anahtarlar_fr);
+      event.keywords_fr2 = this.__stringCharacterChange(event.keywords_fr);
+      event.aciklama_en2 = this.__stringCharacterChange(event.aciklama_en);
+      event.anahtarlar_en2 = this.__stringCharacterChange(event.anahtarlar_en);
+      event.keywords_en2 = this.__stringCharacterChange(event.keywords_en);
+      event.aciklama_es2 = this.__stringCharacterChange(event.aciklama_es);
+      event.anahtarlar_es2 = this.__stringCharacterChange(event.anahtarlar_es);
+      event.keywords_es2 = this.__stringCharacterChange(event.keywords_es);
       this.$store.dispatch("setPanelProductsSave", event);
     },
     update(event) {
-      event.aciklama_fr = this.__stringCharacterChange(event.aciklama_fr);
-      event.anahtarlar_fr = this.__stringCharacterChange(event.anahtarlar_fr);
-      event.keywords_fr = this.__stringCharacterChange(event.keywords_fr);
-      event.aciklama_en = this.__stringCharacterChange(event.aciklama_en);
-      event.anahtarlar_en = this.__stringCharacterChange(event.anahtarlar_en);
-      event.keywords_en = this.__stringCharacterChange(event.keywords_en);
-      event.aciklama_es = this.__stringCharacterChange(event.aciklama_es);
-      event.anahtarlar_es = this.__stringCharacterChange(event.anahtarlar_es);
-      event.keywords_es = this.__stringCharacterChange(event.keywords_es);
+      event.aciklama_fr2 = this.__stringCharacterChange(event.aciklama_fr);
+      event.anahtarlar_fr2 = this.__stringCharacterChange(event.anahtarlar_fr);
+      event.keywords_fr2 = this.__stringCharacterChange(event.keywords_fr);
+      event.aciklama_en2 = this.__stringCharacterChange(event.aciklama_en);
+      event.anahtarlar_en2 = this.__stringCharacterChange(event.anahtarlar_en);
+      event.keywords_en2 = this.__stringCharacterChange(event.keywords_en);
+      event.aciklama_es2 = this.__stringCharacterChange(event.aciklama_es);
+      event.anahtarlar_es2 = this.__stringCharacterChange(event.anahtarlar_es);
+      event.keywords_es2 = this.__stringCharacterChange(event.keywords_es);
 
       this.$store.dispatch("setPanelProductsUpdate", event);
     },
@@ -176,6 +181,8 @@ export default {
       this.$store.dispatch("setPanelProductModel");
       this.$store.dispatch("setPanelProductId", 0);
       this.$store.commit("setPanelProductPhotoListUpdate", []);
+      this.$store.dispatch("setPanelProjectSuggestedReset");
+
       this.model = this.getPanelProductModel;
       this.panel_form_dialog = true;
     },

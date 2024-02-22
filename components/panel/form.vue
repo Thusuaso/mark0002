@@ -296,13 +296,31 @@
           <div class="col">
             <Button type="button" class="p-button-success" label="Add" @click="addSize" />
           </div>
+          <div class="col">
+            <Button
+              type="button"
+              class="p-button-primary"
+              label="Change Queue"
+              @click="changeSizeQueue"
+            />
+          </div>
         </div>
         <DataTable
           :value="sizeList"
           editMode="row"
           :editingRows.sync="edditingSize"
           @row-edit-save="sizeEdditing($event)"
+          :reorderableColumns="true"
+          @row-reorder="onRowReorder"
         >
+          <Column
+            :rowReorder="true"
+            :headerStyle="{ width: '3rem' }"
+            :reorderableColumn="false"
+          />
+
+          <Column field="sira" header="#" />
+
           <Column field="ebat" header="Size">
             <template #editor="slotProps">
               <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
@@ -931,6 +949,23 @@ export default {
     }
   },
   methods: {
+    changeSizeQueue() {
+      this.$store.dispatch("setpanelProductsSizeChangeQueue", this.sizeList);
+    },
+    onRowReorder(event) {
+      let data = event.value;
+      let index = 1;
+      data.forEach((x) => {
+        x.sira = index;
+        index++;
+      });
+      const values = {
+        first: "",
+        end: "",
+      };
+      this.$store.dispatch("setPanelProductsSizeListUpdate", data);
+    },
+
     panelProductTestReportUpload(event) {
       oceanservice.panelProductSendTestReport(event.files[0]).then((response) => {
         if (response) {
@@ -968,7 +1003,7 @@ export default {
     },
     moveToTargetSuggested(event) {
       if (confirm("Eklemek istiyor musunuz?")) {
-        if (this.suggestedList[1].length == 4) {
+        if (this.suggestedList[1].length > 4) {
           alert("Zaten 4 adet eklenmiş.");
           return;
         } else {

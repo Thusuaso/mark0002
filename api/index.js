@@ -5696,22 +5696,22 @@ app.post('/panel/product/save', (req, res) => {
                     '${id}',
                     '${req.body.kategori_id}',
                     '${req.body.urunadi_en}',
-                    '${req.body.aciklama_en}',
-                    '${req.body.anahtarlar_en}',
+                    '${req.body.aciklama_en2}',
+                    '${req.body.anahtarlar_en2}',
                     '${req.body.urunadi_fr}',
-                    '${req.body.aciklama_fr}',
-                    '${req.body.anahtarlar_fr}',
+                    '${req.body.aciklama_fr2}',
+                    '${req.body.anahtarlar_fr2}',
                     '${req.body.urunadi_es}',
-                    '${req.body.aciklama_es}',
-                    '${req.body.anahtarlar_es}',
+                    '${req.body.aciklama_es2}',
+                    '${req.body.anahtarlar_es2}',
                     '${req.body.yayinla}',
                     '${req.body.birim}',
                     '${req.body.urunkod}',
                     '${queueId}',
                     '${req.body.stonetype}',
-                    '${req.body.keywords_en}',
-                    '${req.body.keywords_fr}',
-                    '${req.body.keywords_es}',
+                    '${req.body.keywords_en2}',
+                    '${req.body.keywords_fr2}',
+                    '${req.body.keywords_es2}',
                     '${req.body.keywords_ru}',
                     '${req.body.urunadi_ru}',
                     '${req.body.aciklama_ru}',
@@ -5744,21 +5744,21 @@ app.put('/panel/product/update', (req, res) => {
             SET
                 kategori_id='${req.body.kategori_id}',
                 urunadi_en='${req.body.urunadi_en}',
-                aciklama_en='${req.body.aciklama_en}',
-                anahtarlar_en='${req.body.anahtarlar_en}',
+                aciklama_en='${req.body.aciklama_en2}',
+                anahtarlar_en='${req.body.anahtarlar_en2}',
                 urunadi_fr='${req.body.urunadi_fr}',
-                aciklama_fr='${req.body.aciklama_fr}',
-                anahtarlar_fr='${req.body.anahtarlar_fr}',
+                aciklama_fr='${req.body.aciklama_fr2}',
+                anahtarlar_fr='${req.body.anahtarlar_fr2}',
                 urunadi_es='${req.body.urunadi_es}',
-                aciklama_es='${req.body.aciklama_es}',
-                anahtarlar_es='${req.body.anahtarlar_es}',
+                aciklama_es='${req.body.aciklama_es2}',
+                anahtarlar_es='${req.body.anahtarlar_es2}',
                 yayinla='${req.body.yayinla}',
                 birim='${req.body.birim}',
                 urunkod='${req.body.urunkod}',
                 stonetype=${req.body.stonetype},
-                keywords_en='${req.body.keywords_en}',
-                keywords_fr='${req.body.keywords_fr}',
-                keywords_es='${req.body.keywords_es}',
+                keywords_en='${req.body.keywords_en2}',
+                keywords_fr='${req.body.keywords_fr2}',
+                keywords_es='${req.body.keywords_es2}',
                 urunadi_ru=N'${req.body.urunadi_ru}',
                 aciklama_ru=N'${req.body.aciklama_ru}',
                 keywords_ru=N'${req.body.keywords_ru}'
@@ -5806,9 +5806,10 @@ app.delete('/panel/product/delete/:productId', (req, res) => {
 
 
 });
-app.get('/panel/product/filtered/list/:productId', (req, res) => {
-    const productId = req.params.productId;
-    const sizeListSql = `select Id,urunid,ebat,birim,fiyat,sira from MekmarCom_Ebatlar where urunid='${productId}'`;
+app.post('/panel/product/filtered/list', (req, res) => {
+    const productId = req.body.productId;
+    const categoryId = req.body.categoryId;
+    const sizeListSql = `select Id,urunid,ebat,birim,fiyat,sira from MekmarCom_Ebatlar where urunid='${productId}' order by sira`;
     const finishListSql = `select Id,urunid,finish_en,finish_fr,finish_es,finish_ru from MekmarCom_Finish where urunid='${productId}'`;
     const colorListSql = `
         select mur.ID,mur.RenkId,mur.UrunId,mpc.renk_en,mpc.renk_fr,mpc.renk_es,mpc.renk_ru 
@@ -5850,14 +5851,14 @@ where UrunId=${productId}
         select Id,urunid,name,uzanti,imagePath,macPath,sira from MekmarCom_Fotolar where urunid = '${productId}' order by sira
     `;
      const suggestedAllListSql = `
-                    select 
-                mp.urunid as onerilenurunid,
-                mp.urunadi_en,
-                (select top 1 mf.macPath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid order by sira desc) as Image,
-                mp.sira
-            from MekmarCom_Products mp
-            where mp.urunid not in (select mou.onerilenurunid from MekmarCom_OnerilenUrunler mou where mou.urunid = '${productId}') and
-            mp.yayinla = 1
+            select 
+            mp.urunid as onerilenurunid,
+            mp.urunadi_en,
+            (select top 1 mf.macPath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid order by sira) as Image,
+            mp.sira
+        from MekmarCom_Products mp
+        where mp.urunid not in (select mou.onerilenurunid from MekmarCom_OnerilenUrunler mou where mou.urunid = '${productId}') and
+        mp.yayinla = 1 and mp.kategori_id='${categoryId}'
     `;
     const suggestedListSql = `
         select 
@@ -6149,6 +6150,22 @@ app.delete('/panel/product/edge/delete/:id', (req, res) => {
            res.status(200).json({ 'status': false });
     }
     });
+});
+app.post('/panel/products/size/change/queue',(req,res)=>{
+    req.body.forEach(x=>{
+        const sql = `update MekmarCom_Ebatlar SET sira='${x.sira}' where Id = '${x.Id}'`;
+        mssql.query(sql,(err,sizes)=>{
+           if(sizes.rowsAffected[0] != 1){
+            res.status(200).json({'status':false});
+                return;
+            }
+
+        });
+    });
+
+
+    res.status(200).json({'status':true});
+
 });
 
 
