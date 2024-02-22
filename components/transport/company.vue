@@ -4,7 +4,7 @@
             <div class="col">
                 <span class="p-float-label">
                     <InputText id="company" v-model="companyData.companyname" />
-                    <label for="company">Firma</label>
+                    <label for="company">Company</label>
                 </span>
             </div>
             <div class="col">
@@ -16,24 +16,24 @@
             <div class="col">
                 <span class="p-float-label">
                     <InputText id="phone" v-model="companyData.phone" />
-                    <label for="phone">Telefon</label>
+                    <label for="phone">Phone</label>
                 </span>
             </div>
             <div class="col">
                 <span class="p-float-label">
                     <InputText id="description" v-model="companyData.description" />
-                    <label for="description">Not</label>
+                    <label for="description">Description</label>
                 </span>
             </div>
 
         </div>
-        <Button type="button" class="p-button-success w-100" label="Kaydet" @click="save" />
+        <Button type="button" class="p-button-success w-100" label="Save" @click="save" />
         <DataTable :value="company" paginator :rows="15">
             <Column field="ID" header="Id"></Column>
-            <Column field="FirmaAdi" header="Firma"></Column>
-            <Column field="Telefon" header="Telefon"></Column>
+            <Column field="FirmaAdi" header="Company"></Column>
+            <Column field="Telefon" header="Phone"></Column>
             <Column field="MailAdresi" header="Mail"></Column>
-            <Column field="Notlar" header="Not"></Column>
+            <Column field="Notlar" header="Description"></Column>
         </DataTable>
     </div>
 </template>

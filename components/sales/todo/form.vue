@@ -16,7 +16,7 @@
             field="KullaniciAdi"
             :multiple="true"
           />
-          <label for="users">Görev Sahipleri</label>
+          <label for="users">Todo Owner</label>
         </span>
       </div>
       <div class="col">
@@ -27,14 +27,14 @@
           placeholder="Öncelik"
         />
       </div>
-      <div class="col"><Checkbox v-model="todo.Acil" :binary="true" /> Acil</div>
+      <div class="col"><Checkbox v-model="todo.Acil" :binary="true" /> Urgent</div>
     </div>
     <div class="row">
       <div class="col">
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="saveProcess"
         />
       </div>
@@ -42,7 +42,7 @@
         <Button
           type="button"
           class="p-button-delete w-100"
-          label="Sil"
+          label="Delete"
           @click="deleteForm"
         />
       </div>

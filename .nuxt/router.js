@@ -26,9 +26,12 @@ const _de6face4 = () => interopDefault(import('..\\pages\\orders\\production.vue
 const _32433664 = () => interopDefault(import('..\\pages\\orders\\shipped.vue' /* webpackChunkName: "pages/orders/shipped" */))
 const _6da3de70 = () => interopDefault(import('..\\pages\\orders\\waiting.vue' /* webpackChunkName: "pages/orders/waiting" */))
 const _6b0aa85d = () => interopDefault(import('..\\pages\\panel\\project\\index.vue' /* webpackChunkName: "pages/panel/project/index" */))
+const _5e995db3 = () => interopDefault(import('..\\pages\\panel\\usa\\index.vue' /* webpackChunkName: "pages/panel/usa/index" */))
 const _3e87b5e4 = () => interopDefault(import('..\\pages\\panel\\users\\index.vue' /* webpackChunkName: "pages/panel/users/index" */))
 const _13dc792f = () => interopDefault(import('..\\pages\\sales\\bgp.vue' /* webpackChunkName: "pages/sales/bgp" */))
+const _8cd5b7f6 = () => interopDefault(import('..\\pages\\sales\\consider.vue' /* webpackChunkName: "pages/sales/consider" */))
 const _45579a06 = () => interopDefault(import('..\\pages\\sales\\follow.vue' /* webpackChunkName: "pages/sales/follow" */))
+const _1c1e666a = () => interopDefault(import('..\\pages\\sales\\maintodo.vue' /* webpackChunkName: "pages/sales/maintodo" */))
 const _bc9ff22e = () => interopDefault(import('..\\pages\\sales\\representative.vue' /* webpackChunkName: "pages/sales/representative" */))
 const _4bb2ca12 = () => interopDefault(import('..\\pages\\sales\\todo.vue' /* webpackChunkName: "pages/sales/todo" */))
 const _2f0edda0 = () => interopDefault(import('..\\pages\\sample\\finance.vue' /* webpackChunkName: "pages/sample/finance" */))
@@ -44,6 +47,7 @@ const _88a610d0 = () => interopDefault(import('..\\pages\\reports\\mekmar\\gu.vu
 const _3514d202 = () => interopDefault(import('..\\pages\\reports\\mekmar\\loading.vue' /* webpackChunkName: "pages/reports/mekmar/loading" */))
 const _7545bf70 = () => interopDefault(import('..\\pages\\reports\\mekmar\\mk.vue' /* webpackChunkName: "pages/reports/mekmar/mk" */))
 const _08655928 = () => interopDefault(import('..\\pages\\reports\\mekmar\\summary.vue' /* webpackChunkName: "pages/reports/mekmar/summary" */))
+const _35d2efbd = () => interopDefault(import('..\\pages\\reports\\mekmer\\atlanta.vue' /* webpackChunkName: "pages/reports/mekmer/atlanta" */))
 const _03b6ed79 = () => interopDefault(import('..\\pages\\reports\\mekmer\\mine.vue' /* webpackChunkName: "pages/reports/mekmer/mine" */))
 const _7275545f = () => interopDefault(import('..\\pages\\reports\\mekmer\\production.vue' /* webpackChunkName: "pages/reports/mekmer/production" */))
 const _cfb48f40 = () => interopDefault(import('..\\pages\\reports\\mekmer\\stock.vue' /* webpackChunkName: "pages/reports/mekmer/stock" */))
@@ -149,6 +153,10 @@ export const routerOptions = {
     component: _6b0aa85d,
     name: "panel-project"
   }, {
+    path: "/panel/usa",
+    component: _5e995db3,
+    name: "panel-usa"
+  }, {
     path: "/panel/users",
     component: _3e87b5e4,
     name: "panel-users"
@@ -157,9 +165,17 @@ export const routerOptions = {
     component: _13dc792f,
     name: "sales-bgp"
   }, {
+    path: "/sales/consider",
+    component: _8cd5b7f6,
+    name: "sales-consider"
+  }, {
     path: "/sales/follow",
     component: _45579a06,
     name: "sales-follow"
+  }, {
+    path: "/sales/maintodo",
+    component: _1c1e666a,
+    name: "sales-maintodo"
   }, {
     path: "/sales/representative",
     component: _bc9ff22e,
@@ -220,6 +236,10 @@ export const routerOptions = {
     path: "/reports/mekmar/summary",
     component: _08655928,
     name: "reports-mekmar-summary"
+  }, {
+    path: "/reports/mekmer/atlanta",
+    component: _35d2efbd,
+    name: "reports-mekmer-atlanta"
   }, {
     path: "/reports/mekmer/mine",
     component: _03b6ed79,

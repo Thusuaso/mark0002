@@ -18,36 +18,36 @@
     </div>
     <DataTable :value="list">
       <Column field="Sira" header="#"></Column>
-      <Column field="KasaNo" header="Kasa No"></Column>
-      <Column field="TedarikciAdi" header="Tedarikçi"></Column>
-      <Column field="KategoriAdi" header="Kategori"></Column>
-      <Column field="UrunAdi" header="Ürün">
+      <Column field="KasaNo" header="Crate No"></Column>
+      <Column field="TedarikciAdi" header="Supplier"></Column>
+      <Column field="KategoriAdi" header="Category"></Column>
+      <Column field="UrunAdi" header="Product">
         <template #footer>
           {{ total.crate | formatDecimal }}
         </template>
       </Column>
-      <Column field="YuzeyIslem" header="Yüzey"></Column>
-      <Column field="En" header="En">
+      <Column field="YuzeyIslem" header="Surface"></Column>
+      <Column field="En" header="Width">
         <template #body="slotProps">
           {{ slotProps.data.En }}
         </template>
       </Column>
-      <Column field="Boy" header="Boy">
+      <Column field="Boy" header="Height">
         <template #body="slotProps">
           {{ slotProps.data.Boy }}
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar">
+      <Column field="Kenar" header="Edge">
         <template #body="slotProps">
           {{ slotProps.data.Kenar }}
         </template>
       </Column>
-      <Column field="BirimAdi" header="Birim">
+      <Column field="BirimAdi" header="Unit">
         <template #body="slotProps">
           {{ slotProps.data.BirimAdi }}
         </template>
       </Column>
-      <Column field="KutuAdet" header="Kutu">
+      <Column field="KutuAdet" header="Box">
         <template #body="slotProps">
           {{ slotProps.data.KutuAdet | formatDecimal }}
         </template>
@@ -55,7 +55,7 @@
           {{ total.box | formatDecimal }}
         </template>
       </Column>
-      <Column field="Adet" header="Adet">
+      <Column field="Adet" header="Piece">
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
@@ -63,7 +63,7 @@
           {{ total.piece | formatDecimal }}
         </template>
       </Column>
-      <Column field="Miktar" header="Miktar">
+      <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>

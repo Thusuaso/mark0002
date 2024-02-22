@@ -4,31 +4,31 @@
         <div class="col">
             <span class="p-float-label">
                 <AutoComplete id="supplier" v-model="selectedSupplier" :suggestions="filteredSupplierList" @complete="searchSupplier($event)" field="FirmaAdi" />
-                <label for="supplier">Tedarikçi</label>
+                <label for="supplier">Supplier</label>
             </span>
         </div>
         <div class="col">
             <span class="p-float-label">
                 <InputText id="stonesize" type="text" v-model="KasaOlculeri" />
-                <label for="stonesize">Taş Ebat</label>
+                <label for="stonesize">Stone size</label>
             </span>
         </div>
         <div class="col">
             <span class="p-float-label">
                 <InputText id="cratesize" type="text" v-model="Ebat" />
-                <label for="cratesize">Kasa Ebat</label>
+                <label for="cratesize">Crate Size</label>
             </span>
         </div>
         <div class="col">
             <span class="p-float-label">
                 <InputText id="amount" type="text" v-model="Adet" />
-                <label for="amount">Adet</label>
+                <label for="amount">Piece</label>
             </span>
         </div>
         </div>
         <div class="row mt-3">
-            <div class="col"><Button type="button" class="p-button-success w-100" label="Kaydet" @click="saveProcess"/></div>
-            <div class="col"><Button type="button" class="p-button-danger w-100" label="Sil" @click="deleteForm"/></div>
+            <div class="col"><Button type="button" class="p-button-success w-100" label="Save" @click="saveProcess"/></div>
+            <div class="col"><Button type="button" class="p-button-danger w-100" label="Delete" @click="deleteForm"/></div>
 
         </div>
     </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" label="Yeni" @click="newForm" />
+    <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
     <customerBgpList
       :list="getBgpCustomerList"
       @bgp_customer_emit="bgpCustomerSelected($event)"

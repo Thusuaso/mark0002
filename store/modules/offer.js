@@ -132,8 +132,9 @@ const actions = {
         this.$axios.get('/offer/detail/all/list')
             .then(response => {
                 if (response.data.list) {
-                                vuexContext.commit('setOfferMainDetailList', response.data.list); 
-                vuexContext.dispatch('setEndLoadingAction');
+                    vuexContext.commit('setOfferMainDetailList', response.data.list); 
+                    vuexContext.commit('setOfferMainDetailBList',response.data.bList);
+                    vuexContext.dispatch('setEndLoadingAction');
                 }
 
             });

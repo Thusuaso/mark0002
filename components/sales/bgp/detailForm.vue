@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="customer">Firma Adı</label>
+          <label for="customer">Company</label>
           <InputText id="customer" v-model="formData.FirmaAdi" />
         </div>
       </div>
@@ -15,7 +15,7 @@
       </div>
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="phone">Telefon</label>
+          <label for="phone">Phone</label>
           <InputText id="phone" v-model="formData.PhoneNumber" />
         </div>
       </div>
@@ -23,19 +23,19 @@
     <div class="flex flex-wrap gap-3 m-auto">
       <div class="flex align-items-center">
         <RadioButton v-model="ingredient" inputId="ingredient1" value="WrongNumber" />
-        <label for="ingredient1" class="ml-2">Numara Yanlış</label>
+        <label for="ingredient1" class="ml-2">Wrong Number</label>
       </div>
       <div class="flex align-items-center">
         <RadioButton v-model="ingredient" inputId="ingredient2" value="NotResponse" />
-        <label for="ingredient2" class="ml-2">Cevap Yok</label>
+        <label for="ingredient2" class="ml-2">Not Answer</label>
       </div>
       <div class="flex align-items-center">
         <RadioButton v-model="ingredient" inputId="ingredient3" value="Interested" />
-        <label for="ingredient3" class="ml-2">İlgili</label>
+        <label for="ingredient3" class="ml-2">Interested</label>
       </div>
       <div class="flex align-items-center">
         <RadioButton v-model="ingredient" inputId="ingredient4" value="NotInterested" />
-        <label for="ingredient4" class="ml-2">İlgisiz</label>
+        <label for="ingredient4" class="ml-2">Not Interested</label>
       </div>
     </div>
     <div class="flex flex-wrap gap-3 m-auto">
@@ -51,13 +51,13 @@
     <div class="row">
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="title">Başlık</label>
+          <label for="title">Title</label>
           <InputText id="title" v-model="formData.Baslik" />
         </div>
       </div>
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="reminderdate">H.Tarihi</label>
+          <label for="reminderdate">Reminder Date</label>
           <Calendar id="reminderdate" v-model="reminderdate" dateFormat="dd/mm/yy" />
         </div>
       </div>
@@ -66,13 +66,13 @@
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="formData.Aciklama" class="w-100 h-75" rows="5" />
-          <label>Açıklama</label>
+          <label>Description</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="formData.HatirlatmaAciklama" class="w-100 h-75" rows="5" />
-          <label>H.Açıklama</label>
+          <label>Reminder Desc.</label>
         </span>
       </div>
     </div>
@@ -81,7 +81,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="saveProcess"
         />
       </div>
@@ -89,7 +89,7 @@
         <Button
           type="button"
           class="p-button-danger w-100"
-          label="Sil"
+          label="Delete"
           @click="deleteForm"
         />
       </div>

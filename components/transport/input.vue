@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-primary"
-          label="Yeni Firma"
+          label="New Company"
           @click="newCompany"
         />
       </div>
@@ -21,7 +21,7 @@
             @complete="searchCompany($event)"
             :disabled="disabled"
           />
-          <label for="company">Firma</label>
+          <label for="company">Company</label>
         </span>
       </div>
       <div class="col-3">
@@ -32,13 +32,13 @@
             @date-select="transportDateSelected($event)"
             :disabled="disabled"
           />
-          <label for="date">Tarih</label>
+          <label for="date">Date</label>
         </span>
       </div>
       <div class="col-3">
         <span class="p-float-label">
           <InputText id="invoiceno" v-model="invoiceno" :disabled="disabled" />
-          <label for="invoiceno">Fatura No</label>
+          <label for="invoiceno">Invoice No</label>
         </span>
       </div>
     </div>
@@ -53,7 +53,7 @@
             @complete="searchPo($event)"
             :disabled="disabled"
           />
-          <label for="po">Sipariş No</label>
+          <label for="po">Order No</label>
         </span>
       </div>
       <div class="col">
@@ -78,7 +78,7 @@
             :minFractionDigits="3"
             :disabled="disabled"
           />
-          <label for="currencyInput">Kur ($)</label>
+          <label for="currencyInput">Currency ($)</label>
         </span>
       </div>
       <div class="col">
@@ -100,7 +100,7 @@
         <Button
           type="button"
           class="p-button-primary w-100"
-          label="Yeni"
+          label="New"
           @click="newForm"
           :disabled="newButtonDisabled"
         />
@@ -109,7 +109,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="save"
           :disabled="saveButtonDisabled"
         />
@@ -118,7 +118,7 @@
         <Button
           type="button"
           class="p-button-warning w-100"
-          label="Değiştir"
+          label="Update"
           @click="update"
           :disabled="updateButtonDisabled"
         />
@@ -127,7 +127,7 @@
         <Button
           type="button"
           class="p-button-danger w-100"
-          label="Sil"
+          label="Delete"
           @click="deleteForm"
           :disabled="deleteButtonDisabled"
         />
@@ -141,10 +141,10 @@
           selectionMode="single"
           @row-click="transportSelected($event)"
         >
-          <Column field="companyName" header="Firma"></Column>
+          <Column field="companyName" header="Company"></Column>
           <Column field="po" header="Po"></Column>
-          <Column field="invoiceno" header="Fatura No"></Column>
-          <Column field="date" header="Tarih">
+          <Column field="invoiceno" header="Invoice No"></Column>
+          <Column field="date" header="Date">
             <template #body="slotProps">
               {{ slotProps.data.date }}
             </template>
@@ -154,7 +154,7 @@
               {{ slotProps.data.tl | formatPriceTl }}
             </template>
           </Column>
-          <Column field="currency" header="Kur">
+          <Column field="currency" header="Currency">
             <template #body="slotProps">
               {{ slotProps.data.currency | formatPriceUsd }}
             </template>
@@ -172,7 +172,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="saveTransport"
         />
       </div>

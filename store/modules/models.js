@@ -243,6 +243,16 @@ const state = {
 	    MateryalEs:'',
 	    MateryalRu:'',
     },
+    panelProductEdgeModel:{
+        ID:0,
+	    KategoriId:0,
+	    KenarId:0,
+	    UrunId:0,
+	    KenarEn:'',
+	    KenarFr:'',
+	    KenarEs:'',
+	    KenarRu:'',
+    },
     panelProductProjectModel: {
         ID: 0,
         ProjectName: '',
@@ -397,6 +407,10 @@ const state = {
         SiparisEkstraGiderTurID: 0,
         Aciklama: '',
         Tutar:0
+    },
+    salesPointOfConsiderModel:{
+        ID:null,
+        Hata:''
     }
 
 };
@@ -697,6 +711,20 @@ const actions = {
         };
         vuexContext.commit('setPanelProductMaterialModel', panelProductMaterialModel);
     },
+    setPanelProductEdgeModel(vuexContext){
+        const  panelProductEdgeModel ={
+            ID:0,
+            KategoriId:0,
+            KenarId:0,
+            UrunId:0,
+            KenarEn:'',
+            KenarFr:'',
+            KenarEs:'',
+            KenarRu:'',
+        };
+        vuexContext.commit('setPanelProductEdgeModel', panelProductEdgeModel);
+
+    },
     setPanelProjectModel(vuexContext) {
         const panelProductProjectModel = {
             ID: 0,
@@ -877,6 +905,14 @@ const actions = {
         };
 
         vuexContext.commit('setOrderProductWorkermanModel',orderProductWorkermanModel)
+    },
+    setSalesPointsOfConsiderModel(vuexContext){
+        const salesPointOfConsiderModel= {
+            ID:null,
+            Hata:''
+        };
+        vuexContext.commit('setSalesPointsOfConsiderModel',salesPointOfConsiderModel)
+
     }
 
 
@@ -933,6 +969,10 @@ const mutations = {
     setPanelProductMaterialModel(state, payload) {
         state.panelProductMaterialModel = payload;
     },
+    setPanelProductEdgeModel(state,payload){
+        state.panelProductEdgeModel = payload;
+
+    },
     setPanelProjectModel(state, payload) {
         state.panelProductProjectModel = payload;
     },
@@ -959,7 +999,11 @@ const mutations = {
     },
     setOrderProductWorkermanModel(state, payload) {
         state.orderProductWorkermanModel = payload;
+    },
+    setSalesPointsOfConsiderModel(state,payload){
+        state.salesPointOfConsiderModel = payload;
     }
+
 
 
 }
@@ -1015,6 +1059,9 @@ const getters = {
     getPanelProductMaterialModel(state) {
         return state.panelProductMaterialModel;
     },
+    getPanelProductEdgeModel(state) {
+        return state.panelProductEdgeModel;
+    },
     getPanelProductProjectModel(state) {
         return state.panelProductProjectModel;
     },
@@ -1041,6 +1088,9 @@ const getters = {
     },
     getOrderProductWorkermanModel(state) {
         return state.orderProductWorkermanModel;
+    },
+    getSalesPointOfConsiderModel(state){
+        return state.salesPointOfConsiderModel;
     }
 
 };

@@ -64,7 +64,7 @@
           </thead>
           <tbody>
             <tr>
-              <th scope="row">Toplam</th>
+              <th scope="row">Total</th>
               <td>{{ getReportsMekmarAyoListTotal.profitUsd | formatPriceUsd }}</td>
               <td>{{ getReportsMekmarAyoListTotal.profitTl | formatPriceTl }}</td>
             </tr>

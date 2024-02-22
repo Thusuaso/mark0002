@@ -8,7 +8,7 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="EvrakYuklemeTarihi" header="Yükleme Tarihi" :showFilterMenu="false">
+      <Column field="EvrakYuklemeTarihi" header="Upload Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.EvrakYuklemeTarihi | dateToString }}
         </template>
@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="firma" header="Firma" :showFilterMenu="false">
+      <Column field="firma" header="Company" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -41,7 +41,7 @@
           />
         </template>
       </Column>
-      <Column field="FaturaNo" header="Fatura No" :showFilterMenu="false">
+      <Column field="FaturaNo" header="Invoice No" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -51,7 +51,7 @@
           />
         </template>
       </Column>
-      <Column field="Tur" header="Tür" :showFilterMenu="false">
+      <Column field="Tur" header="Kind" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -61,7 +61,7 @@
           />
         </template>
       </Column>
-      <Column field="Kur" header="Kur">
+      <Column field="Kur" header="Currency">
         <template #body="slotProps">
           {{ slotProps.data.Kur | formatPriceTl }}
         </template>
@@ -76,7 +76,7 @@
           {{ (slotProps.data.Tutar * slotProps.data.Kur) | formatPriceTl }}
         </template>
       </Column>
-      <Column field="Aciklama" header="Açıklama"></Column>
+      <Column field="Aciklama" header="Description"></Column>
       <Column field="Link" header="Link">
         <template #body="slotProps">
           <a :href="slotProps.data.Link">

@@ -5,7 +5,7 @@
         <div class="col">
           <span class="p-float-label">
             <InputText id="customer" v-model="po.FirmaAdi" disabled />
-            <label for="customer">Müşteri</label>
+            <label for="customer">Customer</label>
           </span>
         </div>
         <div class="col">
@@ -17,7 +17,7 @@
         <div class="col">
           <span class="p-float-label">
             <InputText id="balance" v-model="po.Balanced" disabled />
-            <label for="balance">Bakiye</label>
+            <label for="balance">Balance</label>
           </span>
         </div>
       </div>
@@ -29,25 +29,25 @@
               inputId="date"
               @date-select="paidDateSelected($event)"
             />
-            <label for="date">Tarih</label>
+            <label for="date">Date</label>
           </span>
         </div>
         <div class="col">
           <span class="p-float-label">
             <InputText id="amount" v-model="model.Tutar" />
-            <label for="amount">Tutar</label>
+            <label for="amount">Paid Amount</label>
           </span>
         </div>
         <div class="col">
           <span class="p-float-label">
             <InputText id="cost" v-model="model.Masraf" />
-            <label for="cost">Masraf</label>
+            <label for="cost">Cost</label>
           </span>
         </div>
         <div class="col">
           <span class="p-float-label">
             <InputText id="currency" v-model="model.Kur" />
-            <label for="currency">Kur</label>
+            <label for="currency">Currency</label>
           </span>
         </div>
       </div>
@@ -55,7 +55,7 @@
         <div class="col">
           <span class="p-float-label">
             <Textarea v-model="model.Aciklama" rows="5" class="w-100" />
-            <label>Açıklama</label>
+            <label>Description</label>
           </span>
         </div>
       </div>
@@ -64,7 +64,7 @@
           <Button
             type="button"
             class="p-button-success w-100"
-            label="Kaydet"
+            label="Save"
             @click="process"
           />
         </div>
@@ -72,7 +72,7 @@
           <Button
             type="button"
             class="p-button-danger w-100"
-            label="Sil"
+            label="Delete"
             @click="deleteForm"
           />
         </div>
@@ -85,17 +85,17 @@
         selectionMode="single"
         @row-click="poPaidListSelected($event)"
       >
-        <Column field="Tarih" header="Tarih">
+        <Column field="Tarih" header="Date">
           <template #body="slotProps">
             {{ slotProps.data.Tarih | dateToString }}
           </template>
         </Column>
-        <Column field="Tutar" header="Tutar">
+        <Column field="Tutar" header="Price">
           <template #body="slotProps">
             {{ slotProps.data.Tutar | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Masraf" header="Masraf">
+        <Column field="Masraf" header="Paid Amount">
           <template #body="slotProps">
             {{ slotProps.data.Masraf | formatPriceUsd }}
           </template>

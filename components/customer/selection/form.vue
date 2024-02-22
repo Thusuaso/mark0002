@@ -4,7 +4,7 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="firstname" v-model="model.FirstName" class="w-100" />
-          <label for="firstname">Müşteri Adı</label>
+          <label for="firstname">Customer</label>
         </span>
       </div>
       <div class="col">
@@ -16,7 +16,7 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="phone" v-model="model.Phone" class="w-100" />
-          <label for="phone">Telefon</label>
+          <label for="phone">Phone</label>
         </span>
       </div>
     </div>
@@ -32,7 +32,7 @@
             class="w-100"
             @item-select="countrySelected($event)"
           />
-          <label for="country">Ülke</label>
+          <label for="country">Country</label>
         </span>
       </div>
       <div class="col-4">
@@ -46,7 +46,7 @@
             class="w-100"
             @item-select="surfaceSelected($event)"
           />
-          <label for="surface">Ürünler</label>
+          <label for="surface">Products</label>
         </span>
       </div>
     </div>
@@ -54,7 +54,7 @@
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="model.Adress" rows="5" cols="30" class="w-100" />
-          <label>Adres</label>
+          <label>Adress</label>
         </span>
       </div>
     </div>
@@ -64,7 +64,7 @@
           type="button"
           class="p-button-success w-100"
           @click="$emit('surface_customer_process_emit', model)"
-          label="Kaydet"
+          label="Save"
         />
       </div>
       <div class="col" v-if="!button">
@@ -72,7 +72,7 @@
           type="button"
           class="p-button-danger w-100"
           @click="$emit('surface_customer_delete_emit', model.ID)"
-          label="Sil"
+          label="Delete"
         />
       </div>
     </div>

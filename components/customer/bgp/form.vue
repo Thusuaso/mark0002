@@ -4,13 +4,13 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="customer" v-model="model.Customer" />
-          <label for="customer">Müşteri</label>
+          <label for="customer">Customer</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="company" v-model="model.Company" />
-          <label for="company">Şirket</label>
+          <label for="company">Company</label>
         </span>
       </div>
       <div class="col">
@@ -31,19 +31,19 @@
             class="w-full md:w-14rem"
             @change="countrySelected($event)"
           />
-          <label for="country">Şehir Seçiniz</label>
+          <label for="country">Select a Country</label>
         </div>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="phone" v-model="model.Phone" />
-          <label for="phone">Telefon</label>
+          <label for="phone">Phone</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="representative" v-model="model.KullaniciAdi" />
-          <label for="representative">Satışçı</label>
+          <label for="representative">Salesman</label>
         </span>
       </div>
     </div>
@@ -51,7 +51,7 @@
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="model.Adress" rows="5" cols="30" class="w-100" />
-          <label>Adres</label>
+          <label>Address</label>
         </span>
       </div>
     </div>
@@ -61,7 +61,7 @@
           type="button"
           class="p-button-success w-100"
           @click="$emit('bgp_customer_process_emit', model)"
-          label="Kaydet"
+          label="Save"
         />
       </div>
       <div class="col" v-if="!button">
@@ -69,7 +69,7 @@
           type="button"
           class="p-button-danger w-100"
           @click="$emit('bgp_customer_delete_emit', model.ID)"
-          label="Sil"
+          label="Delete"
         />
       </div>
     </div>

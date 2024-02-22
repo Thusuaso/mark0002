@@ -1,48 +1,48 @@
 <template>
-    <div>
-        <DataTable 
-            :value="model" 
-            :rowClass="rowClass" 
-            responsiveLayout="scroll"
-            :selection.sync="selectedUpload"
-            selectionMode="single"
-            @row-click="uploadSelected($event)"
-        >
-            <Column field="ID" header="#"></Column>
-            <Column field="EvrakAdi" header="Evrak Adı"></Column>
-        </DataTable>
-    </div>
+  <div>
+    <DataTable
+      :value="model"
+      :rowClass="rowClass"
+      responsiveLayout="scroll"
+      :selection.sync="selectedUpload"
+      selectionMode="single"
+      @row-click="uploadSelected($event)"
+    >
+      <Column field="ID" header="#"></Column>
+      <Column field="EvrakAdi" header="Document Id"></Column>
+    </DataTable>
+  </div>
 </template>
 <script>
 export default {
-    props:{
-        model:{
-            type:Array,
-            required:false
-        }
+  props: {
+    model: {
+      type: Array,
+      required: false,
     },
-    data(){
-      return{
-            selectedUpload:null,
-        }  
+  },
+  data() {
+    return {
+      selectedUpload: null,
+    };
+  },
+  methods: {
+    rowClass(data) {
+      return data.Color === "gray" ? "row-gray" : "row-yellow";
     },
-    methods:{
-        rowClass(data) {
-            return data.Color === 'gray' ? 'row-gray': 'row-yellow';
-        },
-        uploadSelected(event){
-            this.$store.dispatch('setDocumentForm',event.data);
-        }
-    }
-}
+    uploadSelected(event) {
+      this.$store.dispatch("setDocumentForm", event.data);
+    },
+  },
+};
 </script>
 <style scoped>
-:deep(.row-gray){
-    background-color:rgb(180, 180, 180) !important;
-    color:white !important;
+:deep(.row-gray) {
+  background-color: rgb(180, 180, 180) !important;
+  color: white !important;
 }
-:deep(.row-yellow){
-    background-color: rgb(255, 255, 119) !important;
-    color:black !important;
+:deep(.row-yellow) {
+  background-color: rgb(255, 255, 119) !important;
+  color: black !important;
 }
 </style>

@@ -11,7 +11,7 @@
       style="font-size: 70%"
       :loading="loading"
     >
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
+      <Column field="Tarih" header="Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -25,7 +25,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Kime" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="To" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -36,7 +36,7 @@
           />
         </template>
       </Column>
-      <Column field="TedarikciAdi" header="Kimden" :showFilterMenu="false">
+      <Column field="TedarikciAdi" header="From Who" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -47,7 +47,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunKartId" header="Ürün Id" :showFilterMenu="false">
+      <Column field="UrunKartId" header="Product Id" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -58,7 +58,7 @@
           />
         </template>
       </Column>
-      <Column field="KasaNo" header="Kasa" :showFilterMenu="false">
+      <Column field="KasaNo" header="Crate" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -69,7 +69,7 @@
           />
         </template>
       </Column>
-      <Column field="OcakAdi" header="Ocak" :showFilterMenu="false">
+      <Column field="OcakAdi" header="Mine" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -80,7 +80,7 @@
           />
         </template>
       </Column>
-      <Column field="KategoriAdi" header="Kategori" :showFilterMenu="false">
+      <Column field="KategoriAdi" header="Category" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -91,7 +91,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false">
         <template #footer>
           {{ total.crate | formatDecimal }}
         </template>
@@ -105,7 +105,7 @@
           />
         </template>
       </Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey" :showFilterMenu="false">
+      <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -116,7 +116,7 @@
           />
         </template>
       </Column>
-      <Column field="En" header="En" :showFilterMenu="false">
+      <Column field="En" header="Width" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -127,7 +127,7 @@
           />
         </template>
       </Column>
-      <Column field="Boy" header="Boy" :showFilterMenu="false">
+      <Column field="Boy" header="Height" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -138,7 +138,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar" :showFilterMenu="false">
+      <Column field="Kenar" header="Edge" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -149,12 +149,12 @@
           />
         </template>
       </Column>
-      <Column field="KutuAdet" header="Kutu">
+      <Column field="KutuAdet" header="Box">
         <template #footer>
           {{ total.box | formatDecimal }}
         </template>
       </Column>
-      <Column field="Adet" header="Adet">
+      <Column field="Adet" header="Piece">
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
@@ -162,7 +162,7 @@
           {{ total.piece | formatDecimal }}
         </template>
       </Column>
-      <Column field="Miktar" header="Miktar">
+      <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
@@ -170,7 +170,7 @@
           {{ total.amount | formatDecimal }}
         </template>
       </Column>
-      <Column field="BirimAdi" header="Birim"></Column>
+      <Column field="BirimAdi" header="Unit"></Column>
       <Column field="SiparisAciklama" header="Po" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -182,12 +182,12 @@
           />
         </template>
       </Column>
-      <Column field="BirimFiyat" header="Fiyat">
+      <Column field="BirimFiyat" header="Price">
         <template #body="slotProps">
           {{ slotProps.data.BirimFiyat | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Toplam" header="Toplam">
+      <Column field="Toplam" header="Total">
         <template #body="slotProps">
           {{ slotProps.data.Toplam | formatPriceUsd }}
         </template>

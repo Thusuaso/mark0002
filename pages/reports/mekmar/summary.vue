@@ -9,7 +9,7 @@
         :total="getReportsMekmarSummaryOrderListTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, true)"
         :loading="getLoading"
-        :status="'Sipariş'"
+        :status="'Order'"
       />
     </div>
     <div class="row">
@@ -21,7 +21,7 @@
         :total="getReportsMekmarSummaryForwardingListTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, false)"
         :loading="getLoading"
-        :status="'Yükleme'"
+        :status="'Shipment'"
       />
     </div>
     <Dialog :visible.sync="reports_mekmar_summary_list_detail_dialog" header="" modal>

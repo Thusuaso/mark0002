@@ -346,13 +346,19 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
             });
     },
     setProductionProductSaveMail(vuexContext, production) {
-        console.log(production);
         this.$axios.post('/order/production/product/save/mail', production)
             .then(response => {
                 if(response.data.status){
                     this.$toast.success('Mail Gönderildi.');
                     vuexContext.dispatch('setProductionProductMailReset');
-                    vuexContext.dispatch('setOrderProductionList');
+                    if(production.status == 1){
+                        vuexContext.dispatch('setOrderWaitingList');
+                    } else if (production.status == 2){
+                        vuexContext.dispatch('setOrderProductionList');
+                    } else if (production.status == 3){
+                        vuexContext.dispatch('setOrderShippedList');
+                    }
+                    
                 } else {
                     this.$toast.error('Mail Gönderilemedi.');
                 }

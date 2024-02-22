@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" label="Yeni" @click="newForm" />
+    <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
     <customerMekmarList
       :list="getMekmarList"
       @customer_mekmar_selected_emit="customerMekmarSelected($event)"

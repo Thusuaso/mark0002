@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Yeni"
+          label="New"
           @click="newForm"
         />
       </div>
@@ -19,12 +19,12 @@
             class="w-100"
             @change="yearChange($event)"
           />
-          <label for="years">Yıl</label>
+          <label for="years">Year</label>
         </div>
       </div>
       <div class="col">
         <div class="row mb-2">
-          <div class="col-2">Tedarikçi</div>
+          <div class="col-2">Supplier</div>
           <div class="col">
             <div class="flex flex-wrap gap-3">
               <div
@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-2">Satışçı</div>
+          <div class="col-2">Orderer</div>
           <div class="col">
             <div class="flex flex-wrap gap-3">
               <div
@@ -186,16 +186,16 @@ export default {
       selectedYear: null,
       selectedSupplier: null,
       suppliers: [
-        { key: 0, name: "Hepsi" },
+        { key: 0, name: "All" },
         { key: 1, name: "Mekmer" },
-        { key: 2, name: "Dış" },
+        { key: 2, name: "Outer" },
       ],
-      selectedSupplier: "Hepsi",
+      selectedSupplier: "All",
       marketings: [
-        { key: 0, name: "Hepsi" },
+        { key: 0, name: "All" },
         { key: 1, name: "Mekmar" },
       ],
-      selectedMarketing: "Hepsi",
+      selectedMarketing: "All",
     };
   },
 
@@ -204,7 +204,7 @@ export default {
   },
   methods: {
     marketingChange(event) {
-      if (this.selectedMarketing == "Hepsi") {
+      if (this.selectedMarketing == "All") {
         this.$store.commit("setOrderList", this.getOrderListAll);
       } else {
         const datas = this.getOrderListAll.filter((x) => x.FaturaKesimTurID == 1);
@@ -213,7 +213,7 @@ export default {
     },
     supplierChange(event) {
       this.allProductionData = this.getOrderList;
-      if (this.selectedSupplier == "Hepsi") {
+      if (this.selectedSupplier == "All") {
         this.$store.commit("setOrderList", this.getOrderListAll);
       } else if (this.selectedSupplier == "Mekmer") {
         this.filteredProductionStatus = true;
@@ -221,7 +221,7 @@ export default {
           (x) => x.TedarikciID == 1 || x.TedarikciID == 123
         );
         this.$store.commit("setOrderList", datas);
-      } else if (this.selectedSupplier == "Dış") {
+      } else if (this.selectedSupplier == "Outer") {
         this.filteredProductionStatus = true;
         const datas = this.getOrderListAll.filter(
           (x) => x.TedarikciID != 1 && x.TedarikciID != 123
@@ -230,7 +230,7 @@ export default {
       }
     },
     yearChange(event) {
-      if (event.value.Yil == "Hepsi") {
+      if (event.value.Yil == "All") {
         this.$store.dispatch("setOrderProductionList");
       } else {
         this.$store.dispatch("setOrderProductionListYear", event.value.Yil);
@@ -246,6 +246,7 @@ export default {
         deleted: this.getOrderProductDeleted,
         operation: this.productionModel.operationMail,
         representative: this.productionModel.representativeMail,
+        status: 2,
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
@@ -307,7 +308,7 @@ export default {
   },
   watch: {
     getOrderProductionYearsList() {
-      this.selectedYear = { Yil: "Hepsi" };
+      this.selectedYear = { Yil: "All" };
     },
   },
 };

@@ -96,12 +96,22 @@ const state = {
     reportsMekmarGuMekusList: [],
     reportsMekmarGuLogsList: [],
     reportsMekmarGuForwList: [],
+    reportsMekmerAtlantaList:[]
     
 };
 const actions = {
     setReportsMekmerProductionList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+                vuexContext.commit('setReportsMekmerProductionList', response.data.list);
+                vuexContext.dispatch('setReportsMekmerProductionTotal', response.data.list);
+                vuexContext.dispatch('setEndLoadingAction');
+            })
+    },
+    setReportsMekmerProductionQuarterList(vuexContext,years) {
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get(`/reports/mekmer/production/quarter/list/${years.year1}/${years.year2}`)
             .then(response => {
                 vuexContext.commit('setReportsMekmerProductionList', response.data.list);
                 vuexContext.dispatch('setReportsMekmerProductionTotal', response.data.list);
@@ -297,6 +307,15 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
+    setReportsMekmarForwardingQuarterList(vuexContext,years) {
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get(`/reports/mekmar/forwarding/list/quarter/${years.year1}/${years.year2}`)
+            .then(response => {
+                vuexContext.commit('setReportsMekmarForwardingList', response.data.list); 
+                vuexContext.dispatch('setReportsMekmarForwardingListTotal', response.data.list);
+                vuexContext.dispatch('setEndLoadingAction');
+            });
+    },
     setReportsMekmarForwardingListTotal(vuexContext, payload) {
         vuexContext.commit('setReportsMekmarForwardingListTotal', payload);
     },
@@ -391,6 +410,14 @@ const actions = {
             .then(response => {
                 vuexContext.commit('setReportsMekmarGuList', response.data); 
             });
+    },
+    setReportsMekmerAtlantaList(vuexContext){
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/atlanta/list')
+        .then(response=>{
+            vuexContext.commit('setReportsMekmerAtlantaList',response.data.list);
+            vuexContext.dispatch('setEndLoadingAction');
+        });
     }
 
 
@@ -729,6 +756,9 @@ const mutations = {
         };
 
 
+    },
+    setReportsMekmerAtlantaList(state,payload){
+        state.reportsMekmerAtlantaList = payload;
     }
 
 
@@ -841,6 +871,9 @@ const getters = {
     },
     getReportsMekmarGuForwList(state) {
         return state.reportsMekmarGuForwList;
+    },
+    getReportsMekmerAtlantaList(state){
+        return state.reportsMekmerAtlantaList;
     }
 
 };

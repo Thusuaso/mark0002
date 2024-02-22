@@ -13,10 +13,13 @@ const state = {
     }
 };
 const actions = {
+    setShipmentSendProductionList(vuexContext){
+      vuexContext.commit('setShipmentSendProductionList')  
+    },
+
     setShipmentAmount(vuexContext,product){
         this.$axios.get(`/shipment/product/amount/${product.SiparisNo}/${product.ID}/${product.UrunKartId}`)
         .then(response=>{
-            console.log(response);
             vuexContext.commit('setShipmentAmount',response.data);
             vuexContext.commit('setShipmentProductionList',response.data.productionList);
         });
@@ -28,15 +31,33 @@ const actions = {
         vuexContext.commit('setShipmentProductionDeleteList');
     },
     setShipmentSave(vuexContext,products){
-        this.$axios.post('/shipment/products/save',products)
-        .then(response=>{
-           if(response.data.status){
-                this.$toast.success('Başarıyla Kaydedildi.');
-            };
-        });
+        return new Promise((resolve,reject)=>{
+            this.$axios.post('/shipment/products/save',products)
+            .then(response=>{
+                if(response.data.status){
+                    this.$axios.post('/shipment/products/save/mail',products).then(res=>{
+                        if(res.data.status){
+                            this.$toast.success('Mail Gönderildi');
+                            resolve(res.data.status);
+                        } else{
+                            this.$toast.error('Mail Gönderme Başarısız');
+                            resolve(res.data.status);
+                        }
+                    });
+                } else{
+                    resolve(response.data.status);
+                }
+                
+
+            });
+        })
+
     }
 };
 const mutations = {
+    setShipmentSendProductionList(state){
+      state.shipmentSendProductionList = [];  
+    },
     setShipmentAmount(state,shipmentAmount){
         state.shipmentAmount.order = shipmentAmount.order.toFixed(2);
         state.shipmentAmount.production = shipmentAmount.production.toFixed(2);

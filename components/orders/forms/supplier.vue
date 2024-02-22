@@ -11,7 +11,7 @@
             class="w-100"
             @change="supplierSelected($event)"
           />
-          <label for="supplier">Tedarikçi</label>
+          <label for="supplier">Supplier</label>
         </div>
       </div>
       <div class="col">
@@ -23,7 +23,7 @@
             optionLabel="FaturaAdi"
             class="w-100"
           />
-          <label for="supplier">Fatura Türü</label>
+          <label for="supplier">Kind of Invoice</label>
         </div>
       </div>
       <div class="col">
@@ -35,13 +35,13 @@
             optionLabel="TeslimAdi"
             class="w-100"
           />
-          <label for="delivery">Teslim Türü</label>
+          <label for="delivery">Kind of Delivery</label>
         </div>
       </div>
       <div class="col">
         <span class="p-float-label">
           <Calendar v-model="supplier_date" inputId="date" />
-          <label for="date">Tarih</label>
+          <label for="date">Date</label>
         </span>
       </div>
     </div>
@@ -60,24 +60,24 @@
       </div>
     </div>
     <DataTable :value="supplierProduct">
-      <Column field="KategoriAdi" header="Kategori"></Column>
-      <Column field="UrunAdi" header="Ürün"></Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey"></Column>
-      <Column field="En" header="En"></Column>
-      <Column field="Boy" header="Boy"></Column>
+      <Column field="KategoriAdi" header="Category"></Column>
+      <Column field="UrunAdi" header="Product"></Column>
+      <Column field="YuzeyIslemAdi" header="Surface"></Column>
+      <Column field="En" header="Width"></Column>
+      <Column field="Boy" header="Height"></Column>
       <Column field="Kenar" header="Kenar"></Column>
-      <Column field="UrunBirimAdi" header="Birim"></Column>
-      <Column field="Miktar" header="Miktar">
+      <Column field="UrunBirimAdi" header="Unit"></Column>
+      <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
       </Column>
-      <Column field="AlisFiyati" header="Alış F.">
+      <Column field="AlisFiyati" header="Purchase Price">
         <template #body="slotProps">
           {{ slotProps.data.AlisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column header="Alış T.">
+      <Column header="Purchase Total">
         <template #body="slotProps">
           {{ (slotProps.data.AlisFiyati * slotProps.data.Miktar) | formatPriceUsd }}
         </template>
@@ -89,7 +89,7 @@
           type="button"
           class="p-button-danger"
           @click="download"
-          label="Pdf - Çıktı"
+          label="Pdf - Output"
         />
       </div>
       <div class="col">
@@ -98,7 +98,7 @@
           accept=".pdf"
           customUpload
           @select="isfUpload($event)"
-          chooseLabel="Isf Yükle"
+          chooseLabel="Upload Isf"
         />
       </div>
     </div>

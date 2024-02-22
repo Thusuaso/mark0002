@@ -3,6 +3,8 @@ const state = {
     followDetail:[],
     followDetailData:{},
     followDetailNewButton:false,
+    salesPointsOfConsiderList:[],
+    salesPointsOfConsiderButtonStatus:false,
 };
 const actions = {
     setFollowList(vuexContext){
@@ -56,6 +58,52 @@ const actions = {
                 this.$toast.error('Silme Başarısız');
             }
         });
+    },
+    setSalesPointsOfConsiderList(vuexContext){
+        this.$axios.get('/sales/points/of/consider/list')
+        .then(response=>{
+            vuexContext.commit('setSalesPointsOfConsiderList',response.data.list);
+        });
+    },
+    setSalesPointsOfConsiderButtonStatus(vuexContext,status){
+        vuexContext.commit('setSalesPointsOfConsiderButtonStatus',status);
+    },
+    setSalesPointsOfConsiderSave(vuexContext,data){
+        this.$axios.post('/sales/points/of/consider/save',data)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Kayıt Başarılı');
+                vuexContext.dispatch('setSalesPointsOfConsiderList');
+                vuexContext.dispatch('setSalesPointsOfConsiderModel');
+
+
+            } else{
+                this.$toast.error('Kayıt Başarısız');
+            }
+        });
+    },
+    setSalesPointsOfConsiderUpdate(vuexContext,data){
+        this.$axios.put('/sales/points/of/consider/update',data)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Kayıt Başarılı');
+                vuexContext.dispatch('setSalesPointsOfConsiderList');
+            } else{
+                this.$toast.error('Kayıt Başarısız');
+            }
+        });
+    },
+    setSalesPointsOfConsiderDelete(vuexContext,id){
+        this.$axios.delete(`/sales/points/of/consider/delete/${id}`)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Başarıyla Silindi.');
+                vuexContext.dispatch('setSalesPointsOfConsiderList');
+
+            } else{
+                this.$toast.error('Silme Başarısız.');
+            }
+        });
     }
 };
 const mutations = {
@@ -81,6 +129,12 @@ const mutations = {
     setFollowDetailDelete(state,payload){
         const index = state.followDetail.findIndex(x=>x.ID == payload);
         state.followDetail.splice(index,1);
+    },
+    setSalesPointsOfConsiderList(state,payload){
+        state.salesPointsOfConsiderList = payload;
+    },
+    setSalesPointsOfConsiderButtonStatus(state,payload){
+        state.salesPointsOfConsiderButtonStatus = payload;
     }
 };
 const getters = {
@@ -95,6 +149,12 @@ const getters = {
     },
     getFollowDetailNewButton(state){
         return state.followDetailNewButton;
+    },
+    getSalesPointsOfConsiderList(state){
+        return state.salesPointsOfConsiderList;
+    },
+    getSalesPointsOfConsiderButtonStatus(state){
+        return state.salesPointsOfConsiderButtonStatus;
     }
 };
 

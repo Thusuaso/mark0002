@@ -11,28 +11,28 @@
       </div>
     </div>
     <TabView>
-      <TabPanel header="Yıllık Po Bazında Siparişler">
+      <TabPanel header="Orders by Po (Yearly)">
         <reportsMekmarMkYearByPoOrdersList
           :list="getReportsMekmarMkList.byOrderList"
           :total="getReportsMekmarMkListTotal.byOrders"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Güncel Üretim Sipariş Raporu">
+      <TabPanel header="Current Production Order Report">
         <reportsMekmarMkYearByMarketingOrdersList
           :list="getReportsMekmarMkList.byMarketingList"
           :total="getReportsMekmarMkListTotal.byMarketing"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Yükleme Raporu">
+      <TabPanel header="Shipment Report">
         <reportsMekmarMkYearByMarketingForwardingList
           :list="getReportsMekmarMkForwList"
           :total="getReportsMekmarMkListTotal.byMarketingForw"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Müşteri Raporları">
+      <TabPanel header="Customer Report">
         <reportsMekmarMkByCustomerList
           :list="getReportsMekmarMkList.byCustomerList"
           :loading="getLoading"

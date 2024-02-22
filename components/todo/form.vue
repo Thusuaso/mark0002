@@ -15,7 +15,7 @@
             field="KullaniciAdi"
             :multiple="true"
           />
-          <label for="users">Görev Sahipleri</label>
+          <label for="users">Todo Owner</label>
         </span>
       </div>
       <div class="col">
@@ -28,13 +28,13 @@
             class="w-full md:w-14rem"
             @change="priorityChanged($event)"
           />
-          <label for="priority">Öncelik</label>
+          <label for="priority">Priority</label>
         </div>
       </div>
       <div class="col">
         <div class="flex align-items-center">
           <Checkbox v-model="model.Acil" inputId="ingredient1" :binary="true" />
-          <label for="ingredient1" class="ml-2"> Acil </label>
+          <label for="ingredient1" class="ml-2"> Urgent </label>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="process"
         />
       </div>
@@ -51,7 +51,7 @@
         <Button
           type="button"
           class="p-button-danger w-100"
-          label="Sil"
+          label="Delete"
           @click="$emit('deleteProcess', model)"
         />
       </div>

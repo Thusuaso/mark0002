@@ -11,7 +11,7 @@
                 v-model="modelValue.FirmaAdi"
                 class="w-100"
               />
-              <label for="customer">Müşteri</label>
+              <label for="customer">Customer</label>
             </span>
           </div>
           <div class="col">
@@ -35,7 +35,7 @@
                 cols="30"
                 style="width: 100%"
               />
-              <label>Firma Adı</label>
+              <label>Company</label>
             </span>
           </div>
         </div>
@@ -48,7 +48,7 @@
                 cols="30"
                 style="width: 100%"
               />
-              <label>Adres</label>
+              <label>Address</label>
             </span>
           </div>
         </div>
@@ -61,7 +61,7 @@
                 v-model="modelValue.Marketing"
                 class="w-100"
               />
-              <label for="marketing">Pazarlama</label>
+              <label for="marketing">Marketing</label>
             </span>
           </div>
           <div class="col">
@@ -72,7 +72,7 @@
                 v-model="modelValue.Telefon"
                 class="w-100"
               />
-              <label for="phone">Telefon</label>
+              <label for="phone">Phone</label>
             </span>
           </div>
           <div class="col">
@@ -94,7 +94,7 @@
                 field="KullaniciAdi"
                 @complete="searchRepresentative($event)"
               />
-              <label for="representative">Temsilci</label>
+              <label for="representative">Representative</label>
             </span>
           </div>
           <div class="col">
@@ -106,7 +106,7 @@
                 field="KullaniciAdi"
                 @complete="searchOrderer($event)"
               />
-              <label for="orderer">Satışçı</label>
+              <label for="orderer">Orderer</label>
             </span>
           </div>
           <div class="col">
@@ -118,7 +118,7 @@
                 field="UlkeAdi"
                 @complete="searchCountry($event)"
               />
-              <label for="country">Ülke</label>
+              <label for="country">Country</label>
             </span>
           </div>
         </div>
@@ -126,7 +126,7 @@
           <div class="col">
             <span class="p-float-label">
               <Textarea v-model="modelValue.Notlar" rows="5" class="w-100" />
-              <label>Notlar</label>
+              <label>Description</label>
             </span>
           </div>
         </div>
@@ -134,19 +134,19 @@
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="modelValue.Devir" inputId="cycle" :binary="true" />
-              <label for="cycle" class="ml-2"> Devir </label>
+              <label for="cycle" class="ml-2"> Transfer </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="modelValue.Ozel" inputId="special" :binary="true" />
-              <label for="special" class="ml-2"> Özel </label>
+              <label for="special" class="ml-2"> Special </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="modelValue.Takip" inputId="follow" :binary="true" />
-              <label for="follow" class="ml-2"> Takip </label>
+              <label for="follow" class="ml-2"> Follow </label>
             </div>
           </div>
           <div class="col">
@@ -156,7 +156,7 @@
                 inputId="lastuser"
                 :binary="true"
               />
-              <label for="lastuser" class="ml-2"> Son Kullanıcı </label>
+              <label for="lastuser" class="ml-2"> Last Orderer </label>
             </div>
           </div>
         </div>
@@ -170,8 +170,8 @@
           selectionMode="single"
           @row-click="orderYearSelected($event)"
         >
-          <Column field="year" header="Yıl"></Column>
-          <Column field="total" header="Toplam">
+          <Column field="year" header="Year"></Column>
+          <Column field="total" header="Total">
             <template #body="slotProps">
               {{ slotProps.data.total | formatPriceUsd }}
             </template>
@@ -182,12 +182,12 @@
     <div class="row mt-3">
       <div class="col">
         <button type="button" class="btn btn-success w-100" @click="saveProcess">
-          Kaydet
+          Save
         </button>
       </div>
       <div class="col" v-if="!status">
         <button type="button" class="btn btn-danger w-100" @click="deleteForm">
-          Sil
+          Delete
         </button>
       </div>
     </div>

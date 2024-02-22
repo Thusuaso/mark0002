@@ -11,7 +11,7 @@
       sortField="Acil"
       :sortOrder="-1"
     >
-      <Column field="OrtakGorev" header="Görev Sahipleri">
+      <Column field="OrtakGorev" header="Todo Owner">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="Yapilacak" header="Görev">
+      <Column field="Yapilacak" header="Todo">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -36,7 +36,7 @@
           <Button
             type="button"
             class="p-button-primary"
-            label="Yapıldı"
+            label="Done"
             @click="isTodoChange(slotProps.data.ID)"
           />
         </template>

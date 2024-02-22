@@ -9,11 +9,11 @@
         @row-click="$emit('selection_customer_selected_emit', $event)"
         :loading="loading"
       >
-        <Column field="FirstName" header="Müşteri Adı"></Column>
-        <Column field="City" header="Ülke"></Column>
+        <Column field="FirstName" header="Customer"></Column>
+        <Column field="City" header="Country"></Column>
         <Column field="Email" header="Email"></Column>
         <Column field="Phone" header="Phone"></Column>
-        <Column field="Adress" header="Adres"></Column>
+        <Column field="Adress" header="Address"></Column>
       </DataTable>
     </div>
   </div>

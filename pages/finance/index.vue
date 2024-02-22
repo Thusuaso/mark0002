@@ -6,7 +6,7 @@
           <Button
             type="button"
             class="p-button-primary w-100"
-            label="Tahsilat Listesi"
+            label="Collection List"
             @click="collection"
           />
         </div>
@@ -14,7 +14,7 @@
           <Button
             type="button"
             class="p-button-secondary w-100"
-            label="Peşinat Giriş"
+            label="Input Pre-Payment"
             @click="advancedPayment"
           />
         </div>
@@ -38,7 +38,7 @@
           <Button
             type="button"
             class="p-button-warning w-100"
-            :label="buttonAllStatus ? 'Açık Polar' : 'Hepsi'"
+            :label="buttonAllStatus ? 'Unpaid Po' : 'All'"
             @click="buttonAllStatus = !buttonAllStatus"
           />
         </div>

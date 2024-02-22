@@ -35,3 +35,9 @@ export default {
   },
 };
 </script>
+<style>
+@import url("https://fonts.cdnfonts.com/css/myriad-web-pro");
+* {
+  font-family: "Myriad Web Pro", sans-serif;
+}
+</style>

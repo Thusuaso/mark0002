@@ -7,7 +7,7 @@
           :options="delivery"
           filter
           optionLabel="TeslimTur"
-          placeholder="Teslim Türü"
+          placeholder="Kind of Delivery"
           class="w-100 mb-4"
           @change="deliveryChange($event)"
         >
@@ -30,7 +30,7 @@
           :options="payment"
           filter
           optionLabel="OdemeTur"
-          placeholder="Ödeme Türü"
+          placeholder="Kind of Payment"
           class="w-100 mb-4"
           @change="paymentChange($event)"
         >
@@ -55,7 +55,7 @@
             @date-select="maturityDateSelected($event)"
             class="w-100"
           />
-          <label for="maturity">Vade</label>
+          <label for="maturity">Maturity</label>
         </span>
         <span class="p-float-label mb-4">
           <AutoComplete
@@ -66,19 +66,19 @@
             @item-select="countrySelected($event)"
             field="UlkeAdi"
           />
-          <label for="country">Ülke</label>
+          <label for="country">Country</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText id="paidDescription" v-model="model.OdemeAciklama" class="w-100" />
-          <label for="paidDescription">Ödeme Açıklama</label>
+          <label for="paidDescription">Payment Description</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText id="container" v-model="model.KonteynerAyrinti" class="w-100" />
-          <label for="container">Konteyner Ayrıntı</label>
+          <label for="container">Container Detail</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText id="document" v-model="model.EvrakGideri" class="w-100" />
-          <label for="document">Evrak Gideri</label>
+          <label for="document">Payment of Document</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText
@@ -87,11 +87,11 @@
             class="w-100"
             @input="bankerage($event)"
           />
-          <label for="commission">Komisyon</label>
+          <label for="commission">Commission</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText id="return" v-model="model.Iade" class="w-100" />
-          <label for="return">İade</label>
+          <label for="return">Rebate</label>
         </span>
         <div class="p-float-label">
           <Dropdown
@@ -102,7 +102,7 @@
             class="w-100"
             @change="invoiceChange($event)"
           />
-          <label for="invoice">Fatura Türü</label>
+          <label for="invoice">Kind of Invoice</label>
         </div>
         <div class="row">
           <div class="col">
@@ -114,7 +114,7 @@
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="model.MayaControl" :binary="true" />
-              <label for="ingredient2" class="ml-2"> Maya Ödeme </label>
+              <label for="ingredient2" class="ml-2"> Maya Payment</label>
             </div>
           </div>
         </div>
@@ -122,22 +122,22 @@
       <div class="col-9">
         <span class="p-float-label mb-4">
           <Textarea v-model="model.UretimAciklama" rows="5" class="w-100" />
-          <label>Üretim Açıklama</label>
+          <label>Production Description</label>
         </span>
         <span class="p-float-label mb-4">
           <Textarea v-model="model.SevkiyatAciklama" rows="5" class="w-100" />
-          <label>Sevkiyat Açıklama</label>
+          <label>Shipped Description</label>
         </span>
         <span class="p-float-label mb-4">
           <Textarea v-model="model.FinansAciklama" rows="5" class="w-100" />
-          <label>Finans Açıklama</label>
+          <label>Finance Description</label>
         </span>
         <FileUpload
           mode="basic"
           accept=".pdf"
           customUpload
           @select="uploadInvoiceDocument($event)"
-          chooseLabel="Proforma Yükle"
+          chooseLabel="Upload Proforma"
           :disabled="!saveButtonStatus"
         />
       </div>
@@ -145,7 +145,7 @@
     <div class="row">
       <div class="col">
         <Card style="height: 550px">
-          <template #title>Satış</template>
+          <template #title>Selling</template>
           <template #content>
             <div class="row mb-4">
               <div class="col">
@@ -155,13 +155,13 @@
                     v-model="model.NavlunSatis"
                     @input="freightInput($event)"
                   />
-                  <label for="freight">Navlun</label>
+                  <label for="freight">Freight</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="freightComp" v-model="model.NavlunFirma" />
-                  <label for="freightComp">Navlun Firma</label>
+                  <label for="freightComp">Freight Company</label>
                 </span>
               </div>
             </div>
@@ -173,13 +173,13 @@
                     v-model="model.DetayTutar_1"
                     @input="detail1Input($event)"
                   />
-                  <label for="detail1">Detay 1</label>
+                  <label for="detail1">Detail 1</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="detailDesc" v-model="model.DetayAciklama_1" />
-                  <label for="detailDesc">Detay 1 Açıklama</label>
+                  <label for="detailDesc">Detail 1 Description</label>
                 </span>
               </div>
             </div>
@@ -191,13 +191,13 @@
                     v-model="model.DetayTutar_2"
                     @input="detail2Input($event)"
                   />
-                  <label for="detail2">Detay 2</label>
+                  <label for="detail2">Detail 2</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="detail2Desc" v-model="model.DetayAciklama_2" />
-                  <label for="detail2Desc">Detay 2 Açıklama</label>
+                  <label for="detail2Desc">Detail 2 Description</label>
                 </span>
               </div>
             </div>
@@ -209,13 +209,13 @@
                     v-model="model.DetayTutar_3"
                     @input="detail3Input($event)"
                   />
-                  <label for="detail2">Detay 3</label>
+                  <label for="detail2">Detail 3</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="detail2Desc" v-model="model.DetayAciklama_3" />
-                  <label for="detail2Desc">Detay 3 Açıklama</label>
+                  <label for="detail2Desc">Detail 3 Description</label>
                 </span>
               </div>
             </div>
@@ -233,7 +233,7 @@
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="mekusDesc" v-model="model.DetayAciklama_4" />
-                  <label for="mekusDesc">Mekus Açıklama</label>
+                  <label for="mekusDesc">Mekus Description</label>
                 </span>
               </div>
             </div>
@@ -241,7 +241,7 @@
               <div class="col">
                 <CustomInput
                   :value="model.sigorta_tutar_satis"
-                  text="Sigorta"
+                  text="Insurance"
                   @onInput="model.sigorta_tutar_satis = $event"
                 />
               </div>
@@ -251,7 +251,7 @@
       </div>
       <div class="col">
         <Card style="height: 550px">
-          <template #title>Alış</template>
+          <template #title>Buying</template>
           <template #content>
             <div class="row mb-4">
               <div class="col">
@@ -261,13 +261,13 @@
                     v-model="model.NavlunAlis"
                     @input="getFreightInput($event)"
                   />
-                  <label for="freight">Navlun</label>
+                  <label for="freight">Freight</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="freightComp" v-model="model.DetayMekmarNot_1" />
-                  <label for="freightComp">Navlun A. Açıklama</label>
+                  <label for="freightComp">Freight Description</label>
                 </span>
               </div>
             </div>
@@ -279,13 +279,13 @@
                     v-model="model.DetayAlis_1"
                     @input="getDetail1Input($event)"
                   />
-                  <label for="detail1">Detay 1</label>
+                  <label for="detail1">Detail 1</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="detailDesc" v-model="model.DetayMekmarNot_2" />
-                  <label for="detailDesc">Detay 1 Açıklama</label>
+                  <label for="detailDesc">Detail 1 Description</label>
                 </span>
               </div>
             </div>
@@ -297,13 +297,13 @@
                     v-model="model.DetayAlis_2"
                     @input="getDetail2Input($event)"
                   />
-                  <label for="detail2">Detay 2</label>
+                  <label for="detail2">Detail 2</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" />
-                  <label for="detail2Desc">Detay 2 Açıklama</label>
+                  <label for="detail2Desc">Detail 2 Description</label>
                 </span>
               </div>
             </div>
@@ -315,13 +315,13 @@
                     v-model="model.DetayAlis_3"
                     @input="getDetail3Input($event)"
                   />
-                  <label for="detail3">Detay 3</label>
+                  <label for="detail3">Detail 3</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
                   <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" />
-                  <label for="detail2Desc">Detay 3 Açıklama</label>
+                  <label for="detail2Desc">Detail 3 Description</label>
                 </span>
               </div>
             </div>
@@ -333,7 +333,7 @@
                     v-model="model.sigorta_Tutar"
                     @input="insuranceInput($event)"
                   />
-                  <label for="insurance">Sigorta</label>
+                  <label for="insurance">Insurance</label>
                 </span>
               </div>
             </div>

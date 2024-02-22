@@ -11,13 +11,13 @@
       </div>
     </div>
     <TabView>
-      <TabPanel header="Ayo Maliyet">
+      <TabPanel header="Ayo Cost">
         <reportsMekmarGuAyoCostList
           :list="getReportsMekmarGuAyoCostList"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Konteynır (Mekmar)">
+      <TabPanel header="Container (Mekmar)">
         <reportsMekmarGuContList
           :contCountList="getReportsMekmarGuContList"
           :contCustList="getReportsMekmarGuContByCustList"
@@ -30,13 +30,13 @@
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Loglar">
+      <TabPanel header="Logs">
         <reportsMekmarGuLogsList
           :list="getReportsMekmarGuLogsList"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Sevkiyat Özet (Yıl)">
+      <TabPanel header="Shipment Summary (Yıl)">
         <div class="row">
           <reportsMekmarGuForwardingList
             v-for="item of getReportsMekmarGuForwList"

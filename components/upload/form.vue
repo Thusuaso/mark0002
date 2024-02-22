@@ -10,7 +10,7 @@
         field="SiparisNo"
         @item-select="$store.dispatch('setDocumentList', $event.value.SiparisNo)"
       />
-      <label for="order">Sipariş No</label>
+      <label for="order">Po</label>
     </span>
     <FileUpload
       mode="advanced"
@@ -19,7 +19,7 @@
       @upload="onUpload"
       :multiple="true"
       :auto="true"
-      chooseLabel="Evrak Yükle"
+      chooseLabel="Upload Document"
       @select="onUpload($event)"
     />
   </div>

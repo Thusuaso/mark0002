@@ -10,7 +10,7 @@
       @row-click="$emit('sample_selected_list', $event)"
       :loading="loading"
     >
-      <Column field="NumuneTarihi" header="Tarih" :showFilterMenu="false">
+      <Column field="NumuneTarihi" header="Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.NumuneTarihi | dateToString }}
         </template>
@@ -23,7 +23,7 @@
           />
         </template>
       </Column>
-      <Column field="NumuneTemsilciAdi" header="Temsilci" :showFilterMenu="false">
+      <Column field="NumuneTemsilciAdi" header="Representative" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -43,14 +43,14 @@
           />
         </template>
       </Column>
-      <Column field="NumuneKategori" header="Kategori"></Column>
+      <Column field="NumuneKategori" header="Category"></Column>
       <Column header="Miktar/Birim">
         <template #body="slotProps">
           {{ slotProps.data.Miktar }} / {{ slotProps.data.NumuneUrunBirim }}
         </template>
       </Column>
-      <Column field="NumuneGonderiTipi" header="Gönderi Tipi"></Column>
-      <Column field="NumuneBanka" header="Banka"></Column>
+      <Column field="NumuneGonderiTipi" header="Kind of Sending"></Column>
+      <Column field="NumuneBanka" header="Bank"></Column>
     </DataTable>
   </div>
 </template>

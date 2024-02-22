@@ -3,7 +3,7 @@
     <div class="row m-auto mt-4" style="height: 150px; width: 1000px">
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="projectname">Proje Adı</label>
+          <label for="projectname">Project Name</label>
           <InputText
             id="projectname"
             v-model="bgp.ProjectName"
@@ -13,7 +13,7 @@
       </div>
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="country">Ülke</label>
+          <label for="country">Country</label>
           <AutoComplete
             id="country"
             v-model="selectedCountry"
@@ -32,7 +32,7 @@
     <Button
       type="button"
       class="p-button-success w-100"
-      label="Kaydet"
+      label="Save"
       @click="save"
     ></Button>
   </div>

@@ -1,14 +1,14 @@
 <template>
   <div>
     <DataTable :value="list">
-      <Column field="Tarih" header="Tarih">
+      <Column field="Tarih" header="Date">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
       </Column>
       <Column field="SiparisNo" header="Po"></Column>
-      <Column field="Aciklama" header="Açıklama"></Column>
-      <Column field="Tutar" header="Tutar">
+      <Column field="Aciklama" header="Description"></Column>
+      <Column field="Tutar" header="Paid">
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
@@ -16,12 +16,12 @@
           {{ total | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Masraf" header="Masraf">
+      <Column field="Masraf" header="Cost">
         <template #body="slotProps">
           {{ slotProps.data.Masraf | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Kur" header="Kur">
+      <Column field="Kur" header="Currency">
         <template #body="slotProps">
           {{ slotProps.data.Kur | formatPriceUsd }}
         </template>

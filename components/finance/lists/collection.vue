@@ -11,7 +11,7 @@
             class="w-full md:w-14rem"
             @change="yearChanged($event)"
           />
-          <label for="years">Yıllar</label>
+          <label for="years">Years</label>
         </div>
       </div>
       <div class="col">
@@ -24,7 +24,7 @@
             class="w-full md:w-14rem"
             @change="monthChanged($event)"
           />
-          <label for="months">Aylar</label>
+          <label for="months">Months</label>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
       @filter="collectionFiltered($event)"
       :loading="loading"
     >
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
+      <Column field="Tarih" header="Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -50,7 +50,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Müşteri" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -70,7 +70,7 @@
           />
         </template>
       </Column>
-      <Column field="Tutar" header="Tutar">
+      <Column field="Tutar" header="Paid Amount">
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>

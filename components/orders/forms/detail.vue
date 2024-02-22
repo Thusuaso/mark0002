@@ -2,7 +2,7 @@
   <div class="row mt-3">
     <div class="col-10">
       <TabView>
-        <TabPanel header="Sipariş">
+        <TabPanel header="Order">
           <orderDetailOrderForm
             :model="modelProduct"
             :products="productsList"
@@ -27,10 +27,10 @@
             :saveButtonStatus="saveButtonStatus"
           />
         </TabPanel>
-        <TabPanel header="Masraf">
+        <TabPanel header="Cost">
           <orderDetailCostForm :cost="cost" :total="costTotal" />
         </TabPanel>
-        <TabPanel header="Tedarikçi">
+        <TabPanel header="Supplier">
           <orderDetailSupplierForm
             :modelProduction="modelProduction"
             :productSupplier="productSupplier"
@@ -40,10 +40,10 @@
             :supplierProduct="supplierProduct"
           />
         </TabPanel>
-        <TabPanel header="Evraklar">
+        <TabPanel header="Document">
           <orderDetailDocumentForm :list="document" />
         </TabPanel>
-        <TabPanel header="Çeki">
+        <TabPanel header="Check">
           <orderDetailCheckForm :list="check" :total="checkTotal" />
         </TabPanel>
       </TabView>
@@ -52,14 +52,14 @@
       <Button
         type="button"
         class="p-button-success w-100 mb-3"
-        label="Kaydet"
+        label="Save"
         @click="$emit('process')"
         :disabled="saveButtonStatus"
       />
       <Button
         type="button"
         class="p-button-danger w-100 mb-4"
-        label="Çık"
+        label="Exit"
         @click="$emit('close_production_form_emit')"
       />
       <span class="p-float-label mb-4">
@@ -79,7 +79,7 @@
           @date-select="orderDateSelected($event)"
           :disabled="!status"
         />
-        <label for="order_date">Sipariş Tarihi</label>
+        <label for="order_date">Order Date</label>
       </span>
       <span class="p-float-label mb-4">
         <Calendar
@@ -89,7 +89,7 @@
           @date-select="guessLoadingDateSelected($event)"
           :disabled="!status"
         />
-        <label for="guess_loading_date">Tahmini Yükleme Tarihi</label>
+        <label for="guess_loading_date">Estimated Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -100,7 +100,7 @@
           field="FirmaAdi"
           @item-select="customerSelected($event)"
         />
-        <label for="customer">Müşteri</label>
+        <label for="customer">Customer</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -111,7 +111,7 @@
           field="KullaniciAdi"
           @item-select="ordererSelected($event)"
         />
-        <label for="user">Satışçı</label>
+        <label for="user">Orderer</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -122,7 +122,7 @@
           field="KullaniciAdi"
           @item-select="operationSelected($event)"
         />
-        <label for="operation">Operasyon</label>
+        <label for="operation">Operation</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -133,11 +133,11 @@
           field="KullaniciAdi"
           @item-select="financemanSelected($event)"
         />
-        <label for="financeman">Finansman</label>
+        <label for="financeman">Financier</label>
       </span>
       <CustomInput
         :value="modelProduction.Pesinat"
-        text="Peşinat"
+        text="Pre Payment"
         @onInput="modelProduction.Pesinat = $event"
         :disabled="true"
       />
@@ -149,19 +149,19 @@
         </thead>
         <tbody>
           <tr>
-            <th scope="row">Toplam</th>
+            <th scope="row">Total</th>
             <td>{{ productCalculation | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Navlun</th>
+            <th scope="row">Freight</th>
             <td>{{ freightCalculation | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Detay</th>
+            <th scope="row">Detail</th>
             <td>{{ detailCalculation | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">G.Toplam</th>
+            <th scope="row">G.Total</th>
             <td>
               {{
                 (productCalculation + freightCalculation + detailCalculation)
@@ -174,11 +174,11 @@
 
       <span class="p-float-label mb-4">
         <Calendar v-model="load_date" inputId="load_date" class="w-100" disabled />
-        <label for="load_date">Yükleme Tarihi</label>
+        <label for="load_date">Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
         <Calendar v-model="eta_date" inputId="eta_date" class="w-100" disabled />
-        <label for="eta_date">Eta Tarihi</label>
+        <label for="eta_date">Estimated Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText
@@ -187,7 +187,7 @@
           class="w-100"
           disabled
         />
-        <label for="container">Konteyner No</label>
+        <label for="container">Container No</label>
       </span>
       <table class="table mb-4">
         <thead>
@@ -197,25 +197,25 @@
         </thead>
         <tbody>
           <tr>
-            <th scope="row">Üretici</th>
+            <th scope="row">Producer</th>
             <td>{{ detailProductCost.supplier | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">İşçilik</th>
+            <th scope="row">Workerman</th>
             <td>{{ detailProductCost.workerman | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Navlun A.</th>
+            <th scope="row">Freight Buying</th>
             <td>{{ detailProductCost.freight | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Diğer A.</th>
+            <th scope="row">Other Buyin</th>
             <td>
               {{ detailProductCost.detail | formatPriceUsd }}
             </td>
           </tr>
           <tr>
-            <th scope="row">Komisyon</th>
+            <th scope="row">Commission</th>
             <td>{{ detailProductCost.brokerage | formatPriceUsd }}</td>
           </tr>
           <tr>
@@ -223,7 +223,7 @@
             <td>{{ detailProductCost.fob | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Genel</th>
+            <th scope="row">General</th>
             <td>
               {{
                 (detailProductCost.supplier +
@@ -394,10 +394,10 @@ export default {
   },
   methods: {
     guessLoadingDateSelected(event) {
-      this.modelProduction.SiparisTarihi = date.dateToString(event);
+      this.modelProduction.TahminiYuklemeTarihi = date.dateToString(event);
     },
     orderDateSelected(event) {
-      this.modelProduction.TahminiYuklemeTarihi = date.dateToString(event);
+      this.modelProduction.SiparisTarihi = date.dateToString(event);
     },
     financemanSelected(event) {
       this.modelProduction.Finansman = event.value.ID;

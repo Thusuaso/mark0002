@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" @click="newForm" label="Yeni" />
+    <Button type="button" class="p-button-success w-100" @click="newForm" label="New" />
     <productCards @cards_selected_emit="cardsSelected($event)" :loading="getLoading" />
     <Dialog :visible.sync="cards_form_dialog" header="" modal>
       <cardsForm

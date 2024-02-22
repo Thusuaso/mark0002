@@ -8,7 +8,7 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
+      <Column field="Tarih" header="Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -31,7 +31,7 @@
           />
         </template>
       </Column>
-      <Column field="firma_adi" header="Firma" :showFilterMenu="false">
+      <Column field="firma_adi" header="Company" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -41,7 +41,7 @@
           />
         </template>
       </Column>
-      <Column field="FaturaNo" header="Fatura No" :showFilterMenu="false">
+      <Column field="FaturaNo" header="Invoice No" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -56,7 +56,7 @@
           {{ (slotProps.data.Tutar * slotProps.data.Kur) | formatPriceTl }}
         </template>
       </Column>
-      <Column field="Kur" header="Kur">
+      <Column field="Kur" header="Currency">
         <template #body="slotProps">
           {{ slotProps.data.Kur | formatPriceTl }}
         </template>
@@ -66,7 +66,7 @@
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="link" header="İndir">
+      <Column field="link" header="Download">
         <template #body="slotProps">
           <a :href="slotProps.data.link">
             <i class="pi pi-download" style="font-size: 1rem"></i>

@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Yeni"
+          label="New"
           @click="newForm"
         />
       </div>
@@ -28,6 +28,8 @@
       :visible.sync="panel_form_dialog"
       :header="'Ürün Id ' + getPanelProductId"
       modal
+      maximizable
+      :closeOnEscape="false"
     >
       <panelProductForm
         :model="model"
@@ -121,10 +123,37 @@ export default {
       this.$store.dispatch("setPanelProductsDelete", event);
       this.panel_form_dialog = false;
     },
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
+    },
     save(event) {
+      event.aciklama_fr = this.__stringCharacterChange(event.aciklama_fr);
+      event.anahtarlar_fr = this.__stringCharacterChange(event.anahtarlar_fr);
+      event.keywords_fr = this.__stringCharacterChange(event.keywords_fr);
+      event.aciklama_en = this.__stringCharacterChange(event.aciklama_en);
+      event.anahtarlar_en = this.__stringCharacterChange(event.anahtarlar_en);
+      event.keywords_en = this.__stringCharacterChange(event.keywords_en);
+      event.aciklama_es = this.__stringCharacterChange(event.aciklama_es);
+      event.anahtarlar_es = this.__stringCharacterChange(event.anahtarlar_es);
+      event.keywords_es = this.__stringCharacterChange(event.keywords_es);
       this.$store.dispatch("setPanelProductsSave", event);
     },
     update(event) {
+      event.aciklama_fr = this.__stringCharacterChange(event.aciklama_fr);
+      event.anahtarlar_fr = this.__stringCharacterChange(event.anahtarlar_fr);
+      event.keywords_fr = this.__stringCharacterChange(event.keywords_fr);
+      event.aciklama_en = this.__stringCharacterChange(event.aciklama_en);
+      event.anahtarlar_en = this.__stringCharacterChange(event.anahtarlar_en);
+      event.keywords_en = this.__stringCharacterChange(event.keywords_en);
+      event.aciklama_es = this.__stringCharacterChange(event.aciklama_es);
+      event.anahtarlar_es = this.__stringCharacterChange(event.anahtarlar_es);
+      event.keywords_es = this.__stringCharacterChange(event.keywords_es);
       this.$store.dispatch("setPanelProductsUpdate", event);
     },
     process(event) {
@@ -138,6 +167,8 @@ export default {
       this.$store.dispatch("setPanelProductButtonStatus", true);
       this.$store.dispatch("setPanelProductModel");
       this.$store.dispatch("setPanelProductId", 0);
+      this.$store.commit("setPanelProductPhotoListUpdate", []);
+
       this.model = this.getPanelProductModel;
       this.panel_form_dialog = true;
     },

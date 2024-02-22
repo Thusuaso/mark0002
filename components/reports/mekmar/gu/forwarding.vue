@@ -4,7 +4,7 @@
       <template #header>
         {{ list.year }}
       </template>
-      <Column field="Ay" header="Ay">
+      <Column field="Ay" header="Month">
         <template #body="slotProps">
           {{ slotProps.data.Ay | monthToString }}
         </template>

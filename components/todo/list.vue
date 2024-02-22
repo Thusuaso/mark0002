@@ -10,18 +10,18 @@
       :rowClass="rowClass"
     >
       <Column field="Yapilacak" header="To Do"></Column>
-      <Column field="GirisTarihi" header="Tarih">
+      <Column field="GirisTarihi" header="Date">
         <template #body="slotProps">
           {{ slotProps.data.GirisTarihi | dateToString }}
         </template>
       </Column>
-      <Column field="YapilacakOncelik" header="Öncelik"></Column>
+      <Column field="YapilacakOncelik" header="Priority"></Column>
       <Column>
         <template #body="slotProps">
           <Button
             type="button"
             class="p-button-info"
-            label="Yapıldı"
+            label="Done"
             @click="$emit('todo_done_emit', slotProps.data)"
           />
         </template>

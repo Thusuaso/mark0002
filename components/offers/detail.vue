@@ -17,11 +17,11 @@
           {{ slotProps.data.Tarih | dateToString }}
         </template>
       </Column>
-      <Column field="Sira" header="Sıra"></Column>
-      <Column field="MusteriAdi" header="Müşteri"></Column>
-      <Column field="UlkeAdi" header="Ülke"></Column>
-      <Column field="KullaniciAdi" header="Temsilci"></Column>
-      <Column field="TeklifOncelik" header="Öncelik"></Column>
+      <Column field="Sira" header="Queue"></Column>
+      <Column field="MusteriAdi" header="Customer"></Column>
+      <Column field="UlkeAdi" header="Country"></Column>
+      <Column field="KullaniciAdi" header="Representative"></Column>
+      <Column field="TeklifOncelik" header="Priority"></Column>
     </DataTable>
     <DataTable
       :value="bList"
@@ -36,18 +36,18 @@
       :loading="loading"
     >
       <template #header>
-        <h3 class="header">B Listesi</h3>
+        <h3 class="header">B List</h3>
       </template>
       <Column field="Tarih" header="Tarih">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
       </Column>
-      <Column field="Sira" header="Sıra"></Column>
-      <Column field="MusteriAdi" header="Müşteri"></Column>
-      <Column field="UlkeAdi" header="Ülke"></Column>
-      <Column field="KullaniciAdi" header="Temsilci"></Column>
-      <Column field="TeklifOncelik" header="Öncelik"></Column>
+      <Column field="Sira" header="Queue"></Column>
+      <Column field="MusteriAdi" header="Customer"></Column>
+      <Column field="UlkeAdi" header="Country"></Column>
+      <Column field="KullaniciAdi" header="Representative"></Column>
+      <Column field="TeklifOncelik" header="Priority"></Column>
     </DataTable>
   </div>
 </template>

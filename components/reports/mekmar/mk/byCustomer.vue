@@ -8,7 +8,7 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="FirmaAdi" header="Müşteri" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -19,7 +19,7 @@
           />
         </template>
       </Column>
-      <Column field="Ulke" header="Ülke" :showFilterMenu="false">
+      <Column field="Ulke" header="Country" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -30,7 +30,7 @@
           />
         </template>
       </Column>
-      <Column field="Temsilci" header="Temsilci" :showFilterMenu="false">
+      <Column field="Temsilci" header="Representative" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -53,7 +53,7 @@
         </template>
       </Column>
 
-      <Column field="Toplam" :header="'Toplam'">
+      <Column field="Toplam" :header="'Total'">
         <template #body="slotProps">
           {{ slotProps.data.Toplam | formatPriceUsd }}
         </template>
@@ -123,7 +123,7 @@
       </Column>
       <Column
         field="OnIkiYilOnceYuklenen"
-        :header="new Date().getFullYear() - 11 + ' Öncesi'"
+        :header="new Date().getFullYear() - 11 + ' Before'"
       >
         <template #body="slotProps">
           {{ slotProps.data.OnIkiYilOnceYuklenen | formatPriceUsd }}

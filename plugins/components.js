@@ -95,6 +95,13 @@ import orderDetailSupplierForm from '~/components/orders/forms/supplier';
 import orderDetailDocumentForm from '~/components/orders/forms/document';
 import orderDetailCheckForm from '~/components/orders/forms/check';
 import orderDetailWorkermanForm from '~/components/orders/forms/workerman';
+import reportsMekmerAtlantaList from '~/components/reports/mekmer/atlanta/list';
+import panelUsaStockList from '~/components/panel/usa/list';
+import panelUsaStockForm from '~/components/panel/usa/form';
+import salesConsiderForm from '~/components/sales/consider/form';
+import salesConsiderList from '~/components/sales/consider/list';
+import todoMainList from '~/components/todo/main/list';
+
 
 Vue.component('navbar', navbar);
 Vue.component('authForm', authForm);
@@ -146,6 +153,7 @@ Vue.component('reportsMekmerProductionList', reportsMekmerProductionList);
 Vue.component('reportsMekmerStockList', reportsMekmerStockList);
 Vue.component('reportsMekmerStockForm', reportsMekmerStockForm);
 Vue.component('reportsMekmerMineList', reportsMekmerMineList);
+Vue.component('reportsMekmerAtlantaList', reportsMekmerAtlantaList);
 Vue.component('reportsMekmarAyoList', reportsMekmarAyoList);
 Vue.component('reportsMekmarLoadingList', reportsMekmarLoadingList);
 Vue.component('reportsMekmarForwardingList', reportsMekmarForwardingList);
@@ -173,6 +181,8 @@ Vue.component('panelProjectList', panelProjectList);
 Vue.component('panelProjectForm', panelProjectForm);
 Vue.component('panelUsersList', panelUsersList);
 Vue.component('panelUsersForm', panelUsersForm);
+Vue.component('panelUsaStockList', panelUsaStockList);
+Vue.component('panelUsaStockForm', panelUsaStockForm);
 Vue.component('todoByUsernameList', todoByUsernameList);
 Vue.component('todoByUsernameForm', todoByUsernameForm);
 Vue.component('financeList', financeList);
@@ -190,6 +200,9 @@ Vue.component('orderDetailSupplierForm', orderDetailSupplierForm);
 Vue.component('orderDetailDocumentForm', orderDetailDocumentForm);
 Vue.component('orderDetailCheckForm', orderDetailCheckForm);
 Vue.component('orderDetailWorkermanForm', orderDetailWorkermanForm);
+Vue.component('salesConsiderForm', salesConsiderForm);
+Vue.component('salesConsiderList', salesConsiderList);
+Vue.component('todoMainList', todoMainList);
 
 
 

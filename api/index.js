@@ -161,7 +161,7 @@ app.get('/home',(req,res)=>{
                                             'ortalamaYukleme':totalYearForwarding / (new Date().getMonth() + 1),
                                             'tahminiYillikYukleme':(totalYearForwarding / (new Date().getMonth() + 1)) * 12,
                                             'chartOne':{
-                                                labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+                                                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                                                 datasets: [
                                                     {
                                                         label: new Date().getFullYear(),
@@ -489,7 +489,98 @@ app.delete('/sales/todos/delete/:id',(req,res)=>{
 
     });
 });
+app.get('/sales/todos/main/list/:username',(req,res)=>{
+    const sql = `
+    select y.ID,y.Yapilacak,y.Yapildi,y.GirisTarihi,y.YapildiTarihi,y.YapilacakOncelik,y.Acil,y.Sira,y.OrtakGorev 
+    from Yapilacaklar y 
+    where y.Yapildi=0 and y.Goruldu=0 and y.GorevVerenAdi='${req.params.username}'
+    
+    order by y.Sira 
+    `;
+    mssql.query(sql,(err,todos)=>{
+        res.status(200).json({'list':todos.recordset});
+    });
+});
 
+app.get('/todo/main/list/change/done/:id',(req,res)=>{
+    const sql = `update Yapilacaklar SET Yapildi=1 where ID='${req.params.id}'`;
+    mssql.query(sql,(err,todo)=>{
+        if(todo.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+
+});
+app.get('/todo/main/list/change/seen/:id',(req,res)=>{
+    const sql = `update Yapilacaklar SET Goruldu=1 where ID='${req.params.id}'`;
+    mssql.query(sql,(err,todo)=>{
+        if(todo.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+
+});
+app.post('/todo/main/change/queue',(req,res)=>{
+    req.body.forEach(x=>{
+        const sql = `update Yapilacaklar SET Sira='${x.Sira}' WHERE ID='${x.ID}'`;
+        mssql.query(sql,(err,todos)=>{
+            
+        });
+    });
+    res.status(200).json({'status':true});
+
+
+});
+
+
+
+
+/*Sales Points of Consider */
+app.get('/sales/points/of/consider/list',(req,res)=>{
+    const sql = `select mh.ID,mh.Hata from MaliyetHatalariTB mh`;
+    mssql.query(sql,(err,consider)=>{
+        res.status(200).json({'list':consider.recordset});
+    });
+});
+app.post('/sales/points/of/consider/save',(req,res)=>{
+    const sql = `insert into MaliyetHatalariTB(Hata) Values('${req.body.Hata}')`;
+    mssql.query(sql,(err,consider)=>{
+        if(consider.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+});
+app.put('/sales/points/of/consider/update',(req,res)=>{
+    const sql = `update MaliyetHatalariTB SET Hata='${req.body.Hata}' WHERE ID='${req.body.ID}'`;
+    mssql.query(sql,(err,consider)=>{
+        if(consider.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+});
+app.delete('/sales/points/of/consider/delete/:id',(req,res)=>{
+    const sql = `delete MaliyetHatalariTB where ID='${req.params.id}'`;
+    mssql.query(sql,(err,consider)=>{
+        if(consider.rowsAffected[0]==1){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+        }
+    });
+
+});
 /*Representative */
 app.get('/sales/representative/list',(req,res)=>{
     const sql = 'select s.SiparisNo,(select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as SiparisSahibi,(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as Operasyon from SiparislerTB s where s.SiparisDurumID=2 order by s.SiparisTarihi desc';
@@ -1062,25 +1153,29 @@ app.post('/shipment/products/save',(req,res)=>{
     const updateOrderSql = `update SiparislerTB SET SiparisDurumID=3, YuklemeTarihi='${req.body.YuklemeTarihi}' where SiparisNo='${req.body.SiparisNo}'`;
     for(const item of req.body.data){
         const updateProductionSql = `update UretimTB SET UrunDurumID= 0 where KasaNo='${item.KasaNo}'`;
-        mssql.query(updateProductionSql)
-        .then(response=>{
-            
-        });
-    };
-    for(const item of req.body.data){
         const insertSql = `
             insert into SevkiyatTB(Tarih,KasaNo,MusteriID,BirimFiyat,Toplam,CikisNo,RaporDurum,KullaniciID) 
             VALUES('${item.Tarih}','${item.KasaNo}','${item.MusteriId}','${item.SatisFiyati}','${item.TotalProduct}','${item.SiparisNo}','1','${item.KullaniciId}');
         `;
-        mssql.query(insertSql)
+        mssql.query(updateProductionSql)
         .then(response=>{
-            
+            mssql.query(insertSql)
+            .then(response=>{
+                mssql.query(updateOrderSql,(err,results)=>{
+                    if(results.rowsAffected[0] == 1){
+                        res.status(200).json({
+                            'status':true,
+                        })
+                    }else{
+                        res.status(200).json({
+                            'status':false,
+                        })
+                    }
+                });
+            });
         });
     };
 
-    res.status(200).json({
-        'status':true,
-    })
     
 });
 
@@ -2088,6 +2183,41 @@ where ID='${req.body.ID}'
 });
 
 /*Reports Mekmer*/
+app.get('/reports/mekmer/atlanta/list',(req,res)=>{
+    const sql = `
+            select  
+            k.ID,
+        k.SkuNo,
+        k.MekmarKod,
+        k.UrunTanim,
+        k.KasaKutu,
+        k.KasaAdet,
+        k.KutuAdet,
+        k.KasaSqft,
+        k.KasaM2,
+        k.keys,
+        (select top 1  u.OrderNo from YeniDepoGirisUrunlerTB u where u.UrunId=k.ID order by u.Id desc) atl,
+        dbo.MekmarUsaYeni_StockSqft(k.SkuNo) as StokSqft,
+        dbo.MekmarUsaYeni_StockBox(k.SkuNo) as StokBox,
+
+        k.mekmar_fiyat,
+        k.bd_fiyat,
+        k.maya_fiyat,
+        k.villo_fiyat,
+        k.Kategori,
+        k.DepoEbat,
+        k.DepoUreticiFiyat,
+        k.MaxPayload,
+        k.DepoTransport
+        from
+        DepoUrunKartTB k 
+        where k.Aktif =  1 and k.MekmarKod !='SPO'
+        order by dbo.get_YeniDepoStok(k.ID,k.Devir) * k.KutuM2  desc
+    `;
+    mssql.query(sql,(err,atlanta)=>{
+        res.status(200).json({'list':atlanta.recordset});
+    });
+});
 app.get('/reports/mekmer/production/list', (req, res) => {
     const sql = `
                    select 
@@ -2119,13 +2249,52 @@ inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
 inner join OlculerTB o on o.ID = uk.OlcuID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
-where YEAR(u.Tarih) = YEAR(GETDATE())
+where YEAR(u.Tarih) >= YEAR(GETDATE()) - 2
 order by u.Tarih desc
                 `;
     mssql.query(sql, (err, results) => {
       res.status(200).json({'list':results.recordset})
     })
 });
+app.get('/reports/mekmer/production/quarter/list/:year1/:year2', (req, res) => {
+    const sql = `
+    select 
+
+	u.Tarih,
+	t.FirmaAdi,
+	k.KategoriAdi,
+	u.KasaNo,
+	urun.UrunAdi,
+	uo.OcakAdi,
+	yk.YuzeyIslemAdi,
+	o.En,
+	o.Boy,
+	o.Kenar,
+	u.Miktar,
+	u.Adet,
+	ub.BirimAdi,
+	u.SiparisAciklama,
+	u.Aciklama
+
+
+
+from UretimTB u
+inner join TedarikciTB t on t.ID = u.TedarikciID
+inner join UrunKartTB uk on uk.ID = u.UrunKartID
+inner join KategoriTB k on k.ID = uk.KategoriID
+inner join UrunlerTB urun on urun.ID = uk.UrunID
+inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+inner join OlculerTB o on o.ID = uk.OlcuID
+inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
+inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
+where YEAR(u.Tarih) <= '${req.params.year1}' and YEAR(u.Tarih) >= '${req.params.year2}'
+order by u.Tarih desc
+                `;
+    mssql.query(sql, (err, results) => {
+      res.status(200).json({'list':results.recordset})
+    })
+});
+
 app.post('/reports/mekmer/production/date', (req, res) => {
     const sql = `
                   select 
@@ -2921,42 +3090,87 @@ app.get('/reports/mekmar/loading/year/month/list/:yil', (req, res) => {
 
 app.get('/reports/mekmar/forwarding/list', (req, res) => {
     const sql = `
-select 
-s.Tarih,
-s.KasaNo,
-s.MusteriID,
-s.BirimFiyat,
-s.Toplam,
-m.FirmaAdi,
-u.SiparisAciklama,
-u.Adet,
-u.KutuAdet,
-u.KutuIciAdet,
-u.Miktar,
-uk.ID as UrunKartId,
-k.KategoriAdi,
-urun.UrunAdi,
-yk.YuzeyIslemAdi,
-ol.En,
-ol.Boy,
-ol.Kenar,
-uoc.OcakAdi,
-ub.BirimAdi,
-t.FirmaAdi as TedarikciAdi
+    select 
+    s.Tarih,
+    s.KasaNo,
+    s.MusteriID,
+    s.BirimFiyat,
+    s.Toplam,
+    m.FirmaAdi,
+    u.SiparisAciklama,
+    u.Adet,
+    u.KutuAdet,
+    u.KutuIciAdet,
+    u.Miktar,
+    uk.ID as UrunKartId,
+    k.KategoriAdi,
+    urun.UrunAdi,
+    yk.YuzeyIslemAdi,
+    ol.En,
+    ol.Boy,
+    ol.Kenar,
+    uoc.OcakAdi,
+    ub.BirimAdi,
+    t.FirmaAdi as TedarikciAdi
+    
+    from SevkiyatTB s 
+    inner join UretimTB u on u.KasaNo = s.KasaNo
+    inner join MusterilerTB m on m.ID = s.MusteriID
+    inner join UrunKartTB uk on uk.ID = u.UrunKartID
+    inner join KategoriTB k on k.ID = uk.KategoriID
+    inner join UrunlerTB urun on urun.ID = uk.UrunID
+    inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+    inner join OlculerTB ol on ol.ID = uk.OlcuID
+    inner join UrunOcakTB uoc on uoc.ID = u.UrunOcakID
+    inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
+    inner join TedarikciTB t on t.ID = u.TedarikciID
+    where u.UrunDurumID=0 and YEAR(s.Tarih) >= YEAR(GETDATE()) - 2
+    order by s.Tarih desc
 
-from SevkiyatTB s 
-inner join UretimTB u on u.KasaNo = s.KasaNo
-inner join MusterilerTB m on m.ID = s.MusteriID
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join UrunOcakTB uoc on uoc.ID = u.UrunOcakID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-where u.UrunDurumID=0 and YEAR(s.Tarih) = YEAR(GETDATE())
-order by s.Tarih desc
+
+    `;
+    mssql.query(sql, (err, results) => {
+       res.status(200).json({'list':results.recordset}) 
+    });
+});
+app.get('/reports/mekmar/forwarding/list/quarter/:year1/:year2', (req, res) => {
+    const sql = `
+    select 
+    s.Tarih,
+    s.KasaNo,
+    s.MusteriID,
+    s.BirimFiyat,
+    s.Toplam,
+    m.FirmaAdi,
+    u.SiparisAciklama,
+    u.Adet,
+    u.KutuAdet,
+    u.KutuIciAdet,
+    u.Miktar,
+    uk.ID as UrunKartId,
+    k.KategoriAdi,
+    urun.UrunAdi,
+    yk.YuzeyIslemAdi,
+    ol.En,
+    ol.Boy,
+    ol.Kenar,
+    uoc.OcakAdi,
+    ub.BirimAdi,
+    t.FirmaAdi as TedarikciAdi
+    
+    from SevkiyatTB s 
+    inner join UretimTB u on u.KasaNo = s.KasaNo
+    inner join MusterilerTB m on m.ID = s.MusteriID
+    inner join UrunKartTB uk on uk.ID = u.UrunKartID
+    inner join KategoriTB k on k.ID = uk.KategoriID
+    inner join UrunlerTB urun on urun.ID = uk.UrunID
+    inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+    inner join OlculerTB ol on ol.ID = uk.OlcuID
+    inner join UrunOcakTB uoc on uoc.ID = u.UrunOcakID
+    inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
+    inner join TedarikciTB t on t.ID = u.TedarikciID
+    where u.UrunDurumID=0 and YEAR(s.Tarih) <= '${req.params.year1}' and YEAR(s.Tarih) >='${req.params.year2}'
+    order by s.Tarih desc
 
 
     `;
@@ -5038,12 +5252,74 @@ from YeniTeklifTB yt
 inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
 inner join KullaniciTB k on k.ID = yt.KullaniciId
 inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
+ 
+where yt.TakipEt = 1 and yt.BList != 1
+order by yt.TeklifOncelik 
+    `;
+    const bListSql =  `
+    select 
 
-where yt.TakipEt = 1
+
+	yt.Id,
+	yt.Tarih,
+	yt.HatirlatmaTarihi,
+	yt.HatirlatmaSonTarih,
+	yt.MusteriId,
+	yt.Aciklama,
+	yt.Cfr,
+	yt.Fob,
+	yt.Dtp,
+	yt.Fca,
+	yt.KullaniciId,
+	yt.TakipEt,
+	yt.KaynakYeri,
+	yt.TeklifYeri,
+	yt.HatirlatmaAciklama,
+	yt.HatirlatmaId,
+	yt.DosyaAdi,
+	yt.Numune_Giris_Tarihi,
+	yt.Numune_Hatirlatma_Tarihi,
+	yt.Numune_Hatirlatma_SonTarih,
+	yt.Numune_Tracking_No,
+	yt.Numune_Odenen_Tutar,
+	yt.Numune_Musteriden_Alinan,
+	yt.Proforma_Po_No,
+	yt.Proforma_Tarih,
+	yt.Proforma_Tutar,
+	yt.ProformaNot,
+	yt.Teklif_Cloud,
+	yt.Teklif_Cloud_Dosya,
+	yt.Proforma_Cloud,
+	yt.Proforma_Cloud_Dosya,
+	yt.Numune_Cloud,
+	yt.Numune_Cloud_Dosya,
+	yt.NumuneNot,
+	yt.TeklifOncelik,
+	yt.Sira,
+	yt.BList,
+	yt.SonGorulme_Cloud,
+	yt.SonGorulme_Cloud_Dosya,
+	yt.HatirlatilmaDurumu,
+	yt.Company,
+	yt.Email,
+	yt.Phone,
+	ytm.MusteriAdi,
+	k.KullaniciAdi,
+    ytu.UlkeAdi
+
+from YeniTeklifTB yt
+inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
+inner join KullaniciTB k on k.ID = yt.KullaniciId
+inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
+
+where yt.TakipEt = 1 and yt.BList = 1
 order by yt.TeklifOncelik 
     `;
     mssql.query(sql,(err,results)=>{
-        res.status(200).json({ 'list': results.recordset });
+        mssql.query(bListSql,(err,bList)=>{
+            res.status(200).json({ 'list': results.recordset,'bList':bList.recordset });
+
+        });
     })
 });
 app.get('/offer/old/list', (req, res) => {
@@ -5479,7 +5755,7 @@ app.put('/panel/product/update', (req, res) => {
                 yayinla='${req.body.yayinla}',
                 birim='${req.body.birim}',
                 urunkod='${req.body.urunkod}',
-                stonetype='${req.body.stonetype}',
+                stonetype=${req.body.stonetype},
                 keywords_en='${req.body.keywords_en}',
                 keywords_fr='${req.body.keywords_fr}',
                 keywords_es='${req.body.keywords_es}',
@@ -5598,6 +5874,11 @@ from MekmarCom_OnerilenUrunler mou where mou.urunid='${productId}'
 order by sira
     
     `;
+    const edgeListSql = `
+    select msf.ID,msf.UrunId,msf.KenarId,msf.KategoriId,msl.KenarEn,msl.KenarFr,msl.KenarEs,msl.KenarRu from MekmarCom_KenarFiltered msf
+    inner join MekmarCom_KenarList msl on msl.ID = msf.KenarId
+    where msf.UrunId='${productId}'
+    `;
     mssql.query(sizeListSql, (err,size) => {
        mssql.query(finishListSql,(err,finish)=>{
         mssql.query(colorListSql,(err,color)=>{
@@ -5608,18 +5889,22 @@ order by sira
                        mssql.query(photoListSql, (err, photo) => {
                            mssql.query(suggestedAllListSql, (err, suggestedAll) => {
                                mssql.query(suggestedListSql, (err, suggestedList) => {
-                                   res.status(200).json({
-                                       'size': size.recordset,
-                                       'finish': finish.recordset,
-                                       'color': color.recordset,
-                                       'area': area.recordset,
-                                       'type': type.recordset,
-                                       'material': material.recordset,
-                                       'style': style.recordset,
-                                       'photo': photo.recordset,
-                                       'suggestedall':suggestedAll.recordset,
-                                       'suggestedlist':suggestedList.recordset,
-                                   });
+                                mssql.query(edgeListSql,(err,edge)=>{
+                                    res.status(200).json({
+                                        'edge':edge.recordset,
+                                        'size': size.recordset,
+                                        'finish': finish.recordset,
+                                        'color': color.recordset,
+                                        'area': area.recordset,
+                                        'type': type.recordset,
+                                        'material': material.recordset,
+                                        'style': style.recordset,
+                                        'photo': photo.recordset,
+                                        'suggestedall':suggestedAll.recordset,
+                                        'suggestedlist':suggestedList.recordset,
+                                    });
+                                });
+
                                });
                            });
 
@@ -5838,6 +6123,35 @@ app.delete('/panel/product/material/delete/:id', (req, res) => {
     }
     });
 });
+app.post('/panel/product/edge/add',(req,res)=>{
+    const edgeInsertSql = `
+                    insert into MekmarCom_KenarFiltered 
+            (KenarId,UrunId,KategoriId)
+            VALUES('${req.body.KenarId}','${req.body.UrunId}','${req.body.KategoriId}')
+    `;
+    const edgeIdSql = `select top 1 ID from MekmarCom_KenarFiltered order by ID desc`;
+    mssql.query(edgeInsertSql, (err, edge) => {
+       if(edge.rowsAffected[0] == 1){
+        mssql.query(edgeIdSql,(err,edgeId)=>{
+            res.status(200).json({ 'status': true, 'id': edgeId.recordset[0].ID });
+        });
+       } else{
+        res.status(200).json({'status':false,'id':0});
+       } 
+    });
+});
+app.delete('/panel/product/edge/delete/:id', (req, res) => {
+    const deleteEdgeSql = `delete MekmarCom_KenarFiltered where ID='${req.params.id}'`;
+    mssql.query(deleteEdgeSql, (err, edge) => {
+       if(edge.rowsAffected[0] == 1){
+           res.status(200).json({ 'status': true });
+    } else{
+           res.status(200).json({ 'status': false });
+    }
+    });
+});
+
+
 app.delete('/panel/product/photo/one/delete/:id', (req, res) => {
     const photoDeleteSql = `delete MekmarCom_Fotolar where Id='${req.params.id}'`;
     mssql.query(photoDeleteSql, (err, photo) => {
@@ -5940,6 +6254,178 @@ app.post('/panel/product/test/report', (req, res) => {
         }
     });
 });
+
+app.get('/panel/usa/stock/list',(req,res)=>{
+    const sql = `
+                select 
+
+                dpm.Id,
+                dpm.Yayinla,
+                dpm.MaxStock,
+                dpm.UrunId,
+                dpm.UrunAdi,
+                dpm.Aciklama,
+                dpm.Anahtarlar,
+                dpm.Size,
+                dpm.LinkSize,
+                dpm.Renk,
+                dpm.Fiyat,
+                dpm.MosaicSize,
+                dpm.KutuDetay,
+                dpm.KasaDetay,
+                dpm.Surface,
+                dpm.Edge,
+                dpm.Sira,
+                dpm.TurkeyStock,
+                dpm.urunadi_en,
+                dpm.aciklama_en,
+                dpm.anahtarlar_en,
+                dpm.renk_en,
+                dpm.kutudetay_en,
+                dpm.kasadetay_en,
+                dpm.surface_en,
+                dpm.edge_en,
+                dpm.urunadi_fr,
+                dpm.aciklama_fr,
+                dpm.anahtarlar_fr,
+                dpm.renk_fr,
+                dpm.kutudetay_fr,
+                dpm.kasadetay_fr,
+                dpm.surface_fr,
+                dpm.edge_fr,
+                dpm.urunadi_es,
+                dpm.aciklama_es,
+                dpm.anahtarlar_es,
+                dpm.renk_es,
+                dpm.kutudetay_es,
+                dpm.kasadetay_es,
+                dpm.surface_es,
+                dpm.edge_es,
+                duk.SkuNo,
+                duk.MekmarKod,
+                duk.UrunTanim,
+                duk.UrunAciklama,
+                duk.KasaKutu,
+                duk.KasaAdet,
+                duk.KasaSqft,
+                duk.KasaM2,
+                duk.KutuAdet,
+                duk.KutuSqft,
+                duk.KutuM2,
+                duk.FobFiyat,
+                duk.DtpFiyat,
+                duk.UrunSira,
+                duk.SiteSira,
+                duk.SiteGoster,
+                dbo.MekmarUsaYeni_StockSqft(duk.SkuNo) as StokSqft,
+                dbo.MekmarUsaYeni_StockBox(duk.SkuNo) as StokBox,
+                duk.Kategori,
+                duk.ID as ProductId
+
+
+
+
+            from DepoUrunKart_MekmarSiteTB dpm 
+            inner join DepoUrunKartTB duk on duk.ID = dpm.UrunId
+            where Yayinla=1
+    `;
+    mssql.query(sql,(err,usa)=>{
+        res.status(200).json({'list':usa.recordset});
+    });
+});
+app.get('/panel/usa/stock/photos/list/:product_id',(req,res)=>{
+    const sql =  `select dum.Id,dum.UrunId,dum.Image,dum.Webp,dum.Sira from DepoUrunKart_MekmarFotolarTB dum where UrunId='${req.params.product_id}'`;
+    mssql.query(sql,(err,photos)=>{
+        res.status(200).json({'list':photos.recordset})
+    });
+
+});
+app.put('/panel/usa/stock/update',(req,res)=>{
+    const updateStock = `
+    update MekmarCom_StockListYeni
+    SET
+        StockBox='${req.body.StokBox}',
+        StockSqft='${req.body.StokSqft}'
+    WHERE
+        SkuNo='${req.body.SkuNo}'
+    `;
+    const updatePrice = `
+    select * from DepoUrunKart_MekmarSiteTB
+
+    update DepoUrunKart_MekmarSiteTB
+    SET
+        UrunAdi='${req.body.UrunAdi}',
+        Aciklama='${req.body.Aciklama}',
+        Anahtarlar='${req.body.Anahtarlar}',
+        Size='${req.body.Size}',
+        Renk='${req.body.Renk}',
+        Fiyat='${req.body.Fiyat}',
+        MaxStock='${req.body.MaxStock}',
+        KutuDetay='${req.body.KutuDetay}',
+        KasaDetay='${req.body.KasaDetay}',
+        Surface='${req.body.Surface}',
+        Edge='${req.body.Edge}',
+        Yayinla='${req.body.Yayinla}',
+        urunadi_en='${req.body.UrunAdi}',
+        aciklama_en='${req.body.Aciklama}',
+        anahtarlar_en='${req.body.Anahtarlar}',
+        renk_en='${req.body.Renk}',
+        kutudetay_en='${req.body.KutuDetay}',
+        kasadetay_en='${req.body.KasaDetay}',
+        surface_en='${req.body.Size}',
+        edge_en='${req.body.Edge}',
+        urunadi_fr='${req.body.urunadi_fr}',
+        aciklama_fr='${req.body.aciklama_fr}',
+        anahtarlar_fr='${req.body.anahtarlar_fr}',
+        renk_fr='${req.body.renk_fr}',
+        kutudetay_fr='${req.body.kutudetay_fr}',
+        kasadetay_fr='${req.body.kasadetay_fr}',
+        surface_fr='${req.body.surface_fr}',
+        edge_fr='${req.body.edge_fr}',
+        urunadi_es='${req.body.urunadi_es}',
+        aciklama_es='${req.body.aciklama_es}',
+        anahtarlar_es='${req.body.anahtarlar_es}',
+        renk_es='${req.body.renk_es}',
+        kutudetay_es='${req.body.kutudetay_es}',
+        kasadetay_es='${req.body.kasadetay_es}',
+        surface_es='${req.body.surface_es}',
+        edge_es='${req.body.edge_es}'
+    where Id='${req.body.Id}'
+
+    `;
+
+    mssql.query(updateStock,(err,stock)=>{
+        if(stock.rowsAffected[0]==1){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+
+});
+app.post('/panel/usa/stock/photo/upload',(req,res)=>{
+    const sql = `
+        INSERT INTO DepoUrunKart_MekmarFotolarTB(UrunId,Image,Webp,Sira)
+        VALUES(
+            '${req.body.UrunId}',
+            '${req.body.Image}',
+            '${req.body.Webp}',
+            '${req.body.Sira}'
+        )
+    `;
+    mssql.query(sql,(err,image)=>{
+        if(image.rowsAffected[0]==1){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+});
+
+
+
 
 
 /*Mekmar Com Project */
@@ -6906,7 +7392,7 @@ order by YEAR(s.SiparisTarihi) desc
     `;
     mssql.query(ordersListSql, (err, orders) => {
         mssql.query(orderYearListSql, (err, years) => {
-            let customYearList = [{ 'Yil': 'Hepsi' }];
+            let customYearList = [{ 'Yil': 'All' }];
             years.recordset.forEach(x => {
                 customYearList.push(x);
             });
@@ -7173,7 +7659,7 @@ order by YEAR(s.SiparisTarihi) desc
     `;
     mssql.query(ordersListSql, (err, orders) => {
                mssql.query(orderYearListSql, (err, years) => {
-            let customYearList = [{ 'Yil': 'Hepsi' }];
+            let customYearList = [{ 'Yil': 'All' }];
             years.recordset.forEach(x => {
                 customYearList.push(x);
             });
@@ -7705,7 +8191,7 @@ SatisFiyati = '${req.body.SatisFiyati}',
 SatisToplam = '${req.body.SatisToplam}',
 UretimAciklama = '${req.body.UretimAciklama}',
 MusteriAciklama = '${req.body.MusteriAciklama}',
-AlisFiyati = '${req.body.AlisFiyati}',
+AlisFiyati = ${req.body.AlisFiyati},
 SiraNo = '${req.body.SiraNo}',
 Ton = '${req.body.Ton}',
 Adet = '${req.body.Adet}'
@@ -8727,7 +9213,6 @@ function updatedSendMail(payload) {
             </tr>`
         });
         content = content + '</table>';
-        
         if(payload.operation == payload.representative){
             transporter.sendMail({
                 to: payload.representative,
@@ -8784,6 +9269,70 @@ app.post('/order/production/product/save/mail', (req, res) => {
         });
     };
     updateProductionTotal(req.body.po)
+});
+app.post('/shipment/products/save/mail',(req,res)=>{
+        let content = `
+            <h3>${req.body.KullaniciAdi} Adlı Kullanıcı ${req.body.YuklemeTarihi} Tarihinde ${req.body.SiparisNo} Sevkiyatı Gerçekleştirdi.</h3>
+            <br/>
+            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+            <tr style="border: 1px solid;">
+                <th style="border: 1px solid;">Kasa No</th>
+                <th style="border: 1px solid;">Ürün</th>
+                <th style="border: 1px solid;">Yüzey</th>
+                <th style="border: 1px solid;">Ebat</th>
+                <th style="border: 1px solid;">Birim</th>
+                <th style="border: 1px solid;">Miktar</th>
+                <th style="border: 1px solid;">Toplam</th>
+
+            </tr>
+        `
+        req.body.data.forEach(x => {
+            content = content + `
+            <tr style="border: 1px solid;">
+                <td style="border: 1px solid;text-align:center;">${x.KasaNo}</td>
+                <td style="border: 1px solid;text-align:center;">${x.UrunAdi}</td>
+                <td style="border: 1px solid;text-align:center;">${x.YuzeyIslemAdi}</td>
+                <td style="border: 1px solid;text-align:center;">${x.En} x ${x.Boy} x ${x.Kenar}</td>
+                <td style="border: 1px solid;text-align:center;">${x.BirimAdi}</td>
+                <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+                <td style="border: 1px solid;text-align:center;">$ ${x.TotalProduct}</td>
+
+            </tr>`
+        });
+        content = content + '</table>';
+        transporter.sendMail({
+            to: req.body.mail,
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Sevkiyat İşlemi',
+            html: content
+        })
+        .then(response=>{
+            if(response.response == '250 message sent ok '){
+                res.status(200).json({'status':true});
+            } else{
+                res.status(200).json({'status':false});
+            };
+        });
+        transporter.sendMail({
+            to: 'info@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Sevkiyat İşlemi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'mehmet@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Sevkiyat İşlemi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'huseyin@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Sevkiyat İşlemi',
+            html: content
+        });
+
+
 });
 
 
@@ -9086,6 +9635,7 @@ app.get('/panel/product/shared/list', (req, res) => {
     const styleSql = `select ID,StilEn,StilFr,StilEs,StilRu,StilLink from MekmarCom_StilList`;
     const typeSql = `select ID,TurEn,TurFr,TurEs,TurRu,TurLink from MekmarCom_TurList`;
     const materialSql = `select ID,MateryalEn,MateryalFr,MateryalEs,MateryalRu,MateryalLink from MekmarCom_MateryalList`;
+    const edgeSql = `select ID,KenarEn,KenarFr,KenarEs,KenarRu from MekmarCom_KenarList`;
     mssql.query(sizeSql,(err,size)=>{
         mssql.query(finishSql, (err, finish) => {
             mssql.query(colorSql, (err, color) => {
@@ -9093,15 +9643,19 @@ app.get('/panel/product/shared/list', (req, res) => {
                    mssql.query(styleSql, (err, style) => {
                     mssql.query(typeSql,(err,type)=>{
                         mssql.query(materialSql, (err, material) => {
-                            res.status(200).json({
-                               'size':size.recordset,
-                               'finish':finish.recordset,
-                               'color':color.recordset,
-                                'area': area.recordset,
-                               'style':style.recordset,
-                               'type':type.recordset,
-                               'material':material.recordset
+                            mssql.query(edgeSql,(err,edge)=>{
+                                res.status(200).json({
+                                    'size':size.recordset,
+                                    'finish':finish.recordset,
+                                    'color':color.recordset,
+                                     'area': area.recordset,
+                                    'style':style.recordset,
+                                    'type':type.recordset,
+                                    'material':material.recordset,
+                                    'edge':edge.recordset
+                                 });
                             });
+
                         });
                     });
                    }); 

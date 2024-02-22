@@ -4,13 +4,13 @@
       <div class="col">
         <span class="p-float-label">
           <InputText class="w-100" id="customer" type="text" v-model="model.MusteriAdi" />
-          <label for="customer">Müşteri</label>
+          <label for="customer">Customer</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText class="w-100" id="company" type="text" v-model="model.Company" />
-          <label for="company">Şirket</label>
+          <label for="company">Company</label>
         </span>
       </div>
       <div class="col">
@@ -23,7 +23,7 @@
             @complete="searchCountry($event)"
             class="w-100"
           />
-          <label for="country">Ülke</label>
+          <label for="country">Country</label>
         </span>
       </div>
     </div>
@@ -37,7 +37,7 @@
       <div class="col">
         <span class="p-float-label">
           <InputText class="w-100" id="phone" type="text" v-model="model.Phone" />
-          <label for="phone">Telefon</label>
+          <label for="phone">Phone</label>
         </span>
       </div>
     </div>
@@ -45,13 +45,13 @@
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="model.Adress" rows="5" cols="30" class="w-100" />
-          <label>Adres</label>
+          <label>Address</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="model.Description" rows="5" cols="30" class="w-100" />
-          <label>Açıklama</label>
+          <label>Description</label>
         </span>
       </div>
     </div>
@@ -60,7 +60,7 @@
         <Button
           text="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="process"
         />
       </div>
@@ -68,7 +68,7 @@
         <Button
           text="button"
           class="p-button-danger w-100"
-          label="Sil"
+          label="Delete"
           @click="deleteForm"
         />
       </div>

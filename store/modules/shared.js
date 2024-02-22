@@ -30,6 +30,7 @@ const state = {
     panelProductStyle: [],
     panelProductType: [],
     panelProductMaterial: [],
+    panelProductEdge:[],
     customersList: [],
     unitList:[],
     orderKindOfDeliveryList: [],
@@ -280,6 +281,7 @@ const mutations = {
             state.panelProductStyle = payload.style;
             state.panelProductType = payload.type;
         state.panelProductMaterial = payload.material;
+        state.panelProductEdge = payload.edge;
     },
     setCustomerList(state, payload) {
         state.customersList = payload;
@@ -404,7 +406,9 @@ const getters = {
     },
     getPanelProductMaterial(state){
         return state.panelProductMaterial;
-        
+    },
+    getPanelProductEdge(state){
+        return state.panelProductEdge;
     },
     getCustomersList(state) {
         return state.customersList;

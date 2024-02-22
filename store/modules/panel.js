@@ -9,6 +9,7 @@ const state = {
     panelProductAreaList: [],
     panelProductTypeList: [],
     panelProductMaterialList: [],
+    panelProductEdgeList: [],
     panelProductStyleList:[],
     panelProductPhotoList: [],
     panelProductSuggestedList: [],
@@ -20,7 +21,10 @@ const state = {
     panelProjectButtonStatus: false,
     panelProjectId: 0,
     panelUsersList: [],
-    panelUsersButtonStatus:false
+    panelUsersButtonStatus:false,
+    panelUsaStockList:[],
+    panelUsaStockPhotosList:[],
+    panelUsaStockButtonStatus:false
 };
 const actions = {
     setPanelPublishedList(vuexContext) {
@@ -287,6 +291,29 @@ const actions = {
                     vuexContext.commit('setPanelProductMaterialDelete', id);
                 } else {
                     this.$toast.error('Materyal Silme Başarısız.');
+                }
+            });
+    },
+    setPanelProductEdgeAdd(vuexContext, kenar) {
+        this.$axios.post('/panel/product/edge/add', kenar)
+            .then(response => {
+                if (response.data.status) {
+                    this.$toast.success('Kenar Ekleme Başarılı.');
+                    vuexContext.commit('setPanelProductEdgeAdd', { ...kenar, 'ID': response.data.id });
+                    vuexContext.dispatch('setPanelProductEdgeModel');
+                } else {
+                  this.$toast.error('Kenar Ekleme Başarısız.');
+                };
+            })
+    },
+    setPanelProductEdgeDelete(vuexContext, id) {
+        this.$axios.delete(`/panel/product/edge/delete/${id}`)
+            .then(response => {
+                if (response.data.status) {
+                    this.$toast.success('Kenar Silme Başarılı.');
+                    vuexContext.commit('setPanelProductEdgeDelete', id);
+                } else {
+                    this.$toast.error('Kenar Silme Başarısız.');
                 }
             });
     },
@@ -573,6 +600,54 @@ const actions = {
                     this.$toast.error('Kullanıcı Güncelleme Başarısız.');
                 }
             });
+    },
+    setPanelUsaStockList(vuexContext){
+        this.$axios.get('/panel/usa/stock/list')
+        .then(response=>{
+            vuexContext.commit('setPanelUsaStockList',response.data.list);
+        });
+    },
+    setpanelUsaStockPhotosList(vuexContext,product_id){
+        this.$axios.get(`/panel/usa/stock/photos/list/${product_id}`)
+        .then(response=>{
+            vuexContext.commit('setpanelUsaStockPhotosList',response.data.list);
+        });
+    },
+    setPanelUsaStockButtonStatus(vuexContext,status){
+        vuexContext.commit('setPanelUsaStockButtonStatus',status);
+    },
+    setPanelUsaStockUpdate(vuexContext,product){
+        this.$axios.put('/panel/usa/stock/update',product)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Başarıyla Güncellendi.');
+            } else{
+                this.$toast.error('Güncelleme Başarısız.');
+                
+            }
+        });
+    },
+    setPanelUsaStockPhotoUpload(vuexContext,image){
+        this.$axios.post('/panel/usa/stock/photo/upload',image)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Resim Başarıyla Yüklendi.');
+                vuexContext.dispatch('setpanelUsaStockPhotosList',image.UrunId);
+            } else{
+                this.$toast.error('Resim Yükleme Başarısız.');
+            }
+        });
+    },
+    setUsaStockPhotosChangeQueue(vuexContext,image){
+        this.$axios.post('/panel/usa/stock/photos/change/queue')
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Fotoğraf Sırası Başarıyla Değiştirildi.');    
+            } else{
+                this.$toast.success('Fotoğraf Sırası Değiştirme Başarısız.');    
+
+            }
+        });
     }
 
 
@@ -621,6 +696,7 @@ const mutations = {
             state.panelProductAreaList = payload.area;
             state.panelProductTypeList = payload.type;
         state.panelProductMaterialList = payload.material;
+        state.panelProductEdgeList = payload.edge;
         state.panelProductStyleList = payload.style;
         state.panelProductPhotoList = [payload.photo, []];
         state.panelProductSuggestedList = [payload.suggestedall,payload.suggestedlist]
@@ -663,9 +739,16 @@ const mutations = {
     setPanelProductMaterialAdd(state, payload) {
         state.panelProductMaterialList.push(payload);
     },
+    setPanelProductEdgeAdd(state,payload){
+        state.panelProductEdgeList.push(payload);
+    },
     setPanelProductMaterialDelete(state, payload) {
         const index = state.panelProductMaterialList.findIndex(x => x.ID == payload);
         state.panelProductMaterialList.splice(index, 1);
+    },
+    setPanelProductEdgeDelete(state, payload) {
+        const index = state.panelProductEdgeList.findIndex(x => x.ID == payload);
+        state.panelProductEdgeList.splice(index, 1);
     },
     setPanelProductPhotoListUpdate(state, payload) {
         state.panelProductPhotoList = [payload,[]];
@@ -691,6 +774,15 @@ const mutations = {
     },
     setPanelUsersButtonStatus(state, payload) {
         state.panelUsersButtonStatus = payload;
+    },
+    setPanelUsaStockList(state,payload){
+       state.panelUsaStockList = payload; 
+    },
+    setpanelUsaStockPhotosList(state,payload){
+        state.panelUsaStockPhotosList = payload;
+    },
+    setPanelUsaStockButtonStatus(state,payload){
+        state.panelUsaStockButtonStatus = payload;
     }
 
 
@@ -725,6 +817,9 @@ const getters = {
     },
     getPanelProductMaterialList(state) {
         return state.panelProductMaterialList;
+    },
+    getPanelProductEdgeList(state){
+      return state.panelProductEdgeList;  
     },
     getPanelProductStyleList(state) {
         return state.panelProductStyleList;
@@ -761,6 +856,15 @@ const getters = {
     },
     getPanelUsersButtonStatus(state) {
         return state.panelUsersButtonStatus;
+    },
+    getPanelUsaStockList(state){
+        return state.panelUsaStockList;
+    },
+    getPanelUsaStockPhotosList(state){
+        return state.panelUsaStockPhotosList;
+    },
+    getPanelUsaStockButtonStatus(state){
+        return state.panelUsaStockButtonStatus
     }
 
 };

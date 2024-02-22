@@ -9,7 +9,7 @@
             @date-select="paymentDateSelected($event)"
             :disabled="advanced_payment_disabled"
           />
-          <label for="payment_date">Tarih</label>
+          <label for="payment_date">Date</label>
         </span>
       </div>
       <div class="col">
@@ -26,7 +26,7 @@
             :disabled="advanced_payment_disabled"
             @input="model.Tutar = formatPoint($event)"
           />
-          <label for="pay">Tutar</label>
+          <label for="pay">Price</label>
         </span>
       </div>
       <div class="col">
@@ -37,7 +37,7 @@
             :disabled="advanced_payment_disabled"
             @input="model.Kur = formatPoint($event)"
           />
-          <label for="currency">Kur</label>
+          <label for="currency">Currency</label>
         </span>
       </div>
       <div class="col">
@@ -48,7 +48,7 @@
             :disabled="advanced_payment_disabled"
             @input="model.Masraf = formatPoint($event)"
           />
-          <label for="cost">Masraf</label>
+          <label for="cost">Cost</label>
         </span>
       </div>
     </div>
@@ -61,7 +61,7 @@
             class="w-100"
             :disabled="advanced_payment_disabled"
           />
-          <label>Açıklama</label>
+          <label>Description</label>
         </span>
       </div>
     </div>
@@ -70,7 +70,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           :disabled="advanced_payment_disabled"
           @click="save"
         />
@@ -79,7 +79,7 @@
         <Button
           type="button"
           class="p-button-warning w-100"
-          label="Vazgeç"
+          label="Cancel"
           :disabled="advanced_payment_disabled"
           @click="cancel"
         />
@@ -91,9 +91,9 @@
       selectionMode="single"
       @row-click="advancedPaymentSelected($event)"
     >
-      <Column field="FirmaAdi" header="Müşteri"></Column>
+      <Column field="FirmaAdi" header="Customer"></Column>
       <Column field="SiparisNo" header="Po"></Column>
-      <Column field="Pesinat" header="Tutar">
+      <Column field="Pesinat" header="Price">
         <template #body="slotProps">
           {{ slotProps.data.Pesinat | formatPriceUsd }}
         </template>

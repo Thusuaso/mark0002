@@ -5,7 +5,7 @@
         <TabPanel header="Bilgiler">
           <div class="container">
             <Card class="mb-4">
-              <template #title> Ürün Bilgileri</template>
+              <template #title> Product Info</template>
               <template #content>
                 <div class="row">
                   <div class="col">
@@ -13,7 +13,7 @@
                       v-model="selectedCategory"
                       :options="category"
                       optionLabel="Urun"
-                      placeholder="Kategori Seçiniz"
+                      placeholder="Select a Category"
                       class="w-100"
                       @change="categorySelected($event)"
                     />
@@ -23,7 +23,7 @@
                       v-model="selectedUnit"
                       :options="unit"
                       optionLabel="BirimAdi"
-                      placeholder="Birim Seçiniz"
+                      placeholder="Select a Unit"
                       class="w-100"
                       @change="unitSelected($event)"
                     />
@@ -31,20 +31,20 @@
                   <div class="col">
                     <span class="p-float-label mb-4">
                       <InputText id="amount" v-model="model.Miktar" class="w-100" />
-                      <label for="amount">Miktar</label>
+                      <label for="amount">Amount</label>
                     </span>
                   </div>
                 </div>
               </template>
             </Card>
             <Card class="mb-4">
-              <template #title>Ödeme Bilgileri</template>
+              <template #title>Paid Info</template>
               <template #content>
                 <div class="container">
                   <div class="row">
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title> Gönderi Tipi</template>
+                        <template #title> Kind of Transfer</template>
                         <template #content>
                           <div
                             class="flex align-items-center mb-4"
@@ -67,7 +67,7 @@
                     </div>
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title> Banka Seçimi</template>
+                        <template #title> Kind of Bank</template>
                         <template #content>
                           <div
                             class="flex align-items-center mb-4"
@@ -89,7 +89,7 @@
                     </div>
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title>Kurye Alış</template>
+                        <template #title>Courier Buying</template>
                         <template #content>
                           <span class="p-float-label mb-4">
                             <InputText
@@ -120,7 +120,7 @@
                     </div>
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title>Kurye Satış</template>
+                        <template #title>Courier Selling</template>
                         <template #content>
                           <span class="p-float-label mb-4">
                             <InputText
@@ -155,7 +155,7 @@
             </Card>
             <span class="p-float-label mb-4">
               <Textarea class="w-100" v-model="model.Aciklama" />
-              <label>Not</label>
+              <label>Description</label>
             </span>
           </div>
         </TabPanel>
@@ -165,7 +165,7 @@
               <div class="col">
                 <span class="p-float-label">
                   <Calendar v-model="paid_date" inputId="paid_date" />
-                  <label for="paid_date">Ödenme Tarihi</label>
+                  <label for="paid_date">Paid Date</label>
                 </span>
               </div>
               <div class="col">
@@ -192,7 +192,7 @@
               <div class="col">
                 <span class="p-float-label">
                   <Textarea v-model="paidDescription" rows="5" class="w-100" />
-                  <label>Açıklama</label>
+                  <label>Description</label>
                 </span>
               </div>
             </div>
@@ -203,26 +203,26 @@
               label="Kaydet"
             />
             <DataTable :value="paid">
-              <Column field="Tarih" header="Tarih">
+              <Column field="Tarih" header="Date">
                 <template #body="slotProps">
                   {{ slotProps.data.Tarih | dateToString }}
                 </template>
               </Column>
-              <Column field="Tutar" header="Tutar">
+              <Column field="Tutar" header="Amount">
                 <template #body="slotProps">
                   {{ slotProps.data.Tutar | formatPriceUsd }}
                 </template>
               </Column>
-              <Column field="Banka" header="Banka"></Column>
+              <Column field="Banka" header="Bank"></Column>
             </DataTable>
           </div>
         </TabPanel>
-        <TabPanel header="Fotoğraflar">
+        <TabPanel header="Photos">
           <div class="row">
             <div class="col">
               <FileUpload
                 mode="basic"
-                chooseLabel="Ön Fotoğraf"
+                chooseLabel="Front Photo"
                 v-model="selectedFrontPhoto"
                 @select="frontPhotoSelected($event)"
                 accept="image/*"
@@ -233,7 +233,7 @@
             <div class="col">
               <FileUpload
                 mode="basic"
-                chooseLabel="Arka Fotoğraf"
+                chooseLabel="Back Photo"
                 v-model="selectedBackPhoto"
                 @select="backPhotoSelected($event)"
                 accept="image/*"
@@ -251,7 +251,7 @@
           <Button
             type="button"
             class="p-button-success w-100"
-            label="Kaydet"
+            label="Save"
             @click="process"
           />
         </div>
@@ -259,7 +259,7 @@
           <Button
             type="button"
             class="p-button-danger w-100"
-            label="Sil"
+            label="Delete"
             @click="deleteProcess"
           />
         </div>
@@ -267,15 +267,15 @@
 
       <span class="p-float-label mb-4">
         <InputText id="sampleno" v-model="model.NumuneNo" class="w-100" />
-        <label for="sampleno">Numune No</label>
+        <label for="sampleno">Sample No</label>
       </span>
       <span class="p-float-label mb-4">
         <Calendar v-model="input_date" inputId="inputdate" class="w-100" />
-        <label for="inputdate">Giriş Tarihi</label>
+        <label for="inputdate">Input Date</label>
       </span>
       <span class="p-float-label mb-4">
         <Calendar v-model="output_date" inputId="outputdate" class="w-100" />
-        <label for="outputdate">Yükleme Tarihi</label>
+        <label for="outputdate">Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -286,7 +286,7 @@
           @complete="searchCustomers($event)"
           @item-select="customerSelected($event)"
         />
-        <label for="customer">Müşteriler</label>
+        <label for="customer">Customer</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -297,11 +297,11 @@
           @complete="searchCountry($event)"
           @item-select="countrySelected($event)"
         />
-        <label for="country">Ülkeler</label>
+        <label for="country">Country</label>
       </span>
       <span class="p-float-label mb-4">
         <Textarea v-model="model.Adres" rows="5" cols="30" class="w-100" />
-        <label>Adres</label>
+        <label>Address</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -312,15 +312,15 @@
           @complete="searchUser($event)"
           @item-select="userSelected($event)"
         />
-        <label for="user">Temsilci</label>
+        <label for="user">Representative</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText id="following" v-model="model.TrackingNo" class="w-100" />
-        <label for="following">Takip No</label>
+        <label for="following">Tracking Number</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText id="parite" v-model="model.Parite" class="w-100" />
-        <label for="parite">Parite</label>
+        <label for="parite">Parity</label>
       </span>
     </div>
   </div>

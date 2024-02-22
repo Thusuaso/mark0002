@@ -15,15 +15,15 @@
       filterDisplay="row"
       :filters.sync="filtersOrders"
       v-if="status == 'Shipped'"
-      @page="onPage($event)"
-      @sort="onSort($event)"
+      sortField="YuklemeTarihi"
+      :sortOrder="-1"
     >
       <Column header="#" headerStyle="width:3rem">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
         </template>
       </Column>
-      <Column field="YuklemeTarihi" header="Tarih" :showFilterMenu="false">
+      <Column field="YuklemeTarihi" header="Load Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.YuklemeTarihi | dateToString }}
         </template>
@@ -36,7 +36,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Kime" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="To" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -75,7 +75,7 @@
           </div>
         </template>
       </Column>
-      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -85,8 +85,8 @@
           />
         </template>
       </Column>
-      <Column field="UrunUretimAciklama" header="İçerik"> </Column>
-      <Column field="En" header="En" :showFilterMenu="false">
+      <Column field="UrunUretimAciklama" header="Detail"> </Column>
+      <Column field="En" header="Width" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -97,7 +97,7 @@
         </template>
       </Column>
 
-      <Column field="Boy" header="Boy" :showFilterMenu="false">
+      <Column field="Boy" header="Height" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -107,7 +107,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar" :showFilterMenu="false">
+      <Column field="Kenar" header="Edge" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -117,7 +117,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunFirmaAdi" header="Tedarikçi" :showFilterMenu="false">
+      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -127,13 +127,12 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Miktar">
+      <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
       </Column>
-      <Column field="BirimAdi" header="Birim"> </Column>
-      <Column field="Uretim" header="Üretim">
+      <Column field="BirimAdi" header="Unit">
         <template #body="slotProps">
           <div
             v-if="slotProps.data.Uretim == slotProps.data.Miktar"
@@ -163,12 +162,12 @@
           {{ slotProps.data.Ton | formatDecimal }}
         </template>
       </Column>
-      <Column field="SatisFiyati" header="Fiyat">
+      <Column field="SatisFiyati" header="Price">
         <template #body="slotProps">
           {{ slotProps.data.SatisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="SatisToplam" header="Toplam">
+      <Column field="SatisToplam" header="Total">
         <template #body="slotProps">
           {{ slotProps.data.SatisToplam | formatPriceUsd }}
         </template>
@@ -193,7 +192,7 @@
           {{ slotProps.index + 1 }}
         </template>
       </Column>
-      <Column field="SiparisTarihi" header="Tarih" :showFilterMenu="false">
+      <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.SiparisTarihi | dateToString }}
         </template>
@@ -206,7 +205,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Kime" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="To" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -245,7 +244,7 @@
           </div>
         </template>
       </Column>
-      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -255,8 +254,8 @@
           />
         </template>
       </Column>
-      <Column field="UrunUretimAciklama" header="İçerik"> </Column>
-      <Column field="En" header="En" :showFilterMenu="false">
+      <Column field="UrunUretimAciklama" header="Detail"> </Column>
+      <Column field="En" header="Width" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -267,7 +266,7 @@
         </template>
       </Column>
 
-      <Column field="Boy" header="Boy" :showFilterMenu="false">
+      <Column field="Boy" header="Height" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -277,7 +276,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar" :showFilterMenu="false">
+      <Column field="Kenar" header="Edge" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -287,9 +286,12 @@
           />
         </template>
       </Column>
-      <Column field="UrunFirmaAdi" header="Tedarikçi" :showFilterMenu="false">
+      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false">
         <template #body="slotProps">
           <div
+            :id="'productSupplier' + slotProps.data.UrunId"
+            @mouseover="productSupplier(slotProps.data)"
+            @mouseleave="productSupplierNull(slotProps.data)"
             v-if="
               slotProps.data.FaturaKesimTurID == 1 || slotProps.data.FaturaKesimTurID == 5
             "
@@ -310,13 +312,13 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Miktar">
+      <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
       </Column>
-      <Column field="BirimAdi" header="Birim"> </Column>
-      <Column field="Uretim" header="Üretim">
+      <Column field="BirimAdi" header="Unit"> </Column>
+      <Column field="Uretim" header="Production">
         <template #body="slotProps">
           <div
             v-if="slotProps.data.Uretim == slotProps.data.Miktar"
@@ -347,12 +349,12 @@
           {{ slotProps.data.Ton | formatDecimal }}
         </template>
       </Column>
-      <Column field="SatisFiyati" header="Fiyat">
+      <Column field="SatisFiyati" header="Price">
         <template #body="slotProps">
           {{ slotProps.data.SatisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="SatisToplam" header="Toplam">
+      <Column field="SatisToplam" header="Total">
         <template #body="slotProps">
           {{ slotProps.data.SatisToplam | formatPriceUsd }}
         </template>
@@ -393,6 +395,24 @@ export default {
       },
     };
   },
-  methods: {},
+  methods: {
+    productSupplierNull(event) {
+      const vm = document.getElementById("productSupplier" + event.UrunId);
+      vm.innerHTML = event.UrunFirmaAdi;
+      vm.className = "";
+    },
+    productSupplier(event) {
+      const vm = document.getElementById("productSupplier" + event.UrunId);
+      if (event.Isf == 0) {
+        vm.innerHTML = "Isf Eksik";
+        vm.className = "colorChange";
+      }
+    },
+  },
 };
 </script>
+<style scoped>
+.colorChange {
+  background-color: yellow;
+}
+</style>

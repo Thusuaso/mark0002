@@ -13,7 +13,7 @@
     >
       <Column
         field="ID"
-        header="Ürün Kart Id"
+        header="Product Card Id"
         :showFilterMatchModes="false"
         :showFilterMenu="false"
       >
@@ -26,7 +26,7 @@
           />
         </template>
       </Column>
-      <Column field="KategoriAdi" header="Kategori" :showFilterMenu="false">
+      <Column field="KategoriAdi" header="Category" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -36,7 +36,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -46,7 +46,7 @@
           />
         </template>
       </Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey" :showFilterMenu="false">
+      <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -56,7 +56,7 @@
           />
         </template>
       </Column>
-      <Column field="En" header="En" :showFilterMenu="false">
+      <Column field="En" header="Width" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -66,7 +66,7 @@
           />
         </template>
       </Column>
-      <Column field="Boy" header="Boy" :showFilterMenu="false">
+      <Column field="Boy" header="Height" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -76,7 +76,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar" :showFilterMenu="false">
+      <Column field="Kenar" header="Edge" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Firma" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Company" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -31,7 +31,7 @@
           />
         </template>
       </Column>
-      <Column field="ToplamTedarikci" header="Toplam Sipariş"></Column>
+      <Column field="ToplamTedarikci" header="Total Order"></Column>
     </DataTable>
   </div>
 </template>

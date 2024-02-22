@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Goz</a>
+      <a class="navbar-brand" href="#">EYE</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -26,12 +26,12 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Satışçı
+              Sales
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/sales/follow" class="dropdown-item" tag="a"
-                  >Takip</nuxt-link
+                  >Follow</nuxt-link
                 >
               </li>
               <li>
@@ -40,13 +40,23 @@
                 >
               </li>
               <li>
+                <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
+                  >Points to Consider</nuxt-link
+                >
+              </li>
+              <li>
                 <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
-                  >Yapılacaklar</nuxt-link
+                  >To Do</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/sales/maintodo" class="dropdown-item" tag="a"
+                  >Main To Do</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/sales/representative" class="dropdown-item" tag="a"
-                  >Satışçı ve Operasyon</nuxt-link
+                  >Representative & Operation</nuxt-link
                 >
               </li>
             </ul>
@@ -59,22 +69,22 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Siparişler
+              Orders
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/orders/production" class="dropdown-item" tag="a"
-                  >Üretim</nuxt-link
+                  >Production</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/orders/shipped" class="dropdown-item" tag="a"
-                  >Sevkiyat</nuxt-link
+                  >Shipped</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a"
-                  >Bekleyen</nuxt-link
+                  >Waiting</nuxt-link
                 >
               </li>
             </ul>
@@ -87,23 +97,23 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Seleksiyon
+              Selection
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/selection/input" class="dropdown-item" tag="a"
-                  >Seleksiyon Giriş</nuxt-link
+                  >Input</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/selection/size" class="dropdown-item" tag="a"
-                  >Kasa Ölçüleri</nuxt-link
+                  >Crate Size</nuxt-link
                 >
               </li>
             </ul>
           </li>
           <li class="nav-item">
-            <nuxt-link to="/finance" tag="a" class="nav-link">Finans</nuxt-link>
+            <nuxt-link to="/finance" tag="a" class="nav-link">Finance</nuxt-link>
           </li>
           <li class="nav-item dropdown">
             <a
@@ -113,57 +123,57 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Operasyon
+              Operation
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/operation/cards" class="dropdown-item" tag="a"
-                  >Ürün Kartları</nuxt-link
+                  >Product Card</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/supplier" class="dropdown-item" tag="a"
-                  >Tedarikçi</nuxt-link
+                  >Supplier</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/shipment" class="dropdown-item" tag="a"
-                  >Sevkiyat</nuxt-link
+                  >Shipment</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/uploadform" class="dropdown-item" tag="a"
-                  >Yükleme Formu</nuxt-link
+                  >Upload Form</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/follow" class="dropdown-item" tag="a"
-                  >Konteynır Takip</nuxt-link
+                  >Container Follow List</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/unfollow" class="dropdown-item" tag="a"
-                  >Konteynır Takipten Düşenler</nuxt-link
+                  >Container Out of Traking</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/transport" class="dropdown-item" tag="a"
-                  >Nakliye Giriş</nuxt-link
+                  >Shipping Introduction</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/transportlist" class="dropdown-item" tag="a"
-                  >Nakliye Listesi</nuxt-link
+                  >Shipping List</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/container" class="dropdown-item" tag="a"
-                  >Konteynır Giriş</nuxt-link
+                  >Container Introduction</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/containerlist" class="dropdown-item" tag="a"
-                  >Konteynır Listesi</nuxt-link
+                  >Container List</nuxt-link
                 >
               </li>
             </ul>
@@ -176,7 +186,7 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Müşteriler
+              Customer
             </a>
             <ul class="dropdown-menu">
               <li>
@@ -186,7 +196,7 @@
               </li>
               <li>
                 <nuxt-link to="/customer/offer" class="dropdown-item" tag="a"
-                  >Teklif</nuxt-link
+                  >Offer</nuxt-link
                 >
               </li>
               <li>
@@ -196,12 +206,12 @@
               </li>
               <li>
                 <nuxt-link to="/customer/fair" class="dropdown-item" tag="a"
-                  >Fuar Ziyaret</nuxt-link
+                  >Fair & Visit</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/customer/selection" class="dropdown-item" tag="a"
-                  >Seleksiyon</nuxt-link
+                  >Selection</nuxt-link
                 >
               </li>
             </ul>
@@ -214,22 +224,27 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Mekmer Raporları
+              Mekmer Reports
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/reports/mekmer/production" class="dropdown-item" tag="a"
-                  >Üretim</nuxt-link
+                  >Product</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmer/stock" class="dropdown-item" tag="a"
-                  >Stok</nuxt-link
+                  >Stock</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmer/mine" class="dropdown-item" tag="a"
-                  >Ocak</nuxt-link
+                  >Mine</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/reports/mekmer/atlanta" class="dropdown-item" tag="a"
+                  >Atlanta</nuxt-link
                 >
               </li>
             </ul>
@@ -242,7 +257,7 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Mekmar Raporları
+              Mekmar Reports
             </a>
             <ul class="dropdown-menu">
               <li>
@@ -252,27 +267,27 @@
               </li>
               <li>
                 <nuxt-link to="/reports/mekmar/loading" class="dropdown-item" tag="a"
-                  >Yükleme</nuxt-link
+                  >Loading List</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmar/forwarding" class="dropdown-item" tag="a"
-                  >Sevkiyat</nuxt-link
+                  >Forwarding List</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmar/summary" class="dropdown-item" tag="a"
-                  >Sipariş Özet</nuxt-link
+                  >Order Summary</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmar/mk" class="dropdown-item" tag="a"
-                  >Mk Raporları</nuxt-link
+                  >MK Reports</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmar/gu" class="dropdown-item" tag="a"
-                  >GU Raporları</nuxt-link
+                  >GU Reports</nuxt-link
                 >
               </li>
             </ul>
@@ -285,23 +300,23 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Numuneler
+              Sample
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/sample/sample" class="dropdown-item" tag="a"
-                  >Liste</nuxt-link
+                  >List</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/sample/finance" class="dropdown-item" tag="a"
-                  >Finans</nuxt-link
+                  >Finance</nuxt-link
                 >
               </li>
             </ul>
           </li>
           <li class="nav-item">
-            <nuxt-link to="/offers" tag="a" class="nav-link">Teklifler</nuxt-link>
+            <nuxt-link to="/offers" tag="a" class="nav-link">Offers</nuxt-link>
           </li>
           <li class="nav-item dropdown">
             <a
@@ -316,27 +331,32 @@
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/panel/products/published" class="dropdown-item" tag="a"
-                  >Yayınlı</nuxt-link
+                  >Published</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/panel/products/notpublished" class="dropdown-item" tag="a"
-                  >Yayında Olmayan</nuxt-link
+                  >Not Published</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/panel/project" class="dropdown-item" tag="a"
-                  >Projeler</nuxt-link
+                  >Projects</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/panel/products/queue" class="dropdown-item" tag="a"
-                  >Sıra Değiştir</nuxt-link
+                  >Change Queue</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/panel/users" class="dropdown-item" tag="a"
-                  >Kullanıcı</nuxt-link
+                  >Users</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/panel/usa" class="dropdown-item" tag="a"
+                  >Usa Stock</nuxt-link
                 >
               </li>
             </ul>

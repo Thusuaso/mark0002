@@ -8,8 +8,9 @@
       filterDisplay="row"
       @filter="mekmerProductionFilter($event)"
       :loading="loading"
+      class="p-datatable-sm"
     >
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
+      <Column field="Tarih" header="Date" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -22,7 +23,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Tedarikçi" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Supplier" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -32,7 +33,7 @@
           />
         </template>
       </Column>
-      <Column field="KategoriAdi" header="Kategori" :showFilterMenu="false">
+      <Column field="KategoriAdi" header="Category" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -42,7 +43,7 @@
           />
         </template>
       </Column>
-      <Column field="KasaNo" header="Kasa No" :showFilterMenu="false">
+      <Column field="KasaNo" header="Crate No" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -52,7 +53,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -65,7 +66,7 @@
           {{ total.crate | formatDecimal }}
         </template>
       </Column>
-      <Column field="OcakAdi" header="Ocak" :showFilterMenu="false">
+      <Column field="OcakAdi" header="Mine" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -75,7 +76,7 @@
           />
         </template>
       </Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey" :showFilterMenu="false">
+      <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -85,7 +86,7 @@
           />
         </template>
       </Column>
-      <Column field="En" header="En" :showFilterMenu="false">
+      <Column field="En" header="Width" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -95,7 +96,7 @@
           />
         </template>
       </Column>
-      <Column field="Boy" header="Boy" :showFilterMenu="false">
+      <Column field="Boy" header="Height" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -105,7 +106,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar" :showFilterMenu="false">
+      <Column field="Kenar" header="Edge" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -115,7 +116,7 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Miktar">
+      <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
@@ -123,7 +124,7 @@
           {{ total.amount | formatDecimal }}
         </template>
       </Column>
-      <Column field="Adet" header="Adet">
+      <Column field="Adet" header="Piece">
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
@@ -131,7 +132,7 @@
           {{ total.piece | formatDecimal }}
         </template>
       </Column>
-      <Column field="BirimAdi" header="Birim" :showFilterMenu="false">
+      <Column field="BirimAdi" header="Unit" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -151,7 +152,7 @@
           />
         </template>
       </Column>
-      <Column field="Aciklama" header="Not" :showFilterMenu="false">
+      <Column field="Aciklama" header="Description" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

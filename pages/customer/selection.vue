@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success" label="Yeni" @click="newForm" />
+    <Button type="button" class="p-button-success" label="New" @click="newForm" />
     <customerSelectionList
       :list="getSelectionCustomerList"
       @selection_customer_selected_emit="selectionCustomerSelected($event)"

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <todos :todos="getTodos" @todo_form_detail_dialog="todoFormDetailDialog($event)" />
-    <Dialog :visible.sync="todo_dialog_form" header="Yapilacak Form" modal>
+    <Dialog :visible.sync="todo_dialog_form" header="Todo Form" modal>
       <todoForm
         :todoDetail="todoDetail"
         @todo_form_dialog="todo_dialog_form = $event"

@@ -1,7 +1,7 @@
 <template>
   <div>
     <DataTable :value="list" class="p-datatable-sm" :loading="loading">
-      <Column field="OcakAdi" header="Ocak"></Column>
+      <Column field="OcakAdi" header="Mine"></Column>
       <Column field="M2" header="M2">
         <template #body="slotProps">
           {{ slotProps.data.M2 | formatDecimal }}
@@ -12,12 +12,12 @@
           {{ slotProps.data.MT | formatDecimal }}
         </template>
       </Column>
-      <Column field="Adet" header="Adet">
+      <Column field="Adet" header="Piece">
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
       </Column>
-      <Column field="KasaAdedi" header="Kasa Adedi">
+      <Column field="KasaAdedi" header="Crate Piece">
         <template #body="slotProps">
           {{ slotProps.data.KasaAdedi | formatDecimal }}
         </template>

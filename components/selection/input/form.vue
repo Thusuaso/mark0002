@@ -6,7 +6,7 @@
           v-model="selectedSaveKind"
           :options="kinds"
           optionLabel="status"
-          placeholder="Kayıt Tür"
+          placeholder="Kind of Save"
           class="mb-4"
           style="width: 300px"
           @change="saveKindSelected($event)"
@@ -30,7 +30,7 @@
           v-model="selectedProducts"
           :options="products"
           optionLabel="Aciklama"
-          placeholder="Ürün Seçiniz"
+          placeholder="Select a Product"
           style="width: 300px"
           @change="productsSelected($event)"
         />
@@ -40,7 +40,7 @@
           type="text"
           v-model="orderProductCardDesc"
           disabled
-          placeholder="Sipariş Ürün Kart"
+          placeholder="Order Product Card"
         />
         <div class="row mb-4">
           <div class="col-9">
@@ -60,7 +60,7 @@
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="create" type="text" v-model="getProductionCrateNo" />
-              <label for="create">Kasa No</label>
+              <label for="create">Crate No</label>
             </span>
           </div>
           <div class="col-6">
@@ -72,7 +72,7 @@
                 @complete="searchMine($event)"
                 field="OcakAdi"
               />
-              <label for="mine">Ocak</label>
+              <label for="mine">Mine</label>
             </span>
           </div>
         </div>
@@ -80,13 +80,13 @@
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="organizer" type="text" v-model="organizer" />
-              <label for="organizer">Düzenleyen</label>
+              <label for="organizer">Organizer</label>
             </span>
           </div>
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="crateMan" type="text" v-model="crateman" />
-              <label for="crateMan">Kasalayan</label>
+              <label for="crateMan">Crate</label>
             </span>
           </div>
         </div>
@@ -101,7 +101,7 @@
             @complete="searchSupplier($event)"
             @item-select="supplierSelected($event)"
           />
-          <label for="ac">Tedarikçi</label>
+          <label for="ac">Supplier</label>
         </span>
         <Calendar v-model="selectedDate" dateFormat="dd.mm.yy" class="w-100 mb-3" />
         <div class="row mb-3">
@@ -125,7 +125,7 @@
                 class="w-100"
                 @input="calculateM2Box($event)"
               />
-              <label for="boxamount">Kutu Sayısı</label>
+              <label for="boxamount">Box Amount</label>
             </span>
           </div>
           <div class="col-4">
@@ -137,7 +137,7 @@
                 class="w-100"
                 @input="calculateTotalAmount($event)"
               />
-              <label for="boxinamount">Kutu İçi Adet</label>
+              <label for="boxinamount">Pieces in Box</label>
             </span>
           </div>
           <div class="col-4">
@@ -149,7 +149,7 @@
                 class="w-100"
                 @input="calculateTotalAmountM2($event)"
               />
-              <label for="totalamount">Toplam Adet</label>
+              <label for="totalamount">Total Pieces</label>
             </span>
           </div>
         </div>
@@ -157,7 +157,7 @@
           <div class="col-4">
             <span class="p-float-label">
               <InputText id="amount" type="text" v-model="amount" class="w-100" />
-              <label for="amount">Miktar</label>
+              <label for="amount">Amount</label>
             </span>
           </div>
           <div class="col-4">
@@ -179,7 +179,7 @@
                 v-model="crateAmount"
                 class="w-100"
               />
-              <label for="crateamount">Kasa Sayısı</label>
+              <label for="crateamount">Crate Amount</label>
             </span>
           </div>
         </div>
@@ -187,25 +187,25 @@
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="boxStatus" inputId="box" :binary="true" />
-              <label for="box" class="ml-2"> Kutu </label>
+              <label for="box" class="ml-2"> Box </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="stringStatus" inputId="string" :binary="true" />
-              <label for="string" class="ml-2"> Bağlı </label>
+              <label for="string" class="ml-2"> Bonded </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="outStatus" inputId="out" :binary="true" />
-              <label for="out" class="ml-2"> Dışarda </label>
+              <label for="out" class="ml-2"> Outer </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="notFindStatus" inputId="notFind" :binary="true" />
-              <label for="notFind" class="ml-2"> Bulunamadı </label>
+              <label for="notFind" class="ml-2"> Not Found </label>
             </div>
           </div>
         </div>
@@ -218,13 +218,13 @@
           <div class="col-6 mb-2">
             <span class="p-float-label">
               <InputText id="category" type="text" v-model="categoryName" disabled />
-              <label for="category">Kategori</label>
+              <label for="category">Category</label>
             </span>
           </div>
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="product" type="text" v-model="productName" disabled />
-              <label for="product">Ürün</label>
+              <label for="product">Product</label>
             </span>
           </div>
         </div>
@@ -232,13 +232,13 @@
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="surface" type="text" v-model="surfaceName" disabled />
-              <label for="surface">Yüzey</label>
+              <label for="surface">Surface</label>
             </span>
           </div>
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="size" type="text" v-model="sizeName" disabled />
-              <label for="size">Ebat</label>
+              <label for="size">Size</label>
             </span>
           </div>
         </div>
@@ -250,7 +250,7 @@
           <Button
             type="button"
             class="p-button-success w-100"
-            label="Kaydet"
+            label="Save"
             @click="saveProcess"
           />
         </div>
@@ -258,7 +258,7 @@
           <Button
             type="button"
             class="p-button-danger w-100"
-            label="Sil"
+            label="Delete"
             @click="deleteForm"
           />
         </div>

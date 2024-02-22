@@ -4,13 +4,13 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="customer" v-model="model.Customer" class="w-100" />
-          <label for="customer">Müşteri</label>
+          <label for="customer">Customer</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="company" v-model="model.Company" class="w-100" />
-          <label for="company">Şirket</label>
+          <label for="company">Company</label>
         </span>
       </div>
       <div class="col">
@@ -24,7 +24,7 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="orderer" v-model="model.Orderer" class="w-100" />
-          <label for="orderer">Satışçı</label>
+          <label for="orderer">Salesman</label>
         </span>
       </div>
       <div class="col">
@@ -37,7 +37,7 @@
             class="w-100"
             @change="countrySelected($event)"
           />
-          <label for="country">Şehir Seçiniz</label>
+          <label for="country">Select a Country</label>
         </div>
       </div>
       <div class="col">
@@ -52,17 +52,17 @@
       <div class="col-9">
         <span class="p-float-label">
           <Textarea v-model="model.Adress" rows="5" cols="30" class="w-100" />
-          <label>Adres</label>
+          <label>Address</label>
         </span>
       </div>
       <div class="col-3">
         <div class="flex align-items-center">
           <Checkbox v-model="model.Fuar" inputId="fair" :binary="true" />
-          <label for="fair">Fuar</label>
+          <label for="fair">Fair</label>
         </div>
         <div class="flex align-items-center">
           <Checkbox v-model="model.Ziyaret" inputId="visit" :binary="true" />
-          <label for="visit">Ziyaret</label>
+          <label for="visit">Visit</label>
         </div>
       </div>
     </div>
@@ -71,7 +71,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="$emit('fair_customer_process_emit', model)"
         />
       </div>
@@ -79,7 +79,7 @@
         <Button
           type="button"
           class="p-button-danger w-100"
-          label="Sil"
+          label="Delete"
           @click="$emit('fair_customer_delete_emit', model.ID)"
         />
       </div>

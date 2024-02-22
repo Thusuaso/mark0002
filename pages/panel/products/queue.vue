@@ -14,7 +14,7 @@
         <Button
           type="button"
           class="p-button-info w-100"
-          label="Sıra Değiştir"
+          label="Change Queue"
           @click="changeQueue"
         />
       </div>
@@ -33,10 +33,10 @@
         :headerStyle="{ width: '3rem' }"
         :reorderableColumn="false"
       />
-      <Column field="sira" header="Sıra"> </Column>
-      <Column field="urunid" header="Ürün Id"> </Column>
-      <Column field="urunkod" header="Ürün Kodu"> </Column>
-      <Column field="urunadi_en" header="Ürün Adı"> </Column>
+      <Column field="sira" header="Queue"> </Column>
+      <Column field="urunid" header="Product Id"> </Column>
+      <Column field="urunkod" header="Product Code"> </Column>
+      <Column field="urunadi_en" header="Product Name"> </Column>
     </DataTable>
   </div>
 </template>

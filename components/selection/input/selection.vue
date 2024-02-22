@@ -4,9 +4,9 @@
       <table class="table">
         <thead>
           <tr>
-            <th scope="col">Üretici</th>
-            <th scope="col">Ay</th>
-            <th scope="col">Yıl</th>
+            <th scope="col">Producer</th>
+            <th scope="col">Month</th>
+            <th scope="col">Year</th>
           </tr>
         </thead>
         <tbody>
@@ -21,12 +21,12 @@
             <td>{{ productionTotal.mekmozYear | formatDecimal }}</td>
           </tr>
           <tr>
-            <th>Dış</th>
+            <th>Outer</th>
             <td>{{ productionTotal.disMonth | formatDecimal }}</td>
             <td>{{ productionTotal.disYear | formatDecimal }}</td>
           </tr>
           <tr>
-            <th>Toplam</th>
+            <th>Total</th>
             <td>
               <b
                 >{{ productionTotal.monthTotal | formatDecimal }} ({{
@@ -43,12 +43,7 @@
       </table>
     </div>
     <div class="col-1">
-      <Button
-        type="button"
-        class="p-button-success w-100"
-        label="Yeni"
-        @click="newForm"
-      />
+      <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
     </div>
     <div class="col-2">
       <Button
@@ -60,19 +55,19 @@
       <Button
         type="button"
         class="p-button-secondary w-100 mb-2"
-        label="Dış"
+        label="Outer"
         @click="$emit('products_status_selected', 2)"
       />
       <Button
         type="button"
         class="p-button-warning w-100 mb-2"
-        label="Mekmer Dış"
+        label="Mekmer Outer"
         @click="$emit('products_status_selected', 3)"
       />
       <Button
         type="button"
         class="p-button-danger w-100"
-        label="Bulunamadı"
+        label="Not Found"
         @click="$emit('products_status_selected', 4)"
       />
     </div>

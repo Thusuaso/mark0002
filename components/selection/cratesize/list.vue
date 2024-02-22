@@ -13,12 +13,12 @@
         <Button
           type="button"
           icon="pi pi-filter-slash"
-          label="Filtreleri Temizle"
+          label="Clear Filters"
           outlined
           @click="clearFilter()"
         />
       </template>
-      <Column field="TedarikciAdi" header="Tedarikci" :showFilterMenu="false">
+      <Column field="TedarikciAdi" header="Supplier" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -28,7 +28,7 @@
           />
         </template>
       </Column>
-      <Column field="Ebat" header="Ebat" :showFilterMenu="false">
+      <Column field="Ebat" header="Stone Size" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -38,7 +38,7 @@
           />
         </template>
       </Column>
-      <Column field="KasaOlculeri" header="Kasa Ölçüsü" :showFilterMenu="false">
+      <Column field="KasaOlculeri" header="Crate Size" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -48,7 +48,7 @@
           />
         </template>
       </Column>
-      <Column field="Adet" header="Adet" :showFilterMenu="false">
+      <Column field="Adet" header="Piece" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

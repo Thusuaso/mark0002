@@ -4,13 +4,13 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="name" v-model="model.adi" />
-          <label for="name">Müşteri Adı</label>
+          <label for="name">Customer</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="username" v-model="model.kullaniciadi" />
-          <label for="username">Kullanıcı Adı</label>
+          <label for="username">Username</label>
         </span>
       </div>
       <div class="col">
@@ -22,16 +22,16 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="phone" v-model="model.telefon" />
-          <label for="phone">Telefon</label>
+          <label for="phone">Phone</label>
         </span>
       </div>
     </div>
     <div class="row mt-3">
       <div class="col">
-        <Button type="button" class="p-button-success w-100" label="Kaydet" @click="$emit('process',model)"/>
+        <Button type="button" class="p-button-success w-100" label="Save" @click="$emit('process',model)"/>
       </div>
       <div class="col" v-if="!status">
-        <Button type="button" class="p-button-danger w-100" label="Sil" @click="$emit('deleteForm',model.Id)"/>
+        <Button type="button" class="p-button-danger w-100" label="Delete" @click="$emit('deleteForm',model.Id)"/>
       </div>
     </div>
   </div>

@@ -3,7 +3,7 @@
     <Button
       type="button"
       class="p-button-success w-100 mb-3"
-      label="Yeni Proje"
+      label="New Project"
       @click="newProject"
     />
     <panelProjectList
@@ -161,7 +161,7 @@
               field="UlkeAdi"
               @item-select="countrySelected($event)"
             />
-            <label for="country">Ülke</label>
+            <label for="country">Country</label>
           </span>
         </div>
       </div>
@@ -170,7 +170,7 @@
           <Button
             type="button"
             class="p-button-success w-100"
-            label="Kaydet"
+            label="Save"
             @click="saveProject"
             :disabled="project_save_button_disabled"
           />
@@ -180,7 +180,7 @@
             name="demo[]"
             :customUpload="true"
             @uploader="projectPhotoUpload($event)"
-            chooseLabel="Fotoğraf Ekle"
+            chooseLabel="Add Photo"
             mode="basic"
             class="w-100"
             :disabled="!project_save_button_disabled"

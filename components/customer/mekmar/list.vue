@@ -14,7 +14,7 @@
       :loading="loading"
     >
       <Column field="ID" header="Id"></Column>
-      <Column field="FirmaAdi" header="Firma Adı" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Company" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -24,7 +24,7 @@
           />
         </template>
       </Column>
-      <Column field="Adres" header="Adres"></Column>
+      <Column field="Adres" header="Address"></Column>
       <Column field="Marketing" header="Marketing" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -35,7 +35,7 @@
           />
         </template>
       </Column>
-      <Column field="UlkeAdi" header="Ülke Adı" :showFilterMenu="false">
+      <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -54,7 +54,7 @@
           />
         </template>
       </Column>
-      <Column field="Temsilci" header="Temsilci" :showFilterMenu="false">
+      <Column field="Temsilci" header="Representative" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -64,7 +64,7 @@
           />
         </template>
       </Column>
-      <Column field="SatisciAdi" header="Satışçı" :showFilterMenu="false">
+      <Column field="SatisciAdi" header="Orderer" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -74,13 +74,13 @@
           />
         </template>
       </Column>
-      <Column field="Devir" header="Devir">
+      <Column field="Devir" header="Transfer">
         <template #body="slotProps">
           <div v-if="slotProps.data.Devir">✓</div>
           <div v-else>X</div>
         </template>
       </Column>
-      <Column field="Ozel" header="Özel">
+      <Column field="Ozel" header="Special">
         <template #body="slotProps">
           <div v-if="slotProps.data.Ozel">✓</div>
           <div v-else>X</div>

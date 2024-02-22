@@ -1,25 +1,25 @@
 <template>
   <div>
     <TabView>
-      <TabPanel header="Ürün (En)">
+      <TabPanel header="Product (En)">
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
               <InputText id="productname" v-model="model.urunadi_en" class="w-100" />
-              <label for="productname">Ürün Adı</label>
+              <label for="productname">Product Name</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="code" v-model="model.urunkod" class="w-100" />
-              <label for="code">Kod</label>
+              <label for="code">Code</label>
             </span>
           </div>
           <div class="col">
             <div class="flex flex-wrap justify-content-center gap-3">
               <div class="flex align-items-center">
                 <Checkbox v-model="model.yayinla" inputId="published" binary />
-                <label for="published" class="ml-2"> Yayınla </label>
+                <label for="published" class="ml-2"> Publish </label>
               </div>
             </div>
           </div>
@@ -29,7 +29,7 @@
             <span class="p-float-label">
               <Textarea v-model="model.aciklama_en" rows="10" class="w-100" />
 
-              <label>Açıklama</label>
+              <label>Description</label>
             </span>
           </div>
           <!-- <div class="col">
@@ -44,11 +44,11 @@
           <div class="col-6">
             <span class="p-float-label mb-4">
               <Chips v-model="anahtarlar_en" class="w-100" />
-              <label>Anahtarlar</label>
+              <label>Keywords</label>
             </span>
             <span class="p-float-label">
               <Textarea v-model="model.keywords_en" rows="7" class="w-100" />
-              <label>Başlık Etiketleri</label>
+              <label>Hashtags</label>
             </span>
           </div>
         </div>
@@ -56,7 +56,7 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="unit" v-model="model.birim" class="w-100" />
-              <label for="unit">Birim</label>
+              <label for="unit">Unit</label>
             </span>
           </div>
           <div class="col">
@@ -69,7 +69,7 @@
                 class="w-100"
                 @change="categorySelected($event)"
               />
-              <label for="category">Kategori</label>
+              <label for="category">Category</label>
             </div>
           </div>
           <div class="col">
@@ -82,7 +82,7 @@
                 class="w-100"
                 @change="stoneTypeSelected($event)"
               />
-              <label for="stonetype">Taş Türü</label>
+              <label for="stonetype">Kind of Stone</label>
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@
             <Button
               type="button"
               class="p-button-success w-100"
-              label="Kaydet"
+              label="Save"
               @click="process"
               :disabled="productSaveButtonDisabled"
             />
@@ -100,24 +100,24 @@
             <Button
               type="button"
               class="p-button-danger w-100"
-              label="Sil"
+              label="Delete"
               @click="deleteForm"
             />
           </div>
         </div>
       </TabPanel>
-      <TabPanel header="Ürün (Fr)">
+      <TabPanel header="Product (Fr)">
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
               <InputText id="productname" v-model="model.urunadi_fr" class="w-100" />
-              <label for="productname">Ürün Adı</label>
+              <label for="productname">Product Name</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="code" v-model="model.urunkod" class="w-100" />
-              <label for="code">Kod</label>
+              <label for="code">Code</label>
             </span>
           </div>
         </div>
@@ -125,18 +125,18 @@
           <div class="col">
             <span class="p-float-label">
               <Textarea v-model="model.aciklama_fr" rows="10" class="w-100" />
-              <label>Açıklama</label>
+              <label>Description</label>
             </span>
           </div>
 
           <div class="col">
             <span class="p-float-label mb-4">
               <Chips v-model="anahtarlar_fr" class="w-100" />
-              <label>Anahtarlar</label>
+              <label>Keywords</label>
             </span>
             <span class="p-float-label">
               <Textarea v-model="model.keywords_fr" rows="7" class="w-100" />
-              <label>Başlık Etiketleri</label>
+              <label>Hashtags</label>
             </span>
           </div>
         </div>
@@ -145,7 +145,7 @@
             <Button
               type="button"
               class="p-button-success w-100"
-              label="Kaydet"
+              label="Save"
               @click="process"
               :disabled="productSaveButtonDisabled"
             />
@@ -154,24 +154,24 @@
             <Button
               type="button"
               class="p-button-danger w-100"
-              label="Sil"
+              label="Delete"
               @click="deleteForm"
             />
           </div>
         </div>
       </TabPanel>
-      <TabPanel header="Ürün (Es)">
+      <TabPanel header="Product (Es)">
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
               <InputText id="productname" v-model="model.urunadi_es" class="w-100" />
-              <label for="productname">Ürün Adı</label>
+              <label for="productname">Product Name</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="code" v-model="model.urunkod" class="w-100" />
-              <label for="code">Kod</label>
+              <label for="code">Code</label>
             </span>
           </div>
         </div>
@@ -179,18 +179,18 @@
           <div class="col">
             <span class="p-float-label">
               <Textarea v-model="model.aciklama_es" rows="10" class="w-100" />
-              <label>Açıklama</label>
+              <label>Description</label>
             </span>
           </div>
 
           <div class="col">
             <span class="p-float-label mb-4">
               <Chips v-model="anahtarlar_es" class="w-100" />
-              <label>Anahtarlar</label>
+              <label>Keywords</label>
             </span>
             <span class="p-float-label">
               <Textarea v-model="model.keywords_es" rows="7" class="w-100" />
-              <label>Başlık Etiketleri</label>
+              <label>Hastags</label>
             </span>
           </div>
         </div>
@@ -199,7 +199,7 @@
             <Button
               type="button"
               class="p-button-success w-100"
-              label="Kaydet"
+              label="Save"
               @click="process"
               :disabled="productSaveButtonDisabled"
             />
@@ -208,7 +208,7 @@
             <Button
               type="button"
               class="p-button-danger w-100"
-              label="Sil"
+              label="Delete"
               @click="deleteForm"
             />
           </div>
@@ -219,13 +219,13 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="productname" v-model="model.urunadi_ru" class="w-100" />
-              <label for="productname">Ürün Adı</label>
+              <label for="productname">Product Name</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="code" v-model="model.urunkod" class="w-100" />
-              <label for="code">Kod</label>
+              <label for="code">Code</label>
             </span>
           </div>
         </div>
@@ -233,18 +233,18 @@
           <div class="col">
             <span class="p-float-label">
               <Textarea v-model="model.aciklama_ru" rows="10" class="w-100" />
-              <label>Açıklama</label>
+              <label>Description</label>
             </span>
           </div>
 
           <div class="col">
             <span class="p-float-label mb-4">
               <Chips v-model="anahtarlar_ru" class="w-100" />
-              <label>Anahtarlar</label>
+              <label>Keywords</label>
             </span>
             <span class="p-float-label">
               <Textarea v-model="model.keywords_ru" rows="7" class="w-100" />
-              <label>Başlık Etiketleri</label>
+              <label>Hashtags</label>
             </span>
           </div>
         </div>
@@ -253,7 +253,7 @@
             <Button
               type="button"
               class="p-button-success w-100"
-              label="Kaydet"
+              label="Save"
               @click="process"
               :disabled="productSaveButtonDisabled"
             />
@@ -262,7 +262,7 @@
             <Button
               type="button"
               class="p-button-danger w-100"
-              label="Sil"
+              label="Delete"
               @click="deleteForm"
             />
           </div>
@@ -280,7 +280,7 @@
                 field="ebat"
                 @item-select="sizeSelected($event)"
               />
-              <label for="size">Ölçüler</label>
+              <label for="size">Sizes</label>
             </span>
           </div>
           <div class="col">
@@ -290,16 +290,11 @@
                 v-model="sizeModel.fiyat"
                 @input="sizeModel.fiyat = formatPoint($event)"
               />
-              <label for="price">Fiyat</label>
+              <label for="price">Price</label>
             </span>
           </div>
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-success"
-              label="Ekle"
-              @click="addSize"
-            />
+            <Button type="button" class="p-button-success" label="Add" @click="addSize" />
           </div>
         </div>
         <DataTable
@@ -308,12 +303,12 @@
           :editingRows.sync="edditingSize"
           @row-edit-save="sizeEdditing($event)"
         >
-          <Column field="ebat" header="Ebat">
+          <Column field="ebat" header="Size">
             <template #editor="slotProps">
               <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
             </template>
           </Column>
-          <Column field="fiyat" header="Fiyat">
+          <Column field="fiyat" header="Price">
             <template #body="slotProps">
               {{ slotProps.data.fiyat | formatPriceUsd }}
             </template>
@@ -331,16 +326,16 @@
               <Button
                 type="button"
                 class="p-button-danger"
-                label="Sil"
+                label="Delete"
                 @click="deleteSize(slotProps.data.Id)"
               />
             </template>
           </Column>
         </DataTable>
       </TabPanel>
-      <TabPanel header="Filtreler" v-if="productId != 0">
+      <TabPanel header="Filters" v-if="productId != 0">
         <div class="container">
-          <h3 class="header">Renkler</h3>
+          <h3 class="header">Colors</h3>
           <div class="row">
             <div class="col">
               <div class="p-float-label">
@@ -352,14 +347,14 @@
                   class="w-100"
                   @change="colorChange($event)"
                 />
-                <label for="color">Renk</label>
+                <label for="color">Color</label>
               </div>
             </div>
             <div class="col">
               <Button
                 type="button"
                 class="p-button-success w-100"
-                label="Ekle"
+                label="Add"
                 @click="addColor"
               />
             </div>
@@ -367,16 +362,16 @@
           <div class="row">
             <div class="col">
               <DataTable :value="colorList">
-                <Column field="renk_en" header="Renk (En)"></Column>
-                <Column field="renk_fr" header="Renk (Fr)"></Column>
-                <Column field="renk_es" header="Renk (Es)"></Column>
-                <Column field="renk_ru" header="Renk (Ru)"></Column>
+                <Column field="renk_en" header="Color (En)"></Column>
+                <Column field="renk_fr" header="Color (Fr)"></Column>
+                <Column field="renk_es" header="Color (Es)"></Column>
+                <Column field="renk_ru" header="Color (Ru)"></Column>
                 <Column>
                   <template #body="slotProps">
                     <Button
                       type="button"
                       class="p-button-danger w-100"
-                      label="Sil"
+                      label="Delete"
                       @click="deleteColor(slotProps.data.ID)"
                     />
                   </template>
@@ -385,8 +380,17 @@
             </div>
           </div>
         </div>
-        <div class="container">
-          <h3 class="header">Yüzeyler</h3>
+        <div
+          class="container"
+          v-if="
+            selectedCategory.Id == 2 ||
+            selectedCategory.Id == 1 ||
+            selectedCategory.Id == 3 ||
+            selectedCategory.Id == 4 ||
+            selectedCategory.Id == 8
+          "
+        >
+          <h3 class="header">Surfaces</h3>
           <div class="row">
             <div class="col">
               <div class="p-float-label">
@@ -398,14 +402,14 @@
                   class="w-100"
                   @change="finishChange($event)"
                 />
-                <label for="finish">Yüzey</label>
+                <label for="finish">Surface</label>
               </div>
             </div>
             <div class="col">
               <Button
                 type="button"
                 class="p-button-success w-100"
-                label="Ekle"
+                label="Add"
                 @click="addFinish"
               />
             </div>
@@ -413,16 +417,16 @@
           <div class="row">
             <div class="col">
               <DataTable :value="finishList">
-                <Column field="finish_en" header="Yüzey (En)"></Column>
-                <Column field="finish_fr" header="Yüzey (Fr)"></Column>
-                <Column field="finish_es" header="Yüzey (Es)"></Column>
-                <Column field="finish_ru" header="Yüzey (Ru)"></Column>
+                <Column field="finish_en" header="Surface (En)"></Column>
+                <Column field="finish_fr" header="Surface (Fr)"></Column>
+                <Column field="finish_es" header="Surface (Es)"></Column>
+                <Column field="finish_ru" header="Surface (Ru)"></Column>
                 <Column>
                   <template #body="slotProps">
                     <Button
                       type="button"
                       class="p-button-danger w-100"
-                      label="Sil"
+                      label="Delete"
                       @click="deleteFinish(slotProps.data.Id)"
                     />
                   </template>
@@ -432,7 +436,7 @@
           </div>
         </div>
         <div class="container">
-          <h3 class="header">Alanlar</h3>
+          <h3 class="header">Areas</h3>
           <div class="row">
             <div class="col">
               <div class="p-float-label">
@@ -444,14 +448,14 @@
                   class="w-100"
                   @change="areaChange($event)"
                 />
-                <label for="area">Alan</label>
+                <label for="area">Area</label>
               </div>
             </div>
             <div class="col">
               <Button
                 type="button"
                 class="p-button-success w-100"
-                label="Ekle"
+                label="Add"
                 @click="addArea"
               />
             </div>
@@ -459,16 +463,16 @@
           <div class="row">
             <div class="col">
               <DataTable :value="areaList">
-                <Column field="Areas" header="Alan (En)"></Column>
-                <Column field="Areas_fr" header="Alan (Fr)"></Column>
-                <Column field="Areas_es" header="Alan (Es)"></Column>
-                <Column field="Areas_ru" header="Alan (Ru)"></Column>
+                <Column field="Areas" header="Area (En)"></Column>
+                <Column field="Areas_fr" header="Area (Fr)"></Column>
+                <Column field="Areas_es" header="Area (Es)"></Column>
+                <Column field="Areas_ru" header="Area (Ru)"></Column>
                 <Column>
                   <template #body="slotProps">
                     <Button
                       type="button"
                       class="p-button-danger w-100"
-                      label="Sil"
+                      label="Delete"
                       @click="deleteArea(slotProps.data.ID)"
                     />
                   </template>
@@ -477,8 +481,17 @@
             </div>
           </div>
         </div>
-        <div class="container">
-          <h3 class="header">Türler</h3>
+        <div
+          class="container"
+          v-if="
+            selectedCategory.Id == 5 ||
+            selectedCategory.Id == 6 ||
+            selectedCategory.Id == 9 ||
+            selectedCategory.Id == 11 ||
+            selectedCategory.Id == 18
+          "
+        >
+          <h3 class="header">Types</h3>
           <div class="row">
             <div class="col">
               <div class="p-float-label">
@@ -490,14 +503,14 @@
                   class="w-100"
                   @change="typeChange($event)"
                 />
-                <label for="tur">Tür</label>
+                <label for="tur">Type</label>
               </div>
             </div>
             <div class="col">
               <Button
                 type="button"
                 class="p-button-success w-100"
-                label="Ekle"
+                label="Add"
                 @click="addType"
               />
             </div>
@@ -505,16 +518,16 @@
           <div class="row">
             <div class="col">
               <DataTable :value="typeList">
-                <Column field="TurEn" header="Tür (En)"></Column>
-                <Column field="TurFr" header="Tür (Fr)"></Column>
-                <Column field="TurEs" header="Tür (Es)"></Column>
-                <Column field="TurRu" header="Tür (Ru)"></Column>
+                <Column field="TurEn" header="Type (En)"></Column>
+                <Column field="TurFr" header="Type (Fr)"></Column>
+                <Column field="TurEs" header="Type (Es)"></Column>
+                <Column field="TurRu" header="Type (Ru)"></Column>
                 <Column>
                   <template #body="slotProps">
                     <Button
                       type="button"
                       class="p-button-danger w-100"
-                      label="Sil"
+                      label="Delete"
                       @click="deleteType(slotProps.data.ID)"
                     />
                   </template>
@@ -523,8 +536,8 @@
             </div>
           </div>
         </div>
-        <div class="container">
-          <h3 class="header">Stiller</h3>
+        <div class="container" v-if="selectedCategory.Id == 2">
+          <h3 class="header">Styles</h3>
           <div class="row">
             <div class="col">
               <div class="p-float-label">
@@ -536,14 +549,14 @@
                   class="w-100"
                   @change="styleChange($event)"
                 />
-                <label for="style">Stil</label>
+                <label for="style">Style</label>
               </div>
             </div>
             <div class="col">
               <Button
                 type="button"
                 class="p-button-success w-100"
-                label="Ekle"
+                label="Add"
                 @click="addStyle"
               />
             </div>
@@ -551,16 +564,16 @@
           <div class="row">
             <div class="col">
               <DataTable :value="styleList">
-                <Column field="StilEn" header="Stil (En)"></Column>
-                <Column field="StilFr" header="Stil (Fr)"></Column>
-                <Column field="StilEs" header="Stil (Es)"></Column>
-                <Column field="StilRu" header="Stil (Ru)"></Column>
+                <Column field="StilEn" header="Style (En)"></Column>
+                <Column field="StilFr" header="Style (Fr)"></Column>
+                <Column field="StilEs" header="Style (Es)"></Column>
+                <Column field="StilRu" header="Style (Ru)"></Column>
                 <Column>
                   <template #body="slotProps">
                     <Button
                       type="button"
                       class="p-button-danger w-100"
-                      label="Sil"
+                      label="Delete"
                       @click="deleteStyle(slotProps.data.ID)"
                     />
                   </template>
@@ -569,8 +582,11 @@
             </div>
           </div>
         </div>
-        <div class="container">
-          <h3 class="header">Materyaller</h3>
+        <div
+          class="container"
+          v-if="selectedCategory.Id == 4 || selectedCategory.Id == 7"
+        >
+          <h3 class="header">Materials</h3>
           <div class="row">
             <div class="col">
               <div class="p-float-label">
@@ -582,14 +598,14 @@
                   class="w-100"
                   @change="materialChange($event)"
                 />
-                <label for="material">Materyal</label>
+                <label for="material">Material</label>
               </div>
             </div>
             <div class="col">
               <Button
                 type="button"
                 class="p-button-success w-100"
-                label="Ekle"
+                label="Add"
                 @click="addMaterial"
               />
             </div>
@@ -597,16 +613,16 @@
           <div class="row">
             <div class="col">
               <DataTable :value="materialList">
-                <Column field="MateryalEn" header="Materyal (En)"></Column>
-                <Column field="MateryalFr" header="Materyal (Fr)"></Column>
-                <Column field="MateryalEs" header="Materyal (Es)"></Column>
-                <Column field="MateryalRu" header="Materyal (Ru)"></Column>
+                <Column field="MateryalEn" header="Material (En)"></Column>
+                <Column field="MateryalFr" header="Material (Fr)"></Column>
+                <Column field="MateryalEs" header="Material (Es)"></Column>
+                <Column field="MateryalRu" header="Material (Ru)"></Column>
                 <Column>
                   <template #body="slotProps">
                     <Button
                       type="button"
                       class="p-button-danger w-100"
-                      label="Sil"
+                      label="Delete"
                       @click="deleteMaterial(slotProps.data.ID)"
                     />
                   </template>
@@ -615,8 +631,54 @@
             </div>
           </div>
         </div>
+        <div class="container" v-if="selectedCategory.Id == 2">
+          <h3 class="header">Edge</h3>
+          <div class="row">
+            <div class="col">
+              <div class="p-float-label">
+                <Dropdown
+                  v-model="selectedEdge"
+                  inputId="edge"
+                  :options="edge"
+                  optionLabel="KenarEn"
+                  class="w-100"
+                  @change="edgeChange($event)"
+                />
+                <label for="edge">Edge</label>
+              </div>
+            </div>
+            <div class="col">
+              <Button
+                type="button"
+                class="p-button-success w-100"
+                label="Add"
+                @click="addEdge"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <DataTable :value="edgeList">
+                <Column field="KenarEn" header="Kenar (En)"></Column>
+                <Column field="KenarFr" header="Kenar (Fr)"></Column>
+                <Column field="KenarEs" header="Kenar (Es)"></Column>
+                <Column field="KenarRu" header="Kenar (Ru)"></Column>
+                <Column>
+                  <template #body="slotProps">
+                    <Button
+                      type="button"
+                      class="p-button-danger w-100"
+                      label="Delete"
+                      @click="deleteEdge(slotProps.data.ID)"
+                    />
+                  </template>
+                </Column>
+              </DataTable>
+            </div>
+          </div>
+        </div>
       </TabPanel>
-      <TabPanel header="Fotoğraflar" v-if="productId != 0">
+      <TabPanel header="Photos" v-if="productId != 0">
         <div class="row">
           <div class="col">
             <FileUpload
@@ -631,7 +693,7 @@
             <Button
               type="button"
               class="p-button-warning w-100"
-              label="Sıra Değiştir"
+              label="Change Queue"
               :disabled="queueChangeButtonDisabled"
               @click="reOrderPhotoChangeButton"
             />
@@ -661,7 +723,7 @@
           </template>
         </PickList>
       </TabPanel>
-      <TabPanel header="Önerilenler" v-if="productId != 0">
+      <TabPanel header="Suggested" v-if="productId != 0">
         <PickList
           v-model="suggestedList"
           listStyle="height:342px;width:450px;"
@@ -686,7 +748,7 @@
           </template>
         </PickList>
       </TabPanel>
-      <TabPanel header="Test Raporu" v-if="productId != 0">
+      <TabPanel header="Test Report" v-if="productId != 0">
         <div class="row">
           <div class="col">
             <FileUpload
@@ -702,7 +764,7 @@
             <Button
               type="button"
               class="p-button-success"
-              label="Indir"
+              label="Download"
               @click="$refs.testreports.click()"
               :disabled="model.testrapor == null || model.testrapor == ''"
             />
@@ -761,6 +823,10 @@ export default {
       type: Array,
       required: true,
     },
+    edge: {
+      type: Array,
+      required: true,
+    },
     sizeList: {
       type: Array,
       required: true,
@@ -782,6 +848,10 @@ export default {
       required: true,
     },
     materialList: {
+      type: Array,
+      required: true,
+    },
+    edgeList: {
       type: Array,
       required: true,
     },
@@ -825,6 +895,10 @@ export default {
       type: Object,
       required: true,
     },
+    edgeModel: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -844,6 +918,8 @@ export default {
       selectedType: null,
       selectedStyle: null,
       selectedMaterial: null,
+      selectedEdge: null,
+
       productSaveButtonDisabled: false,
       reOrderPhotoList: [],
       queueChangeButtonDisabled: true,
@@ -962,6 +1038,23 @@ export default {
         });
       }
     },
+
+    deleteEdge(id) {
+      this.$store.dispatch("setPanelProductEdgeDelete", id);
+    },
+    addEdge() {
+      this.edgeModel.UrunId = this.productId;
+      this.edgeModel.KategoriId = this.model.kategori_id;
+      this.$store.dispatch("setPanelProductEdgeAdd", this.edgeModel);
+    },
+    edgeChange(event) {
+      this.edgeModel.KenarId = event.value.ID;
+      this.edgeModel.KenarEn = event.value.KenarEn;
+      this.edgeModel.KenarFr = event.value.KenarFr;
+      this.edgeModel.KenarEs = event.value.KenarEs;
+      this.edgeModel.KenarRu = event.value.KenarRu;
+    },
+
     deleteMaterial(id) {
       this.$store.dispatch("setPanelProductMaterialDelete", id);
     },

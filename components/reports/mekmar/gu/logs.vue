@@ -7,7 +7,7 @@
       :rowClass="logsRowClass"
       :loading="loading"
     >
-      <Column field="Gun" header="Gün" :showFilterMenu="false">
+      <Column field="Gun" header="Day" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -17,7 +17,7 @@
           />
         </template>
       </Column>
-      <Column field="Ay" header="Ay" :showFilterMenu="false">
+      <Column field="Ay" header="Month" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -27,7 +27,7 @@
           />
         </template>
       </Column>
-      <Column field="Yil" header="Yıl" :showFilterMenu="false">
+      <Column field="Yil" header="Year" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -37,7 +37,7 @@
           />
         </template>
       </Column>
-      <Column field="YuklemeTarihi" header="Y.Tarihi" :showFilterMenu="false">
+      <Column field="YuklemeTarihi" header="Shipment Date" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -57,7 +57,7 @@
           />
         </template>
       </Column>
-      <Column field="IslemAdi" header="İşlem Adı" :showFilterMenu="false">
+      <Column field="IslemAdi" header="Process" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -67,7 +67,7 @@
           />
         </template>
       </Column>
-      <Column field="DegisiklikYapan" header="Değişiklik Yapan" :showFilterMenu="false">
+      <Column field="DegisiklikYapan" header="Changer" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -90,8 +90,8 @@ export default {
     },
     loading: {
       type: Boolean,
-      required:false
-    }
+      required: false,
+    },
   },
   data() {
     return {

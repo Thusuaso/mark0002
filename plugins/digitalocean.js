@@ -7,6 +7,24 @@ const s3 = new AWS.S3({
 });
 
 const oceanservice = {
+    panelUsaProductUploadPhoto(file) {
+        const filename = file.name;
+        const params = {
+            Bucket: "mekmar-image",
+            Key: "usa-products/" + filename,
+            Body: file,
+            ACL: "public-read",
+            ContentType: "image/" + filename.split(".")[1],
+            CacheControl: "public,max-age=1,s-max-age=500,must-revalidate",
+        };
+        return new Promise((resolve, reject) => {
+            s3.upload(params, (err, data) => {
+                if (err) reject(false);
+                else resolve(true);
+            });
+        });
+
+    },
     panelProductSendPhoto(file) {
         const filename = file.name;
         const params = {

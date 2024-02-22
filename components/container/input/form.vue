@@ -11,7 +11,7 @@
             @complete="searchCompany($event)"
             :disabled="disabled"
           />
-          <label for="company">Firma</label>
+          <label for="company">Company</label>
         </span>
       </div>
       <div class="col">
@@ -24,7 +24,7 @@
             @complete="searchPo($event)"
             :disabled="disabled"
           />
-          <label for="po">Sipariş No</label>
+          <label for="po">Po</label>
         </span>
       </div>
       <div class="col">
@@ -32,7 +32,7 @@
           v-model="selectedInvoice"
           :options="invoice"
           optionLabel="name"
-          placeholder="Fatura Türü"
+          placeholder="Kind of Invoice"
           :disabled="disabled"
         />
       </div>
@@ -50,7 +50,7 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="invoiceno" v-model="invoiceno" :disabled="disabled" />
-          <label for="invoiceno">Fatura No</label>
+          <label for="invoiceno">Invoice No</label>
         </span>
       </div>
     </div>
@@ -77,7 +77,7 @@
             :minFractionDigits="3"
             :disabled="disabled"
           />
-          <label for="currencyInput">Kur ($)</label>
+          <label for="currencyInput">Currency ($)</label>
         </span>
       </div>
       <div class="col">
@@ -104,7 +104,7 @@
             class="w-100"
             :disabled="disabled"
           />
-          <label for="description">Açıklama</label>
+          <label for="description">Description</label>
         </span>
       </div>
     </div>
@@ -113,7 +113,7 @@
         <Button
           type="button"
           class="p-button-secondary w-100"
-          label="Yeni"
+          label="New"
           @click="newForm"
           :disabled="disabledNewForm"
         />
@@ -122,7 +122,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="save"
           :disabled="disabledSaveForm"
         />

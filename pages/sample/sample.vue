@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Yeni"
+          label="New"
           @click="newForm"
         />
       </div>

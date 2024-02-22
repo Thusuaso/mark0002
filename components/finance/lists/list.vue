@@ -15,7 +15,7 @@
         @row-click="$emit('finance_list_selected_emit', $event)"
         :loading="loading"
       >
-        <Column field="FirmaAdi" header="Müşteri" :showFilterMenu="false">
+        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -25,7 +25,7 @@
             />
           </template>
         </Column>
-        <Column field="TotalOrder" header="Toplam Sipariş">
+        <Column field="TotalOrder" header="Total Order">
           <template #body="slotProps">
             {{ slotProps.data.TotalOrder | formatPriceUsd }}
           </template>
@@ -33,7 +33,7 @@
             {{ total.total | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ProductOrder" header="Üretimde">
+        <Column field="ProductOrder" header="In Production">
           <template #body="slotProps">
             {{ slotProps.data.ProductOrder | formatPriceUsd }}
           </template>
@@ -41,7 +41,7 @@
             {{ total.production | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ForwardingOrder" header="Sevkiyatta">
+        <Column field="ForwardingOrder" header="In Shipment">
           <template #body="slotProps">
             {{ slotProps.data.ForwardingOrder | formatPriceUsd }}
           </template>
@@ -49,7 +49,7 @@
             {{ total.forwarding | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="AdvancedPayment" header="Peşinat">
+        <Column field="AdvancedPayment" header="Pre Payment">
           <template #body="slotProps">
             {{ slotProps.data.AdvancedPayment | formatPriceUsd }}
           </template>
@@ -57,7 +57,7 @@
             {{ total.advanced | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Paid" header="Ödenen">
+        <Column field="Paid" header="Paid">
           <template #body="slotProps">
             {{ slotProps.data.Paid | formatPriceUsd }}
           </template>
@@ -65,7 +65,7 @@
             {{ total.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="BalancedProduction" header="Bakiye">
+        <Column field="BalancedProduction" header="Balance">
           <template #body="slotProps">
             {{ slotProps.data.BalancedProduction | formatPriceUsd }}
           </template>
@@ -73,7 +73,7 @@
             {{ total.balanceProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Balanced" header="Bakiye(Üretim Hariç)">
+        <Column field="Balanced" header="Balance(Except Production)">
           <template #body="slotProps">
             {{ slotProps.data.Balanced | formatPriceUsd }}
           </template>
@@ -85,14 +85,14 @@
     </div>
     <div class="col-3">
       <DataTable :value="expiry" :loading="loading">
-        <Column field="FirmaAdi" header="Müşteri"></Column>
+        <Column field="FirmaAdi" header="Customer"></Column>
         <Column field="SiparisNo" header="Po"></Column>
-        <Column field="Vade" header="Vade">
+        <Column field="Vade" header="Maturity">
           <template #body="slotProps">
             {{ slotProps.data.Vade | dateToString }}
           </template>
         </Column>
-        <Column field="Total" header="Toplam">
+        <Column field="Total" header="Total">
           <template #body="slotProps">
             {{ slotProps.data.Total | formatPriceUsd }}
           </template>

@@ -23,7 +23,7 @@
             @click="clearFilter()"
           />
         </template>
-        <Column field="KasaNo" header="Kasa No" :showFilterMenu="false">
+        <Column field="KasaNo" header="Crate No" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -34,7 +34,7 @@
             />
           </template>
         </Column>
-        <Column field="Tarih" header="Tarih" :showFilterMenu="false">
+        <Column field="Tarih" header="Date" :showFilterMenu="false">
           <template #body="slotProps">
             {{ slotProps.data.Tarih | dateToString }}
           </template>
@@ -48,7 +48,7 @@
             />
           </template>
         </Column>
-        <Column field="KategoriAdi" header="Kategori" :showFilterMenu="false">
+        <Column field="KategoriAdi" header="Category" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -59,7 +59,7 @@
             />
           </template>
         </Column>
-        <Column field="OcakAdi" header="Ocak" :showFilterMenu="false">
+        <Column field="OcakAdi" header="Mine" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -70,7 +70,7 @@
             />
           </template>
         </Column>
-        <Column field="UrunAdi" header="Ürün" :showFilterMenu="false">
+        <Column field="UrunAdi" header="Product" :showFilterMenu="false">
           <template #footer>
             {{ total.kasaadedi }}
           </template>
@@ -84,7 +84,7 @@
             />
           </template>
         </Column>
-        <Column field="YuzeyIslemAdi" header="Yüzey" :showFilterMenu="false">
+        <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -95,7 +95,7 @@
             />
           </template>
         </Column>
-        <Column field="En" header="En" :showFilterMenu="false">
+        <Column field="En" header="Width" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -106,7 +106,7 @@
             />
           </template>
         </Column>
-        <Column field="Boy" header="Boy" :showFilterMenu="false">
+        <Column field="Boy" header="Height" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -117,7 +117,7 @@
             />
           </template>
         </Column>
-        <Column field="Kenar" header="Kenar" :showFilterMenu="false">
+        <Column field="Kenar" header="Edge" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -128,17 +128,17 @@
             />
           </template>
         </Column>
-        <Column field="Adet" header="K.Adet">
+        <Column field="Adet" header="Pieces in Box">
           <template #footer>
             {{ total.kutuiciadet | formatDecimal }}
           </template>
         </Column>
-        <Column field="KutuAdet" header="Kutu">
+        <Column field="KutuAdet" header="Box Piece">
           <template #footer>
             {{ total.kutu | formatDecimal }}
           </template>
         </Column>
-        <Column field="Miktar" header="Miktar">
+        <Column field="Miktar" header="Amount">
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
@@ -146,13 +146,13 @@
             {{ total.miktar | formatDecimal }}
           </template>
         </Column>
-        <Column field="Kutu" header="K">
+        <Column field="Kutu" header="B">
           <template #body="slotProps">
             <div v-if="slotProps.data.Kutu == true">✓</div>
             <div v-else>x</div>
           </template>
         </Column>
-        <Column field="Bagli" header="B">
+        <Column field="Bagli" header="C">
           <template #body="slotProps">
             <div v-if="slotProps.data.Bagli == true">✓</div>
             <div v-else>x</div>
@@ -169,7 +169,7 @@
             />
           </template>
         </Column>
-        <Column field="Aciklama" header="Not" :showFilterMenu="false">
+        <Column field="Aciklama" header="Desc" :showFilterMenu="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"

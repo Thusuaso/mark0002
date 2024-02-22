@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Yeni"
+          label="New"
           @click="newForm"
         />
       </div>
@@ -19,7 +19,7 @@
             class="w-100"
             @change="yearChange($event)"
           />
-          <label for="years">Yıl</label>
+          <label for="years">Year</label>
         </div>
       </div>
     </div>
@@ -144,7 +144,7 @@ export default {
   },
   methods: {
     yearChange(event) {
-      if (event.value.Yil == "Hepsi") {
+      if (event.value.Yil == "All") {
         this.$store.dispatch("setOrderShippedList");
       } else {
         this.$store.dispatch("setOrderShippedListYear", event.value.Yil);
@@ -158,6 +158,9 @@ export default {
         added: this.getOrderProductAdded,
         updated: this.getOrderProductUpdated,
         deleted: this.getOrderProductDeleted,
+        operation: this.productionModel.operationMail,
+        representative: this.productionModel.representativeMail,
+        status: 3,
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
@@ -217,7 +220,7 @@ export default {
   },
   watch: {
     getOrderProductionYearsList() {
-      this.selectedYear = { Yil: "Hepsi" };
+      this.selectedYear = { Yil: "All" };
     },
   },
 };

@@ -9,19 +9,19 @@
         :sortOrder="-1"
         :loading="loading"
       >
-        <template #header> Aylık Yükleme </template>
-        <Column field="YuklemeTarihi" header="Y.Tarih">
+        <template #header> Shipment (Monthly) </template>
+        <Column field="YuklemeTarihi" header="S.Date">
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
           </template>
         </Column>
-        <Column field="SiparisTarihi" header="S.Tarih">
+        <Column field="SiparisTarihi" header="O.Date">
           <template #body="slotProps">
             {{ slotProps.data.SiparisTarihi | dateToString }}
           </template>
         </Column>
-        <Column field="SiparisNo" header="SiparisNo"></Column>
-        <Column field="MusteriAdi" header="Müşteri"></Column>
+        <Column field="SiparisNo" header="Po"></Column>
+        <Column field="MusteriAdi" header="Customer"></Column>
 
         <Column field="FOB" header="Fob">
           <template #body="slotProps">
@@ -50,8 +50,8 @@
         :sortOrder="-1"
         :loading="loading"
       >
-        <template #header> Yıllık Yükleme </template>
-        <Column field="MusteriAdi" header="Müşteri"></Column>
+        <template #header> Shipment (Yearly) </template>
+        <Column field="MusteriAdi" header="Customer"></Column>
         <Column field="FOB" header="FOB">
           <template #body="slotProps">
             {{ slotProps.data.FOB | formatPriceUsd }}

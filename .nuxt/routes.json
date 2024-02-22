@@ -154,6 +154,13 @@
     "_name": "_6b0aa85d"
   },
   {
+    "name": "panel-usa",
+    "path": "/panel/usa",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\panel\\\\usa\\\\index.vue",
+    "chunkName": "pages/panel/usa/index",
+    "_name": "_5e995db3"
+  },
+  {
     "name": "panel-users",
     "path": "/panel/users",
     "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\panel\\\\users\\\\index.vue",
@@ -168,11 +175,25 @@
     "_name": "_13dc792f"
   },
   {
+    "name": "sales-consider",
+    "path": "/sales/consider",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\sales\\\\consider.vue",
+    "chunkName": "pages/sales/consider",
+    "_name": "_8cd5b7f6"
+  },
+  {
     "name": "sales-follow",
     "path": "/sales/follow",
     "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\sales\\\\follow.vue",
     "chunkName": "pages/sales/follow",
     "_name": "_45579a06"
+  },
+  {
+    "name": "sales-maintodo",
+    "path": "/sales/maintodo",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\sales\\\\maintodo.vue",
+    "chunkName": "pages/sales/maintodo",
+    "_name": "_1c1e666a"
   },
   {
     "name": "sales-representative",
@@ -278,6 +299,13 @@
     "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\summary.vue",
     "chunkName": "pages/reports/mekmar/summary",
     "_name": "_08655928"
+  },
+  {
+    "name": "reports-mekmer-atlanta",
+    "path": "/reports/mekmer/atlanta",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\atlanta.vue",
+    "chunkName": "pages/reports/mekmer/atlanta",
+    "_name": "_35d2efbd"
   },
   {
     "name": "reports-mekmer-mine",

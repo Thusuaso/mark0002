@@ -6,17 +6,17 @@
           {{ slotProps.data.Tarih | dateToString }}
         </template>
       </Column>
-      <Column field="KasaNo" header="Kasa No"></Column>
-      <Column field="FirmaAdi" header="Tedarikçi"></Column>
-      <Column field="OcakAdi" header="Ocak"></Column>
-      <Column field="KategoriAdi" header="Kategori"></Column>
-      <Column field="UrunAdi" header="Ürün"></Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey"></Column>
-      <Column field="En" header="En"></Column>
-      <Column field="Boy" header="Boy"></Column>
-      <Column field="Kenar" header="Kenar"></Column>
-      <Column field="BirimAdi" header="Birim"></Column>
-      <Column field="Miktar" header="Miktar">
+      <Column field="KasaNo" header="Crate No"></Column>
+      <Column field="FirmaAdi" header="Supplier"></Column>
+      <Column field="OcakAdi" header="Mine"></Column>
+      <Column field="KategoriAdi" header="Category"></Column>
+      <Column field="UrunAdi" header="Product"></Column>
+      <Column field="YuzeyIslemAdi" header="Surface"></Column>
+      <Column field="En" header="Width"></Column>
+      <Column field="Boy" header="Height"></Column>
+      <Column field="Kenar" header="Edge"></Column>
+      <Column field="BirimAdi" header="Unit"></Column>
+      <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
@@ -24,7 +24,7 @@
           {{ total.amount | formatDecimal }}
         </template>
       </Column>
-      <Column field="Adet" header="Adet">
+      <Column field="Adet" header="Piece">
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>

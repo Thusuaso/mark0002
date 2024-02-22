@@ -16,7 +16,7 @@
               )
             "
           />
-          <label for="order">Sipariş No</label>
+          <label for="order">Orders</label>
         </span>
       </div>
       <div class="col">
@@ -26,19 +26,19 @@
             inputId="forwardingdate"
             dateFormat="dd/mm/yy"
           />
-          <label for="forwardingdate">Sevk Tarihi</label>
+          <label for="forwardingdate">Shipment Date</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="invoice" v-model="invoice" />
-          <label for="invoice">Fatura No</label>
+          <label for="invoice">Invoice No</label>
         </span>
       </div>
       <div class="col">
         <div class="flex align-items-center">
           <Checkbox class="mr-1" id="follow" v-model="follow" binary />
-          <label for="follow"> Takip </label>
+          <label for="follow"> Follow </label>
         </div>
       </div>
       <div class="col">
@@ -49,7 +49,7 @@
             name="dynamic"
             :value="'normal'"
           />
-          <label for="normal" class="ml-2">Normal Sevk</label>
+          <label for="normal" class="ml-2">Normal Shipment</label>
         </div>
         <div class="flex align-items-center">
           <RadioButton
@@ -58,7 +58,7 @@
             name="dynamic"
             :value="'fast'"
           />
-          <label for="fast" class="ml-2">Hızlı Sevk</label>
+          <label for="fast" class="ml-2">Fast Shipment</label>
         </div>
       </div>
     </div>
@@ -68,7 +68,7 @@
           v-model="selectedProduct"
           :options="getProductionProductsList"
           optionLabel="Aciklama"
-          placeholder="Ürün Seçiniz"
+          placeholder="Select a Product"
           class="w-50"
           @change="productSelected($event)"
         />
@@ -76,13 +76,13 @@
       <div class="col-3">
         <span class="p-float-label">
           <InputText id="orderamount" v-model="getShipmentAmount.order" disabled />
-          <label for="orderamount">Sipariş</label>
+          <label for="orderamount">Order</label>
         </span>
       </div>
       <div class="col-3">
         <span class="p-float-label">
           <InputText id="forwardamount" v-model="getShipmentAmount.production" disabled />
-          <label for="forwardamount">Giden</label>
+          <label for="forwardamount">Outgoing</label>
         </span>
       </div>
       <div class="col-3">
@@ -92,18 +92,13 @@
             v-model="getShipmentAmount.remainder"
             disabled
           />
-          <label for="remainderamount">Kalan</label>
+          <label for="remainderamount">Remainder</label>
         </span>
       </div>
     </div>
     <div class="row mb-4">
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-success w-100"
-          label="Sevk Et"
-          @click="save"
-        />
+        <Button type="button" class="p-button-success w-100" label="Ship" @click="save" />
       </div>
     </div>
     <div class="row mb-4">
@@ -118,18 +113,18 @@
           <Column
             selectionMode="multiple"
             headerStyle="width: 2rem"
-            header="Hepsi"
+            header="All"
           ></Column>
-          <Column field="KasaNo" header="Kasa No"></Column>
-          <Column field="Miktar" header="Miktar"></Column>
-          <Column field="BirimAdi" header="Birim"></Column>
+          <Column field="KasaNo" header="Crate No"></Column>
+          <Column field="Miktar" header="Amount"></Column>
+          <Column field="BirimAdi" header="Unit"></Column>
         </DataTable>
       </div>
       <div class="col-1">
         <Button
           type="button"
           class="p-button-primary"
-          label="Kasa Çık"
+          label="Send Crate"
           @click="sendingCrate"
         />
       </div>
@@ -139,22 +134,22 @@
           :scrollable="true"
           scrollHeight="400px"
         >
-          <Column field="KasaNo" header="Kasa No"></Column>
-          <Column field="UrunAdi" header="Ürün">
+          <Column field="KasaNo" header="Crate No"></Column>
+          <Column field="UrunAdi" header="Product">
             <template #footer>
               {{ getShipmentSendProductionTotal.crate }}
             </template>
           </Column>
-          <Column field="YuzeyIslemAdi" header="Yüzey"></Column>
-          <Column header="Ölçü">
+          <Column field="YuzeyIslemAdi" header="Surface"></Column>
+          <Column header="Size">
             <template #body="slotProps">
               {{
                 slotProps.data.En + "x" + slotProps.data.Boy + "x" + slotProps.data.Kenar
               }}
             </template>
           </Column>
-          <Column field="BirimAdi" header="Birim"></Column>
-          <Column field="Miktar" header="Miktar">
+          <Column field="BirimAdi" header="Unit"></Column>
+          <Column field="Miktar" header="Amount">
             <template #body="slotProps">
               {{ slotProps.data.Miktar | formatDecimal }}
             </template>
@@ -162,7 +157,7 @@
               {{ getShipmentSendProductionTotal.amount | formatDecimal }}
             </template>
           </Column>
-          <Column field="TotalProduct" header="Toplam">
+          <Column field="TotalProduct" header="Total">
             <template #body="slotProps">
               {{ slotProps.data.TotalProduct | formatDecimal }}
             </template>
@@ -203,8 +198,8 @@ export default {
       filteredOrders: null,
       forwardingDate: null,
       invoice: null,
-      follow: null,
-      forwardingstatus: null,
+      follow: 0,
+      forwardingstatus: "normal",
       selectedProduct: null,
       orderamount: null,
       forwardamount: null,
@@ -213,6 +208,20 @@ export default {
     };
   },
   methods: {
+    reset() {
+      this.selectedOrder = null;
+      this.forwardingDate = null;
+      this.invoice = null;
+      this.follow = null;
+      this.forwardingstatus = null;
+      this.selectedProduct = null;
+      this.getShipmentAmount.order = 0;
+      this.getShipmentAmount.production = 0;
+      this.getShipmentAmount.remainder = 0;
+      this.getShipmentProductionList = null;
+      this.selectedProducts = null;
+      this.$store.dispatch("setShipmentSendProductionList");
+    },
     save() {
       const data = this.getShipmentSendProductionList;
       for (const item of data) {
@@ -229,8 +238,18 @@ export default {
         YuklemeTarihi: convertDate.dateToString(this.forwardingDate),
         SevkStatus: this.forwardingstatus,
         Takip: this.follow,
+        KullaniciAdi: Cookies.get("username"),
+        mail: Cookies.get("mail"),
       };
-      this.$store.dispatch("setShipmentSave", datas);
+      this.$store.dispatch("setShipmentSave", datas).then((res) => {
+        if (res) {
+          this.$toast.success("Başarıyla Sevk Edildi");
+          this.$store.dispatch("setOrderList");
+          this.reset();
+        } else {
+          this.$toast.error("Sevk Edilemedi");
+        }
+      });
     },
     sendingCrate() {
       this.$store.dispatch("setShipmentSendingProduction", this.selectedProducts);

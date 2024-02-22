@@ -6,7 +6,7 @@
           v-model="selectedDates"
           selectionMode="range"
           :manualInput="false"
-          placeholder="Tarih Aralığı Seçiniz"
+          placeholder="Select a Date Range"
           class="w-100"
         />
       </div>
@@ -14,7 +14,7 @@
         <Button
           type="button"
           class="p-button-secondary w-100"
-          label="Temizle"
+          label="Clear"
           @click="selectedDates = null"
         />
       </div>
@@ -23,7 +23,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Ara"
+          label="Search"
           @click="searchDateList"
         />
       </div>
@@ -58,6 +58,19 @@
           />
         </vue-excel-xlsx>
       </div>
+      <div class="col">
+        <span class="p-float-label">
+          <Dropdown
+            v-model="selectedQuarter"
+            :options="quarters"
+            optionLabel="quarter"
+            class="w-full"
+            id="quarter"
+            @change="quarterChange($event)"
+          />
+          <label for="quarter">Quarter</label>
+        </span>
+      </div>
     </div>
     <reportsMekmerProductionList
       :list="getReportsMekmerProductionList"
@@ -78,6 +91,14 @@ export default {
   },
   data() {
     return {
+      quarters: [
+        { id: 1, quarter: "Q1" },
+        { id: 2, quarter: "Q2" },
+        { id: 3, quarter: "Q3" },
+        { id: 4, quarter: "Q4" },
+        { id: 5, quarter: "Q5" },
+      ],
+      selectedQuarter: { id: 1, quarter: "Q1" },
       selectedDates: null,
       reportsMekmerProductionListExcelFields: {
         Tarih: "Tarih",
@@ -119,6 +140,40 @@ export default {
     this.$store.dispatch("setReportsMekmerProductionList");
   },
   methods: {
+    quarterChange(event) {
+      let year = new Date().getFullYear();
+      if (event.value.id == 1) {
+        const years = {
+          year1: year,
+          year2: year - 2,
+        };
+        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
+      } else if (event.value.id == 2) {
+        const years = {
+          year1: year - 3,
+          year2: year - 5,
+        };
+        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
+      } else if (event.value.id == 3) {
+        const years = {
+          year1: year - 6,
+          year2: year - 8,
+        };
+        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
+      } else if (event.value.id == 4) {
+        const years = {
+          year1: year - 9,
+          year2: year - 11,
+        };
+        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
+      } else if (event.value.id == 5) {
+        const years = {
+          year1: year - 12,
+          year2: year - 14,
+        };
+        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
+      }
+    },
     formatDecimal(value) {
       const data = value.toString().replace(".", ",");
       return data;

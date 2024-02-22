@@ -14,7 +14,7 @@
       class="p-datatable-sm"
       style="font-size: 90%"
     >
-      <Column field="En" header="En" :showFilterMenu="false" sortable>
+      <Column field="En" header="Width" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -24,7 +24,7 @@
           />
         </template>
       </Column>
-      <Column field="Boy" header="Boy" :showFilterMenu="false" sortable>
+      <Column field="Boy" header="Height" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -34,7 +34,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Kenar" :showFilterMenu="false" sortable>
+      <Column field="Kenar" header="Edge" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -44,7 +44,7 @@
           />
         </template>
       </Column>
-      <Column field="KategoriAdi" header="Kategori" :showFilterMenu="false" sortable>
+      <Column field="KategoriAdi" header="Category" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -54,7 +54,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunAdi" header="Ürün" :showFilterMenu="false" sortable>
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -64,7 +64,7 @@
           />
         </template>
       </Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey" :showFilterMenu="false" sortable>
+      <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false" sortable>
         <template #body="slotProps">
           <div style="word-break: break-word">
             {{ slotProps.data.YuzeyIslemAdi }}
@@ -79,7 +79,7 @@
           />
         </template>
       </Column>
-      <Column field="Toplam" header="Miktar">
+      <Column field="Toplam" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Toplam | formatDecimal }}
         </template>
@@ -87,7 +87,7 @@
           {{ total.amount | formatDecimal }}
         </template>
       </Column>
-      <Column field="KasaSayisi" header="Kasa Sayısı">
+      <Column field="KasaSayisi" header="Crate Amount">
         <template #body="slotProps">
           {{ slotProps.data.KasaSayisi | formatDecimal }}
         </template>

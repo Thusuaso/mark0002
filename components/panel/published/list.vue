@@ -13,9 +13,9 @@
       @row-click="panelPublishedListSelected($event.data)"
       :loading="loading"
       sortField="sira"
-      sortOrder="1"
+      :sortOrder="1"
     >
-      <Column field="sira" header="Sıra" :showFilterMenu="false">
+      <Column field="sira" header="Queue" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -25,7 +25,7 @@
           />
         </template>
       </Column>
-      <Column field="urunid" header="Ürün Id" :showFilterMenu="false">
+      <Column field="urunid" header="Product Id" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -35,7 +35,7 @@
           />
         </template>
       </Column>
-      <Column field="urunkod" header="Ürün Kodu" :showFilterMenu="false">
+      <Column field="urunkod" header="Product Code" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -45,7 +45,7 @@
           />
         </template>
       </Column>
-      <Column field="urunadi_en" header="Ürün Adı" :showFilterMenu="false">
+      <Column field="urunadi_en" header="Product Name" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

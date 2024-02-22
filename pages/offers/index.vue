@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Yeni"
+          label="New"
           @click="newOffer"
         />
       </div>
@@ -13,7 +13,7 @@
         <Button
           type="button"
           class="p-button-primary w-100"
-          label="Güncel Teklifler"
+          label="Up to Date Offers"
           @click="offers"
         />
       </div>
@@ -21,7 +21,7 @@
         <Button
           type="button"
           class="p-button-secondary w-100"
-          label="Eski Teklifler"
+          label="Old Offers"
           @click="oldOffers"
         />
       </div>
@@ -33,7 +33,7 @@
       @offer_list_b_list_selected_emit="offerBListSelected($event)"
       :loading="getLoading"
     />
-    <Dialog :visible.sync="offer_list_detail" header="" modal>
+    <Dialog :visible.sync="offer_list_detail" header="" modal :closeOnEscape="false">
       <offerDetail
         :list="getOfferDetailList"
         :bList="getOfferDetailBList"
@@ -41,7 +41,7 @@
         :loading="getLoading"
       />
     </Dialog>
-    <Dialog :visible.sync="offer_list_detail_form" header="" modal>
+    <Dialog :visible.sync="offer_list_detail_form" header="" modal :closeOnEscape="false">
       <offerForm
         :model="model"
         :category="getOfferCategoryList"

@@ -11,7 +11,7 @@
                 v-model="model.UrunKartID"
                 disabled
               />
-              <label for="productId">Ürün Kart Id</label>
+              <label for="productId">Product Card Id</label>
             </span>
           </div>
           <div class="col">
@@ -26,19 +26,19 @@
         </div>
         <span class="p-float-label mb-4">
           <InputText class="w-100" id="category" v-model="categoryName" disabled />
-          <label for="category">Kategori</label>
+          <label for="category">Category</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText class="w-100" id="product" v-model="productName" disabled />
-          <label for="product">Ürün Adı</label>
+          <label for="product">Product</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText class="w-100" id="surface" v-model="surfaceName" disabled />
-          <label for="surface">Yüzey</label>
+          <label for="surface">Surface</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText class="w-100" id="size" v-model="sizeName" disabled />
-          <label for="size">Ölçü</label>
+          <label for="size">Size</label>
         </span>
         <span class="p-float-label mb-4 w-100">
           <AutoComplete
@@ -51,13 +51,13 @@
             class="w-100"
             :disabled="product_form_disabled"
           />
-          <label for="supplier">Tedarikçi</label>
+          <label for="supplier">Supplier</label>
         </span>
         <div class="row mb-4">
           <div class="col">
             <CustomInput
               :value="model.AlisFiyati"
-              text="Alış Fiyatı"
+              text="Purchase Price"
               @onInput="model.AlisFiyati = $event"
               :disabled="product_form_disabled"
             />
@@ -65,7 +65,7 @@
           <div class="col">
             <CustomInput
               :value="model.SatisFiyati"
-              text="Satış Fiyatı"
+              text="Sale Price"
               @onInput="model.SatisFiyati = $event"
               :disabled="product_form_disabled"
             />
@@ -84,13 +84,13 @@
                 class="w-100"
                 :disabled="product_form_disabled"
               />
-              <label for="unit">Birim</label>
+              <label for="unit">Unit</label>
             </span>
           </div>
           <div class="col">
             <CustomInput
               :value="model.Miktar"
-              text="Miktar"
+              text="Amount"
               @onInput="model.Miktar = $event"
               :disabled="product_form_disabled"
             />
@@ -98,7 +98,7 @@
           <div class="col">
             <CustomInput
               :value="model.Adet"
-              text="Adet"
+              text="Piece"
               @onInput="model.Adet = $event"
               :disabled="product_form_disabled"
             />
@@ -113,13 +113,13 @@
                 v-model="model.SiraNo"
                 :disabled="product_form_disabled"
               />
-              <label for="queue">Sıra</label>
+              <label for="queue">Queue</label>
             </span>
           </div>
           <div class="col">
             <CustomInput
               :value="model.OzelMiktar"
-              text="Ö.M"
+              text="S.M"
               @onInput="model.OzelMiktar = $event"
               :disabled="product_form_disabled"
             />
@@ -138,7 +138,7 @@
             <Button
               type="button"
               class="p-button-info w-100"
-              label="İşçilik"
+              label="Workerman"
               @click="$emit('workerman_selected_emit', model.UrunKartID)"
               :disabled="workerman_button_disabled"
             />
@@ -153,7 +153,7 @@
             class="w-100"
             :disabled="product_form_disabled"
           />
-          <label>Açıklama(EN)</label>
+          <label>Description(EN)</label>
         </span>
         <span class="p-float-label">
           <Textarea
@@ -162,14 +162,14 @@
             class="w-100"
             :disabled="product_form_disabled"
           />
-          <label>Açıklama(TR)</label>
+          <label>Description(TR)</label>
         </span>
         <div class="row mt-4" v-if="po">
           <div class="col">
             <Button
               type="button"
               class="p-button-primary w-100"
-              label="Yeni"
+              label="New"
               :disabled="new_button_disabled"
               @click="newForm"
             />
@@ -178,7 +178,7 @@
             <Button
               type="button"
               class="p-button-secondary w-100"
-              label="Vazgeç"
+              label="Cancel"
               :disabled="cancel_button_disabled"
               @click="cancelForm"
             />
@@ -187,7 +187,7 @@
             <Button
               type="button"
               class="p-button-success w-100"
-              label="Ekle"
+              label="Add"
               :disabled="add_button_disabled"
               @click="add"
             />
@@ -196,7 +196,7 @@
             <Button
               type="button"
               class="p-button-warning w-100"
-              label="Değiştir"
+              label="Upadet"
               :disabled="update_button_disabled"
               @click="update"
             />
@@ -205,7 +205,7 @@
             <Button
               type="button"
               class="p-button-danger w-100"
-              label="Sil"
+              label="Delete"
               :disabled="delete_button_disabled"
               @click="deleteItem"
             />
@@ -222,12 +222,12 @@
       sortOrder="1"
     >
       <Column field="SiraNo" header="#"></Column>
-      <Column field="FirmaAdi" header="Kimden"></Column>
-      <Column field="UrunAdi" header="Ürün"></Column>
-      <Column field="YuzeyIslemAdi" header="Yüzey"></Column>
-      <Column field="En" header="En"></Column>
-      <Column field="Boy" header="Boy"></Column>
-      <Column field="Kenar" header="Kenar"></Column>
+      <Column field="FirmaAdi" header="From Who"></Column>
+      <Column field="UrunAdi" header="Product"></Column>
+      <Column field="YuzeyIslemAdi" header="Surface"></Column>
+      <Column field="En" header="Width"></Column>
+      <Column field="Boy" header="Height"></Column>
+      <Column field="Kenar" header="Edge"></Column>
       <Column header="M2">
         <template #body="slotProps">
           <div v-if="slotProps.data.UrunBirimID == 1">
@@ -241,7 +241,7 @@
           {{ detailProductTotal.m2 | formatDecimal }}
         </template>
       </Column>
-      <Column header="Adet">
+      <Column header="Piece">
         <template #body="slotProps">
           <div v-if="slotProps.data.UrunBirimID == 2">
             {{ slotProps.data.Miktar | formatDecimal }}
@@ -275,12 +275,12 @@
           {{ detailProductTotal.ton | formatDecimal }}
         </template>
       </Column>
-      <Column field="SatisFiyati" header="S.Fiyat">
+      <Column field="SatisFiyati" header="Sale Price">
         <template #body="slotProps">
           {{ slotProps.data.SatisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column header="Toplam">
+      <Column header="Total">
         <template #body="slotProps">
           {{ (slotProps.data.Miktar * slotProps.data.SatisFiyati) | formatPriceUsd }}
         </template>
@@ -290,7 +290,7 @@
       </Column>
     </DataTable>
 
-    <Dialog :visible.sync="product_cards_form_dialog" header="Ürün Kartları" modal>
+    <Dialog :visible.sync="product_cards_form_dialog" header="Product Cards" modal>
       <productCards @cards_selected_emit="productCardsSelected($event)" />
     </Dialog>
   </div>

@@ -10,7 +10,7 @@
     filterDisplay="row"
     :loading="loading"
   >
-    <Column field="MusteriAdi" header="Müşteri" :showFilterMenu="false">
+    <Column field="MusteriAdi" header="Customer" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -20,7 +20,7 @@
         />
       </template>
     </Column>
-    <Column field="Company" header="Şirket" :showFilterMenu="false">
+    <Column field="Company" header="Company" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -31,9 +31,9 @@
       </template>
     </Column>
     <Column field="Mail" header="Mail"></Column>
-    <Column field="Phone" header="Telefon"></Column>
-    <Column field="Adress" header="Adres"></Column>
-    <Column field="UlkeAdi" header="Ülke" :showFilterMenu="false">
+    <Column field="Phone" header="Phone"></Column>
+    <Column field="Adress" header="Address"></Column>
+    <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -43,7 +43,7 @@
         />
       </template>
     </Column>
-    <Column field="KullaniciAdi" header="Satışçı" :showFilterMenu="false">
+    <Column field="KullaniciAdi" header="Salesman" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"

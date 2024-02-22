@@ -167,6 +167,12 @@
   "PanelPublishedList": {
     "description": "Auto imported from components/panel/published/list.vue"
   },
+  "PanelUsaForm": {
+    "description": "Auto imported from components/panel/usa/form.vue"
+  },
+  "PanelUsaList": {
+    "description": "Auto imported from components/panel/usa/list.vue"
+  },
   "PanelUsersForm": {
     "description": "Auto imported from components/panel/users/form.vue"
   },
@@ -187,6 +193,12 @@
   },
   "SalesBgpNewForm": {
     "description": "Auto imported from components/sales/bgp/newForm.vue"
+  },
+  "SalesConsiderForm": {
+    "description": "Auto imported from components/sales/consider/form.vue"
+  },
+  "SalesConsiderList": {
+    "description": "Auto imported from components/sales/consider/list.vue"
   },
   "SalesFollowForm": {
     "description": "Auto imported from components/sales/follow/form.vue"
@@ -242,6 +254,9 @@
   "SharedCustomeInputCustominput": {
     "description": "Auto imported from components/shared/customeInput/custominput.vue"
   },
+  "TodoMainList": {
+    "description": "Auto imported from components/todo/main/list.vue"
+  },
   "ReportsMekmarAyoForm": {
     "description": "Auto imported from components/reports/mekmar/ayo/form.vue"
   },
@@ -286,6 +301,9 @@
   },
   "ReportsMekmarSummaryList": {
     "description": "Auto imported from components/reports/mekmar/summary/list.vue"
+  },
+  "ReportsMekmerAtlantaList": {
+    "description": "Auto imported from components/reports/mekmer/atlanta/list.vue"
   },
   "ReportsMekmerMineList": {
     "description": "Auto imported from components/reports/mekmer/mine/list.vue"

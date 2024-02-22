@@ -10,19 +10,19 @@
         @row-click="$emit('po_list_selected_emit', $event)"
         :loading="loading"
       >
-        <Column field="SiparisNo" header="Po (Purchase Order)"></Column>
-        <Column field="SiparisTarihi" header="Sipariş Tarihi (Order Date)">
+        <Column field="SiparisNo" header="Purchase Order"></Column>
+        <Column field="SiparisTarihi" header="Order Date">
           <template #body="slotProps">
             {{ slotProps.data.SiparisTarihi | dateToString }}
           </template>
         </Column>
-        <Column field="YuklemeTarihi" header="Yükleme Tarihi (Shipment Date)">
+        <Column field="YuklemeTarihi" header="Shipment Date">
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
           </template>
         </Column>
-        <Column field="Durum" header="Durum (Status)"></Column>
-        <Column field="OrderTotal" header="Sipariş (Order Total USD)">
+        <Column field="Durum" header="Status"></Column>
+        <Column field="OrderTotal" header="Order Total USD">
           <template #body="slotProps">
             {{ slotProps.data.OrderTotal | formatPriceUsd }}
           </template>
@@ -30,7 +30,7 @@
             {{ poListTotal.order | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Paid" header="Ödenen (Paid Amount)">
+        <Column field="Paid" header="Paid Amount">
           <template #body="slotProps">
             {{ slotProps.data.Paid | formatPriceUsd }}
           </template>
@@ -38,7 +38,7 @@
             {{ poListTotal.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Balanced" header="Kalan (Balance)">
+        <Column field="Balanced" header="Balance">
           <template #body="slotProps">
             {{ slotProps.data.Balanced | formatPriceUsd }}
           </template>
@@ -46,7 +46,7 @@
             {{ poListTotal.balanced | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Pesinat" header="Peşinat (Prepayment)">
+        <Column field="Pesinat" header="Prepayment">
           <template #body="slotProps">
             {{ slotProps.data.Pesinat | formatPriceUsd }}
           </template>
@@ -66,13 +66,13 @@
         @row-click="$emit('po_paid_detail_list_selected_emit', $event)"
         :loading="loading"
       >
-        <Column field="Tarih" header="Tarih">
+        <Column field="Tarih" header="Date">
           <template #body="slotProps">
             {{ slotProps.data.Tarih | dateToString }}
           </template>
         </Column>
 
-        <Column field="Paid" header="Ödenen">
+        <Column field="Paid" header="Paid">
           <template #body="slotProps">
             {{ slotProps.data.Paid | formatPriceUsd }}
           </template>

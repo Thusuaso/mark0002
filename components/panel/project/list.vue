@@ -8,12 +8,12 @@
       :loading="loading"
     >
       <Column field="ID" header="Id"></Column>
-      <Column field="Queue" header="Sıra"></Column>
-      <Column field="ProjectName" header="Proje (En)"></Column>
-      <Column field="ProjectName_Fr" header="Proje (Fr)"></Column>
-      <Column field="ProjectName_Es" header="Proje (Es)"></Column>
-      <Column field="ProjectName_Ru" header="Proje (Ru)"></Column>
-      <Column field="CountryName" header="Ülke"></Column>
+      <Column field="Queue" header="Queue"></Column>
+      <Column field="ProjectName" header="Project (En)"></Column>
+      <Column field="ProjectName_Fr" header="Project (Fr)"></Column>
+      <Column field="ProjectName_Es" header="Project (Es)"></Column>
+      <Column field="ProjectName_Ru" header="Project (Ru)"></Column>
+      <Column field="CountryName" header="Country"></Column>
       <Column>
         <template #body="slotProps">
           <img :src="slotProps.data.Image" width="150" height="150" lazyload />

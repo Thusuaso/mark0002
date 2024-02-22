@@ -1,9 +1,11 @@
+import Cookies from 'js-cookie';
 const state = {
     todos:[],
     todoButtonStatus: false,
         toDoMainListByUsername: [],
     toDoMainListByUsernameLenght: 0,
     todoMainListByUsernameButtonStatus:false,
+    todosMainList:[],
 
 };
 const actions = {
@@ -51,7 +53,7 @@ const actions = {
 
         });
     },
-        setToDoListByUsername(vuexContext, username) {
+    setToDoListByUsername(vuexContext, username) {
         this.$axios.get(`/todo/main/list/by/username/${username}`)
             .then(response => {
                 vuexContext.commit('setToDoListByUsername', response.data.list); 
@@ -105,7 +107,47 @@ const actions = {
                     this.$toast.error('Görev Tamamlanamadı.');
                 }
             });
+    },
+    setTodosMainList(vuexContext,username){
+        this.$axios.get(`/sales/todos/main/list/${username}`)
+        .then(response=>{
+            vuexContext.commit('setTodosMainList',response.data.list);
+        });
+    },
+    setSalesTodoMainDone(vuexContext,id){
+        this.$axios.get(`/todo/main/list/change/done/${id}`)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Görev Tamamlandı.');
+                vuexContext.dispatch('setTodosMainList',Cookies.get('username'));
+            } else{
+                this.$toast.error('Görev Tamamlanamadı.');
+            }
+        });
+    },
+    setSalesTodoMainSeen(vuexContext,id){
+        this.$axios.get(`/todo/main/list/change/seen/${id}`)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Görüldü Olarak Değiştirildi.');
+                vuexContext.dispatch('setTodosMainList',Cookies.get('username'));
+            } else{
+                this.$toast.error('Değiştirme Başarısız');
+            }
+        });
+    },
+    setSalesTodoMainChangeQueue(vuexContext,todos){
+        this.$axios.post('/todo/main/change/queue',todos)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Sıra Başarıyla Değiştirildi.');
+            } else{
+                this.$toast.success('Sıra Değiştirme Başarısız.');
+                
+            }
+        });
     }
+
 };
 const mutations = {
     setTodos(state,todos){
@@ -120,6 +162,9 @@ const mutations = {
     },
     setTodoMainListByUsernameButtonStatus(state, payload) {
         state.todoMainListByUsernameButtonStatus = payload;
+    },
+    setTodosMainList(state,payload){
+        state.todosMainList = payload;
     }
 };
 const getters = {
@@ -137,6 +182,9 @@ const getters = {
     },
     getTodoMainListByUsernameButtonStatus(state) {
         return state.todoMainListByUsernameButtonStatus;
+    },
+    getTodosMainList(state){
+        return state.todosMainList;
     }
 };
 export default {

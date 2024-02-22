@@ -12,7 +12,7 @@
             @item-select="categorySelected($event)"
             @input="categoryChange($event)"
           />
-          <label for="category">Kategori</label>
+          <label for="category">Category</label>
         </span>
       </div>
       <div class="col">
@@ -26,7 +26,7 @@
             @item-select="productSelected($event)"
             @input="productChange($event)"
           />
-          <label for="product">Ürün</label>
+          <label for="product">Product</label>
         </span>
       </div>
       <div class="col">
@@ -40,7 +40,7 @@
             @item-select="surfaceSelected($event)"
             @input="surfaceChange($event)"
           />
-          <label for="surface">Yüzey</label>
+          <label for="surface">Surface</label>
         </span>
       </div>
     </div>
@@ -56,7 +56,7 @@
             @item-select="widthSelected($event)"
             @input="widthSurface($event)"
           />
-          <label for="width">En</label>
+          <label for="width">Width</label>
         </span>
       </div>
       <div class="col">
@@ -70,7 +70,7 @@
             @item-select="heightSelected($event)"
             @input="heightChange($event)"
           />
-          <label for="height">Boy</label>
+          <label for="height">Height</label>
         </span>
       </div>
       <div class="col">
@@ -84,7 +84,7 @@
             @item-select="edgeSelected($event)"
             @input="edgeChange($event)"
           />
-          <label for="edge">Kenar</label>
+          <label for="edge">Edge</label>
         </span>
       </div>
     </div>
@@ -93,7 +93,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="saveProcess"
         />
       </div>
@@ -101,7 +101,7 @@
         <Button
           type="button"
           class="p-button-danger w-100"
-          label="Sil"
+          label="Delete"
           @click="deleteForm"
         />
       </div>

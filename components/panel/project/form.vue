@@ -17,7 +17,7 @@
         <Button
           type="button"
           class="p-button-secondary w-100"
-          label="Ürün Adı Değiştirme"
+          label="Change Product Name"
           @click="$emit('panel_project_photo_change_product_name')"
         />
       </div>
@@ -25,7 +25,7 @@
         <Button
           type="button"
           class="p-button-info w-100"
-          label="Önerilen Projeler"
+          label="Suggested"
           @click="$emit('panel_project_suggested')"
         />
       </div>
@@ -64,14 +64,14 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="video" v-model="videos_link" />
-              <label for="video">Video Linki</label>
+              <label for="video">Video Link</label>
             </span>
           </div>
           <div class="col">
             <Button
               type="button"
               class="p-button-success"
-              label="Ekle"
+              label="Add"
               @click="$emit('panel_project_video_emit', videos_link)"
             />
           </div>
@@ -90,26 +90,26 @@
     </div>
     <span class="p-float-label mt-3">
       <Textarea v-model="information.ProjectInformation" rows="8" class="w-100" />
-      <label>Açıklama (En)</label>
+      <label>Description (En)</label>
     </span>
     <span class="p-float-label mt-3">
       <Textarea v-model="information.ProjectInformation_Fr" rows="8" class="w-100" />
-      <label>Açıklama (Fr)</label>
+      <label>Description (Fr)</label>
     </span>
     <span class="p-float-label mt-3">
       <Textarea v-model="information.ProjectInformation_Es" rows="8" class="w-100" />
-      <label>Açıklama (Es)</label>
+      <label>Description (Es)</label>
     </span>
     <span class="p-float-label mt-3">
       <Textarea v-model="information.ProjectInformation_Ru" rows="8" class="w-100" />
-      <label>Açıklama (Ru)</label>
+      <label>Description (Ru)</label>
     </span>
     <div class="row">
       <div class="col">
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Ekle"
+          label="Save"
           @click="$emit('panel_project_information_save_emit', information)"
         />
       </div>
@@ -117,7 +117,7 @@
         <Button
           type="button"
           class="p-button-warning w-100"
-          label="Güncelle"
+          label="Update"
           @click="$emit('panel_project_information_update_emit', information)"
         />
       </div>

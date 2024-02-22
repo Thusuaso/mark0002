@@ -10,7 +10,7 @@
     filterDisplay="row"
     :loading="loading"
   >
-    <Column field="Customer" header="Müşteri" :showFilterMenu="false">
+    <Column field="Customer" header="Customer" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -20,7 +20,7 @@
         />
       </template>
     </Column>
-    <Column field="Company" header="Şirket" :showFilterMenu="false">
+    <Column field="Company" header="Company" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -31,9 +31,9 @@
       </template>
     </Column>
     <Column field="Email" header="Mail"></Column>
-    <Column field="Phone" header="Telefon"></Column>
-    <Column field="Adress" header="Adres"></Column>
-    <Column field="UlkeAdi" header="Ülke" :showFilterMenu="false">
+    <Column field="Phone" header="Phone"></Column>
+    <Column field="Adress" header="Address"></Column>
+    <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -43,7 +43,7 @@
         />
       </template>
     </Column>
-    <Column field="Orderer" header="Satışçı" :showFilterMenu="false">
+    <Column field="Orderer" header="Salesman" :showFilterMenu="false">
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -53,13 +53,13 @@
         />
       </template>
     </Column>
-    <Column field="Fuar" header="Fuar">
+    <Column field="Fuar" header="Fair">
       <template #body="slotProps">
         <div v-if="slotProps.data.Fuar">✓</div>
         <div v-else>x</div>
       </template>
     </Column>
-    <Column field="Ziyaret" header="Ziyaret">
+    <Column field="Ziyaret" header="Visit">
       <template #body="slotProps">
         <div v-if="slotProps.data.Ziyaret">✓</div>
         <div v-else>x</div>

@@ -1,13 +1,13 @@
 <template>
   <div class="container">
     <DataTable :value="list" :loading="loading">
-      <Column field="MusteriAdi" header="Müşteri"></Column>
+      <Column field="MusteriAdi" header="Customer"></Column>
       <Column field="Proforma" header="Proforma">
         <template #body="slotProps">
           {{ slotProps.data.Proforma | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Maliyet" header="Maliyet">
+      <Column field="Maliyet" header="Cost">
         <template #body="slotProps">
           {{ slotProps.data.Maliyet | formatPriceUsd }}
         </template>
@@ -22,12 +22,12 @@
           {{ slotProps.data.ProfitTl | formatPriceTl }}
         </template>
       </Column>
-      <Column field="Odenen" header="Ödenen">
+      <Column field="Odenen" header="Paid">
         <template #body="slotProps">
           {{ slotProps.data.Odenen | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Kalan" header="Kalan">
+      <Column field="Kalan" header="Remainder">
         <template #body="slotProps">
           {{ slotProps.data.Kalan | formatPriceUsd }}
         </template>
@@ -44,8 +44,8 @@ export default {
     },
     loading: {
       type: Boolean,
-      required:false
-    }
+      required: false,
+    },
   },
 };
 </script>

@@ -7,10 +7,10 @@
       @row-click="$emit('panel_user_list_selected_emit', $event)"
     >
       <Column field="Id" header="Id"></Column>
-      <Column field="adi" header="Adı"></Column>
-      <Column field="kullaniciadi" header="Kullanıcı Adı"></Column>
+      <Column field="adi" header="Name"></Column>
+      <Column field="kullaniciadi" header="Username"></Column>
       <Column field="mailadres" header="Mail"></Column>
-      <Column field="telefon" header="Telefon"></Column>
+      <Column field="telefon" header="Phone"></Column>
     </DataTable>
   </div>
 </template>

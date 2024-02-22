@@ -2,7 +2,7 @@
   <div class="row w-100 h-100" style="height: 500px">
     <div class="col-6">
       <div class="flex flex-column gap-2">
-        <label for="savedate">Kayıt Tarihi</label>
+        <label for="savedate">Save Date</label>
         <Calendar
           id="savedate"
           v-model="saveDate"
@@ -11,17 +11,17 @@
         />
       </div>
       <div class="flex flex-column gap-2">
-        <label for="customer">Müşteri</label>
+        <label for="customer">Customer</label>
         <InputText id="customer" v-model="followDetail.MusteriAdi" />
       </div>
       <span class="p-float-label mt-4">
         <Textarea v-model="followDetail.Aciklama" rows="5" cols="66" />
-        <label>Açıklama</label>
+        <label>Description</label>
       </span>
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2">
-        <label for="reminderdate">Hatırlatma Tarihi</label>
+        <label for="reminderdate">Reminder Date</label>
         <Calendar
           id="reminderdate"
           v-model="reminderDate"
@@ -30,25 +30,30 @@
         />
       </div>
       <div class="flex flex-column gap-2">
-        <label for="text">Başlık</label>
+        <label for="text">Title</label>
         <InputText id="text" v-model="followDetail.Baslik" />
       </div>
       <span class="p-float-label mt-4">
         <Textarea v-model="followDetail.Hatirlatma_Notu" rows="5" cols="66" />
-        <label>Hatırlatma Açıklama</label>
+        <label>Reminder Description</label>
       </span>
     </div>
     <div class="row">
       <div class="col w-100">
         <Button
           type="button"
-          class="p-button-success"
-          label="Kaydet"
+          class="p-button-success w-100"
+          label="Save"
           @click="saveProcess"
         />
       </div>
       <div v-if="!getFollowDetailNewButton" class="col w-100">
-        <Button type="button" class="p-button-danger" label="Sil" @click="deleteForm" />
+        <Button
+          type="button"
+          class="p-button-danger w-100"
+          label="Delete"
+          @click="deleteForm"
+        />
       </div>
     </div>
   </div>

@@ -8,7 +8,7 @@
             inputId="workerman_date"
             @date-select="workermanDateSelected($event)"
           />
-          <label for="workerman_date">Tarih</label>
+          <label for="workerman_date">Date</label>
         </span>
       </div>
       <div class="col">
@@ -22,13 +22,13 @@
             @item-select="supplierSelected($event)"
           />
 
-          <label for="supplier">Tedarikçi</label>
+          <label for="supplier">Supplier</label>
         </span>
       </div>
       <div class="col">
         <CustomInput
           :value="model.Tutar"
-          text="Tutar"
+          text="Price"
           @onInput="model.Tutar = $event"
           :disabled="false"
         />
@@ -38,7 +38,7 @@
       <div class="col">
         <span class="p-float-label">
           <Textarea id="description" v-model="model.Aciklama" rows="5" class="w-100" />
-          <label for="description">Açıklama</label>
+          <label for="description">Description</label>
         </span>
       </div>
     </div>
@@ -47,7 +47,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Kaydet"
+          label="Save"
           @click="process"
         />
       </div>
@@ -55,7 +55,7 @@
         <Button
           type="button"
           class="p-button-danger w-100"
-          label="Sil"
+          label="Delete"
           @click="deleteForm"
           :disabled="deleted_button_disabled"
         />
@@ -69,18 +69,18 @@
           selectionMode="single"
           @row-click="workermanSelected($event)"
         >
-          <Column field="Tarih" header="Tarih">
+          <Column field="Tarih" header="Date">
             <template #body="slotProps">
               {{ slotProps.data.Tarih | dateToString }}
             </template>
           </Column>
-          <Column field="FirmaAdi" header="Tedarikçi"></Column>
-          <Column field="Tutar" header="Tutar">
+          <Column field="FirmaAdi" header="Supplier"></Column>
+          <Column field="Tutar" header="Price">
             <template #body="slotProps">
               {{ slotProps.data.Tutar | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="Aciklama" header="Açıklama"></Column>
+          <Column field="Aciklama" header="Description"></Column>
         </DataTable>
       </div>
     </div>

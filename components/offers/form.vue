@@ -12,7 +12,7 @@
               class="w-100"
               @change="sourceSelected($event)"
             />
-            <label for="source">Kaynak</label>
+            <label for="source">Source</label>
           </div>
           <div class="p-float-label mb-4">
             <Dropdown
@@ -23,7 +23,7 @@
               class="w-100"
               @change="offerTypeSelected($event)"
             />
-            <label for="type">Teklif Yeri</label>
+            <label for="type">Kind of Offer</label>
           </div>
           <div class="p-float-label mb-4">
             <Dropdown
@@ -34,12 +34,12 @@
               class="w-100"
               @change="prioritySelected($event)"
             />
-            <label for="priority">Öncelik</label>
+            <label for="priority">Priority</label>
           </div>
         </div>
         <div class="col">
           <TabView>
-            <TabPanel header="Teklif Açıklama">
+            <TabPanel header="Offer Description">
               <Textarea
                 v-model="model.Aciklama"
                 autoResize
@@ -48,7 +48,7 @@
                 class="w-100"
               />
             </TabPanel>
-            <TabPanel header="Hatırlatma Belge">
+            <TabPanel header="Reminder Document">
               <p class="m-0">
                 Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
                 doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo
@@ -59,7 +59,7 @@
                 modi.
               </p>
             </TabPanel>
-            <TabPanel header="Proforma - Numune">
+            <TabPanel header="Proforma - Sample">
               <p class="m-0">
                 At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis
                 praesentium voluptatum deleniti atque corrupti quos dolores et quas
@@ -83,7 +83,7 @@
                 @date-select="offerProductDateSelected($event)"
                 :disabled="id == 0"
               />
-              <label for="offer_product_date">Tarih</label>
+              <label for="offer_product_date">Date</label>
             </span>
           </div>
           <div class="col">
@@ -97,7 +97,7 @@
                 @item-select="categoryListSelected($event)"
                 :disabled="id == 0"
               />
-              <label for="category">Kategori</label>
+              <label for="category">Category</label>
             </span>
           </div>
           <div class="col">
@@ -111,7 +111,7 @@
                 @item-select="productListSelected($event)"
                 :disabled="id == 0"
               />
-              <label for="product">Ürün</label>
+              <label for="product">Product</label>
             </span>
           </div>
           <div class="col">
@@ -125,7 +125,7 @@
                 @item-select="sizeListSelected($event)"
                 :disabled="id == 0"
               />
-              <label for="size">EnxBoy</label>
+              <label for="size">WidthxHeight</label>
             </span>
           </div>
           <div class="col">
@@ -139,7 +139,7 @@
                 @item-select="thicknessListSelected($event)"
                 :disabled="id == 0"
               />
-              <label for="thickness">Kalınlık</label>
+              <label for="thickness">Edge</label>
             </span>
           </div>
           <div class="col mt-3">
@@ -153,7 +153,7 @@
                 @item-select="surfaceListSelected($event)"
                 :disabled="id == 0"
               />
-              <label for="surface">Yüzey</label>
+              <label for="surface">Surface</label>
             </span>
           </div>
           <div class="col mt-3">
@@ -166,7 +166,7 @@
                 @change="unitSelected($event)"
                 :disabled="id == 0"
               />
-              <label for="unit">Birim Seç</label>
+              <label for="unit">Select a Unit</label>
             </div>
           </div>
         </div>
@@ -221,7 +221,7 @@
             <Button
               type="button"
               class="p-button-success w-100"
-              label="Ekle"
+              label="Add"
               @click="addProduct"
               :disabled="id == 0"
             />
@@ -230,7 +230,7 @@
             <Button
               type="button"
               class="p-button-warning w-100"
-              label="Değiştir"
+              label="Update"
               @click="updateProduct"
               :disabled="id == 0"
             />
@@ -239,7 +239,7 @@
             <Button
               type="button"
               class="p-button-error w-100"
-              label="Sil"
+              label="Delete"
               @click="deleteProduct"
               :disabled="id == 0"
             />
@@ -253,17 +253,17 @@
               selectionMode="single"
               @row-click="productsListSelected($event)"
             >
-              <Column field="Tarih" header="Tarih">
+              <Column field="Tarih" header="Date">
                 <template #body="slotProps">
                   {{ slotProps.data.Tarih | dateToString }}
                 </template>
               </Column>
-              <Column field="KategoriAdi" header="Kategori"></Column>
-              <Column field="UrunAdi" header="Ürün"></Column>
-              <Column field="IslemAdi" header="Yüzey"></Column>
-              <Column field="EnBoy" header="Ebat"></Column>
-              <Column field="Kalinlik" header="Kalınlık"></Column>
-              <Column field="Birim" header="Birim"></Column>
+              <Column field="KategoriAdi" header="Category"></Column>
+              <Column field="UrunAdi" header="Product"></Column>
+              <Column field="IslemAdi" header="Surface"></Column>
+              <Column field="EnBoy" header="Size"></Column>
+              <Column field="Kalinlik" header="Edge"></Column>
+              <Column field="Birim" header="Unit"></Column>
 
               <Column field="FobFiyat" header="Fob">
                 <template #body="slotProps">
@@ -296,7 +296,7 @@
           <Button
             type="button"
             class="p-button-success w-100 mb-4"
-            label="Kaydet"
+            label="Save"
             @click="process"
           />
         </div>
@@ -304,7 +304,7 @@
           <Button
             type="button"
             class="p-button-danger w-100"
-            label="Sil"
+            label="Delete"
             @click="deleteProcess"
           />
         </div>
@@ -313,11 +313,11 @@
       <div class="flex flex-wrap justify-content-center gap-3 mb-4">
         <div class="flex align-items-center">
           <Checkbox v-model="model.TakipEt" inputId="follow" binary />
-          <label for="follow" class="ml-2"> Takip </label>
+          <label for="follow" class="ml-2"> Follow </label>
         </div>
         <div class="flex align-items-center">
           <Checkbox v-model="model.BList" inputId="follow" binary />
-          <label for="follow" class="ml-2"> B Listesi </label>
+          <label for="follow" class="ml-2"> B List </label>
         </div>
       </div>
       <span class="p-float-label mb-4">
@@ -327,7 +327,7 @@
           class="w-100"
           @date-select="offerDateSelected($event)"
         />
-        <label for="offer_date">Tarih</label>
+        <label for="offer_date">Date</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -339,7 +339,7 @@
           @item-select="customerSelected($event)"
           @input="customerInput($event)"
         />
-        <label for="customer">Müşteri</label>
+        <label for="customer">Customer</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -350,11 +350,11 @@
           field="UlkeAdi"
           @item-select="countrySelected($event)"
         />
-        <label for="country">Ülke</label>
+        <label for="country">Customer</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText id="company" v-model="customerModel.Company" />
-        <label for="company">Şirket</label>
+        <label for="company">Company</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText id="mail" v-model="customerModel.Mail" />
@@ -362,15 +362,15 @@
       </span>
       <span class="p-float-label mb-4">
         <InputText id="phone" v-model="customerModel.Phone" />
-        <label for="phone">Telefon</label>
+        <label for="phone">Phone</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText id="adress" v-model="customerModel.Adress" />
-        <label for="adress">Adres</label>
+        <label for="adress">Address</label>
       </span>
       <span class="p-float-label mb-4">
         <Textarea v-model="customerModel.Description" rows="5" class="w-100" />
-        <label>Açıklama</label>
+        <label>Description</label>
       </span>
     </div>
   </div>

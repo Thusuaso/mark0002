@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Yeni"
+          label="New"
           @click="newForm"
         />
       </div>
@@ -19,7 +19,7 @@
             class="w-100"
             @change="yearChange($event)"
           />
-          <label for="years">Yıl</label>
+          <label for="years">Year</label>
         </div>
       </div>
     </div>
@@ -158,6 +158,9 @@ export default {
         added: this.getOrderProductAdded,
         updated: this.getOrderProductUpdated,
         deleted: this.getOrderProductDeleted,
+        operation: this.productionModel.operationMail,
+        representative: this.productionModel.representativeMail,
+        status:1
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
