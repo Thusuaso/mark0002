@@ -6,13 +6,13 @@ You can directly use them in pages and other components without the need to impo
 
 **Tip:** If a component is conditionally rendered with `v-if` and is big, it is better to use `Lazy` or `lazy-` prefix to lazy load.
 
-- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<CardsForm>` | `<cards-form>` (components/cards/form.vue)
 - `<CardsList>` | `<cards-list>` (components/cards/list.vue)
+- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
+- `<Home>` | `<home>` (components/home/home.vue)
 - `<OffersDetail>` | `<offers-detail>` (components/offers/detail.vue)
 - `<OffersForm>` | `<offers-form>` (components/offers/form.vue)
 - `<OffersList>` | `<offers-list>` (components/offers/list.vue)
-- `<Home>` | `<home>` (components/home/home.vue)
 - `<PanelForm>` | `<panel-form>` (components/panel/form.vue)
 - `<SharedNavbar>` | `<shared-navbar>` (components/shared/navbar.vue)
 - `<ShipmentForm>` | `<shipment-form>` (components/shipment/form.vue)

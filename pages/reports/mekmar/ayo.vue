@@ -94,8 +94,8 @@ export default {
   },
   data() {
     return {
-      selectedYear: { Yil: new Date().getFullYear() },
-      selectedMonth: { Ay: new Date().getMonth() + 1 },
+      selectedYear: null,
+      selectedMonth: null,
       reportsMekmarAyoListExcelField: {
         Temsilci: "SiparisSahibi",
         Operasyon: "Operasyon",
@@ -203,6 +203,14 @@ export default {
         month: event.value.Ay,
       };
       this.$store.dispatch("setReportsMekmarAyoListMonth", date);
+    },
+  },
+  watch: {
+    getReportsMekmarAyoYearList() {
+      this.selectedYear = this.getReportsMekmarAyoYearList[0];
+    },
+    getReportsMekmarAyoMonthList() {
+      this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
     },
   },
 };

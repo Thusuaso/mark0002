@@ -123,7 +123,7 @@
             {{ total.proforma | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="MekmerSatis" header="Mekmer P.">
+        <Column field="MekmerUretim" header="Mekmer P.">
           <template #body="slotProps">
             {{ slotProps.data.MekmerUretim | formatPriceUsd }}
           </template>

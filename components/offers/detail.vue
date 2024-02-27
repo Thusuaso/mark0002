@@ -7,21 +7,74 @@
       :selection.sync="selectedOfferDetailListForm"
       selectionMode="single"
       @row-click="$emit('offer_detail_list_form_selected_emit', $event.data)"
-      :sortField="['TeklifOncelik', 'Sira']"
-      sortOrder="-1"
       :rowClass="offerClass"
       :loading="loading"
+      :filters.sync="orderFilters"
+      filterDisplay="row"
     >
-      <Column field="Tarih" header="Tarih">
+      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
       </Column>
-      <Column field="Sira" header="Queue"></Column>
-      <Column field="MusteriAdi" header="Customer"></Column>
-      <Column field="UlkeAdi" header="Country"></Column>
-      <Column field="KullaniciAdi" header="Representative"></Column>
-      <Column field="TeklifOncelik" header="Priority"></Column>
+      <Column field="Sira" header="Queue" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
     </DataTable>
     <DataTable
       :value="bList"
@@ -34,24 +87,80 @@
       :sortOrder="1"
       :rowClass="offerClass"
       :loading="loading"
+      :filters.sync="orderFiltersB"
+      filterDisplay="row"
     >
       <template #header>
         <h3 class="header">B List</h3>
       </template>
-      <Column field="Tarih" header="Tarih">
+      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
       </Column>
-      <Column field="Sira" header="Queue"></Column>
-      <Column field="MusteriAdi" header="Customer"></Column>
-      <Column field="UlkeAdi" header="Country"></Column>
-      <Column field="KullaniciAdi" header="Representative"></Column>
-      <Column field="TeklifOncelik" header="Priority"></Column>
+      <Column field="Sira" header="Queue" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
 <script>
+import { FilterMatchMode } from "primevue/api";
 export default {
   props: {
     list: {
@@ -70,6 +179,22 @@ export default {
   data() {
     return {
       selectedOfferDetailListForm: null,
+      orderFilters: {
+        Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Sira: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        MusteriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UlkeAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KullaniciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        TeklifOncelik: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
+      orderFiltersB: {
+        Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Sira: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        MusteriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UlkeAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KullaniciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        TeklifOncelik: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
     };
   },
   methods: {

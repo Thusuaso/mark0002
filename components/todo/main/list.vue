@@ -10,6 +10,9 @@
       :value="list"
       :reorderableColumns="true"
       @row-reorder="onRowReorder($event)"
+      :selection.sync="selectedMainList"
+      selectionMode="single"
+      @row-click="$emit('main_to_do_list_selected_emit', $event)"
     >
       <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
       <Column field="Sira" header="Queue"></Column>
@@ -46,6 +49,11 @@ export default {
       type: Array,
       required: false,
     },
+  },
+  data(){
+    return{
+      selectedMainList:null
+    }
   },
   methods: {
     onRowReorder(event) {

@@ -37,6 +37,11 @@
       <Column field="urunid" header="Product Id"> </Column>
       <Column field="urunkod" header="Product Code"> </Column>
       <Column field="urunadi_en" header="Product Name"> </Column>
+      <Column field="Image" header="#">
+        <template #body="slotProps">
+          <img lazyload :src="slotProps.data.Image" width="75" height="75" />
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>

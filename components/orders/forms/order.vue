@@ -196,7 +196,7 @@
             <Button
               type="button"
               class="p-button-warning w-100"
-              label="Upadet"
+              label="Update"
               :disabled="update_button_disabled"
               @click="update"
             />

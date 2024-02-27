@@ -43,7 +43,7 @@
           </div> -->
           <div class="col-6">
             <span class="p-float-label mb-4">
-              <Chips v-model="anahtarlar_en" class="w-100" />
+              <Chips v-model="anahtarlar_en" />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">

@@ -309,7 +309,6 @@
           />
         </div>
       </div>
-
       <div class="flex flex-wrap justify-content-center gap-3 mb-4">
         <div class="flex align-items-center">
           <Checkbox v-model="model.TakipEt" inputId="follow" binary />
@@ -500,7 +499,9 @@ export default {
     process() {
       this.customerModel.Kullanici = Cookies.get("userId");
       this.model.KullaniciId = Cookies.get("userId");
-      this.model.TakipEt = true;
+      if (this.status) {
+        this.model.TakipEt = true;
+      }
       this.model.Tarih = date.dateToString(this.offerDate);
       const data = { offer: this.model, customer: this.customerModel };
       this.$emit("offer_process_emit", data);

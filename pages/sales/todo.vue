@@ -1,6 +1,10 @@
 <template>
   <div class="container">
-    <todos :todos="getTodos" @todo_form_detail_dialog="todoFormDetailDialog($event)" />
+    <todos
+      :todos="getTodos"
+      @todo_form_detail_dialog="todoFormDetailDialog($event)"
+      @todo_form_not_seen_emit="todoNotSeen($event)"
+    />
     <Dialog :visible.sync="todo_dialog_form" header="Todo Form" modal>
       <todoForm
         :todoDetail="todoDetail"
@@ -29,6 +33,9 @@ export default {
     todoFormDetailDialog(event) {
       this.todoDetail = event;
       this.todo_dialog_form = true;
+    },
+    todoNotSeen(event) {
+      this.$store.dispatch("setTodoNotSeen",event);
     },
   },
 };

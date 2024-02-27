@@ -508,10 +508,11 @@ const mutations = {
             'profitTl': 0
         };
         payload.forEach(x => {
+            console.log(x.MekmerSatis)
             state.reportsMekmarAyoListTotal.proforma += x.Proforma;
-            state.reportsMekmarAyoListTotal.mekmerProduction += x.MekmerSatis;
-            state.reportsMekmarAyoListTotal.mekmozProduction += x.MekmozSatis;
-            state.reportsMekmarAyoListTotal.outerProduction += x.DisSatis;
+            state.reportsMekmarAyoListTotal.mekmerProduction += x.MekmerUretim;
+            state.reportsMekmarAyoListTotal.mekmozProduction += x.MekmozUretim;
+            state.reportsMekmarAyoListTotal.outerProduction += x.DisUretim;
             state.reportsMekmarAyoListTotal.transport += x.Nakliye;
             state.reportsMekmarAyoListTotal.duty += x.Gumruk;
             state.reportsMekmarAyoListTotal.spraying += x.Ilaclama;
@@ -524,6 +525,8 @@ const mutations = {
             state.reportsMekmarAyoListTotal.spanzlet += x.Spanzlet;
             state.reportsMekmarAyoListTotal.detailBuyes1 += x.DetayAlis1;
             state.reportsMekmarAyoListTotal.detailBuyes2 += x.DetayAlis2;
+            state.reportsMekmarAyoListTotal.detailBuyes3 += x.DetayAlis3;
+
             state.reportsMekmarAyoListTotal.mekus += x.Mekus;
             state.reportsMekmarAyoListTotal.specialwork += x.OzelIscilik;
             state.reportsMekmarAyoListTotal.bankCost += x.BankaMasraf;

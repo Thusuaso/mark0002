@@ -12,7 +12,7 @@ const sql = {
     server:'94.73.151.2',
     options: {
         encrypt: false, // for azure
-        trustServerCertificate: false // change to true for local dev / self-signed certs
+        trustServerCertificate: true // change to true for local dev / self-signed certs
       }
 };
 mssql.connect(sql);
@@ -526,6 +526,22 @@ app.get('/todo/main/list/change/seen/:id',(req,res)=>{
     });
 
 });
+app.get('/todo/main/list/change/not/seen/:id',(req,res)=>{
+    const sql = `update Yapilacaklar SET Goruldu=0 where ID='${req.params.id}'`;
+    mssql.query(sql,(err,todo)=>{
+        if(todo.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+
+});
+
+
+
+
 app.post('/todo/main/change/queue',(req,res)=>{
     req.body.forEach(x=>{
         const sql = `update Yapilacaklar SET Sira='${x.Sira}' WHERE ID='${x.ID}'`;
@@ -4535,8 +4551,38 @@ app.post('/sample/photos/back', (req, res) => {
         }
     })
 });
+
+function getSampleCustomerId(event){
+
+    return new Promise((resolve,reject)=>{
+        const sql = `
+        insert into YeniTeklif_MusterilerTB(
+            MusteriAdi,
+            UlkeId
+            )
+        VALUES(
+        '${event.FirmaAdi}',
+        '${event.Ulke}'
+        )
+        `;
+        mssql.query(sql,(err,customer)=>{
+            if(customer.rowsAffected[0] == 1){
+                const sqlCustomerId = `select top 1 ID from YeniTeklif_MusterilerTB order by ID desc
+                `;
+                mssql.query(sqlCustomerId,(err,customer_id)=>{
+                    resolve(customer_id.recordset[0].ID)
+                });
+            }   
+        });
+    });
+
+
+}
+
+
 app.post('/sample/save', (req, res) => {
-    const sql = `
+    if(req.body.MusteriID){
+        const sql = `
             insert into NumunelerTB(
                     NumuneNo,
                     NumuneTarihi,
@@ -4591,6 +4637,68 @@ app.post('/sample/save', (req, res) => {
         
         }
     });
+    } else{
+        getSampleCustomerId(req.body).then(customer_id=>{
+            const sql = `
+            insert into NumunelerTB(
+                    NumuneNo,
+                    NumuneTarihi,
+                    NumuneTemsilci,
+                    MusteriID,
+                    Ulke,
+                    Adres,
+                    TrackingNo,
+                    Parite,
+                    Aciklama,
+                    YuklemeTarihi,
+                    KuryeAlis,
+                    KuryeSatis,
+                    GonderiTipi,
+                    BankaSecim,
+                    KategoriID,
+                    UrunBirimi,
+                    Miktar,
+                    TL_Alis,
+                    TL_Satis,
+                    Euro_Alis,
+                    Euro_Satis)
+                    VALUES(
+                    '${req.body.NumuneNo}',
+                    '${req.body.NumuneTarihi}',
+                    '${req.body.NumuneTemsilci}',
+                    '${customer_id}',
+                    '${req.body.Ulke}',
+                    '${req.body.Adres}',
+                    '${req.body.TrackingNo}',
+                    '${req.body.Parite}',
+                    '${req.body.Aciklama}',
+                    '${req.body.YuklemeTarihi}',
+                    '${req.body.KuryeAlis}',
+                    '${req.body.KuryeSatis}',
+                    '${req.body.GonderiTipi}',
+                    '${req.body.BankaSecim}',
+                    '${req.body.KategoriID}',
+                    '${req.body.UrunBirimi}',
+                    '${req.body.Miktar}',
+                    '${req.body.TL_Alis}',
+                    '${req.body.TL_Satis}',
+                    '${req.body.Euro_Alis}',
+                    '${req.body.Euro_Satis}'
+                    )
+    `;
+    mssql.query(sql, (err, results) => {
+        if (results.rowsAffected[0] == 1) {
+            res.status(200).json({ 'status': true });
+        } else{
+            res.status(200).json({'status':false});
+        
+        }
+    });
+
+         });
+    };
+    
+    
 });
 app.delete('/sample/delete/:id/:po',(req,res)=>{
     const sql = `
@@ -5147,6 +5255,7 @@ app.post('/offer/save',(req,res)=>{
     }
 });
 app.put('/offer/update',(req,res)=>{
+    console.log(req.body.offer)
     const updateOfferSql = `
             update YeniTeklifTB
             SET
@@ -5492,7 +5601,9 @@ app.get('/panel/published/list', (req, res) => {
 	mp.urunadi_ru,
 	mp.aciklama_ru,
 	mp.anahtarlar_ru,
-	mp.keywords_ru
+	mp.keywords_ru,
+    (select top 1 mf.imagePath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid) as Image
+
 from MekmarCom_Products mp
 where mp.kategori_id = ${categoryId} and mp.yayinla = 1
 order by urunid desc
@@ -5594,7 +5705,9 @@ app.get('/panel/published/list/:id', (req, res) => {
 	mp.urunadi_ru,
 	mp.aciklama_ru,
 	mp.anahtarlar_ru,
-	mp.keywords_ru
+	mp.keywords_ru,
+    (select top 1 mf.imagePath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid) as Image
+
 from MekmarCom_Products mp
 where mp.kategori_id = ${req.params.id} and mp.yayinla = 1
 order by urunid desc
@@ -6847,9 +6960,10 @@ app.post('/todo/by/username/save', (req, res) => {
             GirisTarihi,
             YapilacakOncelik,
             Acil,
-            OrtakGorev
+            OrtakGorev,
+            Goruldu
         )
-        VALUES('${req.body.Yapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}')
+        VALUES('${req.body.Yapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}','0')
     `;
     mssql.query(todoInsertSql,(err,todo)=>{
        if(todo.rowsAffected[0] == 1){
@@ -6880,13 +6994,14 @@ WHERE
 });
 app.delete('/todo/by/username/delete/:id', (req, res) => {
     const todoDeleteSql = `delete Yapilacaklar where ID='${req.params.id}'`;
-    mssql.query(todoDeleteSql,(err,todo)=>{
-        if(todo.rowsAffected[0] == 1){
-            res.status(200).json({ 'status': true });
-        }else{
-            res.status(200).json({'status':false});
-        }
-    });
+    console.log(todoDeleteSql)
+    // mssql.query(todoDeleteSql,(err,todo)=>{
+    //     if(todo.rowsAffected[0] == 1){
+    //         res.status(200).json({ 'status': true });
+    //     }else{
+    //         res.status(200).json({'status':false});
+    //     }
+    // });
 });
 app.post('/todo/by/username/done', (req, res) => {
 

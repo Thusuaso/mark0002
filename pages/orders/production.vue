@@ -306,6 +306,11 @@ export default {
       this.production_detail_form = true;
     },
   },
+
+  mounted() {
+
+  },
+
   watch: {
     getOrderProductionYearsList() {
       this.selectedYear = { Yil: "All" };

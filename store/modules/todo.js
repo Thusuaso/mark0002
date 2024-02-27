@@ -34,7 +34,12 @@ const actions = {
         this.$axios.put('/sales/todos/update',todo)
         .then(response=>{
             if(response.data.status){
+                const username = Cookies.get('username')
+
                 vuexContext.dispatch('setTodos');
+                vuexContext.dispatch('setTodosMainList',username)
+                vuexContext.dispatch('setToDoListByUsername',username);
+
                 this.$toast.success('Başarıyla Güncellendi');
             }else{
                 this.$toast.error('Güncelleme Başarısız');
@@ -45,7 +50,11 @@ const actions = {
         this.$axios.delete(`/sales/todos/delete/${id}`)
         .then(response=>{
            if(response.data.status){
+            const username = Cookies.get('username')
             vuexContext.dispatch('setTodos');
+            vuexContext.dispatch('setTodosMainList',username);
+            vuexContext.dispatch('setToDoListByUsername',username);
+
             this.$toast.success('Başarıyla Silindi');
            }else{
                 this.$toast.error('Silme Başarısız');
@@ -69,33 +78,34 @@ const actions = {
                 if (response.data.status) {
                     this.$toast.success('Yeni Görev Hayırlı Olsun.');
                     vuexContext.dispatch('setToDoListByUsername', todo.GorevVerenAdi);
+                    vuexContext.dispatch('setTodosMainList',Cookies.get('username'))
                 } else {
                     this.$toast.error('Bi Görevi Bile Ekleyemiyor musun?');
                 }
             });
     },
-    setTodoUpdate(vuexContext, todo) {
-        this.$axios.put('/todo/by/username/update', todo)
-            .then(response => {
-                if (response.data.status) {
-                    this.$toast.success('Görev Başarıyla Güncellendi.');
-                    vuexContext.dispatch('setToDoListByUsername', todo.GorevVerenAdi);
-                } else {
-                    this.$toast.error('Görev Güncellenemedi.');
-                }
-            });
-    },
-    setTodoDelete(vuexContext, todo) {
-        this.$axios.delete(`/todo/by/username/delete/${todo.ID}`)
-            .then(response => {
-                if (response.data.status) {
-                    this.$toast.success('Görev Başarıyla Silindi.');
-                    vuexContext.dispatch('setToDoListByUsername', todo.GorevVerenAdi);
-                } else {
-                    this.$toast.error('Görev Silinemedi.');
-                }
-            });
-    },
+    // setTodoUpdate(vuexContext, todo) {
+    //     this.$axios.put('/todo/by/username/update', todo)
+    //         .then(response => {
+    //             if (response.data.status) {
+    //                 this.$toast.success('Görev Başarıyla Güncellendi.');
+    //                 vuexContext.dispatch('setToDoListByUsername', todo.GorevVerenAdi);
+    //             } else {
+    //                 this.$toast.error('Görev Güncellenemedi.');
+    //             }
+    //         });
+    // },
+    // setTodoDelete(vuexContext, todo) {
+    //     this.$axios.delete(`/todo/by/username/delete/${todo.ID}`)
+    //         .then(response => {
+    //             if (response.data.status) {
+    //                 this.$toast.success('Görev Başarıyla Silindi.');
+    //                 vuexContext.dispatch('setToDoListByUsername', todo.GorevVerenAdi);
+    //             } else {
+    //                 this.$toast.error('Görev Silinemedi.');
+    //             }
+    //         });
+    // },
     setTodoDone(vuexContext,todo){
         this.$axios.post(`/todo/by/username/done`,todo)
             .then(response => {
@@ -145,6 +155,17 @@ const actions = {
                 this.$toast.success('Sıra Değiştirme Başarısız.');
                 
             }
+        });
+    },
+    setTodoNotSeen(vuexContext,id){
+        this.$axios.get(`/todo/main/list/change/not/seen/${id}`)
+        .then(response=>{
+           if(response.data.status){
+               this.$toast.success('Başarıyla Değiştirildi.');
+           } else{
+            this.$toast.success('Değiştirme Başarısız.');
+            
+        }
         });
     }
 

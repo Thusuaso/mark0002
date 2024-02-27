@@ -41,6 +41,16 @@
           />
         </template>
       </Column>
+      <Column>
+        <template #body="slotProps">
+          <Button
+            type="button"
+            class="p-button-warning"
+            label="Not Seen"
+            @click="$emit('todo_not_seen_emit', slotProps.data.ID)"
+          />
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>

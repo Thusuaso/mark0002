@@ -285,6 +285,7 @@
           field="MusteriAdi"
           @complete="searchCustomers($event)"
           @item-select="customerSelected($event)"
+          @input="customerInput($event)"
         />
         <label for="customer">Customer</label>
       </span>
@@ -404,6 +405,9 @@ export default {
     }
   },
   methods: {
+    customerInput(event) {
+      this.model.FirmaAdi = event;
+    },
     createdProcess() {
       this.selectedCategory = this.category.find((x) => x.ID == this.model.KategoriID);
       this.selectedUnit = this.unit.find((x) => x.ID == this.model.UrunBirimi);

@@ -88,6 +88,8 @@ export default {
     }
   },
   methods: {
+    deleteForm(id) {},
+
     createdProcess() {
       this.selectedPriority = this.priorities.find(
         (x) => x.priority == this.model.YapilacakOncelik
