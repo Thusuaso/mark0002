@@ -259,6 +259,14 @@
             {{ total.mekus | formatPriceUsd }}
           </template>
         </Column>
+        <Column field="Komisyon" header="Commision">
+          <template #body="slotProps">
+            {{ slotProps.data.Komisyon | formatPriceUsd }}
+          </template>
+          <template #footer>
+            {{ total.commision | formatPriceUsd }}
+          </template>
+        </Column>
         <Column field="OzelIscilik" header="Workerman">
           <template #body="slotProps">
             {{ slotProps.data.OzelIscilik | formatPriceUsd }}

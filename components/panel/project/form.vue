@@ -71,8 +71,9 @@
             <Button
               type="button"
               class="p-button-success"
-              label="Add"
+              label="Add Video"
               @click="$emit('panel_project_video_emit', videos_link)"
+              :disabled="!videos_link"
             />
           </div>
         </div>

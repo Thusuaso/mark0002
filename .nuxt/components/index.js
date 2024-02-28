@@ -1,6 +1,6 @@
+export { default as AuthForm } from '../..\\components\\auth\\authForm.vue'
 export { default as CardsForm } from '../..\\components\\cards\\form.vue'
 export { default as CardsList } from '../..\\components\\cards\\list.vue'
-export { default as AuthForm } from '../..\\components\\auth\\authForm.vue'
 export { default as Home } from '../..\\components\\home\\home.vue'
 export { default as OffersDetail } from '../..\\components\\offers\\detail.vue'
 export { default as OffersForm } from '../..\\components\\offers\\form.vue'

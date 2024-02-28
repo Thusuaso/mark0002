@@ -2689,6 +2689,13 @@ order by sum(u.Miktar) desc
     });
 });
 
+function noneIntControl(value){
+    if(value == null || value == undefined){
+        return parseInt(0);
+    } else{
+        return parseInt(value)
+    }
+}
 app.get('/reports/mekmar/ayo/list/:year/:month', (req, res) => {
     const sql = `
      select 
@@ -2711,7 +2718,7 @@ app.get('/reports/mekmar/ayo/list/:year/:month', (req, res) => {
 	(select stt.TeslimTur from SiparisTeslimTurTB stt where stt.ID = s.TeslimTurID) as TeslimTur,
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as SiparisSahibi,
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as Operasyon,
-
+    s.Komisyon,
 		(
 	   select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo
 	) as ToplamSatis,
@@ -2801,9 +2808,19 @@ where m.Marketing = 'Mekmar' and s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) 
     mssql.query(sql, (err, results) => {
         results.recordset.forEach(x => {
             x.Proforma = (x.ToplamSatis + x.NavlunSatis + x.DetayTutar1 + x.DetayTutar2 + x.DetayTutar3);
-            x.MasrafToplam = (x.ToplamUretim + x.Nakliye + x.Gumruk + x.Ilaclama + x.Liman + x.SigortaAlis + x.NavlunAlis + x.Lashing + x.DetayAlis1 + x.DetayAlis2 + x.DetayAlis3 + x.Mekus + x.OzelIscilik + x.BankaMasraf + x.Kurye);
-            x.ProfitUsd = (x.Proforma - x.MasrafToplam);
-            x.ProfitTl = (x.ProfitUsd * x.Kur)
+            x.MasrafToplam = (x.ToplamUretim + x.Nakliye + x.Gumruk + x.Ilaclama + x.Liman + x.SigortaAlis + x.NavlunAlis + x.Lashing + x.DetayAlis1 + x.DetayAlis2 + x.DetayAlis3 + x.Mekus + x.OzelIscilik + x.BankaMasraf + x.Kurye + x.Komisyon + x.Spanzlet);
+
+            if(noneIntControl(x.Odemeler) < noneIntControl(x.Proforma)){
+                x.ProfitUsd = 0;
+                x.ProfitTl = 0
+
+            } else{
+
+
+                x.ProfitUsd = (x.Proforma - x.MasrafToplam);
+                x.ProfitTl = (x.ProfitUsd * x.Kur)
+            }
+
         });
         res.status(200).json({'list':results.recordset});
     });
@@ -2831,7 +2848,7 @@ app.get('/reports/mekmar/ayo/by/year/list/:yil', (req, res) => {
 	(select stt.TeslimTur from SiparisTeslimTurTB stt where stt.ID = s.TeslimTurID) as TeslimTur,
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as SiparisSahibi,
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as Operasyon,
-
+	s.Komisyon,
 		(
 	   select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo
 	) as ToplamSatis,
@@ -2921,9 +2938,17 @@ where m.Marketing = 'Mekmar' and s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) 
         mssql.query(sql, (err, results) => {
         results.recordset.forEach(x => {
             x.Proforma = (x.ToplamSatis + x.NavlunSatis + x.DetayTutar1 + x.DetayTutar2 + x.DetayTutar3);
-            x.MasrafToplam = (x.ToplamUretim + x.Nakliye + x.Gumruk + x.Ilaclama + x.Liman + x.SigortaAlis + x.NavlunAlis + x.Lashing + x.DetayAlis1 + x.DetayAlis2 + x.DetayAlis3 + x.Mekus + x.OzelIscilik + x.BankaMasraf + x.Kurye);
-            x.ProfitUsd = (x.Proforma - x.MasrafToplam);
-            x.ProfitTl = (x.ProfitUsd * x.Kur)
+            x.MasrafToplam = (x.ToplamUretim + x.Nakliye + x.Gumruk + x.Ilaclama + x.Liman + x.SigortaAlis + x.NavlunAlis + x.Lashing + x.DetayAlis1 + x.DetayAlis2 + x.DetayAlis3 + x.Mekus + x.OzelIscilik + x.BankaMasraf + x.Kurye+ x.Komisyon + x.Spanzlet);
+
+            
+            if(noneControl(x.Odemeler) < noneControl(x.Proforma)){
+                x.ProfitUsd = 0
+                x.ProfitTl = 0
+            } else{
+                x.ProfitUsd = (x.Proforma - x.MasrafToplam);
+                x.ProfitTl = (x.ProfitUsd * x.Kur)
+            }
+
         });
         res.status(200).json({'list':results.recordset});
     });
@@ -3409,10 +3434,10 @@ app.post('/reports/mekmar/summary/forwarding/detail/list', (req, res) => {
 });
 
 function noneControl(value) {
-    if (value == null) {
+    if (value == null || value == undefined) {
         return 0;
     } else{
-        return value;
+        return parseFloat(value).toFixed(2);
     }
 };
 
@@ -5255,7 +5280,6 @@ app.post('/offer/save',(req,res)=>{
     }
 });
 app.put('/offer/update',(req,res)=>{
-    console.log(req.body.offer)
     const updateOfferSql = `
             update YeniTeklifTB
             SET
@@ -7778,7 +7802,7 @@ inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
-where s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) >= YEAR(GETDATE()) - 3
+where s.SiparisDurumID = 3 
 order by s.SiparisTarihi desc
 
 

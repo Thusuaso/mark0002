@@ -1,12 +1,12 @@
 {
+  "AuthForm": {
+    "description": "Auto imported from components/auth/authForm.vue"
+  },
   "CardsForm": {
     "description": "Auto imported from components/cards/form.vue"
   },
   "CardsList": {
     "description": "Auto imported from components/cards/list.vue"
-  },
-  "AuthForm": {
-    "description": "Auto imported from components/auth/authForm.vue"
   },
   "Home": {
     "description": "Auto imported from components/home/home.vue"

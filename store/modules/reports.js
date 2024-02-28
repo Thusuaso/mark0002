@@ -44,7 +44,8 @@ const state = {
         'fregileCost': 0,
         'costTotal': 0,
         'profitUsd': 0,
-        'profitTl':0
+        'profitTl':0,
+        'commision':0
     },
     reportsMekmarAyoYearList: [],
     reportsMekmarAyoMonthList: [],
@@ -505,10 +506,10 @@ const mutations = {
             'fregileCost': 0,
             'costTotal': 0,
             'profitUsd': 0,
-            'profitTl': 0
+            'profitTl': 0,
+            'commision':0
         };
         payload.forEach(x => {
-            console.log(x.MekmerSatis)
             state.reportsMekmarAyoListTotal.proforma += x.Proforma;
             state.reportsMekmarAyoListTotal.mekmerProduction += x.MekmerUretim;
             state.reportsMekmarAyoListTotal.mekmozProduction += x.MekmozUretim;
@@ -533,7 +534,8 @@ const mutations = {
             state.reportsMekmarAyoListTotal.fregileCost += x.Kurye;
             state.reportsMekmarAyoListTotal.costTotal += x.MasrafToplam;
             state.reportsMekmarAyoListTotal.profitUsd += x.ProfitUsd;
-            state.reportsMekmarAyoListTotal.profitTl += x.ProfitTl
+            state.reportsMekmarAyoListTotal.profitTl += x.ProfitTl;
+            state.reportsMekmarAyoListTotal.commision += x.Komisyon
 
 
 
