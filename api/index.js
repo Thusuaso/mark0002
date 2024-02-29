@@ -7547,7 +7547,9 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
     mssql.query(ordersListSql, (err, orders) => {
+        console.log('/order/production/list , hata',err)
         mssql.query(orderYearListSql, (err, years) => {
+            console.log('/order/production/list , year , hata',err)
             let customYearList = [{ 'Yil': 'All' }];
             years.recordset.forEach(x => {
                 customYearList.push(x);
@@ -7680,6 +7682,7 @@ order by s.SiparisTarihi desc
 
     `;
     mssql.query(productionListYearSql,(err,production)=>{
+        console.log('/order/production/list/year/:year , hata',err)
         res.status(200).json({ 'list': production.recordset });
     });
 
@@ -7806,7 +7809,7 @@ app.get('/order/shipped/list', (req, res) => {
     inner join MusterilerTB m on m.ID = s.MusteriID
     inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
     
-    where s.SiparisDurumID = 3 
+    where s.SiparisDurumID = 3  and YEAR(s.SiparisTarihi) = YEAR(GETDATE())
     order by s.SiparisTarihi desc
 
 
@@ -7818,7 +7821,10 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
     mssql.query(ordersListSql, (err, orders) => {
+        console.log('/order/shipped/list , hata', err)
                mssql.query(orderYearListSql, (err, years) => {
+                console.log('/order/shipped/list , year ,  hata', err)
+
             let customYearList = [{ 'Yil': 'All' }];
             years.recordset.forEach(x => {
                 customYearList.push(x);
@@ -7828,6 +7834,159 @@ order by YEAR(s.SiparisTarihi) desc
         });
     });
 });
+
+
+app.post('/order/shipped/list/filter',(req,res)=>{
+    console.log(req.body);
+    const ordersListSql = `
+    select 
+
+    s.ID as SiparisId,
+s.SiparisNo,
+s.SiparisTarihi,
+s.OdemeTurID,
+ot.OdemeTur,
+s.TeslimTurID,
+(
+    select stt.TeslimTur from SiparisTeslimTurTB stt where stt.ID = s.TeslimTurID
+) as TeslimTur,
+s.MusteriID,
+m.FirmaAdi,
+s.Pesinat,
+s.NavlunFirma,
+s.NavlunMekmarNot,
+s.NavlunAlis,
+s.NavlunSatis,
+s.KayitTarihi,
+s.KullaniciID,
+(select k.KullaniciAdi from KullaniciTB k where k.ID = s.KullaniciID) as KayitYapan,
+s.SiparisDurumID,
+sdt.Durum,
+s.UretimAciklama,
+s.SevkiyatAciklama,
+s.FinansAciklama,
+s.OdemeAciklama,
+s.TahminiYuklemeTarihi,
+s.YuklemeTarihi,
+s.FaturaNo,
+s.SiparisFaturaNo,
+s.Vade,
+s.Ulke,
+s.Komisyon,
+s.DetayAciklama_1,
+s.DetayMekmarNot_1,
+s.DetayTutar_1,
+s.DetayAlis_1,
+s.DetayAciklama_2,
+s.DetayMekmarNot_2,
+s.DetayTutar_2,
+s.DetayAlis_2,
+s.DetayAciklama_3,
+s.DetayMekmarNot_3,
+s.DetayTutar_3,
+s.DetayAlis_3,
+(select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as SiparisSahibiAdi,
+s.EvrakGideri,
+s.Eta,
+s.UlkeId,
+(
+    select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = s.UlkeId
+) as UlkeAdi,
+
+(
+    select fst.FaturaAdi from FaturaKesilmeTB fst where fst.ID = s.FaturaKesimTurID
+) as FaturaAdi,
+s.depo_yukleme,
+s.DetayTutar_4,
+s.DetayAciklama_4,
+s.sigorta_Tutar,
+(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
+(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
+s.SiparisSahibi,
+s.Operasyon,
+s.Finansman,
+s.Iade,
+s.MalBedeli,
+s.sigorta_tutar_satis,
+s.KonteynerAyrinti,
+s.MayaControl,
+s.FaturaKesimTurID,
+s.KonteynerNo,
+
+
+    su.ID as UrunId,
+    su.SiparisNo as UrunSiparisNo,
+    su.TedarikciID,
+    t.FirmaAdi as UrunFirmaAdi,
+    su.UrunKartID,
+    k.KategoriAdi,
+    urun.UrunAdi,
+    yk.YuzeyIslemAdi,
+    ol.En,
+    ol.Boy,
+    ol.Kenar,
+    su.UrunBirimID,
+    ub.BirimAdi,
+    su.Miktar,
+    su.OzelMiktar,
+    su.KasaAdet,
+    su.SatisFiyati,
+    su.SatisToplam,
+    su.UretimAciklama as UrunUretimAciklama,
+    su.MusteriAciklama as UrunMusteriAciklama,
+    su.AlisFiyati,
+    su.SiraNo,
+    su.Ton,
+    su.Adet,
+    ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
+    dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum
+
+from SiparisUrunTB su
+inner join SiparislerTB s on s.SiparisNo = su.SiparisNo
+inner join TedarikciTB t on t.ID = su.TedarikciID
+inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
+inner join UrunKartTB uk on uk.ID = su.UrunKartID
+inner join KategoriTB k on k.ID = uk.KategoriID
+inner join UrunlerTB urun on urun.ID = uk.UrunID
+inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+inner join OlculerTB ol on ol.ID = uk.OlcuID
+inner join OdemeTurTB ot on ot.ID = s.OdemeTurID
+inner join MusterilerTB m on m.ID = s.MusteriID
+inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
+
+where s.SiparisDurumID = 3  and
+ s.YuklemeTarihi Like '${req.body.loaddate}'  +'%' and 
+ m.FirmaAdi Like '${req.body.company}' + '%' and
+s.SiparisNo Like '${req.body.po}' + '%' and 
+urun.UrunAdi Like '${req.body.product}' + '%' and
+ol.En Like '${req.body.width}' + '%' and
+ol.Boy Like '${req.body.height}' + '%' and
+ol.Kenar Like '${req.body.edge}' + '%' and 
+t.FirmaAdi Like '${req.body.supplier}' + '%'
+order by s.SiparisTarihi desc
+
+
+
+`;
+
+mssql.query(ordersListSql, (err, orders) => {
+    console.log('/order/shipped/list/filter/load/date/ , hata', err)
+    res.status(200).json({'list':orders.recordset});
+
+});
+});
+
+
+
+
+
+
+
+
+
+
 app.get('/order/shipped/list/year/:year', (req, res) => {
     const shippedListYearSql = `
         
@@ -7962,6 +8121,8 @@ order by s.SiparisTarihi desc
 
     `;
     mssql.query(shippedListYearSql,(err,shipped)=>{
+        console.log('/order/shipped/list/year/:year ,  hata', err)
+
         res.status(200).json({ 'list': shipped.recordset });
     });
 

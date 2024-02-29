@@ -85,6 +85,23 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                 };
             });
     },
+
+    filterShipment(vuexContext,filter){
+        vuexContext.dispatch('setBeginLoadingAction');
+
+        this.$axios.post(`/order/shipped/list/filter`,filter)
+            .then(response => {
+                if (response.data.list) {
+                vuexContext.commit('setOrderList', response.data.list);
+                vuexContext.dispatch('setEndLoadingAction');
+
+                };
+            });
+    },
+
+
+
+
     setOrderShippedListYear(vuexContext, year) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/order/shipped/list/year/${year}`)

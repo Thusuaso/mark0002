@@ -27,31 +27,34 @@
         <template #body="slotProps">
           {{ slotProps.data.YuklemeTarihi | dateToString }}
         </template>
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentLoadDate(filterModel.value)"
+            @input="filterShipmentLoadDateInput(filterModel.value)"
             class="p-column-filter"
           />
         </template>
       </Column>
       <Column field="FirmaAdi" header="To" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentCompany(filterModel.value)"
+            @input="filterShipmentCompanyInput(filterModel.value)"
             class="p-column-filter"
           />
         </template>
       </Column>
       <Column field="SiparisNo" header="Po" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentPo(filterModel.value)"
+            @input="filterShipmentPoInput(filterModel.value)"
             class="p-column-filter"
           />
         </template>
@@ -76,53 +79,62 @@
         </template>
       </Column>
       <Column field="UrunAdi" header="Product" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentProduct(filterModel.value)"
+            @input="filterShipmentProductInput(filterModel.value)"
             class="p-column-filter"
           />
         </template>
       </Column>
       <Column field="UrunUretimAciklama" header="Detail"> </Column>
       <Column field="En" header="Width" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentWidth(filterModel.value)"
+            @input="filterShipmentWidthInput(filterModel.value)"
+
             class="p-column-filter"
           />
         </template>
       </Column>
 
       <Column field="Boy" header="Height" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentHeight(filterModel.value)"
+            @input="filterShipmentHeightInput(filterModel.value)"
+
             class="p-column-filter"
           />
         </template>
       </Column>
       <Column field="Kenar" header="Edge" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentEdge(filterModel.value)"
+            @input="filterShipmentEdgeInput(filterModel.value)"
+
             class="p-column-filter"
           />
         </template>
       </Column>
       <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
+        <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @keyup.enter="filterShipmentSupplier(filterModel.value)"
+            @input="filterShipmentSupplierInput(filterModel.value)"
+
             class="p-column-filter"
           />
         </template>
@@ -393,9 +405,163 @@ export default {
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
+      filterModel: {
+        loaddate: "",
+        company: "",
+        po: "",
+        product: "",
+        width: "",
+        height: "",
+        edge: "",
+        supplier: "",
+      },
     };
   },
   methods: {
+    filterShipmentSupplierInput(event){
+      if(event){
+        this.filterModel.supplier = event;
+
+      }else{
+        this.filterModel.supplier = '';
+      }
+    },
+    filterShipmentEdgeInput(event){
+      if(event){
+        this.filterModel.edge = event;
+      } else{
+        this.filterModel.edge = '';
+      }
+    },
+    filterShipmentHeightInput(event){
+      if(event){
+        this.filterModel.height = event;
+      }else{
+        this.filterModel.height = '';
+      }
+      
+    },
+    filterShipmentWidthInput(event){
+      if(event){
+        this.filterModel.width = event;
+      } else{
+        this.filterModel.width = '';
+      }
+    },
+    filterShipmentProductInput(event){
+      if(event){
+        this.filterModel.product = event;
+      } else{
+        this.filterModel.product = '';
+      }
+    },
+    filterShipmentPoInput(event){
+      if(event){
+        this.filterModel.po = event;
+      } else{
+        this.filterModel.po = '';
+      }
+
+    },
+    filterShipmentCompanyInput(event){
+      if(event){
+        this.filterModel.company = event;
+      } else{
+        this.filterModel.company = '';
+      }
+
+    },
+
+    filterShipmentLoadDateInput(event){
+      if(event){
+        this.filterModel.loaddate = event;
+      } else{
+        this.filterModel.loaddate = '';
+        }
+    },
+
+
+    filterShipmentSupplier(event){
+      if(event){
+        this.filterModel.supplier = event;
+
+      } else{
+        this.filterModel.supplier = '';
+      }
+
+
+      this.$store.dispatch("filterShipment", this.filterModel);
+
+    },
+    filterShipmentEdge(event){
+      if(event){
+        this.filterModel.edge = event
+
+      } else{
+        this.filterModel.edge = '';
+
+      }
+      this.$store.dispatch("filterShipment", this.filterModel);
+    },
+    filterShipmentHeight(event){
+      if(event){
+        this.filterModel.height = event;
+
+      } else{
+        this.filterModel.height = '';
+      }
+      this.$store.dispatch("filterShipment", this.filterModel);
+
+    },
+    filterShipmentWidth(event){
+      if(event){
+        this.filterModel.width = event;
+      } else{
+        this.filterModel.width = '';
+      }
+      this.$store.dispatch("filterShipment", this.filterModel);
+      
+    },
+    filterShipmentProduct(event){
+      if(event){
+      this.filterModel.product = event;
+        
+      }else{
+      this.filterModel.product = '';
+      }
+      this.$store.dispatch("filterShipment", this.filterModel);
+
+    },
+    filterShipmentPo(event) {
+      if(event){
+        this.filterModel.po = event;
+
+      }else{
+        this.filterModel.po = '';
+      }
+        this.$store.dispatch("filterShipment", this.filterModel);
+
+    },
+    filterShipmentCompany(event) {
+      if(event){
+        this.filterModel.company = event;
+      }else{
+        this.filterModel.company = '';
+      }
+      
+        this.$store.dispatch("filterShipment", this.filterModel);
+
+    },
+    filterShipmentLoadDate(event) {
+      if(event){
+        this.filterModel.loaddate = event;
+        }else{
+          this.filterModel.loaddate = '';
+        }
+      
+        this.$store.dispatch("filterShipment", this.filterModel);
+
+    },
     productSupplierNull(event) {
       const vm = document.getElementById("productSupplier" + event.UrunId);
       vm.innerHTML = event.UrunFirmaAdi;
