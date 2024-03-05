@@ -30,7 +30,7 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("setTodosMainList", Cookies.get("username"));
+    this.$store.dispatch("setTodosMainList", 'gizem');
   },
   methods: {
     mainToDoListSelected(event) {

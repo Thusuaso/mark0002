@@ -1066,6 +1066,27 @@ app.delete('/card/delete/:id',(req,res)=>{
 
 });
 
+// app.get('/card/order/list/:id',(req,res)=>{
+//     const sql = `
+//     select 
+
+// 	m.FirmaAdi,
+// 	s.SiparisNo,
+// 	su.SatisFiyati,
+// 	su.Miktar,
+// 	ub.BirimAdi,
+// 	(su.SatisFiyati * su.Miktar) as Toplam
+
+// from SiparislerTB s
+// inner join SiparisUrunTB su on su.SiparisNo= s.SiparisNo
+// inner join MusterilerTB m on m.ID = s.MusteriID
+// inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
+// where su.UrunKartID=${req.params.id}
+//     `;
+//     mssql.query(sql,())
+
+// });
+
 
 /*Supplier*/
 app.post('/supplier/save',(req,res)=>{
@@ -4592,38 +4613,81 @@ app.delete('/sample/delete/:id/:po',(req,res)=>{
 
 });
 app.put('/sample/update', (req, res) => {
-    const sql = `
+    console.log(req.body.MusteriID);
+    if(req.body.MusteriID){
+        const sql = `
                     
-                update NumunelerTB SET
-                NumuneTemsilci='${req.body.NumuneTemsilci}',
-                MusteriID='${req.body.MusteriID}',
-                Ulke='${req.body.Ulke}',
-                Adres='${req.body.Adres}',
-                TrackingNo='${req.body.TrackingNo}',
-                Parite='${req.body.Parite}',
-                Aciklama='${req.body.Aciklama}',
-                YuklemeTarihi='${req.body.YuklemeTarihi}',
-                KuryeAlis='${req.body.KuryeAlis}',
-                KuryeSatis='${req.body.KuryeSatis}',
-                GonderiTipi='${req.body.GonderiTipi}',
-                BankaSecim='${req.body.BankaSecim}',
-                KategoriID='${req.body.KategoriID}',
-                UrunBirimi='${req.body.UrunBirimi}',
-                Miktar='${req.body.Miktar}',
-                TL_Alis='${req.body.TL_Alis}',
-                TL_Satis='${req.body.TL_Satis}',
-                Euro_Alis='${req.body.Euro_Alis}',
-                Euro_Satis='${req.body.Euro_Satis}'
-                where ID='${req.body.ID}'
+        update NumunelerTB SET
+        NumuneTemsilci='${req.body.NumuneTemsilci}',
+        MusteriID='${req.body.MusteriID}',
+        Ulke='${req.body.Ulke}',
+        Adres='${req.body.Adres}',
+        TrackingNo='${req.body.TrackingNo}',
+        Parite='${req.body.Parite}',
+        Aciklama='${req.body.Aciklama}',
+        YuklemeTarihi='${req.body.YuklemeTarihi}',
+        KuryeAlis='${req.body.KuryeAlis}',
+        KuryeSatis='${req.body.KuryeSatis}',
+        GonderiTipi='${req.body.GonderiTipi}',
+        BankaSecim='${req.body.BankaSecim}',
+        KategoriID='${req.body.KategoriID}',
+        UrunBirimi='${req.body.UrunBirimi}',
+        Miktar='${req.body.Miktar}',
+        TL_Alis='${req.body.TL_Alis}',
+        TL_Satis='${req.body.TL_Satis}',
+        Euro_Alis='${req.body.Euro_Alis}',
+        Euro_Satis='${req.body.Euro_Satis}'
+        where ID='${req.body.ID}'
 
-                `;
-    mssql.query(sql, (err, results) => {
-        if(results.rowsAffected[0] == 1){
-            res.status(200).json({ 'status': true});
-        }else{
-            res.status(200).json({'status': false});
-        }
-    });
+        `;
+mssql.query(sql, (err, results) => {
+if(results.rowsAffected[0] == 1){
+    res.status(200).json({ 'status': true});
+}else{
+    res.status(200).json({'status': false});
+}
+});
+    } else{
+        getSampleCustomerId(req.body).then(customer_id=>{
+            const sql = `
+                    
+            update NumunelerTB SET
+            NumuneTemsilci='${req.body.NumuneTemsilci}',
+            MusteriID='${customer_id}',
+            Ulke='${req.body.Ulke}',
+            Adres='${req.body.Adres}',
+            TrackingNo='${req.body.TrackingNo}',
+            Parite='${req.body.Parite}',
+            Aciklama='${req.body.Aciklama}',
+            YuklemeTarihi='${req.body.YuklemeTarihi}',
+            KuryeAlis='${req.body.KuryeAlis}',
+            KuryeSatis='${req.body.KuryeSatis}',
+            GonderiTipi='${req.body.GonderiTipi}',
+            BankaSecim='${req.body.BankaSecim}',
+            KategoriID='${req.body.KategoriID}',
+            UrunBirimi='${req.body.UrunBirimi}',
+            Miktar='${req.body.Miktar}',
+            TL_Alis='${req.body.TL_Alis}',
+            TL_Satis='${req.body.TL_Satis}',
+            Euro_Alis='${req.body.Euro_Alis}',
+            Euro_Satis='${req.body.Euro_Satis}'
+            where ID='${req.body.ID}'
+    
+            `;
+            mssql.query(sql, (err, results) => {
+                if(results.rowsAffected[0] == 1){
+                    res.status(200).json({ 'status': true});
+                }else{
+                    res.status(200).json({'status': false});
+                }
+                });
+        
+        });
+
+
+    }
+
+
             
 
 
@@ -6824,7 +6888,43 @@ order by y.GirisTarihi desc
     });
 });
 app.post('/todo/by/username/save', (req, res) => {
-    const todoInsertSql = `
+
+    if(req.body.GorevVerenID == 10){
+        const queueSql = `
+        select top 1 Sira + 1 as Sira from Yapilacaklar where GorevVerenAdi='Gizem' and Yapildi=0 and Goruldu=0 order by Sira desc
+        `
+
+
+
+
+    mssql.query(queueSql,(err,queueResults)=>{
+        const queue = queueResults.recordset[0].Sira;
+        const todoInsertSql = `
+        insert into Yapilacaklar(
+            Yapilacak,
+            Yapildi,
+            GorevVerenID,
+            GorevVerenAdi,
+            GirisTarihi,
+            YapilacakOncelik,
+            Acil,
+            OrtakGorev,
+            Goruldu,
+            Sira
+        )
+        VALUES('${req.body.Yapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}','0',${queue})
+        `;
+        mssql.query(todoInsertSql,(err,todo)=>{
+            if(todo.rowsAffected[0] == 1){
+                res.status(200).json({ 'status': true });
+         } else{
+                res.status(200).json({ 'status': false });
+         }
+         });
+    });
+    
+    } else{
+        const todoInsertSql = `
         insert into Yapilacaklar(
             Yapilacak,
             Yapildi,
@@ -6839,12 +6939,19 @@ app.post('/todo/by/username/save', (req, res) => {
         VALUES('${req.body.Yapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}','0')
     `;
     mssql.query(todoInsertSql,(err,todo)=>{
-       if(todo.rowsAffected[0] == 1){
-           res.status(200).json({ 'status': true });
-    } else{
-           res.status(200).json({ 'status': false });
+        if(todo.rowsAffected[0] == 1){
+            res.status(200).json({ 'status': true });
+     } else{
+            res.status(200).json({ 'status': false });
+     }
+     });
     }
-    });
+
+
+
+
+
+
 });
 app.put('/todo/by/username/update', (req, res) => {
     const todoUpdateSql = `
@@ -7114,11 +7221,13 @@ app.get('/finance/po/list/:customerId', (req, res) => {
 	) as OrderTotal,
 	s.Pesinat,
 	dbo.Finance_Detail_Po_Advanced_Payment_Total(s.SiparisNo) as Paid,
-    s.MusteriID
+    s.MusteriID,
+    s.MayaControl
 
 from SiparislerTB s
 inner join MusterilerTB m on m.ID = s.MusteriID
 inner join SiparisDurumTB sd on sd.ID = s.SiparisDurumID
+
 
 where s.MusteriID = ${req.params.customerId}
 
@@ -8836,7 +8945,7 @@ app.get('/order/production/product/document/:po', (req, res) => {
             };
             if (x.YuklemeEvrakID == 12) {
                 x.Link = `https://file-service.mekmar.com/file/download/12/${x.SiparisNo}`;
-                x.Evrak = 'Gçb Beyannamesi';
+                x.Evrak = 'Gçb Beyannamesi (Export Declaration)';
             };
             if (x.YuklemeEvrakID == 14) {
                 x.Link = `https://file-service.mekmar.com/file/download/14/${x.SiparisNo}`;

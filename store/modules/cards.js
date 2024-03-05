@@ -1,5 +1,6 @@
 const state = {
     cardsButtonStatus:false,
+    cardsOrderList:[]
 };
 const actions = {
     setCardsButtonStatus(vuexContext,status){
@@ -44,17 +45,28 @@ const actions = {
                 this.$toast.error('Güncelleme Başarısız');
             }
         });
+    },
+    setCardsOrderList(vuexContext,cardId){
+        this.$axios.get('/card/order/list',cardId).then(response=>{
+           vuexContext.commit("setCardsOrderList",response.data.list); 
+        });
     }
 };
 const mutations = {
     setCardsButtonStatus(state,status){
         state.cardsButtonStatus = status;
     },
+    setCardsOrderList(state,payload){
+        state.cardsOrderList = payload;
+    }
 
 };
 const getters = {
     getCardsButtonStatus(state){
         return state.cardsButtonStatus;
+    },
+    getCardsOrderList(state){
+        return state.cardsOrderList;
     }
 };
 

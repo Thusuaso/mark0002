@@ -299,7 +299,16 @@ const mutations = {
 
         });
         payload.list.forEach(x => {
-             state.financeListAll.push({...x,'Balanced':(x.ForwardingOrder - x.Paid),'BalancedProduction':((x.ProductOrder + x.ForwardingOrder) - x.Paid)});
+            if (x.ID == 314 || x.ID == 6 || x.ID==34 || x.ID==153) {
+
+                state.financeListAll.push({...x,'Balanced':0,'BalancedProduction':0});
+
+            } else{
+                state.financeListAll.push({...x,'Balanced':(x.ForwardingOrder - x.Paid),'BalancedProduction':((x.ProductOrder + x.ForwardingOrder) - x.Paid)});
+
+            }
+            
+
         });
         state.financeExpiryList = payload.expiry;
 

@@ -9,8 +9,17 @@
         selectionMode="single"
         @row-click="$emit('po_list_selected_emit', $event)"
         :loading="loading"
+        :rowClass="rowClass"
+        
+
+
       >
-        <Column field="SiparisNo" header="Purchase Order"></Column>
+        
+        <Column field="SiparisNo" header="Purchase Order">
+          <template #body="slotProps">
+              {{ slotProps.data.SiparisNo }}
+          </template>
+        </Column>
         <Column field="SiparisTarihi" header="Order Date">
           <template #body="slotProps">
             {{ slotProps.data.SiparisTarihi | dateToString }}
@@ -114,5 +123,16 @@ export default {
       selectedPoPaidDetailList: null,
     };
   },
+  methods:{
+    rowClass(event) {
+      return event.MayaControl ? "red-row" : "";
+    },
+  }
 };
 </script>
+<style scoped>
+:deep(.red-row) {
+  border: 1px solid yellow !important;
+  color: black !important;
+}
+</style>

@@ -1,12 +1,14 @@
 <template>
    <div class="container">
         <home :home="home" />
-        <Button label="test" @click="methods1" class="btn btn-success"></Button>
+        <Button @click="getMessage" label="test"/>
+        {{ messageRxd }}
    </div>
 </template>
 
 <script>
 export default {
+
     computed:{
       home(){
             return this.$store.getters.getHomeList;
@@ -16,29 +18,31 @@ export default {
     },
     data(){
       return{
-        
+        socket:null,
+        messageRxd:'1234',
         }  
     },
+    beforeMount() {
+      
+  },
     created(){
         this.$store.dispatch('getHome');
     },
     mounted() {
-    const socket = this.$nuxtSocket({
-        channel: '/socket.io'
+     
+      this.socket = this.$nuxtSocket({
+      channel: '/index'
     })
     /* Listen for events: */
-    socket
-    .on('someEvent', (msg) => {
-      console.log(msg)
+    this.socket
+    .on('someEvent', (msg, cb) => {
+      /* Handle event */
     })
   },
-    methods:{
-        methods1(){
-            const socket = this.$nuxtSocket({
-                channel: '/socket.io'
-            });
-            socket.emit('someEvent','deneme')
-        }
-    }
+  methods: {
+    getMessage() {
+      this.$socket.emit('message');
+  },
+  }
 }
 </script>

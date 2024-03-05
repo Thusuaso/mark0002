@@ -51,16 +51,22 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/toast',
-    'nuxt-socket-io',
-    '~/io'
+    'nuxt-socket-io'
+
   ],
   io: {
-    // module options
-    sockets: [{
-      name: 'main',
-      url: 'http://localhost:3000'
-    }]
+    sockets: [ // Required
+      { // At least one entry is required
+        name: 'home',
+        url: 'http://localhost:3000',
+        default: true,
+        vuex: { /* see section below */ },
+        namespaces: { /* see section below */ }
+      }, 
+    ]
   },
+  
+
   toast: {
     position: 'top-center',
     duration:3000,
@@ -79,7 +85,7 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: process.env.server
+    baseURL: process.env.client
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

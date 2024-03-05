@@ -73,6 +73,8 @@ const actions = {
             .then(response => {
                 if (response.data.status) {
                     vuexContext.dispatch("setSampleList");
+                    vuexContext.dispatch("setCustomersOfferList");
+
                     this.$toast.success('Başarıyla Kaydedildi.');
                     
                 } else {
@@ -96,6 +98,7 @@ const actions = {
             .then(response => {
                 if (response.data.status) {
                     vuexContext.dispatch("setSampleList");
+                    vuexContext.dispatch("setCustomersOfferList");
                     this.$toast.success('Başarıyla Güncellendi.');
                 } else {
                     this.$toast.error('Güncelleme Başarısız');

@@ -41,9 +41,11 @@ export default {
       this.cards_form_dialog = true;
     },
     cardsSelected(event) {
+      console.log(event);
       this.model = event;
       this.cards_form_dialog = true;
       this.$store.dispatch("setCardsButtonStatus", false);
+      this.$store.dispatch("setCardsOrderList",event.ID)
     },
   },
 };
