@@ -18,6 +18,14 @@
       sortField="YuklemeTarihi"
       :sortOrder="-1"
     >
+    <template #header>
+            <div class="flex justify-content-between">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search" />
+                    <InputText v-model="globalSearch" placeholder="Keyword Search" @keyup.enter="globalSearchFilter($event)" @input="globalSearchFilterInput($event)"/>
+                </span>
+            </div>
+        </template>
       <Column header="#" headerStyle="width:3rem">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
@@ -393,6 +401,7 @@ export default {
   },
   data() {
     return {
+      globalSearch:null,
       selectedProduction: null,
       filtersOrders: {
         SiparisTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -418,6 +427,20 @@ export default {
     };
   },
   methods: {
+    globalSearchFilterInput(event){
+      if(!event){
+        this.$store.dispatch('setOrderShippedList');
+      };
+    },
+    globalSearchFilter(event){
+      if(event.target._value){
+        this.$store.dispatch('setFilterShipmentGlobal',event.target._value);
+
+      }else{
+        this.$store.dispatch('setOrderShippedList');
+
+      }
+    },
     filterShipmentSupplierInput(event){
       if(event){
         this.filterModel.supplier = event;
@@ -487,10 +510,17 @@ export default {
 
       } else{
         this.filterModel.supplier = '';
+
       }
 
+      if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
 
-      this.$store.dispatch("filterShipment", this.filterModel);
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+
+        }
+
 
     },
     filterShipmentEdge(event){
@@ -500,8 +530,15 @@ export default {
       } else{
         this.filterModel.edge = '';
 
-      }
-      this.$store.dispatch("filterShipment", this.filterModel);
+      };
+      if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
+
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+
+        }
+
     },
     filterShipmentHeight(event){
       if(event){
@@ -509,58 +546,105 @@ export default {
 
       } else{
         this.filterModel.height = '';
-      }
-      this.$store.dispatch("filterShipment", this.filterModel);
+
+      };
+      if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
+
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+
+        }
+
 
     },
     filterShipmentWidth(event){
       if(event){
         this.filterModel.width = event;
+
       } else{
         this.filterModel.width = '';
-      }
-      this.$store.dispatch("filterShipment", this.filterModel);
+
+      };
+      if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
+
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+
+        }
       
     },
     filterShipmentProduct(event){
       if(event){
-      this.filterModel.product = event;
-        
+        this.filterModel.product = event;
       }else{
-      this.filterModel.product = '';
-      }
-      this.$store.dispatch("filterShipment", this.filterModel);
-
+        this.filterModel.product = '';
+      };
+      if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+        }
     },
     filterShipmentPo(event) {
       if(event){
         this.filterModel.po = event;
 
+
       }else{
         this.filterModel.po = '';
-      }
-        this.$store.dispatch("filterShipment", this.filterModel);
+
+      };
+      if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
+
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+
+        }
+
 
     },
     filterShipmentCompany(event) {
       if(event){
         this.filterModel.company = event;
+
       }else{
         this.filterModel.company = '';
+
       }
-      
+      this.__controlFilter();
+      if(this.__controlFilter()){
+        this.$store.dispatch('setOrderShippedList');
+      } else{
         this.$store.dispatch("filterShipment", this.filterModel);
+
+      }
 
     },
     filterShipmentLoadDate(event) {
       if(event){
         this.filterModel.loaddate = event;
+
         }else{
           this.filterModel.loaddate = '';
-        }
-      
-        this.$store.dispatch("filterShipment", this.filterModel);
 
+        }
+        if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
+
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+
+        }
+
+    },
+
+    __controlFilter(){
+      if(this.filterModel.loaddate == '' && this.filterModel.company == '' && this.filterModel.po == '' && this.filterModel.product == '' && this.filterModel.width == '' && this.filterModel.height == '' && this.filterModel.edge == '' && this.filterModel.supplier == ''){
+        return true
+      }
     },
     productSupplierNull(event) {
       const vm = document.getElementById("productSupplier" + event.UrunId);
@@ -575,6 +659,7 @@ export default {
       }
     },
   },
+
 };
 </script>
 <style scoped>

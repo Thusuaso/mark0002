@@ -180,7 +180,7 @@ export default {
     this.$store.dispatch("setReportsMekmarAyoMonthList", new Date().getFullYear());
     const date = {
       year: new Date().getFullYear(),
-      month: new Date().getMonth() + 1,
+      month: new Date().getMonth(),
     };
 
     this.$store.dispatch("setReportsMekmarAyoList", date);

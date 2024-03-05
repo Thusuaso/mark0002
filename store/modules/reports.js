@@ -90,7 +90,6 @@ const state = {
         'byMarketingForw':{'forwarding':{'fob':0,'ddp':0},'mekmar':{'fob':0,'ddp':0},'in':{'fob':0,'ddp':0},'mekmer':{'fob':0,'ddp':0},'imp':{'fob':0,'ddp':0}}
     },
     reportsMekmarMkForwList: [],
-    reportsMekmarGuAyoCostList: [],
     reportsMekmarGuYearList: [],
     reportsMekmarGuContList: [],
     reportsMekmarGuContByCustList:[],
@@ -729,7 +728,6 @@ const mutations = {
     },
     setReportsMekmarGuList(state, payload) {
         state.reportsMekmarGuYearList = payload.yearList;
-        state.reportsMekmarGuAyoCostList = payload.ayoCostList;
         payload.contList.forEach(x => {
             if (x.KontSayisi == null) {
                 x.KontSayisi = 0;
@@ -856,9 +854,7 @@ const getters = {
     getReportsMekmarGuYearList(state) {
         return state.reportsMekmarGuYearList;
     },
-    getReportsMekmarGuAyoCostList(state) {
-        return state.reportsMekmarGuAyoCostList;
-    },
+
     getReportsMekmarGuContList(state) {
         return state.reportsMekmarGuContList;
     },

@@ -21,7 +21,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -32,7 +31,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -43,7 +41,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -54,7 +51,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -65,7 +61,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -76,7 +71,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -87,7 +81,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -101,7 +94,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -112,7 +104,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -123,7 +114,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -134,7 +124,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -145,32 +134,64 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
-      <Column field="KutuAdet" header="Box">
+      <Column field="KutuAdet" header="Box" :showFilterMenu="false">
         <template #footer>
           {{ total.box | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
       </Column>
-      <Column field="Adet" header="Piece">
+      <Column field="Adet" header="Piece" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
         <template #footer>
           {{ total.piece | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
       </Column>
-      <Column field="Miktar" header="Amount">
+      <Column field="Miktar" header="Amount" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
         <template #footer>
           {{ total.amount | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
       </Column>
-      <Column field="BirimAdi" header="Unit"></Column>
+      <Column field="BirimAdi" header="Unit" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
       <Column field="SiparisAciklama" header="Po" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -178,7 +199,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by name"
           />
         </template>
       </Column>
@@ -231,6 +251,11 @@ export default {
         Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         SiparisAciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KutuAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
       },
     };
   },

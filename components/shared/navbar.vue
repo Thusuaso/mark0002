@@ -1,6 +1,6 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
+  <nav class=" navbar navbar-expand-lg bg-body-tertiary " >
+    <div class="container-fluid container" >
       <a class="navbar-brand" href="#">GOZ</a>
       <button
         class="navbar-toggler"
@@ -13,7 +13,7 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="collapse navbar-collapse" id="navbarNav" >
         <ul class="navbar-nav">
           <li class="nav-item">
             <nuxt-link to="/" tag="a" class="nav-link">Home</nuxt-link>
@@ -39,14 +39,20 @@
                   >Bgp Network</nuxt-link
                 >
               </li>
+
+              <li>
+                <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
+                  >To Do</nuxt-link
+                >
+              </li>
               <li>
                 <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
                   >Points to Consider</nuxt-link
                 >
               </li>
               <li>
-                <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
-                  >To Do</nuxt-link
+                <nuxt-link to="/sales/representative" class="dropdown-item" tag="a"
+                  >Sales & Operation</nuxt-link
                 >
               </li>
               <li>
@@ -54,11 +60,7 @@
                   >Main To Do</nuxt-link
                 >
               </li>
-              <li>
-                <nuxt-link to="/sales/representative" class="dropdown-item" tag="a"
-                  >Representative & Operation</nuxt-link
-                >
-              </li>
+
             </ul>
           </li>
           <li class="nav-item dropdown">
@@ -191,7 +193,7 @@
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/customer/mekmar" class="dropdown-item" tag="a"
-                  >Mekmar</nuxt-link
+                  >Order</nuxt-link
                 >
               </li>
               <li>

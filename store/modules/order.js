@@ -3,6 +3,7 @@ const state = {
     orderListAll:[],
     orderProductionButtonStatus: false,
     orderProductionProductDetailList:[],
+    orderProductionProductDetailNotChangeList:[],
     orderProductionPo: '',
     orderProductAdded: [],
     orderProductUpdated: [],
@@ -92,6 +93,20 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
         this.$axios.post(`/order/shipped/list/filter`,filter)
             .then(response => {
                 if (response.data.list) {
+                vuexContext.commit('setOrderList', response.data.list);
+                vuexContext.dispatch('setEndLoadingAction');
+
+                };
+            });
+    },
+
+    setFilterShipmentGlobal(vuexContext,filter){
+        vuexContext.dispatch('setBeginLoadingAction');
+
+        this.$axios.get(`/order/shipped/list/filter/global/${filter}`)
+            .then(response => {
+                if (response.data.list) {
+                
                 vuexContext.commit('setOrderList', response.data.list);
                 vuexContext.dispatch('setEndLoadingAction');
 
@@ -386,6 +401,12 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
     },
     setOrderProductionSaveButtonStatus(vuexContext,status){
         vuexContext.commit('setOrderProductionSaveButtonStatus',status)
+    },
+    setOrderProductionProductDetailNotChangeList(vuexContext,product){
+        vuexContext.commit('setOrderProductionProductDetailNotChangeList',product)
+    },
+    setOrderProductionProductDetailNotChangeListReset(vuexContext){
+        vuexContext.commit('setOrderProductionProductDetailNotChangeListReset')
     }
 
 
@@ -408,12 +429,20 @@ const mutations = {
         state.orderProductionProductDetailList = payload;
 
     },
+    setOrderProductionProductDetailNotChangeList(state,payload){
+        state.orderProductionProductDetailNotChangeList.push(payload);
+    },
+    setOrderProductionProductDetailNotChangeListReset(state){
+        state.orderProductionProductDetailNotChangeList = [];
+    },
+
     setOrderProductionPo(state, payload) {
         state.orderProductionPo = payload;
     },
     setOrderProductAdded(state, payload) {
         state.orderProductAdded.push(payload);
         state.orderProductionProductDetailList.push(payload);
+        state.orderProductionProductDetailNotChangeList.push(payload);
         state.orderProductionProductTotal = 0;
         state.orderProductionProductDetailList.forEach(x => {
             state.orderProductionProductTotal += x.SatisToplam;
@@ -452,11 +481,14 @@ const mutations = {
         state.orderProductDeleted.push(payload);
         const index = state.orderProductionProductDetailList.findIndex(x => x.ID == payload.ID);
         state.orderProductionProductDetailList.splice(index, 1);
-                state.orderProductionProductTotal = 0;
+        state.orderProductionProductDetailNotChangeList.splice(index, 1);
+
+
+        state.orderProductionProductTotal = 0;
         state.orderProductionProductDetailList.forEach(x => {
             state.orderProductionProductTotal += x.SatisToplam;
         });
-                state.orderProductionProductDetailTotal = {
+        state.orderProductionProductDetailTotal = {
             'm2': 0,
             'piece': 0,
             'mt': 0,
@@ -685,6 +717,9 @@ const getters = {
     },
     getOrderProductionProductDetailList(state) {
         return state.orderProductionProductDetailList;
+    },
+    getOrderProductionProductDetailNotChangeList(state){
+        return state.orderProductionProductDetailNotChangeList;
     },
     getOrderProductionPo(state) {
         return state.orderProductionPo;

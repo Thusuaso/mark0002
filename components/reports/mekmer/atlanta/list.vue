@@ -52,39 +52,102 @@
           />
         </template>
       </Column>
-      <Column field="KasaAdet" header="Amount in Crate">
+      <Column field="KasaAdet" header="Amount in Crate" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaAdet | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="Search by country"
+          />
+        </template>
       </Column>
-      <Column field="KasaKutu" header="Box in Crate">
+      <Column field="KasaKutu" header="Box in Crate" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaKutu | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="Search by country"
+          />
+        </template>
       </Column>
-      <Column field="KasaM2" header="M2 in Crate">
+      <Column field="KasaM2" header="M2 in Crate" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaM2 | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="Search by country"
+          />
+        </template>
       </Column>
-      <Column field="KasaSqft" header="Sqft in Crate">
+      <Column field="KasaSqft" header="Sqft in Crate" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaSqft | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="Search by country"
+          />
+        </template>
       </Column>
-      <Column field="StokBox" header="Stock Box">
+      <Column field="StokBox" header="Stock Box" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.StokBox | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="Search by country"
+          />
+        </template>
       </Column>
-      <Column field="StokSqft" header="Stock Sqft">
+      <Column field="StokSqft" header="Stock Sqft" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.StokSqft | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="Search by country"
+          />
+        </template>
       </Column>
-      <Column field="mekmar_fiyat" header="Price">
+      <Column field="mekmar_fiyat" header="Price" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.mekmar_fiyat | formatPriceUsd }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="Search by country"
+          />
         </template>
       </Column>
     </DataTable>
@@ -106,6 +169,14 @@ export default {
         MekmarKod: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         UrunTanim: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         atl: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KasaAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KasaKutu: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KasaM2: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KasaSqft: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        StokBox: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        StokSqft: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        mekmar_fiyat: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+
       },
       selectedAtlantaList: null,
     };

@@ -11,12 +11,6 @@
       </div>
     </div>
     <TabView>
-      <TabPanel header="Ayo Cost">
-        <reportsMekmarGuAyoCostList
-          :list="getReportsMekmarGuAyoCostList"
-          :loading="getLoading"
-        />
-      </TabPanel>
       <TabPanel header="Container (Mekmar)">
         <reportsMekmarGuContList
           :contCountList="getReportsMekmarGuContList"

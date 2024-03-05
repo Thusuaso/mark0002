@@ -11,6 +11,8 @@
       :loading="loading"
       :filters.sync="orderFilters"
       filterDisplay="row"
+      :sortField="[TeklifOncelik,Sira]"
+      :sortOrder="1"
     >
       <Column field="Tarih" header="Tarih" :showFilterMenu="false">
         <template #body="slotProps">

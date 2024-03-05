@@ -128,22 +128,49 @@
             />
           </template>
         </Column>
-        <Column field="Adet" header="Pieces in Box">
+        <Column field="Adet" header="Pieces in Box" :showFilterMenu="false">
           <template #footer>
             {{ total.kutuiciadet | formatDecimal }}
           </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
         </Column>
-        <Column field="KutuAdet" header="Box Piece">
+        <Column field="KutuAdet" header="Box Piece" :showFilterMenu="false">
           <template #footer>
             {{ total.kutu | formatDecimal }}
           </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
         </Column>
-        <Column field="Miktar" header="Amount">
+        <Column field="Miktar" header="Amount" :showFilterMenu="false">
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
           <template #footer>
             {{ total.miktar | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
           </template>
         </Column>
         <Column field="Kutu" header="B">
@@ -216,6 +243,11 @@ export default {
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         SiparisAciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Aciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
+        Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KutuAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
       },
     };
   },

@@ -7,10 +7,25 @@
         :selection="selectedRepresentative"
         selectionMode="single"
         @row-click="representativeSelected($event)"
+        :filters.sync="representativeFilter"
+        filterDisplay="row"
+
       >
-        <Column field="SiparisNo" header="Po"></Column>
-        <Column field="SiparisSahibi" header="Order Owner"></Column>
-        <Column field="Operasyon" header="Operation"></Column>
+        <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+        </Column>
+        <Column field="SiparisSahibi" header="Order Owner" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+        </Column>
+        <Column field="Operasyon" header="Operation" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+        </Column>
       </DataTable>
     </div>
     <div class="col">
@@ -41,6 +56,7 @@
   </div>
 </template>
 <script>
+import {FilterMatchMode} from 'primevue/api';
 export default {
   props: {
     list: {
@@ -59,6 +75,11 @@ export default {
   data() {
     return {
       selectedRepresentative: null,
+      representativeFilter:{
+        SiparisNo:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+        SiparisSahibi:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+        Operasyon:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+      }
     };
   },
   methods: {

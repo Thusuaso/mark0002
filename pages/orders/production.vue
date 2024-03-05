@@ -146,6 +146,7 @@ export default {
       "getCustomersList",
       "getUserList",
       "getOrderProductionProductDetailList",
+      "getOrderProductionProductDetailNotChangeList",
       "getSupplierList",
       "getUnitList",
       "getOrderProductionPo",
@@ -247,6 +248,8 @@ export default {
         operation: this.productionModel.operationMail,
         representative: this.productionModel.representativeMail,
         status: 2,
+        notchange:this.getOrderProductionProductDetailNotChangeList,
+        new:this.getOrderProductionButtonStatus
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
@@ -263,10 +266,42 @@ export default {
 
       this.workerman_dialog_form = true;
     },
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
+
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
+    },
     update() {
+      this.productionModel.FinansAciklama = this.__stringCharacterChange(this.productionModel.FinansAciklama);
+      this.productionModel.UretimAciklama = this.__stringCharacterChange(this.productionModel.UretimAciklama);
+      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(this.productionModel.SevkiyatAciklama);
+      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(this.productionModel.DetayAciklama_1);
+      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(this.productionModel.DetayAciklama_2);
+      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(this.productionModel.DetayAciklama_3);
+      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(this.productionModel.DetayAciklama_4);
+      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_1);
+      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_2);
+      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_3);
+
       this.$store.dispatch("setOrderProductionUpdate", this.productionModel);
     },
     save() {
+      this.productionModel.FinansAciklama = this.__stringCharacterChange(this.productionModel.FinansAciklama);
+      this.productionModel.UretimAciklama = this.__stringCharacterChange(this.productionModel.UretimAciklama);
+      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(this.productionModel.SevkiyatAciklama);
+      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(this.productionModel.DetayAciklama_1);
+      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(this.productionModel.DetayAciklama_2);
+      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(this.productionModel.DetayAciklama_3);
+      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(this.productionModel.DetayAciklama_4);
+      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_1);
+      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_2);
+      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_3);
+
       this.$store.dispatch("setOrderProductionSaveButtonStatus", true);
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");
@@ -301,15 +336,14 @@ export default {
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);
+      this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
       this.production_detail_form = true;
     },
   },
 
-  mounted() {
-
-  },
+  
 
   watch: {
     getOrderProductionYearsList() {

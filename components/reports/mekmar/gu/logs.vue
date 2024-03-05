@@ -101,7 +101,7 @@ export default {
         Yil: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        IslemAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        IslemAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
         DegisiklikYapan: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
     };

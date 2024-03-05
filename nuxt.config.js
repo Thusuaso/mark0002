@@ -51,7 +51,16 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/toast',
+    'nuxt-socket-io',
+    '~/io'
   ],
+  io: {
+    // module options
+    sockets: [{
+      name: 'main',
+      url: 'http://localhost:3000'
+    }]
+  },
   toast: {
     position: 'top-center',
     duration:3000,

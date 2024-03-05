@@ -212,6 +212,8 @@ export default {
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
+      this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
+
 
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);

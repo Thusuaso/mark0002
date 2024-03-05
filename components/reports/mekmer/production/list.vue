@@ -116,9 +116,12 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Amount">
+      <Column field="Miktar" header="Amount" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
         <template #footer>
           {{ total.amount | formatDecimal }}
@@ -198,6 +201,8 @@ export default {
         BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         SiparisAciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Aciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
       },
     };
   },

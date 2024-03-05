@@ -6,6 +6,7 @@ You can directly use them in pages and other components without the need to impo
 
 **Tip:** If a component is conditionally rendered with `v-if` and is big, it is better to use `Lazy` or `lazy-` prefix to lazy load.
 
+- `<IoSocketStatus>` | `<io-socket-status>` (node_modules/nuxt-socket-io/lib/components/SocketStatus.js)
 - `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<CardsForm>` | `<cards-form>` (components/cards/form.vue)
 - `<CardsList>` | `<cards-list>` (components/cards/list.vue)
@@ -25,6 +26,10 @@ You can directly use them in pages and other components without the need to impo
 - `<TransportList>` | `<transport-list>` (components/transport/list.vue)
 - `<UploadForm>` | `<upload-form>` (components/upload/form.vue)
 - `<UploadList>` | `<upload-list>` (components/upload/list.vue)
+- `<ContainerFollowForm>` | `<container-follow-form>` (components/container/follow/form.vue)
+- `<ContainerFollowList>` | `<container-follow-list>` (components/container/follow/list.vue)
+- `<ContainerInputForm>` | `<container-input-form>` (components/container/input/form.vue)
+- `<ContainerInputList>` | `<container-input-list>` (components/container/input/list.vue)
 - `<CustomerBgpForm>` | `<customer-bgp-form>` (components/customer/bgp/form.vue)
 - `<CustomerBgpList>` | `<customer-bgp-list>` (components/customer/bgp/list.vue)
 - `<CustomerFairForm>` | `<customer-fair-form>` (components/customer/fair/form.vue)
@@ -37,10 +42,6 @@ You can directly use them in pages and other components without the need to impo
 - `<CustomerOfferList>` | `<customer-offer-list>` (components/customer/offer/list.vue)
 - `<CustomerSelectionForm>` | `<customer-selection-form>` (components/customer/selection/form.vue)
 - `<CustomerSelectionList>` | `<customer-selection-list>` (components/customer/selection/list.vue)
-- `<ContainerFollowForm>` | `<container-follow-form>` (components/container/follow/form.vue)
-- `<ContainerFollowList>` | `<container-follow-list>` (components/container/follow/list.vue)
-- `<ContainerInputForm>` | `<container-input-form>` (components/container/input/form.vue)
-- `<ContainerInputList>` | `<container-input-list>` (components/container/input/list.vue)
 - `<FinanceFormsAdvancepayment>` | `<finance-forms-advancepayment>` (components/finance/forms/advancepayment.vue)
 - `<FinanceFormsPo>` | `<finance-forms-po>` (components/finance/forms/po.vue)
 - `<FinanceListsCollection>` | `<finance-lists-collection>` (components/finance/lists/collection.vue)
@@ -95,7 +96,6 @@ You can directly use them in pages and other components without the need to impo
 - `<ReportsMekmarAyoForm>` | `<reports-mekmar-ayo-form>` (components/reports/mekmar/ayo/form.vue)
 - `<ReportsMekmarAyoList>` | `<reports-mekmar-ayo-list>` (components/reports/mekmar/ayo/list.vue)
 - `<ReportsMekmarForwardingList>` | `<reports-mekmar-forwarding-list>` (components/reports/mekmar/forwarding/list.vue)
-- `<ReportsMekmarGuAyo>` | `<reports-mekmar-gu-ayo>` (components/reports/mekmar/gu/ayo.vue)
 - `<ReportsMekmarGuCont>` | `<reports-mekmar-gu-cont>` (components/reports/mekmar/gu/cont.vue)
 - `<ReportsMekmarGuForwarding>` | `<reports-mekmar-gu-forwarding>` (components/reports/mekmar/gu/forwarding.vue)
 - `<ReportsMekmarGuLogs>` | `<reports-mekmar-gu-logs>` (components/reports/mekmar/gu/logs.vue)

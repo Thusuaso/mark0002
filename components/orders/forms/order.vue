@@ -443,6 +443,26 @@ export default {
       this.productName = event.data.UrunAdi;
       this.surfaceName = event.data.YuzeyIslemAdi;
       this.sizeName = event.data.En + "x" + event.data.Boy + "x" + event.data.Kenar;
+
+      const data  = {
+        'SiparisNo':event.data.SiparisNo,
+        'FirmaAdi':event.data.FirmaAdi,
+        'KategoriAdi':event.data.KategoriAdi,
+        'UrunAdi':event.data.UrunAdi,
+        'YuzeyIslemAdi':event.data.YuzeyIslemAdi,
+        'En':event.data.En,
+        'Boy':event.data.Boy,
+        'Kenar':event.data.Kenar,
+        'UretimAciklama':event.data.UretimAciklama,
+        'Miktar':event.data.Miktar,
+        'AlisFiyati':event.data.AlisFiyati,
+        'SatisFiyati':event.data.SatisFiyati,
+        'ID':event.data.ID
+      };
+    
+      this.$store.dispatch('setOrderProductionProductDetailNotChangeList',data);
+
+
     },
     unitSelected(event) {
       this.model.UrunBirimID = event.value.ID;

@@ -60,7 +60,6 @@ import reportsMekmarMkYearByPoOrdersList from '~/components/reports/mekmar/mk/ye
 import reportsMekmarMkYearByMarketingOrdersList from '~/components/reports/mekmar/mk/yearByMarketingOrders';
 import reportsMekmarMkYearByMarketingForwardingList from '~/components/reports/mekmar/mk/yearByMarketingForwarding';
 import reportsMekmarMkByCustomerList from '~/components/reports/mekmar/mk/byCustomer';
-import reportsMekmarGuAyoCostList from '~/components/reports/mekmar/gu/ayo';
 import reportsMekmarGuContList from '~/components/reports/mekmar/gu/cont';
 import reportsMekmarGuMekusList from '~/components/reports/mekmar/gu/mekus';
 import reportsMekmarGuLogsList from '~/components/reports/mekmar/gu/logs';
@@ -163,7 +162,6 @@ Vue.component('reportsMekmarMkYearByPoOrdersList', reportsMekmarMkYearByPoOrders
 Vue.component('reportsMekmarMkYearByMarketingOrdersList', reportsMekmarMkYearByMarketingOrdersList);
 Vue.component('reportsMekmarMkYearByMarketingForwardingList', reportsMekmarMkYearByMarketingForwardingList);
 Vue.component('reportsMekmarMkByCustomerList', reportsMekmarMkByCustomerList);
-Vue.component('reportsMekmarGuAyoCostList', reportsMekmarGuAyoCostList);
 Vue.component('reportsMekmarGuContList', reportsMekmarGuContList);
 Vue.component('reportsMekmarGuMekusList', reportsMekmarGuMekusList);
 Vue.component('reportsMekmarGuLogsList', reportsMekmarGuLogsList);

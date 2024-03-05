@@ -79,17 +79,23 @@
           />
         </template>
       </Column>
-      <Column field="Toplam" header="Amount">
+      <Column field="Toplam" header="Amount" :showFilterMenu="false" sortable>
         <template #body="slotProps">
           {{ slotProps.data.Toplam | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
         <template #footer>
           {{ total.amount | formatDecimal }}
         </template>
       </Column>
-      <Column field="KasaSayisi" header="Crate Amount">
+      <Column field="KasaSayisi" header="Crate Amount" :showFilterMenu="false" sortable>
         <template #body="slotProps">
           {{ slotProps.data.KasaSayisi | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
         <template #footer>
           {{ total.crate | formatDecimal }}
@@ -125,6 +131,9 @@ export default {
         KategoriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         YuzeyIslemAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Toplam: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KasaSayisi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
       },
     };
   },

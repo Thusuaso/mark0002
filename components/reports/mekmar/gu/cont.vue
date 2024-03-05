@@ -6,20 +6,54 @@
         scrollable
         scrollHeight="450px"
         :loading="loading"
+        :filters.sync="filtersContCount"
+        filterDisplay="row"
+
       >
-        <Column field="UlkeAdi" header="Country"></Column>
-        <Column field="KontSayisi" header="Container Piece"></Column>
+        <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+        </Column>
+        <Column field="SipSayisi" header="Order Count" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }" > 
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
+        </template>
+        </Column>
+        <Column field="KontSayisi" header="Container Piece" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
+        </template>
+        </Column>
       </DataTable>
     </div>
     <div class="col">
-      <DataTable :value="contCustList" scrollable scrollHeight="450px">
-        <Column field="FirmaAdi" header="Customer"></Column>
-        <Column field="KontSayisi" header="Container Piece"></Column>
+      <DataTable :value="contCustList" scrollable scrollHeight="450px"
+      :filters.sync="filtersContCust"
+        filterDisplay="row"
+        :loading="loading"
+      >
+        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }" > 
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
+        </template>
+        </Column>
+        <Column field="SipSayisi" header="Order Count" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }" > 
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
+        </template>
+        </Column>
+        <Column field="KontSayisi" header="Container Piece" :showFilterMenu="false">
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
+        </template>
+        </Column>
       </DataTable>
     </div>
   </div>
 </template>
 <script>
+import {FilterMatchMode} from 'primevue/api';
 export default {
   props: {
     contCountList: {
@@ -35,5 +69,23 @@ export default {
       required: false,
     },
   },
+  data(){
+    return {
+      filtersContCount:{
+        UlkeAdi:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+        KontSayisi:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+        SipSayisi:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+
+
+      },
+      filtersContCust:{
+        FirmaAdi:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+        KontSayisi:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+        SipSayisi:{value:null,matchMode:FilterMatchMode.STARTS_WITH},
+
+
+      }
+    }
+  }
 };
 </script>

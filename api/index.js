@@ -3,7 +3,8 @@ import session from 'express-session';
 import mssql from 'mssql';
 import nodemailer from 'nodemailer';
 import SMTPConnection from "nodemailer/lib/smtp-connection";
-import date from '../plugins/date';
+import currency from "../plugins/currency";
+
 const app = express();
 const sql = {
     user:'userEC52E044DE',
@@ -2696,7 +2697,24 @@ function noneIntControl(value){
         return parseInt(value)
     }
 }
+
+function __getCurrency(shipped_date){
+    const date = new Date(shipped_date);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return new Promise((resolve,reject)=>{
+        currency.getDateCurrency(year, month, day).then((response) => {
+            resolve(response);
+          });
+    });
+
+}
+
+
 app.get('/reports/mekmar/ayo/list/:year/:month', (req, res) => {
+
+
     const sql = `
      select 
 	s.SiparisTarihi,
@@ -2796,7 +2814,7 @@ app.get('/reports/mekmar/ayo/list/:year/:month', (req, res) => {
 		select sum(o.Masraf) from OdemelerTB o where o.SiparisNo = s.SiparisNo
 	) as BankaMasraf,
 	(
-		select sum(o.Kur) / count(o.ID) from OdemelerTB o where o.SiparisNo = s.SiparisNo
+		select top 1 o.Kur from OdemelerTB o where o.SiparisNo = s.SiparisNo order by o.Tarih desc
 	) as Kur
 
 from SiparislerTB s
@@ -2810,15 +2828,34 @@ where m.Marketing = 'Mekmar' and s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) 
             x.Proforma = (x.ToplamSatis + x.NavlunSatis + x.DetayTutar1 + x.DetayTutar2 + x.DetayTutar3);
             x.MasrafToplam = (x.ToplamUretim + x.Nakliye + x.Gumruk + x.Ilaclama + x.Liman + x.SigortaAlis + x.NavlunAlis + x.Lashing + x.DetayAlis1 + x.DetayAlis2 + x.DetayAlis3 + x.Mekus + x.OzelIscilik + x.BankaMasraf + x.Kurye + x.Komisyon + x.Spanzlet);
 
-            if(noneIntControl(x.Odemeler) < noneIntControl(x.Proforma)){
-                x.ProfitUsd = 0;
-                x.ProfitTl = 0
-
-            } else{
-
-
+            if(noneIntControl(x.Proforma) <= noneIntControl(x.Odemeler) ){
                 x.ProfitUsd = (x.Proforma - x.MasrafToplam);
+            
                 x.ProfitTl = (x.ProfitUsd * x.Kur)
+                if(x.Kur == null || x.Kur == undefined){
+
+                   __getCurrency(x.YuklemeTarihi).then(currency=>{
+                        x.ProfitTl = (x.Proforma - x.MasrafToplam) * currency;
+                        console.log(x.ProfitTl)
+                    });
+                    
+
+                }
+
+                
+            } else{
+                x.ProfitUsd = 0;
+            
+                x.ProfitTl = 0;
+
+    
+                
+                console.log("SiparisNo",x.ProfitTl);
+
+
+
+
+                
             }
 
         });
@@ -4030,111 +4067,18 @@ app.get('/reports/mekmar/gu/list', (req, res) => {
 
     mssql.query(yearListSql, (err, yearList) => {
         let year = yearList.recordset[0].Year;
-        const ayoCostSql = `
-                            select 
-	s.MusteriID,
-	(select m.FirmaAdi from MusterilerTB m where m.ID = s.MusteriID) as MusteriAdi,
-	(
-		sum(s.NavlunAlis) + 
-		sum(s.DetayAlis_1) + 
-		sum(s.DetayAlis_2) + 
-		sum(s.DetayAlis_3) +
-		sum(s.DetayTutar_4)+
-		dbo.Ayo_Sip_Tar_Satis_Toplami_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID)+
-		dbo.Ayo_Ozel_Iscilik_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID) +
-		dbo.Ayo_Yuk_Tar_Sip_Fat_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
 
-	) as Maliyet,
-	(
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) as Proforma,
-
-	 	(
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) -
-	(
-		sum(s.NavlunAlis) + 
-		sum(s.DetayAlis_1) + 
-		sum(s.DetayAlis_2) + 
-		sum(s.DetayAlis_3) +
-		sum(s.DetayTutar_4)+
-		dbo.Ayo_Sip_Tar_Satis_Toplami_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID)+
-		dbo.Ayo_Ozel_Iscilik_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID) +
-		dbo.Ayo_Yuk_Tar_Sip_Fat_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-
-	)  as ProfitUsd,
-
-		 	((
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) -
-	(
-		sum(s.NavlunAlis) + 
-		sum(s.DetayAlis_1) + 
-		sum(s.DetayAlis_2) + 
-		sum(s.DetayAlis_3) +
-		sum(s.DetayTutar_4)+
-		dbo.Ayo_Sip_Tar_Satis_Toplami_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID)+
-		dbo.Ayo_Ozel_Iscilik_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID) +
-		dbo.Ayo_Yuk_Tar_Sip_Fat_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-
-	)) *
-	dbo.Ayo_Yuk_Odemeler_Kur(YEAR(s.YuklemeTarihi),s.MusteriID) as ProfitTl,
-	dbo.Ayo_Yuk_Odemeler_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID) as Odenen,
-
-		(
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) - dbo.Ayo_Yuk_Odemeler_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID) as Kalan
-
-	
-
-
-
-
-
-
-from SiparislerTB s
-
-where s.MusteriID in (select m.ID from MusterilerTB m where m.Marketing = 'Mekmar') and YEAR(s.YuklemeTarihi) = '${year}'
-
-group by s.MusteriID,YEAR(s.YuklemeTarihi)
-
-
-
-
-
-
-
-
-
-                        `;
         
         const contSql = `
-                            select m.UlkeId,ytu.UlkeAdi,sum(s.KonteynirSayisi) as KontSayisi from MusterilerTB m
+                            select m.UlkeId,ytu.UlkeAdi,sum(s.KonteynirSayisi) as KontSayisi,COUNT(s.ID) as SipSayisi from MusterilerTB m
                             inner join SiparislerTB s on s.MusteriID = m.ID
                             inner join YeniTeklif_UlkeTB ytu on ytu.Id = m.UlkeId
                             where YEAR(s.YuklemeTarihi) = '${year}' and m.Marketing='Mekmar'
                             group by 
                             m.UlkeId,ytu.UlkeAdi
                         `;
-        mssql.query(ayoCostSql, (err, ayoCostList) => {
             const contByCustSql = `
-                                        select m.FirmaAdi,sum(s.KonteynirSayisi) as KontSayisi from MusterilerTB m
+                                        select m.FirmaAdi,sum(s.KonteynirSayisi) as KontSayisi,COUNT(s.ID) as SipSayisi from MusterilerTB m
                                         inner join SiparislerTB s on s.MusteriID = m.ID
                                         inner join YeniTeklif_UlkeTB ytu on ytu.Id = m.UlkeId
                                         where YEAR(s.YuklemeTarihi) = '${year}' and m.Marketing='Mekmar'
@@ -4185,7 +4129,6 @@ group by s.MusteriID,YEAR(s.YuklemeTarihi)
                             mssql.query(forwSql, (err, forwList) => {
                                 res.status(200).json({
                                     'contByCust':contByCust.recordset,
-                                    'ayoCostList': ayoCostList.recordset,
                                     'contList':contList.recordset,
                                     'yearList': yearList.recordset,
                                     'mekusList':mekusList.recordset,
@@ -4202,7 +4145,7 @@ group by s.MusteriID,YEAR(s.YuklemeTarihi)
 
             });
 
-        });
+        
         
     });
 
@@ -4218,102 +4161,9 @@ app.get('/reports/mekmar/gu/list/:year', (req, res) => {
     `;
 
     mssql.query(yearListSql, (err, yearList) => {
-        const ayoCostSql = `
-                            select 
-	s.MusteriID,
-	(select m.FirmaAdi from MusterilerTB m where m.ID = s.MusteriID) as MusteriAdi,
-	(
-		sum(s.NavlunAlis) + 
-		sum(s.DetayAlis_1) + 
-		sum(s.DetayAlis_2) + 
-		sum(s.DetayAlis_3) +
-		sum(s.DetayTutar_4)+
-		dbo.Ayo_Sip_Tar_Satis_Toplami_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID)+
-		dbo.Ayo_Ozel_Iscilik_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID) +
-		dbo.Ayo_Yuk_Tar_Sip_Fat_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
 
-	) as Maliyet,
-	(
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) as Proforma,
-
-	 	(
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) -
-	(
-		sum(s.NavlunAlis) + 
-		sum(s.DetayAlis_1) + 
-		sum(s.DetayAlis_2) + 
-		sum(s.DetayAlis_3) +
-		sum(s.DetayTutar_4)+
-		dbo.Ayo_Sip_Tar_Satis_Toplami_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID)+
-		dbo.Ayo_Ozel_Iscilik_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID) +
-		dbo.Ayo_Yuk_Tar_Sip_Fat_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-
-	)  as ProfitUsd,
-
-		 	((
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) -
-	(
-		sum(s.NavlunAlis) + 
-		sum(s.DetayAlis_1) + 
-		sum(s.DetayAlis_2) + 
-		sum(s.DetayAlis_3) +
-		sum(s.DetayTutar_4)+
-		dbo.Ayo_Sip_Tar_Satis_Toplami_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID)+
-		dbo.Ayo_Ozel_Iscilik_Maliyeti(YEAR(s.YuklemeTarihi),s.MusteriID) +
-		dbo.Ayo_Yuk_Tar_Sip_Fat_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-
-	)) *
-	dbo.Ayo_Yuk_Odemeler_Kur(YEAR(s.YuklemeTarihi),s.MusteriID) as ProfitTl,
-	dbo.Ayo_Yuk_Odemeler_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID) as Odenen,
-
-		(
-		sum(s.NavlunSatis) +
-		sum(s.DetayTutar_1) +
-		sum(s.DetayTutar_2) +
-		sum(s.DetayTutar_3) +
-		dbo.Ayo_Sip_Tar_Satis_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID)
-	) - dbo.Ayo_Yuk_Odemeler_Toplami(YEAR(s.YuklemeTarihi),s.MusteriID) as Kalan
-
-	
-
-
-
-
-
-
-from SiparislerTB s
-
-where s.MusteriID in (select m.ID from MusterilerTB m where m.Marketing = 'Mekmar') and YEAR(s.YuklemeTarihi) = '${req.params.year}'
-
-group by s.MusteriID,YEAR(s.YuklemeTarihi)
-
-
-
-
-
-
-
-
-
-                        `;
-        mssql.query(ayoCostSql, (err, ayoCostList) => {
             const contListSql = `
-                            select m.UlkeId,ytu.UlkeAdi,sum(s.KonteynirSayisi) as KontSayisi from MusterilerTB m
+                            select m.UlkeId,ytu.UlkeAdi,sum(s.KonteynirSayisi) as KontSayisi,COUNT(s.ID) as SipSayisi from MusterilerTB m
                             inner join SiparislerTB s on s.MusteriID = m.ID
                             inner join YeniTeklif_UlkeTB ytu on ytu.Id = m.UlkeId
                             where YEAR(s.YuklemeTarihi) = ${req.params.year} and m.Marketing='Mekmar'
@@ -4322,7 +4172,7 @@ group by s.MusteriID,YEAR(s.YuklemeTarihi)
                              `;
             mssql.query(contListSql, (err, contList) => {
                 const contByCustSql = `
-                        select m.FirmaAdi,sum(s.KonteynirSayisi) as KontSayisi from MusterilerTB m
+                        select m.FirmaAdi,sum(s.KonteynirSayisi) as KontSayisi,COUNT(s.ID) as SipSayisi from MusterilerTB m
                         inner join SiparislerTB s on s.MusteriID = m.ID
                         inner join YeniTeklif_UlkeTB ytu on ytu.Id = m.UlkeId
                         where YEAR(s.YuklemeTarihi) = ${req.params.year} and m.Marketing='Mekmar'
@@ -4375,7 +4225,6 @@ group by s.MusteriID,YEAR(s.YuklemeTarihi)
                             mssql.query(forwSql, (err, forwList) => {
                                                         res.status(200).json({
                             'contList': contList.recordset,
-                            'ayoCostList': ayoCostList.recordset,
                             'yearList': yearList.recordset,
                             'contByCust': contByCust.recordset,
                             'mekusList':mekusList.recordset,
@@ -4395,7 +4244,7 @@ group by s.MusteriID,YEAR(s.YuklemeTarihi)
 
             });
 
-        });
+        
         
     });
 });
@@ -7837,7 +7686,6 @@ order by YEAR(s.SiparisTarihi) desc
 
 
 app.post('/order/shipped/list/filter',(req,res)=>{
-    console.log(req.body);
     const ordersListSql = `
     select 
 
@@ -7978,6 +7826,147 @@ mssql.query(ordersListSql, (err, orders) => {
 });
 });
 
+app.get('/order/shipped/list/filter/global/:filter',(req,res)=>{
+    const ordersListSql = `
+    select 
+
+        s.ID as SiparisId,
+        s.SiparisNo,
+        s.SiparisTarihi,
+        s.OdemeTurID,
+        ot.OdemeTur,
+        s.TeslimTurID,
+        (
+            select stt.TeslimTur from SiparisTeslimTurTB stt where stt.ID = s.TeslimTurID
+        ) as TeslimTur,
+        s.MusteriID,
+        m.FirmaAdi,
+        s.Pesinat,
+        s.NavlunFirma,
+        s.NavlunMekmarNot,
+        s.NavlunAlis,
+        s.NavlunSatis,
+        s.KayitTarihi,
+        s.KullaniciID,
+        (select k.KullaniciAdi from KullaniciTB k where k.ID = s.KullaniciID) as KayitYapan,
+        s.SiparisDurumID,
+        sdt.Durum,
+        s.UretimAciklama,
+        s.SevkiyatAciklama,
+        s.FinansAciklama,
+        s.OdemeAciklama,
+        s.TahminiYuklemeTarihi,
+        s.YuklemeTarihi,
+        s.FaturaNo,
+        s.SiparisFaturaNo,
+        s.Vade,
+        s.Ulke,
+        s.Komisyon,
+        s.DetayAciklama_1,
+        s.DetayMekmarNot_1,
+        s.DetayTutar_1,
+        s.DetayAlis_1,
+        s.DetayAciklama_2,
+        s.DetayMekmarNot_2,
+        s.DetayTutar_2,
+        s.DetayAlis_2,
+        s.DetayAciklama_3,
+        s.DetayMekmarNot_3,
+        s.DetayTutar_3,
+        s.DetayAlis_3,
+        (select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as SiparisSahibiAdi,
+        s.EvrakGideri,
+        s.Eta,
+        s.UlkeId,
+        (
+            select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = s.UlkeId
+        ) as UlkeAdi,
+
+        (
+            select fst.FaturaAdi from FaturaKesilmeTB fst where fst.ID = s.FaturaKesimTurID
+        ) as FaturaAdi,
+        s.depo_yukleme,
+        s.DetayTutar_4,
+        s.DetayAciklama_4,
+        s.sigorta_Tutar,
+        (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
+        (select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
+        (select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
+        (select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
+        s.SiparisSahibi,
+        s.Operasyon,
+        s.Finansman,
+        s.Iade,
+        s.MalBedeli,
+        s.sigorta_tutar_satis,
+        s.KonteynerAyrinti,
+        s.MayaControl,
+        s.FaturaKesimTurID,
+        s.KonteynerNo,
+
+
+        su.ID as UrunId,
+        su.SiparisNo as UrunSiparisNo,
+        su.TedarikciID,
+        t.FirmaAdi as UrunFirmaAdi,
+        su.UrunKartID,
+        k.KategoriAdi,
+        urun.UrunAdi,
+        yk.YuzeyIslemAdi,
+        ol.En,
+        ol.Boy,
+        ol.Kenar,
+        su.UrunBirimID,
+        ub.BirimAdi,
+        su.Miktar,
+        su.OzelMiktar,
+        su.KasaAdet,
+        su.SatisFiyati,
+        su.SatisToplam,
+        su.UretimAciklama as UrunUretimAciklama,
+        su.MusteriAciklama as UrunMusteriAciklama,
+        su.AlisFiyati,
+        su.SiraNo,
+        su.Ton,
+        su.Adet,
+        ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
+        dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum
+
+        from SiparisUrunTB su
+        inner join SiparislerTB s on s.SiparisNo = su.SiparisNo
+        inner join TedarikciTB t on t.ID = su.TedarikciID
+        inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
+        inner join UrunKartTB uk on uk.ID = su.UrunKartID
+        inner join KategoriTB k on k.ID = uk.KategoriID
+        inner join UrunlerTB urun on urun.ID = uk.UrunID
+        inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+        inner join OlculerTB ol on ol.ID = uk.OlcuID
+        inner join OdemeTurTB ot on ot.ID = s.OdemeTurID
+        inner join MusterilerTB m on m.ID = s.MusteriID
+        inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
+
+        where s.SiparisDurumID = 3  and
+        s.YuklemeTarihi Like '${req.params.filter}'  +'%' or 
+        m.FirmaAdi Like '${req.params.filter}' + '%' or
+        s.SiparisNo Like '${req.params.filter}' + '%' or 
+        urun.UrunAdi Like '${req.params.filter}' + '%' or
+        ol.En Like '${req.params.filter}' + '%' or
+        ol.Boy Like '${req.params.filter}' + '%' or
+        ol.Kenar Like '${req.params.filter}' + '%' or 
+        t.FirmaAdi Like '${req.params.filter}' + '%' 
+        order by s.SiparisTarihi desc
+
+
+
+    `;
+
+    mssql.query(ordersListSql, (err, orders) => {
+        console.log('/order/shipped/list/filter/load/date/ , hata', err)
+        res.status(200).json({'list':orders.recordset});
+
+    });
+});
+
 
 
 
@@ -7989,10 +7978,6 @@ mssql.query(ordersListSql, (err, orders) => {
 
 app.get('/order/shipped/list/year/:year', (req, res) => {
     const shippedListYearSql = `
-        
-
-
-
 select 
 
 s.ID as SiparisId,
@@ -9214,6 +9199,7 @@ where
 ID='${req.body.SiparisId}'
     `;
     mssql.query(sql,(err,production)=>{
+        console.log('/order/production/update , hata',err);
         if(production.rowsAffected[0] == 1){
             res.status(200).json({'status':true});
         } else {
@@ -9362,8 +9348,10 @@ app.post('/finance/po/paid/update/send/mail', (req, res) => {
 });
 function addedSendMail(payload) {
     return new Promise((resolve, reject) => {
-        
-        let content = `
+        let content;
+        let customSubject;
+        if(payload.new){
+            content = `
             <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişini Girdi.</h3>
             <br/>
             <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
@@ -9373,8 +9361,31 @@ function addedSendMail(payload) {
                 <th style="border: 1px solid;">Ürün Bilgisi</th>
                 <th style="border: 1px solid;">Üretim açıklama</th>
                 <th style="border: 1px solid;">Miktar</th>
+                <th style="border: 1px solid;">Alış Fiyatı</th>
+                <th style="border: 1px solid;">Satış Fiyatı</th>
+
             </tr>
-        `
+            `;
+            customSubject = 'Yeni Sipariş Girişi';
+        }else{
+            content = `
+            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişine Ürün Ekledi.</h3>
+            <br/>
+            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+            <tr style="border: 1px solid;">
+                <th style="border: 1px solid;">Sipariş No</th>
+                <th style="border: 1px solid;">Tedarikçi</th>
+                <th style="border: 1px solid;">Ürün Bilgisi</th>
+                <th style="border: 1px solid;">Üretim açıklama</th>
+                <th style="border: 1px solid;">Miktar</th>
+                <th style="border: 1px solid;">Alış Fiyatı</th>
+                <th style="border: 1px solid;">Satış Fiyatı</th>
+
+            </tr>
+        `;
+        customSubject = 'Siparişe Ürün Eklendi'
+        }
+
         payload.added.forEach(x => {
             content = content + `
             <tr style="border: 1px solid;">
@@ -9383,31 +9394,27 @@ function addedSendMail(payload) {
                 <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
                 <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
                 <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+                <td style="border: 1px solid;text-align:center;">$${x.AlisFiyati}</td>
+                <td style="border: 1px solid;text-align:center;">$${x.SatisFiyati}</td>
+
             </tr>`
         });
         content = content + '</table>';
-        // if(payload.operation == payload.representative){
-        //     transporter.sendMail({
-        //         to: payload.representative,
-        //         from: 'gozmek@mekmar.com',
-        //         subject: 'Yeni Sipariş Girişi',
-        //         html: content
-        //     });
-        // } else{
-        //     transporter.sendMail({
-        //         to: payload.operation,
-        //         from: 'gozmek@mekmar.com',
-        //         subject: 'Yeni Sipariş Girişi',
-        //         html: content
-        //     });
-        //     transporter.sendMail({
-        //         to: payload.representative,
-        //         from: 'gozmek@mekmar.com',
-        //         subject: 'Yeni Sipariş Girişi',
-        //         html: content
-        //     });
-        // }
+       
+        transporter.sendMail({
+            to: 'bilgiislem@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: customSubject,
+            html: content
+        });
 
+
+        // transporter.sendMail({
+        //     to: 'export@mekmar.com',
+        //     from: 'gozmek@mekmar.com',
+        //     subject: 'Yeni Sipariş Girişi',
+        //     html: content
+        // });
         // transporter.sendMail({
         //     to: 'export1@mekmar.com',
         //     from: 'gozmek@mekmar.com',
@@ -9421,49 +9428,17 @@ function addedSendMail(payload) {
         //     html: content
         // });
         // transporter.sendMail({
-        //     to: 'info@mekmar.com',
+        //     to: 'mehmet@mekmer.com',
         //     from: 'gozmek@mekmar.com',
         //     subject: 'Yeni Sipariş Girişi',
         //     html: content
         // });
-        transporter.sendMail({
-            to: 'bilgiislem@mekmar.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
-
-
-        transporter.sendMail({
-            to: 'export@mekmar.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
-        transporter.sendMail({
-            to: 'export1@mekmar.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
-        transporter.sendMail({
-            to: 'export2@mekmar.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
-        transporter.sendMail({
-            to: 'mehmet@mekmer.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
-        transporter.sendMail({
-            to: 'huseyin@mekmer.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
+        // transporter.sendMail({
+        //     to: 'huseyin@mekmer.com',
+        //     from: 'gozmek@mekmar.com',
+        //     subject: 'Yeni Sipariş Girişi',
+        //     html: content
+        // });
         resolve(true);
     });
 
@@ -9529,23 +9504,56 @@ function updatedSendMail(payload) {
             <br/>
             <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
             <tr style="border: 1px solid;">
+            <th style="border: 1px solid;">Durum</th>
                 <th style="border: 1px solid;">Sipariş No</th>
                 <th style="border: 1px solid;">Tedarikçi</th>
                 <th style="border: 1px solid;">Ürün Bilgisi</th>
                 <th style="border: 1px solid;">Üretim açıklama</th>
                 <th style="border: 1px solid;">Miktar</th>
+                <th style="border: 1px solid;">Alış Fiyatı</th>
+                <th style="border: 1px solid;">Satış Fiyatı</th>
+
+
+
             </tr>
-        `
+        `;
+        payload.updated.forEach(x=>{
+            const index = payload.notchange.findIndex(y=>y.ID == x.ID);
+            const po = payload.notchange[index].SiparisNo;
+            const company = payload.notchange[index].FirmaAdi;
+            const desc = payload.notchange[index].KategoriAdi + '-' + payload.notchange[index].UrunAdi + '-' + payload.notchange[index].YuzeyIslemAdi + '-' + payload.notchange[index].En + 'x' +payload.notchange[index].Boy + 'x' +payload.notchange[index].Kenar;
+            const pdesc = payload.notchange[index].UretimAciklama;
+            const amount = payload.notchange[index].Miktar;
+            const buying = payload.notchange[index].AlisFiyati;
+            const selling = payload.notchange[index].SatisFiyati;
+
+
+            content = content + `
+            <tr style="border: 1px solid;">
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">Önceki</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">${po}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.FirmaAdi,company)};">${company}</td>
+                <td style="border: 1px solid;text-align:center;"style="border:1px solid gray;text-align:center;" >${desc}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.UretimAciklama,pdesc)};">${pdesc}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.Miktar,amount)};">${amount}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.AlisFiyati,buying)};">$${buying}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.SatisFiyati,selling)};">$${selling}</td>
+            </tr>`
+        });
         payload.updated.forEach(x => {
             content = content + `
             <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
+                <td style="border: 1px solid;text-align:center;">Sonraki</td>
+                <td style="border: 1px solid;text-align:center;" >${x.SiparisNo}</td>
                 <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
                 <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
                 <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
                 <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+                <td style="border: 1px solid;text-align:center;">$${x.AlisFiyati}</td>
+                <td style="border: 1px solid;text-align:center;">$${x.SatisFiyati}</td>
             </tr>`
         });
+
         content = content + '</table>';
         if(payload.operation == payload.representative){
             transporter.sendMail({
@@ -9584,13 +9592,22 @@ function updateProductionTotal(po){
     });
 
 };
+
+function updateChangedColor(value1,value2){
+    if(value1 == value2){
+        return 'transparent';
+    } else{
+        return 'red';
+    }
+}
+
+
 app.post('/order/production/product/save/mail', (req, res) => {
 
     if (req.body.added.length > 0) {
         addedSendMail(req.body).then(response => {
             res.status(200).json({'status':true});
         });
-
     };
     if (req.body.updated.length > 0) {
         updatedSendMail(req.body).then(response => {

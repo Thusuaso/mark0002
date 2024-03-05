@@ -13,11 +13,21 @@
       :selection.sync="selectedMainList"
       selectionMode="single"
       @row-click="$emit('main_to_do_list_selected_emit', $event)"
+      :filters.sync="mainTodoFilter"
+      filterDisplay="row"
     >
       <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
       <Column field="Sira" header="Queue"></Column>
-      <Column field="OrtakGorev" header="Owner"></Column>
-      <Column field="Yapilacak" header="To Do"></Column>
+      <Column field="OrtakGorev" header="Owner" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column field="Yapilacak" header="To Do" :showFilterMenu="false">
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
       <Column header="#">
         <template #body="slotProps">
           <Button
@@ -43,6 +53,7 @@
 </template>
 
 <script>
+import {FilterMatchMode} from 'primevue/api';
 export default {
   props: {
     list: {
@@ -52,7 +63,12 @@ export default {
   },
   data(){
     return{
-      selectedMainList:null
+      selectedMainList:null,
+      mainTodoFilter:{
+        OrtakGorev:{value:null,matchMode:FilterMatchMode.CONTAINS},
+        Yapilacak:{value:null,matchMode:FilterMatchMode.CONTAINS},
+
+      }
     }
   },
   methods: {
