@@ -31,7 +31,7 @@
           {{ slotProps.index + 1 }}
         </template>
       </Column>
-      <Column field="YuklemeTarihi" header="Load Date" :showFilterMenu="false">
+      <Column field="YuklemeTarihi" header="Load Date" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.YuklemeTarihi | dateToString }}
         </template>
@@ -45,7 +45,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="To" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="To" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -56,7 +56,7 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -86,7 +86,7 @@
           </div>
         </template>
       </Column>
-      <Column field="UrunAdi" header="Product" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -98,7 +98,7 @@
         </template>
       </Column>
       <Column field="UrunUretimAciklama" header="Detail"> </Column>
-      <Column field="En" header="Width" :showFilterMenu="false">
+      <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -111,7 +111,7 @@
         </template>
       </Column>
 
-      <Column field="Boy" header="Height" :showFilterMenu="false">
+      <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -123,7 +123,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Edge" :showFilterMenu="false">
+      <Column field="Kenar" header="Edge" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -135,7 +135,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false">
+      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -147,9 +147,19 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Amount">
+      <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @keyup.enter="filterShipmentAmount(filterModel.value)"
+            @input="filterShipmentAmountInput(filterModel.value)"
+
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column field="BirimAdi" header="Unit">
@@ -336,6 +346,14 @@
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
       </Column>
       <Column field="BirimAdi" header="Unit"> </Column>
       <Column field="Uretim" header="Production">
@@ -413,6 +431,8 @@ export default {
         Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
       },
       filterModel: {
         loaddate: "",
@@ -423,6 +443,7 @@ export default {
         height: "",
         edge: "",
         supplier: "",
+        amount:"",
       },
     };
   },
@@ -439,6 +460,14 @@ export default {
       }else{
         this.$store.dispatch('setOrderShippedList');
 
+      }
+    },
+    filterShipmentAmountInput(event){
+      if(event){
+        this.filterModel.amount = event;
+
+      }else{
+        this.filterModel.amount = '';
       }
     },
     filterShipmentSupplierInput(event){
@@ -503,7 +532,25 @@ export default {
         }
     },
 
+    filterShipmentAmount(event){
+      if(event){
+        this.filterModel.amount = event;
 
+      } else{
+        this.filterModel.amount = '';
+
+      }
+
+      if(this.__controlFilter()){
+          this.$store.dispatch('setOrderShippedList');
+
+        }else{
+          this.$store.dispatch("filterShipment", this.filterModel);
+
+        }
+
+
+    },
     filterShipmentSupplier(event){
       if(event){
         this.filterModel.supplier = event;
@@ -531,6 +578,7 @@ export default {
         this.filterModel.edge = '';
 
       };
+      console.log(this.filterModel);
       if(this.__controlFilter()){
           this.$store.dispatch('setOrderShippedList');
 
@@ -642,7 +690,7 @@ export default {
     },
 
     __controlFilter(){
-      if(this.filterModel.loaddate == '' && this.filterModel.company == '' && this.filterModel.po == '' && this.filterModel.product == '' && this.filterModel.width == '' && this.filterModel.height == '' && this.filterModel.edge == '' && this.filterModel.supplier == ''){
+      if(this.filterModel.loaddate == '' && this.filterModel.company == '' && this.filterModel.po == '' && this.filterModel.product == '' && this.filterModel.width == '' && this.filterModel.height == '' && this.filterModel.edge == '' && this.filterModel.supplier == '' && this.filterModel.amount == ''){
         return true
       }
     },

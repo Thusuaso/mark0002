@@ -79,6 +79,37 @@
         </template>
       </Column>
     </DataTable>
+    <br/>
+    <DataTable
+      :value="sample"
+      :loading="loading"
+    >
+      <Column field="Tarih" header="Date" >
+        <template #body="slotProps">
+          {{ slotProps.data.Tarih | dateToString }}
+        </template>
+      </Column>
+      <Column field="MusteriAdi" header="Customer" >
+
+  </Column>
+      <Column field="NumuneNo" header="Sample No" >
+
+      </Column>
+      <Column field="Banka" header="Bank" >
+
+</Column>
+
+      <Column field="Tutar" header="Paid Amount">
+        <template #body="slotProps">
+          {{ slotProps.data.Tutar | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{sampleTotal | formatPriceUsd}}
+        </template>
+      </Column>
+    </DataTable>
+
+
   </div>
 </template>
 <script>
@@ -104,6 +135,14 @@ export default {
     },
     loading: {
       type: Boolean,
+      required:false
+    },
+    sample:{
+      type:Array,
+      required:false
+    },
+    sampleTotal:{
+      type:Number,
       required:false
     }
   },

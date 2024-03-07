@@ -106,6 +106,30 @@
         />
       </div>
     </div>
+
+    <DataTable :value="orders">
+      <Column field="FirmaAdi" header="Customer"></Column>
+      <Column field="SiparisNo" header="Po"></Column>
+      <Column field="SatisFiyati" header="Price">
+        <template #body="slotProps">
+          {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+        </template>
+      </Column>
+      <Column field="Miktar" header="Amount">
+        <template #body="slotProps">
+          {{ slotProps.data.Miktar | formatDecimal }}
+        </template>
+      </Column>
+      <Column field="BirimAdi" header="Unit"></Column>
+      <Column field="Toplam" header="Total">
+        <template #body="slotProps">
+          {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+        </template>
+      </Column>
+
+
+    </DataTable>
+
   </div>
 </template>
 <script>
@@ -136,6 +160,10 @@ export default {
       type: Array,
       required: true,
     },
+    orders:{
+      type:Array,
+      required:false,
+    }
   },
   data() {
     return {

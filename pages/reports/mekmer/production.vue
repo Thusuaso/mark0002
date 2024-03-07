@@ -58,19 +58,7 @@
           />
         </vue-excel-xlsx>
       </div>
-      <div class="col">
-        <span class="p-float-label">
-          <Dropdown
-            v-model="selectedQuarter"
-            :options="quarters"
-            optionLabel="quarter"
-            class="w-full"
-            id="quarter"
-            @change="quarterChange($event)"
-          />
-          <label for="quarter">Quarter</label>
-        </span>
-      </div>
+
     </div>
     <reportsMekmerProductionList
       :list="getReportsMekmerProductionList"
@@ -140,40 +128,7 @@ export default {
     this.$store.dispatch("setReportsMekmerProductionList");
   },
   methods: {
-    quarterChange(event) {
-      let year = new Date().getFullYear();
-      if (event.value.id == 1) {
-        const years = {
-          year1: year,
-          year2: year - 2,
-        };
-        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
-      } else if (event.value.id == 2) {
-        const years = {
-          year1: year - 3,
-          year2: year - 5,
-        };
-        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
-      } else if (event.value.id == 3) {
-        const years = {
-          year1: year - 6,
-          year2: year - 8,
-        };
-        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
-      } else if (event.value.id == 4) {
-        const years = {
-          year1: year - 9,
-          year2: year - 11,
-        };
-        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
-      } else if (event.value.id == 5) {
-        const years = {
-          year1: year - 12,
-          year2: year - 14,
-        };
-        this.$store.dispatch("setReportsMekmerProductionQuarterList", years);
-      }
-    },
+
     formatDecimal(value) {
       const data = value.toString().replace(".", ",");
       return data;

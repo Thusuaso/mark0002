@@ -40,11 +40,7 @@
                 >
               </li>
 
-              <li>
-                <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
-                  >To Do</nuxt-link
-                >
-              </li>
+              
               <li>
                 <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
                   >Points to Consider</nuxt-link
@@ -53,6 +49,11 @@
               <li>
                 <nuxt-link to="/sales/representative" class="dropdown-item" tag="a"
                   >Sales & Operation</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
+                  >To Do</nuxt-link
                 >
               </li>
               <li>

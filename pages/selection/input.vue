@@ -16,6 +16,7 @@ export default {
             productsList:[],
             selection_production_dialog_form:false,
             model:{},
+            
         }  
     },
     computed:{
@@ -26,7 +27,7 @@ export default {
                     'getOrdersList',
                     'getProductionProductsList',
                     'getMineList',
-          'getProductionButtonStatus',
+                    'getProductionButtonStatus',
                     'getLoading'
         ])  
     },

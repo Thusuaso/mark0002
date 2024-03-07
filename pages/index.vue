@@ -1,12 +1,11 @@
 <template>
    <div class="container">
         <home :home="home" />
-        <Button @click="getMessage" label="test"/>
-        {{ messageRxd }}
    </div>
 </template>
 
 <script>
+import {socket} from '../plugins/socket.io.js';
 export default {
 
     computed:{
@@ -18,8 +17,6 @@ export default {
     },
     data(){
       return{
-        socket:null,
-        messageRxd:'1234',
         }  
     },
     beforeMount() {
@@ -27,22 +24,14 @@ export default {
   },
     created(){
         this.$store.dispatch('getHome');
+
     },
     mounted() {
-     
-      this.socket = this.$nuxtSocket({
-      channel: '/index'
-    })
-    /* Listen for events: */
-    this.socket
-    .on('someEvent', (msg, cb) => {
-      /* Handle event */
-    })
+
+
   },
   methods: {
-    getMessage() {
-      this.$socket.emit('message');
-  },
+
   }
 }
 </script>

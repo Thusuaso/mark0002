@@ -135,6 +135,7 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 import date from "../../plugins/date";
+
 export default {
   computed: {
     ...mapGetters([
@@ -341,6 +342,15 @@ export default {
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
       this.production_detail_form = true;
     },
+  },
+  mounted(){
+    this.$socket.socketIO.on('production_update_on',()=>{
+      this.$store.dispatch("setOrderProductionList");
+    });
+    this.$socket.socketIO.on('cards_update_on',()=>{
+      this.$store.dispatch('setCardList');
+    });
+
   },
 
   

@@ -35,6 +35,7 @@ export default {
   plugins: [
     '~/plugins/components.js',
     { src:'~/plugins/excel.js',mode: 'client'},
+    '~/plugins/socket.io.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

@@ -88,10 +88,12 @@ const actions = {
         this.$axios.post('/offer/save', payload)
             .then(response => {
                 if (response.data.status) {
-                    this.$toast.success('Başarıyla Kaydedildi');
                    
                     vuexContext.dispatch('setOfferMainList');
                     vuexContext.dispatch('setOfferId', response.data.id);
+                    this.$socket.socketIO.emit('offers_updated_emit');
+                    this.$toast.success('Başarıyla Kaydedildi');
+
                 } else {
                     this.$toast.error('Kaydetme Başarısız');
                 }
@@ -101,11 +103,14 @@ const actions = {
         this.$axios.put('/offer/update',payload)
             .then(response => {
                 if (response.data.status) {
-                    this.$toast.success('Başarıyla Güncellendi');
                      if (vuexContext.state.offerAllButtonStatus) {
                         vuexContext.dispatch('setOfferDetailAllList');
                     };
                     vuexContext.dispatch('setOfferMainList');
+                    this.$socket.socketIO.emit('offers_updated_emit');
+                    this.$toast.success('Başarıyla Güncellendi');
+
+
                 } else {
                     this.$toast.error('Güncelleme Başarısız');
                 }
@@ -115,9 +120,12 @@ const actions = {
         this.$axios.delete(`/offer/delete/${id}`)
             .then(response => {
                 if (response.data.status) {
-                    this.$toast.success('Başarıyla Silindi');
                     vuexContext.dispatch('setOfferMainList');
                     vuexContext.commit('setOfferDelete', id);
+                    this.$socket.socketIO.emit('offers_updated_emit');
+                    this.$toast.success('Başarıyla Silindi');
+
+
                 } else {
                     this.$toast.error('Silme Başarısız');
                 }

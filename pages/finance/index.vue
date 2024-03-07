@@ -53,6 +53,7 @@
       :allList="getFinanceListAll"
       @finance_list_selected_emit="financeListSelected($event)"
       :loading="getLoading"
+      :maya="getFinanceListMaya"
     />
     <Dialog
       :visible.sync="finance_collection_list_form"
@@ -66,6 +67,8 @@
         :months="getFinanceCollectionMonthList"
         :total="getFinanceCollectionTotal"
         :loading="getLoading"
+        :sample="getFinanceCollectionSampleList"
+        :sampleTotal="getFinanceCollectionSampleTotal"
       />
     </Dialog>
     <Dialog :visible.sync="finance_advanced_payment_form" header="" modal>
@@ -125,6 +128,9 @@ export default {
       "getFinancePoPaidList",
       "getFinancePoPaidDetailList",
       "getLoading",
+      "getFinanceListMaya",
+      "getFinanceCollectionSampleList",
+      "getFinanceCollectionSampleTotal"
     ]),
   },
   data() {

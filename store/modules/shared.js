@@ -36,7 +36,9 @@ const state = {
     orderKindOfDeliveryList: [],
     orderKindOfPaymentList: [],
     orderKindOfInvoiceList:[],
-    orderKindOfDeliverySupplierList:[]
+    orderKindOfDeliverySupplierList:[],
+    yearList:[],
+    monthList:[]
 
     
 
@@ -202,6 +204,18 @@ const actions = {
             .then(response => {
                 vuexContext.commit('setOrderKindOfDeliverySupplierList', response.data.list);
             });
+    },
+    setYearList(vuexContext){
+        this.$axios.get('/year/list')
+        .then(response=>{
+            vuexContext.commit('setYearList',response.data.list);
+        })
+    },
+    setMonthList(vuexContext){
+        this.$axios.get('/month/list')
+        .then(response=>{
+            vuexContext.commit('setMonthList',response.data.list);
+        })
     }
 
 
@@ -300,6 +314,12 @@ const mutations = {
     },
     setOrderKindOfDeliverySupplierList(state, payload) {
         state.orderKindOfDeliverySupplierList = payload;
+    },
+    setYearList(state,payload){
+        state.yearList = payload;
+    },
+    setMonthList(state,payload){
+        state.monthList = payload;
     }
 
     
@@ -427,7 +447,14 @@ const getters = {
     },
     getOrderKindOfDeliverySupplierList(state) {
         return state.orderKindOfDeliverySupplierList;
-    }
+    },
+    getYearList(state){
+        return state.yearList;
+    },
+    getMonthList(state){
+        return state.monthList;
+    },
+
 
 
 

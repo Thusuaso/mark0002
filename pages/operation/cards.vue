@@ -11,6 +11,7 @@
         :products="getCardProductsList"
         :surfaces="getCardSurfacesList"
         :sizes="getCardSizesList"
+        :orders="getCardsOrderList"
       />
     </Dialog>
   </div>
@@ -32,6 +33,7 @@ export default {
       "getCardSizesList",
       "getCardsButtonStatus",
       "getLoading",
+      "getCardsOrderList"
     ]),
   },
   methods: {
@@ -41,7 +43,6 @@ export default {
       this.cards_form_dialog = true;
     },
     cardsSelected(event) {
-      console.log(event);
       this.model = event;
       this.cards_form_dialog = true;
       this.$store.dispatch("setCardsButtonStatus", false);

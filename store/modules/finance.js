@@ -27,7 +27,10 @@ const state = {
     financePaidListTotal: 0,
     financePoButtonStatus: true,
     financePoPaidList: [],
-    financePoPaidDetailList:[]
+    financePoPaidDetailList:[],
+    financeListMaya:[],
+    financeCollectionSampleList:[],
+    financeCollectionSampleTotal:0,
     
 };
 const actions = {
@@ -52,6 +55,8 @@ const actions = {
             .then(response => {
                 vuexContext.commit('setFinanceCollectionList', response.data); 
                 vuexContext.dispatch('setFinanceCollectionTotal', response.data.list);
+                vuexContext.commit('setFinanceCollectionSampleTotal',response.data.sample);
+
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
@@ -64,6 +69,8 @@ const actions = {
             .then(response => {
                 vuexContext.commit('setFinanceCollectionListYear', response.data);
                 vuexContext.dispatch('setFinanceCollectionTotal', response.data.list);
+                vuexContext.commit('setFinanceCollectionSampleTotal',response.data.sample);
+
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
@@ -244,6 +251,12 @@ const actions = {
 
 };
 const mutations = {
+    setFinanceCollectionSampleTotal(state,payload){
+        state.financeCollectionSampleTotal = 0;
+        payload.forEach(x=>{
+            state.financeCollectionSampleTotal += x.Tutar;
+        });
+    },
     setFinanceTotalList(state, payload) {
                 state.financeListTotal = {
             'total': 0,
@@ -292,6 +305,7 @@ const mutations = {
                     state.financeListTotal.forwarding += x.ForwardingOrder;
                     state.financeListTotal.advanced += x.AdvancedPayment;
                     state.financeListTotal.paid += x.Paid;
+
                     state.financeListTotal.balanceProduction += ((x.ProductOrder + x.ForwardingOrder) - x.Paid);
                     state.financeListTotal.balance += (x.ForwardingOrder - x.Paid);
                 }
@@ -304,19 +318,28 @@ const mutations = {
                 state.financeListAll.push({...x,'Balanced':0,'BalancedProduction':0});
 
             } else{
-                state.financeListAll.push({...x,'Balanced':(x.ForwardingOrder - x.Paid),'BalancedProduction':((x.ProductOrder + x.ForwardingOrder) - x.Paid)});
+                if(x.FirmaAdi == 'Flos - Malta'){
+                    console.log("ProductOrder",x.ProductOrder);
+                    console.log("ForwardingOrder",x.ForwardingOrder);
+                    console.log("Paid",x.Paid);
+                    console.log('(x.ProductOrder + x.ForwardingOrder) - x.Paid)',(x.ProductOrder + x.ForwardingOrder) - x.Paid)
+
+                }
+                state.financeListAll.push({...x,'Balanced':(x.ForwardingOrder - x.Paid),'BalancedProduction':(x.ProductOrder + x.ForwardingOrder) - x.Paid});
 
             }
             
 
         });
         state.financeExpiryList = payload.expiry;
+        state.financeListMaya = payload.maya;
 
     },
     setFinanceCollectionList(state, payload) {
         state.financeCollectionList = payload.list;
         state.financeCollectionYearList = payload.years;
         state.financeCollectionMonthList = payload.months;
+        state.financeCollectionSampleList = payload.sample;
     },
     setFinanceCollectionTotal(state, payload) {
         state.financeCollectionTotal = 0;
@@ -327,7 +350,9 @@ const mutations = {
     },
     setFinanceCollectionListYear(state, payload) {
         state.financeCollectionList = payload.list;
-    state.financeCollectionMonthList = payload.months;
+        state.financeCollectionMonthList = payload.months;
+        state.financeCollectionSampleList = payload.sample;
+
     },
     setFinanceCollectionListMonth(state, payload) {
         state.financeCollectionList = payload;
@@ -420,6 +445,15 @@ const getters = {
     },
     getFinancePoPaidDetailList(state) {
         return state.financePoPaidDetailList;
+    },
+    getFinanceListMaya(state){
+        return state.financeListMaya;
+    },
+    getFinanceCollectionSampleList(state){
+        return state.financeCollectionSampleList;
+    },
+    getFinanceCollectionSampleTotal(state){
+        return state.financeCollectionSampleTotal;
     }
 };
 

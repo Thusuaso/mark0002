@@ -177,7 +177,12 @@ const state = {
     urunadi_ru:null,
     aciklama_ru:null,
     anahtarlar_ru:null,
-    keywords_ru:null
+    keywords_ru:null,
+    urunadi_ar:null,
+    aciklama_ar:null,
+    anahtarlar_ar:null,
+    keywords_ar:null,
+
     },
     panelProductSizeModel: {
         'ebat': null,
@@ -621,7 +626,11 @@ const actions = {
             urunadi_ru: null,
             aciklama_ru: null,
             anahtarlar_ru: null,
-            keywords_ru: null
+            keywords_ru: null,
+            urunadi_ar:null,
+            aciklama_ar:null,
+            anahtarlar_ar:null,
+            keywords_ar:null,
         };
         vuexContext.commit('setPanelProductModel',panelProductModel)
     },

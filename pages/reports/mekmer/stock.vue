@@ -31,6 +31,24 @@
       <div class="flex align-items-center">
         <RadioButton
           v-model="ingredient"
+          inputId="ingredient3"
+          value="MekmerIn"
+          @change="statusSelect($event)"
+        />
+        <label for="ingredient3" class="ml-2">Mekmer</label>
+      </div>
+      <div class="flex align-items-center">
+        <RadioButton
+          v-model="ingredient"
+          inputId="ingredient3"
+          value="Mek-Moz"
+          @change="statusSelect($event)"
+        />
+        <label for="ingredient3" class="ml-2">Mek-Moz</label>
+      </div>
+      <div class="flex align-items-center">
+        <RadioButton
+          v-model="ingredient"
           inputId="ingredient4"
           value="All"
           @change="statusSelect($event)"
@@ -141,6 +159,11 @@ export default {
       } else if (this.ingredient == "Mekmer") {
         this.$store.dispatch("setReportsMekmerStockListDetail", event.data);
       }
+      else if (this.ingredient == "MekmerIn") {
+        this.$store.dispatch("setReportsMekmerInStockListDetail", event.data);
+      } else if (this.ingredient == 'Mek-Moz'){
+        this.$store.dispatch('setReportsMekmozStockListDetail',event.data);
+      }
       this.reports_mekmer_stock_dialog = true;
     },
     statusSelect(event) {
@@ -152,6 +175,10 @@ export default {
         this.$store.dispatch("setReportsMekmerStockListOuter");
       } else if (this.ingredient == "Mekmer") {
         this.$store.dispatch("setReportsMekmerStockListMekmer");
+      } else if (this.ingredient == "MekmerIn"){
+        this.$store.dispatch("setReportsMekmerStockListMekmerIn");
+      }else if (this.ingredient == "Mek-Moz"){
+        this.$store.dispatch("setReportsMekmerStockListMekmoz");
       }
     },
   },

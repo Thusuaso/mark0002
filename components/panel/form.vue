@@ -268,6 +268,61 @@
           </div>
         </div>
       </TabPanel>
+      <TabPanel header="Ürün (Ar)">
+        <div class="row mt-3 mb-3">
+          <div class="col">
+            <span class="p-float-label">
+              <InputText id="productname" v-model="model.urunadi_ar" class="w-100" />
+              <label for="productname">Product Name</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <InputText id="code" v-model="model.urunkod" class="w-100" />
+              <label for="code">Code</label>
+            </span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col">
+            <span class="p-float-label">
+              <Textarea v-model="model.aciklama_ar" rows="10" class="w-100" />
+              <label>Description</label>
+            </span>
+          </div>
+
+          <div class="col">
+            <span class="p-float-label mb-4">
+              <Chips v-model="anahtarlar_ar" class="w-100" />
+              <label>Keywords</label>
+            </span>
+            <span class="p-float-label">
+              <Textarea v-model="model.keywords_ar" rows="7" class="w-100" />
+              <label>Hashtags</label>
+            </span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col">
+            <Button
+              type="button"
+              class="p-button-success w-100"
+              label="Save"
+              @click="process"
+              :disabled="productSaveButtonDisabled"
+            />
+          </div>
+          <div class="col">
+            <Button
+              type="button"
+              class="p-button-danger w-100"
+              label="Delete"
+              @click="deleteForm"
+            />
+          </div>
+        </div>
+      </TabPanel>
+
       <TabPanel header="Ölçüler" v-if="productId != 0">
         <div class="row">
           <div class="col">
@@ -920,6 +975,7 @@ export default {
   },
   data() {
     return {
+      anahtarlar_ar:[],
       anahtarlar_en: [],
       anahtarlar_fr: [],
       anahtarlar_es: [],
@@ -1246,6 +1302,11 @@ export default {
           this.anahtarlar_ru.push(x);
         });
       }
+      if (this.model.anahtarlar_ar) {
+        this.model.anahtarlar_ar.split(",").forEach((x) => {
+          this.anahtarlar_ar.push(x);
+        });
+      }
     },
     deleteForm() {
       this.$emit("delete_emit", this.model.urunid);
@@ -1270,6 +1331,11 @@ export default {
         this.model.anahtarlar_ru = this.anahtarlar_ru.join(",");
       } else {
         this.model.anahtarlar_ru = "";
+      }
+      if (this.anahtarlar_ar) {
+        this.model.anahtarlar_ar = this.anahtarlar_ar.join(",");
+      } else {
+        this.model.anahtarlar_ar = "";
       }
 
       if (this.status) {

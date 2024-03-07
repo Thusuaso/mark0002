@@ -17,6 +17,7 @@ const actions = {
 
 
                 vuexContext.dispatch('setCardList');
+                this.$socket.socketIO.emit('cards_update_emit');
                 this.$toast.success('Başarıyla Kaydedildi.');
             }else{
                 this.$toast.error('Kaydetme Başarısız.');
@@ -28,6 +29,8 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.dispatch('setCardList');
+                this.$socket.socketIO.emit('cards_update_emit');
+
                 this.$toast.success('Başarıyla Silindi.');
             } else{
                 this.$toast.error('Silme Başarısız');
@@ -40,6 +43,8 @@ const actions = {
             if(response.data.status){
                 vuexContext.dispatch('setCardSizesList');
                 vuexContext.dispatch('setCardList');
+                this.$socket.socketIO.emit('cards_update_emit');
+
                 this.$toast.success('Başarıyla Güncellendi.');
             } else{
                 this.$toast.error('Güncelleme Başarısız');
@@ -47,7 +52,7 @@ const actions = {
         });
     },
     setCardsOrderList(vuexContext,cardId){
-        this.$axios.get('/card/order/list',cardId).then(response=>{
+        this.$axios.get(`/card/order/list/${cardId}`).then(response=>{
            vuexContext.commit("setCardsOrderList",response.data.list); 
         });
     }

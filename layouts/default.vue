@@ -32,6 +32,9 @@ export default {
     this.$store.dispatch("setOrderKindOfPaymentList");
     this.$store.dispatch("setOrderKindOfInvoiceList");
     this.$store.dispatch("setOrderKindOfDeliverySupplierList");
+    this.$store.dispatch("setYearList");
+    this.$store.dispatch("setMonthList");
+
   },
 };
 </script>

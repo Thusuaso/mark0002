@@ -162,5 +162,11 @@ export default {
       this.offer_list_detail_form = true;
     },
   },
+  mounted(){
+    this.$socket.socketIO.on('offers_updated_on',()=>{
+      this.$store.dispatch("setOfferDetailAllList");
+
+    });
+  }
 };
 </script>

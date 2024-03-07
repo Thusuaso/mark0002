@@ -1,3 +1,4 @@
+import socket from '../../plugins/socket.io';
 const state = {
     productsList:[],
     productList:[],
@@ -88,6 +89,7 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.dispatch('setSelectionProductionUpdateList');
+                this.$socket.socketIO.emit('production_update_emit');
                 this.$toast.success('Başarıyla Kaydedildi.')
                 
             }
@@ -110,6 +112,8 @@ const actions = {
         .then(response=>{
            if(response.data.status){
                  vuexContext.dispatch('setSelectionProductionUpdateList');
+                 this.$socket.socketIO.emit('production_update_emit');
+
                  this.$toast.success('Başarıyla Silindi.');
             } else{
                 this.$toast.error('Silme Başarısız.');
@@ -136,6 +140,8 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.dispatch('setSelectionProductionUpdateList');
+                this.$socket.socketIO.emit('production_update_emit');
+
                 this.$toast.success('Başarıyla Güncellendi.');
             }else{
                 this.$toast.error('Güncelleme Başarısız.');

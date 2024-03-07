@@ -1,6 +1,31 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
+
+    <div class="row">
+      <div class="col">
+        <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
+
+      </div>
+      <div class="col">
+        <vue-excel-xlsx
+        :data="getMekmarList"
+        :columns="excelColumnsField"
+        :file-name="'Customer'"
+        :file-type="'xlsx'"
+        :sheet-name="'sheetname'"
+        style="border: none; background-color: white"
+      >
+        <Button
+          type="button"
+          class="p-button-info w-100"
+          icon="pi pi-file-excel"
+          label="Excel"
+        />
+      </vue-excel-xlsx>
+
+      </div>
+
+      </div>
     <customerMekmarList
       :list="getMekmarList"
       @customer_mekmar_selected_emit="customerMekmarSelected($event)"
@@ -56,6 +81,49 @@ export default {
       model: null,
       custommer_mekmar_orders_dialog_form: false,
       cusomer_mekmar_orders_products_dialog_form: false,
+      excelColumnsField: [
+        {
+          label: "Firma Adı",
+          field: "FirmaAdi",
+        },
+        {
+          label: "Unvan",
+          field: "Unvan",
+        },
+        {
+          label: "Adres",
+          field: "Adres",
+        },
+        {
+          label: "Ulke",
+          field: "Ulke",
+        },
+        {
+          label: "Marketing",
+          field: "Marketing",
+        },
+        {
+          label: "Temsilci",
+          field: "Temsilci",
+        },
+        {
+          label: "Satisci Adi",
+          field: "SatisciAdi",
+        },
+        {
+          label: "Mail Adresi",
+          field: "MailAdresi",
+        },
+        {
+          label: "Telefon",
+          field: "Telefon",
+        },
+        {
+          label: "Musteri Yeri",
+          field: "MusteriYeri",
+        },
+
+      ],
     };
   },
   methods: {

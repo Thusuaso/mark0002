@@ -99,6 +99,36 @@
         </Column>
       </DataTable>
     </div>
+    <DataTable :value="maya" :loading="loading">
+      <Column field="SiparisTarihi" header="Order Date">
+        <template #body="slotProps">
+          {{ slotProps.data.SiparisTarihi | dateToString }}
+        </template>
+      </Column>
+      <Column field="YuklemeTarihi" header="Shipment Date">
+        <template #body="slotProps">
+          {{ slotProps.data.YuklemeTarihi | dateToString }}
+        </template>
+      </Column>
+      <Column field="FirmaAdi" header="Customer"></Column>
+      <Column field="SiparisNo" header="Po"></Column>
+      <Column field="Invoice" header="Invoice">
+        <template #body="slotProps">
+          {{ slotProps.data.Invoice | formatPriceUsd }}
+        </template>
+      </Column>
+      <Column field="Paid" header="Paid">
+        <template #body="slotProps">
+          {{ slotProps.data.Paid | formatPriceUsd }}
+        </template>
+      </Column>
+      <Column field="Balance" header="Balance">
+        <template #body="slotProps">
+          {{ slotProps.data.Balance | formatPriceUsd }}
+        </template>
+      </Column>
+
+    </DataTable>
   </div>
 </template>
 <script>
@@ -129,6 +159,10 @@ export default {
       type: Boolean,
       required: false,
     },
+    maya:{
+      type:Boolean,
+      required:false
+    }
   },
   data() {
     return {
