@@ -122,7 +122,7 @@ export default {
       api.post("/excel/check/list", this.list).then((response) => {
         if (response) {
           const link = document.createElement("a");
-          link.href = "http://localhost:5000" + "/excel/check/list";
+          link.href = "https://excel-server-mark0002.mekmar.com" + "/excel/check/list";
 
           link.setAttribute("download", "check_list.xlsx");
           document.body.appendChild(link);
