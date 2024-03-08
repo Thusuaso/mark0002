@@ -170,6 +170,12 @@ export default {
     poPaidDelete(event) {
       if (confirm("Silme İşlemini Onaylıyor musunuz?")) {
         this.$store.dispatch("setPoPaidDelete", event);
+        const data = {
+          'description':this.$cookie.get('username') + ', ' + event.SiparisNo + ' na sahip $' + event.Tutar + ' tutar, $' + event.Masraf + ' masraf ve $' + event.Kur +' sildi.',
+          'po':event.SiparisNo,
+          'color':'#ffec31'
+        }
+        this.$logs.save(data)
       }
     },
     poPaidProcess(event) {
@@ -181,9 +187,21 @@ export default {
     },
     save(event) {
       this.$store.dispatch("setPoPaidSave", event);
+      const data = {
+        'description':this.$cookie.get('username') + ', ' + event.SiparisNo + ' ya  $' + event.Tutar + ' tutar, $' + event.Masraf + ' masraf ve $' + event.Kur +' kur girişi yaptı.',
+        'po':event.SiparisNo,
+        'color':'#ffec31'
+      }
+      this.$logs.save(data)
     },
     update(event) {
       this.$store.dispatch("setPoPaidUpdate", event);
+      const data = {
+        'description':this.$cookie.get('username') + ', ' + event.SiparisNo + ' nın $' + event.Tutar + ' tutar, $' + event.Masraf + ' masraf ve $' + event.Kur +' kurunu değiştirdi.',
+        'po':event.SiparisNo,
+        'color':'#ffec31'
+      }
+      this.$logs.save(data)
     },
     poListSelected(event) {
       this.finance_po_list_detail = event.data;

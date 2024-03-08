@@ -7,37 +7,7 @@
       :rowClass="logsRowClass"
       :loading="loading"
     >
-      <Column field="Gun" header="Day" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column field="Ay" header="Month" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column field="Yil" header="Year" :showFilterMenu="false">
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column field="YuklemeTarihi" header="Shipment Date" :showFilterMenu="false">
+      <Column field="DegisiklikTarihi" header="Date" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -96,9 +66,7 @@ export default {
   data() {
     return {
       logsFilter: {
-        Gun: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Ay: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Yil: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        DegisiklikTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         IslemAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },

@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie';
-import store from '../../store';
 const state = {
     token:null,
     userId:null,
@@ -95,6 +94,9 @@ const getters = {
     },
     getUserId(state) {
         return state.userId;
+    },
+    getUsername(state){
+        return state.username;
     }
 };
 

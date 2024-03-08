@@ -24,7 +24,6 @@ export default {
   },
     created(){
         this.$store.dispatch('getHome');
-
     },
     mounted() {
 

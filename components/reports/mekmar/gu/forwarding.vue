@@ -13,10 +13,16 @@
         <template #body="slotProps">
           {{ slotProps.data.Fob | formatPriceUsd }}
         </template>
+        <template #footer>
+          {{ list.fob | formatPriceUsd}}
+        </template>
       </Column>
       <Column field="Ddp" header="Ddp">
         <template #body="slotProps">
           {{ slotProps.data.Ddp | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{ list.ddp | formatPriceUsd}}
         </template>
       </Column>
     </DataTable>

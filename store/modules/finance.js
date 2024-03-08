@@ -168,7 +168,7 @@ const actions = {
         this.$axios.post('/finance/po/paid/send/mail', paid)
             .then(response => {
                 if (response.data.status) {
-                                        this.$toast.success('Mail Başarıyla Gönderildi.');
+                    this.$toast.success('Mail Başarıyla Gönderildi.');
 
                 } else {
                     this.$toast.error('Mail Gönderme Başarısız.');
@@ -318,13 +318,7 @@ const mutations = {
                 state.financeListAll.push({...x,'Balanced':0,'BalancedProduction':0});
 
             } else{
-                if(x.FirmaAdi == 'Flos - Malta'){
-                    console.log("ProductOrder",x.ProductOrder);
-                    console.log("ForwardingOrder",x.ForwardingOrder);
-                    console.log("Paid",x.Paid);
-                    console.log('(x.ProductOrder + x.ForwardingOrder) - x.Paid)',(x.ProductOrder + x.ForwardingOrder) - x.Paid)
 
-                }
                 state.financeListAll.push({...x,'Balanced':(x.ForwardingOrder - x.Paid),'BalancedProduction':(x.ProductOrder + x.ForwardingOrder) - x.Paid});
 
             }

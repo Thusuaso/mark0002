@@ -1,10 +1,7 @@
 import express from 'express';
-import session from 'express-session';
 import mssql from 'mssql';
 import nodemailer from 'nodemailer';
-import SMTPConnection from "nodemailer/lib/smtp-connection";
 import currency from "../plugins/currency";
-
 const app = express();
 const sql = {
     user:'userEC52E044DE',
@@ -63,6 +60,7 @@ app.post('/login',(req,res)=>{
 
 /*Home*/
 app.get('/home',(req,res)=>{
+
     let sqlMonth = "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' group by s.SiparisNo";
     let sqlYear = "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' group by s.SiparisNo";
     let sqlMonthForwarding = "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo";
@@ -3639,6 +3637,42 @@ app.post('/reports/mekmar/summary/forwarding/detail/list', (req, res) => {
     });
 });
 
+app.get('/reports/mekmar/summary/order/list/by/representative/:userId', (req, res) => {
+    const sqlThisYear = `
+    select 
+    dbo.SiparisUrunler_Toplami_by_representative_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE()),'${req.params.userId}') as FOB,
+    sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) + sum(s.DetayTutar_4) + dbo.SiparisUrunler_Toplami_by_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE())) as DDP,
+    MONTH(s.SiparisTarihi) as Month,
+    YEAR(s.SiparisTarihi) as Year
+    from SiparislerTB s 
+    inner join MusterilerTB m on m.ID = s.MusteriID
+    where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and m.Marketing = 'Mekmar' and s.SiparisSahibi='${req.params.userId}'
+
+    group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
+                `;
+    const sqlPreviousYear = `
+                           select 
+                    dbo.SiparisUrunler_Toplami_by_representative_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE())-1,'${req.params.userId}') as FOB,
+                    sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) + sum(s.DetayTutar_4) + dbo.SiparisUrunler_Toplami_by_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE())-1) as DDP,
+                    MONTH(s.SiparisTarihi) as Month,
+					YEAR(s.SiparisTarihi) as Year
+                    from SiparislerTB s 
+                    inner join MusterilerTB m on m.ID = s.MusteriID
+                    where YEAR(s.SiparisTarihi) = YEAR(GETDATE())-1 and m.Marketing = 'Mekmar' and s.SiparisSahibi='${req.params.userId}'
+
+                    group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
+    `;
+    console.log(sqlThisYear)
+    // mssql.query(sqlThisYear, (err, thisYear) => {
+    //     mssql.query(sqlPreviousYear, (err, previousYear) => {
+    //         res.status(200).json({ items: [thisYear.recordset, previousYear.recordset] });
+
+    //     });
+    // });
+});
+
+
+
 function noneControl(value) {
     if (value == null || value == undefined) {
         return 0;
@@ -4761,7 +4795,6 @@ app.delete('/sample/delete/:id/:po',(req,res)=>{
 
 });
 app.put('/sample/update', (req, res) => {
-    console.log(req.body.MusteriID);
     if(req.body.MusteriID){
         const sql = `
                     
@@ -7153,7 +7186,6 @@ WHERE
 });
 app.delete('/todo/by/username/delete/:id', (req, res) => {
     const todoDeleteSql = `delete Yapilacaklar where ID='${req.params.id}'`;
-    console.log(todoDeleteSql)
     // mssql.query(todoDeleteSql,(err,todo)=>{
     //     if(todo.rowsAffected[0] == 1){
     //         res.status(200).json({ 'status': true });
@@ -7426,6 +7458,7 @@ app.post('/finance/advanced/payment/save', (req, res) =>{
         )
     `;
     const changePoStatusSql = `update SiparislerTB SET SiparisDurumID=2 where SiparisNo='${req.body.SiparisNo}'`;
+
     mssql.query(advancedPaymentInsertSql, (err, advancedPayment) => {
         if(advancedPayment.rowsAffected[0] == 1){
             mssql.query(changePoStatusSql, (err, poStatus) => {
@@ -7487,6 +7520,7 @@ order by s.YuklemeTarihi desc
     });
 });
 app.post('/finance/po/paid/save', (req, res) => {
+
     const paidInsertSql = `
         insert into OdemelerTB(
 	        Tarih,
@@ -9754,36 +9788,36 @@ function addedSendMail(payload) {
         });
 
 
-        // transporter.sendMail({
-        //     to: 'export@mekmar.com',
-        //     from: 'gozmek@mekmar.com',
-        //     subject: 'Yeni Sipariş Girişi',
-        //     html: content
-        // });
-        // transporter.sendMail({
-        //     to: 'export1@mekmar.com',
-        //     from: 'gozmek@mekmar.com',
-        //     subject: 'Yeni Sipariş Girişi',
-        //     html: content
-        // });
-        // transporter.sendMail({
-        //     to: 'export2@mekmar.com',
-        //     from: 'gozmek@mekmar.com',
-        //     subject: 'Yeni Sipariş Girişi',
-        //     html: content
-        // });
-        // transporter.sendMail({
-        //     to: 'mehmet@mekmer.com',
-        //     from: 'gozmek@mekmar.com',
-        //     subject: 'Yeni Sipariş Girişi',
-        //     html: content
-        // });
-        // transporter.sendMail({
-        //     to: 'huseyin@mekmer.com',
-        //     from: 'gozmek@mekmar.com',
-        //     subject: 'Yeni Sipariş Girişi',
-        //     html: content
-        // });
+        transporter.sendMail({
+            to: 'export@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'export1@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'export2@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'mehmet@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'huseyin@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
         resolve(true);
     });
 
@@ -10027,6 +10061,39 @@ app.post('/shipment/products/save/mail',(req,res)=>{
             subject: 'Sipariş Sevkiyat İşlemi',
             html: content
         });
+
+
+});
+
+
+/*Logs */
+app.post('/logs/save',(req,res)=>{
+    const sql = `
+    insert into MaliyetAnaliziDegisikliklerTB(
+        DegisiklikTarihi,
+        DegisiklikYapan,
+        SiparisNo,
+        IslemAdi,
+        Renk
+    )
+    
+    VALUES(
+        '${req.body.date}',
+        '${req.body.username}',
+        '${req.body.po}',
+        '${req.body.description}',
+        '${req.body.color}'
+    )
+    `;
+    console.log(sql);
+    mssql.query(sql,(err,log)=>{
+        if(log.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
 
 
 });

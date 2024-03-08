@@ -35,6 +35,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import Cookies from 'js-cookie';
 export default {
   computed: {
     ...mapGetters([
@@ -44,6 +45,9 @@ export default {
       "getReportsMekmarSummaryOrderDetailTotal",
       "getReportsMekmarSummaryForwardingList",
       "getReportsMekmarSummaryForwardingListTotal",
+
+      "getReportsMekmarSummaryOrderListByRepresentative",
+
       "getLoading",
     ]),
   },
@@ -55,6 +59,7 @@ export default {
   created() {
     this.$store.dispatch("setReportsMekmarSummaryOrderList");
     this.$store.dispatch("setReportsMekmarSummaryForwardingList");
+    this.$store.dispatch("setReportsMekmarSummaryOrderListByRepresentative",Cookies.get('userId'));
   },
   methods: {
     orderSelectedList(event, status) {

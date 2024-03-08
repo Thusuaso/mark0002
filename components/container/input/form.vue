@@ -223,7 +223,14 @@ export default {
         nowDate: date.dateToString(new Date()),
         invoicekindid: this.selectedInvoice.id,
       };
+
       this.$store.dispatch("setContainerInputSave", this.containerdata);
+      const log = {
+          'description':this.selectedPo.SiparisNo + ' po ya ' + this.invoiceno + ' fatura no ile ' + this.selectedInvoice.name + ' faturası $' + this.usd.toFixed(2) + ' ve $' + this.currency.toFixed(2) + ' kur girilmiştir.'  ,
+          'po':this.selectedPo.SiparisNo,
+          'color':'#ffec31'
+      };
+      this.$logs.save(log);
       this.reset();
     },
     newForm() {

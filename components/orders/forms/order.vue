@@ -350,6 +350,13 @@ export default {
   },
   methods: {
     deleteItem() {
+      const log = {
+          'description':this.po + ' siparişinden ' + this.model.MusteriAciklama + ' (' + this.model.Miktar + ') ' + this.selectedUnit.BirimAdi + ' kalemi silindi.',
+          'po':this.po,
+          'color':'#ffec31'
+      };
+      this.$logs.save(log);
+
       this.categoryName = null;
       this.productName = null;
       this.surfaceName = null;
@@ -367,6 +374,13 @@ export default {
       this.$store.dispatch("setOrderProductDeleted", this.model);
     },
     add() {
+      const log = {
+          'description':this.po + ' siparişine ' + this.model.MusteriAciklama + ' (' + this.model.Miktar + ') '+  this.selectedUnit.BirimAdi + ' yeni kalem eklendi.',
+          'po':this.po,
+          'color':'#ffec31'
+      };
+      this.$logs.save(log);
+
       this.categoryName = null;
       this.productName = null;
       this.surfaceName = null;
@@ -384,8 +398,15 @@ export default {
       this.model.SiparisNo = this.po;
       this.workerman_button_disabled = true;
       this.$store.dispatch("setOrderProductAdded", this.model);
+
     },
     update() {
+      const log = {
+          'description':this.po + ' siparişinde ' + this.model.MusteriAciklama + ' (' + this.model.Miktar + ') ' + this.selectedUnit.BirimAdi + ' kalemi güncellendi.',
+          'po':this.po,
+          'color':'#ffec31'
+      };
+      this.$logs.save(log);
       this.categoryName = null;
       this.productName = null;
       this.surfaceName = null;

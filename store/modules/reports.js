@@ -82,6 +82,10 @@ const state = {
         'detail4': 0,
         'ddp':0,
     },
+    reportsMekmarSummaryOrderListByRepresentative:[],
+    reportsMekmarSummaryOrderListByRepresentativeTotal:[],
+
+
     reportsMekmarSummaryForwardingList:[],
     reportsMekmarSummaryForwardingListTotal: [],
     reportsMekmarMkList: [],
@@ -101,6 +105,12 @@ const state = {
     
 };
 const actions = {
+    setReportsMekmarSummaryOrderListByRepresentative(vuexContext,userId){
+        this.$axios.get(`/reports/mekmar/summary/order/list/by/representative/${userId}`)
+        .then(response=>{
+            vuexContext.commit('setReportsMekmarSummaryOrderListByRepresentative',response.data.items);
+        });
+    },
     setReportsMekmerProductionList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/reports/mekmer/production/list')
@@ -783,9 +793,11 @@ const mutations = {
         let date = new Date().getFullYear();
         let index = 0;
         for (const x of Array(11).keys()) {
-            state.reportsMekmarGuForwList.push({ 'year': date, 'data': [] });
+            state.reportsMekmarGuForwList.push({ 'year': date, 'data': [],'fob':0,'ddp':0 });
             for (const y of payload.forwList) {
                 if (y.Yil == date) {
+                    state.reportsMekmarGuForwList[index].fob += y.Fob;
+                    state.reportsMekmarGuForwList[index].ddp += y.Ddp
                     state.reportsMekmarGuForwList[index].data.push(y);
                     
                 };
@@ -799,11 +811,17 @@ const mutations = {
     },
     setReportsMekmerAtlantaList(state,payload){
         state.reportsMekmerAtlantaList = payload;
+    },
+    setReportsMekmarSummaryOrderListByRepresentative(state,payload){
+        state.reportsMekmarSummaryOrderListByRepresentative = payload;
     }
 
 
 };
 const getters = {
+    getReportsMekmarSummaryOrderListByRepresentative(state){
+        return state.reportsMekmarSummaryOrderListByRepresentative;
+    },
     getReportsMekmerProductionList(state) {
         return state.reportsMekmerProductionList;
     },
@@ -907,9 +925,7 @@ const getters = {
     getReportsMekmarGuForwList(state) {
         return state.reportsMekmarGuForwList;
     },
-    getReportsMekmarGuForwList(state) {
-        return state.reportsMekmarGuForwList;
-    },
+
     getReportsMekmerAtlantaList(state){
         return state.reportsMekmerAtlantaList;
     }

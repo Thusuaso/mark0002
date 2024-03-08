@@ -22,6 +22,7 @@ import panel from './modules/panel';
 import finance from './modules/finance';
 import order from './modules/order';
 import loading from './modules/loading';
+import logs from './modules/logs';
 const createStore = ()=>{
     return new Vuex.Store({
        state:{
@@ -54,7 +55,8 @@ const createStore = ()=>{
            panel,
            finance,
            order,
-            loading
+            loading,
+            logs
         ],
 
     });
