@@ -298,6 +298,7 @@
             class="p-button-success w-100 mb-4"
             label="Save"
             @click="process"
+            :disabled="process_button_disabled"
           />
         </div>
         <div class="col" v-if="!status">
@@ -439,6 +440,7 @@ export default {
   },
   data() {
     return {
+      process_button_disabled: false,
       selectedCountry: null,
       filteredCountry: null,
       selectedProductsList: null,
@@ -497,6 +499,7 @@ export default {
       this.customerModel.MusteriAdi = event;
     },
     process() {
+      this.process_button_disabled = true;
       this.customerModel.Kullanici = Cookies.get("userId");
       this.model.KullaniciId = Cookies.get("userId");
       if (this.status) {
@@ -520,6 +523,7 @@ export default {
       this.customerModel.Phone = event.value.Phone;
       this.customerModel.Adress = event.value.Adress;
       this.customerModel.Description = event.value.Description;
+      this.process_button_disabled = false;
     },
     searchCountry(event) {
       let results;
@@ -548,12 +552,15 @@ export default {
     },
     prioritySelected(event) {
       this.model.TeklifOncelik = event.value.priority;
+      this.process_button_disabled = false;
     },
     offerTypeSelected(event) {
       this.model.TeklifYeri = event.value.type;
+      this.process_button_disabled = false;
     },
     sourceSelected(event) {
       this.model.KaynakYeri = event.value.source;
+      this.process_button_disabled = false;
     },
     createdProcess() {
       this.selectedSource = this.sources.find((x) => x.source == this.model.KaynakYeri);
@@ -620,6 +627,7 @@ export default {
     },
     offerProductDateSelected(event) {
       this.modelProduct.Tarih = date.dateToString(event);
+      this.process_button_disabled = false;
     },
     deleteProduct() {
       this.$store.dispatch("setOfferDetailProductsDelete", this.modelProduct.Id);
@@ -627,11 +635,13 @@ export default {
     },
     updateProduct() {
       this.$store.dispatch("setOfferDetailProductsUpdate", this.modelProduct);
+
       this.productReset();
     },
     addProduct() {
       this.modelProduct.TeklifId = this.id;
       this.$store.dispatch("setOfferDetailProductsAdd", this.modelProduct);
+
       this.productReset();
     },
     formatPoint(value) {

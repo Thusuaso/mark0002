@@ -349,6 +349,13 @@ const actions = {
         });
     },
 
+    setReportsMekmarLoadingListTotal(vuexContext,list){
+        vuexContext.commit('setReportsMekmarLoadingListTotal',list);
+    },
+    setReportsMekmarLoadingListYear(vuexContext,list){
+        vuexContext.commit('setReportsMekmarLoadingListYear',list);
+    },
+
 
 
 

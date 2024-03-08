@@ -10,7 +10,12 @@
       @row-click="$emit('sample_selected_list', $event)"
       :loading="loading"
     >
-      <Column field="NumuneTarihi" header="Date" :showFilterMenu="false">
+      <Column
+        field="NumuneTarihi"
+        header="Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.NumuneTarihi | dateToString }}
         </template>
@@ -23,7 +28,12 @@
           />
         </template>
       </Column>
-      <Column field="NumuneTemsilciAdi" header="Representative" :showFilterMenu="false">
+      <Column
+        field="NumuneTemsilciAdi"
+        header="Representative"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -33,7 +43,12 @@
           />
         </template>
       </Column>
-      <Column field="NumuneNo" header="Po" :showFilterMenu="false">
+      <Column
+        field="NumuneNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

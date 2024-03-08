@@ -95,6 +95,7 @@ export default {
       offer_list_detail: false,
       offer_list_detail_form: false,
       model: {},
+      offer_updated_list_form: false,
     };
   },
   created() {
@@ -113,6 +114,7 @@ export default {
     },
     offers() {
       this.offer_list_detail = true;
+      this.offer_updated_list_form = true;
       this.$store.dispatch("setOfferDetailAllList");
       this.$store.dispatch("setOfferAllButtonStatus", true);
     },
@@ -162,11 +164,14 @@ export default {
       this.offer_list_detail_form = true;
     },
   },
-  mounted(){
-    this.$socket.socketIO.on('offers_updated_on',()=>{
-      this.$store.dispatch("setOfferDetailAllList");
-
+  mounted() {
+    this.$socket.socketIO.on("offers_updated_on", () => {
+      if (this.offer_updated_list_form) {
+        this.$store.dispatch("setOfferDetailAllList");
+      } else {
+        this.$store.dispatch("setOfferMainDetailList", this.$cookie.get("userId"));
+      }
     });
-  }
+  },
 };
 </script>

@@ -11,7 +11,7 @@
       @row-click="supplierSelected($event)"
       :loading="loading"
     >
-      <Column field="ID" header="Id" :showFilterMenu="false">
+      <Column field="ID" header="Id" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Company" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Company" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

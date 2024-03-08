@@ -7,7 +7,7 @@
       :rowClass="logsRowClass"
       :loading="loading"
     >
-      <Column field="DegisiklikTarihi" header="Date" :showFilterMenu="false">
+      <Column field="DegisiklikTarihi" header="Date" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -17,7 +17,7 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -27,7 +27,7 @@
           />
         </template>
       </Column>
-      <Column field="IslemAdi" header="Process" :showFilterMenu="false">
+      <Column field="IslemAdi" header="Process" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -37,7 +37,7 @@
           />
         </template>
       </Column>
-      <Column field="DegisiklikYapan" header="Changer" :showFilterMenu="false">
+      <Column field="DegisiklikYapan" header="Changer" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

@@ -8,8 +8,24 @@
         selectionMode="single"
         @row-click="financeListSelected($event)"
         :loading="loading"
+        :filters.sync="filterSampleFinance"
+        filterDisplay="row"
       >
-        <Column field="MusteriAdi" header="Customer"> </Column>
+        <Column
+          field="MusteriAdi"
+          header="Customer"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
         <Column field="AlisUsd" header="Buying Usd">
           <template #body="slotProps">
             {{ slotProps.data.AlisUsd | formatPriceUsd }}
@@ -72,10 +88,29 @@
           </template>
         </Column>
       </DataTable>
+      <br />
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Profit($)</th>
+            <th scope="col">Profit(€)</th>
+            <th scope="col">Profit(₺)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>{{ (total.setUsd - total.getUsd) | formatPriceUsd }}</th>
+            <td>{{ (total.setEuro - total.getEuro) | formatPriceUsd }}</td>
+            <td>{{ (total.setTl - total.getTl) | formatPriceUsd }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
 <script>
+import { FilterMatchMode } from "primevue/api";
+
 export default {
   props: {
     list: {
@@ -98,6 +133,9 @@ export default {
   data() {
     return {
       selectedFinanceList: null,
+      filterSampleFinance: {
+        MusteriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
     };
   },
   methods: {

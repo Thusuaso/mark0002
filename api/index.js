@@ -4985,19 +4985,18 @@ app.get('/sample/finance/detail/list/:year/:customer', (req, res) => {
 	n.NumuneNo,
 	n.NumuneTarihi,
 	n.YuklemeTarihi,
-	ngt.GonderiAdi,
-	nbs.BankaAdi,
 	n.KuryeAlis,
 	n.KuryeSatis,
 	n.TL_Alis,
 	n.TL_Satis,
 	n.Euro_Alis,
-	n.Euro_Satis
+	n.Euro_Satis,
+    (select ngt.GonderiAdi from NumuneGonderiTipi ngt where ngt.ID = n.GonderiTipi) as GonderiAdi,
+	(select nbs.BankaAdi from NumuneBankaSecim nbs where nbs.ID = n.BankaSecim) as BankaAdi
 
 from NumunelerTB n
-inner join NumuneGonderiTipi ngt on ngt.ID = n.GonderiTipi
-inner join NumuneBankaSecim nbs on nbs.ID = n.BankaSecim
-where YEAR(n.NumuneTarihi) = ${req.params.year} and n.MusteriID= ${req.params.customer}
+
+where YEAR(n.NumuneTarihi) = '${req.params.year}' and n.MusteriID= '${req.params.customer}'
     `;
     mssql.query(sql,(err,results)=>{
         res.status(200).json({ 'list': results.recordset }); 

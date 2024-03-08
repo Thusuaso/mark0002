@@ -4,12 +4,12 @@
       :filters.sync="mineFilter"
       filterDisplay="row"
     >
-      <Column field="OcakAdi" header="Mine" :showFilterMenu="false">
+      <Column field="OcakAdi" header="Mine" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column field="M2" header="M2" :showFilterMenu="false">
+      <Column field="M2" header="M2" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.M2 | formatDecimal }}
         </template>
@@ -17,7 +17,7 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column field="MT" header="MT" :showFilterMenu="false">
+      <Column field="MT" header="MT" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.MT | formatDecimal }}
         </template>
@@ -25,7 +25,7 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column field="Adet" header="Piece" :showFilterMenu="false">
+      <Column field="Adet" header="Piece" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
@@ -33,7 +33,7 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column field="KasaAdedi" header="Crate Piece" :showFilterMenu="false">
+      <Column field="KasaAdedi" header="Crate Piece" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaAdedi | formatDecimal }}
         </template>

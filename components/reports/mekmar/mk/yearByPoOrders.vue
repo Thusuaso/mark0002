@@ -8,7 +8,7 @@
       scrollHeight="600px"
       :loading="loading"
     >
-      <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false">
+      <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.SiparisTarihi | dateToString }}
         </template>
@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -31,7 +31,7 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

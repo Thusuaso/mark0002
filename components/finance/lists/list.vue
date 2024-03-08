@@ -15,7 +15,7 @@
         @row-click="$emit('finance_list_selected_emit', $event)"
         :loading="loading"
       >
-        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
+        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"

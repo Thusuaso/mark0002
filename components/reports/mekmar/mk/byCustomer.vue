@@ -8,7 +8,7 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -19,7 +19,7 @@
           />
         </template>
       </Column>
-      <Column field="Ulke" header="Country" :showFilterMenu="false">
+      <Column field="Ulke" header="Country" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -30,7 +30,7 @@
           />
         </template>
       </Column>
-      <Column field="Temsilci" header="Representative" :showFilterMenu="false">
+      <Column field="Temsilci" header="Representative" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -41,7 +41,7 @@
           />
         </template>
       </Column>
-      <Column field="Marketing" header="Marketing" :showFilterMenu="false">
+      <Column field="Marketing" header="Marketing" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

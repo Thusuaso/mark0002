@@ -24,7 +24,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false">
+      <Column field="FirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false" >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"

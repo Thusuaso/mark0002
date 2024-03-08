@@ -8,7 +8,7 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="EvrakYuklemeTarihi" header="Upload Date" :showFilterMenu="false">
+      <Column field="EvrakYuklemeTarihi" header="Upload Date" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.EvrakYuklemeTarihi | dateToString }}
         </template>
@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="firma" header="Company" :showFilterMenu="false">
+      <Column field="firma" header="Company" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -31,7 +31,7 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -41,7 +41,7 @@
           />
         </template>
       </Column>
-      <Column field="FaturaNo" header="Invoice No" :showFilterMenu="false">
+      <Column field="FaturaNo" header="Invoice No" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -51,7 +51,7 @@
           />
         </template>
       </Column>
-      <Column field="Tur" header="Kind" :showFilterMenu="false">
+      <Column field="Tur" header="Kind" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

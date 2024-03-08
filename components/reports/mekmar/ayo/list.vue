@@ -10,7 +10,7 @@
         @filter="reportsMekmarAyoFiltered($event)"
         :loading="loading"
       >
-        <Column field="SiparisSahibi" header="Salesman" :showFilterMenu="false">
+        <Column field="SiparisSahibi" header="Salesman" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -21,7 +21,7 @@
             />
           </template>
         </Column>
-        <Column field="Operasyon" header="Operation" :showFilterMenu="false">
+        <Column field="Operasyon" header="Operation" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -32,7 +32,7 @@
             />
           </template>
         </Column>
-        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false">
+        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -43,7 +43,7 @@
             />
           </template>
         </Column>
-        <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+        <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -54,7 +54,7 @@
             />
           </template>
         </Column>
-        <Column field="FaturaAdi" header="Invoice" :showFilterMenu="false">
+        <Column field="FaturaAdi" header="Invoice" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -65,7 +65,7 @@
             />
           </template>
         </Column>
-        <Column field="SiparisTarihi" header="O. Date" :showFilterMenu="false">
+        <Column field="SiparisTarihi" header="O. Date" :showFilterMenu="false" :showClearButton="false">
           <template #body="slotProps">
             {{ slotProps.data.SiparisTarihi | dateToString }}
           </template>
@@ -79,7 +79,7 @@
             />
           </template>
         </Column>
-        <Column field="YuklemeTarihi" header="S.Tarih" :showFilterMenu="false">
+        <Column field="YuklemeTarihi" header="S.Tarih" :showFilterMenu="false" :showClearButton="false">
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
           </template>
@@ -93,7 +93,7 @@
             />
           </template>
         </Column>
-        <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
+        <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -104,7 +104,7 @@
             />
           </template>
         </Column>
-        <Column field="TeslimTur" header="Delivery" :showFilterMenu="false">
+        <Column field="TeslimTur" header="Delivery" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"

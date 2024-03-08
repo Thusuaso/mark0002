@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <JsonExcel
+      <!-- <JsonExcel
         class="w-100"
         :data="list"
         :fields="checkListFields"
@@ -14,7 +14,9 @@
           icon="pi pi-file-excel"
           label="Excel"
         />
-      </JsonExcel>
+      </JsonExcel> -->
+
+      <Button class="p-button-primary w-100" label="Excel-Test" @click="excel_test" />
     </div>
     <DataTable :value="list">
       <Column field="Sira" header="#"></Column>
@@ -83,6 +85,7 @@
   </div>
 </template>
 <script>
+import api from "../../../plugins/excel.server.js";
 export default {
   props: {
     list: {
@@ -113,6 +116,20 @@ export default {
         Ton: "Ton",
       },
     };
+  },
+  methods: {
+    excel_test() {
+      api.post("/excel/check/list", this.list).then((response) => {
+        if (response) {
+          const link = document.createElement("a");
+          link.href = "http://localhost:5000" + "/excel/check/list";
+
+          link.setAttribute("download", "check_list.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+    },
   },
 };
 </script>

@@ -14,7 +14,7 @@
       :loading="loading"
     >
       <Column field="ID" header="Id"></Column>
-      <Column field="FirmaAdi" header="Company" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="Company" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -25,7 +25,7 @@
         </template>
       </Column>
       <Column field="Adres" header="Address"></Column>
-      <Column field="Marketing" header="Marketing" :showFilterMenu="false">
+      <Column field="Marketing" header="Marketing" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -35,7 +35,7 @@
           />
         </template>
       </Column>
-      <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
+      <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -54,7 +54,7 @@
           />
         </template>
       </Column>
-      <Column field="Temsilci" header="Representative" :showFilterMenu="false">
+      <Column field="Temsilci" header="Representative" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -64,7 +64,7 @@
           />
         </template>
       </Column>
-      <Column field="SatisciAdi" header="Orderer" :showFilterMenu="false">
+      <Column field="SatisciAdi" header="Orderer" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

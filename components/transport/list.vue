@@ -8,7 +8,7 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="Tarih" header="Date" :showFilterMenu="false">
+      <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -31,7 +31,7 @@
           />
         </template>
       </Column>
-      <Column field="firma_adi" header="Company" :showFilterMenu="false">
+      <Column field="firma_adi" header="Company" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -41,7 +41,7 @@
           />
         </template>
       </Column>
-      <Column field="FaturaNo" header="Invoice No" :showFilterMenu="false">
+      <Column field="FaturaNo" header="Invoice No" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

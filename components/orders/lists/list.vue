@@ -222,7 +222,7 @@
           {{ slotProps.index + 1 }}
         </template>
       </Column>
-      <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false">
+      <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.SiparisTarihi | dateToString }}
         </template>
@@ -235,7 +235,7 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="To" :showFilterMenu="false">
+      <Column field="FirmaAdi" header="To" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -245,7 +245,7 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -274,7 +274,7 @@
           </div>
         </template>
       </Column>
-      <Column field="UrunAdi" header="Product" :showFilterMenu="false">
+      <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -285,7 +285,7 @@
         </template>
       </Column>
       <Column field="UrunUretimAciklama" header="Detail"> </Column>
-      <Column field="En" header="Width" :showFilterMenu="false">
+      <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -296,7 +296,7 @@
         </template>
       </Column>
 
-      <Column field="Boy" header="Height" :showFilterMenu="false">
+      <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -306,7 +306,7 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Edge" :showFilterMenu="false">
+      <Column field="Kenar" header="Edge" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -316,7 +316,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false">
+      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           <div
             :id="'productSupplier' + slotProps.data.UrunId"
@@ -342,7 +342,7 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Amount">
+      <Column field="Miktar" header="Amount" :showClearButton="false" :showFilterMenu="false">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>

@@ -8,51 +8,47 @@
       selectionMode="single"
       @row-dblclick="test"
     >
-      <Column field="SkuNo" header="Sku" :showFilterMenu="false">
+      <Column field="SkuNo" header="Sku" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="MekmarKod" header="Code" :showFilterMenu="false">
+      <Column field="MekmarKod" header="Code" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="UrunTanim" header="Description" :showFilterMenu="false">
+      <Column field="UrunTanim" header="Description" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="atl" header="Po" :showFilterMenu="false">
+      <Column field="atl" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="KasaAdet" header="Amount in Crate" :showFilterMenu="false">
+      <Column field="KasaAdet" header="Amount in Crate" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaAdet | formatDecimal }}
         </template>
@@ -62,11 +58,10 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="KasaKutu" header="Box in Crate" :showFilterMenu="false">
+      <Column field="KasaKutu" header="Box in Crate" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaKutu | formatDecimal }}
         </template>
@@ -76,11 +71,10 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="KasaM2" header="M2 in Crate" :showFilterMenu="false">
+      <Column field="KasaM2" header="M2 in Crate" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaM2 | formatDecimal }}
         </template>
@@ -90,11 +84,10 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="KasaSqft" header="Sqft in Crate" :showFilterMenu="false">
+      <Column field="KasaSqft" header="Sqft in Crate" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.KasaSqft | formatDecimal }}
         </template>
@@ -104,11 +97,10 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="StokBox" header="Stock Box" :showFilterMenu="false">
+      <Column field="StokBox" header="Stock Box" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.StokBox | formatDecimal }}
         </template>
@@ -118,11 +110,10 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="StokSqft" header="Stock Sqft" :showFilterMenu="false">
+      <Column field="StokSqft" header="Stock Sqft" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.StokSqft | formatDecimal }}
         </template>
@@ -132,11 +123,10 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>
-      <Column field="mekmar_fiyat" header="Price" :showFilterMenu="false">
+      <Column field="mekmar_fiyat" header="Price" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.mekmar_fiyat | formatPriceUsd }}
         </template>
@@ -146,7 +136,6 @@
             type="text"
             @input="filterCallback()"
             class="p-column-filter"
-            placeholder="Search by country"
           />
         </template>
       </Column>

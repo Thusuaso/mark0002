@@ -14,7 +14,7 @@
       :sortField="[TeklifOncelik,Sira]"
       :sortOrder="1"
     >
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
+      <Column field="Tarih" header="Tarih" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -27,7 +27,7 @@
           />
         </template>
       </Column>
-      <Column field="Sira" header="Queue" :showFilterMenu="false">
+      <Column field="Sira" header="Queue" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -37,7 +37,7 @@
           />
         </template>
       </Column>
-      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false">
+      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -47,7 +47,7 @@
           />
         </template>
       </Column>
-      <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
+      <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -57,7 +57,7 @@
           />
         </template>
       </Column>
-      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false">
+      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -67,7 +67,7 @@
           />
         </template>
       </Column>
-      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false">
+      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -95,7 +95,7 @@
       <template #header>
         <h3 class="header">B List</h3>
       </template>
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false">
+      <Column field="Tarih" header="Tarih" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -108,7 +108,7 @@
           />
         </template>
       </Column>
-      <Column field="Sira" header="Queue" :showFilterMenu="false">
+      <Column field="Sira" header="Queue" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -118,7 +118,7 @@
           />
         </template>
       </Column>
-      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false">
+      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -128,7 +128,7 @@
           />
         </template>
       </Column>
-      <Column field="UlkeAdi" header="Country" :showFilterMenu="false">
+      <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -138,7 +138,7 @@
           />
         </template>
       </Column>
-      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false">
+      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -148,7 +148,7 @@
           />
         </template>
       </Column>
-      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false">
+      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

@@ -12,7 +12,7 @@
       :rows="10"
       :loading="loading"
     >
-      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false">
+      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -22,7 +22,7 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -32,7 +32,7 @@
           />
         </template>
       </Column>
-      <Column field="YuklemeTarihi" header="Shipment Date" :showFilterMenu="false">
+      <Column field="YuklemeTarihi" header="Shipment Date" :showFilterMenu="false" :showClearButton="false">
         <template #body="slotProps">
           {{ slotProps.data.YuklemeTarihi | dateToString }}
         </template>
@@ -45,7 +45,7 @@
           />
         </template>
       </Column>
-      <Column field="KonteynerNo" header="Container No" :showFilterMenu="false">
+      <Column field="KonteynerNo" header="Container No" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -75,7 +75,7 @@
         </template>
       </Column>
       <Column field="AktarmaLimanAdi" header="Port"></Column>
-      <Column field="Sorumlu" header="Responsible" :showFilterMenu="false">
+      <Column field="Sorumlu" header="Responsible" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
