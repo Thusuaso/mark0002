@@ -11,6 +11,16 @@
         :loading="getLoading"
         :status="'Order'"
       />
+      <reportsMekmarSummaryList
+        v-for="(item, index) of getReportsMekmarSummaryOrderListByRepresentative"
+        :key="item.Month"
+        :list="item"
+        :year="new Date().getFullYear() - index"
+        :total="getReportsMekmarSummaryOrderListByRepresentativeTotal[index]"
+        @order_selected_list_emit="orderSelectedList($event, true)"
+        :loading="getLoading"
+        :status="'Representative'"
+      />
     </div>
     <div class="row">
       <reportsMekmarSummaryList
@@ -35,7 +45,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 export default {
   computed: {
     ...mapGetters([
@@ -47,6 +57,7 @@ export default {
       "getReportsMekmarSummaryForwardingListTotal",
 
       "getReportsMekmarSummaryOrderListByRepresentative",
+      "getReportsMekmarSummaryOrderListByRepresentativeTotal",
 
       "getLoading",
     ]),
@@ -54,12 +65,13 @@ export default {
   data() {
     return {
       reports_mekmar_summary_list_detail_dialog: false,
+      userId: null,
     };
   },
   created() {
     this.$store.dispatch("setReportsMekmarSummaryOrderList");
     this.$store.dispatch("setReportsMekmarSummaryForwardingList");
-    this.$store.dispatch("setReportsMekmarSummaryOrderListByRepresentative",Cookies.get('userId'));
+    this.userId = Cookies.get("userId");
   },
   methods: {
     orderSelectedList(event, status) {
@@ -70,6 +82,14 @@ export default {
         this.$store.dispatch("setReportsMekmarSummaryForwardingDetail", event);
         this.reports_mekmar_summary_list_detail_dialog = true;
       }
+    },
+  },
+  watch: {
+    userId() {
+      this.$store.dispatch(
+        "setReportsMekmarSummaryOrderListByRepresentative",
+        this.userId
+      );
     },
   },
 };

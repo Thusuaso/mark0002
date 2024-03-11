@@ -27,6 +27,17 @@ const state = {
     panelUsaStockButtonStatus:false
 };
 const actions = {
+    setPanelProjectQueueChange(vuexContext,projects){
+        this.$axios.put('/panel/project/queue/change',projects)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Başarıyla Değiştirildi.');
+            } else{
+                this.$toast.error('Değiştirme Başarısız.');
+                
+            }
+        });
+    },
     setPanelPublishedList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/panel/published/list')

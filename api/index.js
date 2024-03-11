@@ -3662,13 +3662,12 @@ app.get('/reports/mekmar/summary/order/list/by/representative/:userId', (req, re
 
                     group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
     `;
-    console.log(sqlThisYear)
-    // mssql.query(sqlThisYear, (err, thisYear) => {
-    //     mssql.query(sqlPreviousYear, (err, previousYear) => {
-    //         res.status(200).json({ items: [thisYear.recordset, previousYear.recordset] });
+    mssql.query(sqlThisYear, (err, thisYear) => {
+        mssql.query(sqlPreviousYear, (err, previousYear) => {
+            res.status(200).json({ items: [thisYear.recordset, previousYear.recordset] });
 
-    //     });
-    // });
+        });
+    });
 });
 
 
@@ -7071,6 +7070,14 @@ where Id = '${req.body.Id}'
            res.status(200).json({ 'status': false });
        }
     });
+});
+app.put('/panel/project/queue/change',(req,res)=>{
+    req.body.forEach(x=>{
+        const sql = `update MekmarCom_Projects SET Queue='${x.Queue}' WHERE ID='${x.ID}'`;
+        mssql.query(sql);
+
+    });
+    res.status(200).json({'status':true});
 });
 
 /*Todo */

@@ -109,7 +109,11 @@ const actions = {
         this.$axios.get(`/reports/mekmar/summary/order/list/by/representative/${userId}`)
         .then(response=>{
             vuexContext.commit('setReportsMekmarSummaryOrderListByRepresentative',response.data.items);
+            vuexContext.dispatch('setReportsMekmarSummaryOrderListByRepresentativeTotal',response.data.items);
         });
+    },
+    setReportsMekmarSummaryOrderListByRepresentativeTotal(vuexContext,payload){
+        vuexContext.commit('setReportsMekmarSummaryOrderListByRepresentativeTotal',payload);
     },
     setReportsMekmerProductionList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
@@ -821,11 +825,25 @@ const mutations = {
     },
     setReportsMekmarSummaryOrderListByRepresentative(state,payload){
         state.reportsMekmarSummaryOrderListByRepresentative = payload;
-    }
+    },
+    setReportsMekmarSummaryOrderListByRepresentativeTotal(state, payload) {
+        for (const item of payload) {
+            let fob = 0;
+            let ddp = 0;
+            for (const item2 of item) {
+                fob += item2.FOB;
+                ddp += item2.DDP;
+            };
+            state.reportsMekmarSummaryOrderListByRepresentativeTotal.push({ 'fob': fob, 'ddp': ddp });
+        }
+    },
 
 
 };
 const getters = {
+    getReportsMekmarSummaryOrderListByRepresentativeTotal(state){
+        return state.reportsMekmarSummaryOrderListByRepresentativeTotal
+    },
     getReportsMekmarSummaryOrderListByRepresentative(state){
         return state.reportsMekmarSummaryOrderListByRepresentative;
     },

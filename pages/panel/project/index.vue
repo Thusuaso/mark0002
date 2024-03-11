@@ -1,11 +1,26 @@
 <template>
   <div class="container">
-    <Button
-      type="button"
-      class="p-button-success w-100 mb-3"
-      label="New Project"
-      @click="newProject"
-    />
+    <div class="row mb-3">
+      <div class="col">
+        <Button
+          type="button"
+          class="p-button-success w-100"
+          label="New Project"
+          @click="newProject"
+        />
+      </div>
+      <div class="col">
+        <Button
+          type="button"
+          class="p-button-warning w-100 "
+          label="Change Queue"
+          @click="changeQueue"
+        />
+
+      </div>
+
+    </div>
+
     <panelProjectList
       :list="getPanelProjectList"
       @panel_project_selected_emit="panelProjectSelected($event)"
@@ -224,6 +239,9 @@ export default {
     this.$store.dispatch("setPanelProjectList");
   },
   methods: {
+    changeQueue(){
+      this.$store.dispatch('setPanelProjectQueueChange',this.getPanelProjectList);
+    },
     projectChangeNameMouseOver() {
       console.log("projectChangeNameMouseOver");
     },
