@@ -3,71 +3,89 @@
     <div class="col">
       <DataTable
         :value="list"
-        tableStyle="font-size:80%"
+        tableStyle="font-size:70%"
         class="p-datatable-sm"
-        :filters.sync="filters1"
+        :filters.sync="filters"
         filterDisplay="row"
-        @filter="reportsMekmarAyoFiltered($event)"
+        @filter="mekmarAyoFilter($event)"
+        :selection.sync="selectedMekmarAyo"
+        selectionMode="single"
+        @row-click="mekmarAyoSelected($event)"
+        scrollable
+        scrollHeight="500px"
         :loading="loading"
       >
-        <Column field="SiparisSahibi" header="Salesman" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="siparisci"
+          header="Satışçı"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
               type="text"
               @input="filterCallback()"
               class="p-column-filter"
-              style="width: 80px"
             />
           </template>
         </Column>
-        <Column field="Operasyon" header="Operation" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="operasyon"
+          header="Operasyon"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
               type="text"
               @input="filterCallback()"
               class="p-column-filter"
-              style="width: 80px"
             />
           </template>
         </Column>
-        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="musteri_adi"
+          header="Müşteri"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
               type="text"
               @input="filterCallback()"
               class="p-column-filter"
-              style="width: 80px"
             />
           </template>
         </Column>
-        <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-              style="width: 80px"
-            />
-          </template>
-        </Column>
-        <Column field="FaturaAdi" header="Invoice" :showFilterMenu="false" :showClearButton="false">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-              style="width: 80px"
-            />
-          </template>
-        </Column>
-        <Column field="SiparisTarihi" header="O. Date" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="siparis_no"
+          header="Po"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
           <template #body="slotProps">
-            {{ slotProps.data.SiparisTarihi | dateToString }}
+            <div :style="{ backgroundColor: slotProps.data.alisFiyatiKontrol }">
+              {{ slotProps.data.siparis_no }}
+            </div>
           </template>
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -75,251 +93,451 @@
               type="text"
               @input="filterCallback()"
               class="p-column-filter"
-              style="width: 80px"
             />
           </template>
         </Column>
-        <Column field="YuklemeTarihi" header="S.Tarih" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="marketing"
+          header="Marketing"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="faturatur"
+          header="Fatura"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="siparis_tarihi"
+          header="S.Tarihi"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="yukleme_tarihi"
+          header="Y.Tarihi"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="ulke_adi"
+          header="Ülke"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="teslim_sekli"
+          header="Teslim"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column field="toplam_bedel" header="Proforma">
           <template #body="slotProps">
-            {{ slotProps.data.YuklemeTarihi | dateToString }}
-          </template>
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-              style="width: 80px"
-            />
-          </template>
-        </Column>
-        <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-              style="width: 80px"
-            />
-          </template>
-        </Column>
-        <Column field="TeslimTur" header="Delivery" :showFilterMenu="false" :showClearButton="false">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-              style="width: 80px"
-            />
-          </template>
-        </Column>
-        <Column field="Proforma" header="Proforma">
-          <template #body="slotProps">
-            {{ slotProps.data.Proforma | formatPriceUsd }}
+            {{ slotProps.data.toplam_bedel | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.proforma | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="MekmerUretim" header="Mekmer P.">
+        <Column field="mekmar_alim" header="Mekmer Ü.">
           <template #body="slotProps">
-            {{ slotProps.data.MekmerUretim | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.mekmar_alim > 0 &&
+                  slotProps.data.mekmar_alim_evrak.length <= 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.mekmar_alim | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.mekmerProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="MekmozSatis" header="Mekmoz P.">
+        <Column field="mekmoz_alim" header="Mekmoz Ü.">
           <template #body="slotProps">
-            {{ slotProps.data.MekmozUretim | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.mekmoz_alim > 0 &&
+                  slotProps.data.mekmoz_alim_evrak.length <= 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.mekmoz_alim | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.mekmozProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="DisSatis" header="Outer P.">
+        <Column field="dis_alim" header="Dış Alım">
           <template #body="slotProps">
-            {{ slotProps.data.DisUretim | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  (slotProps.data.dis_alim > 0 &&
+                    slotProps.data.dis_alim_tedarikci_sayisi !=
+                      slotProps.data.tedarikci_sayisi) ||
+                  slotProps.data.dis_alim_fatura_sayisi != slotProps.data.tedarikci_sayisi
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.dis_alim | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.outerProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Nakliye" header="Transport">
+
+        <Column field="nakliye" header="Nakliye">
           <template #body="slotProps">
-            {{ slotProps.data.Nakliye | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.nakliye_evrak.length == 0 && slotProps.data.nakliye > 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.nakliye | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.transport | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Gumruk" header="Duty">
+        <Column field="gumruk" header="Gümrük">
           <template #body="slotProps">
-            {{ slotProps.data.Gumruk | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.gumruk_evrak.length == 0 && slotProps.data.gumruk > 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.gumruk | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.duty | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Ilaclama" header="Spraying">
+        <Column field="ilaclama" header="İlaçlama">
           <template #body="slotProps">
-            {{ slotProps.data.Ilaclama | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.ilaclama_evrak.length == 0 && slotProps.data.ilaclama > 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.ilaclama | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.spraying | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Liman" header="Port">
+        <Column field="liman" header="Liman">
           <template #body="slotProps">
-            {{ slotProps.data.Liman | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.liman_evrak.length == 0 && slotProps.data.liman > 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.liman | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.port | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="SigortaAlis" header="Buying Insurance">
+        <Column field="sigorta" header="Sigorta">
           <template #body="slotProps">
-            {{ slotProps.data.SigortaAlis | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.sigorta_id == 1 && slotProps.data.sigorta == 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.sigorta | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.insuranceBuyes | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="SigortaSatis" header="Selling Insurance">
+        <Column field="navlun" header="Navlun">
           <template #body="slotProps">
-            {{ slotProps.data.SigortaSatis | formatPriceUsd }}
-          </template>
-          <template #footer>
-            {{ total.insuranceSales | formatPriceUsd }}
-          </template>
-        </Column>
-        <Column field="NavlunAlis" header="Buying Freight">
-          <template #body="slotProps">
-            {{ slotProps.data.NavlunAlis | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.navlun > 0 && slotProps.data.navlun_evrak.length <= 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.navlun | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.freightBuyes | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Lashing" header="Lashing">
+        <Column field="lashing" header="Lashing">
           <template #body="slotProps">
-            {{ slotProps.data.Lashing | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.lashing > 0 && slotProps.data.lashing_evrak.length <= 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.lashing | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.lashing | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Booking" header="Booking">
+        <Column field="booking" header="Booking">
           <template #body="slotProps">
-            {{ slotProps.data.Booking | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.booking > 0 && slotProps.data.booking_evrak.length <= 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.booking | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.booking | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Spanzlet" header="Spanzlet">
+        <Column field="spazlet" header="Spanzlet">
           <template #body="slotProps">
-            {{ slotProps.data.Spanzlet | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.spazlet > 0 && slotProps.data.spazlet_evrak.length <= 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.spazlet | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.spanzlet | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="DetayAlis1" header="Buying Detail 1">
+        <Column field="detay_1" header="Diğer 1">
           <template #body="slotProps">
-            {{ slotProps.data.DetayAlis1 | formatPriceUsd }}
+            {{ slotProps.data.detay_1 | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.detailBuyes1 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="DetayAlis2" header="Buying Detail 2">
+        <Column field="detay_2" header="Diğer 2">
           <template #body="slotProps">
-            {{ slotProps.data.DetayAlis2 | formatPriceUsd }}
+            {{ slotProps.data.detay_2 | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.detailBuyes2 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="DetayAlis3" header="Buying Detail 3">
+        <Column field="detay_3" header="Diğer 3">
           <template #body="slotProps">
-            {{ slotProps.data.DetayAlis3 | formatPriceUsd }}
+            {{ slotProps.data.detay_3 | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.detailBuyes3 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Mekus" header="Mekus">
+        <Column field="mekus_masraf" header="Mekus">
           <template #body="slotProps">
-            {{ slotProps.data.Mekus | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color': slotProps.data.mekus_id == 1 ? '#ADFF2F' : '',
+              }"
+            >
+              {{ slotProps.data.mekus_masraf | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.mekus | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Komisyon" header="Commision">
+        <Column field="pazarlama" header="Komisyon">
           <template #body="slotProps">
-            {{ slotProps.data.Komisyon | formatPriceUsd }}
+            {{ slotProps.data.pazarlama | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.commision | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="OzelIscilik" header="Workerman">
+        <Column field="ozel_iscilik" header="Özel İşçilik">
           <template #body="slotProps">
-            {{ slotProps.data.OzelIscilik | formatPriceUsd }}
+            <div
+              :style="{
+                'background-color':
+                  slotProps.data.ozel_iscilik > 0 &&
+                  slotProps.data.ozel_iscilik_evrak.length <= 0
+                    ? '#F1948A'
+                    : '',
+              }"
+            >
+              {{ slotProps.data.ozel_iscilik | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.specialwork | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="BankaMasraf" header="Bank">
+        <Column field="banka_masrafi" header="Banka">
           <template #body="slotProps">
-            {{ slotProps.data.BankaMasraf | formatPriceUsd }}
+            {{ slotProps.data.banka_masrafi | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.bankCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Kurye" header="Courier">
+        <Column field="kurye_masrafi" header="Kurye">
           <template #body="slotProps">
-            {{ slotProps.data.Kurye | formatPriceUsd }}
+            {{ slotProps.data.kurye_masrafi | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.fregileCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="MasrafToplam" header="Cost Total">
+        <Column field="masraf_toplam" header="Toplam">
           <template #body="slotProps">
-            {{ slotProps.data.MasrafToplam | formatPriceUsd }}
+            {{ slotProps.data.masraf_toplam | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.costTotal | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ProfitUsd" header="Profit($)">
+        <Column field="kar_zarar" header="Profit / USD">
           <template #body="slotProps">
-            {{ slotProps.data.ProfitUsd | formatPriceUsd }}
+            {{ slotProps.data.kar_zarar | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.profitUsd | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ProfitTl" header="Profit(₺)">
+        <Column field="kar_zarar_tl" header="Profit / TRY">
           <template #body="slotProps">
-            {{ slotProps.data.ProfitTl | formatPriceTl }}
+            {{ slotProps.data.kar_zarar_tl | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.profitTl | formatPriceTl }}
+            {{ total.profitTl | formatPriceUsd }}
           </template>
         </Column>
-        <Column header="Profit-Loss (%)">
+        <Column field="kar_zarar_tl_yuzdesi" header="Kar Zarar(%)">
           <template #body="slotProps">
-            {{ ((slotProps.data.ProfitUsd / slotProps.data.Proforma) * 100).toFixed(2) }}
+            % {{ slotProps.data.kar_zarar_tl_yuzdesi }}
           </template>
         </Column>
+        <Column field="dosya_kapanma_date" header="Kapanma T."></Column>
       </DataTable>
     </div>
   </div>
@@ -343,22 +561,27 @@ export default {
   },
   data() {
     return {
-      filters1: {
-        SiparisSahibi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Operasyon: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        FaturaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        SiparisTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        UlkeAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        TeslimTur: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      selectedMekmarAyo: null,
+      filters: {
+        siparisci: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        operasyon: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        musteri_adi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        siparis_no: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        marketing: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        faturatur: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        siparis_tarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        yukleme_tarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        ulke_adi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        teslim_sekli: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
     };
   },
   methods: {
-    reportsMekmarAyoFiltered(event) {
+    mekmarAyoFilter(event) {
       this.$store.dispatch("setReportsMekmarAyoListTotal", event.filteredValue);
+    },
+    mekmarAyoSelected(event) {
+      console.log(event);
     },
   },
 };

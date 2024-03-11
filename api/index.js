@@ -2296,6 +2296,8 @@ order by u.Tarih desc
 });
 
 app.post('/reports/mekmer/production/filter', (req, res) => {
+    const supplier = req.body.supplier.toUpperCase();
+    const po = req.body.po.toUpperCase();
     const sql = `
                    select 
 
@@ -2327,7 +2329,7 @@ inner join OlculerTB o on o.ID = uk.OlcuID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 where u.Tarih like '${req.body.date}' + '%' and
-t.FirmaAdi  like '${req.body.supplier}' + '%' and
+t.FirmaAdi  like '${supplier}' + '%' and
 k.KategoriAdi  like '${req.body.category}' + '%' and
 u.KasaNo  like '${req.body.crate}' + '%' and
 urun.UrunAdi  like '${req.body.product}' + '%' and
@@ -2337,7 +2339,7 @@ o.En  like '${req.body.width}' + '%' and
 o.Boy  like '${req.body.height}' + '%' and 
 o.Kenar  like '${req.body.edge}' + '%' and
 ub.BirimAdi  like '${req.body.unit}' + '%' and
-u.SiparisAciklama  like '${req.body.po}' + '%' and
+u.SiparisAciklama  like '${po}' + '%' and
 u.Aciklama like '${req.body.description}' + '%' 
 
 
@@ -3033,13 +3035,13 @@ where m.Marketing = 'Mekmar' and s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) 
                 x.ProfitUsd = (x.Proforma - x.MasrafToplam);
                 x.ProfitTl = (x.ProfitUsd * x.Kur)
                 if(x.Kur == null || x.Kur == undefined){
-
+                    let data = 0
                    __getCurrency(x.YuklemeTarihi).then(currency=>{
-                    custCurrency = currency;
+                        custCurrency = currency;
+                        data = 1;
                     });
+                    console.log(data);
                     x.ProfitTl = (x.Proforma - x.MasrafToplam) * custCurrency;
-                    
-
                 }
 
                 
@@ -3267,6 +3269,10 @@ app.get('/reports/mekmar/forwarding/list', (req, res) => {
 });
 
 app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
+    const supplier = req.body.fromWho.charAt(0).toUpperCase()
+    + req.body.fromWho.slice(1);
+    const po = req.body.po.toUpperCase();
+
     const sql = `
     
     select 
@@ -3306,7 +3312,7 @@ app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
     where u.UrunDurumID=0 and 
     s.Tarih Like  '${req.body.date}' + '%' and
     m.FirmaAdi Like  '${req.body.to}' + '%' and
-    t.FirmaAdi Like  '${req.body.fromWho}' + '%' and
+    t.FirmaAdi Like  '${supplier}' + '%' and
     uk.ID Like  '${req.body.productId}' + '%' and
     s.KasaNo Like  '${req.body.crate}' + '%' and
     uoc.OcakAdi Like  '${req.body.mine}' + '%' and
@@ -3320,7 +3326,7 @@ app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
     u.Adet Like  '${req.body.piece}' + '%' and
     u.Miktar Like  '${req.body.amount}' + '%' and
     ub.BirimAdi Like  '${req.body.unit}' + '%' and
-    u.SiparisAciklama Like  '${req.body.po}' + '%' 
+    u.SiparisAciklama Like  '${po}' + '%' 
 
     order by s.Tarih desc
     `;
@@ -8069,6 +8075,9 @@ order by YEAR(s.SiparisTarihi) desc
 
 
 app.post('/order/shipped/list/filter',(req,res)=>{
+
+    const company = req.body.company.charAt(0).toUpperCase() + req.body.company.slice(1);
+    const po = req.body.po.toUpperCase();
     const ordersListSql = `
     select 
 
@@ -8189,8 +8198,8 @@ inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 
 where s.SiparisDurumID = 3  and
  s.YuklemeTarihi Like '${req.body.loaddate}'  +'%' and 
- m.FirmaAdi Like '${req.body.company}' + '%' and
-s.SiparisNo Like '${req.body.po}' + '%' and 
+ m.FirmaAdi Like '${company}' + '%' and
+s.SiparisNo Like '${po}' + '%' and 
 urun.UrunAdi Like '${req.body.product}' + '%' and
 ol.En Like '${req.body.width}' + '%' and
 ol.Boy Like '${req.body.height}' + '%' and

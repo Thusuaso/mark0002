@@ -8,6 +8,7 @@
           optionLabel="Yil"
           class="w-100"
           @change="yearSelected($event)"
+          :disabled="date_disabled"
         />
       </div>
       <div class="col">
@@ -17,6 +18,7 @@
           optionLabel="Ay"
           class="w-100"
           @change="monthSelected($event)"
+          :disabled="date_disabled"
         />
       </div>
       <div class="col">
@@ -54,6 +56,12 @@
         </vue-excel-xlsx>
       </div>
       <div class="col">
+        <span>
+          <Checkbox v-model="checked" :binary="true" @change="allAyoList($event)" />
+        </span>
+        <span style="padding-top: 25px"> Hepsi </span>
+      </div>
+      <div class="col">
         <table class="table">
           <thead>
             <tr>
@@ -82,6 +90,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import api from "../../../plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
@@ -94,6 +103,7 @@ export default {
   },
   data() {
     return {
+      checked: false,
       selectedYear: null,
       selectedMonth: null,
       reportsMekmarAyoListExcelField: {
@@ -173,6 +183,7 @@ export default {
           value: "utf-8",
         },
       ],
+      date_disabled: false,
     };
   },
   created() {
@@ -180,12 +191,46 @@ export default {
     this.$store.dispatch("setReportsMekmarAyoMonthList", new Date().getFullYear());
     const date = {
       year: new Date().getFullYear(),
-      month: new Date().getMonth(),
+      month: new Date().getMonth() + 1,
     };
+    this.$store.dispatch("setBeginLoadingAction");
 
-    this.$store.dispatch("setReportsMekmarAyoList", date);
+    api
+      .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
+      .then((response) => {
+        this.$store.commit("setReportsMekmarAyoList", response.data);
+        this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+        this.$store.dispatch("setEndLoadingAction");
+      });
   },
   methods: {
+    allAyoList(event) {
+      if (this.checked) {
+        this.date_disabled = true;
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
+          .then((response) => {
+            this.$store.commit("setReportsMekmarAyoList", response.data);
+            this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+            this.$store.dispatch("setEndLoadingAction");
+          });
+      } else {
+        this.$store.dispatch("setReportsMekmarAyoMonthList", this.selectedYear.Yil);
+        this.date_disabled = false;
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(
+            `/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`
+          )
+          .then((response) => {
+            this.$store.commit("setReportsMekmarAyoList", response.data);
+            this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+            this.$store.dispatch("setEndLoadingAction");
+            this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+          });
+      }
+    },
     formatDecimal(value) {
       if (value == null || value == undefined || value == "" || value == " ") {
         return 0;
@@ -195,14 +240,31 @@ export default {
       }
     },
     yearSelected(event) {
-      this.$store.dispatch("setReportsMekmarAyoListYear", event.value.Yil);
+      this.$store.dispatch("setBeginLoadingAction");
+      api
+        .get(`/maliyet/listeler/maliyetListesi/${event.value.Yil}/${12}`)
+        .then((response) => {
+          this.$store.dispatch("setReportsMekmarAyoMonthList", event.value.Yil);
+          this.$store.commit("setReportsMekmarAyoList", response.data);
+          this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+          this.$store.dispatch("setEndLoadingAction");
+          this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+        });
     },
     monthSelected(event) {
       let date = {
         year: this.selectedYear.Yil,
         month: event.value.Ay,
       };
-      this.$store.dispatch("setReportsMekmarAyoListMonth", date);
+      this.$store.dispatch("setBeginLoadingAction");
+
+      api
+        .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
+        .then((response) => {
+          this.$store.commit("setReportsMekmarAyoList", response.data);
+          this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+          this.$store.dispatch("setEndLoadingAction");
+        });
     },
   },
   watch: {

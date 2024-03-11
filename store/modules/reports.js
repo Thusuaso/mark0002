@@ -587,32 +587,31 @@ const mutations = {
             'commision':0
         };
         payload.forEach(x => {
-            state.reportsMekmarAyoListTotal.proforma += x.Proforma;
-            state.reportsMekmarAyoListTotal.mekmerProduction += x.MekmerUretim;
-            state.reportsMekmarAyoListTotal.mekmozProduction += x.MekmozUretim;
-            state.reportsMekmarAyoListTotal.outerProduction += x.DisUretim;
-            state.reportsMekmarAyoListTotal.transport += x.Nakliye;
-            state.reportsMekmarAyoListTotal.duty += x.Gumruk;
-            state.reportsMekmarAyoListTotal.spraying += x.Ilaclama;
-            state.reportsMekmarAyoListTotal.port += x.Liman;
-            state.reportsMekmarAyoListTotal.insuranceBuyes += x.SigortaAlis;
-            state.reportsMekmarAyoListTotal.insuranceSales += x.SigortaSatis;
-            state.reportsMekmarAyoListTotal.freightBuyes += x.NavlunAlis;
-            state.reportsMekmarAyoListTotal.lashing += x.Lashing;
-            state.reportsMekmarAyoListTotal.booking += x.Booking;
-            state.reportsMekmarAyoListTotal.spanzlet += x.Spanzlet;
-            state.reportsMekmarAyoListTotal.detailBuyes1 += x.DetayAlis1;
-            state.reportsMekmarAyoListTotal.detailBuyes2 += x.DetayAlis2;
-            state.reportsMekmarAyoListTotal.detailBuyes3 += x.DetayAlis3;
+            state.reportsMekmarAyoListTotal.proforma += x.toplam_bedel;
+            state.reportsMekmarAyoListTotal.mekmerProduction += x.mekmar_alim;
+            state.reportsMekmarAyoListTotal.mekmozProduction += x.mekmoz_alim;
+            state.reportsMekmarAyoListTotal.outerProduction += x.dis_alim;
+            state.reportsMekmarAyoListTotal.transport += x.nakliye;
+            state.reportsMekmarAyoListTotal.duty += x.gumruk;
+            state.reportsMekmarAyoListTotal.spraying += x.ilaclama;
+            state.reportsMekmarAyoListTotal.port += x.liman;
+            state.reportsMekmarAyoListTotal.insuranceBuyes += x.sigorta;
+            state.reportsMekmarAyoListTotal.freightBuyes += x.navlun;
+            state.reportsMekmarAyoListTotal.lashing += x.lashing;
+            state.reportsMekmarAyoListTotal.booking += x.booking;
+            state.reportsMekmarAyoListTotal.spanzlet += x.spazlet;
+            state.reportsMekmarAyoListTotal.detailBuyes1 += x.detay_1;
+            state.reportsMekmarAyoListTotal.detailBuyes2 += x.detay_2;
+            state.reportsMekmarAyoListTotal.detailBuyes3 += x.detay_3;
 
-            state.reportsMekmarAyoListTotal.mekus += x.Mekus;
-            state.reportsMekmarAyoListTotal.specialwork += x.OzelIscilik;
-            state.reportsMekmarAyoListTotal.bankCost += x.BankaMasraf;
-            state.reportsMekmarAyoListTotal.fregileCost += x.Kurye;
-            state.reportsMekmarAyoListTotal.costTotal += x.MasrafToplam;
-            state.reportsMekmarAyoListTotal.profitUsd += x.ProfitUsd;
-            state.reportsMekmarAyoListTotal.profitTl += x.ProfitTl;
-            state.reportsMekmarAyoListTotal.commision += x.Komisyon
+            state.reportsMekmarAyoListTotal.mekus += x.mekus_masraf;
+            state.reportsMekmarAyoListTotal.specialwork += x.ozel_iscilik;
+            state.reportsMekmarAyoListTotal.bankCost += x.banka_masrafi;
+            state.reportsMekmarAyoListTotal.fregileCost += x.kurye_masrafi;
+            state.reportsMekmarAyoListTotal.costTotal += x.masraf_toplam;
+            state.reportsMekmarAyoListTotal.profitUsd += x.kar_zarar;
+            state.reportsMekmarAyoListTotal.profitTl += x.kar_zarar_tl;
+            state.reportsMekmarAyoListTotal.commision += x.pazarlama
 
 
 
