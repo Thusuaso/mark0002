@@ -55,7 +55,7 @@
         :cost="getOrderProductionCostList"
         :costTotal="getOrderProductionCostTotal"
         :supplierDelivery="getOrderKindOfDeliverySupplierList"
-        :productSupplier="getOrderProductionProductDetailList"
+        :productSupplier="getOrderProductionSupplierList"
         :supplierProduct="getOrderSupplierProductList"
         :document="getOrderProductionDocumentList"
         :check="getOrderProductionCheckList"
@@ -160,7 +160,7 @@ export default {
         deleted: this.getOrderProductDeleted,
         operation: this.productionModel.operationMail,
         representative: this.productionModel.representativeMail,
-        status:1
+        status: 1,
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
@@ -214,7 +214,6 @@ export default {
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
 
-
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
       this.production_detail_form = true;
@@ -222,7 +221,7 @@ export default {
   },
   watch: {
     getOrderProductionYearsList() {
-      this.selectedYear = { Yil: "Hepsi" };
+      this.selectedYear = { Yil: new Date().getFullYear() };
     },
   },
 };

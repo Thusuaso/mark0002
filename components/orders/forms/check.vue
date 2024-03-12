@@ -16,7 +16,7 @@
         />
       </JsonExcel> -->
 
-      <Button class="p-button-primary w-100" label="Excel-Test" @click="excel_test" />
+      <Button class="p-button-primary w-100" label="Excel" @click="excel_test" />
     </div>
     <DataTable :value="list">
       <Column field="Sira" header="#"></Column>

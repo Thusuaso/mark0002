@@ -55,7 +55,7 @@
         :cost="getOrderProductionCostList"
         :costTotal="getOrderProductionCostTotal"
         :supplierDelivery="getOrderKindOfDeliverySupplierList"
-        :productSupplier="getOrderProductionProductDetailList"
+        :productSupplier="getOrderProductionSupplierList"
         :supplierProduct="getOrderSupplierProductList"
         :document="getOrderProductionDocumentList"
         :check="getOrderProductionCheckList"
@@ -222,7 +222,7 @@ export default {
   },
   watch: {
     getOrderProductionYearsList() {
-      this.selectedYear = { Yil: "All" };
+      this.selectedYear = { Yil: new Date().getFullYear() };
     },
   },
 };

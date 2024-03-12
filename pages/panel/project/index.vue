@@ -12,13 +12,11 @@
       <div class="col">
         <Button
           type="button"
-          class="p-button-warning w-100 "
+          class="p-button-warning w-100"
           label="Change Queue"
           @click="changeQueue"
         />
-
       </div>
-
     </div>
 
     <panelProjectList
@@ -33,6 +31,7 @@
         :information="getPanelProjectInformation"
         :video="getPanelProjectVideo"
         :status="getPanelProjectButtonStatus"
+        :projectId="getPanelProjectId"
         @move_to_target_project_photo_emit="moveToTargetProjectPhoto($event)"
         @panel_project_information_save_emit="panelProjectInformationSave($event)"
         @panel_project_information_update_emit="panelProjectInformationUpdate($event)"
@@ -239,8 +238,8 @@ export default {
     this.$store.dispatch("setPanelProjectList");
   },
   methods: {
-    changeQueue(){
-      this.$store.dispatch('setPanelProjectQueueChange',this.getPanelProjectList);
+    changeQueue() {
+      this.$store.dispatch("setPanelProjectQueueChange", this.getPanelProjectList);
     },
     projectChangeNameMouseOver() {
       console.log("projectChangeNameMouseOver");

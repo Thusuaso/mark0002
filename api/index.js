@@ -15,7 +15,7 @@ const sql = {
 };
 mssql.connect(sql);
 let transporter = nodemailer.createTransport({
-  host: "mail.mekmar.com",
+  host: "mail.kurumsaleposta.com",
   port: 465,
   secure: true, // use TLS
   auth: {
@@ -3040,7 +3040,6 @@ where m.Marketing = 'Mekmar' and s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) 
                         custCurrency = currency;
                         data = 1;
                     });
-                    console.log(data);
                     x.ProfitTl = (x.Proforma - x.MasrafToplam) * custCurrency;
                 }
 
@@ -6746,10 +6745,12 @@ app.get('/panel/project/detail/:id', (req, res) => {
 	mpd.ProductName_Ru,
 	mpd.ImageLink,
 	mpd.ImageName,
-	mpd.ImageStatus
+	mpd.ImageStatus,
+    mpd.Queue
 
 from MekmarCom_Project_Detail mpd 
 where mpd.ProjectId = '${req.params.id}' and mpd.ImageStatus = 1
+order by mpd.Queue
     `;
     const suggestedSql = `
         select 
@@ -6998,6 +6999,15 @@ VALUES(
         }
     });
 });
+
+app.post('/panel/projet/photos/queue/change',(req,res)=>{
+    req.body.forEach(x=>{
+        const sql = `update MekmarCom_Project_Detail SET Queue='${x.Queue}' where ID='${x.ID}'`;
+        mssql.query(sql);
+    });
+    res.status(200).json({'status':true});
+});
+
 app.post('/panel/product/change/queue',(req,res)=>{
     const dropSql = `update MekmarCom_Products SET sira='${req.body.drop.sira}' where urunid='${req.body.drop.urunid}'`;
     const dragSql = `update MekmarCom_Products SET sira='${req.body.drag.sira}' where urunid='${req.body.drag.urunid}'`;
@@ -7084,6 +7094,17 @@ app.put('/panel/project/queue/change',(req,res)=>{
 
     });
     res.status(200).json({'status':true});
+});
+app.put('/panel/project/main/photo/change',(req,res)=>{
+    const sql = `update MekmarCom_Projects SET Image='${req.body.link}' where ID='${req.body.id}'`;
+    mssql.query(sql,(err,photo)=>{
+        if(photo.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        
+        }
+    });
 });
 
 /*Todo */
@@ -8047,8 +8068,8 @@ app.get('/order/shipped/list', (req, res) => {
     inner join MusterilerTB m on m.ID = s.MusteriID
     inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
     
-    where s.SiparisDurumID = 3  and YEAR(s.SiparisTarihi) = YEAR(GETDATE())
-    order by s.SiparisTarihi desc
+    where s.SiparisDurumID = 3  and YEAR(s.YuklemeTarihi) = YEAR(GETDATE())
+    order by s.YuklemeTarihi desc
 
 
 
@@ -8207,7 +8228,7 @@ ol.Kenar Like '${req.body.edge}' + '%' and
 t.FirmaAdi Like '${req.body.supplier}' + '%' and
 su.Miktar Like '${req.body.amount}' + '%'
 
-order by s.SiparisTarihi desc
+order by s.YuklemeTarihi desc
 
 
 
@@ -9007,6 +9028,7 @@ app.get('/order/production/product/supplier/:po', (req, res) => {
 from SiparisUrunTB s
 inner join TedarikciTB t on t.ID = s.TedarikciID
 where s.SiparisNo='${req.params.po}'
+group by s.TedarikciID,t.FirmaAdi
     `;
     mssql.query(sql,(err,supplier)=>{
         res.status(200).json({ 'list': supplier.recordset }); 
@@ -9740,7 +9762,7 @@ app.post('/finance/po/paid/update/send/mail', (req, res) => {
     });
     res.status(200).json({ 'status': true });
 });
-function addedSendMail(payload) {
+async function addedSendMail(payload) {
     return new Promise((resolve, reject) => {
         let content;
         let customSubject;
@@ -9838,7 +9860,7 @@ function addedSendMail(payload) {
 
 
 };
-function deletedSendMail(payload) {
+async function deletedSendMail(payload) {
 
     return new Promise((resolve, reject) => {
         let content = `
@@ -9891,7 +9913,7 @@ function deletedSendMail(payload) {
 
 
 };
-function updatedSendMail(payload) {
+async function updatedSendMail(payload) {
     return new Promise((resolve, reject) => {
         let content = `
             <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişinden Aşağıdaki Kalemleri Güncelledi.</h3>
@@ -10100,7 +10122,6 @@ app.post('/logs/save',(req,res)=>{
         '${req.body.color}'
     )
     `;
-    console.log(sql);
     mssql.query(sql,(err,log)=>{
         if(log.rowsAffected[0] == 1){
             res.status(200).json({'status':true});

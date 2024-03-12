@@ -100,7 +100,7 @@
         :cost="getOrderProductionCostList"
         :costTotal="getOrderProductionCostTotal"
         :supplierDelivery="getOrderKindOfDeliverySupplierList"
-        :productSupplier="getOrderProductionProductDetailList"
+        :productSupplier="getOrderProductionSupplierList"
         :supplierProduct="getOrderSupplierProductList"
         :document="getOrderProductionDocumentList"
         :check="getOrderProductionCheckList"
@@ -249,8 +249,8 @@ export default {
         operation: this.productionModel.operationMail,
         representative: this.productionModel.representativeMail,
         status: 2,
-        notchange:this.getOrderProductionProductDetailNotChangeList,
-        new:this.getOrderProductionButtonStatus
+        notchange: this.getOrderProductionProductDetailNotChangeList,
+        new: this.getOrderProductionButtonStatus,
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
@@ -278,30 +278,70 @@ export default {
       return value2;
     },
     update() {
-      this.productionModel.FinansAciklama = this.__stringCharacterChange(this.productionModel.FinansAciklama);
-      this.productionModel.UretimAciklama = this.__stringCharacterChange(this.productionModel.UretimAciklama);
-      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(this.productionModel.SevkiyatAciklama);
-      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(this.productionModel.DetayAciklama_1);
-      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(this.productionModel.DetayAciklama_2);
-      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(this.productionModel.DetayAciklama_3);
-      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(this.productionModel.DetayAciklama_4);
-      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_1);
-      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_2);
-      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_3);
+      this.productionModel.FinansAciklama = this.__stringCharacterChange(
+        this.productionModel.FinansAciklama
+      );
+      this.productionModel.UretimAciklama = this.__stringCharacterChange(
+        this.productionModel.UretimAciklama
+      );
+      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(
+        this.productionModel.SevkiyatAciklama
+      );
+      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_1
+      );
+      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_2
+      );
+      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_3
+      );
+      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_4
+      );
+      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_1
+      );
+      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_2
+      );
+      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_3
+      );
 
       this.$store.dispatch("setOrderProductionUpdate", this.productionModel);
     },
     save() {
-      this.productionModel.FinansAciklama = this.__stringCharacterChange(this.productionModel.FinansAciklama);
-      this.productionModel.UretimAciklama = this.__stringCharacterChange(this.productionModel.UretimAciklama);
-      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(this.productionModel.SevkiyatAciklama);
-      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(this.productionModel.DetayAciklama_1);
-      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(this.productionModel.DetayAciklama_2);
-      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(this.productionModel.DetayAciklama_3);
-      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(this.productionModel.DetayAciklama_4);
-      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_1);
-      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_2);
-      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(this.productionModel.DetayMekmarNot_3);
+      this.productionModel.FinansAciklama = this.__stringCharacterChange(
+        this.productionModel.FinansAciklama
+      );
+      this.productionModel.UretimAciklama = this.__stringCharacterChange(
+        this.productionModel.UretimAciklama
+      );
+      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(
+        this.productionModel.SevkiyatAciklama
+      );
+      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_1
+      );
+      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_2
+      );
+      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_3
+      );
+      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_4
+      );
+      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_1
+      );
+      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_2
+      );
+      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_3
+      );
 
       this.$store.dispatch("setOrderProductionSaveButtonStatus", true);
       this.productionModel.KayitTarihi = date.dateToString(new Date());
@@ -343,21 +383,18 @@ export default {
       this.production_detail_form = true;
     },
   },
-  mounted(){
-    this.$socket.socketIO.on('production_update_on',()=>{
+  mounted() {
+    this.$socket.socketIO.on("production_update_on", () => {
       this.$store.dispatch("setOrderProductionList");
     });
-    this.$socket.socketIO.on('cards_update_on',()=>{
-      this.$store.dispatch('setCardList');
+    this.$socket.socketIO.on("cards_update_on", () => {
+      this.$store.dispatch("setCardList");
     });
-
   },
-
-  
 
   watch: {
     getOrderProductionYearsList() {
-      this.selectedYear = { Yil: "All" };
+      this.selectedYear = { Yil: new Date().getFullYear() };
     },
   },
 };

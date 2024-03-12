@@ -176,7 +176,7 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                 if (response.data.status) {
                     this.$toast.success('Başarıyla Eklendi.');
                     vuexContext.commit('setOrderProductAdded', { ...payload, 'ID': response.data.id });
-                    
+                    vuexContext.dispatch("setOrderProductionSupplierList",payload.SiparisNo);
                     vuexContext.dispatch('setOrderProductModel');
                     
                 } else {
@@ -191,6 +191,7 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                     this.$toast.success('Başarıyla Güncellendi.');
                     vuexContext.commit('setOrderProductUpdated', payload);
                     vuexContext.dispatch('setOrderProductModel');
+                    vuexContext.dispatch("setOrderProductionSupplierList",payload.SiparisNo);
                 } else {
                     this.$toast.error('Güncelleme Başarısız.');
                 }
@@ -202,7 +203,7 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                 if (response.data.status) {
                     this.$toast.success('Başarıyla Silindi.');
                     vuexContext.commit('setOrderProductDeleted', payload);
-                    
+                    vuexContext.dispatch("setOrderProductionSupplierList",payload.SiparisNo);
                     vuexContext.dispatch('setOrderProductModel');
                 } else {
                     this.$toast.error('Silme İşlemi Başarısız.');

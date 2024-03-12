@@ -1,6 +1,6 @@
 <template>
-  <nav class=" navbar navbar-expand-lg bg-body-tertiary " >
-    <div class="container-fluid container" >
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid container">
       <a class="navbar-brand" href="#">GOZ</a>
       <button
         class="navbar-toggler"
@@ -13,7 +13,7 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav" >
+      <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
             <nuxt-link to="/" tag="a" class="nav-link">Home</nuxt-link>
@@ -40,7 +40,6 @@
                 >
               </li>
 
-              
               <li>
                 <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
                   >Points to Consider</nuxt-link
@@ -61,7 +60,6 @@
                   >Main To Do</nuxt-link
                 >
               </li>
-
             </ul>
           </li>
           <li class="nav-item dropdown">
@@ -439,7 +437,7 @@ export default {
       this.$store.dispatch("setTodoDone", event);
     },
     deleteProcess(event) {
-      this.$store.dispatch("setTodoDelete", event);
+      this.$store.dispatch("setTodoDelete", event.ID);
       this.to_do_form = false;
     },
     toDoListSelected(event) {

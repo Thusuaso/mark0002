@@ -27,6 +27,27 @@ const state = {
     panelUsaStockButtonStatus:false
 };
 const actions = {
+    setPanelProjectMainPhotoChange(vuexContext,photo){
+        this.$axios.post('/panel/project/main/photo/change',photo)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success("Başarıyla Değiştirildi.");
+            }else{
+                this.$toast.success("Değiştirme Başarısız.");
+                
+            }
+        });
+    },
+    setPanelProjectPhotosQueueChange(vuexContext,photos){
+        this.$axios.post('/panel/projet/photos/queue/change',photos)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Başarıyla Değiştirildi.');
+            } else{
+                this.$toast.error('Hata Oluştu.');
+            }
+        })
+    },
     setPanelProjectQueueChange(vuexContext,projects){
         this.$axios.put('/panel/project/queue/change',projects)
         .then(response=>{

@@ -146,7 +146,6 @@ export default {
       }
     },
     deleteForm() {
-      console.log(this.todo);
       this.$store.dispatch("setTodoDelete", this.todo.ID);
       this.$emit("todo_form_dialog", false);
     },

@@ -13,7 +13,7 @@
           </template>
         </FileUpload>
       </div>
-      <div class="col">
+      <div class="col-2">
         <Button
           type="button"
           class="p-button-secondary w-100"
@@ -21,12 +21,22 @@
           @click="$emit('panel_project_photo_change_product_name')"
         />
       </div>
-      <div class="col">
+      <div class="col-2">
         <Button
           type="button"
           class="p-button-info w-100"
           label="Suggested"
           @click="$emit('panel_project_suggested')"
+        />
+      </div>
+      <div class="col-2">
+        <FileUpload
+          mode="basic"
+          accept="image/*"
+          :maxFileSize="1000000"
+          @select="changeProjectMainPhoto($event)"
+          chooseLabel="Change Main Photo"
+          class="w-100"
         />
       </div>
     </div>
@@ -37,6 +47,7 @@
           listStyle="height:392px;width:450px;"
           breakpoint="1400px"
           @move-to-target="$emit('move_to_target_project_photo_emit', $event)"
+          @reorder="re_order_project_photo($event)"
         >
           <template #sourceheader> Available </template>
           <template #targetheader> Selected </template>
@@ -126,6 +137,7 @@
   </div>
 </template>
 <script>
+import oceanservice from "~/plugins/digitalocean";
 export default {
   props: {
     photos: {
@@ -148,12 +160,38 @@ export default {
       type: Boolean,
       required: true,
     },
+    projectId: {
+      type: Number,
+      required: false,
+    },
   },
   data() {
     return {
       videos_link: null,
     };
   },
-  methods: {},
+  methods: {
+    changeProjectMainPhoto(event) {
+      oceanservice.panelProjectSendPhoto(event.files[0]).then((response) => {
+        if (response) {
+          const data = {
+            id: this.projectId,
+            link:
+              "https://mekmar-image.fra1.cdn.digitaloceanspaces.com/galleria-project_photos/" +
+              event.files[0].name,
+          };
+          this.$store.dispatch("setPanelProjectMainPhotoChange", data);
+        }
+      });
+    },
+    re_order_project_photo(event) {
+      let index = 1;
+      event.value[0].forEach((x) => {
+        x.Queue = index;
+        index++;
+      });
+      this.$store.dispatch("setPanelProjectPhotosQueueChange", event.value[0]);
+    },
+  },
 };
 </script>
