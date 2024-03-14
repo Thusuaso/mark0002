@@ -66,6 +66,9 @@
           </div>
         </div>
       </div>
+      <div class="col">
+        <Button class="p-button-warning" label="Excel" @click="excel_output" />
+      </div>
     </div>
     <orderList
       :list="getOrderList"
@@ -135,7 +138,7 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 import date from "../../plugins/date";
-
+import api from "../../plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
@@ -176,6 +179,7 @@ export default {
       "getLoading",
       "getOrderProductionYearsList",
       "getOrderProductionSaveButtonStatus",
+      "getLocalUrl",
     ]),
   },
   data() {
@@ -205,6 +209,20 @@ export default {
     this.$store.dispatch("setOrderProductionList");
   },
   methods: {
+    excel_output() {
+      api
+        .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
+
+            link.setAttribute("download", "Uretim_list.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
+    },
     marketingChange(event) {
       if (this.selectedMarketing == "All") {
         this.$store.commit("setOrderList", this.getOrderListAll);

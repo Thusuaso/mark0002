@@ -23,6 +23,7 @@ import finance from './modules/finance';
 import order from './modules/order';
 import loading from './modules/loading';
 import logs from './modules/logs';
+import local from './modules/local';
 const createStore = ()=>{
     return new Vuex.Store({
        state:{
@@ -56,7 +57,8 @@ const createStore = ()=>{
            finance,
            order,
             loading,
-            logs
+            logs,
+            local
         ],
 
     });

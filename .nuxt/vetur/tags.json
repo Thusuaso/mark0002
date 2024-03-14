@@ -23,6 +23,12 @@
   "OffersList": {
     "description": "Auto imported from components/offers/list.vue"
   },
+  "OffersProforma": {
+    "description": "Auto imported from components/offers/proforma.vue"
+  },
+  "OffersSample": {
+    "description": "Auto imported from components/offers/sample.vue"
+  },
   "PanelForm": {
     "description": "Auto imported from components/panel/form.vue"
   },
@@ -58,6 +64,18 @@
   },
   "UploadList": {
     "description": "Auto imported from components/upload/list.vue"
+  },
+  "ContainerFollowForm": {
+    "description": "Auto imported from components/container/follow/form.vue"
+  },
+  "ContainerFollowList": {
+    "description": "Auto imported from components/container/follow/list.vue"
+  },
+  "ContainerInputForm": {
+    "description": "Auto imported from components/container/input/form.vue"
+  },
+  "ContainerInputList": {
+    "description": "Auto imported from components/container/input/list.vue"
   },
   "CustomerBgpForm": {
     "description": "Auto imported from components/customer/bgp/form.vue"
@@ -115,18 +133,6 @@
   },
   "FinanceListsPo": {
     "description": "Auto imported from components/finance/lists/po.vue"
-  },
-  "ContainerFollowForm": {
-    "description": "Auto imported from components/container/follow/form.vue"
-  },
-  "ContainerFollowList": {
-    "description": "Auto imported from components/container/follow/list.vue"
-  },
-  "ContainerInputForm": {
-    "description": "Auto imported from components/container/input/form.vue"
-  },
-  "ContainerInputList": {
-    "description": "Auto imported from components/container/input/list.vue"
   },
   "OrdersFormsChat": {
     "description": "Auto imported from components/orders/forms/chat.vue"

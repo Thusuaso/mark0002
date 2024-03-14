@@ -38,5 +38,17 @@ export default {
       }
     },
   },
+  watch: {
+    value() {
+      if (
+        this.value == " " ||
+        this.value == "" ||
+        this.value == undefined ||
+        this.value == null
+      ) {
+        this.value = 0;
+      }
+    },
+  },
 };
 </script>

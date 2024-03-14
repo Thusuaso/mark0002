@@ -3,7 +3,7 @@
     <div class="col-9">
       <DataTable
         :value="allStatus ? allList : list"
-        sortField="Balanced"
+        sortField="balanced"
         :sortOrder="-1"
         scrollable
         scrollHeight="650px"
@@ -15,7 +15,12 @@
         @row-click="$emit('finance_list_selected_emit', $event)"
         :loading="loading"
       >
-        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="customer_name"
+          header="Customer"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -25,57 +30,74 @@
             />
           </template>
         </Column>
-        <Column field="TotalOrder" header="Total Order">
+        <Column field="total_order_amount" header="Total Order">
           <template #body="slotProps">
-            {{ slotProps.data.TotalOrder | formatPriceUsd }}
+            {{ slotProps.data.total_order_amount | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.total | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ProductOrder" header="In Production">
+        <Column field="production" header="In Production">
           <template #body="slotProps">
-            {{ slotProps.data.ProductOrder | formatPriceUsd }}
+            {{ slotProps.data.production | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.production | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ForwardingOrder" header="In Shipment">
+        <Column field="forwarding" header="In Shipment">
           <template #body="slotProps">
-            {{ slotProps.data.ForwardingOrder | formatPriceUsd }}
+            {{ slotProps.data.forwarding | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.forwarding | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="AdvancedPayment" header="Pre Payment">
+        <Column field="advanced_payment" header="Pre Payment">
           <template #body="slotProps">
-            {{ slotProps.data.AdvancedPayment | formatPriceUsd }}
+            {{ slotProps.data.advanced_payment | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.advanced | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Paid" header="Paid">
+        <Column field="paid" header="Paid">
           <template #body="slotProps">
-            {{ slotProps.data.Paid | formatPriceUsd }}
+            {{ slotProps.data.paid | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="BalancedProduction" header="Balance">
+        <Column field="total" header="Balance">
           <template #body="slotProps">
-            {{ slotProps.data.BalancedProduction | formatPriceUsd }}
+            {{ slotProps.data.total | formatPriceUsd }}
           </template>
           <template #footer>
             {{ total.balanceProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Balanced" header="Balance(Except Production)">
+        <Column field="balanced" header="Balance(Except Production)">
           <template #body="slotProps">
-            {{ slotProps.data.Balanced | formatPriceUsd }}
+            <div
+              :style="{
+                backgroundColor:
+                  slotProps.data.balanced < -8
+                    ? 'red'
+                    : 'transparent' || slotProps.data.balanced > 8
+                    ? 'green'
+                    : 'transparent',
+                color:
+                  slotProps.data.balanced < -8
+                    ? 'white'
+                    : 'black' || slotProps.data.balanced > 8
+                    ? 'white'
+                    : 'black',
+              }"
+            >
+              {{ slotProps.data.balanced | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ total.balance | formatPriceUsd }}
@@ -85,49 +107,48 @@
     </div>
     <div class="col-3">
       <DataTable :value="expiry" :loading="loading">
-        <Column field="FirmaAdi" header="Customer"></Column>
-        <Column field="SiparisNo" header="Po"></Column>
-        <Column field="Vade" header="Maturity">
+        <Column field="firmaAdi" header="Customer"></Column>
+        <Column field="siparis_no" header="Po"></Column>
+        <Column field="vade_tarih" header="Maturity">
           <template #body="slotProps">
-            {{ slotProps.data.Vade | dateToString }}
+            {{ slotProps.data.vade_tarih | dateToString }}
           </template>
         </Column>
-        <Column field="Total" header="Total">
+        <Column field="tutar" header="Total">
           <template #body="slotProps">
-            {{ slotProps.data.Total | formatPriceUsd }}
+            {{ slotProps.data.tutar | formatPriceUsd }}
           </template>
         </Column>
       </DataTable>
     </div>
     <DataTable :value="maya" :loading="loading">
-      <Column field="SiparisTarihi" header="Order Date">
+      <Column field="order_date" header="Order Date">
         <template #body="slotProps">
-          {{ slotProps.data.SiparisTarihi | dateToString }}
+          {{ slotProps.data.order_date | dateToString }}
         </template>
       </Column>
-      <Column field="YuklemeTarihi" header="Shipment Date">
+      <Column field="forwarding_date" header="Shipment Date">
         <template #body="slotProps">
-          {{ slotProps.data.YuklemeTarihi | dateToString }}
+          {{ slotProps.data.forwarding_date | dateToString }}
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Customer"></Column>
-      <Column field="SiparisNo" header="Po"></Column>
-      <Column field="Invoice" header="Invoice">
+      <Column field="customer" header="Customer"></Column>
+      <Column field="po" header="Po"></Column>
+      <Column field="order_amount" header="Invoice">
         <template #body="slotProps">
-          {{ slotProps.data.Invoice | formatPriceUsd }}
+          {{ slotProps.data.order_amount | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Paid" header="Paid">
+      <Column field="paid" header="Paid">
         <template #body="slotProps">
-          {{ slotProps.data.Paid | formatPriceUsd }}
+          {{ slotProps.data.paid | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Balance" header="Balance">
+      <Column field="balance" header="Balance">
         <template #body="slotProps">
-          {{ slotProps.data.Balance | formatPriceUsd }}
+          {{ slotProps.data.balance | formatPriceUsd }}
         </template>
       </Column>
-
     </DataTable>
   </div>
 </template>
@@ -159,15 +180,15 @@ export default {
       type: Boolean,
       required: false,
     },
-    maya:{
-      type:Boolean,
-      required:false
-    }
+    maya: {
+      type: Array,
+      required: false,
+    },
   },
   data() {
     return {
       filteredFinance: {
-        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        customer_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       selectedFinanceList: null,
     };

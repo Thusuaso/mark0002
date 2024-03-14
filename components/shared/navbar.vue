@@ -26,6 +26,34 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
+              Orders
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <nuxt-link to="/orders/production" class="dropdown-item" tag="a"
+                  >Production</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/orders/shipped" class="dropdown-item" tag="a"
+                  >Shipped</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a"
+                  >Waiting</nuxt-link
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
               Sales
             </a>
             <ul class="dropdown-menu">
@@ -62,34 +90,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Orders
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/orders/production" class="dropdown-item" tag="a"
-                  >Production</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/orders/shipped" class="dropdown-item" tag="a"
-                  >Shipped</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a"
-                  >Waiting</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
+
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
@@ -432,6 +433,16 @@ export default {
     this.$store.dispatch("setToDoListByUsername", Cookies.get("username"));
   },
   methods: {
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
+
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
+    },
     todoDone(event) {
       event.YapildiTarihi = date.dateToString(new Date());
       this.$store.dispatch("setTodoDone", event);
@@ -446,6 +457,7 @@ export default {
       this.to_do_form = true;
     },
     update(event) {
+      event.CustomYapilacak = this.__stringCharacterChange(event.Yapilacak);
       this.$store.dispatch("setTodoUpdate", event);
       this.to_do_form = false;
     },
@@ -453,6 +465,8 @@ export default {
       event.GorevVerenID = Cookies.get("userId");
       event.GorevVerenAdi = Cookies.get("username");
       event.GirisTarihi = date.dateToString(new Date());
+      event.CustomYapilacak = this.__stringCharacterChange(event.Yapilacak);
+
       this.$store.dispatch("setTodoSave", event);
       this.to_do_form = false;
     },

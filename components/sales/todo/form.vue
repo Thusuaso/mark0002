@@ -111,6 +111,16 @@ export default {
       );
     },
     save() {},
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
+
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
+    },
     update() {
       this.todo.OrtakGorev = "";
       if (this.selectedUsers.length == 1) {
@@ -136,6 +146,8 @@ export default {
           this.selectedUsers[3].KullaniciAdi;
       }
       this.todo.YapilacakOncelik = this.selectedPriority.oncelik;
+      this.todo.CustomYapilacak = this.__stringCharacterChange(this.todo.Yapilacak)
+
       this.$store.dispatch("setTodoUpdate", this.todo);
     },
     saveProcess() {

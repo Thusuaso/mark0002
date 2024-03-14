@@ -49,26 +49,51 @@
               />
             </TabPanel>
             <TabPanel header="Reminder Document">
-              <p class="m-0">
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
-                doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo
-                inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
-                fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem
-                sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius
-                modi.
-              </p>
+              <div class="row">
+                <div class="col">
+                  <Calendar
+                    v-model="reminder_date"
+                    @date-select="reminderDateSelected($event)"
+                    placeholder="Reminder Date"
+                  />
+                </div>
+                <div class="col">
+                  <FileUpload mode="basic" @select="uploadReminder($event)" />
+                </div>
+                <div class="col">
+                  <a :href="offerFileLink" ref="cloudReminder"> </a>
+                  <Button
+                    @click="$refs.cloudReminder.click()"
+                    :disabled="!model.Teklif_Cloud"
+                    class="btn btn-success h-100"
+                    ><i class="pi pi-download"></i
+                  ></Button>
+                </div>
+              </div>
             </TabPanel>
             <TabPanel header="Proforma - Sample">
-              <p class="m-0">
-                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis
-                praesentium voluptatum deleniti atque corrupti quos dolores et quas
-                molestias excepturi sint occaecati cupiditate non provident, similique
-                sunt in culpa qui officia deserunt mollitia animi, id est laborum et
-                dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.
-                Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil
-                impedit quo minus.
-              </p>
+              <div class="row">
+                <div class="col">
+                  <Button
+                    class="p-button-primary"
+                    label="Proforma"
+                    @click="proforma_dialog_form = true"
+                  />
+                  <Dialog :visible.sync="proforma_dialog_form" header="Proforma" modal>
+                    <offerProforma :id="id" :model="model" />
+                  </Dialog>
+                </div>
+                <div class="col">
+                  <Button
+                    class="p-button-secondary"
+                    label="Numune"
+                    @click="sample_dialog_form = true"
+                  />
+                  <Dialog :visible.sync="sample_dialog_form" header="Sample" modal>
+                    <offerSample :id="id" :model="model"/>
+                  </Dialog>
+                </div>
+              </div>
             </TabPanel>
           </TabView>
         </div>
@@ -350,7 +375,7 @@
           field="UlkeAdi"
           @item-select="countrySelected($event)"
         />
-        <label for="country">Customer</label>
+        <label for="country">Country</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText id="company" v-model="customerModel.Company" />
@@ -379,6 +404,7 @@
 import date from "../../plugins/date";
 import Cookies from "js-cookie";
 
+import fileService from "~/plugins/upload.js";
 export default {
   props: {
     model: {
@@ -440,6 +466,10 @@ export default {
   },
   data() {
     return {
+      proforma_dialog_form: false,
+      sample_dialog_form: false,
+      offerFileLink: null,
+      reminder_date: null,
       process_button_disabled: false,
       selectedCountry: null,
       filteredCountry: null,
@@ -492,22 +522,83 @@ export default {
     }
   },
   methods: {
+    uploadReminder(event) {
+      fileService.offerFile(event.files[0], this.id).then((response) => {
+        if (response.Status) {
+          this.model.teklifCloud = true;
+          this.model.teklifCloudDosya = event.files[0].name;
+          const data = {
+            cloud: "1",
+            name: event.files[0].name,
+            date: date.dateToString(this.reminder_date),
+            id: this.id,
+          };
+          this.$store.dispatch("setOfferReminderCloudUpload", data).then((response) => {
+            this.offerFileLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${this.id}/${event.files[0].name}`;
+            if (response) {
+              this.$toast.success("Başarıyla Kaydedildi.");
+            } else {
+              this.$toast.error("Kaydetme Başarısız.");
+            }
+          });
+        }
+      });
+    },
+    reminderDateSelected(event) {
+      console.log(event);
+    },
+    __undefinedControl(value) {
+      if (
+        value === undefined ||
+        value === null ||
+        value == "" ||
+        value == " " ||
+        value == 0
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    },
     deleteProcess() {
       this.$emit("offer_delete_emit", this.model.Id);
     },
     customerInput(event) {
       this.customerModel.MusteriAdi = event;
+      this.customerModel.Id = null;
+    },
+    __saveControl() {
+      if (
+        this.customerModel.MusteriAdi == null ||
+        this.customerModel.MusteriAdi == "" ||
+        this.customerModel.UlkeId == null ||
+        this.customerModel.UlkeId == "" ||
+        this.model.TeklifYeri == null ||
+        this.model.TeklifYeri == "" ||
+        this.model.KaynakYeri == null ||
+        this.model.KaynakYeri == "" ||
+        this.model.Tarih == null ||
+        this.model.Tarih == ""
+      ) {
+        return true;
+      } else {
+        return false;
+      }
     },
     process() {
-      this.process_button_disabled = true;
-      this.customerModel.Kullanici = Cookies.get("userId");
-      this.model.KullaniciId = Cookies.get("userId");
-      if (this.status) {
-        this.model.TakipEt = true;
+      if (this.__saveControl()) {
+        alert("Hatalı Giriş");
+      } else {
+        this.process_button_disabled = true;
+        this.customerModel.Kullanici = Cookies.get("userId");
+        this.model.KullaniciId = Cookies.get("userId");
+        if (this.status) {
+          this.model.TakipEt = true;
+        }
+        this.model.Tarih = date.dateToString(this.offerDate);
+        const data = { offer: this.model, customer: this.customerModel };
+        this.$emit("offer_process_emit", data);
       }
-      this.model.Tarih = date.dateToString(this.offerDate);
-      const data = { offer: this.model, customer: this.customerModel };
-      this.$emit("offer_process_emit", data);
     },
     countrySelected(event) {
       this.customerModel.UlkeId = event.value.Id;
@@ -563,6 +654,7 @@ export default {
       this.process_button_disabled = false;
     },
     createdProcess() {
+      this.offerFileLink = this.model.cloudLink;
       this.selectedSource = this.sources.find((x) => x.source == this.model.KaynakYeri);
       this.selectedOfferType = this.offerTypes.find(
         (x) => x.type == this.model.TeklifYeri
@@ -571,14 +663,18 @@ export default {
         (x) => x.priority == this.model.TeklifOncelik
       );
       this.offerDate = date.stringToDate(this.model.Tarih);
-      this.selectedCustomer = this.customer.find((x) => x.Id == this.model.MusteriId);
-      this.selectedCountry = this.country.find(
-        (x) => x.Id == this.selectedCustomer.UlkeId
-      );
+      if (this.__undefinedControl(this.model.MusteriId)) {
+        this.selectedCustomer = this.customer.find((x) => x.Id == this.model.MusteriId);
+        if (this.__undefinedControl(this.selectedCustomer.UlkeId)) {
+          this.selectedCountry = this.country.find(
+            (x) => x.Id == this.selectedCustomer.UlkeId
+          );
+          this.customerModel.UlkeId = this.selectedCustomer.UlkeId;
+        }
+      }
 
       this.customerModel.Id = this.selectedCustomer.Id;
       this.customerModel.MusteriAdi = this.selectedCustomer.MusteriAdi;
-      this.customerModel.UlkeId = this.selectedCustomer.UlkeId;
       this.customerModel.Company = this.selectedCustomer.Company;
       this.customerModel.Mail = this.selectedCustomer.Mail;
       this.customerModel.Phone = this.selectedCustomer.Phone;
@@ -627,7 +723,6 @@ export default {
     },
     offerProductDateSelected(event) {
       this.modelProduct.Tarih = date.dateToString(event);
-      this.process_button_disabled = false;
     },
     deleteProduct() {
       this.$store.dispatch("setOfferDetailProductsDelete", this.modelProduct.Id);

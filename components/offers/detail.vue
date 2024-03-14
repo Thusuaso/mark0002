@@ -11,10 +11,14 @@
       :loading="loading"
       :filters.sync="orderFilters"
       filterDisplay="row"
-      :sortField="[TeklifOncelik,Sira]"
-      :sortOrder="1"
+      @filter="aListFiltered($event)"
     >
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Tarih"
+        header="Tarih"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -27,7 +31,12 @@
           />
         </template>
       </Column>
-      <Column field="Sira" header="Queue" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Sira"
+        header="Queue"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -37,7 +46,12 @@
           />
         </template>
       </Column>
-      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="MusteriAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -47,7 +61,12 @@
           />
         </template>
       </Column>
-      <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UlkeAdi"
+        header="Country"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -57,7 +76,12 @@
           />
         </template>
       </Column>
-      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KullaniciAdi"
+        header="Representative"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -66,8 +90,16 @@
             class="p-column-filter"
           />
         </template>
+        <template #footer>
+          {{ aListTotal }}
+        </template>
       </Column>
-      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="TeklifOncelik"
+        header="Priority"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -91,11 +123,17 @@
       :loading="loading"
       :filters.sync="orderFiltersB"
       filterDisplay="row"
+      @filter="bListFiltered($event)"
     >
       <template #header>
         <h3 class="header">B List</h3>
       </template>
-      <Column field="Tarih" header="Tarih" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Tarih"
+        header="Tarih"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -108,7 +146,12 @@
           />
         </template>
       </Column>
-      <Column field="Sira" header="Queue" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Sira"
+        header="Queue"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -118,7 +161,12 @@
           />
         </template>
       </Column>
-      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="MusteriAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -128,7 +176,12 @@
           />
         </template>
       </Column>
-      <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UlkeAdi"
+        header="Country"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -138,7 +191,12 @@
           />
         </template>
       </Column>
-      <Column field="KullaniciAdi" header="Representative" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KullaniciAdi"
+        header="Representative"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -147,8 +205,16 @@
             class="p-column-filter"
           />
         </template>
+        <template #footer>
+          {{ bListTotal }}
+        </template>
       </Column>
-      <Column field="TeklifOncelik" header="Priority" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="TeklifOncelik"
+        header="Priority"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -177,6 +243,14 @@ export default {
       type: Boolean,
       required: false,
     },
+    aListTotal: {
+      type: Number,
+      required: false,
+    },
+    bListTotal: {
+      type: Number,
+      required: false,
+    },
   },
   data() {
     return {
@@ -200,6 +274,12 @@ export default {
     };
   },
   methods: {
+    bListFiltered(event) {
+      this.$store.dispatch("setOfferBListTotal", event.filteredValue);
+    },
+    aListFiltered(event) {
+      this.$store.dispatch("setOfferAListTotal", event.filteredValue);
+    },
     offerClass(event) {
       return event.TeklifOncelik == "Toplantı" ? "yellow" : "";
     },

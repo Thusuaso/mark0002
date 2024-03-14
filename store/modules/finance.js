@@ -1,3 +1,5 @@
+import api from "../../plugins/excel.server";
+
 const state = {
     financeList: [],
     financeListAll: [],
@@ -36,15 +38,26 @@ const state = {
 const actions = {
     setFinanceList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
-        this.$axios.get('/finance/list')
-            .then(response => {
-                if (response.data) {
-                    vuexContext.commit('setFinanceList', response.data); 
-                            vuexContext.dispatch('setEndLoadingAction');
+
+        api.get("/finance/reports/test").then((response) => {
+            if(response.data){
+                vuexContext.commit('setFinanceList', response.data); 
+                vuexContext.commit('setFinanceTotalList',response.data.financeList)
+                vuexContext.dispatch('setEndLoadingAction');
+            }
+            
+          });
 
 
-                }
-            });
+
+        // this.$axios.get('/finance/list')
+        //     .then(response => {
+        //         if (response.data) {
+        //             vuexContext.commit('setFinanceList', response.data); 
+
+
+        //         }
+        //     });
     },
     setFinanceTotalList(vuexContext,finance) {
       vuexContext.commit('setFinanceTotalList',finance)  
@@ -151,6 +164,8 @@ const actions = {
                     vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'huseyin@mekmer.com' });
                     vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'info@mekmar.com' });
                     vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'mehmet@mekmer.com' });
+                    vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'export1@mekmar.com' });
+                    vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'export2@mekmar.com' });
                     vuexContext.dispatch('setFinancePoPaidList', paid.SiparisNo);
                     vuexContext.dispatch('setFinancePoList', paid.MusteriID);
                     vuexContext.dispatch('setFinanceList');
@@ -190,6 +205,10 @@ const actions = {
                     vuexContext.dispatch('setPoPaidDeleteSendMail', { ...paid, 'Mail': 'huseyin@mekmer.com' });
                     vuexContext.dispatch('setPoPaidDeleteSendMail', { ...paid, 'Mail': 'info@mekmar.com' });
                     vuexContext.dispatch('setPoPaidDeleteSendMail', { ...paid, 'Mail': 'mehmet@mekmer.com' });
+                    vuexContext.dispatch('setPoPaidDeleteSendMail', { ...paid, 'Mail': 'export1@mekmar.com' });
+                    vuexContext.dispatch('setPoPaidDeleteSendMail', { ...paid, 'Mail': 'export2@mekmar.com' });
+
+
 
                     vuexContext.dispatch('setFinancePoPaidList', paid.SiparisNo);
                     vuexContext.dispatch('setFinancePoList', paid.MusteriID);
@@ -220,7 +239,8 @@ const actions = {
                     vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'huseyin@mekmer.com' });
                     vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'info@mekmar.com' });
                     vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'mehmet@mekmer.com' });
-
+                    vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'export1@mekmar.com' });
+                    vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'export2@mekmar.com' });
                     vuexContext.dispatch('setFinancePoPaidList', paid.SiparisNo);
                     vuexContext.dispatch('setFinancePoList', paid.MusteriID);
                     vuexContext.dispatch('setFinanceList');
@@ -268,13 +288,13 @@ const mutations = {
             'balanceProduction': 0
         };
         payload.forEach(x => {
-                              state.financeListTotal.total += x.TotalOrder;
-                    state.financeListTotal.production += x.ProductOrder;
-                    state.financeListTotal.forwarding += x.ForwardingOrder;
-                    state.financeListTotal.advanced += x.AdvancedPayment;
-                    state.financeListTotal.paid += x.Paid;
-                    state.financeListTotal.balanceProduction += ((x.ProductOrder + x.ForwardingOrder) - x.Paid);
-                    state.financeListTotal.balance += (x.ForwardingOrder - x.Paid);  
+                              state.financeListTotal.total += x.total_order_amount;
+                    state.financeListTotal.production += x.production;
+                    state.financeListTotal.forwarding += x.forwarding;
+                    state.financeListTotal.advanced += x.advanced_payment;
+                    state.financeListTotal.paid += x.paid;
+                    state.financeListTotal.balanceProduction += ((x.production + x.forwarding) - x.paid);
+                    state.financeListTotal.balance += (x.forwarding - x.paid);  
         })
 
     },
@@ -290,43 +310,20 @@ const mutations = {
             'balance': 0,
             'balanceProduction': 0
         };
-        payload.list.forEach(x => {
-            if (x.ID == 314 || x.ID == 6 || x.ID==34 || x.ID==153) {
-                x.ForwardingBalance = 0;
-                x.ProductBalance = 0;
-
-
-            } else {
-                if ((x.ForwardingOrder - x.Paid) > 8 || (x.ForwardingOrder - x.Paid) < -8) {
-                    state.financeList.push({...x,'Balanced':(x.ForwardingOrder - x.Paid),'BalancedProduction':((x.ProductOrder + x.ForwardingOrder) - x.Paid)});
-
-                    state.financeListTotal.total += x.TotalOrder;
-                    state.financeListTotal.production += x.ProductOrder;
-                    state.financeListTotal.forwarding += x.ForwardingOrder;
-                    state.financeListTotal.advanced += x.AdvancedPayment;
-                    state.financeListTotal.paid += x.Paid;
-
-                    state.financeListTotal.balanceProduction += ((x.ProductOrder + x.ForwardingOrder) - x.Paid);
-                    state.financeListTotal.balance += (x.ForwardingOrder - x.Paid);
-                }
+        for(const item of payload.financeList) {
+            if(item.forwarding - item.paid == 0 ){
+                continue;
+            }else if ((item.forwarding - item.paid) >8 || (item.forwarding - item.paid) <-8){
+                item.balanced = item.forwarding - item.paid;
+                state.financeList.push(item);
             }
-
-        });
-        payload.list.forEach(x => {
-            if (x.ID == 314 || x.ID == 6 || x.ID==34 || x.ID==153) {
-
-                state.financeListAll.push({...x,'Balanced':0,'BalancedProduction':0});
-
-            } else{
-
-                state.financeListAll.push({...x,'Balanced':(x.ForwardingOrder - x.Paid),'BalancedProduction':(x.ProductOrder + x.ForwardingOrder) - x.Paid});
-
-            }
-            
-
-        });
-        state.financeExpiryList = payload.expiry;
-        state.financeListMaya = payload.maya;
+        };
+        for(const item of payload.financeList) {
+                item.balanced = item.forwarding - item.paid;
+                state.financeListAll.push(item);
+        };
+        state.financeExpiryList = payload.vadeList;
+        state.financeListMaya = payload.mayaList;
 
     },
     setFinanceCollectionList(state, payload) {

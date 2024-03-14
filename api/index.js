@@ -457,7 +457,7 @@ app.put('/sales/todos/change/status/:id',(req,res)=>{
     });
 });
 app.put('/sales/todos/update',(req,res)=>{
-    const sql = `update Yapilacaklar SET Yapilacak='${req.body.Yapilacak}',YapilacakOncelik='${req.body.YapilacakOncelik}',OrtakGorev='${req.body.OrtakGorev}',Acil='${req.body.Acil}' WHERE ID='${req.body.ID}'`;
+    const sql = `update Yapilacaklar SET Yapilacak='${req.body.CustomYapilacak}',YapilacakOncelik='${req.body.YapilacakOncelik}',OrtakGorev='${req.body.OrtakGorev}',Acil='${req.body.Acil}' WHERE ID='${req.body.ID}'`;
     mssql.query(sql,(err,results)=>{
        if(results.rowsAffected[0] == 1){
             res.status(200).json({
@@ -1200,19 +1200,14 @@ app.post('/shipment/products/save',(req,res)=>{
             mssql.query(insertSql)
             .then(response=>{
                 mssql.query(updateOrderSql,(err,results)=>{
-                    if(results.rowsAffected[0] == 1){
-                        res.status(200).json({
-                            'status':true,
-                        })
-                    }else{
-                        res.status(200).json({
-                            'status':false,
-                        })
-                    }
+                    
                 });
             });
         });
     };
+        res.status(200).json({
+            'status':true,
+        })
 
     
 });
@@ -5106,6 +5101,9 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
 where yt.TakipEt = 1 and yt.KullaniciId=${req.params.representative} and yt.BList != 1
     `;
     mssql.query(sql, (err, results) => {
+        results.recordset.forEach(x=>{
+            x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;;
+        });
         res.status(200).json({ 'list': results.recordset }); 
     });
 });
@@ -5428,7 +5426,7 @@ app.delete('/offer/delete/:id', (req, res) => {
 });
 app.get('/offer/detail/all/list', (req, res) => {
     const sql = `
-         select 
+    select 
 
 
 	yt.Id,
@@ -5475,16 +5473,18 @@ app.get('/offer/detail/all/list', (req, res) => {
 	yt.Email,
 	yt.Phone,
 	ytm.MusteriAdi,
-	k.KullaniciAdi,
-    ytu.UlkeAdi
+
+	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = ytm.UlkeId) as UlkeAdi,
+	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as KullaniciAdi
+
+
 
 from YeniTeklifTB yt
 inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
 inner join KullaniciTB k on k.ID = yt.KullaniciId
-inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
  
 where yt.TakipEt = 1 and yt.BList != 1
-order by yt.TeklifOncelik 
+order by yt.TeklifOncelik,yt.Sira
     `;
     const bListSql =  `
     select 
@@ -5534,16 +5534,18 @@ order by yt.TeklifOncelik
 	yt.Email,
 	yt.Phone,
 	ytm.MusteriAdi,
-	k.KullaniciAdi,
-    ytu.UlkeAdi
+
+	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = ytm.UlkeId) as UlkeAdi,
+	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as KullaniciAdi
+
+
 
 from YeniTeklifTB yt
 inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
 inner join KullaniciTB k on k.ID = yt.KullaniciId
-inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
-
+ 
 where yt.TakipEt = 1 and yt.BList = 1
-order by yt.TeklifOncelik 
+order by yt.TeklifOncelik,yt.Sira
     `;
     mssql.query(sql,(err,results)=>{
         mssql.query(bListSql,(err,bList)=>{
@@ -5678,6 +5680,53 @@ where yt.TakipEt = 1 and yt.KullaniciId='${req.params.representative}' and yt.BL
         res.status(200).json({ 'list': bList.recordset }); 
     });
 });
+app.put('/offer/reminder/file/upload',(req,res)=>{
+    const sql = `update YeniTeklifTB set Teklif_Cloud='${req.body.cloud}',Teklif_Cloud_Dosya='${req.body.name}',HatirlatmaTarihi='${req.body.date}' where Id='${req.body.id}'`;
+    mssql.query(sql,(err,reminder)=>{
+        if(reminder.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        }
+    });
+});
+app.put('/offer/proforma/file/upload',(req,res)=>{
+    const sql = `
+    update YeniTeklifTB set Proforma_Po_No='${req.body.po}',Proforma_Tarih='${req.body.date}',Proforma_Tutar='${req.body.amount}',
+    Proforma_Cloud='${req.body.cloud}',Proforma_Cloud_Dosya='${req.body.name}',ProformaNot='${req.body.description}' where Id='${req.body.id}'
+    `;
+    mssql.query(sql,(err,proforma)=>{
+        if(proforma.rowsAffected[0]==1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+});
+app.put('/offer/sample/file/upload',(req,res)=>{
+    const sql = `
+    update YeniTeklifTB set Numune_Giris_Tarihi='${req.body.entrydate}',Numune_Hatirlatma_Tarihi='${req.body.reminderdate}',Numune_Hatirlatma_SonTarih='${req.body.lastreminderdate}',
+    Numune_Tracking_No='${req.body.followno}',Numune_Odenen_Tutar='${req.body.paid}',Numune_Musteriden_Alinan='${req.body.received}',Numune_Cloud='${req.body.cloud}',
+    Numune_Cloud_Dosya='${req.body.name}',NumuneNot='${req.body.description}' where Id='${req.body.id}'
+    `;
+    console.log(sql);
+    try{
+        mssql.query(sql,(err,sample)=>{
+            if(sample.rowsAffected[0] == 1){
+                res.status(200).json({'status':true})    
+            }else{
+                res.status(200).json({'status':false});
+            }
+            
+        });
+    } catch (err){
+        console.log(err)
+    }
+   
+
+});
+
 
 /*Panel*/
 app.get('/panel/published/list', (req, res) => {
@@ -7157,7 +7206,7 @@ app.post('/todo/by/username/save', (req, res) => {
             Goruldu,
             Sira
         )
-        VALUES('${req.body.Yapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}','0',${queue})
+        VALUES('${req.body.CustomYapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}','0',${queue})
         `;
         mssql.query(todoInsertSql,(err,todo)=>{
             if(todo.rowsAffected[0] == 1){
@@ -7181,7 +7230,7 @@ app.post('/todo/by/username/save', (req, res) => {
             OrtakGorev,
             Goruldu
         )
-        VALUES('${req.body.Yapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}','0')
+        VALUES('${req.body.CustomYapilacak}','${0}','${req.body.GorevVerenID}','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${req.body.YapilacakOncelik}','${req.body.Acil}','${req.body.OrtakGorev}','0')
     `;
     mssql.query(todoInsertSql,(err,todo)=>{
         if(todo.rowsAffected[0] == 1){
@@ -7201,7 +7250,7 @@ app.post('/todo/by/username/save', (req, res) => {
 app.put('/todo/by/username/update', (req, res) => {
     const todoUpdateSql = `
         update Yapilacaklar
-SET Yapilacak='${req.body.Yapilacak}',
+SET Yapilacak='${req.body.CustomYapilacak}',
 	OrtakGorev='${req.body.OrtakGorev}',
 	YapilacakOncelik='${req.body.YapilacakOncelik}',
 	Acil='${req.body.Acil}'
@@ -7219,13 +7268,13 @@ WHERE
 });
 app.delete('/todo/by/username/delete/:id', (req, res) => {
     const todoDeleteSql = `delete Yapilacaklar where ID='${req.params.id}'`;
-    // mssql.query(todoDeleteSql,(err,todo)=>{
-    //     if(todo.rowsAffected[0] == 1){
-    //         res.status(200).json({ 'status': true });
-    //     }else{
-    //         res.status(200).json({'status':false});
-    //     }
-    // });
+    mssql.query(todoDeleteSql,(err,todo)=>{
+        if(todo.rowsAffected[0] == 1){
+            res.status(200).json({ 'status': true });
+        }else{
+            res.status(200).json({'status':false});
+        }
+    });
 });
 app.post('/todo/by/username/done', (req, res) => {
 
@@ -7809,7 +7858,7 @@ order by YEAR(s.SiparisTarihi) desc
         console.log('/order/production/list , hata',err)
         mssql.query(orderYearListSql, (err, years) => {
             console.log('/order/production/list , year , hata',err)
-            let customYearList = [{ 'Yil': 'All' }];
+            let customYearList = [];
             years.recordset.forEach(x => {
                 customYearList.push(x);
             });
@@ -8084,7 +8133,7 @@ order by YEAR(s.SiparisTarihi) desc
                mssql.query(orderYearListSql, (err, years) => {
                 console.log('/order/shipped/list , year ,  hata', err)
 
-            let customYearList = [{ 'Yil': 'All' }];
+            let customYearList = [];
             years.recordset.forEach(x => {
                 customYearList.push(x);
             });
@@ -8663,7 +8712,7 @@ order by YEAR(s.SiparisTarihi) desc
     mssql.query(ordersListSql, (err, orders) => {
  
         mssql.query(orderYearListSql, (err, years) => {
-            let customYearList = [{ 'Yil': 'Hepsi' }];
+            let customYearList = [];
             years.recordset.forEach(x => {
                 customYearList.push(x);
             });

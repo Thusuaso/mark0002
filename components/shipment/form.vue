@@ -98,7 +98,13 @@
     </div>
     <div class="row mb-4">
       <div class="col">
-        <Button type="button" class="p-button-success w-100" label="Ship" @click="save" />
+        <Button
+          type="button"
+          class="p-button-success w-100"
+          label="Ship"
+          @click="save"
+          :disabled="save_button_disabled"
+        />
       </div>
     </div>
     <div class="row mb-4">
@@ -126,6 +132,7 @@
           class="p-button-primary"
           label="Send Crate"
           @click="sendingCrate"
+          :disabled="sending_crate_button_disabled"
         />
       </div>
       <div class="col">
@@ -205,6 +212,8 @@ export default {
       forwardamount: null,
       remainderamount: null,
       sendCrateList: [],
+      save_button_disabled: false,
+      sending_crate_button_disabled: true,
     };
   },
   methods: {
@@ -223,33 +232,40 @@ export default {
       this.$store.dispatch("setShipmentSendProductionList");
     },
     save() {
-      const data = this.getShipmentSendProductionList;
-      for (const item of data) {
-        item.KullaniciId = Cookies.get("userId");
-        item.Tarih = convertDate.dateToString(this.forwardingDate);
-        item.MusteriId = this.selectedOrder.MusteriID;
-        item.SiparisNo = this.selectedOrder.SiparisNo;
-      }
-      const datas = {
-        data: data,
-        MusteriID: this.selectedOrder.MusteriID,
-        SiparisNo: this.selectedOrder.SiparisNo,
-        FaturaNo: this.invoice,
-        YuklemeTarihi: convertDate.dateToString(this.forwardingDate),
-        SevkStatus: this.forwardingstatus,
-        Takip: this.follow,
-        KullaniciAdi: Cookies.get("username"),
-        mail: Cookies.get("mail"),
-      };
-      this.$store.dispatch("setShipmentSave", datas).then((res) => {
-        if (res) {
-          this.$toast.success("Başarıyla Sevk Edildi");
-          this.$store.dispatch("setOrderList");
-          this.reset();
-        } else {
-          this.$toast.error("Sevk Edilemedi");
+      this.save_button_disabled = true;
+      if (confirm("Sevk etmek istiyor musunuz?")) {
+        const data = this.getShipmentSendProductionList;
+        for (const item of data) {
+          item.KullaniciId = Cookies.get("userId");
+          item.Tarih = convertDate.dateToString(this.forwardingDate);
+          item.MusteriId = this.selectedOrder.MusteriID;
+          item.SiparisNo = this.selectedOrder.SiparisNo;
         }
-      });
+        const datas = {
+          data: data,
+          MusteriID: this.selectedOrder.MusteriID,
+          SiparisNo: this.selectedOrder.SiparisNo,
+          FaturaNo: this.invoice,
+          YuklemeTarihi: convertDate.dateToString(this.forwardingDate),
+          SevkStatus: this.forwardingstatus,
+          Takip: this.follow,
+          KullaniciAdi: Cookies.get("username"),
+          mail: Cookies.get("mail"),
+        };
+        this.$store.dispatch("setShipmentSave", datas).then((res) => {
+          if (res) {
+            this.$toast.success("Başarıyla Sevk Edildi");
+            this.$store.dispatch("setOrderList");
+            this.save_button_disabled = false;
+
+            this.reset();
+          } else {
+            this.$toast.error("Sevk Edilemedi");
+          }
+        });
+      } else {
+        this.save_button_disabled = false;
+      }
     },
     sendingCrate() {
       this.$store.dispatch("setShipmentSendingProduction", this.selectedProducts);
@@ -258,9 +274,11 @@ export default {
         "setSelectionProductionProductDelete",
         this.selectedProduct.ID
       );
+      this.sending_crate_button_disabled = true;
     },
     productSelected(event) {
       this.$store.dispatch("setShipmentAmount", event.value);
+      this.sending_crate_button_disabled = false;
     },
     searchOrders(event) {
       let results;

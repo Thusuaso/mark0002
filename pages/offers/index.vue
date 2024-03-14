@@ -39,6 +39,9 @@
         :bList="getOfferDetailBList"
         @offer_detail_list_form_selected_emit="offerDetailListFormSelected($event)"
         :loading="getLoading"
+        :aListTotal="getOfferDetailTotalA"
+        :bListTotal="getOfferDetailTotalB"
+
       />
     </Dialog>
     <Dialog :visible.sync="offer_list_detail_form" header="" modal :closeOnEscape="false">
@@ -88,6 +91,8 @@ export default {
       "getOfferAllButtonStatus",
       "getOfferDetailBList",
       "getLoading",
+      "getOfferDetailTotalA",
+      "getOfferDetailTotalB"
     ]),
   },
   data() {

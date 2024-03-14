@@ -10,14 +10,12 @@
         @row-click="$emit('po_list_selected_emit', $event)"
         :loading="loading"
         :rowClass="rowClass"
-        
-
-
+        sortField="Balanced"
+        :sortOrder="-1"
       >
-        
         <Column field="SiparisNo" header="Purchase Order">
           <template #body="slotProps">
-              {{ slotProps.data.SiparisNo }}
+            {{ slotProps.data.SiparisNo }}
           </template>
         </Column>
         <Column field="SiparisTarihi" header="Order Date">
@@ -49,7 +47,14 @@
         </Column>
         <Column field="Balanced" header="Balance">
           <template #body="slotProps">
-            {{ slotProps.data.Balanced | formatPriceUsd }}
+            <div
+              :style="{
+                backgroundColor: slotProps.data.Balanced > 8 ? 'green' : 'transparent',
+                color: slotProps.data.Balanced > 8 ? 'white' : 'black',
+              }"
+            >
+              {{ slotProps.data.Balanced | formatPriceUsd }}
+            </div>
           </template>
           <template #footer>
             {{ poListTotal.balanced | formatPriceUsd }}
@@ -123,11 +128,11 @@ export default {
       selectedPoPaidDetailList: null,
     };
   },
-  methods:{
+  methods: {
     rowClass(event) {
       return event.MayaControl ? "red-row" : "";
     },
-  }
+  },
 };
 </script>
 <style scoped>

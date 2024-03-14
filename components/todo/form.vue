@@ -100,6 +100,16 @@ export default {
         this.selectedUsers.push(user);
       });
     },
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
+
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
+    },
     process() {
       this.model.OrtakGorev = "";
       if (this.selectedUsers.length == 1) {
@@ -124,7 +134,7 @@ export default {
           "," +
           this.selectedUsers[3].KullaniciAdi;
       }
-
+      this.model.CustomYapilacak = this.__stringCharacterChange(this.model.Yapilacak);
       this.$emit("process", this.model);
     },
     priorityChanged(event) {

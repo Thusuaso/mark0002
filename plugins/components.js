@@ -71,6 +71,9 @@ import sampleFinanceForm from '~/components/sample/finance/form';
 import offerList from '~/components/offers/list';
 import offerDetail from '~/components/offers/detail';
 import offerForm from '~/components/offers/form';
+import offerProforma from '~/components/offers/proforma';
+import offerSample from '~/components/offers/sample';
+
 import panelPublishedList from '~/components/panel/published/list';
 import panelProductForm from '~/components/panel/form';
 import panelProjectList from '~/components/panel/project/list';
@@ -101,7 +104,8 @@ import salesConsiderForm from '~/components/sales/consider/form';
 import salesConsiderList from '~/components/sales/consider/list';
 import todoMainList from '~/components/todo/main/list';
 
-
+Vue.component('offerSample',offerSample);
+Vue.component('offerProforma',offerProforma);
 Vue.component('navbar', navbar);
 Vue.component('authForm', authForm);
 Vue.component('home',home);

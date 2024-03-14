@@ -7,16 +7,24 @@ const state = {
     offerId: 0,
     offerAllButtonStatus: false,
     offerOldList: [],
-    offerDetailBList:[]
+    offerDetailBList:[],
+    offerDetailTotalA:0,
+    offerDetailTotalB:0
 };
 const actions = {
+    setOfferAListTotal(vuexContext,payload){
+        vuexContext.commit('setOfferAListTotal',payload);
+    },
+    setOfferBListTotal(vuexContext,payload){
+        vuexContext.commit('setOfferBListTotal',payload);
+    },
     setOfferMainList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/offer/main/list')
             .then(response => {
                 if (response.data) {
-                                vuexContext.commit('setOfferMainList', response.data); 
-                vuexContext.dispatch('setEndLoadingAction');
+                    vuexContext.commit('setOfferMainList', response.data); 
+                    vuexContext.dispatch('setEndLoadingAction');
                 }
 
             });
@@ -27,6 +35,7 @@ const actions = {
             .then(response => {
                 if (response.data.list) {
                                     vuexContext.commit('setOfferMainDetailList', response.data.list); 
+                                    vuexContext.dispatch('setOfferAListTotal',response.data.list);
                 vuexContext.dispatch('setEndLoadingAction');
                 }
 
@@ -142,6 +151,9 @@ const actions = {
                 if (response.data.list) {
                     vuexContext.commit('setOfferMainDetailList', response.data.list); 
                     vuexContext.commit('setOfferMainDetailBList',response.data.bList);
+                    vuexContext.dispatch('setOfferAListTotal',response.data.list);
+                    vuexContext.dispatch('setOfferBListTotal',response.data.bList);
+
                     vuexContext.dispatch('setEndLoadingAction');
                 }
 
@@ -165,10 +177,54 @@ const actions = {
         this.$axios.get(`/offer/main/detail/b/list/${representative}`)
             .then(response => {
                     vuexContext.commit('setOfferMainDetailBList', response.data.list);
+                    vuexContext.dispatch('setOfferBListTotal',response.data.list);
             });
+    },
+    setOfferReminderCloudUpload(vuexContext,payload){
+        return new Promise((resolve,reject)=>{
+            this.$axios.put('/offer/reminder/file/upload',payload).then(response=>{
+                if(response.data.status){
+                    resolve(true);
+                }else{
+                    reject(false)
+                }
+            });
+        });
+
+    },
+    setOfferProformaUpload(vuexContext,payload){
+        return new Promise((resolve,reject)=>{
+
+            this.$axios.put('/offer/proforma/file/upload',payload).then(response=>{
+
+                if(response.data.status){
+                    resolve(true);
+                }else{
+                    reject(false)
+                }
+
+            })
+        });
+    },
+    setOfferSampleUpload(vuexContext,payload){
+        return new Promise((resolve,reject)=>{
+            this.$axios.put('/offer/sample/file/upload',payload).then(response=>{
+                if(response.data.status){
+                    resolve(true);
+                }else{
+                    reject(false)
+                }
+            })
+        });
     }
 };
 const mutations = {
+    setOfferAListTotal(state,payload){
+        state.offerDetailTotalA=payload.length;
+    },
+    setOfferBListTotal(state,payload){
+        state.offerDetailTotalB=payload.length;
+    },
     setOfferMainList(state, payload) {
         state.offerList = payload.list;
         state.offerCountryList = payload.country;
@@ -209,6 +265,15 @@ const mutations = {
 
 };
 const getters = {
+    getOfferDetailTotalA(state){
+        return state.offerDetailTotalA;
+    },
+    getOfferDetailTotalB(state){
+        return state.offerDetailTotalB;
+    },
+    getOfferDetailAllTotalB(state){
+        return state.offerDetailAllTotalA;
+    },
     getOfferList(state) {
         return state.offerList;
     },

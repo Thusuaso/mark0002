@@ -30,7 +30,7 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("setTodosMainList", 'gizem');
+    this.$store.dispatch("setTodosMainList", "gizem");
   },
   methods: {
     mainToDoListSelected(event) {

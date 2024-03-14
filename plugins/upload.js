@@ -9,6 +9,26 @@ const api = axios.create({
 });
 
 const fileService = {
+  offerFile(file, teklifId) {
+    const kontrol = file.name.split(".").length;
+    if (kontrol > 2) {
+      alert(
+        "Lütfen Dosya İsmini Düzeltiniz.Dosya İsminde '.' karakteri olamaz."
+      );
+      return;
+    }
+
+    const dosya = file.name;
+
+    const url = "file/upload/teklif/teklifDosya/" + teklifId + "/" + dosya;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api.post(url, formData).then((res) => {
+      return { ...res.data, dosyaAdi: dosya };
+    });
+  },
     sendInvoice(file, id, siparisno) {
         const kontrol = file.name.split(".").length;
         if (kontrol > 2) {
@@ -130,7 +150,48 @@ const fileService = {
     return api.post(url, formData).then((res) => {
       return { ...res.data, dosyaAdi: dosya };
     });
-  }
+  },
+  sendOfferProforma(file,offerId) {
+    const kontrol = file.name.split(".").length;
+    if (kontrol > 2) {
+      alert(
+        "Lütfen Dosya İsmini Düzeltiniz.Dosya İsminde '.' karakteri olamaz."
+      );
+      return;
+    }
+    //let uzanti = file.name.split('.')[1];
+    const dosya = file.name;
+
+    const url = "file/upload/teklif/proforma/" + offerId + "/" + dosya;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api.post(url, formData).then((res) => {
+      return { ...res.data, dosyaAdi: dosya };
+    });
+  },
+  sendSampleFile(file, offerId) {
+    const kontrol = file.name.split(".").length;
+    if (kontrol > 2) {
+      alert(
+        "Lütfen Dosya İsmini Düzeltiniz.Dosya İsminde '.' karakteri olamaz."
+      );
+      return;
+    }
+    //  let uzanti = file.name.split('.')[1];
+    // let dosya = 'numune.' + uzanti;
+    const dosya = file.name;
+
+    const url = "file/upload/teklif/teklifNumune/" + offerId + "/" + dosya;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api.post(url, formData).then((res) => {
+      return { ...res.data, dosyaAdi: dosya };
+    });
+  },
 }
 
 export default fileService;

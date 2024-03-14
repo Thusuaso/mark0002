@@ -19,7 +19,8 @@
           />
         </div>
         <div class="col">
-          <JsonExcel
+          <Button class="p-button-warning" label="Excel" @click="excel_output" />
+          <!-- <JsonExcel
             class="w-100"
             :data="getfinanceList"
             :fields="financeListExcelFields"
@@ -32,7 +33,7 @@
               icon="pi pi-file-excel"
               label="Excel"
             />
-          </JsonExcel>
+          </JsonExcel> -->
         </div>
         <div class="col">
           <Button
@@ -106,6 +107,7 @@
 <script>
 import { mapGetters } from "vuex";
 import date from "../../plugins/date";
+import api from "../../plugins/excel.server.js";
 export default {
   computed: {
     ...mapGetters([
@@ -130,7 +132,8 @@ export default {
       "getLoading",
       "getFinanceListMaya",
       "getFinanceCollectionSampleList",
-      "getFinanceCollectionSampleTotal"
+      "getFinanceCollectionSampleTotal",
+      "getLocalUrl",
     ]),
   },
   data() {
@@ -159,6 +162,18 @@ export default {
     this.$store.dispatch("setFinanceList");
   },
   methods: {
+    excel_output() {
+      api.post("/finance/reports/test/excel", this.getfinanceList).then((response) => {
+        if (response.status) {
+          const link = document.createElement("a");
+          link.href = this.getLocalUrl + "finance/reports/test/excel";
+
+          link.setAttribute("download", "finans_test_list.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+    },
     poPaidDetailListSelected(event) {
       const data = {
         Tarih: date.dateToString(event.data.Tarih),
@@ -171,11 +186,21 @@ export default {
       if (confirm("Silme İşlemini Onaylıyor musunuz?")) {
         this.$store.dispatch("setPoPaidDelete", event);
         const data = {
-          'description':this.$cookie.get('username') + ', ' + event.SiparisNo + ' na sahip $' + event.Tutar + ' tutar, $' + event.Masraf + ' masraf ve $' + event.Kur +' sildi.',
-          'po':event.SiparisNo,
-          'color':'#ffec31'
-        }
-        this.$logs.save(data)
+          description:
+            this.$cookie.get("username") +
+            ", " +
+            event.SiparisNo +
+            " na sahip $" +
+            event.Tutar +
+            " tutar, $" +
+            event.Masraf +
+            " masraf ve $" +
+            event.Kur +
+            " sildi.",
+          po: event.SiparisNo,
+          color: "#ffec31",
+        };
+        this.$logs.save(data);
       }
     },
     poPaidProcess(event) {
@@ -188,20 +213,40 @@ export default {
     save(event) {
       this.$store.dispatch("setPoPaidSave", event);
       const data = {
-        'description':this.$cookie.get('username') + ', ' + event.SiparisNo + ' ya  $' + event.Tutar + ' tutar, $' + event.Masraf + ' masraf ve $' + event.Kur +' kur girişi yaptı.',
-        'po':event.SiparisNo,
-        'color':'#ffec31'
-      }
-      this.$logs.save(data)
+        description:
+          this.$cookie.get("username") +
+          ", " +
+          event.SiparisNo +
+          " ya  $" +
+          event.Tutar +
+          " tutar, $" +
+          event.Masraf +
+          " masraf ve $" +
+          event.Kur +
+          " kur girişi yaptı.",
+        po: event.SiparisNo,
+        color: "#ffec31",
+      };
+      this.$logs.save(data);
     },
     update(event) {
       this.$store.dispatch("setPoPaidUpdate", event);
       const data = {
-        'description':this.$cookie.get('username') + ', ' + event.SiparisNo + ' nın $' + event.Tutar + ' tutar, $' + event.Masraf + ' masraf ve $' + event.Kur +' kurunu değiştirdi.',
-        'po':event.SiparisNo,
-        'color':'#ffec31'
-      }
-      this.$logs.save(data)
+        description:
+          this.$cookie.get("username") +
+          ", " +
+          event.SiparisNo +
+          " nın $" +
+          event.Tutar +
+          " tutar, $" +
+          event.Masraf +
+          " masraf ve $" +
+          event.Kur +
+          " kurunu değiştirdi.",
+        po: event.SiparisNo,
+        color: "#ffec31",
+      };
+      this.$logs.save(data);
     },
     poListSelected(event) {
       this.finance_po_list_detail = event.data;
@@ -209,8 +254,8 @@ export default {
       this.$store.dispatch("setFinancePoPaidList", event.data.SiparisNo);
     },
     financeListSelected(event) {
-      this.customerId = event.data.ID;
-      this.$store.dispatch("setFinancePoList", event.data.ID);
+      this.customerId = event.data.customer_id;
+      this.$store.dispatch("setFinancePoList", event.data.customer_id);
       this.finance_po_list_form = true;
     },
     advancesPaymentSave(event) {
