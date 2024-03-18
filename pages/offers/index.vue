@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="New"
+          label="New Quotes"
           @click="newOffer"
         />
       </div>
@@ -13,7 +13,7 @@
         <Button
           type="button"
           class="p-button-primary w-100"
-          label="Up to Date Offers"
+          label="Current Quotes"
           @click="offers"
         />
       </div>
@@ -21,7 +21,7 @@
         <Button
           type="button"
           class="p-button-secondary w-100"
-          label="Old Offers"
+          label="Old Quotes"
           @click="oldOffers"
         />
       </div>
@@ -41,7 +41,6 @@
         :loading="getLoading"
         :aListTotal="getOfferDetailTotalA"
         :bListTotal="getOfferDetailTotalB"
-
       />
     </Dialog>
     <Dialog :visible.sync="offer_list_detail_form" header="" modal :closeOnEscape="false">
@@ -92,7 +91,7 @@ export default {
       "getOfferDetailBList",
       "getLoading",
       "getOfferDetailTotalA",
-      "getOfferDetailTotalB"
+      "getOfferDetailTotalB",
     ]),
   },
   data() {

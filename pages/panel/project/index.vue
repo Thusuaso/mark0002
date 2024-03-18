@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="New Project"
+          label="Add New Project"
           @click="newProject"
         />
       </div>
@@ -59,7 +59,7 @@
               {{ slotProps.data.ID }}
             </template>
           </Column>
-          <Column field="ProductName" header="Name (En)">
+          <Column field="ProductName" header="Project Name (En)">
             <template #body="slotProps">
               {{ slotProps.data.ProductName }}
             </template>
@@ -67,7 +67,7 @@
               <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
             </template>
           </Column>
-          <Column field="ProductName_Fr" header="Name (Fr)">
+          <Column field="ProductName_Fr" header="Project Name (Fr)">
             <template #body="slotProps">
               {{ slotProps.data.ProductName_Fr }}
             </template>
@@ -75,7 +75,7 @@
               <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
             </template>
           </Column>
-          <Column field="ProductName_Es" header="Name (Es)">
+          <Column field="ProductName_Es" header="Project Name (Es)">
             <template #body="slotProps">
               {{ slotProps.data.ProductName_Es }}
             </template>
@@ -83,7 +83,7 @@
               <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
             </template>
           </Column>
-          <Column field="ProductName_Ru" header="Name (Ru)">
+          <Column field="ProductName_Ru" header="Project Name (Ru)">
             <template #body="slotProps">
               {{ slotProps.data.ProductName_Ru }}
             </template>

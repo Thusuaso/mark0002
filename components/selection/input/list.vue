@@ -23,7 +23,12 @@
             @click="clearFilter()"
           />
         </template>
-        <Column field="KasaNo" header="Crate No" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="KasaNo"
+          header="Crate No"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -34,7 +39,12 @@
             />
           </template>
         </Column>
-        <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="Tarih"
+          header="Date"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #body="slotProps">
             {{ slotProps.data.Tarih | dateToString }}
           </template>
@@ -48,7 +58,12 @@
             />
           </template>
         </Column>
-        <Column field="KategoriAdi" header="Category" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="KategoriAdi"
+          header="Category"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -59,7 +74,12 @@
             />
           </template>
         </Column>
-        <Column field="OcakAdi" header="Mine" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="OcakAdi"
+          header="Quarry"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -70,7 +90,12 @@
             />
           </template>
         </Column>
-        <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="UrunAdi"
+          header="Product"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #footer>
             {{ total.kasaadedi }}
           </template>
@@ -84,7 +109,12 @@
             />
           </template>
         </Column>
-        <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="YuzeyIslemAdi"
+          header="Surface"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -95,7 +125,12 @@
             />
           </template>
         </Column>
-        <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="En"
+          header="Width"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -106,7 +141,12 @@
             />
           </template>
         </Column>
-        <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="Boy"
+          header="Height"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -117,7 +157,12 @@
             />
           </template>
         </Column>
-        <Column field="Kenar" header="Edge" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="Kenar"
+          header="Thickness"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -128,7 +173,12 @@
             />
           </template>
         </Column>
-        <Column field="Adet" header="Pieces in Box" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="Adet"
+          header="Pcs in Box"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #footer>
             {{ total.kutuiciadet | formatDecimal }}
           </template>
@@ -142,7 +192,12 @@
             />
           </template>
         </Column>
-        <Column field="KutuAdet" header="Box Piece" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="KutuAdet"
+          header="Box Amount"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #footer>
             {{ total.kutu | formatDecimal }}
           </template>
@@ -156,7 +211,12 @@
             />
           </template>
         </Column>
-        <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="Miktar"
+          header="Amount"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
@@ -173,19 +233,24 @@
             />
           </template>
         </Column>
-        <Column field="Kutu" header="B">
+        <Column field="Kutu" header="Box">
           <template #body="slotProps">
             <div v-if="slotProps.data.Kutu == true">✓</div>
             <div v-else>x</div>
           </template>
         </Column>
-        <Column field="Bagli" header="C">
+        <Column field="Bagli" header="Binded">
           <template #body="slotProps">
             <div v-if="slotProps.data.Bagli == true">✓</div>
             <div v-else>x</div>
           </template>
         </Column>
-        <Column field="SiparisAciklama" header="Po" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="SiparisAciklama"
+          header="Po"
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -196,7 +261,12 @@
             />
           </template>
         </Column>
-        <Column field="Aciklama" header="Desc" :showFilterMenu="false" :showClearButton="false">
+        <Column
+          field="Aciklama"
+          header="Expl."
+          :showFilterMenu="false"
+          :showClearButton="false"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -247,7 +317,6 @@ export default {
         Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         KutuAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-
       },
     };
   },

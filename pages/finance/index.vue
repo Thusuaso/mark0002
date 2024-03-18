@@ -6,7 +6,7 @@
           <Button
             type="button"
             class="p-button-primary w-100"
-            label="Collection List"
+            label="Collection"
             @click="collection"
           />
         </div>
@@ -14,7 +14,7 @@
           <Button
             type="button"
             class="p-button-secondary w-100"
-            label="Input Pre-Payment"
+            label="Pre-Payment"
             @click="advancedPayment"
           />
         </div>

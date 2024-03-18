@@ -1,7 +1,7 @@
 <template>
   <div>
     <DataTable :value="cost">
-      <Column field="Tur" header="Kind"></Column>
+      <Column field="Tur" header="Kind of Cost"></Column>
       <Column field="tut" header="Price">
         <template #body="slotProps">
           {{ slotProps.data.tut | formatPriceUsd }}

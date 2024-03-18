@@ -113,13 +113,13 @@
                 v-model="model.SiraNo"
                 :disabled="product_form_disabled"
               />
-              <label for="queue">Queue</label>
+              <label for="queue">#</label>
             </span>
           </div>
           <div class="col">
             <CustomInput
               :value="model.OzelMiktar"
-              text="S.M"
+              text="M2"
               @onInput="model.OzelMiktar = $event"
               :disabled="product_form_disabled"
             />
@@ -138,7 +138,7 @@
             <Button
               type="button"
               class="p-button-info w-100"
-              label="Workerman"
+              label="Labour Cost"
               @click="$emit('workerman_selected_emit', model.UrunKartID)"
               :disabled="workerman_button_disabled"
             />
@@ -153,7 +153,7 @@
             class="w-100"
             :disabled="product_form_disabled"
           />
-          <label>Description(EN)</label>
+          <label>Explanation(EN)</label>
         </span>
         <span class="p-float-label">
           <Textarea
@@ -162,14 +162,14 @@
             class="w-100"
             :disabled="product_form_disabled"
           />
-          <label>Description(TR)</label>
+          <label>Explanation(TR)</label>
         </span>
         <div class="row mt-4" v-if="po">
           <div class="col">
             <Button
               type="button"
               class="p-button-primary w-100"
-              label="New"
+              label="New Product"
               :disabled="new_button_disabled"
               @click="newForm"
             />
@@ -222,12 +222,12 @@
       sortOrder="1"
     >
       <Column field="SiraNo" header="#"></Column>
-      <Column field="FirmaAdi" header="From Who"></Column>
+      <Column field="FirmaAdi" header="Supplier"></Column>
       <Column field="UrunAdi" header="Product"></Column>
       <Column field="YuzeyIslemAdi" header="Surface"></Column>
       <Column field="En" header="Width"></Column>
       <Column field="Boy" header="Height"></Column>
-      <Column field="Kenar" header="Edge"></Column>
+      <Column field="Kenar" header="Thickness"></Column>
       <Column header="M2">
         <template #body="slotProps">
           <div v-if="slotProps.data.UrunBirimID == 1">
@@ -275,7 +275,7 @@
           {{ detailProductTotal.ton | formatDecimal }}
         </template>
       </Column>
-      <Column field="SatisFiyati" header="Sale Price">
+      <Column field="SatisFiyati" header="Price">
         <template #body="slotProps">
           {{ slotProps.data.SatisFiyati | formatPriceUsd }}
         </template>
@@ -290,7 +290,7 @@
       </Column>
     </DataTable>
 
-    <Dialog :visible.sync="product_cards_form_dialog" header="Product Cards" modal>
+    <Dialog :visible.sync="product_cards_form_dialog" header="Product Data" modal>
       <productCards @cards_selected_emit="productCardsSelected($event)" />
     </Dialog>
   </div>
@@ -351,9 +351,17 @@ export default {
   methods: {
     deleteItem() {
       const log = {
-          'description':this.po + ' siparişinden ' + this.model.MusteriAciklama + ' (' + this.model.Miktar + ') ' + this.selectedUnit.BirimAdi + ' kalemi silindi.',
-          'po':this.po,
-          'color':'#ffec31'
+        description:
+          this.po +
+          " siparişinden " +
+          this.model.MusteriAciklama +
+          " (" +
+          this.model.Miktar +
+          ") " +
+          this.selectedUnit.BirimAdi +
+          " kalemi silindi.",
+        po: this.po,
+        color: "#ffec31",
       };
       this.$logs.save(log);
 
@@ -375,9 +383,17 @@ export default {
     },
     add() {
       const log = {
-          'description':this.po + ' siparişine ' + this.model.MusteriAciklama + ' (' + this.model.Miktar + ') '+  this.selectedUnit.BirimAdi + ' yeni kalem eklendi.',
-          'po':this.po,
-          'color':'#ffec31'
+        description:
+          this.po +
+          " siparişine " +
+          this.model.MusteriAciklama +
+          " (" +
+          this.model.Miktar +
+          ") " +
+          this.selectedUnit.BirimAdi +
+          " yeni kalem eklendi.",
+        po: this.po,
+        color: "#ffec31",
       };
       this.$logs.save(log);
 
@@ -398,13 +414,20 @@ export default {
       this.model.SiparisNo = this.po;
       this.workerman_button_disabled = true;
       this.$store.dispatch("setOrderProductAdded", this.model);
-
     },
     update() {
       const log = {
-          'description':this.po + ' siparişinde ' + this.model.MusteriAciklama + ' (' + this.model.Miktar + ') ' + this.selectedUnit.BirimAdi + ' kalemi güncellendi.',
-          'po':this.po,
-          'color':'#ffec31'
+        description:
+          this.po +
+          " siparişinde " +
+          this.model.MusteriAciklama +
+          " (" +
+          this.model.Miktar +
+          ") " +
+          this.selectedUnit.BirimAdi +
+          " kalemi güncellendi.",
+        po: this.po,
+        color: "#ffec31",
       };
       this.$logs.save(log);
       this.categoryName = null;
@@ -465,25 +488,23 @@ export default {
       this.surfaceName = event.data.YuzeyIslemAdi;
       this.sizeName = event.data.En + "x" + event.data.Boy + "x" + event.data.Kenar;
 
-      const data  = {
-        'SiparisNo':event.data.SiparisNo,
-        'FirmaAdi':event.data.FirmaAdi,
-        'KategoriAdi':event.data.KategoriAdi,
-        'UrunAdi':event.data.UrunAdi,
-        'YuzeyIslemAdi':event.data.YuzeyIslemAdi,
-        'En':event.data.En,
-        'Boy':event.data.Boy,
-        'Kenar':event.data.Kenar,
-        'UretimAciklama':event.data.UretimAciklama,
-        'Miktar':event.data.Miktar,
-        'AlisFiyati':event.data.AlisFiyati,
-        'SatisFiyati':event.data.SatisFiyati,
-        'ID':event.data.ID
+      const data = {
+        SiparisNo: event.data.SiparisNo,
+        FirmaAdi: event.data.FirmaAdi,
+        KategoriAdi: event.data.KategoriAdi,
+        UrunAdi: event.data.UrunAdi,
+        YuzeyIslemAdi: event.data.YuzeyIslemAdi,
+        En: event.data.En,
+        Boy: event.data.Boy,
+        Kenar: event.data.Kenar,
+        UretimAciklama: event.data.UretimAciklama,
+        Miktar: event.data.Miktar,
+        AlisFiyati: event.data.AlisFiyati,
+        SatisFiyati: event.data.SatisFiyati,
+        ID: event.data.ID,
       };
-    
-      this.$store.dispatch('setOrderProductionProductDetailNotChangeList',data);
 
-
+      this.$store.dispatch("setOrderProductionProductDetailNotChangeList", data);
     },
     unitSelected(event) {
       this.model.UrunBirimID = event.value.ID;

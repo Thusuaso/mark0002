@@ -7,8 +7,8 @@
         </template>
       </Column>
       <Column field="SiparisNo" header="Po"></Column>
-      <Column field="FirmaAdi" header="Müşteri"></Column>
-      <Column field="TeslimTur" header="Teslim Tür"></Column>
+      <Column field="FirmaAdi" header="Customer"></Column>
+      <Column field="TeslimTur" header="Delivery Term"></Column>
       <Column field="Fob" header="Fob">
         <template #body="slotProps">
           {{ slotProps.data.Fob | formatPriceUsd }}
@@ -17,7 +17,7 @@
           {{ total.fob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="NavlunSatis" header="Navlun S.">
+      <Column field="NavlunSatis" header="Freight">
         <template #body="slotProps">
           {{ slotProps.data.NavlunSatis | formatPriceUsd }}
         </template>
@@ -25,7 +25,7 @@
           {{ total.freight | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="DetayTutar_1" header="Detay Tutar 1">
+      <Column field="DetayTutar_1" header="Detail 1">
         <template #body="slotProps">
           {{ slotProps.data.DetayTutar_1 | formatPriceUsd }}
         </template>
@@ -33,7 +33,7 @@
           {{ total.detail1 | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="DetayTutar_2" header="Detay Tutar 2">
+      <Column field="DetayTutar_2" header="Detail 2">
         <template #body="slotProps">
           {{ slotProps.data.DetayTutar_2 | formatPriceUsd }}
         </template>
@@ -41,7 +41,7 @@
           {{ total.detail2 | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="DetayTutar_3" header="Detay Tutar 3">
+      <Column field="DetayTutar_3" header="Detail 3">
         <template #body="slotProps">
           {{ slotProps.data.DetayTutar_3 | formatPriceUsd }}
         </template>
@@ -49,7 +49,7 @@
           {{ total.detail3 | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="DetayTutar_4" header="Detay Tutar 4">
+      <Column field="DetayTutar_4" header="Detail 4">
         <template #body="slotProps">
           {{ slotProps.data.DetayTutar_4 | formatPriceUsd }}
         </template>

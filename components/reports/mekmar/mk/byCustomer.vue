@@ -1,157 +1,262 @@
 <template>
-  <div>
-    <DataTable
-      :value="list"
-      sortField="Toplam"
-      :sortOrder="-1"
-      :filters.sync="filteredByCustomer"
-      filterDisplay="row"
-      :loading="loading"
-    >
-      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-            style="width: 100px"
-          />
-        </template>
-      </Column>
-      <Column field="Ulke" header="Country" :showFilterMenu="false" :showClearButton="false">
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-            style="width: 100px"
-          />
-        </template>
-      </Column>
-      <Column field="Temsilci" header="Representative" :showFilterMenu="false" :showClearButton="false">
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-            style="width: 100px"
-          />
-        </template>
-      </Column>
-      <Column field="Marketing" header="Marketing" :showFilterMenu="false" :showClearButton="false">
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-            style="width: 100px"
-          />
-        </template>
-      </Column>
-
-      <Column field="Toplam" :header="'Total'">
-        <template #body="slotProps">
-          {{ slotProps.data.Toplam | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column :header="new Date().getFullYear()">
-        <template #body="slotProps">
-          {{ slotProps.data.BuYilSiparis | formatPriceUsd }}
-          {{ slotProps.data.BuYilYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="BirYilOnceYuklenen" :header="new Date().getFullYear() - 1">
-        <template #body="slotProps">
-          {{ slotProps.data.BirYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="İkiYilOnceYuklenen" :header="new Date().getFullYear() - 2">
-        <template #body="slotProps">
-          {{ slotProps.data.İkiYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="UcYilOnceYuklenen" :header="new Date().getFullYear() - 3">
-        <template #body="slotProps">
-          {{ slotProps.data.UcYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="DortYilOnceYuklenen" :header="new Date().getFullYear() - 4">
-        <template #body="slotProps">
-          {{ slotProps.data.DortYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="BesYilOnceYuklenen" :header="new Date().getFullYear() - 5">
-        <template #body="slotProps">
-          {{ slotProps.data.BesYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-
-      <Column field="AltiYilOnceYuklenen" :header="new Date().getFullYear() - 6">
-        <template #body="slotProps">
-          {{ slotProps.data.AltiYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="YediYilOnceYuklenen" :header="new Date().getFullYear() - 7">
-        <template #body="slotProps">
-          {{ slotProps.data.YediYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-
-      <Column field="SekizYilOnceYuklenen" :header="new Date().getFullYear() - 8">
-        <template #body="slotProps">
-          {{ slotProps.data.SekizYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="DokuzYilOnceYuklenen" :header="new Date().getFullYear() - 9">
-        <template #body="slotProps">
-          {{ slotProps.data.DokuzYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="OnYilOnceYuklenen" :header="new Date().getFullYear() - 10">
-        <template #body="slotProps">
-          {{ slotProps.data.OnYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column field="OnBirYilOnceYuklenen" :header="new Date().getFullYear() - 11">
-        <template #body="slotProps">
-          {{ slotProps.data.OnBirYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column
-        field="OnIkiYilOnceYuklenen"
-        :header="new Date().getFullYear() - 11 + ' Before'"
+  <div class="row m-auto mt-3">
+    <div class="col">
+      <DataTable
+        :value="list"
+        :filters="filters"
+        filterDisplay="row"
+        style="font-size: 85%"
+        :sortOrder="-1"
+        sortField="Toplam"
+        :loading="loading"
       >
-        <template #body="slotProps">
-          {{ slotProps.data.OnIkiYilOnceYuklenen | formatPriceUsd }}
-        </template>
-      </Column>
-    </DataTable>
+        <Column
+          field="musteri"
+          header="Customer"
+          bodyStyle="text-align:center"
+          headerStyle="width:60px;"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.musteri }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="logo"
+          header="Logo"
+          headerStyle="width:30px;"
+          bodyStyle="text-align:center"
+        >
+          <template #body="slotProps">
+            <img
+              :src="'https://cdn.mekmarimage.com/countryLogo/' + slotProps.data.logo"
+              width="40"
+              height="40"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Toplam"
+          header="Total"
+          headerStyle="width:65px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Toplam | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="ulkeAdi"
+          header="Country"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.ulkeAdi }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="temsilci"
+          header="Representative"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.temsilci }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+
+        <Column
+          field="BuYilUretim"
+          :header="new Date().getFullYear() + '        Production-Shipped       '"
+          headerStyle="width:100px;white-space:pre-wrap;"
+          bodyStyle="text-align:center"
+        >
+          <template #body="slotProps">
+            <div style="column-count: 2; column-rule: 1px solid black">
+              <div>
+                {{ slotProps.data.BuYilUretim | formatPriceUsd }}
+              </div>
+              <div>
+                {{ slotProps.data.BuYilSevkiyat | formatPriceUsd }}
+              </div>
+            </div>
+          </template>
+        </Column>
+
+        <Column
+          field="GecenYil"
+          :header="new Date().getFullYear() - 1 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.GecenYil | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="OncekiYil"
+          :header="new Date().getFullYear() - 2 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OncekiYil | formatPriceUsd }}
+          </template>
+        </Column>
+
+        <Column
+          field="OnDokuzYili"
+          :header="new Date().getFullYear() - 3 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnDokuzYili | formatPriceUsd }}
+          </template>
+        </Column>
+
+        <Column
+          field="OnSekizYili"
+          :header="new Date().getFullYear() - 4 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnSekizYili | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="OnYediYili"
+          :header="new Date().getFullYear() - 5 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnYediYili | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="OnAltiYili"
+          :header="new Date().getFullYear() - 6 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnAltiYili | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="OnBesYili"
+          :header="new Date().getFullYear() - 7 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnBesYili | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="OnDortYili"
+          :header="new Date().getFullYear() - 8 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnDortYili | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="OnUcYili"
+          :header="new Date().getFullYear() - 9 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnUcYili | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="OnUcYiliOncesi"
+          :header="new Date().getFullYear() - 10 + ' Ddp'"
+          headerStyle="width:60px;"
+          bodyStyle="text-align:center"
+          style="flex-grow: 1; flex-basis: 100px"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.OnUcYiliOncesi | formatPriceUsd }}
+          </template>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 <script>
 import { FilterMatchMode } from "primevue/api";
 export default {
   props: {
-    list: {
-      type: Array,
-      required: false,
-    },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+    list: {},
+    loading: {},
   },
   data() {
     return {
-      filteredByCustomer: {
-        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Ulke: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Temsilci: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Marketing: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      filters: {
+        musteri: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        ulkeAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        temsilci: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
     };
   },

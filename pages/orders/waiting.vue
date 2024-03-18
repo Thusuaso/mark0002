@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="New"
+          label="New Product"
           @click="newForm"
         />
       </div>

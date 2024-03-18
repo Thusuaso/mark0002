@@ -18,14 +18,24 @@
     >
       <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
       <Column field="Sira" header="Queue"></Column>
-      <Column field="OrtakGorev" header="Owner" :showFilterMenu="false">
+      <Column field="OrtakGorev" header="Assignee" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
-      <Column field="Yapilacak" header="To Do" :showFilterMenu="false">
+      <Column field="Yapilacak" header="Assignment" :showFilterMenu="false">
         <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column header="#">
@@ -53,7 +63,7 @@
 </template>
 
 <script>
-import {FilterMatchMode} from 'primevue/api';
+import { FilterMatchMode } from "primevue/api";
 export default {
   props: {
     list: {
@@ -61,15 +71,14 @@ export default {
       required: false,
     },
   },
-  data(){
-    return{
-      selectedMainList:null,
-      mainTodoFilter:{
-        OrtakGorev:{value:null,matchMode:FilterMatchMode.CONTAINS},
-        Yapilacak:{value:null,matchMode:FilterMatchMode.CONTAINS},
-
-      }
-    }
+  data() {
+    return {
+      selectedMainList: null,
+      mainTodoFilter: {
+        OrtakGorev: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        Yapilacak: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      },
+    };
   },
   methods: {
     onRowReorder(event) {

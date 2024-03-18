@@ -17,7 +17,7 @@
       >
         <Column
           field="siparisci"
-          header="Satışçı"
+          header="Seller"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -117,7 +117,7 @@
         </Column>
         <Column
           field="faturatur"
-          header="Fatura"
+          header="Invoice"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -136,7 +136,7 @@
         </Column>
         <Column
           field="siparis_tarihi"
-          header="S.Tarihi"
+          header="O. Date"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -155,7 +155,7 @@
         </Column>
         <Column
           field="yukleme_tarihi"
-          header="Y.Tarihi"
+          header="S. Date"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -174,7 +174,7 @@
         </Column>
         <Column
           field="ulke_adi"
-          header="Ülke"
+          header="Country"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -193,7 +193,7 @@
         </Column>
         <Column
           field="teslim_sekli"
-          header="Teslim"
+          header="Delivery Term"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -218,7 +218,7 @@
             {{ total.proforma | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="mekmar_alim" header="Mekmer Ü.">
+        <Column field="mekmar_alim" header="Production (Mekmer)">
           <template #body="slotProps">
             <div
               :style="{
@@ -254,7 +254,7 @@
             {{ total.mekmozProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="dis_alim" header="Dış Alım">
+        <Column field="dis_alim" header="External Purchase">
           <template #body="slotProps">
             <div
               :style="{
@@ -275,7 +275,7 @@
           </template>
         </Column>
 
-        <Column field="nakliye" header="Nakliye">
+        <Column field="nakliye" header="Logistics">
           <template #body="slotProps">
             <div
               :style="{
@@ -292,7 +292,7 @@
             {{ total.transport | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="gumruk" header="Gümrük">
+        <Column field="gumruk" header="Custom">
           <template #body="slotProps">
             <div
               :style="{
@@ -309,7 +309,7 @@
             {{ total.duty | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ilaclama" header="İlaçlama">
+        <Column field="ilaclama" header="Fumigation">
           <template #body="slotProps">
             <div
               :style="{
@@ -343,7 +343,7 @@
             {{ total.port | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="sigorta" header="Sigorta">
+        <Column field="sigorta" header="Port">
           <template #body="slotProps">
             <div
               :style="{
@@ -360,7 +360,7 @@
             {{ total.insuranceBuyes | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="navlun" header="Navlun">
+        <Column field="navlun" header="Freight">
           <template #body="slotProps">
             <div
               :style="{
@@ -428,7 +428,7 @@
             {{ total.spanzlet | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_1" header="Diğer 1">
+        <Column field="detay_1" header="Detail 1">
           <template #body="slotProps">
             {{ slotProps.data.detay_1 | formatPriceUsd }}
           </template>
@@ -436,7 +436,7 @@
             {{ total.detailBuyes1 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_2" header="Diğer 2">
+        <Column field="detay_2" header="Detail 2">
           <template #body="slotProps">
             {{ slotProps.data.detay_2 | formatPriceUsd }}
           </template>
@@ -444,7 +444,7 @@
             {{ total.detailBuyes2 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_3" header="Diğer 3">
+        <Column field="detay_3" header="Detail 3">
           <template #body="slotProps">
             {{ slotProps.data.detay_3 | formatPriceUsd }}
           </template>
@@ -466,7 +466,7 @@
             {{ total.mekus | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="pazarlama" header="Komisyon">
+        <Column field="pazarlama" header="Commision">
           <template #body="slotProps">
             {{ slotProps.data.pazarlama | formatPriceUsd }}
           </template>
@@ -474,7 +474,7 @@
             {{ total.commision | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ozel_iscilik" header="Özel İşçilik">
+        <Column field="ozel_iscilik" header="Manual Labour Cost">
           <template #body="slotProps">
             <div
               :style="{
@@ -492,7 +492,7 @@
             {{ total.specialwork | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="banka_masrafi" header="Banka">
+        <Column field="banka_masrafi" header="Bank">
           <template #body="slotProps">
             {{ slotProps.data.banka_masrafi | formatPriceUsd }}
           </template>
@@ -500,7 +500,7 @@
             {{ total.bankCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="kurye_masrafi" header="Kurye">
+        <Column field="kurye_masrafi" header="Courier">
           <template #body="slotProps">
             {{ slotProps.data.kurye_masrafi | formatPriceUsd }}
           </template>

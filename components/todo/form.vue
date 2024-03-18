@@ -2,7 +2,7 @@
   <div class="mt-4">
     <span class="p-float-label">
       <Textarea v-model="model.Yapilacak" rows="5" class="w-100" />
-      <label>Todo</label>
+      <label>Assignment</label>
     </span>
     <div class="row mt-3">
       <div class="col">
@@ -15,7 +15,7 @@
             field="KullaniciAdi"
             :multiple="true"
           />
-          <label for="users">Todo Owner</label>
+          <label for="users">Assignee</label>
         </span>
       </div>
       <div class="col">

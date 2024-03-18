@@ -24,7 +24,8 @@
             :country="country"
             :invoice="invoice"
             :po="po"
-            :saveButtonStatus="saveButtonStatus"
+            :proformaUploadButtonStatus="proformaUploadButtonStatus"
+            @prepayment_is_activated_emit="prePaymentIsActivated($event)"
           />
         </TabPanel>
         <TabPanel header="Cost">
@@ -79,7 +80,7 @@
           @date-select="orderDateSelected($event)"
           :disabled="!status"
         />
-        <label for="order_date">Order Date</label>
+        <label for="order_date">Date</label>
       </span>
       <span class="p-float-label mb-4">
         <Calendar
@@ -111,7 +112,7 @@
           field="KullaniciAdi"
           @item-select="ordererSelected($event)"
         />
-        <label for="user">Orderer</label>
+        <label for="user">Seller</label>
       </span>
       <span class="p-float-label mb-4">
         <AutoComplete
@@ -133,13 +134,13 @@
           field="KullaniciAdi"
           @item-select="financemanSelected($event)"
         />
-        <label for="financeman">Financier</label>
+        <label for="financeman">Finance</label>
       </span>
       <CustomInput
         :value="modelProduction.Pesinat"
-        text="Pre Payment"
+        text="Prepayment"
         @onInput="modelProduction.Pesinat = $event"
-        :disabled="true"
+        :disabled="prepaymentDisabledForm"
       />
       <table class="table mb-4">
         <thead>
@@ -153,11 +154,11 @@
             <td>{{ productCalculation | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Freight</th>
+            <th scope="row">Freight Cost</th>
             <td>{{ freightCalculation | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Detail</th>
+            <th scope="row">Total (Other)</th>
             <td>{{ detailCalculation | formatPriceUsd }}</td>
           </tr>
           <tr>
@@ -178,7 +179,7 @@
       </span>
       <span class="p-float-label mb-4">
         <Calendar v-model="eta_date" inputId="eta_date" class="w-100" disabled />
-        <label for="eta_date">Estimated Shipment Date</label>
+        <label for="eta_date">ETA</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText
@@ -201,15 +202,15 @@
             <td>{{ detailProductCost.supplier | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Workerman</th>
+            <th scope="row">Labour Cost</th>
             <td>{{ detailProductCost.workerman | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Freight Buying</th>
+            <th scope="row">Freight Quote</th>
             <td>{{ detailProductCost.freight | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">Other Buyin</th>
+            <th scope="row">Other (Cost)</th>
             <td>
               {{ detailProductCost.detail | formatPriceUsd }}
             </td>
@@ -223,7 +224,7 @@
             <td>{{ detailProductCost.fob | formatPriceUsd }}</td>
           </tr>
           <tr>
-            <th scope="row">General</th>
+            <th scope="row">G. Total</th>
             <td>
               {{
                 (detailProductCost.supplier +
@@ -370,9 +371,14 @@ export default {
       type: Object,
       required: false,
     },
+    proformaUploadButtonStatus: {
+      type: Boolean,
+      required: false,
+    },
   },
   data() {
     return {
+      prepaymentDisabledForm: true,
       guess_loading_date: null,
       order_date: null,
       filteredCustomer: null,
@@ -393,6 +399,22 @@ export default {
     }
   },
   methods: {
+    prePaymentIsActivated(event) {
+      let prepayment = 0;
+      this.productsList.forEach((product) => {
+        prepayment += product.SatisToplam;
+      });
+      if (event == 1) {
+        this.prepaymentDisabledForm = false;
+        this.modelProduction.Pesinat = prepayment;
+      } else if (event == 2) {
+        this.prepaymentDisabledForm = false;
+        this.modelProduction.Pesinat = 0;
+      } else {
+        this.prepaymentDisabledForm = true;
+        this.modelProduction.Pesinat = 0;
+      }
+    },
     guessLoadingDateSelected(event) {
       this.modelProduction.TahminiYuklemeTarihi = date.dateToString(event);
     },

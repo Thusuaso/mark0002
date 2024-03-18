@@ -102,5 +102,9 @@ export default {
   serverMiddleware:[
     bodyParser.json(),
     '~/api'
-  ]
+  ],
+  devServer: {
+    port: 3000
+  }
+
 }

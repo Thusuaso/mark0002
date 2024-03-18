@@ -11,7 +11,7 @@
       sortField="Acil"
       :sortOrder="-1"
     >
-      <Column field="OrtakGorev" header="Todo Owner">
+      <Column field="OrtakGorev" header="Assignee">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -21,7 +21,7 @@
           />
         </template>
       </Column>
-      <Column field="Yapilacak" header="Todo">
+      <Column field="Yapilacak" header="Assignment">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

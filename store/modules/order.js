@@ -43,7 +43,9 @@ const state = {
     orderProductionProductDetailFobCostTotal: 0,
     orderProductionProductDetailWorkermanList: [],
     orderProductionYearsList:[],
-    orderProductionSaveButtonStatus:false
+    orderProductionSaveButtonStatus:false,
+    orderProductionId:0,
+    orderProductionUploadProformaButtonStatus:true
     
 
 
@@ -287,6 +289,11 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
             .then(response => {
                 if (response.data.status) {
                     this.$toast.success('Başarıyla Kaydedildi. Ürünlerinizi Girebilirsiniz!');
+                    vuexContext.dispatch("setOrderProductionButtonStatus", false);
+                    vuexContext.dispatch("setOrderProductionSaveButtonStatus",false);
+                    vuexContext.dispatch('setOrderProductionId',response.data.id);
+                    vuexContext.dispatch('setOrderProductionUploadProformaButtonStatus',false);
+
                     
                 } else {
                     this.$toast.error('Kaydetme Başarısız');
@@ -408,6 +415,12 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
     },
     setOrderProductionProductDetailNotChangeListReset(vuexContext){
         vuexContext.commit('setOrderProductionProductDetailNotChangeListReset')
+    },
+    setOrderProductionId(vuexContext,id){
+        vuexContext.commit('setOrderProductionId',id)
+    },
+    setOrderProductionUploadProformaButtonStatus(vuexContext,status){
+        vuexContext.commit('setOrderProductionUploadProformaButtonStatus',status)
     }
 
 
@@ -701,6 +714,12 @@ const mutations = {
     },
     setOrderProductionSaveButtonStatus(state,payload){
         state.orderProductionSaveButtonStatus = payload;
+    },
+    setOrderProductionId(state,payload){
+        state.orderProductionId = payload;
+    },
+    setOrderProductionUploadProformaButtonStatus(state,payload){
+        state.orderProductionUploadProformaButtonStatus = payload;
     }
 
 
@@ -784,6 +803,12 @@ const getters = {
     },
     getOrderProductionSaveButtonStatus(state){
         return state.orderProductionSaveButtonStatus;
+    },
+    getOrderProductionId(state){
+        return state.orderProductionId;
+    },
+    getOrderProductionUploadProformaButtonStatus(state){
+        return state.orderProductionUploadProformaButtonStatus;
     }
 
 };

@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="customer">Company</label>
+          <label for="customer">Customer</label>
           <InputText id="customer" v-model="formData.FirmaAdi" />
         </div>
       </div>
@@ -27,7 +27,7 @@
       </div>
       <div class="flex align-items-center">
         <RadioButton v-model="ingredient" inputId="ingredient2" value="NotResponse" />
-        <label for="ingredient2" class="ml-2">Not Answer</label>
+        <label for="ingredient2" class="ml-2">No Answer</label>
       </div>
       <div class="flex align-items-center">
         <RadioButton v-model="ingredient" inputId="ingredient3" value="Interested" />
@@ -57,7 +57,7 @@
       </div>
       <div class="col">
         <div class="flex flex-column gap-2">
-          <label for="reminderdate">Reminder Date</label>
+          <label for="reminderdate">Reminder Time</label>
           <Calendar id="reminderdate" v-model="reminderdate" dateFormat="dd/mm/yy" />
         </div>
       </div>
@@ -66,13 +66,13 @@
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="formData.Aciklama" class="w-100 h-75" rows="5" />
-          <label>Description</label>
+          <label>Explanation</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <Textarea v-model="formData.HatirlatmaAciklama" class="w-100 h-75" rows="5" />
-          <label>Reminder Desc.</label>
+          <label>Reminder</label>
         </span>
       </div>
     </div>

@@ -15,7 +15,7 @@
     >
       <Column
         field="Tarih"
-        header="Tarih"
+        header="Date"
         :showFilterMenu="false"
         :showClearButton="false"
       >
@@ -78,7 +78,7 @@
       </Column>
       <Column
         field="KullaniciAdi"
-        header="Representative"
+        header="Rep."
         :showFilterMenu="false"
         :showClearButton="false"
       >

@@ -11,7 +11,12 @@
       style="font-size: 70%"
       :loading="loading"
     >
-      <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Tarih"
+        header="Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -25,7 +30,12 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="To" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="FirmaAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -36,7 +46,12 @@
           />
         </template>
       </Column>
-      <Column field="TedarikciAdi" header="From Who" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="TedarikciAdi"
+        header="Supplier"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -47,7 +62,12 @@
           />
         </template>
       </Column>
-      <Column field="UrunKartId" header="Product Id" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunKartId"
+        header="Product Id"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -58,7 +78,12 @@
           />
         </template>
       </Column>
-      <Column field="KasaNo" header="Crate" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KasaNo"
+        header="Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -69,7 +94,12 @@
           />
         </template>
       </Column>
-      <Column field="OcakAdi" header="Mine" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="OcakAdi"
+        header="Mine"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -80,7 +110,12 @@
           />
         </template>
       </Column>
-      <Column field="KategoriAdi" header="Category" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KategoriAdi"
+        header="Category"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -91,7 +126,12 @@
           />
         </template>
       </Column>
-      <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunAdi"
+        header="Product"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #footer>
           {{ total.crate | formatDecimal }}
         </template>
@@ -105,7 +145,12 @@
           />
         </template>
       </Column>
-      <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="YuzeyIslemAdi"
+        header="Surface"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -127,7 +172,12 @@
           />
         </template>
       </Column>
-      <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Boy"
+        header="Height"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -138,7 +188,12 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Edge" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Kenar"
+        header="Edge"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -149,7 +204,12 @@
           />
         </template>
       </Column>
-      <Column field="KutuAdet" header="Box" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KutuAdet"
+        header="Box"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #footer>
           {{ total.box | formatDecimal }}
         </template>
@@ -163,7 +223,12 @@
           />
         </template>
       </Column>
-      <Column field="Adet" header="Piece" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Adet"
+        header="Piece"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
@@ -180,7 +245,12 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Miktar"
+        header="Amount"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
@@ -197,7 +267,12 @@
           />
         </template>
       </Column>
-      <Column field="BirimAdi" header="Unit" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="BirimAdi"
+        header="Unit"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -208,7 +283,12 @@
           />
         </template>
       </Column>
-      <Column field="SiparisAciklama" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisAciklama"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -254,25 +334,24 @@ export default {
   },
   data() {
     return {
-
-      filterModel:{
-        date:'',
-        to:'',
-        fromWho:'',
-        productId:'',
-        crate:'',
-        mine:'',
-        category:'',
-        product:'',
-        surface:'',
-        width:'',
-        height:'',
-        edge:'',
-        box:'',
-        piece:'',
-        amount:'',
-        unit:'',
-        po:''
+      filterModel: {
+        date: "",
+        to: "",
+        fromWho: "",
+        productId: "",
+        crate: "",
+        mine: "",
+        category: "",
+        product: "",
+        surface: "",
+        width: "",
+        height: "",
+        edge: "",
+        box: "",
+        piece: "",
+        amount: "",
+        unit: "",
+        po: "",
       },
 
       filters1: {
@@ -293,400 +372,370 @@ export default {
         Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-
       },
     };
   },
   methods: {
-
-    filterPoInput(event){
-      if(event){
+    filterPoInput(event) {
+      if (event) {
         this.filterModel.po = event;
-      } else{
-        this.filterModel.po = '';
+      } else {
+        this.filterModel.po = "";
       }
     },
-    filterPo(event){
-      if(event){
+    filterPo(event) {
+      if (event) {
         this.filterModel.po = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    filterUnitInput(event){
-      if(event){
+    filterUnitInput(event) {
+      if (event) {
         this.filterModel.unit = event;
-      } else{
-        this.filterModel.unit = '';
+      } else {
+        this.filterModel.unit = "";
       }
     },
-    filterUnit(event){
-      if(event){
+    filterUnit(event) {
+      if (event) {
         this.filterModel.unit = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-    filterAmountInput(event){
-      if(event){
+    filterAmountInput(event) {
+      if (event) {
         this.filterModel.amount = event;
-      } else{
-        this.filterModel.amount = '';
+      } else {
+        this.filterModel.amount = "";
       }
     },
-    filterAmount(event){
-      if(event){
+    filterAmount(event) {
+      if (event) {
         this.filterModel.amount = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    filterPieceInput(event){
-      if(event){
+    filterPieceInput(event) {
+      if (event) {
         this.filterModel.piece = event;
-      } else{
-        this.filterModel.piece = '';
+      } else {
+        this.filterModel.piece = "";
       }
     },
-    filterPiece(event){
-      if(event){
+    filterPiece(event) {
+      if (event) {
         this.filterModel.piece = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    filterBoxInput(event){
-      if(event){
+    filterBoxInput(event) {
+      if (event) {
         this.filterModel.box = event;
-      } else{
-        this.filterModel.box = '';
+      } else {
+        this.filterModel.box = "";
       }
     },
-    filterBox(event){
-      if(event){
+    filterBox(event) {
+      if (event) {
         this.filterModel.box = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-    filterEdgeInput(event){
-      if(event){
+    filterEdgeInput(event) {
+      if (event) {
         this.filterModel.edge = event;
-      } else{
-        this.filterModel.edge = '';
+      } else {
+        this.filterModel.edge = "";
       }
     },
-    filterEdge(event){
-      if(event){
+    filterEdge(event) {
+      if (event) {
         this.filterModel.edge = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-    filterHeightInput(event){
-      if(event){
+    filterHeightInput(event) {
+      if (event) {
         this.filterModel.height = event;
-      } else{
-        this.filterModel.height = '';
+      } else {
+        this.filterModel.height = "";
       }
     },
-    filterHeight(event){
-      if(event){
+    filterHeight(event) {
+      if (event) {
         this.filterModel.height = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    filterWidthInput(event){
-      if(event){
+    filterWidthInput(event) {
+      if (event) {
         this.filterModel.width = event;
-      } else{
-        this.filterModel.width = '';
+      } else {
+        this.filterModel.width = "";
       }
     },
-    filterWidth(event){
-      if(event){
+    filterWidth(event) {
+      if (event) {
         this.filterModel.width = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    filterSurfaceInput(event){
-      if(event){
+    filterSurfaceInput(event) {
+      if (event) {
         this.filterModel.surface = event;
-      } else{
-        this.filterModel.surface = '';
+      } else {
+        this.filterModel.surface = "";
       }
     },
-    filterSurface(event){
-      if(event){
+    filterSurface(event) {
+      if (event) {
         this.filterModel.surface = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-    filterProductInput(event){
-      if(event){
+    filterProductInput(event) {
+      if (event) {
         this.filterModel.product = event;
-      } else{
-        this.filterModel.product = '';
+      } else {
+        this.filterModel.product = "";
       }
     },
-    filterProduct(event){
-      if(event){
+    filterProduct(event) {
+      if (event) {
         this.filterModel.product = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-
-    filterCategoryInput(event){
-      if(event){
+    filterCategoryInput(event) {
+      if (event) {
         this.filterModel.category = event;
-      } else{
-        this.filterModel.category = '';
+      } else {
+        this.filterModel.category = "";
       }
     },
-    filterCategory(event){
-      if(event){
+    filterCategory(event) {
+      if (event) {
         this.filterModel.category = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    filterMineInput(event){
-      if(event){
+    filterMineInput(event) {
+      if (event) {
         this.filterModel.mine = event;
-      } else{
-        this.filterModel.mine = '';
+      } else {
+        this.filterModel.mine = "";
       }
     },
-    filterMine(event){
-      if(event){
+    filterMine(event) {
+      if (event) {
         this.filterModel.mine = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-
-    filterCrateInput(event){
-      if(event){
+    filterCrateInput(event) {
+      if (event) {
         this.filterModel.crate = event;
-      } else{
-        this.filterModel.crate = '';
+      } else {
+        this.filterModel.crate = "";
       }
     },
-    filterCrate(event){
-      if(event){
+    filterCrate(event) {
+      if (event) {
         this.filterModel.crate = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    filterProductIdInput(event){
-      if(event){
+    filterProductIdInput(event) {
+      if (event) {
         this.filterModel.productId = event;
-      } else{
-        this.filterModel.productId = '';
+      } else {
+        this.filterModel.productId = "";
       }
     },
-    filterProductId(event){
-      if(event){
+    filterProductId(event) {
+      if (event) {
         this.filterModel.productId = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-    filterFromWhoInput(event){
-      if(event){
+    filterFromWhoInput(event) {
+      if (event) {
         this.filterModel.fromWho = event;
-      } else{
-        this.filterModel.fromWho = '';
+      } else {
+        this.filterModel.fromWho = "";
       }
     },
-    filterFromWho(event){
-      if(event){
+    filterFromWho(event) {
+      if (event) {
         this.filterModel.fromWho = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-    filterToInput(event){
-      if(event){
+    filterToInput(event) {
+      if (event) {
         this.filterModel.to = event;
-      } else{
-        this.filterModel.to = '';
+      } else {
+        this.filterModel.to = "";
       }
     },
-    filterTo(event){
-      if(event){
+    filterTo(event) {
+      if (event) {
         this.filterModel.to = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
-    filterDateInput(event){
-      if(event){
+    filterDateInput(event) {
+      if (event) {
         this.filterModel.date = event;
-      } else{
-        this.filterModel.date = '';
+      } else {
+        this.filterModel.date = "";
       }
     },
-    filterDate(event){
-      if(event){
+    filterDate(event) {
+      if (event) {
         this.filterModel.date = event;
-        this.$store.dispatch("setForwardingFilterList",this.filterModel);
-      } else{
-        if(this.resetFilter()){
-          this.$store.dispatch('setReportsMekmarForwardingList');
-        }else{
-          this.$store.dispatch("setForwardingFilterList",this.filterModel);
-
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
         }
       }
     },
 
-
-    resetFilter(){
-      if(this.filterModel.date == '' && 
-      this.filterModel.to == '' &&
-      this.filterModel.fromWho == '' &&
-      this.filterModel.crate == '' &&
-      this.filterModel.mine == '' &&
-      this.filterModel.category == '' &&
-      this.filterModel.product == '' &&
-      this.filterModel.surface == '' &&
-      this.filterModel.width == '' &&
-      this.filterModel.height == '' &&
-      this.filterModel.edge == '' &&
-      this.filterModel.box == '' &&
-      this.filterModel.piece == '' &&
-      this.filterModel.amount == '' &&
-      this.filterModel.unit == '' &&
-      this.filterModel.po == '' 
-      ){
+    resetFilter() {
+      if (
+        this.filterModel.date == "" &&
+        this.filterModel.to == "" &&
+        this.filterModel.fromWho == "" &&
+        this.filterModel.crate == "" &&
+        this.filterModel.mine == "" &&
+        this.filterModel.category == "" &&
+        this.filterModel.product == "" &&
+        this.filterModel.surface == "" &&
+        this.filterModel.width == "" &&
+        this.filterModel.height == "" &&
+        this.filterModel.edge == "" &&
+        this.filterModel.box == "" &&
+        this.filterModel.piece == "" &&
+        this.filterModel.amount == "" &&
+        this.filterModel.unit == "" &&
+        this.filterModel.po == ""
+      ) {
         return true;
-      } else{
+      } else {
         return false;
       }
     },

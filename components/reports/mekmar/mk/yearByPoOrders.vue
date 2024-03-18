@@ -2,15 +2,20 @@
   <div>
     <DataTable
       :value="list"
-      :filters.sync="filterYearByPoOrders"
+      responsiveLayout="scroll"
+      :filters.sync="filters"
       filterDisplay="row"
-      scrollable
-      scrollHeight="600px"
+      @filter="filtered($event)"
       :loading="loading"
     >
-      <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="tarih"
+        header="Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
-          {{ slotProps.data.SiparisTarihi | dateToString }}
+          {{ slotProps.data.tarih | dateToString }}
         </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -21,7 +26,12 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="firma"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -31,7 +41,22 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column field="po" header="Po" :showFilterMenu="false" :showClearButton="false">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="teslim"
+        header="Delivery Term."
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -42,21 +67,20 @@
         </template>
       </Column>
 
-      <Column field="TeslimTur" header="Kind of Delivery"></Column>
-      <Column field="Fob" header="Fob">
+      <Column field="fob" header="Fob ($)">
         <template #body="slotProps">
-          {{ slotProps.data.Fob | formatPriceUsd }}
+          {{ slotProps.data.fob | formatPriceUsd }}
         </template>
         <template #footer>
-          {{ total.fob | formatPriceUsd }}
+          {{ fob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Ddp" header="Ddp">
+      <Column field="ddp" header="Ddp ($)">
         <template #body="slotProps">
-          {{ slotProps.data.Ddp | formatPriceUsd }}
+          {{ slotProps.data.ddp | formatPriceUsd }}
         </template>
         <template #footer>
-          {{ total.ddp | formatPriceUsd }}
+          {{ ddp | formatPriceUsd }}
         </template>
       </Column>
     </DataTable>
@@ -67,26 +91,43 @@ import { FilterMatchMode } from "primevue/api";
 export default {
   props: {
     list: {
-      type: Array,
-      required: false,
-    },
-    total: {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+    loading: {},
   },
   data() {
     return {
-      filterYearByPoOrders: {
-        SiparisTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      filters: {
+        tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        firma: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        po: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        teslim: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
+      fob: 0,
+      ddp: 0,
     };
+  },
+  methods: {
+    filtered(event) {
+      this.fob = 0;
+      this.ddp = 0;
+      event.filteredValue.forEach((x) => {
+        this.fob += x.fob;
+        this.ddp += x.ddp;
+      });
+    },
+  },
+  mounted() {},
+  watch: {
+    list() {
+      this.fob = 0;
+      this.ddp = 0;
+      this.list.forEach((x) => {
+        this.fob += x.fob;
+        this.ddp += x.ddp;
+      });
+    },
   },
 };
 </script>

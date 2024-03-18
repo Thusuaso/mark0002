@@ -1,40 +1,44 @@
 <template>
-  <div>
-    <div class="row container">
+  <div class="container">
+    <div class="row">
       <div class="col">
         <Dropdown
           v-model="selectedYear"
-          :options="getOrderYearList"
+          :options="getYearList"
           optionLabel="Year"
+          placeholder="Select a Year"
+          class="w-full md:w-14rem"
           @change="yearSelected($event)"
         />
       </div>
+      <div class="col">
+        <Button class="p-button-success" @click="excel_output" label="Excel" />
+      </div>
     </div>
     <TabView>
-      <TabPanel header="Orders by Po (Yearly)">
+      <TabPanel header="Yearly By Po">
         <reportsMekmarMkYearByPoOrdersList
-          :list="getReportsMekmarMkList.byOrderList"
-          :total="getReportsMekmarMkListTotal.byOrders"
+          :list="getReportsMekmarMkList.byPo"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Current Production Order Report">
+      <TabPanel header="Up To Date Orders">
         <reportsMekmarMkYearByMarketingOrdersList
-          :list="getReportsMekmarMkList.byMarketingList"
-          :total="getReportsMekmarMkListTotal.byMarketing"
+          :customer="getReportsMekmarMkList.byCustomer"
+          :marketing="getReportsMekmarMkList.byMarketing"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Shipment Report">
+      <TabPanel header="Shipment Reports">
         <reportsMekmarMkYearByMarketingForwardingList
-          :list="getReportsMekmarMkForwList"
-          :total="getReportsMekmarMkListTotal.byMarketingForw"
+          :marketing="getReportsMekmarMkList.byMarketingYukleme"
+          :marketingByDetail="getReportsMekmarMkList.byMarketingDetayYukleme"
           :loading="getLoading"
         />
       </TabPanel>
-      <TabPanel header="Customer Report">
+      <TabPanel header="Customers Reports">
         <reportsMekmarMkByCustomerList
-          :list="getReportsMekmarMkList.byCustomerList"
+          :list="getReportsMekmarMkList.byCustomerOrder"
           :loading="getLoading"
         />
       </TabPanel>
@@ -43,29 +47,46 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import api from "../../../plugins/excel.server";
 export default {
-  computed: {
-    ...mapGetters([
-      "getOrderYearList",
-      "getReportsMekmarMkList",
-      "getReportsMekmarMkListTotal",
-      "getReportsMekmarMkForwList",
-      "getLoading",
-    ]),
-  },
-
   data() {
     return {
-      selectedYear: null,
+      selectedYear: { Year: 2024 },
     };
   },
+  computed: {
+    ...mapGetters(["getReportsMekmarMkList", "getLocalUrl", "getLoading", "getYearList"]),
+  },
   created() {
-    this.$store.dispatch("setReportsMekmarMkList");
-    this.selectedYear = { Year: 2024 };
+    const year = new Date().getFullYear();
+    this.$store.dispatch("setBeginLoadingAction");
+    api.get(`/raporlar/listeler/mkraporlari/${year}`).then((response) => {
+      this.$store.dispatch("setReportsMekmarMkList", response.data);
+      this.$store.dispatch("setEndLoadingAction");
+    });
   },
   methods: {
+    excel_output() {
+      this.$store.dispatch("setBeginLoadingAction");
+      api
+        .post("/raporlar/listeler/mkraporlari/excel", this.getReportsMekmarMkList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "raporlar/listeler/mkraporlari/excel";
+            link.setAttribute("download", "mkRaporlari.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            this.$store.dispatch("setEndLoadingAction");
+          }
+        });
+    },
     yearSelected(event) {
-      this.$store.dispatch("setReportsMekmarMkListYear", event.value.Year);
+      this.$store.dispatch("setBeginLoadingAction");
+      api.get(`/raporlar/listeler/mkraporlari/${event.value.Year}`).then((response) => {
+        this.$store.dispatch("setReportsMekmarMkList", response.data);
+        this.$store.dispatch("setEndLoadingAction");
+      });
     },
   },
 };

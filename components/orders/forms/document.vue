@@ -14,7 +14,7 @@
           </a>
         </template>
       </Column>
-      <Column field="kullanici" header="Uploaded By"> </Column>
+      <Column field="kullanici" header="Document Rep"> </Column>
     </DataTable>
   </div>
 </template>

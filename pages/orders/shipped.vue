@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="New"
+          label="New Product"
           @click="newForm"
         />
       </div>
@@ -213,7 +213,6 @@ export default {
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
-
 
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);

@@ -38,7 +38,7 @@
       <div class="col">
         <span class="p-float-label">
           <Textarea id="description" v-model="model.Aciklama" rows="5" class="w-100" />
-          <label for="description">Description</label>
+          <label for="description">Explanation</label>
         </span>
       </div>
     </div>

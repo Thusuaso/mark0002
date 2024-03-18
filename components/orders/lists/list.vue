@@ -18,20 +18,30 @@
       sortField="YuklemeTarihi"
       :sortOrder="-1"
     >
-    <template #header>
-            <div class="flex justify-content-between">
-                <span class="p-input-icon-left">
-                    <i class="pi pi-search" />
-                    <InputText v-model="globalSearch" placeholder="Keyword Search" @keyup.enter="globalSearchFilter($event)" @input="globalSearchFilterInput($event)"/>
-                </span>
-            </div>
-        </template>
+      <template #header>
+        <div class="flex justify-content-between">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText
+              v-model="globalSearch"
+              placeholder="Keyword Search"
+              @keyup.enter="globalSearchFilter($event)"
+              @input="globalSearchFilterInput($event)"
+            />
+          </span>
+        </div>
+      </template>
       <Column header="#" headerStyle="width:3rem">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
         </template>
       </Column>
-      <Column field="YuklemeTarihi" header="Load Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="YuklemeTarihi"
+        header="Load Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.YuklemeTarihi | dateToString }}
         </template>
@@ -45,7 +55,12 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="To" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="FirmaAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -56,7 +71,12 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -86,7 +106,12 @@
           </div>
         </template>
       </Column>
-      <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunAdi"
+        header="Product"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -97,7 +122,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunUretimAciklama" header="Detail"> </Column>
+      <Column field="UrunUretimAciklama" header="Details"> </Column>
       <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel }">
           <InputText
@@ -105,49 +130,65 @@
             type="text"
             @keyup.enter="filterShipmentWidth(filterModel.value)"
             @input="filterShipmentWidthInput(filterModel.value)"
-
             class="p-column-filter"
           />
         </template>
       </Column>
 
-      <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Boy"
+        header="Height"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
             @keyup.enter="filterShipmentHeight(filterModel.value)"
             @input="filterShipmentHeightInput(filterModel.value)"
-
             class="p-column-filter"
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Edge" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Kenar"
+        header="Thickness"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
             @keyup.enter="filterShipmentEdge(filterModel.value)"
             @input="filterShipmentEdgeInput(filterModel.value)"
-
             class="p-column-filter"
           />
         </template>
       </Column>
-      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunFirmaAdi"
+        header="Supplier"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
             type="text"
             @keyup.enter="filterShipmentSupplier(filterModel.value)"
             @input="filterShipmentSupplierInput(filterModel.value)"
-
             class="p-column-filter"
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Miktar"
+        header="Amount"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
@@ -157,7 +198,6 @@
             type="text"
             @keyup.enter="filterShipmentAmount(filterModel.value)"
             @input="filterShipmentAmountInput(filterModel.value)"
-
             class="p-column-filter"
           />
         </template>
@@ -222,7 +262,12 @@
           {{ slotProps.index + 1 }}
         </template>
       </Column>
-      <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisTarihi"
+        header="Order Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.SiparisTarihi | dateToString }}
         </template>
@@ -235,7 +280,12 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="To" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="FirmaAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -245,7 +295,12 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -274,7 +329,12 @@
           </div>
         </template>
       </Column>
-      <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunAdi"
+        header="Product"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -284,7 +344,7 @@
           />
         </template>
       </Column>
-      <Column field="UrunUretimAciklama" header="Detail"> </Column>
+      <Column field="UrunUretimAciklama" header="Details"> </Column>
       <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -296,7 +356,12 @@
         </template>
       </Column>
 
-      <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Boy"
+        header="Height"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -306,7 +371,12 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Edge" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Kenar"
+        header="Thickness"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -316,7 +386,12 @@
           />
         </template>
       </Column>
-      <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunFirmaAdi"
+        header="Supplier"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #body="slotProps">
           <div
             :id="'productSupplier' + slotProps.data.UrunId"
@@ -342,7 +417,12 @@
           />
         </template>
       </Column>
-      <Column field="Miktar" header="Amount" :showClearButton="false" :showFilterMenu="false">
+      <Column
+        field="Miktar"
+        header="Amount"
+        :showClearButton="false"
+        :showFilterMenu="false"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
@@ -356,7 +436,7 @@
         </template>
       </Column>
       <Column field="BirimAdi" header="Unit"> </Column>
-      <Column field="Uretim" header="Production">
+      <Column field="Uretim" header="Produced">
         <template #body="slotProps">
           <div
             v-if="slotProps.data.Uretim == slotProps.data.Miktar"
@@ -419,7 +499,7 @@ export default {
   },
   data() {
     return {
-      globalSearch:null,
+      globalSearch: null,
       selectedProduction: null,
       filtersOrders: {
         SiparisTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -432,7 +512,6 @@ export default {
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-
       },
       filterModel: {
         loaddate: "",
@@ -443,255 +522,214 @@ export default {
         height: "",
         edge: "",
         supplier: "",
-        amount:"",
+        amount: "",
       },
     };
   },
   methods: {
-    globalSearchFilterInput(event){
-      if(!event){
-        this.$store.dispatch('setOrderShippedList');
-      };
-    },
-    globalSearchFilter(event){
-      if(event.target._value){
-        this.$store.dispatch('setFilterShipmentGlobal',event.target._value);
-
-      }else{
-        this.$store.dispatch('setOrderShippedList');
-
+    globalSearchFilterInput(event) {
+      if (!event) {
+        this.$store.dispatch("setOrderShippedList");
       }
     },
-    filterShipmentAmountInput(event){
-      if(event){
+    globalSearchFilter(event) {
+      if (event.target._value) {
+        this.$store.dispatch("setFilterShipmentGlobal", event.target._value);
+      } else {
+        this.$store.dispatch("setOrderShippedList");
+      }
+    },
+    filterShipmentAmountInput(event) {
+      if (event) {
         this.filterModel.amount = event;
-
-      }else{
-        this.filterModel.amount = '';
+      } else {
+        this.filterModel.amount = "";
       }
     },
-    filterShipmentSupplierInput(event){
-      if(event){
+    filterShipmentSupplierInput(event) {
+      if (event) {
         this.filterModel.supplier = event;
-
-      }else{
-        this.filterModel.supplier = '';
+      } else {
+        this.filterModel.supplier = "";
       }
     },
-    filterShipmentEdgeInput(event){
-      if(event){
+    filterShipmentEdgeInput(event) {
+      if (event) {
         this.filterModel.edge = event;
-      } else{
-        this.filterModel.edge = '';
+      } else {
+        this.filterModel.edge = "";
       }
     },
-    filterShipmentHeightInput(event){
-      if(event){
+    filterShipmentHeightInput(event) {
+      if (event) {
         this.filterModel.height = event;
-      }else{
-        this.filterModel.height = '';
+      } else {
+        this.filterModel.height = "";
       }
-      
     },
-    filterShipmentWidthInput(event){
-      if(event){
+    filterShipmentWidthInput(event) {
+      if (event) {
         this.filterModel.width = event;
-      } else{
-        this.filterModel.width = '';
+      } else {
+        this.filterModel.width = "";
       }
     },
-    filterShipmentProductInput(event){
-      if(event){
+    filterShipmentProductInput(event) {
+      if (event) {
         this.filterModel.product = event;
-      } else{
-        this.filterModel.product = '';
+      } else {
+        this.filterModel.product = "";
       }
     },
-    filterShipmentPoInput(event){
-      if(event){
+    filterShipmentPoInput(event) {
+      if (event) {
         this.filterModel.po = event;
-      } else{
-        this.filterModel.po = '';
+      } else {
+        this.filterModel.po = "";
       }
-
     },
-    filterShipmentCompanyInput(event){
-      if(event){
+    filterShipmentCompanyInput(event) {
+      if (event) {
         this.filterModel.company = event;
-      } else{
-        this.filterModel.company = '';
+      } else {
+        this.filterModel.company = "";
       }
-
     },
 
-    filterShipmentLoadDateInput(event){
-      if(event){
+    filterShipmentLoadDateInput(event) {
+      if (event) {
         this.filterModel.loaddate = event;
-      } else{
-        this.filterModel.loaddate = '';
-        }
+      } else {
+        this.filterModel.loaddate = "";
+      }
     },
 
-    filterShipmentAmount(event){
-      if(event){
+    filterShipmentAmount(event) {
+      if (event) {
         this.filterModel.amount = event;
-
-      } else{
-        this.filterModel.amount = '';
-
+      } else {
+        this.filterModel.amount = "";
       }
 
-      if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-
-        }
-
-
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
-    filterShipmentSupplier(event){
-      if(event){
+    filterShipmentSupplier(event) {
+      if (event) {
         this.filterModel.supplier = event;
-
-      } else{
-        this.filterModel.supplier = '';
-
+      } else {
+        this.filterModel.supplier = "";
       }
 
-      if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-
-        }
-
-
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
-    filterShipmentEdge(event){
-      if(event){
-        this.filterModel.edge = event
-
-      } else{
-        this.filterModel.edge = '';
-
-      };
+    filterShipmentEdge(event) {
+      if (event) {
+        this.filterModel.edge = event;
+      } else {
+        this.filterModel.edge = "";
+      }
       console.log(this.filterModel);
-      if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-
-        }
-
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
-    filterShipmentHeight(event){
-      if(event){
+    filterShipmentHeight(event) {
+      if (event) {
         this.filterModel.height = event;
-
-      } else{
-        this.filterModel.height = '';
-
-      };
-      if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-
-        }
-
-
+      } else {
+        this.filterModel.height = "";
+      }
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
-    filterShipmentWidth(event){
-      if(event){
+    filterShipmentWidth(event) {
+      if (event) {
         this.filterModel.width = event;
-
-      } else{
-        this.filterModel.width = '';
-
-      };
-      if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-
-        }
-      
+      } else {
+        this.filterModel.width = "";
+      }
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
-    filterShipmentProduct(event){
-      if(event){
+    filterShipmentProduct(event) {
+      if (event) {
         this.filterModel.product = event;
-      }else{
-        this.filterModel.product = '';
-      };
-      if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-        }
+      } else {
+        this.filterModel.product = "";
+      }
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
     filterShipmentPo(event) {
-      if(event){
+      if (event) {
         this.filterModel.po = event;
-
-
-      }else{
-        this.filterModel.po = '';
-
-      };
-      if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-
-        }
-
-
+      } else {
+        this.filterModel.po = "";
+      }
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
     filterShipmentCompany(event) {
-      if(event){
+      if (event) {
         this.filterModel.company = event;
-
-      }else{
-        this.filterModel.company = '';
-
+      } else {
+        this.filterModel.company = "";
       }
       this.__controlFilter();
-      if(this.__controlFilter()){
-        this.$store.dispatch('setOrderShippedList');
-      } else{
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
         this.$store.dispatch("filterShipment", this.filterModel);
-
       }
-
     },
     filterShipmentLoadDate(event) {
-      if(event){
+      if (event) {
         this.filterModel.loaddate = event;
-
-        }else{
-          this.filterModel.loaddate = '';
-
-        }
-        if(this.__controlFilter()){
-          this.$store.dispatch('setOrderShippedList');
-
-        }else{
-          this.$store.dispatch("filterShipment", this.filterModel);
-
-        }
-
+      } else {
+        this.filterModel.loaddate = "";
+      }
+      if (this.__controlFilter()) {
+        this.$store.dispatch("setOrderShippedList");
+      } else {
+        this.$store.dispatch("filterShipment", this.filterModel);
+      }
     },
 
-    __controlFilter(){
-      if(this.filterModel.loaddate == '' && this.filterModel.company == '' && this.filterModel.po == '' && this.filterModel.product == '' && this.filterModel.width == '' && this.filterModel.height == '' && this.filterModel.edge == '' && this.filterModel.supplier == '' && this.filterModel.amount == ''){
-        return true
+    __controlFilter() {
+      if (
+        this.filterModel.loaddate == "" &&
+        this.filterModel.company == "" &&
+        this.filterModel.po == "" &&
+        this.filterModel.product == "" &&
+        this.filterModel.width == "" &&
+        this.filterModel.height == "" &&
+        this.filterModel.edge == "" &&
+        this.filterModel.supplier == "" &&
+        this.filterModel.amount == ""
+      ) {
+        return true;
       }
     },
     productSupplierNull(event) {
@@ -707,7 +745,6 @@ export default {
       }
     },
   },
-
 };
 </script>
 <style scoped>

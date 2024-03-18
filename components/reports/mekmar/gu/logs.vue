@@ -7,7 +7,12 @@
       :rowClass="logsRowClass"
       :loading="loading"
     >
-      <Column field="DegisiklikTarihi" header="Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="DegisiklikTarihi"
+        header="Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -17,7 +22,12 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -27,7 +37,12 @@
           />
         </template>
       </Column>
-      <Column field="IslemAdi" header="Process" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="IslemAdi"
+        header="LOGs"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -37,7 +52,12 @@
           />
         </template>
       </Column>
-      <Column field="DegisiklikYapan" header="Changer" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="DegisiklikYapan"
+        header="Rep."
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"

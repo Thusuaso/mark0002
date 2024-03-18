@@ -72,7 +72,7 @@
                 @complete="searchMine($event)"
                 field="OcakAdi"
               />
-              <label for="mine">Mine</label>
+              <label for="mine">Quarry</label>
             </span>
           </div>
         </div>
@@ -80,13 +80,13 @@
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="organizer" type="text" v-model="organizer" />
-              <label for="organizer">Organizer</label>
+              <label for="organizer">Controled by</label>
             </span>
           </div>
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="crateMan" type="text" v-model="crateman" />
-              <label for="crateMan">Crate</label>
+              <label for="crateMan">Crated by</label>
             </span>
           </div>
         </div>
@@ -137,7 +137,7 @@
                 class="w-100"
                 @input="calculateTotalAmount($event)"
               />
-              <label for="boxinamount">Pieces in Box</label>
+              <label for="boxinamount">Pcs in Box</label>
             </span>
           </div>
           <div class="col-4">
@@ -193,19 +193,19 @@
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="stringStatus" inputId="string" :binary="true" />
-              <label for="string" class="ml-2"> Bonded </label>
+              <label for="string" class="ml-2"> Binded </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="outStatus" inputId="out" :binary="true" />
-              <label for="out" class="ml-2"> Outer </label>
+              <label for="out" class="ml-2"> Out </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="notFindStatus" inputId="notFind" :binary="true" />
-              <label for="notFind" class="ml-2"> Not Found </label>
+              <label for="notFind" class="ml-2"> Unknown </label>
             </div>
           </div>
         </div>

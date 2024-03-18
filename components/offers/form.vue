@@ -23,7 +23,7 @@
               class="w-100"
               @change="offerTypeSelected($event)"
             />
-            <label for="type">Kind of Offer</label>
+            <label for="type">Quote Type</label>
           </div>
           <div class="p-float-label mb-4">
             <Dropdown
@@ -39,7 +39,7 @@
         </div>
         <div class="col">
           <TabView>
-            <TabPanel header="Offer Description">
+            <TabPanel header="Description">
               <Textarea
                 v-model="model.Aciklama"
                 autoResize
@@ -48,13 +48,13 @@
                 class="w-100"
               />
             </TabPanel>
-            <TabPanel header="Reminder Document">
+            <TabPanel header="Reminder">
               <div class="row">
                 <div class="col">
                   <Calendar
                     v-model="reminder_date"
                     @date-select="reminderDateSelected($event)"
-                    placeholder="Reminder Date"
+                    placeholder="Date"
                   />
                 </div>
                 <div class="col">
@@ -86,11 +86,11 @@
                 <div class="col">
                   <Button
                     class="p-button-secondary"
-                    label="Numune"
+                    label="Sample"
                     @click="sample_dialog_form = true"
                   />
                   <Dialog :visible.sync="sample_dialog_form" header="Sample" modal>
-                    <offerSample :id="id" :model="model"/>
+                    <offerSample :id="id" :model="model" />
                   </Dialog>
                 </div>
               </div>
@@ -323,7 +323,7 @@
             class="p-button-success w-100 mb-4"
             label="Save"
             @click="process"
-            :disabled="process_button_disabled"
+            :disabled="offer_disabled_button"
           />
         </div>
         <div class="col" v-if="!status">
@@ -338,7 +338,7 @@
       <div class="flex flex-wrap justify-content-center gap-3 mb-4">
         <div class="flex align-items-center">
           <Checkbox v-model="model.TakipEt" inputId="follow" binary />
-          <label for="follow" class="ml-2"> Follow </label>
+          <label for="follow" class="ml-2"> Track </label>
         </div>
         <div class="flex align-items-center">
           <Checkbox v-model="model.BList" inputId="follow" binary />
@@ -466,11 +466,11 @@ export default {
   },
   data() {
     return {
+      offer_disabled_button: false,
       proforma_dialog_form: false,
       sample_dialog_form: false,
       offerFileLink: null,
       reminder_date: null,
-      process_button_disabled: false,
       selectedCountry: null,
       filteredCountry: null,
       selectedProductsList: null,
@@ -586,18 +586,22 @@ export default {
       }
     },
     process() {
+      this.offer_disabled_button = true;
       if (this.__saveControl()) {
         alert("Hatalı Giriş");
+        this.offer_disabled_button = false;
       } else {
-        this.process_button_disabled = true;
         this.customerModel.Kullanici = Cookies.get("userId");
         this.model.KullaniciId = Cookies.get("userId");
         if (this.status) {
           this.model.TakipEt = true;
         }
+        this.model.Id = this.id;
+
         this.model.Tarih = date.dateToString(this.offerDate);
         const data = { offer: this.model, customer: this.customerModel };
         this.$emit("offer_process_emit", data);
+        this.offer_disabled_button = false;
       }
     },
     countrySelected(event) {

@@ -70,7 +70,7 @@
             label="Excel"
           />
         </JsonExcel> -->
-        <vue-excel-xlsx
+        <!-- <vue-excel-xlsx
           :data="getReportsMekmerStockList"
           :columns="reportsMekmerStockListExcelFields2"
           :file-name="'Stock'"
@@ -84,7 +84,8 @@
             icon="pi pi-file-excel"
             label="Excel"
           />
-        </vue-excel-xlsx>
+        </vue-excel-xlsx> -->
+        <Button class="p-button-success" label="Excel" @click="excel_output" />
       </div>
     </div>
 
@@ -105,6 +106,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import api from "@/plugins/excel.server.js";
 export default {
   computed: {
     ...mapGetters([
@@ -113,6 +115,7 @@ export default {
       "getReportsStockListDetail",
       "getReportsStockListDetailTotal",
       "getLoading",
+      "getLocalUrl",
     ]),
   },
   data() {
@@ -145,6 +148,23 @@ export default {
     this.$store.dispatch("setReportsMekmerStockList");
   },
   methods: {
+    excel_output() {
+      vuexContext.dispatch('setBeginLoadingAction');
+
+      api
+        .post("/raporlar/listeler/stokRaporExcelListe", this.getReportsMekmerStockList)
+        .then((response) => {
+          if (response.status) {
+            alert(true);
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "/raporlar/listeler/stokRaporExcelListe";
+            link.setAttribute("download", "Stok_listesi.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            this.$store.dispatch("setEndLoadingAction");
+          }
+        });
+    },
     formatDecimal(value) {
       const data = value.toString().replace(".", ",");
       return data;
@@ -158,11 +178,10 @@ export default {
         this.$store.dispatch("setReportsOuterStockListDetail", event.data);
       } else if (this.ingredient == "Mekmer") {
         this.$store.dispatch("setReportsMekmerStockListDetail", event.data);
-      }
-      else if (this.ingredient == "MekmerIn") {
+      } else if (this.ingredient == "MekmerIn") {
         this.$store.dispatch("setReportsMekmerInStockListDetail", event.data);
-      } else if (this.ingredient == 'Mek-Moz'){
-        this.$store.dispatch('setReportsMekmozStockListDetail',event.data);
+      } else if (this.ingredient == "Mek-Moz") {
+        this.$store.dispatch("setReportsMekmozStockListDetail", event.data);
       }
       this.reports_mekmer_stock_dialog = true;
     },
@@ -175,9 +194,9 @@ export default {
         this.$store.dispatch("setReportsMekmerStockListOuter");
       } else if (this.ingredient == "Mekmer") {
         this.$store.dispatch("setReportsMekmerStockListMekmer");
-      } else if (this.ingredient == "MekmerIn"){
+      } else if (this.ingredient == "MekmerIn") {
         this.$store.dispatch("setReportsMekmerStockListMekmerIn");
-      }else if (this.ingredient == "Mek-Moz"){
+      } else if (this.ingredient == "Mek-Moz") {
         this.$store.dispatch("setReportsMekmerStockListMekmoz");
       }
     },

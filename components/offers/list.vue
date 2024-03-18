@@ -8,10 +8,10 @@
         @row-click="offerListSelected($event)"
         :loading="loading"
       >
-        <Column field="TeklifSahibi" header="Owner"></Column>
-        <Column field="TeklifSayisi" header="Total"></Column>
-        <Column field="TeklifSayisiA" header="A"></Column>
-        <Column field="TeklifSayisiB" header="B"></Column>
+        <Column field="TeklifSahibi" header="Rep."></Column>
+        <Column field="TeklifSayisi" header="Quote Count"></Column>
+        <Column field="TeklifSayisiA" header="Quote Count A"></Column>
+        <Column field="TeklifSayisiB" header="Quote Count B"></Column>
       </DataTable>
     </div>
     <div class="col">

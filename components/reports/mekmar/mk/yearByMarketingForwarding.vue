@@ -1,110 +1,133 @@
 <template>
   <div>
-    <DataTable :value="list.forwList" :loading="loading">
-      <Column field="Marketing" header="Marketing"></Column>
-      <Column field="Fob" header="Fob">
-        <template #body="slotProps">
-          {{ slotProps.data.Fob | formatPriceUsd }}
-        </template>
-        <template #footer>
-          {{ total.forwarding.fob | formatPriceUsd }}
+    <DataTable
+      :value="marketing"
+      responsiveLayout="scroll"
+      :filters.sync="filtersMarketing"
+      filterDisplay="row"
+      @filter="filteredMarketing($event)"
+      :loading="loading"
+    >
+      <Column
+        field="marketing"
+        header="Marketing"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
-      <Column field="Ddp" header="Ddp">
+
+      <Column field="fobToplam" header="Fob ($)">
         <template #body="slotProps">
-          {{ slotProps.data.Ddp | formatPriceUsd }}
+          {{ slotProps.data.fobToplam | formatPriceUsd }}
         </template>
         <template #footer>
-          {{ total.forwarding.ddp | formatPriceUsd }}
+          {{ marketingFob | formatPriceUsd }}
+        </template>
+      </Column>
+      <Column field="cfrToplam" header="Ddp ($)">
+        <template #body="slotProps">
+          {{ slotProps.data.cfrToplam | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{ marketingDdp | formatPriceUsd }}
         </template>
       </Column>
     </DataTable>
     <br />
-    <div class="row">
-      <div class="col">
-        <DataTable :value="list.forwMekmarList" scrollable scrollHeight="500px" :loading="loading">
-          <template #header> Mekmar </template>
-          <Column field="SiparisNo" header="Po"></Column>
-          <Column field="Fob" header="Fob">
+
+    <div class="row m-auto mt-3">
+      <div class="col" v-if="mekmarlist.length > 0">
+        <DataTable :value="mekmarlist" style="font-size: 85%" :loading="loading">
+          <template #header> Mekmar Shipped </template>
+          <Column field="musteri" header="Customer"></Column>
+          <Column field="toplamFob" header="Fob">
             <template #body="slotProps">
-              {{ slotProps.data.Fob | formatPriceUsd }}
+              {{ slotProps.data.toplamFob | formatPriceUsd }}
             </template>
             <template #footer>
-              {{ total.mekmar.ddp | formatPriceUsd }}
+              {{ totalDetail.mekmarFob | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="Ddp" header="Ddp">
+          <Column field="toplamCfr" header="Ddp">
             <template #body="slotProps">
-              {{ slotProps.data.Ddp | formatPriceUsd }}
+              {{ slotProps.data.toplamCfr | formatPriceUsd }}
             </template>
             <template #footer>
-              {{ total.mekmar.ddp | formatPriceUsd }}
-            </template>
-          </Column>
-        </DataTable>
-      </div>
-      <div class="col">
-        <DataTable :value="list.forwInList" scrollable scrollHeight="500px" :loading="loading">
-          <template #header> İç Piyasa </template>
-          <Column field="SiparisNo" header="Po"></Column>
-          <Column field="Fob" header="Fob">
-            <template #body="slotProps">
-              {{ slotProps.data.Fob | formatPriceUsd }}
-            </template>
-            <template #footer>
-              {{ total.in.ddp | formatPriceUsd }}
-            </template>
-          </Column>
-          <Column field="Ddp" header="Ddp">
-            <template #body="slotProps">
-              {{ slotProps.data.Ddp | formatPriceUsd }}
-            </template>
-            <template #footer>
-              {{ total.in.ddp | formatPriceUsd }}
+              {{ totalDetail.mekmarDdp | formatPriceUsd }}
             </template>
           </Column>
         </DataTable>
       </div>
-      <div class="col">
-        <DataTable :value="list.forwMekmerList" scrollable scrollHeight="500px" :loading="loading">
-          <template #header>Mekmer </template>
-          <Column field="SiparisNo" header="Po"></Column>
-          <Column field="Fob" header="Fob">
+      <div class="col" v-if="mekmerlist.length > 0" >
+        <DataTable :value="mekmerlist" style="font-size: 85%" :loading="loading">
+          <template #header>Mekmer Shipped </template>
+          <Column field="musteri" header="Customer"></Column>
+          <Column field="toplamFob" header="Fob">
             <template #body="slotProps">
-              {{ slotProps.data.Fob | formatPriceUsd }}
+              {{ slotProps.data.toplamFob | formatPriceUsd }}
             </template>
             <template #footer>
-              {{ total.mekmer.ddp | formatPriceUsd }}
+              {{ totalDetail.mekmerFob | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="Ddp" header="Ddp">
+          <Column field="toplamCfr" header="Ddp">
             <template #body="slotProps">
-              {{ slotProps.data.Ddp | formatPriceUsd }}
+              {{ slotProps.data.toplamCfr | formatPriceUsd }}
             </template>
             <template #footer>
-              {{ total.mekmer.ddp | formatPriceUsd }}
+              {{ totalDetail.mekmerDdp | formatPriceUsd }}
             </template>
           </Column>
         </DataTable>
       </div>
-      <div class="col">
-        <DataTable :value="list.forwImpList" scrollable scrollHeight="500px" :loading="loading">
-          <template #header>Imperial Homes </template>
-          <Column field="SiparisNo" header="Po"></Column>
-          <Column field="Fob" header="Fob">
+      <div class="col" v-if="icpiyasalist.length > 0">
+        <DataTable :value="icpiyasalist" style="font-size: 85%" :loading="loading">
+          <template #header>İç Piyasa Shipped </template>
+          <Column field="musteri" header="Customer"></Column>
+          <Column field="toplamFob" header="Fob">
             <template #body="slotProps">
-              {{ slotProps.data.Fob | formatPriceUsd }}
+              {{ slotProps.data.toplamFob | formatPriceUsd }}
             </template>
             <template #footer>
-              {{ total.imp.ddp | formatPriceUsd }}
+              {{ totalDetail.icpiyasaFob | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="Ddp" header="Ddp">
+          <Column field="toplamCfr" header="Ddp">
             <template #body="slotProps">
-              {{ slotProps.data.Ddp | formatPriceUsd }}
+              {{ slotProps.data.toplamCfr | formatPriceUsd }}
             </template>
             <template #footer>
-              {{ total.imp.ddp | formatPriceUsd }}
+              {{ totalDetail.icpiyasaDdp | formatPriceUsd }}
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+      <div class="col" v-if="imperial.length > 0">
+        <DataTable :value="imperial" style="font-size: 85%" :loading="loading">
+          <template #header>Imperial Homes Shipped </template>
+          <Column field="musteri" header="Customer"></Column>
+          <Column field="toplamFob" header="Fob">
+            <template #body="slotProps">
+              {{ slotProps.data.toplamFob | formatPriceUsd }}
+            </template>
+            <template #footer>
+              {{ totalDetail.imperialFob | formatPriceUsd }}
+            </template>
+          </Column>
+          <Column field="toplamCfr" header="Ddp">
+            <template #body="slotProps">
+              {{ slotProps.data.toplamCfr | formatPriceUsd }}
+            </template>
+            <template #footer>
+              {{ totalDetail.imperialDdp | formatPriceUsd }}
             </template>
           </Column>
         </DataTable>
@@ -113,20 +136,93 @@
   </div>
 </template>
 <script>
+import { FilterMatchMode } from "primevue/api";
+
 export default {
   props: {
-    list: {
-      type: Array,
-      required: false,
+    marketing: {},
+    marketingByDetail: {},
+    loading:{}
+  },
+  data() {
+    return {
+      filtersMarketing: {
+        marketing: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
+      marketingFob: 0,
+      marketingDdp: 0,
+      mekmarlist: [],
+      mekmerlist: [],
+      icpiyasalist: [],
+      imperial: [],
+      totalDetail: {
+        mekmarFob: 0,
+        mekmarDdp: 0,
+        icpiyasaFob: 0,
+        icpiyasaDdp: 0,
+        mekmerFob: 0,
+        mekmerDdp: 0,
+        imperialFob: 0,
+        imperialDdp: 0,
+      },
+    };
+  },
+  methods: {
+    filteredMarketing(event) {
+      this.marketingFob = 0;
+      this.marketingDdp = 0;
+      event.filteredValue.forEach((x) => {
+        this.marketingFob += x.fobToplam;
+        this.marketingDdp += x.cfrToplam;
+      });
     },
-    total: {
-      type: Object,
-      required: false,
+  },
+  watch: {
+    marketing() {
+      this.marketingFob = 0;
+      this.marketingDdp = 0;
+      this.marketing.forEach((x) => {
+        this.marketingFob += x.fobToplam;
+        this.marketingDdp += x.cfrToplam;
+      });
     },
-    loading: {
-      type: Boolean,
-      required:false
-    }
+    marketingByDetail() {
+      this.totalDetail = {
+        mekmarFob: 0,
+        mekmarDdp: 0,
+        icpiyasaFob: 0,
+        icpiyasaDdp: 0,
+        mekmerFob: 0,
+        mekmerDdp: 0,
+        imperialFob: 0,
+        imperialDdp: 0,
+      };
+      this.mekmarlist = this.marketingByDetail.filter((x) => x.marketing == "Mekmar");
+      this.mekmerlist = this.marketingByDetail.filter((x) => x.marketing == "Mekmer");
+      this.icpiyasalist = this.marketingByDetail.filter(
+        (x) => x.marketing == "İç Piyasa"
+      );
+      this.imperial = this.marketingByDetail.filter(
+        (x) => x.marketing == "Imperial Homes"
+      );
+
+      this.mekmarlist.forEach((x) => {
+        this.totalDetail.mekmarFob += x.toplamFob;
+        this.totalDetail.mekmarDdp += x.toplamCfr;
+      });
+      this.mekmerlist.forEach((x) => {
+        this.totalDetail.mekmerFob += x.toplamFob;
+        this.totalDetail.mekmerDdp += x.toplamCfr;
+      });
+      this.icpiyasalist.forEach((x) => {
+        this.totalDetail.icpiyasaFob += x.toplamFob;
+        this.totalDetail.icpiyasaDdp += x.toplamCfr;
+      });
+      this.imperial.forEach((x) => {
+        this.totalDetail.imperialFob += x.toplamFob;
+        this.totalDetail.imperialDdp += x.toplamCfr;
+      });
+    },
   },
 };
 </script>

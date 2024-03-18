@@ -44,7 +44,7 @@
                   <div class="row">
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title> Kind of Transfer</template>
+                        <template #title> Shipment Type</template>
                         <template #content>
                           <div
                             class="flex align-items-center mb-4"
@@ -67,7 +67,7 @@
                     </div>
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title> Kind of Bank</template>
+                        <template #title>Bank</template>
                         <template #content>
                           <div
                             class="flex align-items-center mb-4"
@@ -89,7 +89,7 @@
                     </div>
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title>Courier Buying</template>
+                        <template #title>Courier Cost</template>
                         <template #content>
                           <span class="p-float-label mb-4">
                             <InputText
@@ -120,7 +120,7 @@
                     </div>
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title>Courier Selling</template>
+                        <template #title>Courier Price</template>
                         <template #content>
                           <span class="p-float-label mb-4">
                             <InputText
@@ -222,7 +222,7 @@
             <div class="col">
               <FileUpload
                 mode="basic"
-                chooseLabel="Front Photo"
+                chooseLabel="Front of Photo"
                 v-model="selectedFrontPhoto"
                 @select="frontPhotoSelected($event)"
                 accept="image/*"
@@ -233,7 +233,7 @@
             <div class="col">
               <FileUpload
                 mode="basic"
-                chooseLabel="Back Photo"
+                chooseLabel="Back of Photo"
                 v-model="selectedBackPhoto"
                 @select="backPhotoSelected($event)"
                 accept="image/*"

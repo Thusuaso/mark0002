@@ -15,12 +15,12 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
         </Column>
-        <Column field="SipSayisi" header="Order Count" :showFilterMenu="false" :showClearButton="false">
+        <Column field="SipSayisi" header="Order Amount" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }" > 
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
         </Column>
-        <Column field="KontSayisi" header="Container Piece" :showFilterMenu="false" :showClearButton="false">
+        <Column field="KontSayisi" header="Container Amount" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
@@ -38,12 +38,12 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
         </Column>
-        <Column field="SipSayisi" header="Order Count" :showFilterMenu="false" :showClearButton="false">
+        <Column field="SipSayisi" header="Order Amount" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }" > 
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
         </Column>
-        <Column field="KontSayisi" header="Container Piece" :showFilterMenu="false" :showClearButton="false">
+        <Column field="KontSayisi" header="Container Amount" :showFilterMenu="false" :showClearButton="false">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>

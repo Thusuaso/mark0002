@@ -5,7 +5,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="New"
+          label="New Order"
           @click="newForm"
         />
       </div>
@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-2">Orderer</div>
+          <div class="col-2">Seller</div>
           <div class="col">
             <div class="flex flex-wrap gap-3">
               <div
@@ -114,6 +114,7 @@
         :detailProductTotal="getOrderProductionProductDetailTotal"
         :detailProductCost="getOrderProductionProductDetailCostTotal"
         :saveButtonStatus="getOrderProductionSaveButtonStatus"
+        :proformaUploadButtonStatus="getOrderProductionUploadProformaButtonStatus"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
         "
@@ -180,6 +181,8 @@ export default {
       "getOrderProductionYearsList",
       "getOrderProductionSaveButtonStatus",
       "getLocalUrl",
+      "getOrderProductionId",
+      "getOrderProductionUploadProformaButtonStatus"
     ]),
   },
   data() {
@@ -194,7 +197,7 @@ export default {
       suppliers: [
         { key: 0, name: "All" },
         { key: 1, name: "Mekmer" },
-        { key: 2, name: "Outer" },
+        { key: 2, name: "External" },
       ],
       selectedSupplier: "All",
       marketings: [
@@ -241,7 +244,7 @@ export default {
           (x) => x.TedarikciID == 1 || x.TedarikciID == 123
         );
         this.$store.commit("setOrderList", datas);
-      } else if (this.selectedSupplier == "Outer") {
+      } else if (this.selectedSupplier == "External") {
         this.filteredProductionStatus = true;
         const datas = this.getOrderListAll.filter(
           (x) => x.TedarikciID != 1 && x.TedarikciID != 123
@@ -326,8 +329,10 @@ export default {
       this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
-
-      this.$store.dispatch("setOrderProductionUpdate", this.productionModel);
+      this.$store.dispatch("setOrderProductionUpdate", {
+        ...this.productionModel,
+        SiparisId: this.getOrderProductionId,
+      });
     },
     save() {
       this.productionModel.FinansAciklama = this.__stringCharacterChange(
@@ -380,6 +385,7 @@ export default {
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch("setOrderProductionDetailListReset");
       this.$store.dispatch("setOrderProductionPo", null);
+      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus",true);
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
     },
@@ -396,6 +402,9 @@ export default {
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
+      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus",false);
+
+      this.$store.dispatch("setOrderProductionId", event.SiparisId);
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
       this.production_detail_form = true;

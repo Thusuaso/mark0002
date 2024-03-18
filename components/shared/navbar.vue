@@ -16,7 +16,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <nuxt-link to="/" tag="a" class="nav-link">Home</nuxt-link>
+            <nuxt-link to="/" tag="a" class="nav-link">HOME</nuxt-link>
           </li>
           <li class="nav-item dropdown">
             <a
@@ -26,7 +26,7 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Orders
+              ORDERS
             </a>
             <ul class="dropdown-menu">
               <li>
@@ -41,7 +41,7 @@
               </li>
               <li>
                 <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a"
-                  >Waiting</nuxt-link
+                  >On Hold</nuxt-link
                 >
               </li>
             </ul>
@@ -54,28 +54,12 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Sales
+              SALES
             </a>
             <ul class="dropdown-menu">
               <li>
-                <nuxt-link to="/sales/follow" class="dropdown-item" tag="a"
-                  >Follow</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/sales/bgp" class="dropdown-item" tag="a"
-                  >Bgp Network</nuxt-link
-                >
-              </li>
-
-              <li>
-                <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
-                  >Points to Consider</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/sales/representative" class="dropdown-item" tag="a"
-                  >Sales & Operation</nuxt-link
+                <nuxt-link to="/sales/maintodo" class="dropdown-item" tag="a"
+                  >Main To Do</nuxt-link
                 >
               </li>
               <li>
@@ -84,8 +68,24 @@
                 >
               </li>
               <li>
-                <nuxt-link to="/sales/maintodo" class="dropdown-item" tag="a"
-                  >Main To Do</nuxt-link
+                <nuxt-link to="/sales/representative" class="dropdown-item" tag="a"
+                  >Sales & Operation</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/sales/follow" class="dropdown-item" tag="a"
+                  >Customer Notes</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/sales/bgp" class="dropdown-item" tag="a"
+                  >BGP Projects</nuxt-link
+                >
+              </li>
+
+              <li>
+                <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
+                  >Points to Consider</nuxt-link
                 >
               </li>
             </ul>
@@ -99,12 +99,12 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Selection
+              SELECTION
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/selection/input" class="dropdown-item" tag="a"
-                  >Input</nuxt-link
+                  >Entry</nuxt-link
                 >
               </li>
               <li>
@@ -115,7 +115,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <nuxt-link to="/finance" tag="a" class="nav-link">Finance</nuxt-link>
+            <nuxt-link to="/finance" tag="a" class="nav-link">FINANCE</nuxt-link>
           </li>
           <li class="nav-item dropdown">
             <a
@@ -125,57 +125,57 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Operation
+              OPERATION
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/operation/cards" class="dropdown-item" tag="a"
-                  >Product Card</nuxt-link
+                  >Product Data</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/supplier" class="dropdown-item" tag="a"
-                  >Supplier</nuxt-link
+                  >Suppliers</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/shipment" class="dropdown-item" tag="a"
-                  >Shipment</nuxt-link
+                  >Dispatch</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/uploadform" class="dropdown-item" tag="a"
-                  >Upload Form</nuxt-link
+                  >Shipment Form</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/follow" class="dropdown-item" tag="a"
-                  >Container Follow List</nuxt-link
+                  >Container Tracking</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/unfollow" class="dropdown-item" tag="a"
-                  >Container Out of Traking</nuxt-link
+                  >Shipped Containers</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/transport" class="dropdown-item" tag="a"
-                  >Shipping Introduction</nuxt-link
+                  >Shipment Costs</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/transportlist" class="dropdown-item" tag="a"
-                  >Shipping List</nuxt-link
+                  >Shipment Invoices</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/container" class="dropdown-item" tag="a"
-                  >Container Introduction</nuxt-link
+                  >FOB Costs</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/operation/containerlist" class="dropdown-item" tag="a"
-                  >Container List</nuxt-link
+                  >FOB Invoices</nuxt-link
                 >
               </li>
             </ul>
@@ -188,27 +188,27 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Customer
+              CUSTOMERS
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/customer/mekmar" class="dropdown-item" tag="a"
-                  >Order</nuxt-link
+                  >Sale Customers</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/customer/offer" class="dropdown-item" tag="a"
-                  >Offer</nuxt-link
+                  >Quote Customers</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/customer/bgp" class="dropdown-item" tag="a"
-                  >Bgp</nuxt-link
+                  >BGP Customer</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/customer/fair" class="dropdown-item" tag="a"
-                  >Fair & Visit</nuxt-link
+                  >Expo Customers</nuxt-link
                 >
               </li>
               <li>
@@ -226,27 +226,27 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Mekmer Reports
+              MEKMER REPORTS
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/reports/mekmer/production" class="dropdown-item" tag="a"
-                  >Product</nuxt-link
+                  >Production Report</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmer/stock" class="dropdown-item" tag="a"
-                  >Stock</nuxt-link
+                  >Stock Report</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmer/mine" class="dropdown-item" tag="a"
-                  >Mine</nuxt-link
+                  >Quarry Info</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/reports/mekmer/atlanta" class="dropdown-item" tag="a"
-                  >Atlanta</nuxt-link
+                  >ATL</nuxt-link
                 >
               </li>
             </ul>
@@ -259,12 +259,12 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Mekmar Reports
+              MEKMAR REPORTS
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/reports/mekmar/ayo" class="dropdown-item" tag="a"
-                  >Ayo</nuxt-link
+                  >AYO</nuxt-link
                 >
               </li>
               <li>
@@ -274,7 +274,7 @@
               </li>
               <li>
                 <nuxt-link to="/reports/mekmar/forwarding" class="dropdown-item" tag="a"
-                  >Forwarding List</nuxt-link
+                  >Shipped Crates</nuxt-link
                 >
               </li>
               <li>
@@ -302,23 +302,23 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Sample
+              SAMPLE
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/sample/sample" class="dropdown-item" tag="a"
-                  >List</nuxt-link
+                  >Sample List</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/sample/finance" class="dropdown-item" tag="a"
-                  >Finance</nuxt-link
+                  >Sample Finance</nuxt-link
                 >
               </li>
             </ul>
           </li>
           <li class="nav-item">
-            <nuxt-link to="/offers" tag="a" class="nav-link">Offers</nuxt-link>
+            <nuxt-link to="/offers" tag="a" class="nav-link">QUOTES</nuxt-link>
           </li>
           <li class="nav-item dropdown">
             <a
@@ -328,17 +328,17 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Panel
+              W. PANEL
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/panel/products/published" class="dropdown-item" tag="a"
-                  >Published</nuxt-link
+                  >Products (Published)</nuxt-link
                 >
               </li>
               <li>
                 <nuxt-link to="/panel/products/notpublished" class="dropdown-item" tag="a"
-                  >Not Published</nuxt-link
+                  >Products (Unpublished)</nuxt-link
                 >
               </li>
               <li>
@@ -348,7 +348,7 @@
               </li>
               <li>
                 <nuxt-link to="/panel/products/queue" class="dropdown-item" tag="a"
-                  >Change Queue</nuxt-link
+                  >Product Queue</nuxt-link
                 >
               </li>
               <li>
@@ -358,7 +358,7 @@
               </li>
               <li>
                 <nuxt-link to="/panel/usa" class="dropdown-item" tag="a"
-                  >Usa Stock</nuxt-link
+                  >USA Panel</nuxt-link
                 >
               </li>
             </ul>
@@ -384,7 +384,7 @@
           <Button
             type="button"
             class="p-button-success w-100"
-            label="Yeni"
+            label="New"
             @click="newForm"
           />
           <todoByUsernameList

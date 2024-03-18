@@ -65,19 +65,19 @@
       <Column field="YuzeyIslemAdi" header="Surface"></Column>
       <Column field="En" header="Width"></Column>
       <Column field="Boy" header="Height"></Column>
-      <Column field="Kenar" header="Kenar"></Column>
+      <Column field="Kenar" header="Thickness"></Column>
       <Column field="UrunBirimAdi" header="Unit"></Column>
       <Column field="Miktar" header="Amount">
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
       </Column>
-      <Column field="AlisFiyati" header="Purchase Price">
+      <Column field="AlisFiyati" header="Buying Price">
         <template #body="slotProps">
           {{ slotProps.data.AlisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column header="Purchase Total">
+      <Column header="Buying Total">
         <template #body="slotProps">
           {{ (slotProps.data.AlisFiyati * slotProps.data.Miktar) | formatPriceUsd }}
         </template>

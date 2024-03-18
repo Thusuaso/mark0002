@@ -9,7 +9,7 @@
       :sortOrder="-1"
       :rowClass="rowClass"
     >
-      <Column field="Yapilacak" header="To Do"></Column>
+      <Column field="Yapilacak" header="Assignment"></Column>
       <Column field="GirisTarihi" header="Date">
         <template #body="slotProps">
           {{ slotProps.data.GirisTarihi | dateToString }}

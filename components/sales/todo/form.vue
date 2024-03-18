@@ -2,7 +2,12 @@
   <div class="container" style="height: 400px">
     <div class="row">
       <div class="col">
-        <Textarea v-model="todo.Yapilacak" class="w-100" rows="5" />
+        <Textarea
+          v-model="todo.Yapilacak"
+          class="w-100"
+          rows="5"
+          placeholder="Assignment"
+        />
       </div>
     </div>
     <div class="row">
@@ -16,7 +21,7 @@
             field="KullaniciAdi"
             :multiple="true"
           />
-          <label for="users">Todo Owner</label>
+          <label for="users">Assignee</label>
         </span>
       </div>
       <div class="col">
@@ -24,7 +29,7 @@
           v-model="selectedPriority"
           :options="priorities"
           optionLabel="oncelik"
-          placeholder="Öncelik"
+          placeholder="Priority"
         />
       </div>
       <div class="col"><Checkbox v-model="todo.Acil" :binary="true" /> Urgent</div>
@@ -146,7 +151,7 @@ export default {
           this.selectedUsers[3].KullaniciAdi;
       }
       this.todo.YapilacakOncelik = this.selectedPriority.oncelik;
-      this.todo.CustomYapilacak = this.__stringCharacterChange(this.todo.Yapilacak)
+      this.todo.CustomYapilacak = this.__stringCharacterChange(this.todo.Yapilacak);
 
       this.$store.dispatch("setTodoUpdate", this.todo);
     },

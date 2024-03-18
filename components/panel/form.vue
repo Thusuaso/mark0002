@@ -47,7 +47,12 @@
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_en" rows="7" class="w-100" />
+              <Textarea
+                v-model="model.keywords_en"
+                rows="7"
+                class="w-100"
+                @input="changeKeywordsEn($event)"
+              />
               <label>Hashtags</label>
             </span>
           </div>
@@ -135,7 +140,12 @@
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_fr" rows="7" class="w-100" />
+              <Textarea
+                v-model="model.keywords_fr"
+                rows="7"
+                class="w-100"
+                @input="changeKeywordsFr($event)"
+              />
               <label>Hashtags</label>
             </span>
           </div>
@@ -189,7 +199,12 @@
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_es" rows="7" class="w-100" />
+              <Textarea
+                v-model="model.keywords_es"
+                rows="7"
+                class="w-100"
+                @input="changeKeywordsEs($event)"
+              />
               <label>Hastags</label>
             </span>
           </div>
@@ -243,7 +258,12 @@
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_ru" rows="7" class="w-100" />
+              <Textarea
+                v-model="model.keywords_ru"
+                rows="7"
+                class="w-100"
+                @input="changeKeywordsRu($event)"
+              />
               <label>Hashtags</label>
             </span>
           </div>
@@ -297,7 +317,12 @@
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
-              <Textarea v-model="model.keywords_ar" rows="7" class="w-100" />
+              <Textarea
+                v-model="model.keywords_ar"
+                rows="7"
+                class="w-100"
+                @input="changeKeywordsAr($event)"
+              />
               <label>Hashtags</label>
             </span>
           </div>
@@ -975,7 +1000,7 @@ export default {
   },
   data() {
     return {
-      anahtarlar_ar:[],
+      anahtarlar_ar: [],
       anahtarlar_en: [],
       anahtarlar_fr: [],
       anahtarlar_es: [],
@@ -1005,6 +1030,26 @@ export default {
     }
   },
   methods: {
+    changeKeywordsEn(event) {
+      const data = event.replaceAll(/\s/g, "");
+      this.model.keywords_en = data;
+    },
+    changeKeywordsFr(event) {
+      const data = event.replaceAll(/\s/g, "");
+      this.model.keywords_fr = data;
+    },
+    changeKeywordsEs(event) {
+      const data = event.replaceAll(/\s/g, "");
+      this.model.keywords_es = data;
+    },
+    changeKeywordsRu(event) {
+      const data = event.replaceAll(/\s/g, "");
+      this.model.keywords_ru = data;
+    },
+    changeKeywordsAr(event) {
+      const data = event.replaceAll(/\s/g, "");
+      this.model.keywords_ar = data;
+    },
     changeSizeQueue() {
       this.$store.dispatch("setpanelProductsSizeChangeQueue", this.sizeList);
     },

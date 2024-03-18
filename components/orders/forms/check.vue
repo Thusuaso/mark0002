@@ -39,7 +39,7 @@
           {{ slotProps.data.Boy }}
         </template>
       </Column>
-      <Column field="Kenar" header="Edge">
+      <Column field="Kenar" header="Thickness">
         <template #body="slotProps">
           {{ slotProps.data.Kenar }}
         </template>

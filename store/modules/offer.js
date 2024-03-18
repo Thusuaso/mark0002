@@ -101,6 +101,7 @@ const actions = {
                     vuexContext.dispatch('setOfferMainList');
                     vuexContext.dispatch('setOfferId', response.data.id);
                     this.$socket.socketIO.emit('offers_updated_emit');
+                    vuexContext.commit('setOfferButtonStatus', false);
                     this.$toast.success('Başarıyla Kaydedildi');
 
                 } else {

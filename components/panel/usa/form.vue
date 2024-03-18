@@ -25,7 +25,7 @@
             <div class="flex flex-wrap justify-content-center gap-3">
               <div class="flex align-items-center">
                 <Checkbox v-model="model.Yayinla" inputId="published" binary />
-                <label for="published" class="ml-2"> Yayınla </label>
+                <label for="published" class="ml-2"> Publish </label>
               </div>
             </div>
           </div>
@@ -122,13 +122,13 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="amountsqft" type="text" v-model="model.KasaSqft" />
-              <label for="amountsqft">Amount (Sqft)</label>
+              <label for="amountsqft">Sqft in Crate</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="m2" type="text" v-model="model.KasaM2" />
-              <label for="m2">M2</label>
+              <label for="m2">M2 in Crate</label>
             </span>
           </div>
         </div>

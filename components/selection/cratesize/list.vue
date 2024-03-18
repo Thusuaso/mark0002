@@ -18,7 +18,12 @@
           @click="clearFilter()"
         />
       </template>
-      <Column field="TedarikciAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="TedarikciAdi"
+        header="Supplier"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -28,7 +33,12 @@
           />
         </template>
       </Column>
-      <Column field="Ebat" header="Stone Size" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Ebat"
+        header="Tile Size"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -38,7 +48,12 @@
           />
         </template>
       </Column>
-      <Column field="KasaOlculeri" header="Crate Size" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KasaOlculeri"
+        header="Crate Size"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -48,7 +63,12 @@
           />
         </template>
       </Column>
-      <Column field="Adet" header="Piece" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Adet"
+        header="Piece"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

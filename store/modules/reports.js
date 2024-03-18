@@ -88,23 +88,21 @@ const state = {
 
     reportsMekmarSummaryForwardingList:[],
     reportsMekmarSummaryForwardingListTotal: [],
-    reportsMekmarMkList: [],
-    reportsMekmarMkListTotal: {
-        'byOrders': { 'fob': 0, 'ddp': 0 },
-        'byMarketing': { 'fob': 0, 'ddp': 0 },
-        'byMarketingForw':{'forwarding':{'fob':0,'ddp':0},'mekmar':{'fob':0,'ddp':0},'in':{'fob':0,'ddp':0},'mekmer':{'fob':0,'ddp':0},'imp':{'fob':0,'ddp':0}}
-    },
-    reportsMekmarMkForwList: [],
+
     reportsMekmarGuYearList: [],
     reportsMekmarGuContList: [],
     reportsMekmarGuContByCustList:[],
     reportsMekmarGuMekusList: [],
     reportsMekmarGuLogsList: [],
     reportsMekmarGuForwList: [],
-    reportsMekmerAtlantaList:[]
+    reportsMekmerAtlantaList:[],
+    reportsMekmarMkList:[]
     
 };
 const actions = {
+    setReportsMekmarMkList(vuexContext,payload){
+        vuexContext.commit('setReportsMekmarMkList',payload)
+    },
     setReportsMekmarSummaryOrderListByRepresentative(vuexContext,userId){
         this.$axios.get(`/reports/mekmar/summary/order/list/by/representative/${userId}`)
         .then(response=>{
@@ -448,29 +446,12 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
-    setReportsMekmarMkList(vuexContext) {
-        vuexContext.dispatch('setBeginLoadingAction');
-        this.$axios.get(`/reports/mekmar/mk/list`)
-            .then(response => {
-                vuexContext.commit('setReportsMekmarMkList', response.data);
-                vuexContext.dispatch('setOrderYearList', response.data.yearList);
-                vuexContext.dispatch('setReportsMekmarMkListTotal', response.data);
-                vuexContext.dispatch('setEndLoadingAction');
-            });
-    },
-    setReportsMekmarMkListYear(vuexContext, payload) {
-        vuexContext.dispatch('setBeginLoadingAction');
-        this.$axios.get(`/reports/mekmar/mk/list/${payload}`)
-            .then(response => {
-                vuexContext.commit('setReportsMekmarMkList', response.data);
-                vuexContext.dispatch('setOrderYearList', response.data.yearList);
-                vuexContext.dispatch('setReportsMekmarMkListTotal', response.data);
-                vuexContext.dispatch('setEndLoadingAction');
-            });
-    },
-    setReportsMekmarMkListTotal(vuexContext, payload) {
-        vuexContext.commit('setReportsMekmarMkListTotal', payload);
-    },
+
+    
+
+
+
+
     setReportsMekmarGuList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/reports/mekmar/gu/list')
@@ -497,6 +478,9 @@ const actions = {
 
 };
 const mutations = {
+    setReportsMekmarMkList(state,payload){
+        state.reportsMekmarMkList = payload;
+    },
     setLoadingList(state,payload){
         state.reportsMekmarLoadingList = payload.list;
         state.reportsMekmarLoadingListYear = payload.yearly;
@@ -738,51 +722,7 @@ const mutations = {
             state.reportsMekmarSummaryOrderDetailTotal.ddp += item.Ddp;
         }
     },
-    setReportsMekmarMkList(state, payload) {
-        state.reportsMekmarMkList = payload;
-        state.reportsMekmarMkForwList = payload.byMarketingForwList;
-    },
-    setReportsMekmarMkListTotal(state, payload) {
-        state.reportsMekmarMkListTotal = {
-            'byOrders': { 'fob': 0, 'ddp': 0 },
-            'byMarketing': { 'fob': 0, 'ddp': 0 },
-             'byMarketingForw':{'forwarding':{'fob':0,'ddp':0},'mekmar':{'fob':0,'ddp':0},'in':{'fob':0,'ddp':0},'mekmer':{'fob':0,'ddp':0},'imp':{'fob':0,'ddp':0}}
 
-        };
-        payload.byOrderList.forEach(x => {
-            state.reportsMekmarMkListTotal.byOrders.fob += x.Fob;
-            state.reportsMekmarMkListTotal.byOrders.ddp += x.Ddp;
-        });
-        payload.byMarketingList.forEach(x => {
-            state.reportsMekmarMkListTotal.byMarketing.fob += x.Fob;
-            state.reportsMekmarMkListTotal.byMarketing.ddp += x.Ddp;
-
-        });
-        payload.byMarketingForwList.forwList.forEach(x => {
-            state.reportsMekmarMkListTotal.byMarketingForw.forwarding.fob += x.Fob;
-            state.reportsMekmarMkListTotal.byMarketingForw.forwarding.ddp += x.Ddp;
-        });
-        payload.byMarketingForwList.forwMekmarList.forEach(x => {
-            state.reportsMekmarMkListTotal.byMarketingForw.mekmar.fob += x.Fob;
-            state.reportsMekmarMkListTotal.byMarketingForw.mekmar.ddp += x.Ddp;
-
-        });
-        payload.byMarketingForwList.forwInList.forEach(x => {
-            state.reportsMekmarMkListTotal.byMarketingForw.in.fob += x.Fob;
-            state.reportsMekmarMkListTotal.byMarketingForw.in.ddp += x.Ddp;
-
-        });
-                payload.byMarketingForwList.forwMekmerList.forEach(x => {
-            state.reportsMekmarMkListTotal.byMarketingForw.mekmer.fob += x.Fob;
-            state.reportsMekmarMkListTotal.byMarketingForw.mekmer.ddp += x.Ddp;
-
-                });
-                payload.byMarketingForwList.forwImpList.forEach(x => {
-            state.reportsMekmarMkListTotal.byMarketingForw.imp.fob += x.Fob;
-            state.reportsMekmarMkListTotal.byMarketingForw.imp.ddp += x.Ddp;
-
-        });
-    },
     setReportsMekmarGuList(state, payload) {
         state.reportsMekmarGuYearList = payload.yearList;
         payload.contList.forEach(x => {
@@ -840,6 +780,9 @@ const mutations = {
 
 };
 const getters = {
+    getReportsMekmarMkList(state){
+        return state.reportsMekmarMkList;
+    },
     getReportsMekmarSummaryOrderListByRepresentativeTotal(state){
         return state.reportsMekmarSummaryOrderListByRepresentativeTotal
     },
@@ -921,15 +864,7 @@ const getters = {
     getReportsMekmarSummaryForwardingListTotal(state) {
         return state.reportsMekmarSummaryForwardingListTotal;
     },
-    getReportsMekmarMkList(state) {
-        return state.reportsMekmarMkList;
-    },
-    getReportsMekmarMkListTotal(state) {
-        return state.reportsMekmarMkListTotal;
-    },
-    getReportsMekmarMkForwList(state) {
-        return state.reportsMekmarMkForwList;
-    },
+
     getReportsMekmarGuYearList(state) {
         return state.reportsMekmarGuYearList;
     },

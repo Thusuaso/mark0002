@@ -7,8 +7,8 @@
         </template>
       </Column>
       <Column field="SiparisNo" header="Po"></Column>
-      <Column field="Aciklama" header="Description"></Column>
-      <Column field="Tutar" header="Paid">
+      <Column field="Aciklama" header="Explanation"></Column>
+      <Column field="Tutar" header="Payment Received">
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
@@ -21,7 +21,7 @@
           {{ slotProps.data.Masraf | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Kur" header="Currency">
+      <Column field="Kur" header="Rate">
         <template #body="slotProps">
           {{ slotProps.data.Kur | formatPriceUsd }}
         </template>

@@ -38,7 +38,7 @@
             {{ total.total | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="production" header="In Production">
+        <Column field="production" header="On Production">
           <template #body="slotProps">
             {{ slotProps.data.production | formatPriceUsd }}
           </template>
@@ -46,7 +46,7 @@
             {{ total.production | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="forwarding" header="In Shipment">
+        <Column field="forwarding" header="Shipped">
           <template #body="slotProps">
             {{ slotProps.data.forwarding | formatPriceUsd }}
           </template>
@@ -70,7 +70,7 @@
             {{ total.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="total" header="Balance">
+        <Column field="total" header="Balance (Including Production)">
           <template #body="slotProps">
             {{ slotProps.data.total | formatPriceUsd }}
           </template>
@@ -78,7 +78,7 @@
             {{ total.balanceProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="balanced" header="Balance(Except Production)">
+        <Column field="balanced" header="Balance (Except Production)">
           <template #body="slotProps">
             <div
               :style="{
@@ -139,7 +139,7 @@
           {{ slotProps.data.order_amount | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="paid" header="Paid">
+      <Column field="paid" header="Payment Received">
         <template #body="slotProps">
           {{ slotProps.data.paid | formatPriceUsd }}
         </template>

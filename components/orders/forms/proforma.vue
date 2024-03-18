@@ -7,7 +7,7 @@
           :options="delivery"
           filter
           optionLabel="TeslimTur"
-          placeholder="Kind of Delivery"
+          placeholder="Delivery Term"
           class="w-100 mb-4"
           @change="deliveryChange($event)"
         >
@@ -30,7 +30,7 @@
           :options="payment"
           filter
           optionLabel="OdemeTur"
-          placeholder="Kind of Payment"
+          placeholder="Payment Term"
           class="w-100 mb-4"
           @change="paymentChange($event)"
         >
@@ -70,7 +70,7 @@
         </span>
         <span class="p-float-label mb-4">
           <InputText id="paidDescription" v-model="model.OdemeAciklama" class="w-100" />
-          <label for="paidDescription">Payment Description</label>
+          <label for="paidDescription">Payment Details</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText id="container" v-model="model.KonteynerAyrinti" class="w-100" />
@@ -78,7 +78,7 @@
         </span>
         <span class="p-float-label mb-4">
           <InputText id="document" v-model="model.EvrakGideri" class="w-100" />
-          <label for="document">Payment of Document</label>
+          <label for="document">Document Cost</label>
         </span>
         <span class="p-float-label mb-4">
           <InputText
@@ -91,7 +91,7 @@
         </span>
         <span class="p-float-label mb-4">
           <InputText id="return" v-model="model.Iade" class="w-100" />
-          <label for="return">Rebate</label>
+          <label for="return">Refund</label>
         </span>
         <div class="p-float-label">
           <Dropdown
@@ -102,7 +102,7 @@
             class="w-100"
             @change="invoiceChange($event)"
           />
-          <label for="invoice">Kind of Invoice</label>
+          <label for="invoice">Invoice Type</label>
         </div>
         <div class="row">
           <div class="col">
@@ -122,15 +122,15 @@
       <div class="col-9">
         <span class="p-float-label mb-4">
           <Textarea v-model="model.UretimAciklama" rows="5" class="w-100" />
-          <label>Production Description</label>
+          <label>Production Explanation</label>
         </span>
         <span class="p-float-label mb-4">
           <Textarea v-model="model.SevkiyatAciklama" rows="5" class="w-100" />
-          <label>Shipped Description</label>
+          <label>Shipped Explanation</label>
         </span>
         <span class="p-float-label mb-4">
           <Textarea v-model="model.FinansAciklama" rows="5" class="w-100" />
-          <label>Finance Description</label>
+          <label>Finance Explanation</label>
         </span>
         <FileUpload
           mode="basic"
@@ -138,7 +138,7 @@
           customUpload
           @select="uploadInvoiceDocument($event)"
           chooseLabel="Upload Proforma"
-          :disabled="!saveButtonStatus"
+          :disabled="proformaUploadButtonStatus"
         />
       </div>
     </div>
@@ -228,12 +228,6 @@
                     @input="detail4Input($event)"
                   />
                   <label for="detail4">Mekus</label>
-                </span>
-              </div>
-              <div class="col">
-                <span class="p-float-label">
-                  <InputText id="mekusDesc" v-model="model.DetayAciklama_4" />
-                  <label for="mekusDesc">Mekus Description</label>
                 </span>
               </div>
             </div>
@@ -378,7 +372,8 @@ export default {
       type: String,
       required: false,
     },
-    saveButtonStatus: {
+
+    proformaUploadButtonStatus: {
       type: Boolean,
       required: false,
     },
@@ -595,6 +590,7 @@ export default {
       } else {
         this.model.SiparisDurumID = 2;
       }
+      this.$emit("prepayment_is_activated_emit", event.value.ID);
     },
     deliveryChange(event) {
       this.model.TeslimTur = event.value.TeslimTur;

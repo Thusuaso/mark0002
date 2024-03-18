@@ -8,7 +8,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R1 Incoming Order (Monthly) (FOB)
+                  Monthly Order (FOB)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.aylikSiparis | formatPriceUsd }}
@@ -29,7 +29,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R2 Incoming Order (Yearly) (FOB)
+                  Annual Order (FOB)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.yillikSiparis | formatPriceUsd }}
@@ -51,7 +51,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R3 Monthly Average (FOB)
+                  Monthly Average (FOB)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.ortalamaSiparis | formatPriceUsd }}
@@ -67,7 +67,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R4 End of Year Forecast (FOB)
+                  Annual Forecast (FOB)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.tahminiYillikSiparis | formatPriceUsd }}
@@ -83,7 +83,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R4 Shipment (Monthly) (DDP)
+                  Monthly Shipment (DDP)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.aylikYukleme | formatPriceUsd }}
@@ -104,7 +104,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R6 Shipment (Yearly) (DDP)
+                  Annual Shipment (DDP)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.yillikYukleme | formatPriceUsd }}
@@ -126,7 +126,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R7 Monthly Average (DDP)
+                  Shipment Average Monthly (DDP)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.ortalamaYukleme | formatPriceUsd }}
@@ -142,7 +142,7 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs font-weight-bold text-primary mb-1">
-                  R8 End of Year Forecast (DDP)
+                  Annual Shipment Forecast (DDP)
                 </div>
                 <div class="h6 mb-0 font-weight-bold text-gray-800">
                   {{ home.tahminiYillikYukleme | formatPriceUsd }}

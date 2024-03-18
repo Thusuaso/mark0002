@@ -2,7 +2,7 @@
   <div class="row w-100 h-100" style="height: 500px">
     <div class="col-6">
       <div class="flex flex-column gap-2">
-        <label for="savedate">Save Date</label>
+        <label for="savedate">Date</label>
         <Calendar
           id="savedate"
           v-model="saveDate"
@@ -21,7 +21,7 @@
     </div>
     <div class="col-6">
       <div class="flex flex-column gap-2">
-        <label for="reminderdate">Reminder Date</label>
+        <label for="reminderdate">Reminder Time</label>
         <Calendar
           id="reminderdate"
           v-model="reminderDate"
@@ -35,7 +35,7 @@
       </div>
       <span class="p-float-label mt-4">
         <Textarea v-model="followDetail.Hatirlatma_Notu" rows="5" cols="66" />
-        <label>Reminder Description</label>
+        <label>Reminder</label>
       </span>
     </div>
     <div class="row">

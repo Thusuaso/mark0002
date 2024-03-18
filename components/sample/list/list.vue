@@ -64,7 +64,7 @@
           {{ slotProps.data.Miktar }} / {{ slotProps.data.NumuneUrunBirim }}
         </template>
       </Column>
-      <Column field="NumuneGonderiTipi" header="Kind of Sending"></Column>
+      <Column field="NumuneGonderiTipi" header="Shipment Type"></Column>
       <Column field="NumuneBanka" header="Bank"></Column>
     </DataTable>
   </div>

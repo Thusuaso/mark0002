@@ -25,7 +25,7 @@
         <Button
           type="button"
           class="p-button-info w-100"
-          label="Suggested"
+          label="Suggested Projects"
           @click="$emit('panel_project_suggested')"
         />
       </div>
@@ -75,7 +75,7 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="video" v-model="videos_link" />
-              <label for="video">Video Link</label>
+              <label for="video">Add Video</label>
             </span>
           </div>
           <div class="col">
@@ -121,7 +121,7 @@
         <Button
           type="button"
           class="p-button-success w-100"
-          label="Save"
+          label="Add Description"
           @click="$emit('panel_project_information_save_emit', information)"
         />
       </div>
@@ -129,7 +129,7 @@
         <Button
           type="button"
           class="p-button-warning w-100"
-          label="Update"
+          label="Update Description"
           @click="$emit('panel_project_information_update_emit', information)"
         />
       </div>
