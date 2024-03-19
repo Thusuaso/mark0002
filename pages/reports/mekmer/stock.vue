@@ -149,13 +149,12 @@ export default {
   },
   methods: {
     excel_output() {
-      vuexContext.dispatch('setBeginLoadingAction');
+      this.$store.dispatch("setBeginLoadingAction");
 
       api
         .post("/raporlar/listeler/stokRaporExcelListe", this.getReportsMekmerStockList)
         .then((response) => {
           if (response.status) {
-            alert(true);
             const link = document.createElement("a");
             link.href = this.getLocalUrl + "/raporlar/listeler/stokRaporExcelListe";
             link.setAttribute("download", "Stok_listesi.xlsx");

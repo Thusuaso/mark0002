@@ -29,6 +29,7 @@ export default {
       '~/assets/css/bootstrap.css',
       '~/assets/css/bootstrap.min.css',
       '~/assets/css/bootstrap.min.css',
+      'primevue/resources/themes/bootstrap4-light-purple/theme.css'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins

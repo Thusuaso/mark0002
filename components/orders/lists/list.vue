@@ -11,12 +11,13 @@
       :paginator="true"
       :rows="25"
       :loading="loading"
-      style="font-size: 70%"
+      style="font-size: 70%; border: 2px solid gray"
       filterDisplay="row"
       :filters.sync="filtersOrders"
       v-if="status == 'Shipped'"
       sortField="YuklemeTarihi"
       :sortOrder="-1"
+      :rowClass="rowClass2"
     >
       <template #header>
         <div class="flex justify-content-between">
@@ -255,6 +256,7 @@
       style="font-size: 70%"
       filterDisplay="row"
       :filters.sync="filtersOrders"
+      :rowClass="rowClass2"
       v-else
     >
       <Column header="#" headerStyle="width:3rem">
@@ -527,6 +529,9 @@ export default {
     };
   },
   methods: {
+    rowClass2(event) {
+      return "row-accessories";
+    },
     globalSearchFilterInput(event) {
       if (!event) {
         this.$store.dispatch("setOrderShippedList");
@@ -750,5 +755,9 @@ export default {
 <style scoped>
 .colorChange {
   background-color: yellow;
+}
+
+:deep(.row-accessories) {
+  border: 2px solid gray !important;
 }
 </style>

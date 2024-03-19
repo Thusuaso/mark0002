@@ -14,6 +14,9 @@
         scrollable
         scrollHeight="500px"
         :loading="loading"
+        :resizableColumns="true"
+        columnResizeMode="fit"
+        showGridlines
       >
         <Column
           field="siparisci"

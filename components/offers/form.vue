@@ -1,6 +1,6 @@
 <template>
-  <div class="row mt-3">
-    <div class="col-10">
+  <div class="row">
+    <div class="col-9">
       <div class="row">
         <div class="col">
           <div class="p-float-label mb-4">
@@ -107,6 +107,7 @@
                 inputId="offer_product_date"
                 @date-select="offerProductDateSelected($event)"
                 :disabled="id == 0"
+                style="z-index: 99"
               />
               <label for="offer_product_date">Date</label>
             </span>
@@ -315,88 +316,90 @@
         </div>
       </div>
     </div>
-    <div class="col-2">
-      <div class="row">
-        <div class="col">
-          <Button
-            type="button"
-            class="p-button-success w-100 mb-4"
-            label="Save"
-            @click="process"
-            :disabled="offer_disabled_button"
+    <div class="col-3">
+      <div class="">
+        <div class="row">
+          <div class="col">
+            <Button
+              type="button"
+              class="p-button-success w-100 mb-4"
+              label="Save"
+              @click="process"
+              :disabled="offer_disabled_button"
+            />
+          </div>
+          <div class="col" v-if="!status">
+            <Button
+              type="button"
+              class="p-button-danger w-100"
+              label="Delete"
+              @click="deleteProcess"
+            />
+          </div>
+        </div>
+        <div class="flex flex-wrap justify-content-center gap-3 mb-4">
+          <div class="flex align-items-center">
+            <Checkbox v-model="model.TakipEt" inputId="follow" binary />
+            <label for="follow" class="ml-2"> Track </label>
+          </div>
+          <div class="flex align-items-center">
+            <Checkbox v-model="model.BList" inputId="follow" binary />
+            <label for="follow" class="ml-2"> B List </label>
+          </div>
+        </div>
+        <span class="p-float-label mb-4">
+          <Calendar
+            v-model="offerDate"
+            inputId="offer_date"
+            style="width: 100%"
+            @date-select="offerDateSelected($event)"
           />
-        </div>
-        <div class="col" v-if="!status">
-          <Button
-            type="button"
-            class="p-button-danger w-100"
-            label="Delete"
-            @click="deleteProcess"
+          <label for="offer_date">Date</label>
+        </span>
+        <span class="p-float-label mb-4">
+          <AutoComplete
+            v-model="selectedCustomer"
+            inputId="customer"
+            :suggestions="filteredCustomer"
+            @complete="searchCustomer($event)"
+            field="MusteriAdi"
+            @item-select="customerSelected($event)"
+            @input="customerInput($event)"
           />
-        </div>
+          <label for="customer">Customer</label>
+        </span>
+        <span class="p-float-label mb-4">
+          <AutoComplete
+            v-model="selectedCountry"
+            inputId="country"
+            :suggestions="filteredCountry"
+            @complete="searchCountry($event)"
+            field="UlkeAdi"
+            @item-select="countrySelected($event)"
+          />
+          <label for="country">Country</label>
+        </span>
+        <span class="p-float-label mb-4">
+          <InputText id="company" v-model="customerModel.Company" />
+          <label for="company">Company</label>
+        </span>
+        <span class="p-float-label mb-4">
+          <InputText id="mail" v-model="customerModel.Mail" />
+          <label for="mail">Mail</label>
+        </span>
+        <span class="p-float-label mb-4">
+          <InputText id="phone" v-model="customerModel.Phone" />
+          <label for="phone">Phone</label>
+        </span>
+        <span class="p-float-label mb-4">
+          <InputText id="adress" v-model="customerModel.Adress" />
+          <label for="adress">Address</label>
+        </span>
+        <span class="p-float-label mb-4">
+          <Textarea v-model="customerModel.Description" rows="5" class="w-100" />
+          <label>Description</label>
+        </span>
       </div>
-      <div class="flex flex-wrap justify-content-center gap-3 mb-4">
-        <div class="flex align-items-center">
-          <Checkbox v-model="model.TakipEt" inputId="follow" binary />
-          <label for="follow" class="ml-2"> Track </label>
-        </div>
-        <div class="flex align-items-center">
-          <Checkbox v-model="model.BList" inputId="follow" binary />
-          <label for="follow" class="ml-2"> B List </label>
-        </div>
-      </div>
-      <span class="p-float-label mb-4">
-        <Calendar
-          v-model="offerDate"
-          inputId="offer_date"
-          class="w-100"
-          @date-select="offerDateSelected($event)"
-        />
-        <label for="offer_date">Date</label>
-      </span>
-      <span class="p-float-label mb-4">
-        <AutoComplete
-          v-model="selectedCustomer"
-          inputId="customer"
-          :suggestions="filteredCustomer"
-          @complete="searchCustomer($event)"
-          field="MusteriAdi"
-          @item-select="customerSelected($event)"
-          @input="customerInput($event)"
-        />
-        <label for="customer">Customer</label>
-      </span>
-      <span class="p-float-label mb-4">
-        <AutoComplete
-          v-model="selectedCountry"
-          inputId="country"
-          :suggestions="filteredCountry"
-          @complete="searchCountry($event)"
-          field="UlkeAdi"
-          @item-select="countrySelected($event)"
-        />
-        <label for="country">Country</label>
-      </span>
-      <span class="p-float-label mb-4">
-        <InputText id="company" v-model="customerModel.Company" />
-        <label for="company">Company</label>
-      </span>
-      <span class="p-float-label mb-4">
-        <InputText id="mail" v-model="customerModel.Mail" />
-        <label for="mail">Mail</label>
-      </span>
-      <span class="p-float-label mb-4">
-        <InputText id="phone" v-model="customerModel.Phone" />
-        <label for="phone">Phone</label>
-      </span>
-      <span class="p-float-label mb-4">
-        <InputText id="adress" v-model="customerModel.Adress" />
-        <label for="adress">Address</label>
-      </span>
-      <span class="p-float-label mb-4">
-        <Textarea v-model="customerModel.Description" rows="5" class="w-100" />
-        <label>Description</label>
-      </span>
     </div>
   </div>
 </template>
