@@ -43,7 +43,7 @@
           </div> -->
           <div class="col-6">
             <span class="p-float-label mb-4">
-              <Chips v-model="anahtarlar_en" />
+              <InputText type="text" v-model="model.anahtarlar_en" class="w-100" />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -136,7 +136,7 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <Chips v-model="anahtarlar_fr" class="w-100" />
+              <InputText type="text" v-model="model.anahtarlar_fr" class="w-100" />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -195,7 +195,7 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <Chips v-model="anahtarlar_es" class="w-100" />
+              <InputText type="text" v-model="model.anahtarlar_es" class="w-100" />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -254,7 +254,7 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <Chips v-model="anahtarlar_ru" class="w-100" />
+              <InputText type="text" v-model="model.anahtarlar_ru" class="w-100" />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -313,7 +313,7 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <Chips v-model="anahtarlar_ar" class="w-100" />
+              <InputText type="text" v-model="model.anahtarlar_ar" class="w-100" />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -1000,12 +1000,6 @@ export default {
   },
   data() {
     return {
-      anahtarlar_ar: [],
-      anahtarlar_en: [],
-      anahtarlar_fr: [],
-      anahtarlar_es: [],
-      anahtarlar_ru: [],
-
       selectedCategory: null,
       selectedStoneType: null,
       selectedSize: null,
@@ -1327,62 +1321,11 @@ export default {
     createdProcess() {
       this.selectedCategory = this.category.find((x) => x.Id == this.model.kategori_id);
       this.selectedStoneType = this.category.find((x) => x.Id == this.model.stonetype);
-      if (this.model.anahtarlar_en) {
-        this.model.anahtarlar_en.split(",").forEach((x) => {
-          this.anahtarlar_en.push(x);
-        });
-      }
-      if (this.model.anahtarlar_fr) {
-        this.model.anahtarlar_fr.split(",").forEach((x) => {
-          this.anahtarlar_fr.push(x);
-        });
-      }
-      if (this.model.anahtarlar_es) {
-        this.model.anahtarlar_es.split(",").forEach((x) => {
-          this.anahtarlar_es.push(x);
-        });
-      }
-      if (this.model.anahtarlar_ru) {
-        this.model.anahtarlar_ru.split(",").forEach((x) => {
-          this.anahtarlar_ru.push(x);
-        });
-      }
-      if (this.model.anahtarlar_ar) {
-        this.model.anahtarlar_ar.split(",").forEach((x) => {
-          this.anahtarlar_ar.push(x);
-        });
-      }
     },
     deleteForm() {
       this.$emit("delete_emit", this.model.urunid);
     },
     process() {
-      if (this.anahtarlar_en) {
-        this.model.anahtarlar_en = this.anahtarlar_en.join(",");
-      } else {
-        this.model.anahtarlar_en = "";
-      }
-      if (this.anahtarlar_fr) {
-        this.model.anahtarlar_fr = this.anahtarlar_fr.join(",");
-      } else {
-        this.model.anahtarlar_fr = "";
-      }
-      if (this.anahtarlar_es) {
-        this.model.anahtarlar_es = this.anahtarlar_es.join(",");
-      } else {
-        this.model.anahtarlar_es = "";
-      }
-      if (this.anahtarlar_ru) {
-        this.model.anahtarlar_ru = this.anahtarlar_ru.join(",");
-      } else {
-        this.model.anahtarlar_ru = "";
-      }
-      if (this.anahtarlar_ar) {
-        this.model.anahtarlar_ar = this.anahtarlar_ar.join(",");
-      } else {
-        this.model.anahtarlar_ar = "";
-      }
-
       if (this.status) {
         this.productSaveButtonDisabled = true;
       }

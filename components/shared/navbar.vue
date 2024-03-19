@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="font-size: 85%">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">GOZ</a>
       <button
@@ -366,15 +366,21 @@
         </ul>
       </div>
       <div class="d-flex">
-        <Button
+        <!-- <Button
           type="button"
-          label="To Do"
           icon="pi pi-calendar"
           severity="secondary"
           :badge="parseInt(getToDoMainListByUsernameLenght)"
           badgeSeverity="info"
           @click="visibleRight = true"
+        /> -->
+        <i
+          v-badge.danger="parseInt(getToDoMainListByUsernameLenght)"
+          class="pi pi-calendar"
+          style="font-size: 2rem; cursor: pointer"
+          @click="visibleRight = true"
         />
+
         <Sidebar
           :visible.sync="visibleRight"
           header="Right Sidebar"
