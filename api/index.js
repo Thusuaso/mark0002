@@ -5492,6 +5492,7 @@ app.put('/panel/product/update', (req, res) => {
                 urunadi_ru=N'${req.body.urunadi_ru}',
                 aciklama_ru=N'${req.body.aciklama_ru}',
                 keywords_ru=N'${req.body.keywords_ru}',
+                anahtarlar_ru=N'${req.body.anahtarlar_ru}',
 
                 urunadi_ar=N'${req.body.urunadi_ar}',
                 aciklama_ar=N'${req.body.aciklama_ar}',

@@ -7,9 +7,9 @@ You can directly use them in pages and other components without the need to impo
 **Tip:** If a component is conditionally rendered with `v-if` and is big, it is better to use `Lazy` or `lazy-` prefix to lazy load.
 
 - `<IoSocketStatus>` | `<io-socket-status>` (node_modules/nuxt-socket-io/lib/components/SocketStatus.js)
-- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<CardsForm>` | `<cards-form>` (components/cards/form.vue)
 - `<CardsList>` | `<cards-list>` (components/cards/list.vue)
+- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<Home>` | `<home>` (components/home/home.vue)
 - `<OffersDetail>` | `<offers-detail>` (components/offers/detail.vue)
 - `<OffersForm>` | `<offers-form>` (components/offers/form.vue)
