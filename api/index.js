@@ -4511,20 +4511,19 @@ app.get('/offer/main/detail/list/:representative', (req, res) => {
 	yt.Company,
 	yt.Email,
 	yt.Phone,
-	ytm.MusteriAdi,
 	k.KullaniciAdi,
-    ytu.UlkeAdi
+    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
+	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi
+    
 
 from YeniTeklifTB yt
-inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
 inner join KullaniciTB k on k.ID = yt.KullaniciId
-inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
 
 where yt.TakipEt = 1 and yt.KullaniciId=${req.params.representative} and yt.BList != 1
     `;
     mssql.query(sql, (err, results) => {
         results.recordset.forEach(x=>{
-            x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;;
+            x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;
         });
         res.status(200).json({ 'list': results.recordset }); 
     });
@@ -4894,15 +4893,13 @@ app.get('/offer/detail/all/list', (req, res) => {
 	yt.Company,
 	yt.Email,
 	yt.Phone,
-	ytm.MusteriAdi,
-
-	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = ytm.UlkeId) as UlkeAdi,
+    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
+	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi,
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as KullaniciAdi
 
 
 
 from YeniTeklifTB yt
-inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
 inner join KullaniciTB k on k.ID = yt.KullaniciId
  
 where yt.TakipEt = 1 and yt.BList != 1
@@ -4955,15 +4952,14 @@ order by yt.TeklifOncelik,yt.Sira
 	yt.Company,
 	yt.Email,
 	yt.Phone,
-	ytm.MusteriAdi,
 
-	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = ytm.UlkeId) as UlkeAdi,
+    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
+	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi,
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as KullaniciAdi
 
 
 
 from YeniTeklifTB yt
-inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
 inner join KullaniciTB k on k.ID = yt.KullaniciId
  
 where yt.TakipEt = 1 and yt.BList = 1
@@ -4971,6 +4967,9 @@ order by yt.TeklifOncelik,yt.Sira
     `;
     mssql.query(sql,(err,results)=>{
         mssql.query(bListSql,(err,bList)=>{
+            results.recordset.forEach(x=>{
+                x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;
+            });
             res.status(200).json({ 'list': results.recordset,'bList':bList.recordset });
 
         });
@@ -5024,18 +5023,20 @@ app.get('/offer/old/list', (req, res) => {
 	yt.Company,
 	yt.Email,
 	yt.Phone,
-	ytm.MusteriAdi,
 	k.KullaniciAdi,
-    ytu.UlkeAdi
+    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
+	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi
+    
 
 from YeniTeklifTB yt
-inner join YeniTeklif_MusterilerTB ytm on ytm.Id = yt.MusteriId
 inner join KullaniciTB k on k.ID = yt.KullaniciId
-inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
 
 order by yt.TeklifOncelik 
     `;
     mssql.query(sql,(err,results)=>{
+        results.recordset.forEach(x=>{
+            x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;
+        });
         res.status(200).json({ 'list': results.recordset });
     });
 });

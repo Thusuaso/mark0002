@@ -43,7 +43,12 @@
         :bListTotal="getOfferDetailTotalB"
       />
     </Dialog>
-    <Dialog :visible.sync="offer_list_detail_form" header="" modal :closeOnEscape="false">
+    <Dialog
+      :visible.sync="offer_list_detail_form"
+      :header="offer_id"
+      modal
+      :closeOnEscape="false"
+    >
       <offerForm
         :model="model"
         :category="getOfferCategoryList"
@@ -100,6 +105,7 @@ export default {
       offer_list_detail_form: false,
       model: {},
       offer_updated_list_form: false,
+      offer_id: null,
     };
   },
   created() {
@@ -136,6 +142,7 @@ export default {
       this.$store.dispatch("setOfferCustomerModel");
       this.$store.dispatch("setOfferId", 0);
       this.$store.commit("setOfferDetailProductsList", []);
+      this.offer_id = null;
       this.model = this.getOfferModel;
       this.offer_list_detail_form = true;
     },
@@ -164,7 +171,7 @@ export default {
       this.$store.dispatch("setOfferDetailProductsList", event.Id);
       this.$store.dispatch("setOfferButtonStatus", false);
       this.$store.dispatch("setOfferId", event.Id);
-
+      this.offer_id = event.Sira;
       this.offer_list_detail_form = true;
     },
   },

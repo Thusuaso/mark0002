@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <div class="row mt-3">
-      <div class="col">
+  <div class="">
+    <div class="row m-auto text-center">
+      <div class="col-4">
         <Button
           type="button"
           class="p-button-success w-100"
@@ -9,7 +9,7 @@
           @click="newForm"
         />
       </div>
-      <div class="col">
+      <!-- <div class="col">
         <div class="p-float-label">
           <Dropdown
             v-model="selectedYear"
@@ -21,53 +21,57 @@
           />
           <label for="years">Year</label>
         </div>
-      </div>
-      <div class="col">
-        <div class="row mb-2">
-          <div class="col-2">Supplier</div>
-          <div class="col">
-            <div class="flex flex-wrap gap-3">
-              <div
-                class="flex align-items-center"
-                v-for="supplier in suppliers"
-                :key="supplier.key"
-              >
-                <RadioButton
-                  v-model="selectedSupplier"
-                  :inputId="supplier.key"
-                  name="dynamic"
-                  :value="supplier.name"
-                  @change="supplierChange($event)"
-                />
-                <label :for="supplier.key" class="ml-2">{{ supplier.name }}</label>
+      </div> -->
+      <div class="col-4 m-auto text-center">
+        <div class="m-auto text-center" style="width: 400px">
+          <div class="m-auto text-center">
+            <div class="row mb-2 m-auto text-center">
+              <div class="col-2">Supplier</div>
+              <div class="col">
+                <div class="flex flex-wrap gap-3">
+                  <div
+                    class="flex align-items-center"
+                    v-for="supplier in suppliers"
+                    :key="supplier.key"
+                  >
+                    <RadioButton
+                      v-model="selectedSupplier"
+                      :inputId="supplier.key"
+                      name="dynamic"
+                      :value="supplier.name"
+                      @change="supplierChange($event)"
+                    />
+                    <label :for="supplier.key" class="ml-2">{{ supplier.name }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row m-auto text-center">
+              <div class="col-2">Seller</div>
+              <div class="col">
+                <div class="flex flex-wrap gap-3">
+                  <div
+                    class="flex align-items-center"
+                    v-for="marketing in marketings"
+                    :key="marketing.key"
+                  >
+                    <RadioButton
+                      v-model="selectedMarketing"
+                      :inputId="marketing.key"
+                      name="dynamic"
+                      :value="marketing.name"
+                      @change="marketingChange($event)"
+                    />
+                    <label :for="marketing.key" class="ml-2">{{ marketing.name }}</label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-2">Seller</div>
-          <div class="col">
-            <div class="flex flex-wrap gap-3">
-              <div
-                class="flex align-items-center"
-                v-for="marketing in marketings"
-                :key="marketing.key"
-              >
-                <RadioButton
-                  v-model="selectedMarketing"
-                  :inputId="marketing.key"
-                  name="dynamic"
-                  :value="marketing.name"
-                  @change="marketingChange($event)"
-                />
-                <label :for="marketing.key" class="ml-2">{{ marketing.name }}</label>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-      <div class="col">
-        <Button class="p-button-warning" label="Excel" @click="excel_output" />
+      <div class="col-4">
+        <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
       </div>
     </div>
     <orderList
@@ -182,7 +186,7 @@ export default {
       "getOrderProductionSaveButtonStatus",
       "getLocalUrl",
       "getOrderProductionId",
-      "getOrderProductionUploadProformaButtonStatus"
+      "getOrderProductionUploadProformaButtonStatus",
     ]),
   },
   data() {
@@ -385,7 +389,7 @@ export default {
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch("setOrderProductionDetailListReset");
       this.$store.dispatch("setOrderProductionPo", null);
-      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus",true);
+      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", true);
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
     },
@@ -402,7 +406,7 @@ export default {
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
-      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus",false);
+      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", false);
 
       this.$store.dispatch("setOrderProductionId", event.SiparisId);
       this.productionModel = event;

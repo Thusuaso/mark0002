@@ -40,11 +40,15 @@ export default {
   },
   watch: {
     value() {
+      console.log(this.value);
       if (
         this.value == " " ||
         this.value == "" ||
         this.value == undefined ||
-        this.value == null
+        this.value == null ||
+        this.value == 0 ||
+        this.value == "NaN" ||
+        this.value == NaN
       ) {
         this.value = 0;
       }

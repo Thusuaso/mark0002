@@ -365,6 +365,7 @@
             field="MusteriAdi"
             @item-select="customerSelected($event)"
             @input="customerInput($event)"
+            :disabled="offer_customer_disabled"
           />
           <label for="customer">Customer</label>
         </span>
@@ -376,6 +377,7 @@
             @complete="searchCountry($event)"
             field="UlkeAdi"
             @item-select="countrySelected($event)"
+            :disabled="offer_customer_disabled"
           />
           <label for="country">Country</label>
         </span>
@@ -469,6 +471,7 @@ export default {
   },
   data() {
     return {
+      offer_customer_disabled: false,
       offer_disabled_button: false,
       proforma_dialog_form: false,
       sample_dialog_form: false,
@@ -522,6 +525,11 @@ export default {
   created() {
     if (!this.status) {
       this.createdProcess();
+    } else {
+      this.selectedPriority = { id: 4, priority: "Toplantı" };
+      this.model.TeklifOncelik = "Toplantı";
+
+      this.offer_customer_disabled = false;
     }
   },
   methods: {
@@ -660,7 +668,15 @@ export default {
       this.model.KaynakYeri = event.value.source;
       this.process_button_disabled = false;
     },
+    __nullControl(value) {
+      if (value == "null" || value == null || value == undefined) {
+        return "";
+      } else {
+        return value;
+      }
+    },
     createdProcess() {
+      this.offer_customer_disabled = true;
       this.offerFileLink = this.model.cloudLink;
       this.selectedSource = this.sources.find((x) => x.source == this.model.KaynakYeri);
       this.selectedOfferType = this.offerTypes.find(
@@ -682,11 +698,14 @@ export default {
 
       this.customerModel.Id = this.selectedCustomer.Id;
       this.customerModel.MusteriAdi = this.selectedCustomer.MusteriAdi;
-      this.customerModel.Company = this.selectedCustomer.Company;
-      this.customerModel.Mail = this.selectedCustomer.Mail;
-      this.customerModel.Phone = this.selectedCustomer.Phone;
-      this.customerModel.Adress = this.selectedCustomer.Adress;
-      this.customerModel.Description = this.selectedCustomer.Description;
+
+      this.customerModel.Company = this.__nullControl(this.selectedCustomer.Company);
+      this.customerModel.Mail = this.__nullControl(this.selectedCustomer.Mail);
+      this.customerModel.Phone = this.__nullControl(this.selectedCustomer.Phone);
+      this.customerModel.Adress = this.__nullControl(this.selectedCustomer.Adress);
+      this.customerModel.Description = this.__nullControl(
+        this.selectedCustomer.Description
+      );
     },
     productReset() {
       this.offerProductDate = null;

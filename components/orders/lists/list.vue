@@ -484,6 +484,7 @@
 </template>
 <script>
 import { FilterMatchMode } from "primevue/api";
+import Cookies from "js-cookie";
 export default {
   props: {
     list: {
@@ -530,7 +531,11 @@ export default {
   },
   methods: {
     rowClass2(event) {
-      return "row-accessories";
+      console.log(event);
+      const userId = Cookies.get("userId");
+      if (event.SiparisSahibi == userId || event.Operasyon == userId)
+        return "row-accessories";
+      else return "row-accessories-border";
     },
     globalSearchFilterInput(event) {
       if (!event) {
@@ -758,6 +763,10 @@ export default {
 }
 
 :deep(.row-accessories) {
-  border: 2px solid gray !important;
+  border: 2px solid #c3c7c6 !important;
+  background-color: #ccede2 !important;
+}
+:deep(.row-accessories-border) {
+  border: 2px solid #dee0e0 !important;
 }
 </style>
