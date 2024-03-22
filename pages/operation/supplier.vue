@@ -42,7 +42,6 @@ export default {
       this.supplier_form_dialog = true;
     },
     supplierModelEmit(event) {
-      console.log(event);
       this.model = event;
       this.$store.dispatch("setSupplierButtonStatus", false);
       this.supplier_form_dialog = true;

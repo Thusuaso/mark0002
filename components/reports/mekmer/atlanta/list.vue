@@ -172,7 +172,6 @@ export default {
   },
   methods: {
     test() {
-      console.log("double click");
     },
   },
 };

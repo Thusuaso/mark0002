@@ -531,7 +531,6 @@ export default {
   },
   methods: {
     rowClass2(event) {
-      console.log(event);
       const userId = Cookies.get("userId");
       if (event.SiparisSahibi == userId || event.Operasyon == userId)
         return "row-accessories";
@@ -646,7 +645,6 @@ export default {
       } else {
         this.filterModel.edge = "";
       }
-      console.log(this.filterModel);
       if (this.__controlFilter()) {
         this.$store.dispatch("setOrderShippedList");
       } else {

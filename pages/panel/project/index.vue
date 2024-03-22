@@ -242,7 +242,6 @@ export default {
       this.$store.dispatch("setPanelProjectQueueChange", this.getPanelProjectList);
     },
     projectChangeNameMouseOver() {
-      console.log("projectChangeNameMouseOver");
     },
     saveProject() {
       this.project_save_button_disabled = true;

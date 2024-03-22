@@ -3674,7 +3674,7 @@ app.get('/reports/mekmar/summary/order/list/by/representative/:userId', (req, re
 
 function noneControl(value) {
     if (value == null || value == undefined) {
-        return 0;
+        return parseFloat(0).toFixed(2);
     } else{
         return parseFloat(value).toFixed(2);
     }
@@ -5133,7 +5133,6 @@ app.put('/offer/sample/file/upload',(req,res)=>{
     Numune_Tracking_No='${req.body.followno}',Numune_Odenen_Tutar='${req.body.paid}',Numune_Musteriden_Alinan='${req.body.received}',Numune_Cloud='${req.body.cloud}',
     Numune_Cloud_Dosya='${req.body.name}',NumuneNot='${req.body.description}' where Id='${req.body.id}'
     `;
-    console.log(sql);
     try{
         mssql.query(sql,(err,sample)=>{
             if(sample.rowsAffected[0] == 1){
@@ -9338,6 +9337,12 @@ async function addedSendMail(payload) {
             subject: 'Yeni Sipariş Girişi',
             html: content
         });
+        transporter.sendMail({
+            to: 'muhsin@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Yeni Sipariş Girişi',
+            html: content
+        });
         resolve(true);
     });
 
@@ -9423,8 +9428,8 @@ async function updatedSendMail(payload) {
             const desc = payload.notchange[index].KategoriAdi + '-' + payload.notchange[index].UrunAdi + '-' + payload.notchange[index].YuzeyIslemAdi + '-' + payload.notchange[index].En + 'x' +payload.notchange[index].Boy + 'x' +payload.notchange[index].Kenar;
             const pdesc = payload.notchange[index].UretimAciklama;
             const amount = payload.notchange[index].Miktar;
-            const buying = payload.notchange[index].AlisFiyati;
-            const selling = payload.notchange[index].SatisFiyati;
+            const buying = noneControl(payload.notchange[index].AlisFiyati);
+            const selling = noneControl(payload.notchange[index].SatisFiyati);
 
 
             content = content + `
@@ -9435,8 +9440,8 @@ async function updatedSendMail(payload) {
                 <td style="border: 1px solid;text-align:center;"style="border:1px solid gray;text-align:center;" >${desc}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.UretimAciklama,pdesc)};">${pdesc}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.Miktar,amount)};">${amount}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.AlisFiyati,buying)};">$${buying}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.SatisFiyati,selling)};">$${selling}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(noneControl(x.AlisFiyati),buying)};">$${buying}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(noneControl(x.SatisFiyati),selling)};">$${selling}</td>
             </tr>`
         });
         payload.updated.forEach(x => {
@@ -9448,33 +9453,77 @@ async function updatedSendMail(payload) {
                 <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
                 <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
                 <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
-                <td style="border: 1px solid;text-align:center;">$${x.AlisFiyati}</td>
-                <td style="border: 1px solid;text-align:center;">$${x.SatisFiyati}</td>
+                <td style="border: 1px solid;text-align:center;">$${noneControl(x.AlisFiyati)}</td>
+                <td style="border: 1px solid;text-align:center;">$${noneControl(x.SatisFiyati)}</td>
             </tr>`
         });
 
         content = content + '</table>';
-        if(payload.operation == payload.representative){
-            transporter.sendMail({
-                to: payload.representative,
-                from: 'gozmek@mekmar.com',
-                subject: 'Sipariş Ürün Güncelleme',
-                html: content
-            });
-        } else{
-            transporter.sendMail({
-                to: payload.operation,
-                from: 'gozmek@mekmar.com',
-                subject: 'Sipariş Ürün Güncelleme',
-                html: content
-            });
-            transporter.sendMail({
-                to: payload.representative,
-                from: 'gozmek@mekmar.com',
-                subject: 'Sipariş Ürün Güncelleme',
-                html: content
-            });
-        }
+        // if(payload.operation == payload.representative){
+        //     transporter.sendMail({
+        //         to: payload.representative,
+        //         from: 'gozmek@mekmar.com',
+        //         subject: 'Sipariş Ürün Güncelleme',
+        //         html: content
+        //     });
+        // } else{
+        //     transporter.sendMail({
+        //         to: payload.operation,
+        //         from: 'gozmek@mekmar.com',
+        //         subject: 'Sipariş Ürün Güncelleme',
+        //         html: content
+        //     });
+        //     transporter.sendMail({
+        //         to: payload.representative,
+        //         from: 'gozmek@mekmar.com',
+        //         subject: 'Sipariş Ürün Güncelleme',
+        //         html: content
+        //     });
+        // }
+        transporter.sendMail({
+            to: 'bilgiislem@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Ürün Güncelleme',
+            html: content
+        });
+
+
+        transporter.sendMail({
+            to: 'export@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Ürün Güncelleme',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'export1@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Ürün Güncelleme',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'export2@mekmar.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Ürün Güncelleme',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'mehmet@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Ürün Güncelleme',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'huseyin@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Ürün Güncelleme',
+            html: content
+        });
+        transporter.sendMail({
+            to: 'muhsin@mekmer.com',
+            from: 'gozmek@mekmar.com',
+            subject: 'Sipariş Ürün Güncelleme',
+            html: content
+        });
         resolve(true);
 
     });

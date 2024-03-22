@@ -528,7 +528,16 @@ const mutations = {
         });
     },
     setOrderProductUpdated(state, payload) {
-        state.orderProductUpdated.push(payload);
+        const index2 = state.orderProductUpdated.findIndex(x=>x.ID == payload.ID);
+
+        if(index2 == -1){
+            state.orderProductUpdated.push(payload);
+
+        }else{
+            state.orderProductUpdated.splice(index2,1,payload);
+
+        }
+
         const index = state.orderProductionProductDetailList.findIndex(x => x.ID == payload.ID);
         state.orderProductionProductDetailList.splice(index, 1, payload);
                 state.orderProductionProductTotal = 0;

@@ -57,7 +57,6 @@
           />
         </vue-excel-xlsx>
       </div>
-
     </div>
     <reportsMekmarForwardingList
       :list="getreportsMekmarForwardingList"
@@ -135,9 +134,7 @@ export default {
     this.$store.dispatch("setReportsMekmarForwardingList");
   },
   methods: {
-    yearChange(event) {
-      console.log(event.value.id);
-    },
+    yearChange(event) {},
     formatDecimal(value) {
       if (value == null || value == undefined || value == "" || value == " ") {
         return 0;

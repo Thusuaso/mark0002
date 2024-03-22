@@ -219,7 +219,7 @@
       selectionMode="single"
       @row-click="orderProductsSelected($event)"
       :sortField="'SiraNo'"
-      sortOrder="1"
+      :sortOrder="1"
     >
       <Column field="SiraNo" header="#"></Column>
       <Column field="FirmaAdi" header="Supplier"></Column>
@@ -349,6 +349,13 @@ export default {
     };
   },
   methods: {
+    __nullControl(value) {
+      if (value == null || value == "" || value == undefined) {
+        return 0;
+      } else {
+        return value;
+      }
+    },
     deleteItem() {
       const log = {
         description:
@@ -413,6 +420,8 @@ export default {
       this.model.SatisToplam = this.model.SatisFiyati * this.model.Miktar;
       this.model.SiparisNo = this.po;
       this.workerman_button_disabled = true;
+      this.model.Adet = this.__nullControl(this.model.Adet);
+
       this.$store.dispatch("setOrderProductAdded", this.model);
     },
     update() {
@@ -446,6 +455,7 @@ export default {
       this.model.SatisToplam = this.model.SatisFiyati * this.model.Miktar;
       this.model.SiparisNo = this.po;
       this.workerman_button_disabled = true;
+      this.model.Adet = this.__nullControl(this.model.Adet);
       this.$store.dispatch("setOrderProductUpdated", this.model);
     },
     cancelForm() {

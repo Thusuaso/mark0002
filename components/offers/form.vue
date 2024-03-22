@@ -556,7 +556,6 @@ export default {
       });
     },
     reminderDateSelected(event) {
-      console.log(event);
     },
     __undefinedControl(value) {
       if (

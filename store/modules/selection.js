@@ -172,7 +172,6 @@ const actions = {
         
     },
     setSelectionProductionCrateSizeUpdate(vuexContext,cratesize){
-        console.log(cratesize);
         this.$axios.put('/selection/production/cratesize/update',cratesize)
         .then(response=>{
             if(response.data.status){

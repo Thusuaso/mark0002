@@ -47,7 +47,6 @@ export default {
     list() {
       this.total = 0;
       this.list.forEach((x) => {
-        console.log(x);
         this.total += x.Tutar;
       });
     },

@@ -368,7 +368,7 @@ export default {
       required: false,
     },
     saveButtonStatus: {
-      type: Object,
+      type: Boolean,
       required: false,
     },
     proformaUploadButtonStatus: {

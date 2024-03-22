@@ -349,8 +349,7 @@ export default {
       this.filteredRepresentative = results;
     },
     createdProcess() {
-      console.log(this.country);
-      console.log();
+
       this.selectedCountry = this.country.find((x) => x.Id == this.modelValue.UlkeId);
       this.selectedRepresentative = this.users.find(
         (x) => x.ID == this.modelValue.TemsilciId
