@@ -616,6 +616,7 @@ const mutations = {
         });
     },
     setOrderProductionCostTotal(state, payload) {
+        state.orderProductionCostTotal = 0;
         payload.forEach(x => {
                     state.orderProductionCostTotal += x.tut;
 

@@ -395,6 +395,13 @@ export default {
     }
   },
   methods: {
+    __nullControl(value) {
+      if (value == null || value == undefined) {
+        return 0;
+      } else {
+        return value;
+      }
+    },
     __stringCharacterChange(event) {
       const data = event.split("'");
       let value = "";
@@ -587,6 +594,7 @@ export default {
       } else {
         this.model.Vade = "";
       }
+      this.model.Iade = this.__nullControl(this.model.Iade);
     },
     paymentChange(event) {
       this.model.OdemeTurID = event.value.ID;

@@ -71,6 +71,9 @@
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
+        <template #footer>
+          {{ total.amount | formatDecimal }}
+        </template>
       </Column>
       <Column field="AlisFiyati" header="Buying Price">
         <template #body="slotProps">
@@ -80,6 +83,9 @@
       <Column header="Buying Total">
         <template #body="slotProps">
           {{ (slotProps.data.AlisFiyati * slotProps.data.Miktar) | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{ total.sum | formatDecimal }}
         </template>
       </Column>
     </DataTable>
@@ -148,6 +154,10 @@ export default {
       supplier_date: null,
       m4: "",
       m5: "",
+      total: {
+        amount: 0,
+        sum: 0,
+      },
     };
   },
   methods: {
@@ -342,6 +352,18 @@ export default {
         supplier: event.value.TedarikciID,
       };
       this.$store.dispatch("setOrderSupplierProductList", data);
+    },
+  },
+  watch: {
+    supplierProduct() {
+      this.total = {
+        amount: 0,
+        sum: 0,
+      };
+      this.supplierProduct.forEach((x) => {
+        this.total.amount += x.Miktar;
+        this.total.sum += x.AlisFiyati * x.Miktar;
+      });
     },
   },
 };
