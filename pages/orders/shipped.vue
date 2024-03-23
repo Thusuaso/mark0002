@@ -71,6 +71,7 @@
         @process="process"
         @workerman_selected_emit="workermanSelected($event)"
         @close_production_form_emit="closeProductionForm"
+        @proforma_delete_emit="proformaDelete($event)"
       />
     </Dialog>
 
@@ -143,6 +144,9 @@ export default {
     this.$store.dispatch("setOrderShippedList");
   },
   methods: {
+    proformaDelete(id) {
+      this.$store.dispatch("setOrderProductionProformaDelete", id);
+    },
     yearChange(event) {
       if (event.value.Yil == "All") {
         this.$store.dispatch("setOrderShippedList");
@@ -178,9 +182,69 @@ export default {
       this.workerman_dialog_form = true;
     },
     update() {
+      this.productionModel.FinansAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.FinansAciklama
+      );
+      this.productionModel.UretimAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.UretimAciklama
+      );
+      this.productionModel.SevkiyatAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.SevkiyatAciklama
+      );
+      this.productionModel.DetayAciklama_1_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_1
+      );
+      this.productionModel.DetayAciklama_2_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_2
+      );
+      this.productionModel.DetayAciklama_3_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_3
+      );
+      this.productionModel.DetayAciklama_4_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_4
+      );
+      this.productionModel.DetayMekmarNot_1_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_1
+      );
+      this.productionModel.DetayMekmarNot_2_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_2
+      );
+      this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_3
+      );
       this.$store.dispatch("setOrderProductionUpdate", this.productionModel);
     },
     save() {
+      this.productionModel.FinansAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.FinansAciklama
+      );
+      this.productionModel.UretimAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.UretimAciklama
+      );
+      this.productionModel.SevkiyatAciklama_2 = this.__stringCharacterChange(
+        this.productionModel.SevkiyatAciklama
+      );
+      this.productionModel.DetayAciklama_1_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_1
+      );
+      this.productionModel.DetayAciklama_2_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_2
+      );
+      this.productionModel.DetayAciklama_3_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_3
+      );
+      this.productionModel.DetayAciklama_4_2 = this.__stringCharacterChange(
+        this.productionModel.DetayAciklama_4
+      );
+      this.productionModel.DetayMekmarNot_1_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_1
+      );
+      this.productionModel.DetayMekmarNot_2_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_2
+      );
+      this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
+        this.productionModel.DetayMekmarNot_3
+      );
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");
       this.$store.dispatch("setOrderProductionSave", this.productionModel);

@@ -42,7 +42,11 @@
           />
         </TabPanel>
         <TabPanel header="Document">
-          <orderDetailDocumentForm :list="document" />
+          <orderDetailDocumentForm
+            :list="document"
+            @proforma_delete_emit="$emit('proforma_delete_emit', $event)"
+            @isf_delete_emit="$emit('isf_delete_emit', $event)"
+          />
         </TabPanel>
         <TabPanel header="Check">
           <orderDetailCheckForm :list="check" :total="checkTotal" />
@@ -174,11 +178,23 @@
       </table>
 
       <span class="p-float-label mb-4">
-        <Calendar v-model="load_date" inputId="load_date" class="w-100" disabled />
+        <Calendar
+          v-model="load_date"
+          inputId="load_date"
+          class="w-100"
+          disabled
+          dateFormat="dd/mm/yy"
+        />
         <label for="load_date">Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
-        <Calendar v-model="eta_date" inputId="eta_date" class="w-100" disabled />
+        <Calendar
+          v-model="eta_date"
+          inputId="eta_date"
+          class="w-100"
+          disabled
+          dateFormat="dd/mm/yy"
+        />
         <label for="eta_date">ETA</label>
       </span>
       <span class="p-float-label mb-4">

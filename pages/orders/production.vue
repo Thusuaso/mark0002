@@ -125,6 +125,8 @@
         @process="process"
         @workerman_selected_emit="workermanSelected($event)"
         @close_production_form_emit="closeProductionForm"
+        @proforma_delete_emit="proformaDelete($event)"
+        @isf_delete_emit="isfDelete($event)"
       />
     </Dialog>
 
@@ -216,6 +218,12 @@ export default {
     this.$store.dispatch("setOrderProductionList");
   },
   methods: {
+    isfDelete(event) {
+      this.$store.dispatch("setOrderProductionIsfDelete", event);
+    },
+    proformaDelete(id) {
+      this.$store.dispatch("setOrderProductionProformaDelete", id);
+    },
     excel_output() {
       api
         .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
@@ -303,34 +311,34 @@ export default {
       return value2;
     },
     update() {
-      this.productionModel.FinansAciklama = this.__stringCharacterChange(
+      this.productionModel.FinansAciklama_2 = this.__stringCharacterChange(
         this.productionModel.FinansAciklama
       );
-      this.productionModel.UretimAciklama = this.__stringCharacterChange(
+      this.productionModel.UretimAciklama_2 = this.__stringCharacterChange(
         this.productionModel.UretimAciklama
       );
-      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(
+      this.productionModel.SevkiyatAciklama_2 = this.__stringCharacterChange(
         this.productionModel.SevkiyatAciklama
       );
-      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_1_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_1
       );
-      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_2_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_2
       );
-      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_3
       );
-      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_4_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_4
       );
-      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(
+      this.productionModel.DetayMekmarNot_1_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_1
       );
-      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(
+      this.productionModel.DetayMekmarNot_2_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_2
       );
-      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(
+      this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
       this.$store.dispatch("setOrderProductionUpdate", {
@@ -339,34 +347,34 @@ export default {
       });
     },
     save() {
-      this.productionModel.FinansAciklama = this.__stringCharacterChange(
+      this.productionModel.FinansAciklama_2 = this.__stringCharacterChange(
         this.productionModel.FinansAciklama
       );
-      this.productionModel.UretimAciklama = this.__stringCharacterChange(
+      this.productionModel.UretimAciklama_2 = this.__stringCharacterChange(
         this.productionModel.UretimAciklama
       );
-      this.productionModel.SevkiyatAciklama = this.__stringCharacterChange(
+      this.productionModel.SevkiyatAciklama_2 = this.__stringCharacterChange(
         this.productionModel.SevkiyatAciklama
       );
-      this.productionModel.DetayAciklama_1 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_1_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_1
       );
-      this.productionModel.DetayAciklama_2 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_2_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_2
       );
-      this.productionModel.DetayAciklama_3 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_3
       );
-      this.productionModel.DetayAciklama_4 = this.__stringCharacterChange(
+      this.productionModel.DetayAciklama_4_2 = this.__stringCharacterChange(
         this.productionModel.DetayAciklama_4
       );
-      this.productionModel.DetayMekmarNot_1 = this.__stringCharacterChange(
+      this.productionModel.DetayMekmarNot_1_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_1
       );
-      this.productionModel.DetayMekmarNot_2 = this.__stringCharacterChange(
+      this.productionModel.DetayMekmarNot_2_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_2
       );
-      this.productionModel.DetayMekmarNot_3 = this.__stringCharacterChange(
+      this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
 

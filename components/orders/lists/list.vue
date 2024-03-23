@@ -395,18 +395,7 @@
         :showClearButton="false"
       >
         <template #body="slotProps">
-          <div
-            :id="'productSupplier' + slotProps.data.UrunId"
-            @mouseover="productSupplier(slotProps.data)"
-            @mouseleave="productSupplierNull(slotProps.data)"
-            v-if="
-              slotProps.data.FaturaKesimTurID == 1 || slotProps.data.FaturaKesimTurID == 5
-            "
-            :style="{ color: slotProps.data.Isf > 0 ? 'black' : 'red' }"
-          >
-            {{ slotProps.data.UrunFirmaAdi }}
-          </div>
-          <div v-else>
+          <div :style="{ backgroundColor: slotProps.data.Isf ? '' : 'red' }">
             {{ slotProps.data.UrunFirmaAdi }}
           </div>
         </template>

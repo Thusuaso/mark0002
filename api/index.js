@@ -19,8 +19,8 @@ let transporter = nodemailer.createTransport({
   port: 465,
   secure: true, // use TLS
   auth: {
-    user: "gozmek@mekmar.com",
-    pass: "w_FrBO87:3K3nz==",
+    user: "goz@mekmar.com",
+    pass: "_bwt64h-3SR_-G2O",
   },
   tls: {
     // do not fail on invalid certs
@@ -5598,7 +5598,7 @@ where UrunId=${productId}
         mp.yayinla = 1 and mp.kategori_id='${categoryId}'
     `;
     const suggestedListSql = `
-        select 
+    select 
 
 	mou.Id,
 	mou.urunid,
@@ -5608,7 +5608,12 @@ where UrunId=${productId}
     	(select mp.urunadi_en from MekmarCom_Products mp where mp.urunid = mou.onerilenurunid) as urunadi_en
 
 
-from MekmarCom_OnerilenUrunler mou where mou.urunid='${productId}'
+from MekmarCom_OnerilenUrunler mou 
+inner join MekmarCom_Products mp on mp.urunid = mou.onerilenurunid
+
+
+where mou.urunid='${productId}' and mp.yayinla=1
+
 order by sira
     
     `;
@@ -7148,7 +7153,7 @@ where o.Tarih='${req.params.date}' and o.MusteriID = '${req.params.customerId}'
 });
 
 /*Orders*/
-app.get('/order/production/list', (req, res) => {
+app.get('/order/production/list', async (req, res) => {
     const ordersListSql = `
 select 
 
@@ -7247,7 +7252,7 @@ s.KonteynerNo,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
     dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
-    dbo.Production_Isf_Document_Control3(su.SiparisNo,su.TedarikciID) as Isf
+    dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
 
 
 from SiparisUrunTB su
@@ -7277,9 +7282,9 @@ order by s.SiparisTarihi desc
 group by YEAR(s.SiparisTarihi) 
 order by YEAR(s.SiparisTarihi) desc
     `;
-    mssql.query(ordersListSql, (err, orders) => {
+   await mssql.query(ordersListSql, async (err, orders) => {
         console.log('/order/production/list , hata',err)
-        mssql.query(orderYearListSql, (err, years) => {
+        await mssql.query(orderYearListSql, (err, years) => {
             console.log('/order/production/list , year , hata',err)
             let customYearList = [];
             years.recordset.forEach(x => {
@@ -7290,7 +7295,7 @@ order by YEAR(s.SiparisTarihi) desc
         });
     });
 });
-app.get('/order/production/list/year/:year', (req, res) => {
+app.get('/order/production/list/year/:year', async (req, res) => {
     const productionListYearSql = `
         select 
 
@@ -7389,7 +7394,7 @@ s.KonteynerNo,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
     dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
-    dbo.Production_Isf_Document_Control3(su.SiparisNo,su.TedarikciID) as Isf
+    dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
 
 
 from SiparisUrunTB su
@@ -7412,7 +7417,7 @@ where s.SiparisDurumID = 2 and YEAR(s.SiparisTarihi) = '${req.params.year}'
 order by s.SiparisTarihi desc
 
     `;
-    mssql.query(productionListYearSql,(err,production)=>{
+    await mssql.query(productionListYearSql,(err,production)=>{
         console.log('/order/production/list/year/:year , hata',err)
         res.status(200).json({ 'list': production.recordset });
     });
@@ -7421,7 +7426,7 @@ order by s.SiparisTarihi desc
 
 });
 
-app.get('/order/shipped/list', (req, res) => {
+app.get('/order/shipped/list', async (req, res) => {
         const ordersListSql = `
         select 
 
@@ -7551,9 +7556,9 @@ app.get('/order/shipped/list', (req, res) => {
 group by YEAR(s.SiparisTarihi) 
 order by YEAR(s.SiparisTarihi) desc
     `;
-    mssql.query(ordersListSql, (err, orders) => {
+    await mssql.query(ordersListSql,async (err, orders) => {
         console.log('/order/shipped/list , hata', err)
-               mssql.query(orderYearListSql, (err, years) => {
+               await mssql.query(orderYearListSql, (err, years) => {
                 console.log('/order/shipped/list , year ,  hata', err)
 
             let customYearList = [];
@@ -7567,7 +7572,7 @@ order by YEAR(s.SiparisTarihi) desc
 });
 
 
-app.post('/order/shipped/list/filter',(req,res)=>{
+app.post('/order/shipped/list/filter',async (req,res)=>{
 
     const company = req.body.company.charAt(0).toUpperCase() + req.body.company.slice(1);
     const po = req.body.po.toUpperCase();
@@ -7706,14 +7711,14 @@ order by s.YuklemeTarihi desc
 
 `;
 
-mssql.query(ordersListSql, (err, orders) => {
+await mssql.query(ordersListSql, (err, orders) => {
     console.log('/order/shipped/list/filter/load/date/ , hata', err)
     res.status(200).json({'list':orders.recordset});
 
 });
 });
 
-app.get('/order/shipped/list/filter/global/:filter',(req,res)=>{
+app.get('/order/shipped/list/filter/global/:filter',async (req,res)=>{
     const ordersListSql = `
     select 
 
@@ -7847,7 +7852,7 @@ app.get('/order/shipped/list/filter/global/:filter',(req,res)=>{
 
     `;
 
-    mssql.query(ordersListSql, (err, orders) => {
+    await mssql.query(ordersListSql, (err, orders) => {
         console.log('/order/shipped/list/filter/load/date/ , hata', err)
         res.status(200).json({'list':orders.recordset});
 
@@ -7863,7 +7868,7 @@ app.get('/order/shipped/list/filter/global/:filter',(req,res)=>{
 
 
 
-app.get('/order/shipped/list/year/:year', (req, res) => {
+app.get('/order/shipped/list/year/:year',async (req, res) => {
     const shippedListYearSql = `
 select 
 
@@ -7992,7 +7997,7 @@ order by s.SiparisTarihi desc
 
 
     `;
-    mssql.query(shippedListYearSql,(err,shipped)=>{
+    await mssql.query(shippedListYearSql,(err,shipped)=>{
         console.log('/order/shipped/list/year/:year ,  hata', err)
 
         res.status(200).json({ 'list': shipped.recordset });
@@ -8003,7 +8008,7 @@ order by s.SiparisTarihi desc
 });
 
 
-app.get('/order/waiting/list', (req, res) => {
+app.get('/order/waiting/list',async (req, res) => {
         const ordersListSql = `
 select 
 
@@ -8132,9 +8137,9 @@ order by s.SiparisTarihi desc
 group by YEAR(s.SiparisTarihi) 
 order by YEAR(s.SiparisTarihi) desc
     `;
-    mssql.query(ordersListSql, (err, orders) => {
+    await mssql.query(ordersListSql, async (err, orders) => {
  
-        mssql.query(orderYearListSql, (err, years) => {
+        await mssql.query(orderYearListSql, (err, years) => {
             let customYearList = [];
             years.recordset.forEach(x => {
                 customYearList.push(x);
@@ -8145,7 +8150,7 @@ order by YEAR(s.SiparisTarihi) desc
     });
 });
 
-app.get('/order/waiting/list/year/:year', (req, res) => {
+app.get('/order/waiting/list/year/:year',async (req, res) => {
     const waitingListYearSql = `
         select 
 
@@ -8267,7 +8272,7 @@ where s.SiparisDurumID = 1 and YEAR(s.SiparisTarihi) = '${req.params.year}'
 order by s.SiparisTarihi desc
 
     `;
-    mssql.query(waitingListYearSql,(err,waiting)=>{
+   await mssql.query(waitingListYearSql,(err,waiting)=>{
         res.status(200).json({ 'list': waiting.recordset });
     });
 
@@ -8275,7 +8280,7 @@ order by s.SiparisTarihi desc
 
 });
 
-app.get('/order/production/product/detail/list/:po', (req, res) => {
+app.get('/order/production/product/detail/list/:po', async (req, res) => {
     const sql = `
         select 
 
@@ -8317,7 +8322,7 @@ inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
 
 where su.SiparisNo='${req.params.po}'
     `;
-    mssql.query(sql,(err,detail)=>{
+    await mssql.query(sql,(err,detail)=>{
         res.status(200).json({ 'list': detail.recordset }); 
     });
 });
@@ -8434,7 +8439,7 @@ app.post('/order/production/proforma/upload', (req, res) => {
         }
     });
 });
-app.get('/order/production/cost/list/:po', (req, res) => {
+app.get('/order/production/cost/list/:po', async (req, res) => {
     const sql = `
                        select *from
                 (
@@ -8449,8 +8454,8 @@ app.get('/order/production/cost/list/:po', (req, res) => {
                where f.SiparisNo='${req.params.po}'
     `;
 
-    mssql.query(sql, (err, cost) => {
-        mssql.query(sql2,(err,cost2)=>{
+    await mssql.query(sql, async (err, cost) => {
+        await mssql.query(sql2,(err,cost2)=>{
             let costData = [];
             if (cost2.recordset.length > 0) {
                 cost2.recordset.forEach(x => {
@@ -8490,7 +8495,7 @@ app.get('/order/production/cost/list/:po', (req, res) => {
         });
     });
 });
-app.get('/order/production/product/supplier/:po', (req, res) => {
+app.get('/order/production/product/supplier/:po', async (req, res) => {
     const sql = `
         select 
 
@@ -8502,11 +8507,11 @@ inner join TedarikciTB t on t.ID = s.TedarikciID
 where s.SiparisNo='${req.params.po}'
 group by s.TedarikciID,t.FirmaAdi
     `;
-    mssql.query(sql,(err,supplier)=>{
+    await mssql.query(sql,(err,supplier)=>{
         res.status(200).json({ 'list': supplier.recordset }); 
     });
 });
-app.get('/order/production/supplier/product/:po/:supplier', (req, res) => {
+app.get('/order/production/supplier/product/:po/:supplier', async (req, res) => {
     const sql = `
         select 
 	
@@ -8547,7 +8552,7 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID='${req.params.supplier}
 
 
     `;
-    mssql.query(sql, (err, supplier) => {
+    await mssql.query(sql, (err, supplier) => {
         if (supplier.recordset.length > 0) {
             supplier.recordset.forEach(x => {
                 if (x.AlisFiyati == null || x.AlisFiyati == '') {
@@ -8649,7 +8654,7 @@ app.post('/order/production/supplier/isf/save', (req, res) => {
     });
 
 });
-app.get('/order/production/product/document/:po', (req, res) => {
+app.get('/order/production/product/document/:po', async (req, res) => {
     const documentListSql = `
         select
             *,
@@ -8672,7 +8677,7 @@ app.get('/order/production/product/document/:po', (req, res) => {
             )
             order by YuklemeEvrakID ASC
     `;
-    mssql.query(documentListSql, (err, document) => {
+    await mssql.query(documentListSql, (err, document) => {
         document.recordset.forEach(x => {
             if (x.YuklemeEvrakID == 1) {
                 x.Link = `https://file-service.mekmar.com/file/download/1/${x.SiparisNo}`;
@@ -8774,6 +8779,10 @@ app.get('/order/production/product/document/:po', (req, res) => {
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
                 x.Evrak = x.KonteynerFirmaAdi;
             };
+            if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID==73 ){
+                x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
+                x.Evrak = x.KonteynerFirmaAdi;
+            };
             if(x.YuklemeEvrakID == 71 ){
                 x.Link = `https://file-service.mekmar.com/file/download/71/${x.SiparisNo}`;
                 x.Evrak = 'İlaçlama Notası';
@@ -8783,6 +8792,7 @@ app.get('/order/production/product/document/:po', (req, res) => {
                 x.Evrak = 'Fotolar';
             };
             if(x.YuklemeEvrakID == 73 ){
+
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
                 x.Evrak = x.KonteynerFirmaAdi;
             };
@@ -8818,7 +8828,7 @@ function __getCategoryMass(category) {
     
 
 };
-app.get('/order/production/product/check/:po',(req,res)=>{
+app.get('/order/production/product/check/:po',async (req,res)=>{
     const checkListSql = `
         select    
 t.FirmaAdi as TedarikciAdi,    
@@ -8842,7 +8852,7 @@ and b.ID = u.UrunBirimID
 and t.ID = u.TedarikciID    
 order by u.UrunKartID asc    
     `;
-    mssql.query(checkListSql, (err, check) => {
+   await mssql.query(checkListSql, (err, check) => {
         let queue = 1;
         check.recordset.forEach(x => {
             x.Sira = queue;
@@ -8852,7 +8862,7 @@ order by u.UrunKartID asc
         res.status(200).json({ 'list': check.recordset });
     });
 });
-app.get('/order/production/product/workerman/:po/:productId',(req,res)=>{
+app.get('/order/production/product/workerman/:po/:productId',async (req,res)=>{
     const sql = `
         select sg.ID,sg.Tarih,sg.TedarikciID,sg.Aciklama,sg.Tutar,t.FirmaAdi
 
@@ -8868,8 +8878,8 @@ from SiparisEkstraGiderlerTB sg
 
 where sg.SiparisNo='${req.params.po}'
     `;
-    mssql.query(sql, (err, workerman) => {
-        mssql.query(sql2,(err,workermanTotalList)=>{
+    await mssql.query(sql, async (err, workerman) => {
+       await mssql.query(sql2,(err,workermanTotalList)=>{
             res.status(200).json({ 'list': workerman.recordset, 'workerman': workermanTotalList.recordset[0] });
 
         });
@@ -8993,23 +9003,23 @@ VALUES(
 	'${req.body.KayitTarihi}',
 	'${req.body.KullaniciID}',
 	'${req.body.SiparisDurumID}',
-	'${req.body.UretimAciklama}',
-	'${req.body.SevkiyatAciklama}',
-	'${req.body.FinansAciklama}',
+	'${req.body.UretimAciklama_2}',
+	'${req.body.SevkiyatAciklama_2}',
+	'${req.body.FinansAciklama_2}',
 	'${req.body.OdemeAciklama}',
 	'${req.body.TahminiYuklemeTarihi}',
 	'${req.body.Ulke}',
 	'${req.body.Komisyon}',
-	'${req.body.DetayAciklama_1}',
-	'${req.body.DetayMekmarNot_1}',
+	'${req.body.DetayAciklama_1_2}',
+	'${req.body.DetayMekmarNot_1_2}',
 	'${req.body.DetayTutar_1}',
 	'${req.body.DetayAlis_1}',
-	'${req.body.DetayAciklama_2}',
-	'${req.body.DetayMekmarNot_2}',
+	'${req.body.DetayAciklama_2_2}',
+	'${req.body.DetayMekmarNot_2_2}',
 	'${req.body.DetayTutar_2}',
 	'${req.body.DetayAlis_2}',
-	'${req.body.DetayAciklama_3}',
-	'${req.body.DetayMekmarNot_3}',
+	'${req.body.DetayAciklama_3_2}',
+	'${req.body.DetayMekmarNot_3_2}',
 	'${req.body.DetayTutar_3}',
 	'${req.body.DetayAlis_3}',
 	'${req.body.SiparisSahibi}',
@@ -9019,7 +9029,7 @@ VALUES(
 	'${req.body.UlkeId}',
 	'${req.body.depo_yukleme}',
 	'${req.body.DetayTutar_4}',
-	'${req.body.DetayAciklama_4}',
+	'${req.body.DetayAciklama_4_2}',
 	'${req.body.sigorta_id}',
 	'${req.body.sigorta_Tutar}',
 	'${req.body.Operasyon}',
@@ -9061,23 +9071,23 @@ SET
 	NavlunAlis='${req.body.NavlunAlis}',
 	NavlunSatis='${req.body.NavlunSatis}',
 	SiparisDurumID='${req.body.SiparisDurumID}',
-	UretimAciklama='${req.body.UretimAciklama}',
-	SevkiyatAciklama='${req.body.SevkiyatAciklama}',
-	FinansAciklama='${req.body.FinansAciklama}',
+	UretimAciklama='${req.body.UretimAciklama_2}',
+	SevkiyatAciklama='${req.body.SevkiyatAciklama_2}',
+	FinansAciklama='${req.body.FinansAciklama_2}',
 	OdemeAciklama='${req.body.OdemeAciklama}',
 	Vade='${req.body.Vade}',
 	Ulke='${req.body.Ulke}',
 	Komisyon='${req.body.Komisyon}',
-	DetayAciklama_1='${req.body.DetayAciklama_1}',
-	DetayMekmarNot_1='${req.body.DetayMekmarNot_1}',
+	DetayAciklama_1='${req.body.DetayAciklama_1_2}',
+	DetayMekmarNot_1='${req.body.DetayMekmarNot_1_2}',
 	DetayTutar_1='${req.body.DetayTutar_1}',
 	DetayAlis_1='${req.body.DetayAlis_1}',
-	DetayAciklama_2='${req.body.DetayAciklama_2}',
-	DetayMekmarNot_2='${req.body.DetayMekmarNot_2}',
+	DetayAciklama_2='${req.body.DetayAciklama_2_2}',
+	DetayMekmarNot_2='${req.body.DetayMekmarNot_2_2}',
 	DetayTutar_2='${req.body.DetayTutar_2}',
 	DetayAlis_2='${req.body.DetayAlis_2}',
-	DetayAciklama_3='${req.body.DetayAciklama_3}',
-	DetayMekmarNot_3='${req.body.DetayMekmarNot_3}',
+	DetayAciklama_3='${req.body.DetayAciklama_3_2}',
+	DetayMekmarNot_3='${req.body.DetayMekmarNot_3_2}',
 	DetayTutar_3='${req.body.DetayTutar_3}',
 	DetayAlis_3='${req.body.DetayAlis_3}',
 	SiparisSahibi='${req.body.SiparisSahibi}',
@@ -9087,7 +9097,7 @@ SET
 	FaturaKesimTurID='${req.body.FaturaKesimTurID}',
 	depo_yukleme='${req.body.depo_yukleme}',
 	DetayTutar_4='${req.body.DetayTutar_4}',
-	DetayAciklama_4='${req.body.DetayAciklama_4}',
+	DetayAciklama_4='${req.body.DetayAciklama_4_2}',
 	sigorta_Tutar='${req.body.sigorta_Tutar}',
 	Operasyon='${req.body.Operasyon}',
 	Finansman='${req.body.Finansman}',
@@ -9106,13 +9116,67 @@ ID='${req.body.SiparisId}'
     });
 });
 
+app.get('/production/proforma/delete/:id',async(req,res)=>{
+    const sql = `delete SiparisFaturaKayitTB where ID='${req.params.id}'`;
+    await mssql.query(sql,(err,response)=>{
+        if(response){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        }
+    });
+});
+app.get('/production/isf/delete/:id/:document/:po',async (req,res)=>{
+    const id = req.params.id;
+    const document = req.params.document.split('-');
+    if(document.length >2){
+    console.log(document);
+        
+    }else{
+    const supplierIdSql = `select top 1 ID from TedarikciTB where FirmaAdi='${document[0]}'`;
+    await mssql.query(supplierIdSql,async (err,supplier)=>{
+        if(supplier){
+            const supplierId = supplier.recordset[0].ID;
+            const documentProductIdSql = `select top 1 ID from SiparisUrunTedarikciFormTB where SiparisNo='${req.params.po}' and TedarikciID='${supplierId}'
+            `;
+            await mssql.query(documentProductIdSql,async (err,documentId)=>{
+                const deleteDocumentIdSql = `delete SiparisUrunTedarikciFormTB where ID='${documentId.recordset[0].ID}'
+                `;
+                await mssql.query(deleteDocumentIdSql,async (err,deleteDocumentId)=>{
+                    if(deleteDocumentId){
+                        const productionDocumentDeleteSql = `delete SiparisFaturaKayitTB where ID='${req.params.id}'
+                        `;
+                        await mssql.query(productionDocumentDeleteSql,(err,productionDocument)=>{
+                            if(productionDocument){
+                                res.status(200).json({'status':true});
+                            }else{
+                                res.status(200).json({'status':false});
+                            }
+                        
+                        });
+                    }
+                });
+                
+
+            });
+
+
+        }
+    });
+        
+        
+    }
+
+
+
+});
 
 
 /*Mailler */
 app.post('/mail/login/server', (req, res) => {
     transporter.sendMail({
         to: 'bilgiislem@mekmar.com',
-        from: 'gozmek@mekmar.com',
+        from: 'goz@mekmar.com',
         subject: 'Giriş Tespit Edildi.',
         html: `<h1>${req.body.innerDate} tarihinde ${req.body.username} giriş yaptı.</h1>`
     });
@@ -9121,7 +9185,7 @@ app.post('/mail/login/server', (req, res) => {
 app.post('/mail/advanced/payment/server',(req,res)=>{
     transporter.sendMail({
         to:req.body.Mail,
-        from:'gozmek@mekmar.com',
+        from:'goz@mekmar.com',
         subject:'Peşinat Kayıt İşlemi',
         html: `
             <h3>${req.body.KullaniciAdi} Adlı Kullanıcı ${req.body.BugunTarih} Tarihi İtibariyle ${req.body.FirmaAdi} Firmasına Peşinat Girişi Yaptı.</h3>
@@ -9153,7 +9217,7 @@ app.post('/mail/advanced/payment/server',(req,res)=>{
 app.post('/finance/po/paid/send/mail', (req, res) => {
     transporter.sendMail({
         to:req.body.Mail,
-        from:'gozmek@mekmar.com',
+        from:'goz@mekmar.com',
         subject:'Tahsilat Kayıt İşlemi',
         html: `
             <h3>${req.body.KullaniciAdi} Adlı Kullanıcı ${req.body.BugunTarih} Tarihi İtibariyle ${req.body.FirmaAdi} Firmasına Tahsilat Girişi Yaptı.</h3>
@@ -9184,7 +9248,7 @@ app.post('/finance/po/paid/send/mail', (req, res) => {
 app.post('/finance/po/paid/delete/send/mail', (req, res) => {
     transporter.sendMail({
         to:req.body.Mail,
-        from:'gozmek@mekmar.com',
+        from:'goz@mekmar.com',
         subject:'Tahsilat Silme İşlemi',
         html: `
             <h3>${req.body.KullaniciAdi} Adlı Kullanıcı ${req.body.BugunTarih} Tarihi İtibariyle ${req.body.FirmaAdi} Firmasına Tahsilat Silme İşlemi Yaptı.</h3>
@@ -9216,7 +9280,7 @@ app.post('/finance/po/paid/update/send/mail', (req, res) => {
 
     transporter.sendMail({
         to:req.body.Mail,
-        from:'gozmek@mekmar.com',
+        from:'goz@mekmar.com',
         subject:'Tahsilat Güncelleme İşlemi',
         html: `
             <h3>${req.body.KullaniciAdi} Adlı Kullanıcı ${req.body.BugunTarih} Tarihi İtibariyle ${req.body.FirmaAdi} Firmasına Tahsilat Güncelleme İşlemi Yaptı.</h3>
@@ -9248,6 +9312,8 @@ async function addedSendMail(payload) {
     return new Promise((resolve, reject) => {
         let content;
         let customSubject;
+        let content_mekmer;
+
         if(payload.new){
             content = `
             <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişini Girdi.</h3>
@@ -9265,6 +9331,23 @@ async function addedSendMail(payload) {
             </tr>
             `;
             customSubject = 'Yeni Sipariş Girişi';
+            content_mekmer = `
+            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişini Girdi.</h3>
+            <br/>
+            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+            <tr style="border: 1px solid;">
+                <th style="border: 1px solid;">Sipariş No</th>
+                <th style="border: 1px solid;">Tedarikçi</th>
+                <th style="border: 1px solid;">Ürün Bilgisi</th>
+                <th style="border: 1px solid;">Üretim açıklama</th>
+                <th style="border: 1px solid;">Miktar</th>
+                <th style="border: 1px solid;">Alış Fiyatı</th>
+                <th style="border: 1px solid;">Satış Fiyatı</th>
+
+            </tr>
+            
+            `;
+
         }else{
             content = `
             <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişine Ürün Ekledi.</h3>
@@ -9281,7 +9364,22 @@ async function addedSendMail(payload) {
 
             </tr>
         `;
-        customSubject = 'Siparişe Ürün Eklendi'
+        customSubject = 'Siparişe Ürün Eklendi';
+        content_mekmer =  `
+                <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişine Ürün Ekledi.</h3>
+                <br/>
+                <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+                <tr style="border: 1px solid;">
+                    <th style="border: 1px solid;">Sipariş No</th>
+                    <th style="border: 1px solid;">Tedarikçi</th>
+                    <th style="border: 1px solid;">Ürün Bilgisi</th>
+                    <th style="border: 1px solid;">Üretim açıklama</th>
+                    <th style="border: 1px solid;">Miktar</th>
+                    <th style="border: 1px solid;">Alış Fiyatı</th>
+                    <th style="border: 1px solid;">Satış Fiyatı</th>
+
+                </tr>
+            `;
         }
 
         payload.added.forEach(x => {
@@ -9298,51 +9396,75 @@ async function addedSendMail(payload) {
             </tr>`
         });
         content = content + '</table>';
-       
+
+        const mekmer_product = payload.added.filter(x=>(x.FirmaAdi == 'Mekmer') || (x.FirmaAdi == 'Mek-Moz'));
+        if(mekmer_product.length >0){
+            mekmer_product.forEach(x => {
+                content_mekmer = content_mekmer + `
+                <tr style="border: 1px solid;">
+                    <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
+                    <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
+                    <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
+                    <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
+                    <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+                    <td style="border: 1px solid;text-align:center;">$${x.AlisFiyati}</td>
+                    <td style="border: 1px solid;text-align:center;">$${x.SatisFiyati}</td>
+    
+                </tr>`
+            });
+            content_mekmer = content_mekmer + '</table>';
+
+                    transporter.sendMail({
+                    to: 'sergen@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: customSubject,
+                    html: content_mekmer
+                });
+                transporter.sendMail({
+                    to: 'muhsin@mekmer.com',
+                    from: 'goz@mekmar.com',
+                    subject: customSubject,
+                    html: content_mekmer
+                });
+        };
         transporter.sendMail({
             to: 'bilgiislem@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: customSubject,
             html: content
         });
-
-
+       
         transporter.sendMail({
             to: 'export@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Yeni Sipariş Girişi',
             html: content
         });
         transporter.sendMail({
             to: 'export1@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Yeni Sipariş Girişi',
             html: content
         });
         transporter.sendMail({
             to: 'export2@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Yeni Sipariş Girişi',
             html: content
         });
         transporter.sendMail({
             to: 'mehmet@mekmer.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Yeni Sipariş Girişi',
             html: content
         });
         transporter.sendMail({
             to: 'huseyin@mekmer.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Yeni Sipariş Girişi',
             html: content
         });
-        transporter.sendMail({
-            to: 'muhsin@mekmer.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
-            html: content
-        });
+
         resolve(true);
     });
 
@@ -9378,20 +9500,20 @@ async function deletedSendMail(payload) {
         if(payload.operation == payload.representative){
             transporter.sendMail({
                 to: payload.representative,
-                from: 'gozmek@mekmar.com',
+                from: 'goz@mekmar.com',
                 subject: 'Sipariş Ürün Silme',
                 html: content
             });
         } else{
             transporter.sendMail({
                 to: payload.operation,
-                from: 'gozmek@mekmar.com',
+                from: 'goz@mekmar.com',
                 subject: 'Sipariş Ürün Silme',
                 html: content
             });
             transporter.sendMail({
                 to: payload.representative,
-                from: 'gozmek@mekmar.com',
+                from: 'goz@mekmar.com',
                 subject: 'Sipariş Ürün Silme',
                 html: content
             });
@@ -9459,30 +9581,87 @@ async function updatedSendMail(payload) {
         });
 
         content = content + '</table>';
-        // if(payload.operation == payload.representative){
-        //     transporter.sendMail({
-        //         to: payload.representative,
-        //         from: 'gozmek@mekmar.com',
-        //         subject: 'Sipariş Ürün Güncelleme',
-        //         html: content
-        //     });
-        // } else{
-        //     transporter.sendMail({
-        //         to: payload.operation,
-        //         from: 'gozmek@mekmar.com',
-        //         subject: 'Sipariş Ürün Güncelleme',
-        //         html: content
-        //     });
-        //     transporter.sendMail({
-        //         to: payload.representative,
-        //         from: 'gozmek@mekmar.com',
-        //         subject: 'Sipariş Ürün Güncelleme',
-        //         html: content
-        //     });
-        // }
+
+        let content_mekmer = `
+            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişinden Aşağıdaki Kalemleri Güncelledi.</h3>
+            <br/>
+            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+            <tr style="border: 1px solid;">
+            <th style="border: 1px solid;">Durum</th>
+                <th style="border: 1px solid;">Sipariş No</th>
+                <th style="border: 1px solid;">Tedarikçi</th>
+                <th style="border: 1px solid;">Ürün Bilgisi</th>
+                <th style="border: 1px solid;">Üretim açıklama</th>
+                <th style="border: 1px solid;">Miktar</th>
+                <th style="border: 1px solid;">Alış Fiyatı</th>
+                <th style="border: 1px solid;">Satış Fiyatı</th>
+
+
+
+            </tr>
+        `;
+        /*Eğer Mekmer ve Mekmoz ise Sergen ile Muhsin abiye mail gitsin */
+        const mekmer_product = payload.updated.filter(x=>(x.FirmaAdi == 'Mekmer') || (x.FirmaAdi == 'Mek-Moz'));
+        
+        if(mekmer_product.length >0){
+            console.log('mekmer_product');
+            mekmer_product.forEach(x=>{
+            const index = payload.notchange.findIndex(y=>y.ID == x.ID);
+            const po = payload.notchange[index].SiparisNo;
+            const company = payload.notchange[index].FirmaAdi;
+            const desc = payload.notchange[index].KategoriAdi + '-' + payload.notchange[index].UrunAdi + '-' + payload.notchange[index].YuzeyIslemAdi + '-' + payload.notchange[index].En + 'x' +payload.notchange[index].Boy + 'x' +payload.notchange[index].Kenar;
+            const pdesc = payload.notchange[index].UretimAciklama;
+            const amount = payload.notchange[index].Miktar;
+            const buying = noneControl(payload.notchange[index].AlisFiyati);
+            const selling = noneControl(payload.notchange[index].SatisFiyati);
+
+
+            content_mekmer = content_mekmer + `
+            <tr style="border: 1px solid;">
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">Önceki</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">${po}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.FirmaAdi,company)};">${company}</td>
+                <td style="border: 1px solid;text-align:center;"style="border:1px solid gray;text-align:center;" >${desc}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.UretimAciklama,pdesc)};">${pdesc}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(x.Miktar,amount)};">${amount}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(noneControl(x.AlisFiyati),buying)};">$${buying}</td>
+                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(noneControl(x.SatisFiyati),selling)};">$${selling}</td>
+            </tr>`
+            
+            });
+            mekmer_product.forEach(x=>{
+                content_mekmer = content_mekmer + `
+            <tr style="border: 1px solid;">
+                <td style="border: 1px solid;text-align:center;">Sonraki</td>
+                <td style="border: 1px solid;text-align:center;" >${x.SiparisNo}</td>
+                <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
+                <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
+                <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
+                <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+                <td style="border: 1px solid;text-align:center;">$${noneControl(x.AlisFiyati)}</td>
+                <td style="border: 1px solid;text-align:center;">$${noneControl(x.SatisFiyati)}</td>
+            </tr>`
+            });
+            content_mekmer = content_mekmer +'</table>';
+
+            transporter.sendMail({
+                to: 'muhsin@mekmer.com',
+                from: 'goz@mekmar.com',
+                subject: 'Sipariş Ürün Güncelleme',
+                html: content_mekmer
+            });
+            transporter.sendMail({
+                to: 'sergen@mekmar.com',
+                from: 'goz@mekmar.com',
+                subject: 'Sipariş Ürün Güncelleme',
+                html: content_mekmer
+            });
+
+        };
+
         transporter.sendMail({
             to: 'bilgiislem@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Ürün Güncelleme',
             html: content
         });
@@ -9490,40 +9669,35 @@ async function updatedSendMail(payload) {
 
         transporter.sendMail({
             to: 'export@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Ürün Güncelleme',
             html: content
         });
         transporter.sendMail({
             to: 'export1@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Ürün Güncelleme',
             html: content
         });
         transporter.sendMail({
             to: 'export2@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Ürün Güncelleme',
             html: content
         });
         transporter.sendMail({
             to: 'mehmet@mekmer.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Ürün Güncelleme',
             html: content
         });
         transporter.sendMail({
             to: 'huseyin@mekmer.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Ürün Güncelleme',
             html: content
         });
-        transporter.sendMail({
-            to: 'muhsin@mekmer.com',
-            from: 'gozmek@mekmar.com',
-            subject: 'Sipariş Ürün Güncelleme',
-            html: content
-        });
+        
         resolve(true);
 
     });
@@ -9550,24 +9724,35 @@ function updateChangedColor(value1,value2){
 }
 
 
-app.post('/order/production/product/save/mail', (req, res) => {
+app.post('/order/production/product/save/mail', async (req, res) => {
+    if(req.body.updated.length >0 || req.body.added.length >0 || req.body.deleted.length >0){
+        if (req.body.added.length > 0) {
+            await addedSendMail(req.body).then(response => {
+                
+                res.status(200).json({'status':true});
+            });
+        }
+        if (req.body.updated.length > 0) {
+            await updatedSendMail(req.body).then(response => {
+                if(response){
+                    res.status(200).json({ 'status': true });
+                }
+                
+            });
+        } 
+        if(req.body.deleted.length >0){
+            await deletedSendMail(req.body).then(response => {
+                res.status(200).json({ 'status': true });
+            });
+        }
+            updateProductionTotal(req.body.po);
+    
+    }else{
+        res.status(200).json({'status':false})
+    }
 
-    if (req.body.added.length > 0) {
-        addedSendMail(req.body).then(response => {
-            res.status(200).json({'status':true});
-        });
-    };
-    if (req.body.updated.length > 0) {
-        updatedSendMail(req.body).then(response => {
-            res.status(200).json({ 'status': true });
-        });
-    };
-    if(req.body.deleted.length >0){
-        deletedSendMail(req.body).then(response => {
-            res.status(200).json({ 'status': true });
-        });
-    };
-    updateProductionTotal(req.body.po)
+    
+    
 });
 app.post('/shipment/products/save/mail',(req,res)=>{
         let content = `
@@ -9601,7 +9786,7 @@ app.post('/shipment/products/save/mail',(req,res)=>{
         content = content + '</table>';
         transporter.sendMail({
             to: req.body.mail,
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Sevkiyat İşlemi',
             html: content
         })
@@ -9614,19 +9799,19 @@ app.post('/shipment/products/save/mail',(req,res)=>{
         });
         transporter.sendMail({
             to: 'info@mekmar.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Sevkiyat İşlemi',
             html: content
         });
         transporter.sendMail({
             to: 'mehmet@mekmer.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Sevkiyat İşlemi',
             html: content
         });
         transporter.sendMail({
             to: 'huseyin@mekmer.com',
-            from: 'gozmek@mekmar.com',
+            from: 'goz@mekmar.com',
             subject: 'Sipariş Sevkiyat İşlemi',
             html: content
         });

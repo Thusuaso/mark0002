@@ -395,6 +395,16 @@ export default {
     }
   },
   methods: {
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
+
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
+    },
     bankerage(event) {
       if (event) {
         if (event[0] == 0) {

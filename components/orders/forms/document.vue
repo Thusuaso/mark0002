@@ -15,6 +15,22 @@
         </template>
       </Column>
       <Column field="kullanici" header="Document Rep"> </Column>
+      <Column header="#">
+        <template #body="slotProps">
+          <Button
+            v-if="slotProps.data.Evrak == 'Proforma Invoice'"
+            label="Sil"
+            class="p-button-danger"
+            @click="proformaDelete(slotProps.data.ID)"
+          ></Button>
+          <Button
+            v-if="slotProps.data.YuklemeEvrakID == 3"
+            label="Sil"
+            class="p-button-danger"
+            @click="isfDelete(slotProps.data)"
+          ></Button>
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
@@ -24,6 +40,19 @@ export default {
     list: {
       type: Array,
       required: false,
+    },
+  },
+  methods: {
+    isfDelete(event) {
+      this.$emit("isf_delete_emit", event);
+    },
+    proformaDelete(id) {
+      this.$emit("proforma_delete_emit", id);
+    },
+  },
+  watch: {
+    list() {
+      console.log(this.list);
     },
   },
 };

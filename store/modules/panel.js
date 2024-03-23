@@ -744,11 +744,11 @@ const mutations = {
             state.panelProductColorList = payload.color;
             state.panelProductAreaList = payload.area;
             state.panelProductTypeList = payload.type;
-        state.panelProductMaterialList = payload.material;
-        state.panelProductEdgeList = payload.edge;
-        state.panelProductStyleList = payload.style;
-        state.panelProductPhotoList = [payload.photo, []];
-        state.panelProductSuggestedList = [payload.suggestedall,payload.suggestedlist]
+            state.panelProductMaterialList = payload.material;
+            state.panelProductEdgeList = payload.edge;
+            state.panelProductStyleList = payload.style;
+            state.panelProductPhotoList = [payload.photo, []];
+            state.panelProductSuggestedList = [payload.suggestedall,payload.suggestedlist]
     },
     setPanelProductColorAdd(state, payload) {
         state.panelProductColorList.push(payload);

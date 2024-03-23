@@ -52,6 +52,35 @@ const state = {
 
 };
 const actions = {
+    setOrderProductionIsfDelete(vuexContext,event){
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get(`/production/isf/delete/${event.ID}/${event.EvrakAdi}/${event.SiparisNo}`)
+        .then(response=>{
+            if(response.data.status){
+                vuexContext.dispatch('setEndLoadingAction');
+                this.$toast.success('Isf Silindi.');
+                vuexContext.commit('setOrderProductionProformaDelete',event.ID);
+                vuexContext.dispatch('setOrderProductionList');
+            }else{
+                this.$toast.error('Isf Silme Başarısız.');
+                vuexContext.dispatch('setEndLoadingAction');
+            };
+        });
+    },
+    setOrderProductionProformaDelete(vuexContext,id){
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get(`/production/proforma/delete/${id}`)
+        .then(response=>{
+            if(response.data.status){
+                vuexContext.dispatch('setEndLoadingAction');
+                this.$toast.success('Proforma Silindi.');
+                vuexContext.commit('setOrderProductionProformaDelete',id);
+            }else{
+                this.$toast.error('Proforma Silme Başarısız.');
+                vuexContext.dispatch('setEndLoadingAction');
+            };
+        });
+    },
     setOrderProductionList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/production/list')
@@ -399,8 +428,6 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                         vuexContext.dispatch('setOrderShippedList');
                     }
                     
-                } else {
-                    this.$toast.error('Mail Gönderilemedi.');
                 }
             });
     },
@@ -430,6 +457,10 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
 
 };
 const mutations = {
+    setOrderProductionProformaDelete(state,id){
+        const index = state.orderProductionDocumentList.findIndex(x=>x.ID == id);
+        state.orderProductionDocumentList.splice(index,1);
+    },
     setOrderList(state, payload) {
         state.orderList = payload;
     },

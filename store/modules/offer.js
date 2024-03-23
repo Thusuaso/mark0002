@@ -220,7 +220,8 @@ const actions = {
                 }
             })
         });
-    }
+    },
+
 };
 const mutations = {
     setOfferAListTotal(state,payload){

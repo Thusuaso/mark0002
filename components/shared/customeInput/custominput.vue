@@ -31,8 +31,10 @@ export default {
       if (event) {
         if (event[0] == 0) {
           event = event.substr(1);
+          this.$emit("onInput", 0);
+        } else {
+          this.$emit("onInput", parseFloat(event.replace(",", ".")));
         }
-        this.$emit("onInput", parseFloat(event.replace(",", ".")));
       } else {
         this.$emit("onInput", 0);
       }
