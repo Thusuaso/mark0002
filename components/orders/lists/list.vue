@@ -345,6 +345,18 @@
             class="p-column-filter"
           />
         </template>
+        <template #body="slotProps">
+          <div
+            :style="{
+              backgroundColor:
+                slotProps.data.AlisFiyati == null || slotProps.data.AlisFiyati == 0
+                  ? '#81fca0'
+                  : '',
+            }"
+          >
+            {{ slotProps.data.UrunAdi }}
+          </div>
+        </template>
       </Column>
       <Column field="UrunUretimAciklama" header="Details"> </Column>
       <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
