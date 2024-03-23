@@ -583,8 +583,7 @@ export default {
     mekmarAyoFilter(event) {
       this.$store.dispatch("setReportsMekmarAyoListTotal", event.filteredValue);
     },
-    mekmarAyoSelected(event) {
-    },
+    mekmarAyoSelected(event) {},
   },
 };
 </script>

@@ -72,6 +72,7 @@
         @workerman_selected_emit="workermanSelected($event)"
         @close_production_form_emit="closeProductionForm"
         @proforma_delete_emit="proformaDelete($event)"
+        @isf_delete_emit="isfDelete($event)"
       />
     </Dialog>
 
@@ -144,6 +145,9 @@ export default {
     this.$store.dispatch("setOrderShippedList");
   },
   methods: {
+    isfDelete(event) {
+      this.$store.dispatch("setOrderProductionIsfDelete", event);
+    },
     proformaDelete(id) {
       this.$store.dispatch("setOrderProductionProformaDelete", id);
     },
@@ -262,6 +266,8 @@ export default {
       this.$store.dispatch("setOrderProductionModel");
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch("setOrderProductionDetailListReset");
+      this.$store.commit("setOrderSupplierProductList", []);
+
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
     },
@@ -277,6 +283,7 @@ export default {
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
+      this.$store.commit("setOrderSupplierProductList", []);
 
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);

@@ -39,7 +39,7 @@
           />
         </JsonExcel> -->
 
-        <vue-excel-xlsx
+        <!-- <vue-excel-xlsx
           :data="getReportsMekmarAyoList"
           :columns="reportsMekmarAyoListExcelField2"
           :file-name="'Ayo'"
@@ -53,7 +53,14 @@
             icon="pi pi-file-excel"
             label="Excel"
           />
-        </vue-excel-xlsx>
+        </vue-excel-xlsx> -->
+        <Button
+          type="button"
+          class="p-button-info w-100"
+          icon="pi pi-file-excel"
+          label="Excel"
+          @click="excel_output"
+        />
       </div>
       <div class="col">
         <span>
@@ -99,6 +106,7 @@ export default {
       "getReportsMekmarAyoMonthList",
       "getReportsMekmarAyoListTotal",
       "getLoading",
+      "getLocalUrl",
     ]),
   },
   data() {
@@ -142,39 +150,47 @@ export default {
         "Profit Tl": "ProfitTl",
       },
       reportsMekmarAyoListExcelField2: [
-        { label: "Temsilci", field: "SiparisSahibi" },
-        { label: "Operasyon", field: "Operasyon" },
-        { label: "Firma Adi", field: "FirmaAdi" },
-        { label: "Siparis No", field: "SiparisNo" },
-        { label: "Fatura Adi", field: "FaturaAdi" },
-        { label: "Siparis Tarihi", field: "SiparisTarihi" },
-        { label: "Yukleme Tarihi", field: "YuklemeTarihi" },
-        { label: "Ulke Adi", field: "UlkeAdi" },
-        { label: "Teslim Tur", field: "TeslimTur" },
-        { label: "Proforma", field: "Proforma", dataFormat: this.formatDecimal },
-        { label: "Mekmer Satis", field: "MekmerSatis", dataFormat: this.formatDecimal },
-        { label: "Mekmoz Satis", field: "MekmozSatis", dataFormat: this.formatDecimal },
-        { label: "Dis Satis", field: "DisSatis", dataFormat: this.formatDecimal },
-        { label: "Nakliye", field: "Nakliye", dataFormat: this.formatDecimal },
-        { label: "Gumruk", field: "Gumruk", dataFormat: this.formatDecimal },
-        { label: "Ilaclama", field: "Ilaclama", dataFormat: this.formatDecimal },
-        { label: "Liman", field: "Liman", dataFormat: this.formatDecimal },
-        { label: "Sigorta Alış", field: "SigortaAlis", dataFormat: this.formatDecimal },
-        { label: "Sigorta Satış", field: "SigortaSatis", dataFormat: this.formatDecimal },
-        { label: "Navlun Alış", field: "NavlunAlis", dataFormat: this.formatDecimal },
-        { label: "Lashing", field: "Lashing", dataFormat: this.formatDecimal },
-        { label: "Booking", field: "Booking", dataFormat: this.formatDecimal },
-        { label: "Spanzlet", field: "Spanzlet", dataFormat: this.formatDecimal },
-        { label: "Detay Alış 1", field: "DetayAlis1", dataFormat: this.formatDecimal },
-        { label: "Detay Alış 2", field: "DetayAlis2", dataFormat: this.formatDecimal },
-        { label: "Detay Alış 3", field: "DetayAlis3", dataFormat: this.formatDecimal },
-        { label: "Mekus", field: "Mekus", dataFormat: this.formatDecimal },
-        { label: "Özel İşçilik", field: "OzelIscilik", dataFormat: this.formatDecimal },
-        { label: "Banka Masraf", field: "BankaMasraf", dataFormat: this.formatDecimal },
-        { label: "Kurye", field: "Kurye", dataFormat: this.formatDecimal },
-        { label: "Masraf Toplam", field: "MasrafToplam", dataFormat: this.formatDecimal },
-        { label: "Profit Usd", field: "ProfitUsd", dataFormat: this.formatDecimal },
-        { label: "Profit Tl", field: "ProfitTl", dataFormat: this.formatDecimal },
+        { label: "Temsilci", field: "siparisci" },
+        { label: "Operasyon", field: "operasyon" },
+        { label: "Firma Adi", field: "musteri_adi" },
+        { label: "Siparis No", field: "siparis_no" },
+        { label: "Fatura Adi", field: "faturatur" },
+        { label: "Siparis Tarihi", field: "siparis_tarihi" },
+        { label: "Yukleme Tarihi", field: "yukleme_tarihi" },
+        { label: "Ulke Adi", field: "ulke_adi" },
+        { label: "Teslim Tur", field: "teslim_sekli" },
+        { label: "Proforma", field: "toplam_bedel", dataFormat: this.formatDecimal },
+        { label: "Mekmer Satis", field: "mekmar_alim", dataFormat: this.formatDecimal },
+        { label: "Mekmoz Satis", field: "mekmoz_alim", dataFormat: this.formatDecimal },
+        { label: "Dis Satis", field: "dis_alim", dataFormat: this.formatDecimal },
+        { label: "Nakliye", field: "nakliye", dataFormat: this.formatDecimal },
+        { label: "Gumruk", field: "gumruk", dataFormat: this.formatDecimal },
+        { label: "Ilaclama", field: "ilaclama", dataFormat: this.formatDecimal },
+        { label: "Liman", field: "liman", dataFormat: this.formatDecimal },
+        { label: "Sigorta Alış", field: "sigorta", dataFormat: this.formatDecimal },
+        {
+          label: "Sigorta Satış",
+          field: "sigorta_tutar_satis",
+          dataFormat: this.formatDecimal,
+        },
+        { label: "Navlun Alış", field: "navlun", dataFormat: this.formatDecimal },
+        { label: "Lashing", field: "lashing", dataFormat: this.formatDecimal },
+        { label: "Booking", field: "booking", dataFormat: this.formatDecimal },
+        { label: "Spanzlet", field: "spazlet", dataFormat: this.formatDecimal },
+        { label: "Detay Alış 1", field: "detay_1", dataFormat: this.formatDecimal },
+        { label: "Detay Alış 2", field: "detay_2", dataFormat: this.formatDecimal },
+        { label: "Detay Alış 3", field: "detay_3", dataFormat: this.formatDecimal },
+        { label: "Mekus", field: "mekus_masraf", dataFormat: this.formatDecimal },
+        { label: "Özel İşçilik", field: "ozel_iscilik", dataFormat: this.formatDecimal },
+        { label: "Banka Masraf", field: "banka_masrafi", dataFormat: this.formatDecimal },
+        { label: "Kurye", field: "kurye_masrafi", dataFormat: this.formatDecimal },
+        {
+          label: "Masraf Toplam",
+          field: "masraf_toplam",
+          dataFormat: this.formatDecimal,
+        },
+        { label: "Profit Usd", field: "kar_zarar", dataFormat: this.formatDecimal },
+        { label: "Profit Tl", field: "kar_zarar_tl", dataFormat: this.formatDecimal },
       ],
 
       json_meta: [
@@ -204,6 +220,20 @@ export default {
       });
   },
   methods: {
+    excel_output() {
+      api
+        .post("/maliyet/dosyalar/maliyetRaporExcelListe", this.getReportsMekmarAyoList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "maliyet/dosyalar/maliyetRaporExcelListe";
+
+            link.setAttribute("download", "ayo_maliyet_listesi.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
+    },
     allAyoList(event) {
       if (this.checked) {
         this.date_disabled = true;

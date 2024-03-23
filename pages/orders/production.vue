@@ -398,6 +398,8 @@ export default {
       this.$store.dispatch("setOrderProductionDetailListReset");
       this.$store.dispatch("setOrderProductionPo", null);
       this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", true);
+      this.$store.commit("setOrderSupplierProductList", []);
+
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
     },
@@ -415,6 +417,7 @@ export default {
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
       this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", false);
+      this.$store.commit("setOrderSupplierProductList", []);
 
       this.$store.dispatch("setOrderProductionId", event.SiparisId);
       this.productionModel = event;
