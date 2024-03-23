@@ -595,6 +595,10 @@ export default {
         this.model.Vade = "";
       }
       this.model.Iade = this.__nullControl(this.model.Iade);
+      this.model.depo_yukleme;
+      if (this.model.depo_yukleme == null || this.model.depo_yukleme == undefined) {
+        this.model.depo_yukleme = 0;
+      }
     },
     paymentChange(event) {
       this.model.OdemeTurID = event.value.ID;

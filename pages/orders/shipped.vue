@@ -146,14 +146,18 @@ export default {
   },
   methods: {
     __stringCharacterChange(event) {
-      const data = event.split("'");
-      let value = "";
+      if (event != null || event != undefined) {
+        const data = event.split("'");
+        let value = "";
 
-      data.forEach((x) => {
-        value += x + "''";
-      });
-      const value2 = value.substring(0, value.length - 2);
-      return value2;
+        data.forEach((x) => {
+          value += x + "''";
+        });
+        const value2 = value.substring(0, value.length - 2);
+        return value2;
+      } else {
+        return "";
+      }
     },
     isfDelete(event) {
       this.$store.dispatch("setOrderProductionIsfDelete", event);
