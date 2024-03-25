@@ -1,5 +1,9 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="font-size: 85%">
+  <nav
+    class="navbar navbar-expand-lg bg-body-tertiary"
+    style="font-size: 85%"
+    data-bs-theme="blue"
+  >
     <div class="container-fluid">
       <a class="navbar-brand" href="#">GOZ</a>
       <button

@@ -16,7 +16,7 @@ export default {
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      {rel:'primevue/resources/themes/vela-orange/theme.css'}
     ],
     script:[
       {src:'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'}
@@ -29,7 +29,6 @@ export default {
       '~/assets/css/bootstrap.css',
       '~/assets/css/bootstrap.min.css',
       '~/assets/css/bootstrap.min.css',
-      'primevue/resources/themes/bootstrap4-light-purple/theme.css'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -52,7 +51,15 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // Doc: https://www.primefaces.org/primevue/showcase-v2/#/setup
-    'primevue/nuxt',
+    [
+      'primevue/nuxt',
+    {
+      theme: 'saga-orange',
+      ripple: true,
+
+  },
+    ],
+    
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/toast',

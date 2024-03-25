@@ -17,7 +17,7 @@ import nuxt_plugin_plugin_08d9df22 from 'nuxt_plugin_plugin_08d9df22' // Source:
 import nuxt_plugin_nuxtsocketio_4208c890 from 'nuxt_plugin_nuxtsocketio_4208c890' // Source: .\\nuxt-socket-io.js (mode: 'all')
 import nuxt_plugin_toast_0d96807e from 'nuxt_plugin_toast_0d96807e' // Source: .\\toast.js (mode: 'client')
 import nuxt_plugin_axios_2d047312 from 'nuxt_plugin_axios_2d047312' // Source: .\\axios.js (mode: 'all')
-import nuxt_plugin_configplugina81ff15a_bdcc6a98 from 'nuxt_plugin_configplugina81ff15a_bdcc6a98' // Source: .\\config.plugin.a81ff15a.js (mode: 'all')
+import nuxt_plugin_configpluginripple65532b5e_d2346d8a from 'nuxt_plugin_configpluginripple65532b5e_d2346d8a' // Source: .\\config.plugin-ripple.65532b5e.js (mode: 'all')
 import nuxt_plugin_components_50cb0b6b from 'nuxt_plugin_components_50cb0b6b' // Source: ..\\plugins\\components.js (mode: 'all')
 import nuxt_plugin_excel_698a9d56 from 'nuxt_plugin_excel_698a9d56' // Source: ..\\plugins\\excel.js (mode: 'client')
 import nuxt_plugin_socketio_2006d74c from 'nuxt_plugin_socketio_2006d74c' // Source: ..\\plugins\\socket.io.js (mode: 'all')
@@ -90,7 +90,7 @@ async function createApp(ssrContext, config = {}) {
   // here we inject the router and store to all child components,
   // making them available everywhere as `this.$router` and `this.$store`.
   const app = {
-    head: {"title":"mark0002","htmlAttrs":{"lang":"en"},"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"hid":"description","name":"description","content":""},{"name":"format-detection","content":"telephone=no"}],"link":[{"rel":"icon","type":"image\u002Fx-icon","href":"\u002Ffavicon.ico"}],"script":[{"src":"https:\u002F\u002Fcdn.jsdelivr.net\u002Fnpm\u002Fbootstrap@5.3.2\u002Fdist\u002Fjs\u002Fbootstrap.bundle.min.js"}],"style":[]},
+    head: {"title":"mark0002","htmlAttrs":{"lang":"en"},"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"hid":"description","name":"description","content":""},{"name":"format-detection","content":"telephone=no"}],"link":[{"rel":"primevue\u002Fresources\u002Fthemes\u002Fvela-orange\u002Ftheme.css"}],"script":[{"src":"https:\u002F\u002Fcdn.jsdelivr.net\u002Fnpm\u002Fbootstrap@5.3.2\u002Fdist\u002Fjs\u002Fbootstrap.bundle.min.js"}],"style":[]},
 
     store,
     router,
@@ -236,8 +236,8 @@ async function createApp(ssrContext, config = {}) {
     await nuxt_plugin_axios_2d047312(app.context, inject)
   }
 
-  if (typeof nuxt_plugin_configplugina81ff15a_bdcc6a98 === 'function') {
-    await nuxt_plugin_configplugina81ff15a_bdcc6a98(app.context, inject)
+  if (typeof nuxt_plugin_configpluginripple65532b5e_d2346d8a === 'function') {
+    await nuxt_plugin_configpluginripple65532b5e_d2346d8a(app.context, inject)
   }
 
   if (typeof nuxt_plugin_components_50cb0b6b === 'function') {

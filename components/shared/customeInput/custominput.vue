@@ -2,16 +2,42 @@
   <span class="p-float-label w-100">
     <InputText
       id="freight"
-      v-model="value"
+      v-model="newValueData"
       @input="changeInput($event)"
       :disabled="disabled"
       class="w-100"
+      @blur="isInputActive = false"
+      @focus="isInputActive = true"
     />
     <label for="freight">{{ text }}</label>
   </span>
 </template>
 <script>
 export default {
+  data() {
+    return {
+      isInputActive: false,
+    };
+  },
+  computed: {
+    newValueData: {
+      get() {
+        if (this.isInputActive) {
+          return this.value.toString();
+        } else {
+          return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\,\d+)?$)/g, ".");
+        }
+      },
+      set(modifiedValue) {
+        let newValue = parseFloat(modifiedValue /*.replace(/[^\d\.]/g, "")*/);
+        if (isNaN(newValue)) {
+          newValue = 0;
+        }
+
+        this.$emit("onInput", newValue);
+      },
+    },
+  },
   props: {
     value: {
       type: Number,
@@ -28,32 +54,31 @@ export default {
   },
   methods: {
     changeInput(event) {
-      if (event) {
-        if (event[0] == 0) {
-          event = event.substr(1);
-          this.$emit("onInput", 0);
-        } else {
-          this.$emit("onInput", parseFloat(event.replace(",", ".")));
-        }
-      } else {
-        this.$emit("onInput", 0);
-      }
+      // if (event) {
+      //   if (event[0] == 0) {
+      //     event = event.substr(1);
+      //     this.$emit("onInput", 0);
+      //   } else {
+      //     this.$emit("onInput", parseFloat(event.replace(",", ".")));
+      //   }
+      // } else {
+      //   this.$emit("onInput", 0);
+      // }
     },
   },
   watch: {
-    value() {
-      if (
-        this.value == " " ||
-        this.value == "" ||
-        this.value == undefined ||
-        this.value == null ||
-        this.value == 0 ||
-        this.value == "NaN" ||
-        this.value == NaN
-      ) {
-        this.value = 0;
-      }
-    },
+    // value() {
+    //   if (
+    //     this.value == " " ||
+    //     this.value == "" ||
+    //     this.value == undefined ||
+    //     this.value == null ||
+    //     this.value == "NaN" ||
+    //     this.value == NaN
+    //   ) {
+    //     this.value = 0;
+    //   }
+    // },
   },
 };
 </script>

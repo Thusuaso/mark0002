@@ -220,6 +220,7 @@
       @row-click="orderProductsSelected($event)"
       :sortField="'SiraNo'"
       :sortOrder="1"
+      :rowClass="rowClass"
     >
       <Column field="SiraNo" header="#"></Column>
       <Column field="FirmaAdi" header="Supplier"></Column>
@@ -349,6 +350,15 @@ export default {
     };
   },
   methods: {
+    rowClass(event) {
+      if (
+        event.AlisFiyati == 0 ||
+        event.AlisFiyati == null ||
+        event.AlisFiyati == undefined
+      ) {
+        return "row-accessories";
+      }
+    },
     __nullControl(value) {
       if (value == null || value == "" || value == undefined) {
         return 0;
@@ -575,3 +585,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+:deep(.row-accessories) {
+  background-color: #81fca0 !important;
+}
+</style>

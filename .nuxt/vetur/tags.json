@@ -11,9 +11,6 @@
   "CardsList": {
     "description": "Auto imported from components/cards/list.vue"
   },
-  "Home": {
-    "description": "Auto imported from components/home/home.vue"
-  },
   "OffersDetail": {
     "description": "Auto imported from components/offers/detail.vue"
   },
@@ -28,6 +25,9 @@
   },
   "OffersSample": {
     "description": "Auto imported from components/offers/sample.vue"
+  },
+  "Home": {
+    "description": "Auto imported from components/home/home.vue"
   },
   "PanelForm": {
     "description": "Auto imported from components/panel/form.vue"
@@ -233,6 +233,18 @@
   "SalesTodoTodos": {
     "description": "Auto imported from components/sales/todo/todos.vue"
   },
+  "SampleFinanceForm": {
+    "description": "Auto imported from components/sample/finance/form.vue"
+  },
+  "SampleFinanceList": {
+    "description": "Auto imported from components/sample/finance/list.vue"
+  },
+  "SampleListForm": {
+    "description": "Auto imported from components/sample/list/form.vue"
+  },
+  "SampleList": {
+    "description": "Auto imported from components/sample/list/list.vue"
+  },
   "SelectionCratesizeForm": {
     "description": "Auto imported from components/selection/cratesize/form.vue"
   },
@@ -247,18 +259,6 @@
   },
   "Selection": {
     "description": "Auto imported from components/selection/input/selection.vue"
-  },
-  "SampleFinanceForm": {
-    "description": "Auto imported from components/sample/finance/form.vue"
-  },
-  "SampleFinanceList": {
-    "description": "Auto imported from components/sample/finance/list.vue"
-  },
-  "SampleListForm": {
-    "description": "Auto imported from components/sample/list/form.vue"
-  },
-  "SampleList": {
-    "description": "Auto imported from components/sample/list/list.vue"
   },
   "SharedCustomeInputCustominput": {
     "description": "Auto imported from components/shared/customeInput/custominput.vue"

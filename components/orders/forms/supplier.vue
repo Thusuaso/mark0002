@@ -163,22 +163,29 @@ export default {
   methods: {
     isfUpload(event) {
       const file = event.files[0];
-      const po = this.modelProduction.SiparisNo;
+      const doc =
+        this.selectedSupplier.FirmaAdi + "-" + this.modelProduction.SiparisNo + ".pdf";
       const id = 3;
-      upload.sendIsf(file, id, po).then((response) => {
-        const value = {
-          doc: this.selectedSupplier.FirmaAdi + "-" + po + ".pdf",
-          po: po,
-          username: Cookies.get("username"),
-          userId: Cookies.get("userId"),
-          date: date.dateToString(new Date()),
-          supplier: this.selectedSupplier.TedarikciID,
-          deliveryDate: date.dateToString(this.supplier_date),
-          m4: this.m4,
-          m5: this.m5,
-          productionDate: date.dateToString(this.modelProduction.SiparisTarihi),
-        };
-        this.$store.dispatch("setProductionProductSupplierIsfSave", value);
+      upload.sendIsf(file, id, doc).then((response) => {
+        if (response) {
+          const value = {
+            doc:
+              this.selectedSupplier.FirmaAdi +
+              "-" +
+              this.modelProduction.SiparisNo +
+              ".pdf",
+            po: this.modelProduction.SiparisNo,
+            username: Cookies.get("username"),
+            userId: Cookies.get("userId"),
+            date: date.dateToString(new Date()),
+            supplier: this.selectedSupplier.TedarikciID,
+            deliveryDate: date.dateToString(this.supplier_date),
+            m4: this.m4,
+            m5: this.m5,
+            productionDate: date.dateToString(this.modelProduction.SiparisTarihi),
+          };
+          this.$store.dispatch("setProductionProductSupplierIsfSave", value);
+        }
       });
     },
     formatDecimal(value) {

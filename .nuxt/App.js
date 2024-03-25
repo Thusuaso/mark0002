@@ -14,9 +14,7 @@ import '..\\assets\\css\\bootstrap.min.css'
 
 import '..\\assets\\css\\bootstrap.min.css'
 
-import '..\\node_modules\\primevue\\resources\\themes\\bootstrap4-light-purple\\theme.css'
-
-import '..\\node_modules\\primevue\\resources\\themes\\saga-blue\\theme.css'
+import '..\\node_modules\\primevue\\resources\\themes\\saga-orange\\theme.css'
 
 import '..\\node_modules\\primevue\\resources\\primevue.min.css'
 
