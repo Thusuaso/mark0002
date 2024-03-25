@@ -417,7 +417,7 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.Komisyon = parseFloat(event.replace(",", "."));
+        this.model.Komisyon = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
       } else {
         this.model.Komisyon = 0;
@@ -429,7 +429,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.sigorta_Tutar = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.sigorta_Tutar = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
       } else {
         this.model.sigorta_Tutar = 0;
@@ -441,7 +444,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.DetayAlis_3 = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.DetayAlis_3 = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
       } else {
         this.model.DetayAlis_3 = 0;
@@ -453,7 +459,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.DetayAlis_2 = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.DetayAlis_2 = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
       } else {
         this.model.DetayAlis_2 = 0;
@@ -465,7 +474,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.DetayAlis_1 = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.DetayAlis_1 = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
       } else {
         this.model.DetayAlis_1 = 0;
@@ -477,7 +489,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.NavlunAlis = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.NavlunAlis = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
       } else {
         this.model.NavlunAlis = 0;
@@ -489,7 +504,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.DetayTutar_4 = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.DetayTutar_4 = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
       } else {
         this.model.DetayTutar_4 = 0;
@@ -501,7 +519,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.DetayTutar_1 = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.DetayTutar_1 = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionDetailTotal", this.model);
       } else {
         this.model.DetayTutar_1 = 0;
@@ -513,7 +534,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.DetayTutar_2 = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.DetayTutar_2 = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionDetailTotal", this.model);
       } else {
         this.model.DetayTutar_2 = 0;
@@ -525,7 +549,10 @@ export default {
         if (event[0] == 0) {
           event = event.substr(1);
         }
-        this.model.DetayTutar_3 = parseFloat(event.replace(",", "."));
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.DetayTutar_3 = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionDetailTotal", this.model);
       } else {
         this.model.DetayTutar_3 = 0;
@@ -536,6 +563,9 @@ export default {
       if (event) {
         if (event[0] == 0) {
           event = event.substr(1);
+        }
+        if (event == null || event == undefined) {
+          event = 0;
         }
         this.model.NavlunSatis = event.replace(",", ".");
         this.$store.dispatch(

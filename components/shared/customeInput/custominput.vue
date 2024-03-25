@@ -23,17 +23,16 @@ export default {
     newValueData: {
       get() {
         if (this.isInputActive) {
-          return this.value.toString();
+          return this.value.toString().replace(",", ".");
         } else {
-          return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\,\d+)?$)/g, ".");
+          return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
         }
       },
       set(modifiedValue) {
-        let newValue = parseFloat(modifiedValue /*.replace(/[^\d\.]/g, "")*/);
+        let newValue = parseFloat(modifiedValue.replace(",", "."));
         if (isNaN(newValue)) {
           newValue = 0;
         }
-
         this.$emit("onInput", newValue);
       },
     },

@@ -698,7 +698,7 @@ const mutations = {
         state.orderProductionFreightTotal = payload;
     },
     setOrderProductionDetailTotal(state, payload) {
-        state.orderProductionDetailTotal = (payload.DetayTutar_1 + payload.DetayTutar_2 + payload.DetayTutar_3);
+        state.orderProductionDetailTotal = (parseFloat(payload.DetayTutar_1) + parseFloat(payload.DetayTutar_2) + parseFloat(payload.DetayTutar_3));
     },
     setOrderProductionProductDetailTotal(state, payload) {
         state.orderProductionProductDetailTotal = {
@@ -730,9 +730,9 @@ const mutations = {
         state.orderProductionProductDetailCostTotal.brokerage = 0;
         state.orderProductionProductDetailCostTotal.freight = 0;
         state.orderProductionProductDetailCostTotal.detail = 0;
-        state.orderProductionProductDetailCostTotal.brokerage = payload.Komisyon;
-        state.orderProductionProductDetailCostTotal.freight = payload.NavlunAlis;
-        state.orderProductionProductDetailCostTotal.detail = (payload.DetayAlis_1 + payload.DetayAlis_2 + payload.DetayAlis_3 +payload.EvrakGideri + payload.sigorta_Tutar + payload.DetayTutar_4);
+        state.orderProductionProductDetailCostTotal.brokerage = parseFloat(payload.Komisyon);
+        state.orderProductionProductDetailCostTotal.freight = parseFloat(payload.NavlunAlis);
+        state.orderProductionProductDetailCostTotal.detail = (parseFloat(payload.DetayAlis_1) + parseFloat(payload.DetayAlis_2) + parseFloat(payload.DetayAlis_3) + parseFloat(payload.EvrakGideri) + parseFloat(payload.sigorta_Tutar) + parseFloat(payload.DetayTutar_4));
     },
     setProductionProductWorkermanList(state, payload) {
         state.orderProductionProductDetailWorkermanList = payload;
