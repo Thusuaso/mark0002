@@ -678,7 +678,15 @@ export default {
     },
     filterShipmentProduct(event) {
       if (event) {
-        this.filterModel.product = event;
+        console.log(event.split(" "));
+        if (event.split(" ").length == 1) {
+          this.filterModel.product = event.charAt(0).toUpperCase() + event.slice(1);
+        } else {
+          this.filterModel.product = "";
+          event.split(" ").forEach((x) => {
+            this.filterModel.product += x.charAt(0).toUpperCase() + x.slice(1) + " ";
+          });
+        }
       } else {
         this.filterModel.product = "";
       }
