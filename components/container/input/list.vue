@@ -8,7 +8,14 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="EvrakYuklemeTarihi" header="Upload Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="EvrakYuklemeTarihi"
+        header="Upload Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.EvrakYuklemeTarihi | dateToString }}
         </template>
@@ -21,7 +28,14 @@
           />
         </template>
       </Column>
-      <Column field="firma" header="Company" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="firma"
+        header="Company"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -31,7 +45,14 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -41,7 +62,14 @@
           />
         </template>
       </Column>
-      <Column field="FaturaNo" header="Invoice No" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="FaturaNo"
+        header="Invoice No"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -51,7 +79,14 @@
           />
         </template>
       </Column>
-      <Column field="Tur" header="Kind" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Tur"
+        header="Kind"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -61,23 +96,33 @@
           />
         </template>
       </Column>
-      <Column field="Kur" header="Currency">
+      <Column
+        field="Kur"
+        header="Currency"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Kur | formatPriceTl }}
         </template>
       </Column>
-      <Column field="Tutar" header="$">
+      <Column field="Tutar" header="$" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Tutar" header="₺">
+      <Column field="Tutar" header="₺" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ (slotProps.data.Tutar * slotProps.data.Kur) | formatPriceTl }}
         </template>
       </Column>
-      <Column field="Aciklama" header="Description"></Column>
-      <Column field="Link" header="Link">
+      <Column
+        field="Aciklama"
+        header="Description"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column field="Link" header="Link" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <a :href="slotProps.data.Link">
             <i class="pi pi-download" style="font-size: 1rem"></i>

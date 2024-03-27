@@ -2,8 +2,18 @@
   <div class="row">
     <div class="col">
       <DataTable :value="list" scrollable scrollHeight="450px" :loading="loading">
-        <Column field="SiparisNo" header="Po"></Column>
-        <Column field="DetayTutar_4" header="Mekus">
+        <Column
+          field="SiparisNo"
+          header="Po"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="DetayTutar_4"
+          header="Mekus"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.DetayTutar_4 | formatPriceUsd }}
           </template>

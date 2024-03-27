@@ -37,7 +37,14 @@
       @filter="collectionFiltered($event)"
       :loading="loading"
     >
-      <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Tarih"
+        header="Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
@@ -50,7 +57,14 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="FirmaAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -60,7 +74,14 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -70,7 +91,12 @@
           />
         </template>
       </Column>
-      <Column field="Tutar" header="Paid Amount">
+      <Column
+        field="Tutar"
+        header="Paid Amount"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
@@ -79,37 +105,44 @@
         </template>
       </Column>
     </DataTable>
-    <br/>
-    <DataTable
-      :value="sample"
-      :loading="loading"
-    >
-      <Column field="Tarih" header="Date" >
+    <br />
+    <DataTable :value="sample" :loading="loading">
+      <Column field="Tarih" header="Date" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
       </Column>
-      <Column field="MusteriAdi" header="Customer" >
-
-  </Column>
-      <Column field="NumuneNo" header="Sample No" >
-
+      <Column
+        field="MusteriAdi"
+        header="Customer"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
       </Column>
-      <Column field="Banka" header="Bank" >
+      <Column
+        field="NumuneNo"
+        header="Sample No"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      </Column>
+      <Column field="Banka" header="Bank" headerClass="tableHeader" bodyClass="tableBody">
+      </Column>
 
-</Column>
-
-      <Column field="Tutar" header="Paid Amount">
+      <Column
+        field="Tutar"
+        header="Paid Amount"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
         <template #footer>
-          {{sampleTotal | formatPriceUsd}}
+          {{ sampleTotal | formatPriceUsd }}
         </template>
       </Column>
     </DataTable>
-
-
   </div>
 </template>
 <script>
@@ -135,16 +168,16 @@ export default {
     },
     loading: {
       type: Boolean,
-      required:false
+      required: false,
     },
-    sample:{
-      type:Array,
-      required:false
+    sample: {
+      type: Array,
+      required: false,
     },
-    sampleTotal:{
-      type:Number,
-      required:false
-    }
+    sampleTotal: {
+      type: Number,
+      required: false,
+    },
   },
   data() {
     return {

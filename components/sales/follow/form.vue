@@ -9,20 +9,45 @@
       dataKey="ID"
       @row-click="followDetailSelected($event)"
     >
-      <Column field="Tarih" header="Date">
+      <Column field="Tarih" header="Date" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
       </Column>
-      <Column field="Baslik" header="Title"></Column>
-      <Column field="Aciklama" header="Explanation"></Column>
-      <Column field="Hatirlatma_Tarih" header="Reminder Time">
+      <Column
+        field="Baslik"
+        header="Title"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Aciklama"
+        header="Explanation"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Hatirlatma_Tarih"
+        header="Reminder Time"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Hatirlatma_Tarih | dateToString }}
         </template>
       </Column>
-      <Column field="Hatirlatma_Notu" header="Reminder"></Column>
-      <Column field="KullaniciAdi" header="Seller"></Column>
+      <Column
+        field="Hatirlatma_Notu"
+        header="Reminder"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="KullaniciAdi"
+        header="Seller"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
     </DataTable>
   </div>
 </template>

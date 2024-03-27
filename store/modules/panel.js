@@ -76,7 +76,7 @@ const actions = {
                     .then(response => {
                         if (response.data) {
                             vuexContext.commit('setPanelPublishedList', response.data);
-                vuexContext.dispatch('setEndLoadingAction');
+                            vuexContext.dispatch('setEndLoadingAction');
                         }
                 
             });
@@ -583,12 +583,16 @@ const actions = {
                 }
             });
     },
-    setPanelProductQueue(vuexContext, products) {
-        this.$axios.post('/panel/product/change/queue', products)
-            .then(response => {
-                
-            });
+
+    setPanelProductQueue(vuexContext,product){
+
+            this.$axios.put('/panel/products/queue/change',product);
+
+        
+
+
     },
+
     setPanelUsersList(vuexContext) {
         this.$axios.get('/panel/users/list')
             .then(response => {
@@ -705,6 +709,9 @@ const mutations = {
     setPanelPublishedList(state, payload) {
         state.panelPublishedList = payload.list;
         state.panelCategoryList = payload.category;
+    },
+    setPanelPublishedChangedList(state,payload){
+        state.panelPublishedList = payload;
     },
     setPanelPublishedListCategory(state, payload) {
         state.panelPublishedList = payload;

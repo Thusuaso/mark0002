@@ -16,6 +16,8 @@
           header="Customer"
           :showFilterMenu="false"
           :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -26,7 +28,12 @@
             />
           </template>
         </Column>
-        <Column field="AlisUsd" header="Buying Usd">
+        <Column
+          field="AlisUsd"
+          header="Buying Usd"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.AlisUsd | formatPriceUsd }}
           </template>
@@ -34,7 +41,12 @@
             {{ total.getUsd | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="SatisUsd" header="Selling Usd">
+        <Column
+          field="SatisUsd"
+          header="Selling Usd"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.SatisUsd | formatPriceUsd }}
           </template>
@@ -42,7 +54,12 @@
             {{ total.setUsd | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="AlisEuro" header="Buying Euro">
+        <Column
+          field="AlisEuro"
+          header="Buying Euro"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.AlisEuro | formatPriceEuro }}
           </template>
@@ -50,7 +67,12 @@
             {{ total.getEuro | formatPriceEuro }}
           </template>
         </Column>
-        <Column field="SatisEuro" header="Selling Euro">
+        <Column
+          field="SatisEuro"
+          header="Selling Euro"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.SatisEuro | formatPriceEuro }}
           </template>
@@ -58,7 +80,12 @@
             {{ total.setEuro | formatPriceEuro }}
           </template>
         </Column>
-        <Column field="AlisTl" header="Buying Tl">
+        <Column
+          field="AlisTl"
+          header="Buying Tl"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.AlisTl | formatPriceTl }}
           </template>
@@ -66,7 +93,12 @@
             {{ total.getTl | formatPriceTl }}
           </template>
         </Column>
-        <Column field="SatisTl" header="Selling Tl">
+        <Column
+          field="SatisTl"
+          header="Selling Tl"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.SatisTl | formatPriceTl }}
           </template>
@@ -78,8 +110,19 @@
     </div>
     <div class="col-3">
       <DataTable :value="bank" :loading="loading">
-        <Column field="Banka" header="Bank"> </Column>
-        <Column field="Tutar" header="Amount">
+        <Column
+          field="Banka"
+          header="Bank"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+        </Column>
+        <Column
+          field="Tutar"
+          header="Amount"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.Tutar | formatPriceUsd }}
           </template>

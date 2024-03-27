@@ -10,17 +10,26 @@
         filterDisplay="row"
 
       >
-        <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
+        <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
         </Column>
-        <Column field="SipSayisi" header="Order Amount" :showFilterMenu="false" :showClearButton="false">
+        <Column field="SipSayisi" header="Order Amount" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }" > 
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
         </Column>
-        <Column field="KontSayisi" header="Container Amount" :showFilterMenu="false" :showClearButton="false">
+        <Column field="KontSayisi" header="Container Amount" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
@@ -33,17 +42,26 @@
         filterDisplay="row"
         :loading="loading"
       >
-        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }" > 
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
         </Column>
-        <Column field="SipSayisi" header="Order Amount" :showFilterMenu="false" :showClearButton="false">
+        <Column field="SipSayisi" header="Order Amount" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }" > 
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>
         </Column>
-        <Column field="KontSayisi" header="Container Amount" :showFilterMenu="false" :showClearButton="false">
+        <Column field="KontSayisi" header="Container Amount" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"  />
         </template>

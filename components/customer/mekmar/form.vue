@@ -170,8 +170,18 @@
           selectionMode="single"
           @row-click="orderYearSelected($event)"
         >
-          <Column field="year" header="Year"></Column>
-          <Column field="total" header="Total">
+          <Column
+            field="year"
+            header="Year"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="total"
+            header="Total"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.total | formatPriceUsd }}
             </template>
@@ -349,7 +359,6 @@ export default {
       this.filteredRepresentative = results;
     },
     createdProcess() {
-
       this.selectedCountry = this.country.find((x) => x.Id == this.modelValue.UlkeId);
       this.selectedRepresentative = this.users.find(
         (x) => x.ID == this.modelValue.TemsilciId

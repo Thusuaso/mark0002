@@ -32,7 +32,7 @@
           </span>
         </div>
       </template>
-      <Column header="#" headerStyle="width:3rem">
+      <Column header="#" headerStyle="width:3rem;font-size:16px;">
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
         </template>
@@ -42,6 +42,8 @@
         header="Load Date"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.YuklemeTarihi | dateToString }}
@@ -61,6 +63,8 @@
         header="Customer"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -77,6 +81,8 @@
         header="Po"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -88,7 +94,7 @@
           />
         </template>
       </Column>
-      <Column field="PI" header="PI">
+      <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <div v-if="slotProps.data.EvrakDurum > 0">
             <a
@@ -112,6 +118,8 @@
         header="Product"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -123,8 +131,21 @@
           />
         </template>
       </Column>
-      <Column field="UrunUretimAciklama" header="Details"> </Column>
-      <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunUretimAciklama"
+        header="Details"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      </Column>
+      <Column
+        field="En"
+        header="Width"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -141,6 +162,8 @@
         header="Height"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -157,6 +180,8 @@
         header="Thickness"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -173,6 +198,8 @@
         header="Supplier"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -189,6 +216,8 @@
         header="Amount"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
@@ -203,7 +232,12 @@
           />
         </template>
       </Column>
-      <Column field="BirimAdi" header="Unit">
+      <Column
+        field="BirimAdi"
+        header="Unit"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           <div
             v-if="slotProps.data.Uretim == slotProps.data.Miktar"
@@ -228,17 +262,27 @@
           </div>
         </template>
       </Column>
-      <Column field="Ton" header="Ton">
+      <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Ton | formatDecimal }}
         </template>
       </Column>
-      <Column field="SatisFiyati" header="Price">
+      <Column
+        field="SatisFiyati"
+        header="Price"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.SatisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="SatisToplam" header="Total">
+      <Column
+        field="SatisToplam"
+        header="Total"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.SatisToplam | formatPriceUsd }}
         </template>
@@ -259,7 +303,12 @@
       :rowClass="rowClass2"
       v-else
     >
-      <Column header="#" headerStyle="width:3rem">
+      <Column
+        header="#"
+        headerStyle="width:3rem"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.index + 1 }}
         </template>
@@ -269,6 +318,8 @@
         header="Order Date"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.SiparisTarihi | dateToString }}
@@ -287,6 +338,8 @@
         header="Customer"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -302,6 +355,8 @@
         header="Po"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -312,7 +367,7 @@
           />
         </template>
       </Column>
-      <Column field="PI" header="PI">
+      <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <div v-if="slotProps.data.EvrakDurum > 0">
             <a
@@ -336,6 +391,8 @@
         header="Product"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -358,8 +415,21 @@
           </div>
         </template>
       </Column>
-      <Column field="UrunUretimAciklama" header="Details"> </Column>
-      <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunUretimAciklama"
+        header="Details"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      </Column>
+      <Column
+        field="En"
+        header="Width"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -375,6 +445,8 @@
         header="Height"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -390,6 +462,8 @@
         header="Thickness"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -405,6 +479,8 @@
         header="Supplier"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           <div :style="{ backgroundColor: slotProps.data.Isf ? '' : 'red' }">
@@ -425,6 +501,8 @@
         header="Amount"
         :showClearButton="false"
         :showFilterMenu="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
@@ -438,8 +516,19 @@
           />
         </template>
       </Column>
-      <Column field="BirimAdi" header="Unit"> </Column>
-      <Column field="Uretim" header="Produced">
+      <Column
+        field="BirimAdi"
+        header="Unit"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      </Column>
+      <Column
+        field="Uretim"
+        header="Produced"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           <div
             v-if="slotProps.data.Uretim == slotProps.data.Miktar"
@@ -465,17 +554,27 @@
           </div>
         </template>
       </Column>
-      <Column field="Ton" header="Ton">
+      <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Ton | formatDecimal }}
         </template>
       </Column>
-      <Column field="SatisFiyati" header="Price">
+      <Column
+        field="SatisFiyati"
+        header="Price"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.SatisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="SatisToplam" header="Total">
+      <Column
+        field="SatisToplam"
+        header="Total"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.SatisToplam | formatPriceUsd }}
         </template>

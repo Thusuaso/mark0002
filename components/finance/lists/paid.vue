@@ -1,14 +1,29 @@
 <template>
   <div>
     <DataTable :value="list">
-      <Column field="Tarih" header="Date">
+      <Column field="Tarih" header="Date" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po"></Column>
-      <Column field="Aciklama" header="Explanation"></Column>
-      <Column field="Tutar" header="Payment Received">
+      <Column
+        field="SiparisNo"
+        header="Po"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Aciklama"
+        header="Explanation"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Tutar"
+        header="Payment Received"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
@@ -16,12 +31,17 @@
           {{ total | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Masraf" header="Cost">
+      <Column
+        field="Masraf"
+        header="Cost"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Masraf | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Kur" header="Rate">
+      <Column field="Kur" header="Rate" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Kur | formatPriceUsd }}
         </template>

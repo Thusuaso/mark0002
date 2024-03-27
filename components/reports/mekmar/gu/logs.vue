@@ -12,6 +12,8 @@
         header="Date"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -27,6 +29,8 @@
         header="Po"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -42,6 +46,8 @@
         header="LOGs"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -57,6 +63,8 @@
         header="Rep."
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText

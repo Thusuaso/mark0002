@@ -10,7 +10,14 @@
     filterDisplay="row"
     :loading="loading"
   >
-    <Column field="MusteriAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="MusteriAdi"
+      header="Customer"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -20,7 +27,14 @@
         />
       </template>
     </Column>
-    <Column field="Company" header="Company" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="Company"
+      header="Company"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -30,10 +44,32 @@
         />
       </template>
     </Column>
-    <Column field="Mail" header="Mail"></Column>
-    <Column field="Phone" header="Phone"></Column>
-    <Column field="Adress" header="Address"></Column>
-    <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="Mail"
+      header="Mail"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    ></Column>
+    <Column
+      field="Phone"
+      header="Phone"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    ></Column>
+    <Column
+      field="Adress"
+      header="Address"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    ></Column>
+    <Column
+      field="UlkeAdi"
+      header="Country"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -43,7 +79,14 @@
         />
       </template>
     </Column>
-    <Column field="KullaniciAdi" header="Salesman" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="KullaniciAdi"
+      header="Salesman"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"

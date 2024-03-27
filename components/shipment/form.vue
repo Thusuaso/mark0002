@@ -120,10 +120,27 @@
             selectionMode="multiple"
             headerStyle="width: 2rem"
             header="All"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
           ></Column>
-          <Column field="KasaNo" header="Crate No"></Column>
-          <Column field="Miktar" header="Amount"></Column>
-          <Column field="BirimAdi" header="Unit"></Column>
+          <Column
+            field="KasaNo"
+            header="Crate No"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="Miktar"
+            header="Amount"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="BirimAdi"
+            header="Unit"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
         </DataTable>
       </div>
       <div class="col-1">
@@ -141,22 +158,47 @@
           :scrollable="true"
           scrollHeight="400px"
         >
-          <Column field="KasaNo" header="Crate No"></Column>
-          <Column field="UrunAdi" header="Product">
+          <Column
+            field="KasaNo"
+            header="Crate No"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="UrunAdi"
+            header="Product"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #footer>
               {{ getShipmentSendProductionTotal.crate }}
             </template>
           </Column>
-          <Column field="YuzeyIslemAdi" header="Surface"></Column>
-          <Column header="Size">
+          <Column
+            field="YuzeyIslemAdi"
+            header="Surface"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column header="Size" headerClass="tableHeader" bodyClass="tableBody">
             <template #body="slotProps">
               {{
                 slotProps.data.En + "x" + slotProps.data.Boy + "x" + slotProps.data.Kenar
               }}
             </template>
           </Column>
-          <Column field="BirimAdi" header="Unit"></Column>
-          <Column field="Miktar" header="Amount">
+          <Column
+            field="BirimAdi"
+            header="Unit"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="Miktar"
+            header="Amount"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.Miktar | formatDecimal }}
             </template>
@@ -164,7 +206,12 @@
               {{ getShipmentSendProductionTotal.amount | formatDecimal }}
             </template>
           </Column>
-          <Column field="TotalProduct" header="Total">
+          <Column
+            field="TotalProduct"
+            header="Total"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.TotalProduct | formatDecimal }}
             </template>

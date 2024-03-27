@@ -1024,6 +1024,13 @@ export default {
     }
   },
   methods: {
+    __noneNullControl(value) {
+      if (value == null || value == " " || value == undefined || value == "null") {
+        return "";
+      } else {
+        return value;
+      }
+    },
     changeKeywordsEn(event) {
       const data = event.replaceAll(/\s/g, "");
       this.model.keywords_en = data;
@@ -1321,6 +1328,31 @@ export default {
     createdProcess() {
       this.selectedCategory = this.category.find((x) => x.Id == this.model.kategori_id);
       this.selectedStoneType = this.category.find((x) => x.Id == this.model.stonetype);
+      this.model.urunadi_en = this.__noneNullControl(this.model.urunadi_en);
+      this.model.aciklama_en = this.__noneNullControl(this.model.aciklama_en);
+      this.model.anahtarlar_en = this.__noneNullControl(this.model.anahtarlar_en);
+      this.model.keywords_en = this.__noneNullControl(this.model.keywords_en);
+
+      this.model.birim = this.__noneNullControl(this.model.birim);
+      this.model.urunadi_fr = this.__noneNullControl(this.model.urunadi_fr);
+      this.model.aciklama_fr = this.__noneNullControl(this.model.aciklama_fr);
+      this.model.anahtarlar_fr = this.__noneNullControl(this.model.anahtarlar_fr);
+      this.model.keywords_fr = this.__noneNullControl(this.model.keywords_fr);
+
+      this.model.urunadi_es = this.__noneNullControl(this.model.urunadi_es);
+      this.model.aciklama_es = this.__noneNullControl(this.model.aciklama_es);
+      this.model.anahtarlar_es = this.__noneNullControl(this.model.anahtarlar_es);
+      this.model.keywords_es = this.__noneNullControl(this.model.keywords_es);
+
+      this.model.urunadi_ru = this.__noneNullControl(this.model.urunadi_ru);
+      this.model.aciklama_ru = this.__noneNullControl(this.model.aciklama_ru);
+      this.model.anahtarlar_ru = this.__noneNullControl(this.model.anahtarlar_ru);
+      this.model.keywords_ru = this.__noneNullControl(this.model.keywords_ru);
+
+      this.model.urunadi_ar = this.__noneNullControl(this.model.urunadi_ar);
+      this.model.aciklama_ar = this.__noneNullControl(this.model.aciklama_ar);
+      this.model.anahtarlar_ar = this.__noneNullControl(this.model.anahtarlar_ar);
+      this.model.keywords_ar = this.__noneNullControl(this.model.keywords_ar);
     },
     deleteForm() {
       this.$emit("delete_emit", this.model.urunid);

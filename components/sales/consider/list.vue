@@ -6,7 +6,12 @@
       selectionMode="single"
       @row-click="$emit('points_of_consider_selected_emit', $event)"
     >
-      <Column field="Hata" header="Points of Consider"></Column>
+      <Column
+        field="Hata"
+        header="Points of Consider"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
     </DataTable>
   </div>
 </template>

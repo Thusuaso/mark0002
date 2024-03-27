@@ -13,8 +13,20 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="ID" header="Id"></Column>
-      <Column field="FirmaAdi" header="Company" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="ID"
+        header="Id"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="FirmaAdi"
+        header="Company"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -24,8 +36,20 @@
           />
         </template>
       </Column>
-      <Column field="Adres" header="Address"></Column>
-      <Column field="Marketing" header="Marketing" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Adres"
+        header="Address"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Marketing"
+        header="Marketing"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -35,7 +59,14 @@
           />
         </template>
       </Column>
-      <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UlkeAdi"
+        header="Country"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -45,7 +76,12 @@
           />
         </template>
       </Column>
-      <Column field="Png_Flags" header="Logo">
+      <Column
+        field="Png_Flags"
+        header="Logo"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           <img
             :src="'https://cdn.mekmarimage.com/countryLogo/' + slotProps.data.Png_Flags"
@@ -54,7 +90,14 @@
           />
         </template>
       </Column>
-      <Column field="Temsilci" header="Representative" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Temsilci"
+        header="Representative"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -64,7 +107,14 @@
           />
         </template>
       </Column>
-      <Column field="SatisciAdi" header="Orderer" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SatisciAdi"
+        header="Orderer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -74,13 +124,23 @@
           />
         </template>
       </Column>
-      <Column field="Devir" header="Transfer">
+      <Column
+        field="Devir"
+        header="Transfer"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           <div v-if="slotProps.data.Devir">✓</div>
           <div v-else>X</div>
         </template>
       </Column>
-      <Column field="Ozel" header="Special">
+      <Column
+        field="Ozel"
+        header="Special"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           <div v-if="slotProps.data.Ozel">✓</div>
           <div v-else>X</div>

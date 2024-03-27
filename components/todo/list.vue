@@ -9,14 +9,29 @@
       :sortOrder="-1"
       :rowClass="rowClass"
     >
-      <Column field="Yapilacak" header="Assignment"></Column>
-      <Column field="GirisTarihi" header="Date">
+      <Column
+        field="Yapilacak"
+        header="Assignment"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="GirisTarihi"
+        header="Date"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.GirisTarihi | dateToString }}
         </template>
       </Column>
-      <Column field="YapilacakOncelik" header="Priority"></Column>
-      <Column>
+      <Column
+        field="YapilacakOncelik"
+        header="Priority"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <Button
             type="button"

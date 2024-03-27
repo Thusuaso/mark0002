@@ -21,6 +21,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.musteri }}
@@ -39,6 +41,8 @@
           header="Logo"
           headerStyle="width:30px;"
           bodyStyle="text-align:center"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             <img
@@ -54,6 +58,8 @@
           headerStyle="width:65px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.Toplam | formatPriceUsd }}
@@ -71,6 +77,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.ulkeAdi }}
@@ -96,6 +104,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.temsilci }}
@@ -115,6 +125,8 @@
           :header="new Date().getFullYear() + '        Production-Shipped       '"
           headerStyle="width:100px;white-space:pre-wrap;"
           bodyStyle="text-align:center"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             <div style="column-count: 2; column-rule: 1px solid black">
@@ -134,6 +146,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.GecenYil | formatPriceUsd }}
@@ -145,6 +159,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OncekiYil | formatPriceUsd }}
@@ -157,6 +173,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnDokuzYili | formatPriceUsd }}
@@ -169,6 +187,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnSekizYili | formatPriceUsd }}
@@ -180,6 +200,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnYediYili | formatPriceUsd }}
@@ -191,6 +213,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnAltiYili | formatPriceUsd }}
@@ -202,6 +226,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnBesYili | formatPriceUsd }}
@@ -213,6 +239,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnDortYili | formatPriceUsd }}
@@ -224,6 +252,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnUcYili | formatPriceUsd }}
@@ -235,6 +265,8 @@
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.OnUcYiliOncesi | formatPriceUsd }}

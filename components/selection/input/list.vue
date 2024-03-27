@@ -28,6 +28,9 @@
           header="Crate No"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -44,6 +47,9 @@
           header="Date"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.Tarih | dateToString }}
@@ -63,6 +69,9 @@
           header="Category"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -79,6 +88,9 @@
           header="Quarry"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -95,6 +107,9 @@
           header="Product"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #footer>
             {{ total.kasaadedi }}
@@ -114,6 +129,9 @@
           header="Surface"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -130,6 +148,9 @@
           header="Width"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -146,6 +167,9 @@
           header="Height"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -162,6 +186,9 @@
           header="Thickness"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -178,6 +205,9 @@
           header="Pcs in Box"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #footer>
             {{ total.kutuiciadet | formatDecimal }}
@@ -197,6 +227,9 @@
           header="Box Amount"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #footer>
             {{ total.kutu | formatDecimal }}
@@ -216,6 +249,9 @@
           header="Amount"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
@@ -233,13 +269,25 @@
             />
           </template>
         </Column>
-        <Column field="Kutu" header="Box">
+        <Column
+          field="Kutu"
+          header="Box"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div v-if="slotProps.data.Kutu == true">✓</div>
             <div v-else>x</div>
           </template>
         </Column>
-        <Column field="Bagli" header="Binded">
+        <Column
+          field="Bagli"
+          header="Binded"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div v-if="slotProps.data.Bagli == true">✓</div>
             <div v-else>x</div>
@@ -250,6 +298,9 @@
           header="Po"
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -266,6 +317,9 @@
           header="Expl."
           :showFilterMenu="false"
           :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText

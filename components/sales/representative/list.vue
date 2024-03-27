@@ -10,7 +10,13 @@
         :filters.sync="representativeFilter"
         filterDisplay="row"
       >
-        <Column field="SiparisNo" header="Po" :showFilterMenu="false">
+        <Column
+          field="SiparisNo"
+          header="Po"
+          :showFilterMenu="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -20,7 +26,13 @@
             />
           </template>
         </Column>
-        <Column field="SiparisSahibi" header="Seller" :showFilterMenu="false">
+        <Column
+          field="SiparisSahibi"
+          header="Seller"
+          :showFilterMenu="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -30,7 +42,13 @@
             />
           </template>
         </Column>
-        <Column field="Operasyon" header="Operation" :showFilterMenu="false">
+        <Column
+          field="Operasyon"
+          header="Operation"
+          :showFilterMenu="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               v-model="filterModel.value"
@@ -51,8 +69,18 @@
             Sales Summary
           </div>
         </template>
-        <Column field="SiparisSahibi" header="Seller"></Column>
-        <Column field="Total" header="Total"></Column>
+        <Column
+          field="SiparisSahibi"
+          header="Seller"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="Total"
+          header="Total"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
       </DataTable>
       <br />
       <DataTable :value="operation" class="p-datatable-sm">
@@ -60,11 +88,21 @@
           <div
             class="flex flex-wrap align-items-center justify-content-between gap-2 text-center"
           >
-          Operation Summary
+            Operation Summary
           </div>
         </template>
-        <Column field="Operasyon" header="Seller"></Column>
-        <Column field="Total" header="Total"></Column>
+        <Column
+          field="Operasyon"
+          header="Seller"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="Total"
+          header="Total"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
       </DataTable>
     </div>
   </div>

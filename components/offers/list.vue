@@ -8,16 +8,46 @@
         @row-click="offerListSelected($event)"
         :loading="loading"
       >
-        <Column field="TeklifSahibi" header="Rep."></Column>
-        <Column field="TeklifSayisi" header="Quote Count"></Column>
-        <Column field="TeklifSayisiA" header="Quote Count A"></Column>
-        <Column field="TeklifSayisiB" header="Quote Count B"></Column>
+        <Column
+          field="TeklifSahibi"
+          header="Rep."
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="TeklifSayisi"
+          header="Quote Count"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="TeklifSayisiA"
+          header="Quote Count A"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="TeklifSayisiB"
+          header="Quote Count B"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
       </DataTable>
     </div>
     <div class="col">
       <DataTable :value="country" scrollable scrollHeight="450px" :loading="loading">
-        <Column field="Ulke" header="Country"></Column>
-        <Column field="TeklifSayisi" header="Total"></Column>
+        <Column
+          field="Ulke"
+          header="Country"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="TeklifSayisi"
+          header="Total"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
       </DataTable>
     </div>
   </div>

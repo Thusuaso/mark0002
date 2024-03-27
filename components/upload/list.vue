@@ -8,8 +8,18 @@
       selectionMode="single"
       @row-click="uploadSelected($event)"
     >
-      <Column field="ID" header="#"></Column>
-      <Column field="EvrakAdi" header="Document Id"></Column>
+      <Column
+        field="ID"
+        header="#"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="EvrakAdi"
+        header="Document Id"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
     </DataTable>
   </div>
 </template>

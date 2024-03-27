@@ -11,7 +11,14 @@
       filterDisplay="row"
       :loading="loading"
     >
-      <Column field="Customer" header="Müşteri" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Customer"
+        header="Müşteri"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -21,7 +28,14 @@
           />
         </template>
       </Column>
-      <Column field="Company" header="Şirket" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Company"
+        header="Şirket"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -31,10 +45,32 @@
           />
         </template>
       </Column>
-      <Column field="Phone" header="Telefon"></Column>
-      <Column field="Email" header="Mail"></Column>
-      <Column field="Adress" header="Adres"></Column>
-      <Column field="Ulke" header="Ülke" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Phone"
+        header="Telefon"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Email"
+        header="Mail"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Adress"
+        header="Adres"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Ulke"
+        header="Ülke"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -44,7 +80,14 @@
           />
         </template>
       </Column>
-      <Column field="KullaniciAdi" header="Satışçı" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KullaniciAdi"
+        header="Satışçı"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

@@ -17,6 +17,8 @@
         :showFilterMatchModes="false"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -27,7 +29,14 @@
           />
         </template>
       </Column>
-      <Column field="KategoriAdi" header="Category" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KategoriAdi"
+        header="Category"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -37,7 +46,14 @@
           />
         </template>
       </Column>
-      <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunAdi"
+        header="Product"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -47,7 +63,14 @@
           />
         </template>
       </Column>
-      <Column field="YuzeyIslemAdi" header="Surface" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="YuzeyIslemAdi"
+        header="Surface"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -57,7 +80,14 @@
           />
         </template>
       </Column>
-      <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="En"
+        header="Width"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -67,7 +97,14 @@
           />
         </template>
       </Column>
-      <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Boy"
+        header="Height"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -77,7 +114,14 @@
           />
         </template>
       </Column>
-      <Column field="Kenar" header="Edge" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Kenar"
+        header="Edge"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

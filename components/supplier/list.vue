@@ -11,7 +11,14 @@
       @row-click="supplierSelected($event)"
       :loading="loading"
     >
-      <Column field="ID" header="Id" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="ID"
+        header="Id"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -21,7 +28,14 @@
           />
         </template>
       </Column>
-      <Column field="FirmaAdi" header="Company" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="FirmaAdi"
+        header="Company"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -31,7 +45,12 @@
           />
         </template>
       </Column>
-      <Column field="ToplamTedarikci" header="Total Order"></Column>
+      <Column
+        field="ToplamTedarikci"
+        header="Total Order"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
     </DataTable>
   </div>
 </template>

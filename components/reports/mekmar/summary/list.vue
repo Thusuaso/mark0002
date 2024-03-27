@@ -9,12 +9,12 @@
       :loading="loading"
     >
       <template #header> {{ year }} {{ status }} Summary</template>
-      <Column field="Month" header="Ay">
+      <Column field="Month" header="Ay" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Month | monthToString }}
         </template>
       </Column>
-      <Column field="FOB" header="FOB">
+      <Column field="FOB" header="FOB" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.FOB | formatPriceUsd }}
         </template>
@@ -22,7 +22,7 @@
           {{ total.fob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="DDP" header="DDP">
+      <Column field="DDP" header="DDP" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.DDP | formatPriceUsd }}
         </template>

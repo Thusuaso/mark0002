@@ -13,6 +13,8 @@
         header="Marketing"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -24,7 +26,10 @@
         </template>
       </Column>
 
-      <Column field="toplam" header="Fob ($)">
+      <Column field="toplam" header="Fob ($)"
+      headerClass="tableHeader"
+          bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.toplam | formatPriceUsd }}
         </template>
@@ -32,7 +37,10 @@
           {{ marketingFob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="toplamCfr" header="Ddp ($)">
+      <Column field="toplamCfr" header="Ddp ($)"
+      headerClass="tableHeader"
+          bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.toplamCfr | formatPriceUsd }}
         </template>
@@ -54,6 +62,8 @@
         header="Customer"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -69,6 +79,8 @@
         header="Marketing"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -84,6 +96,8 @@
         header="Country"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+          bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -94,7 +108,10 @@
           />
         </template>
       </Column>
-      <Column field="toplam" header="Fob ($)">
+      <Column field="toplam" header="Fob ($)"
+      headerClass="tableHeader"
+          bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.toplam | formatPriceUsd }}
         </template>
@@ -102,7 +119,10 @@
           {{ customerFob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="toplamCfr" header="Ddp ($)">
+      <Column field="toplamCfr" header="Ddp ($)"
+      headerClass="tableHeader"
+          bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.toplamCfr | formatPriceUsd }}
         </template>

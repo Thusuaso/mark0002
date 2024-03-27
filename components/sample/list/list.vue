@@ -15,6 +15,8 @@
         header="Date"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.NumuneTarihi | dateToString }}
@@ -33,6 +35,8 @@
         header="Representative"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -48,6 +52,8 @@
         header="Po"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -58,14 +64,29 @@
           />
         </template>
       </Column>
-      <Column field="NumuneKategori" header="Category"></Column>
-      <Column header="Miktar/Birim">
+      <Column
+        field="NumuneKategori"
+        header="Category"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column header="Miktar/Birim" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Miktar }} / {{ slotProps.data.NumuneUrunBirim }}
         </template>
       </Column>
-      <Column field="NumuneGonderiTipi" header="Shipment Type"></Column>
-      <Column field="NumuneBanka" header="Bank"></Column>
+      <Column
+        field="NumuneGonderiTipi"
+        header="Shipment Type"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="NumuneBanka"
+        header="Bank"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
     </DataTable>
   </div>
 </template>

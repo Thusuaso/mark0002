@@ -16,6 +16,7 @@
           class="p-button-info w-100"
           label="Change Queue"
           @click="changeQueue"
+          :disabled="change_queue_button_status"
         />
       </div>
     </div>
@@ -27,6 +28,7 @@
       @row-reorder="reOrderPanelPublishedList($event)"
       :sortOrder="1"
       sortField="sira"
+      :loading="getLoading"
     >
       <Column
         :rowReorder="true"
@@ -39,7 +41,7 @@
       <Column field="urunadi_en" header="Product Name"> </Column>
       <Column field="Image" header="#">
         <template #body="slotProps">
-          <img lazyload :src="slotProps.data.Image" width="75" height="75" />
+          <img lazyload :src="slotProps.data.Image" width="100" height="100" />
         </template>
       </Column>
     </DataTable>
@@ -49,7 +51,7 @@
 import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters(["getPanelPublishedList", "getPanelCategoryList"]),
+    ...mapGetters(["getPanelPublishedList", "getPanelCategoryList", "getLoading"]),
   },
   created() {
     this.$store.dispatch("setPanelPublishedList");
@@ -57,10 +59,25 @@ export default {
   data() {
     return {
       selectedCategory: null,
+      change_queue_button_status: false,
     };
   },
   methods: {
-    changeQueue() {},
+    changeQueue() {
+      this.$store.dispatch("setBeginLoadingAction");
+      this.change_queue_button_status = true;
+      let index = 0;
+      while (index < this.getPanelPublishedList.length) {
+        this.$store.dispatch("setPanelProductQueue", this.getPanelPublishedList[index]);
+        index++;
+
+        if (index + 1 == this.getPanelPublishedList.length) {
+          this.$toast.success("Başarıyla Değiştirildi.");
+          this.$store.dispatch("setEndLoadingAction");
+          this.change_queue_button_status = false;
+        }
+      }
+    },
 
     reOrderPanelPublishedList(event) {
       let queue = 0;
@@ -68,13 +85,7 @@ export default {
         queue++;
         x.sira = queue;
       });
-      const drop = event.value[event.dropIndex];
-      const drag = event.value[event.dragIndex];
-      const data = {
-        drop: drop,
-        drag: drag,
-      };
-      this.$store.dispatch("setPanelProductQueue", data);
+      this.$store.commit("setPanelPublishedChangedList", event.value);
     },
     categorySelected(event) {
       this.$store.dispatch("setPanelPublishedListCategory", event.value.Id);

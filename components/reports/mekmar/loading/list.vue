@@ -18,6 +18,8 @@
           header="Shipment Date"
           :showFilterMenu="false"
           :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
@@ -37,6 +39,8 @@
           header="Customer"
           :showFilterMenu="false"
           :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -53,6 +57,8 @@
           header="Po"
           :showFilterMenu="false"
           :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -64,7 +70,7 @@
             />
           </template>
         </Column>
-        <Column field="Fob" header="Fob">
+        <Column field="Fob" header="Fob" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Fob | formatPriceUsd }}
           </template>
@@ -72,7 +78,7 @@
             {{ total.fob | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Dtp" header="Ddp">
+        <Column field="Dtp" header="Ddp" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Dtp | formatPriceUsd }}
           </template>
@@ -100,6 +106,8 @@
           header="Customer"
           :showFilterMenu="false"
           :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -116,6 +124,8 @@
           header="Po"
           :showFilterMenu="false"
           :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -127,7 +137,7 @@
             />
           </template>
         </Column>
-        <Column field="Fob" header="Fob">
+        <Column field="Fob" header="Fob" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Fob | formatPriceUsd }}
           </template>
@@ -135,7 +145,7 @@
             {{ yearlyTotal.fob | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Dtp" header="Ddp">
+        <Column field="Dtp" header="Ddp" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Dtp | formatPriceUsd }}
           </template>

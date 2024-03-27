@@ -12,7 +12,14 @@
       :rows="10"
       :loading="loading"
     >
-      <Column field="MusteriAdi" header="Customer" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="MusteriAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -22,7 +29,14 @@
           />
         </template>
       </Column>
-      <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SiparisNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -32,7 +46,14 @@
           />
         </template>
       </Column>
-      <Column field="YuklemeTarihi" header="Shipment Date" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="YuklemeTarihi"
+        header="Shipment Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.YuklemeTarihi | dateToString }}
         </template>
@@ -45,7 +66,14 @@
           />
         </template>
       </Column>
-      <Column field="KonteynerNo" header="Container No" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KonteynerNo"
+        header="Container No"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -55,14 +83,29 @@
           />
         </template>
       </Column>
-      <Column field="Line" header="Line"></Column>
-      <Column field="Eta" header="Est. Date">
+      <Column
+        field="Line"
+        header="Line"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Eta"
+        header="Est. Date"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Eta | dateToString }}
         </template>
       </Column>
-      <Column field="Kalan" header="Remaining Time"></Column>
-      <Column header="#">
+      <Column
+        field="Kalan"
+        header="Remaining Time"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column header="#" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <div
             v-if="
@@ -74,8 +117,20 @@
           <div v-else>Sent</div>
         </template>
       </Column>
-      <Column field="AktarmaLimanAdi" header="Port"></Column>
-      <Column field="Sorumlu" header="Responsible" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="AktarmaLimanAdi"
+        header="Port"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Sorumlu"
+        header="Responsible"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"

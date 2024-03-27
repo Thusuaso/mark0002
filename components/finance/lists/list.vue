@@ -20,6 +20,8 @@
           header="Customer"
           :showFilterMenu="false"
           :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -30,7 +32,12 @@
             />
           </template>
         </Column>
-        <Column field="total_order_amount" header="Total Order">
+        <Column
+          field="total_order_amount"
+          header="Total Order"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.total_order_amount | formatPriceUsd }}
           </template>
@@ -38,7 +45,12 @@
             {{ total.total | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="production" header="On Production">
+        <Column
+          field="production"
+          header="On Production"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.production | formatPriceUsd }}
           </template>
@@ -46,7 +58,12 @@
             {{ total.production | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="forwarding" header="Shipped">
+        <Column
+          field="forwarding"
+          header="Shipped"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.forwarding | formatPriceUsd }}
           </template>
@@ -54,7 +71,12 @@
             {{ total.forwarding | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="advanced_payment" header="Pre Payment">
+        <Column
+          field="advanced_payment"
+          header="Pre Payment"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.advanced_payment | formatPriceUsd }}
           </template>
@@ -62,7 +84,12 @@
             {{ total.advanced | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="paid" header="Paid">
+        <Column
+          field="paid"
+          header="Paid"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.paid | formatPriceUsd }}
           </template>
@@ -70,7 +97,12 @@
             {{ total.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="total" header="Balance (Including Production)">
+        <Column
+          field="total"
+          header="Balance (Including Production)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.total | formatPriceUsd }}
           </template>
@@ -78,7 +110,12 @@
             {{ total.balanceProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="balanced" header="Balance (Except Production)">
+        <Column
+          field="balanced"
+          header="Balance (Except Production)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -107,14 +144,34 @@
     </div>
     <div class="col-3">
       <DataTable :value="expiry" :loading="loading">
-        <Column field="firmaAdi" header="Customer"></Column>
-        <Column field="siparis_no" header="Po"></Column>
-        <Column field="vade_tarih" header="Maturity">
+        <Column
+          field="firmaAdi"
+          header="Customer"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="siparis_no"
+          header="Po"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="vade_tarih"
+          header="Maturity"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.vade_tarih | dateToString }}
           </template>
         </Column>
-        <Column field="tutar" header="Total">
+        <Column
+          field="tutar"
+          header="Total"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.tutar | formatPriceUsd }}
           </template>
@@ -122,29 +179,64 @@
       </DataTable>
     </div>
     <DataTable :value="maya" :loading="loading">
-      <Column field="order_date" header="Order Date">
+      <Column
+        field="order_date"
+        header="Order Date"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.order_date | dateToString }}
         </template>
       </Column>
-      <Column field="forwarding_date" header="Shipment Date">
+      <Column
+        field="forwarding_date"
+        header="Shipment Date"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.forwarding_date | dateToString }}
         </template>
       </Column>
-      <Column field="customer" header="Customer"></Column>
-      <Column field="po" header="Po"></Column>
-      <Column field="order_amount" header="Invoice">
+      <Column
+        field="customer"
+        header="Customer"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="po"
+        header="Po"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="order_amount"
+        header="Invoice"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.order_amount | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="paid" header="Payment Received">
+      <Column
+        field="paid"
+        header="Payment Received"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.paid | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="balance" header="Balance">
+      <Column
+        field="balance"
+        header="Balance"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.balance | formatPriceUsd }}
         </template>

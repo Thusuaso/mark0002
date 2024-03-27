@@ -27,6 +27,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -46,6 +48,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -65,6 +69,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -84,6 +90,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #body="slotProps">
             <div :style="{ backgroundColor: slotProps.data.alisFiyatiKontrol }">
@@ -108,6 +116,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -127,6 +137,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -146,6 +158,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -165,6 +179,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -184,6 +200,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -203,6 +221,8 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -213,7 +233,12 @@
             />
           </template>
         </Column>
-        <Column field="toplam_bedel" header="Proforma">
+        <Column
+          field="toplam_bedel"
+          header="Proforma"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.toplam_bedel | formatPriceUsd }}
           </template>
@@ -221,7 +246,12 @@
             {{ total.proforma | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="mekmar_alim" header="Production (Mekmer)">
+        <Column
+          field="mekmar_alim"
+          header="Production (Mekmer)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -239,7 +269,12 @@
             {{ total.mekmerProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="mekmoz_alim" header="Mekmoz Ü.">
+        <Column
+          field="mekmoz_alim"
+          header="Mekmoz Ü."
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -257,7 +292,12 @@
             {{ total.mekmozProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="dis_alim" header="External Purchase">
+        <Column
+          field="dis_alim"
+          header="External Purchase"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -278,7 +318,12 @@
           </template>
         </Column>
 
-        <Column field="nakliye" header="Logistics">
+        <Column
+          field="nakliye"
+          header="Logistics"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -295,7 +340,12 @@
             {{ total.transport | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="gumruk" header="Custom">
+        <Column
+          field="gumruk"
+          header="Custom"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -312,7 +362,12 @@
             {{ total.duty | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ilaclama" header="Fumigation">
+        <Column
+          field="ilaclama"
+          header="Fumigation"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -329,7 +384,12 @@
             {{ total.spraying | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="liman" header="Liman">
+        <Column
+          field="liman"
+          header="Liman"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -346,7 +406,12 @@
             {{ total.port | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="sigorta" header="Port">
+        <Column
+          field="sigorta"
+          header="Port"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -363,7 +428,12 @@
             {{ total.insuranceBuyes | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="navlun" header="Freight">
+        <Column
+          field="navlun"
+          header="Freight"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -380,7 +450,12 @@
             {{ total.freightBuyes | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="lashing" header="Lashing">
+        <Column
+          field="lashing"
+          header="Lashing"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -397,7 +472,12 @@
             {{ total.lashing | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="booking" header="Booking">
+        <Column
+          field="booking"
+          header="Booking"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -414,7 +494,12 @@
             {{ total.booking | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="spazlet" header="Spanzlet">
+        <Column
+          field="spazlet"
+          header="Spanzlet"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -431,7 +516,12 @@
             {{ total.spanzlet | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_1" header="Detail 1">
+        <Column
+          field="detay_1"
+          header="Detail 1"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.detay_1 | formatPriceUsd }}
           </template>
@@ -439,7 +529,12 @@
             {{ total.detailBuyes1 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_2" header="Detail 2">
+        <Column
+          field="detay_2"
+          header="Detail 2"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.detay_2 | formatPriceUsd }}
           </template>
@@ -447,7 +542,12 @@
             {{ total.detailBuyes2 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_3" header="Detail 3">
+        <Column
+          field="detay_3"
+          header="Detail 3"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.detay_3 | formatPriceUsd }}
           </template>
@@ -455,7 +555,12 @@
             {{ total.detailBuyes3 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="mekus_masraf" header="Mekus">
+        <Column
+          field="mekus_masraf"
+          header="Mekus"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -469,7 +574,12 @@
             {{ total.mekus | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="pazarlama" header="Commision">
+        <Column
+          field="pazarlama"
+          header="Commision"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.pazarlama | formatPriceUsd }}
           </template>
@@ -477,7 +587,12 @@
             {{ total.commision | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="ozel_iscilik" header="Manual Labour Cost">
+        <Column
+          field="ozel_iscilik"
+          header="Manual Labour Cost"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -495,7 +610,12 @@
             {{ total.specialwork | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="banka_masrafi" header="Bank">
+        <Column
+          field="banka_masrafi"
+          header="Bank"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.banka_masrafi | formatPriceUsd }}
           </template>
@@ -503,7 +623,12 @@
             {{ total.bankCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="kurye_masrafi" header="Courier">
+        <Column
+          field="kurye_masrafi"
+          header="Courier"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.kurye_masrafi | formatPriceUsd }}
           </template>
@@ -511,7 +636,12 @@
             {{ total.fregileCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="masraf_toplam" header="Toplam">
+        <Column
+          field="masraf_toplam"
+          header="Toplam"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.masraf_toplam | formatPriceUsd }}
           </template>
@@ -519,7 +649,12 @@
             {{ total.costTotal | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="kar_zarar" header="Profit / USD">
+        <Column
+          field="kar_zarar"
+          header="Profit / USD"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.kar_zarar | formatPriceUsd }}
           </template>
@@ -527,7 +662,12 @@
             {{ total.profitUsd | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="kar_zarar_tl" header="Profit / TRY">
+        <Column
+          field="kar_zarar_tl"
+          header="Profit / TRY"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.kar_zarar_tl | formatPriceUsd }}
           </template>
@@ -535,12 +675,22 @@
             {{ total.profitTl | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="kar_zarar_tl_yuzdesi" header="Kar Zarar(%)">
+        <Column
+          field="kar_zarar_tl_yuzdesi"
+          header="Kar Zarar(%)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             % {{ slotProps.data.kar_zarar_tl_yuzdesi }}
           </template>
         </Column>
-        <Column field="dosya_kapanma_date" header="Kapanma T."></Column>
+        <Column
+          field="dosya_kapanma_date"
+          header="Kapanma T."
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
       </DataTable>
     </div>
   </div>

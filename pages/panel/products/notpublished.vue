@@ -130,6 +130,7 @@ export default {
     __stringCharacterChange(event) {
       const data = event.split("'");
       let value = "";
+
       data.forEach((x) => {
         value += x + "''";
       });

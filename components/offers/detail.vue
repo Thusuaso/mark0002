@@ -18,6 +18,8 @@
         header="Date"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
@@ -36,6 +38,8 @@
         header="Queue"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -51,6 +55,8 @@
         header="Customer"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -66,6 +72,8 @@
         header="Country"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -81,6 +89,8 @@
         header="Rep."
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -99,6 +109,8 @@
         header="Priority"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -133,6 +145,8 @@
         header="Tarih"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
@@ -151,6 +165,8 @@
         header="Queue"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -166,6 +182,8 @@
         header="Customer"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -181,6 +199,8 @@
         header="Country"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -196,6 +216,8 @@
         header="Representative"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -214,6 +236,8 @@
         header="Priority"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText

@@ -11,7 +11,12 @@
       sortField="Acil"
       :sortOrder="-1"
     >
-      <Column field="OrtakGorev" header="Assignee">
+      <Column
+        field="OrtakGorev"
+        header="Assignee"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -21,7 +26,12 @@
           />
         </template>
       </Column>
-      <Column field="Yapilacak" header="Assignment">
+      <Column
+        field="Yapilacak"
+        header="Assignment"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             type="text"
@@ -31,7 +41,7 @@
           />
         </template>
       </Column>
-      <Column>
+      <Column headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <Button
             type="button"

@@ -23,6 +23,8 @@
         header="Supplier"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -38,6 +40,8 @@
         header="Tile Size"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -53,6 +57,8 @@
         header="Crate Size"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -68,6 +74,8 @@
         header="Piece"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText

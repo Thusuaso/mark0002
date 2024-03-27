@@ -13,6 +13,8 @@
         header="Date"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.tarih | dateToString }}
@@ -31,6 +33,8 @@
         header="Customer"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -41,7 +45,14 @@
           />
         </template>
       </Column>
-      <Column field="po" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="po"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -56,6 +67,8 @@
         header="Delivery Term."
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -67,7 +80,12 @@
         </template>
       </Column>
 
-      <Column field="fob" header="Fob ($)">
+      <Column
+        field="fob"
+        header="Fob ($)"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.fob | formatPriceUsd }}
         </template>
@@ -75,7 +93,12 @@
           {{ fob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="ddp" header="Ddp ($)">
+      <Column
+        field="ddp"
+        header="Ddp ($)"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.ddp | formatPriceUsd }}
         </template>

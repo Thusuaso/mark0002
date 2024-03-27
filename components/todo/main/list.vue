@@ -17,8 +17,19 @@
       filterDisplay="row"
     >
       <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
-      <Column field="Sira" header="Queue"></Column>
-      <Column field="OrtakGorev" header="Assignee" :showFilterMenu="false">
+      <Column
+        field="Sira"
+        header="Queue"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="OrtakGorev"
+        header="Assignee"
+        :showFilterMenu="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -28,7 +39,13 @@
           />
         </template>
       </Column>
-      <Column field="Yapilacak" header="Assignment" :showFilterMenu="false">
+      <Column
+        field="Yapilacak"
+        header="Assignment"
+        :showFilterMenu="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -38,7 +55,7 @@
           />
         </template>
       </Column>
-      <Column header="#">
+      <Column header="#" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <Button
             type="button"
@@ -48,7 +65,7 @@
           />
         </template>
       </Column>
-      <Column header="#">
+      <Column header="#" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           <Button
             type="button"

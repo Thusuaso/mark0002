@@ -13,6 +13,8 @@
         header="Marketing"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -24,7 +26,12 @@
         </template>
       </Column>
 
-      <Column field="fobToplam" header="Fob ($)">
+      <Column
+        field="fobToplam"
+        header="Fob ($)"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.fobToplam | formatPriceUsd }}
         </template>
@@ -32,7 +39,12 @@
           {{ marketingFob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="cfrToplam" header="Ddp ($)">
+      <Column
+        field="cfrToplam"
+        header="Ddp ($)"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.cfrToplam | formatPriceUsd }}
         </template>
@@ -47,8 +59,18 @@
       <div class="col" v-if="mekmarlist.length > 0">
         <DataTable :value="mekmarlist" style="font-size: 85%" :loading="loading">
           <template #header> Mekmar Shipped </template>
-          <Column field="musteri" header="Customer"></Column>
-          <Column field="toplamFob" header="Fob">
+          <Column
+            field="musteri"
+            header="Customer"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="toplamFob"
+            header="Fob"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamFob | formatPriceUsd }}
             </template>
@@ -56,7 +78,12 @@
               {{ totalDetail.mekmarFob | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="toplamCfr" header="Ddp">
+          <Column
+            field="toplamCfr"
+            header="Ddp"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamCfr | formatPriceUsd }}
             </template>
@@ -66,11 +93,21 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col" v-if="mekmerlist.length > 0" >
+      <div class="col" v-if="mekmerlist.length > 0">
         <DataTable :value="mekmerlist" style="font-size: 85%" :loading="loading">
           <template #header>Mekmer Shipped </template>
-          <Column field="musteri" header="Customer"></Column>
-          <Column field="toplamFob" header="Fob">
+          <Column
+            field="musteri"
+            header="Customer"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="toplamFob"
+            header="Fob"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamFob | formatPriceUsd }}
             </template>
@@ -78,7 +115,12 @@
               {{ totalDetail.mekmerFob | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="toplamCfr" header="Ddp">
+          <Column
+            field="toplamCfr"
+            header="Ddp"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamCfr | formatPriceUsd }}
             </template>
@@ -91,8 +133,18 @@
       <div class="col" v-if="icpiyasalist.length > 0">
         <DataTable :value="icpiyasalist" style="font-size: 85%" :loading="loading">
           <template #header>İç Piyasa Shipped </template>
-          <Column field="musteri" header="Customer"></Column>
-          <Column field="toplamFob" header="Fob">
+          <Column
+            field="musteri"
+            header="Customer"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="toplamFob"
+            header="Fob"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamFob | formatPriceUsd }}
             </template>
@@ -100,7 +152,12 @@
               {{ totalDetail.icpiyasaFob | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="toplamCfr" header="Ddp">
+          <Column
+            field="toplamCfr"
+            header="Ddp"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamCfr | formatPriceUsd }}
             </template>
@@ -113,8 +170,18 @@
       <div class="col" v-if="imperial.length > 0">
         <DataTable :value="imperial" style="font-size: 85%" :loading="loading">
           <template #header>Imperial Homes Shipped </template>
-          <Column field="musteri" header="Customer"></Column>
-          <Column field="toplamFob" header="Fob">
+          <Column
+            field="musteri"
+            header="Customer"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          ></Column>
+          <Column
+            field="toplamFob"
+            header="Fob"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamFob | formatPriceUsd }}
             </template>
@@ -122,7 +189,12 @@
               {{ totalDetail.imperialFob | formatPriceUsd }}
             </template>
           </Column>
-          <Column field="toplamCfr" header="Ddp">
+          <Column
+            field="toplamCfr"
+            header="Ddp"
+            headerClass="tableHeader"
+            bodyClass="tableBody"
+          >
             <template #body="slotProps">
               {{ slotProps.data.toplamCfr | formatPriceUsd }}
             </template>
@@ -142,7 +214,7 @@ export default {
   props: {
     marketing: {},
     marketingByDetail: {},
-    loading:{}
+    loading: {},
   },
   data() {
     return {

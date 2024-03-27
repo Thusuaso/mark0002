@@ -8,7 +8,14 @@
       selectionMode="single"
       @row-dblclick="test"
     >
-      <Column field="SkuNo" header="Sku" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="SkuNo"
+        header="Sku"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -18,7 +25,14 @@
           />
         </template>
       </Column>
-      <Column field="MekmarKod" header="Code" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="MekmarKod"
+        header="Code"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -28,7 +42,14 @@
           />
         </template>
       </Column>
-      <Column field="UrunTanim" header="Description" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="UrunTanim"
+        header="Description"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -38,7 +59,14 @@
           />
         </template>
       </Column>
-      <Column field="atl" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="atl"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -48,7 +76,14 @@
           />
         </template>
       </Column>
-      <Column field="KasaAdet" header="Amount in Crate" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KasaAdet"
+        header="Amount in Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.KasaAdet | formatDecimal }}
         </template>
@@ -61,7 +96,14 @@
           />
         </template>
       </Column>
-      <Column field="KasaKutu" header="Box in Crate" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KasaKutu"
+        header="Box in Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.KasaKutu | formatDecimal }}
         </template>
@@ -74,7 +116,14 @@
           />
         </template>
       </Column>
-      <Column field="KasaM2" header="M2 in Crate" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KasaM2"
+        header="M2 in Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.KasaM2 | formatDecimal }}
         </template>
@@ -87,7 +136,14 @@
           />
         </template>
       </Column>
-      <Column field="KasaSqft" header="Sqft in Crate" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="KasaSqft"
+        header="Sqft in Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.KasaSqft | formatDecimal }}
         </template>
@@ -100,7 +156,14 @@
           />
         </template>
       </Column>
-      <Column field="StokBox" header="Stock Box" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="StokBox"
+        header="Stock Box"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.StokBox | formatDecimal }}
         </template>
@@ -113,7 +176,14 @@
           />
         </template>
       </Column>
-      <Column field="StokSqft" header="Stock Sqft" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="StokSqft"
+        header="Stock Sqft"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.StokSqft | formatDecimal }}
         </template>
@@ -126,7 +196,14 @@
           />
         </template>
       </Column>
-      <Column field="mekmar_fiyat" header="Price" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="mekmar_fiyat"
+        header="Price"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.mekmar_fiyat | formatPriceUsd }}
         </template>
@@ -164,15 +241,13 @@ export default {
         KasaSqft: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         StokBox: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         StokSqft: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        mekmar_fiyat: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
-
+        mekmar_fiyat: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       selectedAtlantaList: null,
     };
   },
   methods: {
-    test() {
-    },
+    test() {},
   },
 };
 </script>

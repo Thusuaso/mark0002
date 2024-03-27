@@ -27,7 +27,13 @@ let transporter = nodemailer.createTransport({
     rejectUnauthorized: false,
   },
 });
-
+function __noneNullControl(value){
+    if(value == null || value == " " || value == undefined || value == 'null' || value == 'NULL' || value == 'Null'){
+        return "";
+    } else{
+        return value;
+    }
+}
 /*Auth*/
 app.post('/login',(req,res)=>{
     if(req.body){
@@ -1896,6 +1902,17 @@ app.get('/customer/offer/list',(req,res)=>{
                     inner join KullaniciTB k on k.ID = ytm.Kullanici
                 `;
     mssql.query(sql,(err,results)=>{
+        results.recordset?.forEach(x=>{
+            x.UlkeAdi = __noneNullControl(x.UlkeAdi);
+            x.Company = __noneNullControl(x.Company);
+            x.Mail = __noneNullControl(x.Mail);
+            x.Phone = __noneNullControl(x.Phone);
+            x.Description = __noneNullControl(x.Description);
+            x.Adress = __noneNullControl(x.Adress);
+
+
+        });
+
         res.status(200).json({
             'list':results.recordset
         })
@@ -5198,12 +5215,13 @@ app.get('/panel/published/list', (req, res) => {
 	mp.aciklama_ar,
 	mp.anahtarlar_ar,
 	mp.keywords_ar,
-    (select top 1 mf.imagePath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid) as Image
+    (select top 1 mf.imagePath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid order by mf.sira) as Image
 
 from MekmarCom_Products mp
 where mp.kategori_id = ${categoryId} and mp.yayinla = 1
 order by urunid desc
         `;
+
         mssql.query(publishedSql, (err, published) => {
             res.status(200).json({
                 'list': published.recordset,
@@ -5310,7 +5328,7 @@ app.get('/panel/published/list/:id', (req, res) => {
 	mp.aciklama_ar,
 	mp.anahtarlar_ar,
 	mp.keywords_ar,
-    (select top 1 mf.imagePath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid) as Image
+    (select top 1 mf.imagePath from MekmarCom_Fotolar mf where mf.urunid = mp.urunid order by mf.sira) as Image
 
 from MekmarCom_Products mp
 where mp.kategori_id = ${req.params.id} and mp.yayinla = 1
@@ -6485,25 +6503,22 @@ app.post('/panel/projet/photos/queue/change',(req,res)=>{
     res.status(200).json({'status':true});
 });
 
-app.post('/panel/product/change/queue',(req,res)=>{
-    const dropSql = `update MekmarCom_Products SET sira='${req.body.drop.sira}' where urunid='${req.body.drop.urunid}'`;
-    const dragSql = `update MekmarCom_Products SET sira='${req.body.drag.sira}' where urunid='${req.body.drag.urunid}'`;
 
-    mssql.query(dropSql, (err, drop) => {
-       if(drop.rowsAffected[0] == 1){
-            mssql.query(dragSql,(err,drag)=>{
-               if(drag.rowsAffected[0] == 1){
-                   res.status(200).json({ 'status': true });
-               } else {
-                   res.status(200).json({ 'status': false });
-               }
-            });
-        } else{
-            res.status(200).json({'status':false});
+
+
+app.put('/panel/products/queue/change',(req,res)=>{
+    const sql = `update MekmarCom_Products SET sira='${req.body.sira}' where urunid='${req.body.urunid}'`;
+    mssql.query(sql,(err,drag)=>{
+        if(drag.rowsAffected[0] == 1){
+            res.status(200).json({ 'status': true });
+        } else {
+            res.status(200).json({ 'status': false });
         }
-    });
+     });
 
 });
+
+
 app.get('/panel/users/list', (req, res) => {
     const usersListSql = `
         select 

@@ -16,6 +16,8 @@
         header="Date"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
@@ -35,6 +37,8 @@
         header="Customer"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -51,6 +55,8 @@
         header="Supplier"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -67,6 +73,8 @@
         header="Product Id"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -83,6 +91,8 @@
         header="Crate"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -99,6 +109,8 @@
         header="Mine"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -115,6 +127,8 @@
         header="Category"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -131,6 +145,8 @@
         header="Product"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #footer>
           {{ total.crate | formatDecimal }}
@@ -150,6 +166,8 @@
         header="Surface"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -161,7 +179,14 @@
           />
         </template>
       </Column>
-      <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="En"
+        header="Width"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #filter="{ filterModel }">
           <InputText
             v-model="filterModel.value"
@@ -177,6 +202,8 @@
         header="Height"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -193,6 +220,8 @@
         header="Edge"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -209,6 +238,8 @@
         header="Box"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #footer>
           {{ total.box | formatDecimal }}
@@ -228,6 +259,8 @@
         header="Piece"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
@@ -250,6 +283,8 @@
         header="Amount"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #body="slotProps">
           {{ slotProps.data.Miktar | formatDecimal }}
@@ -272,6 +307,8 @@
         header="Unit"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -288,6 +325,8 @@
         header="Po"
         :showFilterMenu="false"
         :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel }">
           <InputText
@@ -299,12 +338,22 @@
           />
         </template>
       </Column>
-      <Column field="BirimFiyat" header="Price">
+      <Column
+        field="BirimFiyat"
+        header="Price"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.BirimFiyat | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Toplam" header="Total">
+      <Column
+        field="Toplam"
+        header="Total"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Toplam | formatPriceUsd }}
         </template>

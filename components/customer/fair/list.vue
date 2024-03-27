@@ -10,7 +10,14 @@
     filterDisplay="row"
     :loading="loading"
   >
-    <Column field="Customer" header="Customer" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="Customer"
+      header="Customer"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -20,7 +27,14 @@
         />
       </template>
     </Column>
-    <Column field="Company" header="Company" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="Company"
+      header="Company"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -30,10 +44,32 @@
         />
       </template>
     </Column>
-    <Column field="Email" header="Mail"></Column>
-    <Column field="Phone" header="Phone"></Column>
-    <Column field="Adress" header="Address"></Column>
-    <Column field="UlkeAdi" header="Country" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="Email"
+      header="Mail"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    ></Column>
+    <Column
+      field="Phone"
+      header="Phone"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    ></Column>
+    <Column
+      field="Adress"
+      header="Address"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    ></Column>
+    <Column
+      field="UlkeAdi"
+      header="Country"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -43,7 +79,14 @@
         />
       </template>
     </Column>
-    <Column field="Orderer" header="Salesman" :showFilterMenu="false" :showClearButton="false">
+    <Column
+      field="Orderer"
+      header="Salesman"
+      :showFilterMenu="false"
+      :showClearButton="false"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #filter="{ filterModel, filterCallback }">
         <InputText
           type="text"
@@ -53,13 +96,18 @@
         />
       </template>
     </Column>
-    <Column field="Fuar" header="Fair">
+    <Column field="Fuar" header="Fair" headerClass="tableHeader" bodyClass="tableBody">
       <template #body="slotProps">
         <div v-if="slotProps.data.Fuar">✓</div>
         <div v-else>x</div>
       </template>
     </Column>
-    <Column field="Ziyaret" header="Visit">
+    <Column
+      field="Ziyaret"
+      header="Visit"
+      headerClass="tableHeader"
+      bodyClass="tableBody"
+    >
       <template #body="slotProps">
         <div v-if="slotProps.data.Ziyaret">✓</div>
         <div v-else>x</div>

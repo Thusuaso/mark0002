@@ -4,25 +4,25 @@
       <template #header>
         {{ list.year }}
       </template>
-      <Column field="Ay" header="Month">
+      <Column field="Ay" header="Month" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Ay | monthToString }}
         </template>
       </Column>
-      <Column field="Fob" header="Fob">
+      <Column field="Fob" header="Fob" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Fob | formatPriceUsd }}
         </template>
         <template #footer>
-          {{ list.fob | formatPriceUsd}}
+          {{ list.fob | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="Ddp" header="Ddp">
+      <Column field="Ddp" header="Ddp" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Ddp | formatPriceUsd }}
         </template>
         <template #footer>
-          {{ list.ddp | formatPriceUsd}}
+          {{ list.ddp | formatPriceUsd }}
         </template>
       </Column>
     </DataTable>
