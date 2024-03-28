@@ -47,6 +47,7 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 export default {
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getReportsMekmarSummaryOrderList",

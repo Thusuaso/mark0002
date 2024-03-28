@@ -19,6 +19,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  middleware: ["authority"],
   data() {
     return {
       cards_form_dialog: false,
@@ -33,7 +34,7 @@ export default {
       "getCardSizesList",
       "getCardsButtonStatus",
       "getLoading",
-      "getCardsOrderList"
+      "getCardsOrderList",
     ]),
   },
   methods: {
@@ -46,7 +47,7 @@ export default {
       this.model = event;
       this.cards_form_dialog = true;
       this.$store.dispatch("setCardsButtonStatus", false);
-      this.$store.dispatch("setCardsOrderList",event.ID)
+      this.$store.dispatch("setCardsOrderList", event.ID);
     },
   },
 };

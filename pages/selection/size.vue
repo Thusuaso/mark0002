@@ -21,6 +21,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getProductionCrateSizeList",

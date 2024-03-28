@@ -17,6 +17,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  middleware: ["authority"],
   data() {
     return {
       todo_dialog_form: false,
@@ -35,7 +36,7 @@ export default {
       this.todo_dialog_form = true;
     },
     todoNotSeen(event) {
-      this.$store.dispatch("setTodoNotSeen",event);
+      this.$store.dispatch("setTodoNotSeen", event);
     },
   },
 };

@@ -73,6 +73,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getOfferList",
@@ -177,17 +178,13 @@ export default {
   },
   mounted() {
     this.$socket.socketIO.on("offers_updated_on", (payload) => {
-
       if (this.offer_updated_list_form) {
         this.$store.dispatch("setOfferDetailUpdatedAllEmit", payload.offer);
       }
     });
-    this.$socket.socketIO.on("offers_deleted_on",(offerId)=>{
-      this.$store.dispatch("setOfferDetailDeletedAllEmit",offerId);
+    this.$socket.socketIO.on("offers_deleted_on", (offerId) => {
+      this.$store.dispatch("setOfferDetailDeletedAllEmit", offerId);
     });
-  }
-
-
-
+  },
 };
 </script>

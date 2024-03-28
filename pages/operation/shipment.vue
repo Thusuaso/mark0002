@@ -1,13 +1,14 @@
 <template>
-    <div class="container">
-        <shipmentForm :orders="getOrdersList"/>
-    </div>
+  <div class="container">
+    <shipmentForm :orders="getOrdersList" />
+  </div>
 </template>
 <script>
-import {mapGetters} from 'vuex';
+import { mapGetters } from "vuex";
 export default {
-    computed:{
-        ...mapGetters(['getOrdersList'])
-    }
-}
+  middleware: ["authority"],
+  computed: {
+    ...mapGetters(["getOrdersList"]),
+  },
+};
 </script>

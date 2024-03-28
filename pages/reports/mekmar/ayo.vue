@@ -99,6 +99,7 @@
 import { mapGetters } from "vuex";
 import api from "../../../plugins/excel.server";
 export default {
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getReportsMekmarAyoList",

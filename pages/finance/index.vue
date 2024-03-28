@@ -109,6 +109,7 @@ import { mapGetters } from "vuex";
 import date from "../../plugins/date";
 import api from "../../plugins/excel.server.js";
 export default {
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getfinanceList",

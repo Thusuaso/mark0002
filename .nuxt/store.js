@@ -20,6 +20,7 @@ let store = {};
   store.modules = store.modules || {}
 
   resolveStoreModules(require('..\\store\\modules\\auth.js'), 'modules/auth.js')
+  resolveStoreModules(require('..\\store\\modules\\authority.js'), 'modules/authority.js')
   resolveStoreModules(require('..\\store\\modules\\bgp.js'), 'modules/bgp.js')
   resolveStoreModules(require('..\\store\\modules\\cards.js'), 'modules/cards.js')
   resolveStoreModules(require('..\\store\\modules\\container.js'), 'modules/container.js')
@@ -52,6 +53,7 @@ let store = {};
     module.hot.accept([
       '..\\store\\index.js',
       '..\\store\\modules\\auth.js',
+      '..\\store\\modules\\authority.js',
       '..\\store\\modules\\bgp.js',
       '..\\store\\modules\\cards.js',
       '..\\store\\modules\\container.js',

@@ -13,6 +13,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  middleware: ["authority"],
   data() {
     return {
       follow_dialog_form: false,

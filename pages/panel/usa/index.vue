@@ -19,6 +19,7 @@
 import { mapGetters } from "vuex";
 import oceanservice from "../../../plugins/digitalocean";
 export default {
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getPanelUsaStockList",
@@ -38,7 +39,7 @@ export default {
   methods: {
     photosChangeQueue(event) {
       event.forEach((x) => {
-        this.$store.dispatch("setUsaStockPhotosChangeQueue",x);
+        this.$store.dispatch("setUsaStockPhotosChangeQueue", x);
       });
     },
     uploadPhotos(event) {

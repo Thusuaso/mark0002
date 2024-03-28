@@ -208,6 +208,7 @@
 import { mapGetters } from "vuex";
 import oceanservice from "../../../plugins/digitalocean";
 export default {
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getPanelProjectList",
@@ -241,8 +242,7 @@ export default {
     changeQueue() {
       this.$store.dispatch("setPanelProjectQueueChange", this.getPanelProjectList);
     },
-    projectChangeNameMouseOver() {
-    },
+    projectChangeNameMouseOver() {},
     saveProject() {
       this.project_save_button_disabled = true;
       this.$store.dispatch("setPanelProjectSave", this.getPanelProductProjectModel);
