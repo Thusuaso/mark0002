@@ -360,6 +360,14 @@ export default {
     }
   },
   methods: {
+    __nullNoneTrueFalseControl(value) {
+      if (value == null || value == undefined || value == "" || value == " ") {
+        return false;
+      } else {
+        return value;
+      }
+    },
+
     calculateTotalAmountM2(event) {
       if (
         this.width == "ANT" ||
@@ -595,10 +603,10 @@ export default {
         this.speacialAmount = this.model.OzelMiktar;
       }
       this.description = this.model.Aciklama;
-      this.notFindStatus = this.model.Bulunamadi;
-      this.outStatus = this.model.Disarda;
-      this.stringStatus = this.model.Bagli;
-      this.boxStatus = this.model.Kutu;
+      this.notFindStatus = this.__nullNoneTrueFalseControl(this.model.Bulunamadi);
+      this.outStatus = this.__nullNoneTrueFalseControl(this.model.Disarda);
+      this.stringStatus = this.__nullNoneTrueFalseControl(this.model.Bagli);
+      this.boxStatus = this.__nullNoneTrueFalseControl(this.model.Kutu);
     },
     searchMine(event) {
       let results;

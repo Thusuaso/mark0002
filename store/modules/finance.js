@@ -363,11 +363,13 @@ const mutations = {
             balanced: 0,
         
         };
+
         payload.forEach(x => {
-            state.financePoListTotal.order += x.OrderTotal;
-            state.financePoListTotal.advancedPayment += x.Pesinat;
-            state.financePoListTotal.paid += x.Paid;
-            state.financePoListTotal.balanced += x.Balanced;
+                state.financePoListTotal.order += x.OrderTotal;
+                state.financePoListTotal.advancedPayment += x.Pesinat;
+                state.financePoListTotal.paid += x.Paid;
+                state.financePoListTotal.balanced += x.Balanced;
+
         })
     },
     setFinancePaidListTotal(state, payload) {

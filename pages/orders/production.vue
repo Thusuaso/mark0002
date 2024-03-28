@@ -79,6 +79,8 @@
       @production_selected_emit="productionSelected($event)"
       :loading="getLoading"
       :status="'Production'"
+      :total="getOrderProductionTotal"
+
     />
     <Dialog
       :visible.sync="production_detail_form"
@@ -189,6 +191,7 @@ export default {
       "getLocalUrl",
       "getOrderProductionId",
       "getOrderProductionUploadProformaButtonStatus",
+      "getOrderProductionTotal",
     ]),
   },
   data() {

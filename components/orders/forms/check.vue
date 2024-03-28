@@ -17,75 +17,281 @@
       </JsonExcel> -->
 
       <Button class="p-button-primary w-100" label="Excel" @click="excel_test" />
+      <DataTable
+        :value="list"
+        filterDisplay="row"
+        :filters.sync="filtersCheck"
+        @filter="checkFilters($event)"
+      >
+        <Column field="Sira" header="#"></Column>
+        <Column
+          field="KasaNo"
+          header="Crate No"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="TedarikciAdi"
+          header="Supplier"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="KategoriAdi"
+          header="Category"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="UrunAdi"
+          header="Product"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #footer>
+            {{ total.crate | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="YuzeyIslem"
+          header="Surface"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="En"
+          header="Width"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.En }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Boy"
+          header="Height"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Boy }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Kenar"
+          header="Thickness"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Kenar }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="BirimAdi"
+          header="Unit"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.BirimAdi }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="KutuAdet"
+          header="Box"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.KutuAdet | formatDecimal }}
+          </template>
+          <template #footer>
+            {{ total.box | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Adet"
+          header="Piece"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Adet | formatDecimal }}
+          </template>
+          <template #footer>
+            {{ total.piece | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Miktar"
+          header="Amount"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Miktar | formatDecimal }}
+          </template>
+          <template #footer>
+            {{ total.amount | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Ton"
+          header="Ton"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Ton | formatDecimal }}
+          </template>
+          <template #footer>
+            {{ total.ton | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+      </DataTable>
     </div>
-    <DataTable :value="list">
-      <Column field="Sira" header="#"></Column>
-      <Column field="KasaNo" header="Crate No"></Column>
-      <Column field="TedarikciAdi" header="Supplier"></Column>
-      <Column field="KategoriAdi" header="Category"></Column>
-      <Column field="UrunAdi" header="Product">
-        <template #footer>
-          {{ total.crate | formatDecimal }}
-        </template>
-      </Column>
-      <Column field="YuzeyIslem" header="Surface"></Column>
-      <Column field="En" header="Width">
-        <template #body="slotProps">
-          {{ slotProps.data.En }}
-        </template>
-      </Column>
-      <Column field="Boy" header="Height">
-        <template #body="slotProps">
-          {{ slotProps.data.Boy }}
-        </template>
-      </Column>
-      <Column field="Kenar" header="Thickness">
-        <template #body="slotProps">
-          {{ slotProps.data.Kenar }}
-        </template>
-      </Column>
-      <Column field="BirimAdi" header="Unit">
-        <template #body="slotProps">
-          {{ slotProps.data.BirimAdi }}
-        </template>
-      </Column>
-      <Column field="KutuAdet" header="Box">
-        <template #body="slotProps">
-          {{ slotProps.data.KutuAdet | formatDecimal }}
-        </template>
-        <template #footer>
-          {{ total.box | formatDecimal }}
-        </template>
-      </Column>
-      <Column field="Adet" header="Piece">
-        <template #body="slotProps">
-          {{ slotProps.data.Adet | formatDecimal }}
-        </template>
-        <template #footer>
-          {{ total.piece | formatDecimal }}
-        </template>
-      </Column>
-      <Column field="Miktar" header="Amount">
-        <template #body="slotProps">
-          {{ slotProps.data.Miktar | formatDecimal }}
-        </template>
-        <template #footer>
-          {{ total.amount | formatDecimal }}
-        </template>
-      </Column>
-      <Column field="Ton" header="Ton">
-        <template #body="slotProps">
-          {{ slotProps.data.Ton | formatDecimal }}
-        </template>
-        <template #footer>
-          {{ total.ton | formatDecimal }}
-        </template>
-      </Column>
-    </DataTable>
   </div>
 </template>
 <script>
 import api from "../../../plugins/excel.server.js";
+import { FilterMatchMode } from "primevue/api";
+
 export default {
   props: {
     list: {
@@ -99,6 +305,21 @@ export default {
   },
   data() {
     return {
+      filtersCheck: {
+        KasaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        TedarikciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KategoriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        YuzeyIslem: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KutuAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Ton: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
       checkListFields: {
         Sıra: "Sira",
         "Kasa No": "KasaNo",
@@ -118,6 +339,9 @@ export default {
     };
   },
   methods: {
+    checkFilters(event) {
+      this.$store.dispatch("setOrderProductionCheckListTotal", event.filteredValue);
+    },
     excel_test() {
       api.post("/excel/check/list", this.list).then((response) => {
         if (response) {

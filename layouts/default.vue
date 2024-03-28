@@ -34,13 +34,18 @@ export default {
     this.$store.dispatch("setOrderKindOfDeliverySupplierList");
     this.$store.dispatch("setYearList");
     this.$store.dispatch("setMonthList");
-
   },
 };
 </script>
 <style>
-@import url("https://fonts.cdnfonts.com/css/myriad-web-pro");
 * {
-  font-family: "Myriad Web Pro", sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+.tableHeader {
+  font-size: 15px;
+  font-weight: bold;
+}
+.tableBody {
+  font-size: 13px;
 }
 </style>

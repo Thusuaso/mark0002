@@ -23,12 +23,4 @@ export default {
   methods: {},
 };
 </script>
-<style>
-.tableHeader {
-  font-size: 15px;
-  font-weight: bold;
-}
-.tableBody{
-  font-size:13px;
-}
-</style>
+<style></style>

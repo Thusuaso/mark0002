@@ -118,7 +118,7 @@ const actions = {
                         vuexContext.dispatch('setOfferDetailAllList');
                     };
                     vuexContext.dispatch('setOfferMainList');
-                    this.$socket.socketIO.emit('offers_updated_emit');
+                    this.$socket.socketIO.emit('offers_updated_emit',payload);
                     vuexContext.dispatch('setOfferCustomerList');
 
                     this.$toast.success('Başarıyla Güncellendi');
@@ -135,7 +135,7 @@ const actions = {
                 if (response.data.status) {
                     vuexContext.dispatch('setOfferMainList');
                     vuexContext.commit('setOfferDelete', id);
-                    this.$socket.socketIO.emit('offers_updated_emit');
+                    this.$socket.socketIO.emit('offers_deleted_emit',id);
                     this.$toast.success('Başarıyla Silindi');
 
 
@@ -221,9 +221,24 @@ const actions = {
             })
         });
     },
+    setOfferDetailUpdatedAllEmit(vuexContext,payload){
+        vuexContext.commit('setOfferDetailUpdatedAllEmit',payload);
+    },
+    setOfferDetailDeletedAllEmit(vuexContext,offerId){
+        vuexContext.commit('setOfferDetailDeletedAllEmit',offerId);
+    }
 
 };
 const mutations = {
+    setOfferDetailDeletedAllEmit(state,offerId){
+        console.log(offerId);
+        const index = state.offerDetailList.findIndex(x=>x.Id==offerId);
+        state.offerDetailList.splice(index,1);
+    },
+    setOfferDetailUpdatedAllEmit(state,payload){
+        const index = state.offerDetailList.findIndex(x=>x.Id==payload.Id);
+        state.offerDetailList.splice(index,1,payload);
+    },
     setOfferAListTotal(state,payload){
         state.offerDetailTotalA=payload.length;
     },

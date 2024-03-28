@@ -7036,10 +7036,11 @@ order by s.YuklemeTarihi desc
             x.Balanced = x.OrderTotal - x.Paid;
             if (x.Durum == 'Sevk Edilen') {
                 x.Pesinat = 0;
-            }
+            };
+            
         })
         mssql.query(paidListSql, (err, paidList) => {
-                    res.status(200).json({ 'poList': poList.recordset,'paidList':paidList.recordset });
+            res.status(200).json({ 'poList': poList.recordset,'paidList':paidList.recordset });
 
         });
     });
@@ -7591,6 +7592,7 @@ app.post('/order/shipped/list/filter',async (req,res)=>{
 
     const company = req.body.company.charAt(0).toUpperCase() + req.body.company.slice(1);
     const po = req.body.po.toUpperCase();
+    const width = req.body.width.charAt(0).toUpperCase() + req.body.width.slice(1);
     const ordersListSql = `
     select 
 
@@ -7714,7 +7716,7 @@ where s.SiparisDurumID = 3  and
  m.FirmaAdi Like '${company}' + '%' and
 s.SiparisNo Like '${po}' + '%' and 
 urun.UrunAdi Like '${req.body.product}' + '%' and
-ol.En Like '${req.body.width}' + '%' and
+ol.En Like '${width}' + '%' and
 ol.Boy Like '${req.body.height}' + '%' and
 ol.Kenar Like '${req.body.edge}' + '%' and 
 t.FirmaAdi Like '${req.body.supplier}' + '%' and
@@ -7725,6 +7727,7 @@ order by s.YuklemeTarihi desc
 
 
 `;
+
 
 await mssql.query(ordersListSql, (err, orders) => {
     console.log('/order/shipped/list/filter/load/date/ , hata', err)
@@ -9452,31 +9455,31 @@ async function addedSendMail(payload) {
         transporter.sendMail({
             to: 'export@mekmar.com',
             from: 'goz@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
+            subject: customSubject,
             html: content
         });
         transporter.sendMail({
             to: 'export1@mekmar.com',
             from: 'goz@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
+            subject: customSubject,
             html: content
         });
         transporter.sendMail({
             to: 'export2@mekmar.com',
             from: 'goz@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
+            subject: customSubject,
             html: content
         });
         transporter.sendMail({
             to: 'mehmet@mekmer.com',
             from: 'goz@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
+            subject: customSubject,
             html: content
         });
         transporter.sendMail({
             to: 'huseyin@mekmer.com',
             from: 'goz@mekmar.com',
-            subject: 'Yeni Sipariş Girişi',
+            subject: customSubject,
             html: content
         });
 
@@ -9619,7 +9622,6 @@ async function updatedSendMail(payload) {
         const mekmer_product = payload.updated.filter(x=>(x.FirmaAdi == 'Mekmer') || (x.FirmaAdi == 'Mek-Moz'));
         
         if(mekmer_product.length >0){
-            console.log('mekmer_product');
             mekmer_product.forEach(x=>{
             const index = payload.notchange.findIndex(y=>y.ID == x.ID);
             const po = payload.notchange[index].SiparisNo;

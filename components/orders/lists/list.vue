@@ -231,6 +231,9 @@
             class="p-column-filter"
           />
         </template>
+        <template #footer>
+          {{ total.order | formatDecimal }}
+        </template>
       </Column>
       <Column
         field="BirimAdi"
@@ -239,32 +242,15 @@
         bodyClass="tableBody"
       >
         <template #body="slotProps">
-          <div
-            v-if="slotProps.data.Uretim == slotProps.data.Miktar"
-            style="background-color: green; color: white"
-          >
-            {{ slotProps.data.Uretim | formatDecimal }}
-          </div>
-          <div
-            v-else-if="slotProps.data.Uretim > slotProps.data.Miktar"
-            style="background-color: red; color: white"
-          >
-            {{ slotProps.data.Uretim | formatDecimal }}
-          </div>
-          <div
-            v-else-if="slotProps.data.Uretim < slotProps.data.Miktar"
-            style="background-color: yellow; color: black"
-          >
-            {{ slotProps.data.Uretim | formatDecimal }}
-          </div>
-          <div v-else>
-            {{ slotProps.data.Uretim | formatDecimal }}
-          </div>
+          {{ slotProps.data.BirimAdi }}
         </template>
       </Column>
       <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Ton | formatDecimal }}
+        </template>
+        <template #footer>
+          {{ total.ton | formatDecimal }}
         </template>
       </Column>
       <Column
@@ -286,6 +272,9 @@
         <template #body="slotProps">
           {{ slotProps.data.SatisToplam | formatPriceUsd }}
         </template>
+        <template #footer>
+          {{ total.price | formatPriceUsd }}
+        </template>
       </Column>
     </DataTable>
     <DataTable
@@ -301,6 +290,7 @@
       filterDisplay="row"
       :filters.sync="filtersOrders"
       :rowClass="rowClass2"
+      @filter="ordersFilter($event)"
       v-else
     >
       <Column
@@ -515,6 +505,9 @@
             class="p-column-filter"
           />
         </template>
+        <template #footer>
+          {{ total.order | formatDecimal }}
+        </template>
       </Column>
       <Column
         field="BirimAdi"
@@ -553,10 +546,16 @@
             {{ slotProps.data.Uretim | formatDecimal }}
           </div>
         </template>
+        <template #footer>
+          {{ total.production | formatDecimal }}
+        </template>
       </Column>
       <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Ton | formatDecimal }}
+        </template>
+        <template #footer>
+          {{ total.ton | formatDecimal }}
         </template>
       </Column>
       <Column
@@ -578,6 +577,9 @@
         <template #body="slotProps">
           {{ slotProps.data.SatisToplam | formatPriceUsd }}
         </template>
+        <template #footer>
+          {{ total.price | formatDecimal }}
+        </template>
       </Column>
     </DataTable>
   </div>
@@ -597,6 +599,10 @@ export default {
     },
     status: {
       type: String,
+      required: true,
+    },
+    total: {
+      type: Object,
       required: true,
     },
   },
@@ -630,6 +636,9 @@ export default {
     };
   },
   methods: {
+    ordersFilter(event) {
+      this.$store.dispatch("setOrderProductionTotal", event.filteredValue);
+    },
     rowClass2(event) {
       const userId = Cookies.get("userId");
       if (event.SiparisSahibi == userId || event.Operasyon == userId)
@@ -777,7 +786,6 @@ export default {
     },
     filterShipmentProduct(event) {
       if (event) {
-        console.log(event.split(" "));
         if (event.split(" ").length == 1) {
           this.filterModel.product = event.charAt(0).toUpperCase() + event.slice(1);
         } else {

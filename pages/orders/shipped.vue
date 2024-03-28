@@ -28,6 +28,7 @@
       @production_selected_emit="productionSelected($event)"
       :loading="getLoading"
       :status="'Shipped'"
+      :total="getOrderProductionTotal"
     />
     <Dialog
       :visible.sync="production_detail_form"
@@ -128,6 +129,7 @@ export default {
       "getOrderProductDeleted",
       "getLoading",
       "getOrderProductionYearsList",
+      "getOrderProductionTotal",
     ]),
   },
   data() {

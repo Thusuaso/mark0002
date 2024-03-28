@@ -1,3 +1,11 @@
+
+function __noneNullControl(value){
+    if(value == null || value == '' || value == undefined || value == ' '){
+        return parseFloat(0);
+    }else{
+    return parseFloat(value);
+    }
+};
 const state = {
     orderList: [],
     orderListAll:[],
@@ -45,13 +53,22 @@ const state = {
     orderProductionYearsList:[],
     orderProductionSaveButtonStatus:false,
     orderProductionId:0,
-    orderProductionUploadProformaButtonStatus:true
+    orderProductionUploadProformaButtonStatus:true,
+    orderProductionTotal:{
+        'order':0,
+        'production':0,
+        'ton':0,
+        'price':0
+    }
     
 
 
 
 };
 const actions = {
+    setOrderProductionTotal(vuexContext,list){
+        vuexContext.commit('setOrderProductionTotal',list)
+    },
     setOrderProductionIsfDelete(vuexContext,event){
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/production/isf/delete/${event.ID}/${event.EvrakAdi}/${event.SiparisNo}`)
@@ -89,6 +106,7 @@ const actions = {
                     vuexContext.commit('setOrderList', response.data.list);
                     vuexContext.commit('setOrderProductionYearsList', response.data.years);
                     vuexContext.commit('setOrderListAll', response.data.list);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
                     vuexContext.dispatch('setEndLoadingAction');
                 } 
             });
@@ -99,7 +117,10 @@ const actions = {
             .then(response => {
                 if (response.data.list) {
                     vuexContext.commit('setOrderList', response.data.list);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+
                     vuexContext.dispatch('setEndLoadingAction');
+                    
 
                 
                 } 
@@ -113,6 +134,8 @@ const actions = {
                 if (response.data.list) {
                 vuexContext.commit('setOrderList', response.data.list);
 vuexContext.commit('setOrderProductionYearsList', response.data.years);
+vuexContext.commit('setOrderProductionTotal',response.data.list);
+
                 vuexContext.dispatch('setEndLoadingAction');
                 };
             });
@@ -125,6 +148,8 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
             .then(response => {
                 if (response.data.list) {
                 vuexContext.commit('setOrderList', response.data.list);
+                vuexContext.commit('setOrderProductionTotal',response.data.list);
+
                 vuexContext.dispatch('setEndLoadingAction');
 
                 };
@@ -139,6 +164,8 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                 if (response.data.list) {
                 
                 vuexContext.commit('setOrderList', response.data.list);
+                vuexContext.commit('setOrderProductionTotal',response.data.list);
+
                 vuexContext.dispatch('setEndLoadingAction');
 
                 };
@@ -154,6 +181,8 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
             .then(response => {
                 if (response.data.list) {
                     vuexContext.commit('setOrderList', response.data.list);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+
                     vuexContext.dispatch('setEndLoadingAction');
 
                 
@@ -169,6 +198,8 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
                 if (response.data.list) {
                                     vuexContext.commit('setOrderList', response.data.list);
                     vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+
                     vuexContext.dispatch('setEndLoadingAction');
                 }
 
@@ -180,6 +211,8 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
             .then(response => {
                 if (response.data.list) {
                     vuexContext.commit('setOrderList', response.data.list);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+
                     vuexContext.dispatch('setEndLoadingAction');
 
                 
@@ -457,6 +490,22 @@ vuexContext.commit('setOrderProductionYearsList', response.data.years);
 
 };
 const mutations = {
+    setOrderProductionTotal(state,list){
+        console.log(15.15+15.15);
+        state.orderProductionTotal = {
+            'order':0,
+            'production':0,
+            'ton':0,
+            'price':0
+        };
+        list.forEach(x=>{
+            state.orderProductionTotal.order += __noneNullControl(x.Miktar);
+            state.orderProductionTotal.production += __noneNullControl(x.Uretim);
+            state.orderProductionTotal.ton += __noneNullControl(x.Ton);
+            state.orderProductionTotal.price += __noneNullControl(x.SatisToplam);
+            
+        });
+    },
     setOrderProductionProformaDelete(state,id){
         const index = state.orderProductionDocumentList.findIndex(x=>x.ID == id);
         state.orderProductionDocumentList.splice(index,1);
@@ -770,6 +819,9 @@ const mutations = {
 
 };
 const getters = {
+    getOrderProductionTotal(state){
+        return state.orderProductionTotal;
+    },
     getOrderList(state) {
         return state.orderList;
     },
