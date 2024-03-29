@@ -23,11 +23,10 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 export default {
-  middleware: ["authority"],
+  middleware: ["authority", "selectionCustomer"],
   computed: {
     ...mapGetters([
       "getSelectionCustomerList",
-      "getUserId",
       "getSelectionSurfaces",
       "getSelectionCustomerModel",
       "getSelectionCustomerButtonStatus",
@@ -42,9 +41,7 @@ export default {
       model: null,
     };
   },
-  created() {
-    this.$store.dispatch("setSelectionCustomerList", this.getUserId);
-  },
+  created() {},
   methods: {
     deleteForm(id) {
       this.$store.dispatch("setSelectionCustomerDelete", id);

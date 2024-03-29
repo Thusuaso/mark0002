@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="row mt-3">
+    <div class="row m-auto text-center">
       <div class="col">
         <Button
           type="button"

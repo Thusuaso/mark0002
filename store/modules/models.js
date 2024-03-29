@@ -386,7 +386,7 @@ const state = {
         SiparisNo: '',
         TedarikciID: 0,
         TedarikciAdi:'',
-        UrunKartID: null,
+        UrunKartID: 0,
         UrunBirimID: 0,
         Miktar: 0,
         OzelMiktar: 0,

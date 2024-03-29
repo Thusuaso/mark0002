@@ -1,3 +1,4 @@
+
 const state = {
     mekmarList:[],
     mekmarButtonStatus:false,
@@ -224,7 +225,7 @@ const actions = {
         this.$axios.post('/customer/selection/save', payload)
             .then(response => {
                 if (response.data.status) {
-                    vuexContext.dispatch('setSelectionCustomerList', vuexContext.getters.getUserId);
+                    vuexContext.dispatch('setSelectionCustomerList', payload.UserId);
                     this.$toast.success('Başarıyla Eklendi.');
                 } else {
                     this.$toast.error('Ekleme Başarısız');
@@ -236,7 +237,6 @@ const actions = {
         this.$axios.delete(`/customer/selection/delete/${id}`)
             .then(response => {
                 if (response.data.status) {
-                    vuexContext.dispatch('setSelectionCustomerList', vuexContext.getters.getUserId);
                     this.$toast.success('Başarıyla Silindi.');
                 } else {
                     this.$toast.error('Silme Başarısız.');
@@ -247,7 +247,7 @@ const actions = {
         this.$axios.put('/customer/selection/update', payload)
             .then(response => {
                 if (response.data.status) {
-                    vuexContext.dispatch('setSelectionCustomerList', vuexContext.getters.getUserId);
+                    vuexContext.dispatch('setSelectionCustomerList', payload.UserId);
                     this.$toast.success('Başarıyla Güncellendi.');
                 } else {
                   this.$toast.error('Güncelleme Başarısız.');

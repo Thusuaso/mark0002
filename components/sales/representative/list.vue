@@ -64,7 +64,7 @@
       <DataTable :value="orderer" class="p-datatable-sm">
         <template #header>
           <div
-            class="flex flex-wrap align-items-center justify-content-between gap-2 text-center"
+            class="flex flex-wrap align-items-center justify-content-between text-center"
           >
             Sales Summary
           </div>

@@ -7,10 +7,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Monthly Order (FOB)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Monthly Order (FOB)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.aylikSiparis | formatPriceUsd }}
                 </div>
               </div>
@@ -28,10 +26,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Annual Order (FOB)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Annual Order (FOB)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.yillikSiparis | formatPriceUsd }}
                 </div>
               </div>
@@ -50,10 +46,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Monthly Average (FOB)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Monthly Average (FOB)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.ortalamaSiparis | formatPriceUsd }}
                 </div>
               </div>
@@ -66,10 +60,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Annual Forecast (FOB)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Annual Forecast (FOB)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.tahminiYillikSiparis | formatPriceUsd }}
                 </div>
               </div>
@@ -82,10 +74,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Monthly Shipment (DDP)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Monthly Shipment (DDP)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.aylikYukleme | formatPriceUsd }}
                 </div>
               </div>
@@ -103,10 +93,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Annual Shipment (DDP)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Annual Shipment (DDP)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.yillikYukleme | formatPriceUsd }}
                 </div>
               </div>
@@ -125,10 +113,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Shipment Average Monthly (DDP)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Shipment Average Monthly (DDP)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.ortalamaYukleme | formatPriceUsd }}
                 </div>
               </div>
@@ -141,10 +127,8 @@
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary mb-1">
-                  Annual Shipment Forecast (DDP)
-                </div>
-                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                <div class="text-primary mb-1">Annual Shipment Forecast (DDP)</div>
+                <div class="h6 mb-0 text-gray-800">
                   {{ home.tahminiYillikYukleme | formatPriceUsd }}
                 </div>
               </div>
@@ -179,7 +163,7 @@ export default {
             ticks: {
               color: "black",
               font: {
-                weight: 500,
+                weight: 100,
               },
             },
             grid: {

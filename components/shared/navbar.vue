@@ -1,7 +1,7 @@
 <template>
   <nav
     class="navbar navbar-expand-lg bg-body-tertiary"
-    style="font-size: 85%"
+    style="font-size: 100%"
     data-bs-theme="blue"
   >
     <div class="container-fluid">
@@ -496,3 +496,51 @@ export default {
   },
 };
 </script>
+<style scoped>
+.nav-link {
+  font-size: 15px;
+  font-weight: bold;
+}
+.dropdown-item {
+  font-size: 13px;
+}
+
+@media (min-width: 576px) {
+}
+
+@media (min-width: 768px) {
+  .nav-link {
+    font-size: 9px;
+  }
+  .dropdown-item {
+    font-size: 7px;
+  }
+}
+
+@media (min-width: 992px) {
+  .nav-link {
+    font-size: 11px;
+  }
+  .dropdown-item {
+    font-size: 9px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .nav-link {
+    font-size: 13px;
+  }
+  .dropdown-item {
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .nav-link {
+    font-size: 15px;
+  }
+  .dropdown-item {
+    font-size: 13px;
+  }
+}
+</style>

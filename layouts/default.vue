@@ -1,7 +1,6 @@
 <template>
   <div class="">
-    <navbar v-if="$store.getters.isAuthenticated" />
-    <br />
+    <navbar v-if="$store.getters.isAuthenticated" style="margin-bottom: 5px" />
     <nuxt />
   </div>
 </template>
@@ -39,13 +38,20 @@ export default {
 </script>
 <style>
 * {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
 }
-.tableHeader {
-  font-size: 15px;
+.p-column-header-content > .p-column-title {
   font-weight: bold;
+  font-size: 13px;
+  text-align: center;
+  margin: 0px auto;
 }
 .tableBody {
-  font-size: 13px;
+  font-size: 11px;
+}
+.p-datatable .p-datatable-tfoot > tr > td {
+  font-size: 11px;
+  font-weight: normal;
 }
 </style>

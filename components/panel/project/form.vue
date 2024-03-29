@@ -60,7 +60,7 @@
                 lazyload
               />
               <div class="flex-1 flex flex-column gap-2">
-                <span class="font-bold">{{ slotProps.item.ImageName }}</span>
+                <span >{{ slotProps.item.ImageName }}</span>
                 <div class="flex align-items-center gap-2">
                   <i class="pi pi-tag text-sm"></i>
                   <span>{{ slotProps.item.ID }}</span>

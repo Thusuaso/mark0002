@@ -2168,7 +2168,8 @@ app.get('/customer/selection/list/:userId', (req, res) => {
             let data = [];
          surfaces.recordset.forEach(x=>{
              data.push({ 'surface': x.Surface, 'items': customers.recordset.filter((y) => y.SurfaceId == x.ID) });
-         })
+         });
+
             res.status(200).json({ 'list': data });
         });
     })
@@ -2184,7 +2185,6 @@ app.post('/customer/selection/save', (req, res) => {
                         '${req.body.SurfaceId}',
                         '${req.body.UserId}')
                 `;
-
     mssql.query(sql, (err, results) => {
         if (results.rowsAffected[0] == 1) {
             res.status(200).json({
@@ -9870,6 +9870,16 @@ app.post('/logs/save',(req,res)=>{
 
 
 /*Shared*/
+app.get('/orders/production/list',(req,res)=>{
+    const sql = `
+    select SiparisNo from SiparislerTB
+    where SiparisDurumID=2
+    order by SiparisTarihi desc
+    `;
+    mssql.query(sql,(err,order)=>{
+        res.status(200).json({'list':order.recordset});
+    });
+});
 app.get('/country',(req,res)=>{
     const sql = 'select ytu.Id,ytu.UlkeAdi,ytu.Kod,ytu.Icon_Flags,ytu.Png_Flags,ytu.dhl from YeniTeklif_UlkeTB ytu';
     mssql.query(sql,(err,country)=>{

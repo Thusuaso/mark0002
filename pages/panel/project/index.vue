@@ -117,7 +117,7 @@
               :alt="slotProps.item.ID"
             />
             <div class="flex-1 flex flex-column gap-2">
-              <span class="font-bold">{{ slotProps.item.ProjectName }}</span>
+              <span>{{ slotProps.item.ProjectName }}</span>
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-tag text-sm"></i>
                 <span>{{ slotProps.item.ID }}</span>

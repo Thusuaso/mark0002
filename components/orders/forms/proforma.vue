@@ -578,18 +578,22 @@ export default {
       }
     },
     uploadInvoiceDocument(event) {
-      upload.sendProforma(event.files[0], 2, this.po).then((response) => {
-        if (response) {
-          const data = {
-            id: 2,
-            po: this.po,
-            userId: Cookies.get("userId"),
-            date: date.dateToString(new Date()),
-            document: this.po + ".pdf",
-          };
-          this.$store.dispatch("setOrderProformaUpload", data);
-        }
-      });
+      if (event.files[0].size < "1000000") {
+        upload.sendProforma(event.files[0], 2, this.po).then((response) => {
+          if (response) {
+            const data = {
+              id: 2,
+              po: this.po,
+              userId: Cookies.get("userId"),
+              date: date.dateToString(new Date()),
+              document: this.po + ".pdf",
+            };
+            this.$store.dispatch("setOrderProformaUpload", data);
+          }
+        });
+      } else {
+        this.$toast.success("Dosya boyutu 1MB den büyük olamaz!");
+      }
     },
     invoiceChange(event) {
       this.model.FaturaKesimTurID = event.value.ID;

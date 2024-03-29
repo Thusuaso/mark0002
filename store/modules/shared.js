@@ -38,12 +38,19 @@ const state = {
     orderKindOfInvoiceList:[],
     orderKindOfDeliverySupplierList:[],
     yearList:[],
-    monthList:[]
+    monthList:[],
+    orderProductionList:[]
 
     
 
 };
 const actions = {
+    setOrderProductionList(vuexContext){
+        this.$axios.get('/orders/production/list')
+        .then(response=>{
+            vuexContext.commit('setOrderProductionList',response.data.list);
+        });
+    },
     setCountryList(vuexContext){
         this.$axios.get('/country')
             .then(response => {
@@ -224,7 +231,9 @@ const actions = {
 
 };
 const mutations = {
-    
+    setOrderProductionList(state,payload){
+        state.orderProductionList = payload;
+    },
     setCountryList(state,payload){
         state.countryList = payload;
     },
@@ -327,7 +336,9 @@ const mutations = {
 
 };
 const getters = {
-
+    getOrderProductionList(state){
+        return state.orderProductionList;
+    },
     getCountryList(state){
         return state.countryList;
     },

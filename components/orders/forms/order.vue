@@ -231,10 +231,16 @@
       <Column field="Kenar" header="Thickness"></Column>
       <Column header="M2">
         <template #body="slotProps">
-          <div v-if="slotProps.data.UrunBirimID == 1">
+          <div
+            v-if="slotProps.data.UrunBirimID == 1"
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }"
+          >
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
-          <div v-else>
+          <div
+            v-else
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }"
+          >
             {{ 0 | formatDecimal }}
           </div>
         </template>
@@ -244,10 +250,16 @@
       </Column>
       <Column header="Piece">
         <template #body="slotProps">
-          <div v-if="slotProps.data.UrunBirimID == 2">
+          <div
+            v-if="slotProps.data.UrunBirimID == 2"
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 2 ? 'red' : '' }"
+          >
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
-          <div v-else>
+          <div
+            v-else
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 2 ? 'red' : '' }"
+          >
             {{ 0 | formatDecimal }}
           </div>
         </template>
@@ -257,10 +269,16 @@
       </Column>
       <Column header="MT">
         <template #body="slotProps">
-          <div v-if="slotProps.data.UrunBirimID == 3">
+          <div
+            v-if="slotProps.data.UrunBirimID == 3"
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 3 ? 'red' : '' }"
+          >
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
-          <div v-else>
+          <div
+            v-else
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 3 ? 'red' : '' }"
+          >
             {{ 0 | formatDecimal }}
           </div>
         </template>
@@ -274,6 +292,11 @@
         </template>
         <template #footer>
           {{ detailProductTotal.ton | formatDecimal }}
+        </template>
+      </Column>
+      <Column field="OzelMiktar" header="Ö.M">
+        <template #body="slotProps">
+          {{ slotProps.data.OzelMiktar | formatDecimal }}
         </template>
       </Column>
       <Column field="SatisFiyati" header="Price">

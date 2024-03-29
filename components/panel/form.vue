@@ -1375,8 +1375,6 @@ export default {
 <style scoped>
 .header {
   font-size: 18px;
-  font-weight: bold;
-  font-family: "Courier New", Courier, monospace;
   text-align: center;
 }
 </style>

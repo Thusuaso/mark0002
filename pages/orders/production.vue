@@ -80,7 +80,6 @@
       :loading="getLoading"
       :status="'Production'"
       :total="getOrderProductionTotal"
-
     />
     <Dialog
       :visible.sync="production_detail_form"

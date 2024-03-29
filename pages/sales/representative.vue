@@ -1,13 +1,11 @@
 <template>
   <div class="container">
-    <div>
-      <representativeList
-        :list="getRepresentativeList"
-        :orderer="getTotalRepresentative"
-        :operation="getTotalOperation"
-        @representative_form_emit="representativeFormEmit($event)"
-      />
-    </div>
+    <representativeList
+      :list="getRepresentativeList"
+      :orderer="getTotalRepresentative"
+      :operation="getTotalOperation"
+      @representative_form_emit="representativeFormEmit($event)"
+    />
     <Dialog
       :visible.sync="representative_form_dialog"
       modal

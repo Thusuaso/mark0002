@@ -15,7 +15,7 @@
       <selectionForm
         @selection_production_dialog_form="selection_production_dialog_form = $event"
         :suppliers="getSupplierList"
-        :orders="getOrdersList"
+        :orders="getOrderProductionList"
         :products="getProductionProductsList"
         :mines="getMineList"
         :model="model"
@@ -46,9 +46,11 @@ export default {
       "getMineList",
       "getProductionButtonStatus",
       "getLoading",
+      "getOrderProductionList"
     ]),
   },
   created() {
+    this.$store.dispatch("setOrderProductionList");
     this.$store.dispatch("setSelectionProductionTotal");
     this.$store.dispatch("setSelectionProductsList");
     this.$store.dispatch("setSelectionProductionMekmerButtonStatus");

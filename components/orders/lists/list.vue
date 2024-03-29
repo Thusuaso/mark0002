@@ -286,7 +286,6 @@
       @row-click="$emit('production_selected_emit', $event.data)"
       class="p-datatable-sm"
       :loading="loading"
-      style="font-size: 70%"
       filterDisplay="row"
       :filters.sync="filtersOrders"
       :rowClass="rowClass2"
