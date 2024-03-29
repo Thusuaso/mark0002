@@ -148,6 +148,9 @@ export default {
       event.aciklama_es2 = this.__stringCharacterChange(event.aciklama_es);
       event.anahtarlar_es2 = this.__stringCharacterChange(event.anahtarlar_es);
       event.keywords_es2 = this.__stringCharacterChange(event.keywords_es);
+
+      event.urunadi_fr2 = this.__stringCharacterChange(event.urunadi_fr);
+
       this.$store.dispatch("setPanelProductsSave", event);
     },
     update(event) {
@@ -160,6 +163,8 @@ export default {
       event.aciklama_es2 = this.__stringCharacterChange(event.aciklama_es);
       event.anahtarlar_es2 = this.__stringCharacterChange(event.anahtarlar_es);
       event.keywords_es2 = this.__stringCharacterChange(event.keywords_es);
+      event.urunadi_fr2 = this.__stringCharacterChange(event.urunadi_fr);
+
       this.$store.dispatch("setPanelProductsUpdate", event);
     },
     process(event) {
