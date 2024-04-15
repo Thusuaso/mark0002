@@ -876,10 +876,10 @@ export default {
 }
 
 :deep(.row-accessories) {
-  border: 2px solid #c3c7c6 !important;
+  border: 2px solid #414241 !important;
   background-color: #ccede2 !important;
 }
 :deep(.row-accessories-border) {
-  border: 2px solid #dee0e0 !important;
+  border: 2px solid #313131 !important;
 }
 </style>

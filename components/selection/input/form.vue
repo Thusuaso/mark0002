@@ -328,7 +328,7 @@ export default {
       surfaceName: null,
       sizeName: null,
       orderProductCardDesc: null,
-      selectedAmountStatus: "M2",
+      selectedAmountStatus: "Sqm",
       selectedSaveKind: null,
       kinds: [
         { id: 1, status: "Stok" },
@@ -342,8 +342,8 @@ export default {
       selectedDate: new Date(),
       selectedProducts: null,
       amountStatus: [
-        { id: 1, status: "M2" },
-        { id: 2, status: "Adet" },
+        { id: 1, status: "Sqm" },
+        { id: 2, status: "Pcs" },
         { id: 3, status: "Mt" },
         { id: 4, status: "Ton" },
       ],
@@ -383,7 +383,7 @@ export default {
       ) {
         return 0;
       } else {
-        if (this.selectedAmountStatus == "M2") {
+        if (this.selectedAmountStatus == "Sqm") {
           const width = parseFloat(this.width.replace(",", "."));
           const height = parseFloat(this.height.replace(",", "."));
           this.amount = (
@@ -448,9 +448,9 @@ export default {
         sipAciklama = this.selectedProducts.SiparisNo;
       }
       let birimId;
-      if (this.selectedAmountStatus == "M2") {
+      if (this.selectedAmountStatus == "Sqm") {
         birimId = 1;
-      } else if (this.selectedAmountStatus == "Adet") {
+      } else if (this.selectedAmountStatus == "Pcs") {
         birimId = 2;
       } else if (this.selectedAmountStatus == "Mt") {
         birimId = 3;
@@ -491,9 +491,9 @@ export default {
         sipAciklama = this.selectedPo.SiparisNo;
       }
       let birimId;
-      if (this.selectedAmountStatus == "M2") {
+      if (this.selectedAmountStatus == "Sqm") {
         birimId = 1;
-      } else if (this.selectedAmountStatus == "Adet") {
+      } else if (this.selectedAmountStatus == "Pcs") {
         birimId = 2;
       } else if (this.selectedAmountStatus == "Mt") {
         birimId = 3;
@@ -553,7 +553,7 @@ export default {
       this.surfaceName = null;
       this.sizeName = null;
       this.orderProductCardDesc = null;
-      this.selectedAmountStatus = "M2";
+      this.selectedAmountStatus = "Sqm";
       this.selectedSaveKind = null;
       this.selectedSupplier = null;
       this.$store.commit("setSelectionProductionCrateNo", null);
@@ -566,6 +566,7 @@ export default {
       this.selectedSupplier = this.suppliers.find(
         (x) => x.FirmaAdi == this.model.FirmaAdi
       );
+      console.log(this.model);
       this.selectedDate = date.stringToDate(this.model.Tarih);
       this.selectedAmountStatus = this.model.UrunBirimAdi;
       this.productCardId = this.model.UrunKartId;

@@ -1101,7 +1101,9 @@ export default {
       }
     },
     moveToSourceSuggested(event) {
-      this.$store.dispatch("setPanelProductSuggestedDelete", event.items[0].Id);
+      if (confirm("Are you sure you want to delete?")) {
+        this.$store.dispatch("setPanelProductSuggestedDelete", event.items[0].Id);
+      }
     },
     moveToTargetSuggested(event) {
       if (confirm("Eklemek istiyor musunuz?")) {
@@ -1114,6 +1116,8 @@ export default {
             urunid: this.productId,
           });
         }
+      } else {
+        return;
       }
     },
     panelProductPhotoUpload(event) {
@@ -1162,22 +1166,28 @@ export default {
           }
         });
       });
-      this.$store.dispatch("setPanelProductPhotoAllDelete", this.productId);
+      if (confirm("Are you sure you want to delete?")) {
+        this.$store.dispatch("setPanelProductPhotoAllDelete", this.productId);
+      }
     },
     moveToTargetPhotoOne(event) {
       if (event.items.length == 0) {
         return;
       } else {
-        oceanservice.panelProductPhotoDelete(event.items[0].name).then((response) => {
-          if (response) {
-            this.$store.dispatch("setPanelProductPhotoOneDelete", event.items[0].Id);
-          }
-        });
+        if (confirm("Are you sure you want to delete?")) {
+          oceanservice.panelProductPhotoDelete(event.items[0].name).then((response) => {
+            if (response) {
+              this.$store.dispatch("setPanelProductPhotoOneDelete", event.items[0].Id);
+            }
+          });
+        }
       }
     },
 
     deleteEdge(id) {
-      this.$store.dispatch("setPanelProductEdgeDelete", id);
+      if (confirm("Are you sure you want to delete?")) {
+        this.$store.dispatch("setPanelProductEdgeDelete", id);
+      }
     },
     addEdge() {
       this.edgeModel.UrunId = this.productId;
@@ -1193,7 +1203,9 @@ export default {
     },
 
     deleteMaterial(id) {
-      this.$store.dispatch("setPanelProductMaterialDelete", id);
+      if (confirm("Are you sure you want to delete?")) {
+        this.$store.dispatch("setPanelProductMaterialDelete", id);
+      }
     },
     addMaterial() {
       this.materialModel.UrunId = this.productId;
@@ -1208,7 +1220,7 @@ export default {
       this.materialModel.MateryalRu = event.value.MateryalRu;
     },
     deleteStyle(id) {
-      if (confirm("Silmek istiyor musunuz?")) {
+      if (confirm("Are you sure you want to delete?")) {
         this.$store.dispatch("setPanelProductStyleDelete", id);
       }
     },
@@ -1225,7 +1237,7 @@ export default {
       this.styleModel.StilRu = event.value.StilRu;
     },
     deleteType(id) {
-      if (confirm("Silmek istiyor musunuz?")) {
+      if (confirm("Are you sure you want to delete?")) {
         this.$store.dispatch("setPanelProductTypeDelete", id);
       }
     },
@@ -1242,7 +1254,7 @@ export default {
       this.typeModel.TurRu = event.value.TurRu;
     },
     deleteArea(id) {
-      if (confirm("Silmek istiyor musunuz?")) {
+      if (confirm("Are you sure you want to delete?")) {
         this.$store.dispatch("setPanelProductAreaDelete", id);
       }
     },
@@ -1259,7 +1271,7 @@ export default {
       this.areaModel.Areas_ru = event.value.Areas_ru;
     },
     deleteFinish(id) {
-      if (confirm("Silmek istiyor musunuz?")) {
+      if (confirm("Are you sure you want to delete?")) {
         this.$store.dispatch("setPanelProductFinishDelete", id);
       }
     },
@@ -1275,7 +1287,7 @@ export default {
       this.finishModel.finish_ru = event.value.finish_ru;
     },
     deleteColor(event) {
-      if (confirm("Silmek istiyor musunuz?")) {
+      if (confirm("Are you sure you want to delete?")) {
         this.$store.dispatch("setPanelProductColorDelete", event);
       }
     },
@@ -1295,7 +1307,7 @@ export default {
       this.$store.dispatch("setPanelProductSizeUpdate", event.newData);
     },
     deleteSize(id) {
-      if (confirm("Silmek istiyor musunuz?")) {
+      if (confirm("Are you sure you want to delete?")) {
         this.$store.dispatch("setPanelProductSizeDelete", id);
       }
     },
@@ -1355,7 +1367,9 @@ export default {
       this.model.keywords_ar = this.__noneNullControl(this.model.keywords_ar);
     },
     deleteForm() {
-      this.$emit("delete_emit", this.model.urunid);
+      if (confirm("Are you sure you want to delete?")) {
+        this.$emit("delete_emit", this.model.urunid);
+      }
     },
     process() {
       if (this.status) {

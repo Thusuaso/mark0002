@@ -533,6 +533,16 @@ export default {
     }
   },
   methods: {
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
+
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
+    },
     uploadReminder(event) {
       fileService.offerFile(event.files[0], this.id).then((response) => {
         if (response.Status) {
@@ -555,8 +565,7 @@ export default {
         }
       });
     },
-    reminderDateSelected(event) {
-    },
+    reminderDateSelected(event) {},
     __undefinedControl(value) {
       if (
         value === undefined ||
