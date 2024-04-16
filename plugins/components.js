@@ -73,6 +73,8 @@ import offerDetail from '~/components/offers/detail';
 import offerForm from '~/components/offers/form';
 import offerProforma from '~/components/offers/proforma';
 import offerSample from '~/components/offers/sample';
+import offerOld from '~/components/offers/old';
+
 
 import panelPublishedList from '~/components/panel/published/list';
 import panelProductForm from '~/components/panel/form';
@@ -103,6 +105,8 @@ import panelUsaStockForm from '~/components/panel/usa/form';
 import salesConsiderForm from '~/components/sales/consider/form';
 import salesConsiderList from '~/components/sales/consider/list';
 import todoMainList from '~/components/todo/main/list';
+
+Vue.component('offerOld',offerOld);
 
 Vue.component('offerSample',offerSample);
 Vue.component('offerProforma',offerProforma);
@@ -282,8 +286,13 @@ Vue.component('CustomInput', CustomInput)
 
 /*Filters */
 Vue.filter('formatPriceUsd',(value)=>{
-    const val = (value / 1).toFixed(2).replace(".", ",");
-    return "$" + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    if(value == null || value == undefined){
+        return '$0';
+    }else{
+        const val = (value / 1).toFixed(2).replace(".", ",");
+        return "$" + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
 });
 Vue.filter('formatDecimal', (value) => {
     if (value == 'null' || value == null || value == ' ') {

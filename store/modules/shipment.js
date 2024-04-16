@@ -52,7 +52,11 @@ const actions = {
             });
         })
 
+    },
+    setShipmentSendProductionTotalCrateReset(vuexContext){
+        vuexContext.commit('setShipmentSendProductionTotalCrateReset');
     }
+
 };
 const mutations = {
     setShipmentSendProductionList(state){
@@ -77,6 +81,9 @@ const mutations = {
             state.shipmentSendProductionList.push(item);
         }
         state.shipmentSendProductionTotal.crate += products.length;
+    },
+    setShipmentSendProductionTotalCrateReset(state){
+        state.shipmentSendProductionTotal.crate = 0;
     }
 
 };

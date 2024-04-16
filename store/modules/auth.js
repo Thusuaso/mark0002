@@ -41,17 +41,22 @@ const actions = {
         vuexContext.commit('setToken',payload);
     },
     login(vuexContext,user){
-        this.$axios.post('/login',user)
-        .then(response=>{
-            if(response.data.status){
-                this.$toast.success('Giriş Başarılı ' + 'Hoşgeldin ' + response.data.username.charAt(0).toUpperCase() + response.data.username.slice(1));
-                vuexContext.commit('login',response.data);
-                this.$router.push('/');
-            } else{
-                this.$toast.error('Kullanıcı adı ya da şifre hatalı.')
-            }
+        return new Promise((resolve,reject)=>{
+            this.$axios.post('/login',user)
+            .then(response=>{
+                if(response.data.status){
+                    this.$toast.success('Giriş Başarılı ' + 'Hoşgeldin ' + response.data.username.charAt(0).toUpperCase() + response.data.username.slice(1));
+                    vuexContext.commit('login',response.data);
+                    this.$router.push('/');
+                    resolve(true)
+                } else{
+                    this.$toast.error('Kullanıcı adı ya da şifre hatalı.');
+                    resolve(false)
+                }
+    
+            })
+        });
 
-        })
     },
     login_mailer(vuexContext,payload) {
         this.$axios.post('/mail/login/server',payload)
@@ -62,7 +67,8 @@ const actions = {
                 this.$toast.error('Mail gönderilemedi.');
                 }
             })
-    }
+    },
+
 };
 const mutations = {
     setToken(state,user){
@@ -86,7 +92,8 @@ const mutations = {
         process.isClient ? localStorage.setItem('mail',user.mail):false;
 
 
-    }
+    },
+
 };
 const getters = {
     isAuthenticated(state){

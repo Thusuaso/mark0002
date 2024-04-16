@@ -12,6 +12,18 @@ const state = {
     offerDetailTotalB:0
 };
 const actions = {
+    setOfferAddSize(vuexContext,size){
+        this.$axios.post('/offer/add/size',{'size':size})
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Successful');
+                vuexContext.dispatch('setOfferSharedList');
+            }else{
+                this.$toast.error('Error');
+            }
+        });
+        
+    },
     setOfferAListTotal(vuexContext,payload){
         vuexContext.commit('setOfferAListTotal',payload);
     },
@@ -171,7 +183,7 @@ const actions = {
         this.$axios.get('/offer/old/list')
             .then(response => {
                 if (response.data.list) {
-                                vuexContext.commit('setOfferMainDetailList', response.data.list); 
+                                vuexContext.commit('setOfferOldList', response.data.list); 
                 vuexContext.dispatch('setEndLoadingAction');
                 }
 
@@ -230,8 +242,10 @@ const actions = {
 
 };
 const mutations = {
+    setOfferOldList(state,payload){
+        state.offerOldList = payload;
+    },
     setOfferDetailDeletedAllEmit(state,offerId){
-        console.log(offerId);
         const index = state.offerDetailList.findIndex(x=>x.Id==offerId);
         state.offerDetailList.splice(index,1);
     },
@@ -285,6 +299,9 @@ const mutations = {
 
 };
 const getters = {
+    getOfferOldList(state){
+        return state.offerOldList;
+    },
     getOfferDetailTotalA(state){
         return state.offerDetailTotalA;
     },

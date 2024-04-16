@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row" style="width: 1300px">
     <div class="col-9">
       <div class="row">
         <div class="col">
@@ -154,6 +154,8 @@
               <label for="size">WidthxHeight</label>
             </span>
           </div>
+        </div>
+        <div class="row mt-4">
           <div class="col">
             <span class="p-float-label">
               <AutoComplete
@@ -168,7 +170,7 @@
               <label for="thickness">Edge</label>
             </span>
           </div>
-          <div class="col mt-3">
+          <div class="col">
             <span class="p-float-label">
               <AutoComplete
                 v-model="selectedSurface"
@@ -182,7 +184,7 @@
               <label for="surface">Surface</label>
             </span>
           </div>
-          <div class="col mt-3">
+          <div class="col">
             <div class="p-float-label">
               <Dropdown
                 v-model="selectedUnit"
@@ -194,6 +196,9 @@
               />
               <label for="unit">Select a Unit</label>
             </div>
+          </div>
+          <div class="col">
+            <Button type="button" label="Add Size" @click="toggle" />
           </div>
         </div>
         <div class="row mt-4">
@@ -264,7 +269,7 @@
           <div class="col">
             <Button
               type="button"
-              class="p-button-error w-100"
+              class="p-button-danger w-100"
               label="Delete"
               @click="deleteProduct"
               :disabled="id == 0"
@@ -403,6 +408,35 @@
         </span>
       </div>
     </div>
+    <OverlayPanel ref="op">
+      <div class="row">
+        <div class="col">
+          <span class="p-float-label">
+            <InputText
+              id="inputtext"
+              type="text"
+              v-model="width"
+              @input="inputWidth($event)"
+            />
+            <label for="inputtext">Width</label>
+          </span>
+        </div>
+        <div class="col">
+          <span class="p-float-label">
+            <InputText
+              id="inputtext"
+              type="text"
+              v-model="height"
+              @input="inputHeight($event)"
+            />
+            <label for="inputtext">Height</label>
+          </span>
+        </div>
+        <div class="col">
+          <Button label="Add" @click="saveWidthHeight" />
+        </div>
+      </div>
+    </OverlayPanel>
   </div>
 </template>
 <script>
@@ -471,6 +505,8 @@ export default {
   },
   data() {
     return {
+      width: null,
+      height: null,
       offer_customer_disabled: false,
       offer_disabled_button: false,
       proforma_dialog_form: false,
@@ -533,6 +569,21 @@ export default {
     }
   },
   methods: {
+    inputHeight(event) {
+      this.height = event.replace(".", ",");
+    },
+    inputWidth(event) {
+      this.width = event.replace(".", ",");
+    },
+    saveWidthHeight() {
+      const size = this.width + "x" + this.height;
+      this.$store.dispatch("setOfferAddSize", size);
+      this.width = null;
+      this.height = null;
+    },
+    toggle(event) {
+      this.$refs.op.toggle(event);
+    },
     __stringCharacterChange(event) {
       const data = event.split("'");
       let value = "";
@@ -580,7 +631,9 @@ export default {
       }
     },
     deleteProcess() {
-      this.$emit("offer_delete_emit", this.model.Id);
+      if (confirm("Are you sure you want to delete?")) {
+        this.$emit("offer_delete_emit", this.model.Id);
+      }
     },
     customerInput(event) {
       this.customerModel.MusteriAdi = event;
@@ -759,8 +812,10 @@ export default {
       this.modelProduct.Tarih = date.dateToString(event);
     },
     deleteProduct() {
-      this.$store.dispatch("setOfferDetailProductsDelete", this.modelProduct.Id);
-      this.productReset();
+      if (confirm("Are you sure you want to delete?")) {
+        this.$store.dispatch("setOfferDetailProductsDelete", this.modelProduct.Id);
+        this.productReset();
+      }
     },
     updateProduct() {
       this.$store.dispatch("setOfferDetailProductsUpdate", this.modelProduct);

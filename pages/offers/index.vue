@@ -68,6 +68,14 @@
         @offer_delete_emit="offerDelete($event)"
       />
     </Dialog>
+    <Dialog
+      :visible.sync="offer_list_detail_old"
+      header="Old Quotes"
+      :closeOnEscape="false"
+      modal
+    >
+      <offerOld :list="getOfferOldList" :loading="getLoading"></offerOld>
+    </Dialog>
   </div>
 </template>
 <script>
@@ -98,6 +106,7 @@ export default {
       "getLoading",
       "getOfferDetailTotalA",
       "getOfferDetailTotalB",
+      "getOfferOldList",
     ]),
   },
   data() {
@@ -107,6 +116,7 @@ export default {
       model: {},
       offer_updated_list_form: false,
       offer_id: null,
+      offer_list_detail_old: false,
     };
   },
   created() {
@@ -121,7 +131,7 @@ export default {
     oldOffers() {
       this.$store.dispatch("setOfferOldList");
       this.$store.dispatch("setOfferAllButtonStatus", false);
-      this.offer_list_detail = true;
+      this.offer_list_detail_old = true;
     },
     offers() {
       this.offer_list_detail = true;

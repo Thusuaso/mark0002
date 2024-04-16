@@ -9,12 +9,7 @@
             :suggestions="filteredOrders"
             @complete="searchOrders($event)"
             field="SiparisNo"
-            @item-select="
-              $store.dispatch(
-                'setSelectionProductionProductsList',
-                $event.value.SiparisNo
-              )
-            "
+            @item-select="ordersSelected($event.value.SiparisNo)"
           />
           <label for="order">Orders</label>
         </span>
@@ -264,6 +259,21 @@ export default {
     };
   },
   methods: {
+    ordersSelected(event) {
+      this.$store.dispatch("setSelectionProductionProductsList", event);
+      this.forwardingDate = null;
+      this.invoice = null;
+      this.follow = null;
+      this.forwardingstatus = null;
+      this.selectedProduct = null;
+      this.getShipmentAmount.order = 0;
+      this.getShipmentAmount.production = 0;
+      this.getShipmentAmount.remainder = 0;
+      this.getShipmentProductionList = null;
+      this.selectedProducts = null;
+      this.$store.dispatch("setShipmentSendProductionList");
+      this.$store.dispatch("setShipmentSendProductionTotalCrateReset");
+    },
     reset() {
       this.selectedOrder = null;
       this.forwardingDate = null;

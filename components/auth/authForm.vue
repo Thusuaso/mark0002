@@ -5,13 +5,11 @@
       <input
         type="text"
         class="form-control"
-        :class="{ 'is-invalid': !usernameStatus, 'is-valid': usernameStatus }"
         id="exampleInputEmail1"
         aria-describedby="emailHelp"
         v-model="user.username"
         @change="validateUsername($event)"
       />
-      <i v-if="usernameInfoStatus" style="color: red">*Kullanıcı Adınız Hatalıdır.</i>
     </div>
 
     <div class="mb-3">
@@ -21,17 +19,10 @@
         class="form-control"
         id="exampleInputPassword1"
         v-model="user.password"
-        :class="{ 'is-invalid': !passwordStatus, 'is-valid': passwordStatus }"
         @change="validatePassword($event)"
       />
-      <i v-if="passwordInfoStatus" style="color: red">*Parolanız Hatalıdır.</i>
     </div>
-    <i v-if="passwordStatus" style="color: rgb(0, 255, 0); padding-bottom: 10px"
-      >Artık Giriş Yapabilirsiniz.</i
-    >
-    <button type="submit" class="btn btn-primary w-100" :disabled="!passwordStatus">
-      Login
-    </button>
+    <button type="submit" class="btn btn-primary w-100">Login</button>
   </form>
 </template>
 <script>

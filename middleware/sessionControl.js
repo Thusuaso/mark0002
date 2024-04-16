@@ -4,5 +4,5 @@ export default function (context) {
         context.store.dispatch('sessionControl',context.req);
     } else {
         context.store.dispatch('sessionControl');
-    }
+    };
 }

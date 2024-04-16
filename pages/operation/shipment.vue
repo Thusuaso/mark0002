@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <shipmentForm :orders="getOrdersList" />
+    <shipmentForm :orders="getOrderProductionList" />
   </div>
 </template>
 <script>
@@ -8,7 +8,10 @@ import { mapGetters } from "vuex";
 export default {
   middleware: ["authority"],
   computed: {
-    ...mapGetters(["getOrdersList"]),
+    ...mapGetters(["getOrderProductionList"]),
+  },
+  created() {
+    this.$store.dispatch("setOrderProductionList");
   },
 };
 </script>

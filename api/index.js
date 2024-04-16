@@ -4447,8 +4447,8 @@ app.get('/offer/main/list', (req, res) => {
     select
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as TeklifSahibi,
 	count(yt.Id) as TeklifSayisi,
-	dbo.Offers_A_List_Total(yt.KullaniciId) as TeklifSayisiB,
-	dbo.Offers_B_List_Total(yt.KullaniciId) as TeklifSayisiA,
+	dbo.Offers_A_List_Total(yt.KullaniciId) as TeklifSayisiA,
+	dbo.Offers_B_List_Total(yt.KullaniciId) as TeklifSayisiB,
 	yt.KullaniciId
 			
 from YeniTeklifTB yt
@@ -4994,65 +4994,50 @@ order by yt.TeklifOncelik,yt.Sira
 });
 app.get('/offer/old/list', (req, res) => {
     const sql = `
-        select 
+    select 
+	yt.*,
+	(select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as Customer,
+	(select (select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = ytm.UlkeId) from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as Country,
+	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as Username,
+	yurun.FobFiyat as FobPrice,
+	yurun.FcaFiyat as FcaPrice,
+	yurun.DFiyat as DtpPrice,
+	yurun.CFiyat as CfrPrice,
+	(select ytk.KategoriAdi from YeniTeklif_KategorilerTB ytk where ytk.Id = yurun.KategoriId) as Category,
+	(select ytu.UrunAdi from YeniTeklif_UrunlerTB ytu where ytu.Id = yurun.UrunId) as Product,
+	(select yty.IslemAdi from YeniTeklif_YuzeyIslemTB yty where yty.Id = yurun.YuzeyIslemId) as Surface,
+	(select yto.EnBoy from YeniTeklif_Olcu_EnBoyTB yto where yto.id = yurun.EnBoyId) as Size,
+	(select ytedge.Kalinlik from YeniTeklif_Olcu_KalinlikTB ytedge where ytedge.id = yurun.KalinlikId) as Edge,
+	yurun.Birim
 
 
-	yt.Id,
-	yt.Tarih,
-	yt.HatirlatmaTarihi,
-	yt.HatirlatmaSonTarih,
-	yt.MusteriId,
-	yt.Aciklama,
-	yt.Cfr,
-	yt.Fob,
-	yt.Dtp,
-	yt.Fca,
-	yt.KullaniciId,
-	yt.TakipEt,
-	yt.KaynakYeri,
-	yt.TeklifYeri,
-	yt.HatirlatmaAciklama,
-	yt.HatirlatmaId,
-	yt.DosyaAdi,
-	yt.Numune_Giris_Tarihi,
-	yt.Numune_Hatirlatma_Tarihi,
-	yt.Numune_Hatirlatma_SonTarih,
-	yt.Numune_Tracking_No,
-	yt.Numune_Odenen_Tutar,
-	yt.Numune_Musteriden_Alinan,
-	yt.Proforma_Po_No,
-	yt.Proforma_Tarih,
-	yt.Proforma_Tutar,
-	yt.ProformaNot,
-	yt.Teklif_Cloud,
-	yt.Teklif_Cloud_Dosya,
-	yt.Proforma_Cloud,
-	yt.Proforma_Cloud_Dosya,
-	yt.Numune_Cloud,
-	yt.Numune_Cloud_Dosya,
-	yt.NumuneNot,
-	yt.TeklifOncelik,
-	yt.Sira,
-	yt.BList,
-	yt.SonGorulme_Cloud,
-	yt.SonGorulme_Cloud_Dosya,
-	yt.HatirlatilmaDurumu,
-	yt.Company,
-	yt.Email,
-	yt.Phone,
-	k.KullaniciAdi,
-    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
-	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi
-    
 
-from YeniTeklifTB yt
-inner join KullaniciTB k on k.ID = yt.KullaniciId
 
-order by yt.TeklifOncelik 
+
+
+from YeniTeklif_UrunKayitTB yurun
+inner join YeniTeklifTB yt on yt.Id = yurun.TeklifId
+where yt.TakipEt = 0
+order by Tarih desc
+
+
+
     `;
     mssql.query(sql,(err,results)=>{
         results.recordset.forEach(x=>{
             x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;
+            if(parseInt(x.FobPrice) >0){
+                x.Price = x.FobPrice
+            }
+            if(parseInt(x.FcaPrice)>0){
+                x.Price = x.FcaPrice;
+            }
+            if(parseInt(x.DtpPrice)>0){
+                x.Price = x.DtpPrice;
+            } 
+            if(parseInt(x.CfrPrice)>0){
+                x.Price = x.CfrPrice;
+            }
         });
         res.status(200).json({ 'list': results.recordset });
     });
@@ -5164,6 +5149,19 @@ app.put('/offer/sample/file/upload',(req,res)=>{
     }
    
 
+});
+app.post('/offer/add/size',(req,res)=>{
+    const sql = `
+    insert into YeniTeklif_Olcu_EnBoyTB(EnBoy)
+    VALUES('${req.body.size}')
+    `;
+    mssql.query(sql,(err,size)=>{
+        if(size.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        };
+    });
 });
 
 

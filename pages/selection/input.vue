@@ -46,7 +46,7 @@ export default {
       "getMineList",
       "getProductionButtonStatus",
       "getLoading",
-      "getOrderProductionList"
+      "getOrderProductionList",
     ]),
   },
   created() {
