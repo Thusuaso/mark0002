@@ -105,6 +105,11 @@ export default {
     // https://github.com/primefaces/primevue/issues/844
     transpile: ['primevue'],
     standalone: false,
+    loaders:  {
+      vue: {
+         prettify: false
+      }
+    }
 
   },
   serverMiddleware:[

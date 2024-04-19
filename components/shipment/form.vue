@@ -61,7 +61,7 @@
       <div class="col-3">
         <Dropdown
           v-model="selectedProduct"
-          :options="getProductionProductsList"
+          :options="getOrderProductionProductNormalList"
           optionLabel="Aciklama"
           placeholder="Select a Product"
           class="w-50"
@@ -227,7 +227,7 @@ import Cookies from "js-cookie";
 export default {
   computed: {
     ...mapGetters([
-      "getProductionProductsList",
+      "getOrderProductionProductNormalList",
       "getShipmentAmount",
       "getShipmentProductionList",
       "getShipmentSendProductionList",
@@ -260,7 +260,7 @@ export default {
   },
   methods: {
     ordersSelected(event) {
-      this.$store.dispatch("setSelectionProductionProductsList", event);
+      this.$store.dispatch("setOrderProductionProductListNormal", event);
       this.forwardingDate = null;
       this.invoice = null;
       this.follow = null;

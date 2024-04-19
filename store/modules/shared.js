@@ -39,12 +39,22 @@ const state = {
     orderKindOfDeliverySupplierList:[],
     yearList:[],
     monthList:[],
-    orderProductionList:[]
+    orderProductionList:[],
+    orderProductionProductNormalList:[],
 
     
 
 };
 const actions = {
+
+    setOrderProductionProductListNormal(vuexContext,po){
+        console.log(po);
+        this.$axios.get(`/order/products/normal/${po}`)
+        .then(response=>{
+            vuexContext.commit('setOrderProductionProductListNormal',response.data.products)
+        })
+    },
+
     setOrderProductionList(vuexContext){
         this.$axios.get('/orders/production/list')
         .then(response=>{
@@ -231,6 +241,9 @@ const actions = {
 
 };
 const mutations = {
+    setOrderProductionProductListNormal(state,payload){
+        state.orderProductionProductNormalList = payload;
+    },
     setOrderProductionList(state,payload){
         state.orderProductionList = payload;
     },
@@ -336,6 +349,9 @@ const mutations = {
 
 };
 const getters = {
+    getOrderProductionProductNormalList(state){
+        return state.orderProductionProductNormalList;
+    },
     getOrderProductionList(state){
         return state.orderProductionList;
     },

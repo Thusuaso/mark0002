@@ -4664,6 +4664,29 @@ app.delete('/offer/product/delete/:id', (req, res) => {
         }
     });
 });
+function __stringCharacterChange(event) {
+    if(event == null || event == undefined){
+        console.log('if',event);
+        return '';
+    }else{
+        console.log('ilk else',event);
+        const data = event.split("'");
+        let value = "";
+        if(data.length >0){
+            data.forEach((x) => {
+                value += x + "''";
+              });
+              const value2 = value.substring(0, value.length - 2);
+              return value2;
+        }else{
+        console.log('ikinci else',event);
+
+            return event
+        }
+
+    }
+
+  }
 app.post('/offer/save',(req,res)=>{
     if(req.body.customer.Id == 0 || req.body.customer.Id == null){
         const insertCustomerSql = `
@@ -4752,7 +4775,7 @@ app.post('/offer/save',(req,res)=>{
             update YeniTeklif_MusterilerTB
             SET 
             MusteriAdi='${__stringCharacterChange(req.body.customer.MusteriAdi)}',
-            UlkeId='${__stringCharacterChange(req.body.customer.UlkeId)}',
+            UlkeId='${req.body.customer.UlkeId}',
             Company='${__stringCharacterChange(req.body.customer.Company)}',
             Mail='${__stringCharacterChange(req.body.customer.Mail)}',
             Phone='${__stringCharacterChange(req.body.customer.Phone)}',
@@ -4813,16 +4836,7 @@ app.post('/offer/save',(req,res)=>{
     }
 });
 
-function __stringCharacterChange(event) {
-    const data = event.split("'");
-    let value = "";
 
-    data.forEach((x) => {
-      value += x + "''";
-    });
-    const value2 = value.substring(0, value.length - 2);
-    return value2;
-  }
 
 app.put('/offer/update',(req,res)=>{
     const updateOfferSql = `
@@ -4852,7 +4866,6 @@ app.put('/offer/update',(req,res)=>{
             Description='${__stringCharacterChange(req.body.customer.Description)}'
             WHERE Id = '${req.body.customer.Id}'
     `;
-
     mssql.query(updateCustomerSql);
     mssql.query(updateOfferSql,(err,results)=>{
         if (results.rowsAffected[0] == 1) {
@@ -9068,24 +9081,23 @@ VALUES(
 	'${req.body.FaturaKesimTurID}'
 )
     `;
-    console.log(sql)
-    // const sqlId = `select top 1 ID from SiparislerTB order by ID desc
-    // `;
-    // mssql.query(sql, (err, production) => {
-    //     if (production.rowsAffected[0] == 1) {
-    //         mssql.query(sqlId,(err,id)=>{
-    //             if(id.rowsAffected[0] == 1){
-    //                 res.status(200).json({'status':true,'id':id.recordset[0].ID});
+    const sqlId = `select top 1 ID from SiparislerTB order by ID desc
+    `;
+    mssql.query(sql, (err, production) => {
+        if (production.rowsAffected[0] == 1) {
+            mssql.query(sqlId,(err,id)=>{
+                if(id.rowsAffected[0] == 1){
+                    res.status(200).json({'status':true,'id':id.recordset[0].ID});
 
-    //             }else{
-    //                 res.status(200).json({'status':false});
+                }else{
+                    res.status(200).json({'status':false});
 
-    //             }
-    //         });
-    //     }else{
-    //         res.status(200).json({'status':false});
-    //     };
-    // });
+                }
+            });
+        }else{
+            res.status(200).json({'status':false});
+        };
+    });
 
 });
 app.put('/order/production/update', (req, res) => {
@@ -9976,6 +9988,28 @@ app.get('/mines',(req,res)=>{
         }) 
     });
 });
+
+app.get('/order/products/normal/:po',(req,res)=>{
+    const sql = `
+    select su.ID,su.UrunBirimID,s.SiparisNo,uk.ID as UrunKartId,k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar,su.TedarikciID,(t.FirmaAdi + '/' + k.KategoriAdi + '/' + ur.UrunAdi + '/' + yk.YuzeyIslemAdi + '/' + ol.En + 'x' + ol.Boy + 'x' + ol.Kenar) as Aciklama from SiparislerTB s
+    inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+    inner join UrunKartTB uk on uk.ID = su.UrunKartID
+    inner join UrunlerTB ur on ur.ID = uk.UrunID
+    inner join KategoriTB k on k.ID = uk.KategoriID
+    inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+    inner join OlculerTB ol on ol.ID = uk.OlcuID
+    inner join TedarikciTB t on t.ID = su.TedarikciID
+    
+    where s.SiparisDurumID=2 and  s.SiparisNo='${req.params.po}'
+    `;
+    mssql.query(sql,(err,products)=>{
+        res.status(200).json({
+            'products':products.recordset,
+        })
+    });
+});
+
+
 app.get('/order/products/:po',(req,res)=>{
     const sql = `select su.ID,su.UrunBirimID,s.SiparisNo,uk.ID as UrunKartId,k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar,su.TedarikciID,(t.FirmaAdi + '/' + k.KategoriAdi + '/' + ur.UrunAdi + '/' + yk.YuzeyIslemAdi + '/' + ol.En + 'x' + ol.Boy + 'x' + ol.Kenar) as Aciklama from SiparislerTB s
                 inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
