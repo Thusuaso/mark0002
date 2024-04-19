@@ -8,6 +8,9 @@
       :rows="10"
       :filters.sync="filteredOldOffers"
       filterDisplay="row"
+      :selection="selectedOldOffer"
+      selectionMode="single"
+      @row-click="$emit('old_offers_selected_emit', $event)"
     >
       <Column field="Sira" header="Id" :showFilterMenu="false" :showClearButton="false">
         <template #filter="{ filterModel, filterCallback }">
@@ -191,6 +194,7 @@ export default {
   },
   data() {
     return {
+      selectedOldOffer: null,
       filteredOldOffers: {
         Sira: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },

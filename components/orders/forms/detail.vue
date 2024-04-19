@@ -73,6 +73,7 @@
           v-model="modelProduction.SiparisNo"
           class="w-100"
           :disabled="!status"
+          @input="inputPo($event)"
         />
         <label for="po">Po</label>
       </span>
@@ -277,7 +278,11 @@
 </template>
 <script>
 import date from "../../../plugins/date";
+import { mapGetters } from "vuex";
 export default {
+  computed: {
+    ...mapGetters(["getOrdersAllList"]),
+  },
   props: {
     modelProduction: {
       type: Object,
@@ -415,6 +420,12 @@ export default {
     }
   },
   methods: {
+    inputPo(event) {
+      const index = this.getOrdersAllList.find((x) => x.SiparisNo == event);
+      if (index) {
+        this.$toast.success("Bu po ya ait sipariş bulunmakta.");
+      }
+    },
     prePaymentIsActivated(event) {
       let prepayment = 0;
       this.productsList.forEach((product) => {

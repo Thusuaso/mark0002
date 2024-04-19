@@ -74,7 +74,11 @@
       :closeOnEscape="false"
       modal
     >
-      <offerOld :list="getOfferOldList" :loading="getLoading"></offerOld>
+      <offerOld
+        :list="getOfferOldList"
+        :loading="getLoading"
+        @old_offers_selected_emit="oldOfferSelected($event)"
+      ></offerOld>
     </Dialog>
   </div>
 </template>
@@ -125,6 +129,14 @@ export default {
     this.$store.dispatch("setOfferCustomerList");
   },
   methods: {
+    oldOfferSelected(event) {
+      this.model = event.data;
+      this.$store.dispatch("setOfferDetailProductsList", event.data.Id);
+      this.$store.dispatch("setOfferButtonStatus", false);
+      this.$store.dispatch("setOfferId", event.data.Id);
+      this.offer_id = event.data.Sira;
+      this.offer_list_detail_form = true;
+    },
     offerBListSelected(event) {
       this.$store.dispatch("setOfferMainDetailBList", event.KullaniciId);
     },

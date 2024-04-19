@@ -401,7 +401,7 @@ export default {
       this.$store.dispatch("setOrderProductionPo", null);
       this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", true);
       this.$store.commit("setOrderSupplierProductList", []);
-
+      this.$store.dispatch('setOrderAllList');
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
     },

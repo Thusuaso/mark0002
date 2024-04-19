@@ -203,7 +203,13 @@
         </div>
         <div class="row mt-4">
           <div class="col">
-            <span class="p-float-label">
+            <CustomInput
+              :value="modelProduct.FobFiyat"
+              text="Fca"
+              @onInput="modelProduct.FobFiyat = $event"
+              :disabled="id == 0"
+            />
+            <!-- <span class="p-float-label">
               <InputText
                 id="fob"
                 v-model="modelProduct.FobFiyat"
@@ -211,10 +217,18 @@
                 :disabled="id == 0"
               />
               <label for="fob">Fob</label>
-            </span>
+            </span> -->
           </div>
           <div class="col">
-            <span class="p-float-label">
+            <CustomInput
+              :value="modelProduct.FcaFiyat"
+              text="Fca"
+              @onInput="modelProduct.FcaFiyat = $event"
+              :disabled="id == 0"
+            />
+            <!-- <span class="p-float-label">
+              
+
               <InputText
                 id="fca"
                 v-model="modelProduct.FcaFiyat"
@@ -222,10 +236,16 @@
                 :disabled="id == 0"
               />
               <label for="fca">Fca</label>
-            </span>
+            </span> -->
           </div>
           <div class="col">
-            <span class="p-float-label">
+            <CustomInput
+              :value="modelProduct.CFiyat"
+              text="Fca"
+              @onInput="modelProduct.CFiyat = $event"
+              :disabled="id == 0"
+            />
+            <!-- <span class="p-float-label">
               <InputText
                 id="c"
                 v-model="modelProduct.CFiyat"
@@ -233,10 +253,16 @@
                 :disabled="id == 0"
               />
               <label for="c">C</label>
-            </span>
+            </span> -->
           </div>
           <div class="col">
-            <span class="p-float-label">
+            <CustomInput
+              :value="modelProduct.DFiyat"
+              text="Fca"
+              @onInput="modelProduct.DFiyat = $event"
+              :disabled="id == 0"
+            />
+            <!-- <span class="p-float-label">
               <InputText
                 id="d"
                 v-model="modelProduct.DFiyat"
@@ -244,7 +270,7 @@
                 :disabled="id == 0"
               />
               <label for="d">D</label>
-            </span>
+            </span> -->
           </div>
         </div>
         <div class="row mt-3">

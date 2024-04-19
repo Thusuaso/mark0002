@@ -4681,14 +4681,14 @@ app.post('/offer/save',(req,res)=>{
 
                 )
                 VALUES(
-                '${req.body.customer.MusteriAdi}',
+                '${__stringCharacterChange(req.body.customer.MusteriAdi)}',
                 '${req.body.customer.UlkeId}',
-                '${req.body.customer.Company}',
-                '${req.body.customer.Mail}',
-                '${req.body.customer.Phone}',
+                '${__stringCharacterChange(req.body.customer.Company)}',
+                '${__stringCharacterChange(req.body.customer.Mail)}',
+                '${__stringCharacterChange(req.body.customer.Phone)}',
                 '${req.body.customer.Kullanici}',
-                '${req.body.customer.Adress}',
-                '${req.body.customer.Description}'
+                '${__stringCharacterChange(req.body.customer.Adress)}',
+                '${__stringCharacterChange(req.body.customer.Description)}'
 
                 )
         `;
@@ -4719,7 +4719,7 @@ app.post('/offer/save',(req,res)=>{
                                     VALUES(
                                     '${req.body.offer.Tarih}',
                                     '${custId}',
-                                    '${req.body.offer.Aciklama}',
+                                    '${__stringCharacterChange(req.body.offer.Aciklama)}',
                                     '${req.body.offer.KullaniciId}',
                                     '${req.body.offer.TakipEt}',
                                     '${req.body.offer.KaynakYeri}',
@@ -4751,13 +4751,13 @@ app.post('/offer/save',(req,res)=>{
         const updateCustomerSql = `
             update YeniTeklif_MusterilerTB
             SET 
-            MusteriAdi='${req.body.customer.MusteriAdi}',
-            UlkeId='${req.body.customer.UlkeId}',
-            Company='${req.body.customer.Company}',
-            Mail='${req.body.customer.Mail}',
-            Phone='${req.body.customer.Phone}',
-            Adress='${req.body.customer.Adress}',
-            Description='${req.body.customer.Description}'
+            MusteriAdi='${__stringCharacterChange(req.body.customer.MusteriAdi)}',
+            UlkeId='${__stringCharacterChange(req.body.customer.UlkeId)}',
+            Company='${__stringCharacterChange(req.body.customer.Company)}',
+            Mail='${__stringCharacterChange(req.body.customer.Mail)}',
+            Phone='${__stringCharacterChange(req.body.customer.Phone)}',
+            Adress='${__stringCharacterChange(req.body.customer.Adress)}',
+            Description='${__stringCharacterChange(req.body.customer.Description)}'
             WHERE Id = '${req.body.customer.Id}'
         `;
         mssql.query(updateCustomerSql);
@@ -4783,7 +4783,7 @@ app.post('/offer/save',(req,res)=>{
                                     VALUES(
                                     '${req.body.offer.Tarih}',
                                     '${req.body.offer.MusteriId}',
-                                    '${req.body.offer.Aciklama}',
+                                    '${__stringCharacterChange(req.body.offer.Aciklama)}',
                                     '${req.body.offer.KullaniciId}',
                                     '${req.body.offer.TakipEt}',
                                     '${req.body.offer.KaynakYeri}',
@@ -4812,13 +4812,25 @@ app.post('/offer/save',(req,res)=>{
 
     }
 });
+
+function __stringCharacterChange(event) {
+    const data = event.split("'");
+    let value = "";
+
+    data.forEach((x) => {
+      value += x + "''";
+    });
+    const value2 = value.substring(0, value.length - 2);
+    return value2;
+  }
+
 app.put('/offer/update',(req,res)=>{
     const updateOfferSql = `
             update YeniTeklifTB
             SET
                 
                     Tarih='${req.body.offer.Tarih}',
-                    Aciklama='${req.body.offer.Aciklama}',
+                    Aciklama='${__stringCharacterChange(req.body.offer.Aciklama)}',
                     TakipEt='${req.body.offer.TakipEt}',
                     KaynakYeri='${req.body.offer.KaynakYeri}',
                     TeklifYeri='${req.body.offer.TeklifYeri}',
@@ -4833,11 +4845,11 @@ app.put('/offer/update',(req,res)=>{
             SET 
             MusteriAdi='${req.body.customer.MusteriAdi}',
             UlkeId='${req.body.customer.UlkeId}',
-            Company='${req.body.customer.Company}',
-            Mail='${req.body.customer.Mail}',
-            Phone='${req.body.customer.Phone}',
-            Adress='${req.body.customer.Adress}',
-            Description='${req.body.customer.Description}'
+            Company='${__stringCharacterChange(req.body.customer.Company)}',
+            Mail='${__stringCharacterChange(req.body.customer.Mail)}',
+            Phone='${__stringCharacterChange(req.body.customer.Phone)}',
+            Adress='${__stringCharacterChange(req.body.customer.Adress)}',
+            Description='${__stringCharacterChange(req.body.customer.Description)}'
             WHERE Id = '${req.body.customer.Id}'
     `;
 
@@ -9056,23 +9068,24 @@ VALUES(
 	'${req.body.FaturaKesimTurID}'
 )
     `;
-    const sqlId = `select top 1 ID from SiparislerTB order by ID desc
-    `;
-    mssql.query(sql, (err, production) => {
-        if (production.rowsAffected[0] == 1) {
-            mssql.query(sqlId,(err,id)=>{
-                if(id.rowsAffected[0] == 1){
-                    res.status(200).json({'status':true,'id':id.recordset[0].ID});
+    console.log(sql)
+    // const sqlId = `select top 1 ID from SiparislerTB order by ID desc
+    // `;
+    // mssql.query(sql, (err, production) => {
+    //     if (production.rowsAffected[0] == 1) {
+    //         mssql.query(sqlId,(err,id)=>{
+    //             if(id.rowsAffected[0] == 1){
+    //                 res.status(200).json({'status':true,'id':id.recordset[0].ID});
 
-                }else{
-                    res.status(200).json({'status':false});
+    //             }else{
+    //                 res.status(200).json({'status':false});
 
-                }
-            });
-        }else{
-            res.status(200).json({'status':false});
-        };
-    });
+    //             }
+    //         });
+    //     }else{
+    //         res.status(200).json({'status':false});
+    //     };
+    // });
 
 });
 app.put('/order/production/update', (req, res) => {
@@ -9870,9 +9883,7 @@ app.post('/logs/save',(req,res)=>{
 /*Shared*/
 app.get('/orders/production/list',(req,res)=>{
     const sql = `
-    select SiparisNo from SiparislerTB
-    where SiparisDurumID=2
-    order by SiparisTarihi desc
+    select s.SiparisNo,s.MusteriID from SiparislerTB s where s.SiparisDurumID=2 order by s.SiparisTarihi desc
     `;
     mssql.query(sql,(err,order)=>{
         res.status(200).json({'list':order.recordset});
@@ -9975,7 +9986,7 @@ app.get('/order/products/:po',(req,res)=>{
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
                 inner join TedarikciTB t on t.ID = su.TedarikciID
                 
-                where s.SiparisDurumID=2 and s.SiparisNo='${req.params.po}'
+                where s.SiparisDurumID=2 and dbo.Production_Total_Control_Fk(s.SiparisNo,su.UrunKartID) < su.Miktar and  s.SiparisNo='${req.params.po}'
     `;
     mssql.query(sql,(err,products)=>{
         res.status(200).json({
