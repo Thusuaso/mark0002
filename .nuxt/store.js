@@ -19,6 +19,7 @@ let store = {};
   // Enforce store modules
   store.modules = store.modules || {}
 
+  resolveStoreModules(require('..\\store\\modules\\accounts.js'), 'modules/accounts.js')
   resolveStoreModules(require('..\\store\\modules\\auth.js'), 'modules/auth.js')
   resolveStoreModules(require('..\\store\\modules\\authority.js'), 'modules/authority.js')
   resolveStoreModules(require('..\\store\\modules\\bgp.js'), 'modules/bgp.js')
@@ -52,6 +53,7 @@ let store = {};
     // Whenever any Vuex module is updated...
     module.hot.accept([
       '..\\store\\index.js',
+      '..\\store\\modules\\accounts.js',
       '..\\store\\modules\\auth.js',
       '..\\store\\modules\\authority.js',
       '..\\store\\modules\\bgp.js',

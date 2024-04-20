@@ -24,7 +24,8 @@ import order from './modules/order';
 import loading from './modules/loading';
 import logs from './modules/logs';
 import local from './modules/local';
-import authority from './modules/authority'
+import authority from './modules/authority';
+import accounts from './modules/accounts';
 const createStore = ()=>{
     return new Vuex.Store({
        state:{
@@ -60,7 +61,8 @@ const createStore = ()=>{
             loading,
             logs,
             local,
-            authority
+            authority,
+            accounts
         ],
 
     });

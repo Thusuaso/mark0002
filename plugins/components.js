@@ -105,6 +105,11 @@ import panelUsaStockForm from '~/components/panel/usa/form';
 import salesConsiderForm from '~/components/sales/consider/form';
 import salesConsiderList from '~/components/sales/consider/list';
 import todoMainList from '~/components/todo/main/list';
+import accountsList from '~/components/accounts/list';
+import accountsForm from '~/components/accounts/form';
+
+Vue.component('accountsList',accountsList);
+Vue.component('accountsForm',accountsForm);
 
 Vue.component('offerOld',offerOld);
 

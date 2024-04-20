@@ -2,6 +2,12 @@
   "IoSocketStatus": {
     "description": "Auto imported from node_modules/nuxt-socket-io/lib/components/SocketStatus.js"
   },
+  "AccountsForm": {
+    "description": "Auto imported from components/accounts/form.vue"
+  },
+  "AccountsList": {
+    "description": "Auto imported from components/accounts/list.vue"
+  },
   "AuthForm": {
     "description": "Auto imported from components/auth/authForm.vue"
   },
@@ -314,9 +320,6 @@
   "ReportsMekmerAtlantaList": {
     "description": "Auto imported from components/reports/mekmer/atlanta/list.vue"
   },
-  "ReportsMekmerMineList": {
-    "description": "Auto imported from components/reports/mekmer/mine/list.vue"
-  },
   "ReportsMekmerProductionList": {
     "description": "Auto imported from components/reports/mekmer/production/list.vue"
   },
@@ -325,5 +328,8 @@
   },
   "ReportsMekmerStockList": {
     "description": "Auto imported from components/reports/mekmer/stock/list.vue"
+  },
+  "ReportsMekmerMineList": {
+    "description": "Auto imported from components/reports/mekmer/mine/list.vue"
   }
 }

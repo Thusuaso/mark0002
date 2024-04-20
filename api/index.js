@@ -9892,6 +9892,51 @@ app.post('/logs/save',(req,res)=>{
 });
 
 
+/*Accounts*/
+app.get('/accounts/list',(req,res)=>{
+    const sql = `select ID,Platform,LoginName,LoginPassword from Accounts`;
+    mssql.query(sql,(err,accounts)=>{
+        res.status(200).json({'list':accounts.recordset})
+    });
+});
+
+app.post('/accounts/save',(req,res)=>{
+    const sql = `
+    insert into Accounts(Platform,LoginName,LoginPassword)
+    VALUES('${req.body.Platform}','${req.body.LoginName}','${req.body.LoginPassword}')
+    `;
+    mssql.query(sql,(err,saved)=>{
+        if(saved.rowsAffected[0]==1){
+            res.status(200).json({'status':true});
+
+        }else{
+            res.status(200).json({'status':false});
+
+        }
+    });
+});
+
+app.put('/accounts/update',(req,res)=>{
+    const sql = `update Accounts SET Platform='${req.body.Platform}',LoginName='${req.body.LoginName}',LoginPassword='${req.body.LoginPassword}' WHERE ID='${req.body.ID}'`;
+    mssql.query(sql,(err,accounts)=>{
+        if(accounts.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        }
+    });
+});
+app.delete('/accounts/delete/:id',(req,res)=>{
+    const sql = `delete Accounts WHERE ID='${req.params.id}'`;
+    mssql.query(sql,(err,accounts)=>{
+        if(accounts.rowsAffected[0]==1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false})
+        }
+    });
+});
+
 /*Shared*/
 app.get('/orders/production/list',(req,res)=>{
     const sql = `

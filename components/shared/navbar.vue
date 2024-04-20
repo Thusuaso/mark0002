@@ -92,6 +92,11 @@
                   >Points to Consider</nuxt-link
                 >
               </li>
+              <li>
+                <nuxt-link to="/passwords" class="dropdown-item" tag="a"
+                  >Passwords</nuxt-link
+                >
+              </li>
             </ul>
           </li>
 

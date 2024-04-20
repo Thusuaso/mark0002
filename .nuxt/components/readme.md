@@ -7,6 +7,8 @@ You can directly use them in pages and other components without the need to impo
 **Tip:** If a component is conditionally rendered with `v-if` and is big, it is better to use `Lazy` or `lazy-` prefix to lazy load.
 
 - `<IoSocketStatus>` | `<io-socket-status>` (node_modules/nuxt-socket-io/lib/components/SocketStatus.js)
+- `<AccountsForm>` | `<accounts-form>` (components/accounts/form.vue)
+- `<AccountsList>` | `<accounts-list>` (components/accounts/list.vue)
 - `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<CardsForm>` | `<cards-form>` (components/cards/form.vue)
 - `<CardsList>` | `<cards-list>` (components/cards/list.vue)
@@ -111,7 +113,7 @@ You can directly use them in pages and other components without the need to impo
 - `<ReportsMekmarSummaryDetail>` | `<reports-mekmar-summary-detail>` (components/reports/mekmar/summary/detail.vue)
 - `<ReportsMekmarSummaryList>` | `<reports-mekmar-summary-list>` (components/reports/mekmar/summary/list.vue)
 - `<ReportsMekmerAtlantaList>` | `<reports-mekmer-atlanta-list>` (components/reports/mekmer/atlanta/list.vue)
-- `<ReportsMekmerMineList>` | `<reports-mekmer-mine-list>` (components/reports/mekmer/mine/list.vue)
 - `<ReportsMekmerProductionList>` | `<reports-mekmer-production-list>` (components/reports/mekmer/production/list.vue)
 - `<ReportsMekmerStockForm>` | `<reports-mekmer-stock-form>` (components/reports/mekmer/stock/form.vue)
 - `<ReportsMekmerStockList>` | `<reports-mekmer-stock-list>` (components/reports/mekmer/stock/list.vue)
+- `<ReportsMekmerMineList>` | `<reports-mekmer-mine-list>` (components/reports/mekmer/mine/list.vue)

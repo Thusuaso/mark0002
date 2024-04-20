@@ -7,6 +7,7 @@ import scrollBehavior from './router.scrollBehavior.js'
 const _c288462c = () => interopDefault(import('..\\pages\\auth\\index.vue' /* webpackChunkName: "pages/auth/index" */))
 const _579285b0 = () => interopDefault(import('..\\pages\\finance\\index.vue' /* webpackChunkName: "pages/finance/index" */))
 const _862cf8ca = () => interopDefault(import('..\\pages\\offers\\index.vue' /* webpackChunkName: "pages/offers/index" */))
+const _df5551ec = () => interopDefault(import('..\\pages\\passwords\\index.vue' /* webpackChunkName: "pages/passwords/index" */))
 const _05b1da26 = () => interopDefault(import('..\\pages\\customer\\bgp.vue' /* webpackChunkName: "pages/customer/bgp" */))
 const _018637f2 = () => interopDefault(import('..\\pages\\customer\\fair.vue' /* webpackChunkName: "pages/customer/fair" */))
 const _54444b0e = () => interopDefault(import('..\\pages\\customer\\mekmar.vue' /* webpackChunkName: "pages/customer/mekmar" */))
@@ -76,6 +77,10 @@ export const routerOptions = {
     path: "/offers",
     component: _862cf8ca,
     name: "offers"
+  }, {
+    path: "/passwords",
+    component: _df5551ec,
+    name: "passwords"
   }, {
     path: "/customer/bgp",
     component: _05b1da26,

@@ -416,10 +416,25 @@ const state = {
     salesPointOfConsiderModel:{
         ID:null,
         Hata:''
+    },
+    accountsModel:{
+        ID:0,
+        LoginName:'',
+        LoginPassword:'',
+        Platform:''
     }
 
 };
 const actions = {
+    setAccountsModel(vuexContext){
+        const accountsModel = {
+            ID:0,
+            LoginName:'',
+            LoginPassword:'',
+            Platform:''
+        }
+        vuexContext.commit('setAccountsModel',accountsModel);
+    },
     setCustomerModel(vuexContext) {
         const payload = {
             'FirmaAdi': "",
@@ -927,6 +942,9 @@ const actions = {
 
 }
 const mutations = {
+    setAccountsModel(state,payload){
+        state.accountsModel = payload;
+    },
     setCustomerModel(state,payload) {
         state.customerModel = payload
     },
@@ -1017,6 +1035,9 @@ const mutations = {
 
 }
 const getters = {
+    getAccountsModel(state){
+        return state.accountsModel;
+    },
     getCustomerModel(state){
         return state.customerModel;
     },
