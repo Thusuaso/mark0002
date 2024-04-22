@@ -56,42 +56,28 @@
     </div>
     <div class="row mt-3">
       <div class="col">
-        <span class="p-float-label">
-          <InputNumber
-            v-model="tl"
-            locale="en-US"
-            inputId="tlInput"
-            :minFractionDigits="3"
-            @input="tlInput($event)"
-            :disabled="disabled"
-          />
-          <label for="tlInput">₺</label>
-        </span>
+        <CustomInput
+          :value="tl"
+          text="₺"
+          @onInput="inputTl($event)"
+          :disabled="disabled_input"
+        />
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputNumber
-            v-model="currency"
-            locale="en-US"
-            inputId="currencyInput"
-            :minFractionDigits="3"
-            :disabled="disabled"
-          />
-          <label for="currencyInput">Currency ($)</label>
-        </span>
+        <CustomInput
+          :value="currency"
+          text="Currency ($)"
+          @onInput="currency = $event"
+          :disabled="disabled_input"
+        />
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputNumber
-            v-model="usd"
-            locale="en-US"
-            inputId="usdInput"
-            :minFractionDigits="3"
-            @input="usdInput($event)"
-            :disabled="disabled"
-          />
-          <label for="usdInput">$</label>
-        </span>
+        <CustomInput
+          :value="usd"
+          text="$"
+          @onInput="inputUsd($event)"
+          :disabled="disabled_input"
+        />
       </div>
     </div>
     <div class="row mt-3">
@@ -146,7 +132,7 @@ import date from "../../../plugins/date";
 import upload from "../../../plugins/upload";
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
-
+import server from "../../../plugins/excel.server";
 export default {
   computed: {
     ...mapGetters(["getContainerResults"]),
@@ -167,6 +153,7 @@ export default {
   },
   data() {
     return {
+      disabled_input: true,
       selectedCompany: null,
       filteredCompany: null,
       selectedPo: null,
@@ -185,6 +172,14 @@ export default {
     };
   },
   methods: {
+    inputUsd(event) {
+      this.usd = event;
+      this.tl = event * this.currency;
+    },
+    inputTl(event) {
+      this.tl = event;
+      this.usd = event / this.currency;
+    },
     onUpload(event) {
       upload.sendInvoiceShipping(
         event.files[0],
@@ -226,9 +221,19 @@ export default {
 
       this.$store.dispatch("setContainerInputSave", this.containerdata);
       const log = {
-          'description':this.selectedPo.SiparisNo + ' po ya ' + this.invoiceno + ' fatura no ile ' + this.selectedInvoice.name + ' faturası $' + this.usd.toFixed(2) + ' ve $' + this.currency.toFixed(2) + ' kur girilmiştir.'  ,
-          'po':this.selectedPo.SiparisNo,
-          'color':'#ffec31'
+        description:
+          this.selectedPo.SiparisNo +
+          " po ya " +
+          this.invoiceno +
+          " fatura no ile " +
+          this.selectedInvoice.name +
+          " faturası $" +
+          this.usd.toFixed(2) +
+          " ve $" +
+          this.currency.toFixed(2) +
+          " kur girilmiştir.",
+        po: this.selectedPo.SiparisNo,
+        color: "#ffec31",
       };
       this.$logs.save(log);
       this.reset();
@@ -249,9 +254,15 @@ export default {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      currency.getDateCurrency(year, month, day).then((response) => {
-        this.currency = response;
-      });
+      server
+        .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
+        .then((response) => {
+          this.currency = parseFloat(response.data);
+          this.disabled_input = false;
+        });
+      // currency.getDateCurrency(year, month, day).then((response) => {
+      //   this.currency = response;
+      // });
     },
     searchPo(event) {
       let result;

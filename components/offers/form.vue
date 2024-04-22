@@ -122,6 +122,7 @@
                 field="KategoriAdi"
                 @item-select="categoryListSelected($event)"
                 :disabled="id == 0"
+                @input="inputCategory($event)"
               />
               <label for="category">Category</label>
             </span>
@@ -136,6 +137,7 @@
                 field="UrunAdi"
                 @item-select="productListSelected($event)"
                 :disabled="id == 0"
+                @input="inputProduct($event)"
               />
               <label for="product">Product</label>
             </span>
@@ -150,6 +152,7 @@
                 field="EnBoy"
                 @item-select="sizeListSelected($event)"
                 :disabled="id == 0"
+                @input="inputSize($event)"
               />
               <label for="size">WidthxHeight</label>
             </span>
@@ -166,6 +169,7 @@
                 field="Kalinlik"
                 @item-select="thicknessListSelected($event)"
                 :disabled="id == 0"
+                @input="inputThickness($event)"
               />
               <label for="thickness">Edge</label>
             </span>
@@ -180,6 +184,7 @@
                 field="IslemAdi"
                 @item-select="surfaceListSelected($event)"
                 :disabled="id == 0"
+                @input="inputSurface($event)"
               />
               <label for="surface">Surface</label>
             </span>
@@ -196,9 +201,6 @@
               />
               <label for="unit">Select a Unit</label>
             </div>
-          </div>
-          <div class="col">
-            <Button type="button" label="Add Size" @click="toggle" />
           </div>
         </div>
         <div class="row mt-4">
@@ -434,35 +436,6 @@
         </span>
       </div>
     </div>
-    <OverlayPanel ref="op">
-      <div class="row">
-        <div class="col">
-          <span class="p-float-label">
-            <InputText
-              id="inputtext"
-              type="text"
-              v-model="width"
-              @input="inputWidth($event)"
-            />
-            <label for="inputtext">Width</label>
-          </span>
-        </div>
-        <div class="col">
-          <span class="p-float-label">
-            <InputText
-              id="inputtext"
-              type="text"
-              v-model="height"
-              @input="inputHeight($event)"
-            />
-            <label for="inputtext">Height</label>
-          </span>
-        </div>
-        <div class="col">
-          <Button label="Add" @click="saveWidthHeight" />
-        </div>
-      </div>
-    </OverlayPanel>
   </div>
 </template>
 <script>
@@ -595,6 +568,21 @@ export default {
     }
   },
   methods: {
+    inputSurface(event){
+      this.modelProduct.IslemAdi = event;
+    },
+    inputThickness(event){
+      this.modelProduct.Kalinlik = event;
+    },
+    inputSize(event) {
+      this.modelProduct.EnBoy = event;
+    },
+    inputProduct(event) {
+      this.modelProduct.UrunAdi = event;
+    },
+    inputCategory(event) {
+      this.modelProduct.KategoriAdi = event;
+    },
     inputHeight(event) {
       this.height = event.replace(".", ",");
     },
@@ -607,9 +595,7 @@ export default {
       this.width = null;
       this.height = null;
     },
-    toggle(event) {
-      this.$refs.op.toggle(event);
-    },
+
     __stringCharacterChange(event) {
       const data = event.split("'");
       let value = "";

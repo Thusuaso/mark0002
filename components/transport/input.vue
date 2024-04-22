@@ -51,48 +51,34 @@
             :suggestions="filteredPo"
             field="SiparisNo"
             @complete="searchPo($event)"
-            :disabled="disabled"
+            :disabled="disabled_input"
           />
           <label for="po">Order No</label>
         </span>
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputNumber
-            v-model="tl"
-            locale="en-US"
-            inputId="tlInput"
-            :minFractionDigits="3"
-            @input="tlInput($event)"
-            :disabled="disabled"
-          />
-          <label for="tlInput">₺</label>
-        </span>
+        <CustomInput
+          :value="tl"
+          text="₺"
+          @onInput="inputTl($event)"
+          :disabled="disabled_input"
+        />
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputNumber
-            v-model="currency"
-            locale="en-US"
-            inputId="currencyInput"
-            :minFractionDigits="3"
-            :disabled="disabled"
-          />
-          <label for="currencyInput">Currency ($)</label>
-        </span>
+        <CustomInput
+          :value="currency"
+          text="Currency ($)"
+          @onInput="currency = $event"
+          :disabled="disabled_input"
+        />
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputNumber
-            v-model="usd"
-            locale="en-US"
-            inputId="usdInput"
-            :minFractionDigits="3"
-            @input="usdInput($event)"
-            :disabled="disabled"
-          />
-          <label for="usdInput">$</label>
-        </span>
+        <CustomInput
+          :value="usd"
+          text="$"
+          @onInput="inputUsd($event)"
+          :disabled="disabled"
+        />
       </div>
     </div>
     <div class="row">
@@ -194,6 +180,7 @@ import currency from "../../plugins/currency";
 import date from "../../plugins/date";
 import upload from "../../plugins/upload";
 import Cookies from "js-cookie";
+import server from "@/plugins/excel.server";
 
 export default {
   props: {
@@ -208,6 +195,7 @@ export default {
   },
   data() {
     return {
+      disabled_input: true,
       filteredCompany: null,
       selectedCompany: null,
       transportdate: null,
@@ -227,6 +215,14 @@ export default {
     };
   },
   methods: {
+    inputUsd(event) {
+      this.usd = event;
+      this.tl = event * this.currency;
+    },
+    inputTl(event) {
+      this.tl = event;
+      this.usd = event / this.currency;
+    },
     onUpload(event) {
       upload.sendTransport(event.files[0], this.selectedCompany.ID, this.invoiceno);
       this.$store.dispatch("setTransportFileSave", this.transportList);
@@ -283,9 +279,17 @@ export default {
         userId: Cookies.get("userId"),
       };
       const log = {
-          'description':this.selectedPo.SiparisNo + ' po ya ' + this.invoiceno + ' fatura no ile Nakliye Faturası $' + this.usd.toFixed(2) + ' ve $' + this.currency.toFixed(2) + ' kur girilmiştir.'  ,
-          'po':this.selectedPo.SiparisNo,
-          'color':'#ffec31'
+        description:
+          this.selectedPo.SiparisNo +
+          " po ya " +
+          this.invoiceno +
+          " fatura no ile Nakliye Faturası $" +
+          this.usd.toFixed(2) +
+          " ve $" +
+          this.currency.toFixed(2) +
+          " kur girilmiştir.",
+        po: this.selectedPo.SiparisNo,
+        color: "#ffec31",
       };
       this.$logs.save(log);
 
@@ -327,9 +331,12 @@ export default {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      currency.getDateCurrency(year, month, day).then((response) => {
-        this.currency = response;
-      });
+      server
+        .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
+        .then((response) => {
+          this.currency = parseFloat(response.data);
+          this.disabled_input = false;
+        });
     },
     searchPo(event) {
       let result;

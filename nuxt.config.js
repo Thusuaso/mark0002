@@ -5,7 +5,7 @@ export default {
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'mark0002',
+    title: 'GOZ',
     htmlAttrs: {
       lang: 'en'
     },

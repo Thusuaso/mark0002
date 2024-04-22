@@ -67,6 +67,7 @@ const actions = {
                     this.$toast.success('Başarıyla Eklendi.');
                     vuexContext.commit('setOfferDetailProductsAdd', { ...product, 'Id': response.data.id });
                     vuexContext.dispatch('setOfferProductModel');
+                    vuexContext.dispatch('setOfferSharedList');
 
 
                 } else {

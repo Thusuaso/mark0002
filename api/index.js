@@ -4582,48 +4582,160 @@ where ytuk.TeklifId='${req.params.id}'
         res.status(200).json({ 'list': results.recordset }); 
     });
 });
-app.post('/offer/product/add', (req, res) => {
-    const addSql = `
-                        insert into YeniTeklif_UrunKayitTB(
-                            Tarih,
-                            TeklifId,
-                            KategoriId,
-                            UrunId,
-                            EnBoyId,
-                            YuzeyIslemId,
-                            KalinlikId,
-                            FobFiyat,
-                            Birim,
-                            FcaFiyat,
-                            CFiyat,
-                            DFiyat
-                        )
-                        VALUES(
-                            '${req.body.Tarih}',
-                            '${req.body.TeklifId}',
-                            '${req.body.KategoriId}',
-                            '${req.body.UrunId}',
-                            '${req.body.EnBoyId}',
-                            '${req.body.YuzeyIslemId}',
-                            '${req.body.KalinlikId}',
-                            '${req.body.FobFiyat}',
-                            '${req.body.Birim}',
-                            '${req.body.FcaFiyat}',
-                            '${req.body.CFiyat}',
-                            '${req.body.DFiyat}'
 
-                        )
-                 `;
-    const productIdSql = `select top 1 Id from YeniTeklif_UrunKayitTB order by Id desc`;
-    mssql.query(addSql, (err, add) => {
-        if (add.rowsAffected[0] == 1) {
-            mssql.query(productIdSql, (err, id) => {
-                res.status(200).json({ 'id': id.recordset[0].Id ,'status':true}); 
+function __offerCategoryId(payload){
+    
+    return new Promise((resolve,reject)=>{
+        if(payload.KategoriId == null || payload.KategoriId == 0 || payload.KategoriId == undefined){
+            const insertCategory = `insert into YeniTeklif_KategorilerTB(KategoriAdi) VALUES('${payload.KategoriAdi}')`;
+            mssql.query(insertCategory,(err,category)=>{
+                if(category.rowsAffected[0] == 1){
+                    const sql = `select top 1 Id from YeniTeklif_KategorilerTB order by Id desc`;
+                    mssql.query(sql,(err,categoryId)=>{
+                        resolve(categoryId.recordset[0].Id);
+                    });
+                }
             });
-        } else {
-            res.status(200).json({ 'id': 0, 'status': false });
+
+        } else{
+            resolve(payload.KategoriId);
         }
     });
+
+};
+function __offerProductId(payload){
+    return new Promise((resolve,reject)=>{
+        if(payload.UrunId == null || payload.UrunId == 0 || payload.UrunId ==undefined){
+            const insertProduct = `insert into YeniTeklif_UrunlerTB(UrunAdi) VALUES('${payload.UrunAdi}')`;
+            mssql.query(insertProduct,(err,product)=>{
+                if(product.rowsAffected[0]==1){
+                    const productIdSql = `select top 1 Id from YeniTeklif_UrunlerTB order by Id desc`;
+                    mssql.query(productIdSql,(err,productId)=>{
+                        resolve(productId.recordset[0].Id);
+                    });
+                }
+            });
+        }else{
+            resolve(payload.UrunId);
+        }
+
+    });
+};
+function __offerSizeId(payload){
+    return new Promise((resolve,reject)=>{
+        if(payload.EnBoyId == null || payload.EnBoyId == 0 || payload.EnBoyId == undefined){
+            const insertSizeSql = `insert into YeniTeklif_Olcu_EnBoyTB(EnBoy) VALUES('${payload.EnBoy}')`;
+            mssql.query(insertSizeSql,(err,size)=>{
+                if(size.rowsAffected[0]==1){
+                    const sizeIdSql = `select top 1 id from YeniTeklif_Olcu_EnBoyTB order by id desc`;
+                    mssql.query(sizeIdSql,(err,sizeId)=>{
+                        resolve(sizeId.recordset[0].id)
+                    });
+                }
+            });
+        }else{
+            resolve(payload.EnBoyId);
+        }
+    });
+};
+function __offerThicknessId(payload){
+    return new Promise((resolve,reject)=>{
+        if(payload.KalinlikId == null || payload.KalinlikId == 0 || payload.KalinlikId == undefined){
+            const insertThicknessSql = `insert into YeniTeklif_Olcu_KalinlikTB(Kalinlik) VALUES('${payload.Kalinlik}')`;
+            mssql.query(insertThicknessSql,(err,thickness)=>{
+                if(thickness.rowsAffected[0]==1){
+                    const thicknessIdSql = `select top 1 id from YeniTeklif_Olcu_KalinlikTB order by id desc`;
+                    mssql.query(thicknessIdSql,(err,thicknessId)=>{
+                        resolve(thicknessId.recordset[0].id)
+                    });
+                }   
+            });
+        }else{
+            resolve(payload.KalinlikId);
+        }
+    });
+};
+function __offerSurfaceId(payload){
+    return new Promise((resolve,reject)=>{
+        if(payload.YuzeyIslemId == null || payload.YuzeyIslemId == 0 || payload.YuzeyIslemId == undefined){
+            const insertSurfaceSql = `insert into YeniTeklif_YuzeyIslemTB(IslemAdi) VALUES('${payload.IslemAdi}')`;
+            mssql.query(insertSurfaceSql,(err,surface)=>{
+                if(surface.rowsAffected[0] == 1){
+                    const surfaceIdSql = `select top 1 Id from YeniTeklif_YuzeyIslemTB order by Id desc`;
+                    mssql.query(surfaceIdSql,(err,surfaceId)=>{
+                        resolve(surfaceId.recordset[0].Id)
+                    });
+                }
+            });
+        }else{
+            resolve(payload.YuzeyIslemId);
+        }
+    });
+}
+
+app.post('/offer/product/add', (req, res) => {
+    __offerCategoryId(req.body)
+    .then(categoryId=>{
+        __offerProductId(req.body)
+        .then(productId=>{
+        __offerSizeId(req.body)
+        .then(sizeId=>{
+
+            __offerThicknessId(req.body)
+            .then(thicknessId=>{
+                __offerSurfaceId(req.body)
+                .then(surfaceId=>{
+                    const addSql = `
+                    insert into YeniTeklif_UrunKayitTB(
+                        Tarih,
+                        TeklifId,
+                        KategoriId,
+                        UrunId,
+                        EnBoyId,
+                        YuzeyIslemId,
+                        KalinlikId,
+                        FobFiyat,
+                        Birim,
+                        FcaFiyat,
+                        CFiyat,
+                        DFiyat
+                    )
+                    VALUES(
+                        '${req.body.Tarih}',
+                        '${req.body.TeklifId}',
+                        '${categoryId}',
+                        '${productId}',
+                        '${sizeId}',
+                        '${surfaceId}',
+                        '${thicknessId}',
+                        '${req.body.FobFiyat}',
+                        '${req.body.Birim}',
+                        '${req.body.FcaFiyat}',
+                        '${req.body.CFiyat}',
+                        '${req.body.DFiyat}'
+            
+                    )
+                    `;
+                    const productIdSql = `select top 1 Id from YeniTeklif_UrunKayitTB order by Id desc`;
+                    mssql.query(addSql, (err, add) => {
+                        if (add.rowsAffected[0] == 1) {
+                            mssql.query(productIdSql, (err, id) => {
+                                res.status(200).json({ 'id': id.recordset[0].Id ,'status':true}); 
+                            });
+                        } else {
+                            res.status(200).json({ 'id': 0, 'status': false });
+                        }
+                    });
+                });
+ 
+            });
+            
+        });
+
+        });
+
+    });
+
 });
 app.put('/offer/product/update', (req, res) => {
     const sql = `
@@ -4666,10 +4778,8 @@ app.delete('/offer/product/delete/:id', (req, res) => {
 });
 function __stringCharacterChange(event) {
     if(event == null || event == undefined){
-        console.log('if',event);
         return '';
     }else{
-        console.log('ilk else',event);
         const data = event.split("'");
         let value = "";
         if(data.length >0){
@@ -4679,7 +4789,6 @@ function __stringCharacterChange(event) {
               const value2 = value.substring(0, value.length - 2);
               return value2;
         }else{
-        console.log('ikinci else',event);
 
             return event
         }

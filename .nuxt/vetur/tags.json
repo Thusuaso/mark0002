@@ -212,12 +212,6 @@
   "SalesBgpNewForm": {
     "description": "Auto imported from components/sales/bgp/newForm.vue"
   },
-  "SalesConsiderForm": {
-    "description": "Auto imported from components/sales/consider/form.vue"
-  },
-  "SalesConsiderList": {
-    "description": "Auto imported from components/sales/consider/list.vue"
-  },
   "SalesFollowForm": {
     "description": "Auto imported from components/sales/follow/form.vue"
   },
@@ -226,6 +220,12 @@
   },
   "SalesFollowList": {
     "description": "Auto imported from components/sales/follow/list.vue"
+  },
+  "SalesConsiderForm": {
+    "description": "Auto imported from components/sales/consider/form.vue"
+  },
+  "SalesConsiderList": {
+    "description": "Auto imported from components/sales/consider/list.vue"
   },
   "SalesRepresentativeForm": {
     "description": "Auto imported from components/sales/representative/form.vue"
@@ -268,6 +268,9 @@
   },
   "Selection": {
     "description": "Auto imported from components/selection/input/selection.vue"
+  },
+  "SharedCustomeInputCurrencyInput": {
+    "description": "Auto imported from components/shared/customeInput/currencyInput.vue"
   },
   "SharedCustomeInputCustominput": {
     "description": "Auto imported from components/shared/customeInput/custominput.vue"
@@ -320,6 +323,9 @@
   "ReportsMekmerAtlantaList": {
     "description": "Auto imported from components/reports/mekmer/atlanta/list.vue"
   },
+  "ReportsMekmerMineList": {
+    "description": "Auto imported from components/reports/mekmer/mine/list.vue"
+  },
   "ReportsMekmerProductionList": {
     "description": "Auto imported from components/reports/mekmer/production/list.vue"
   },
@@ -328,8 +334,5 @@
   },
   "ReportsMekmerStockList": {
     "description": "Auto imported from components/reports/mekmer/stock/list.vue"
-  },
-  "ReportsMekmerMineList": {
-    "description": "Auto imported from components/reports/mekmer/mine/list.vue"
   }
 }

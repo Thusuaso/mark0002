@@ -10,7 +10,7 @@ const api = axios.create({
         'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, OPTIONS',
         "X-Requested-With":"XMLHttpRequest",
         Accept: "application/json",
-        "Content-Type": "application/json;charset=UTF-8",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       mode: 'no-cors',
       withCredentials: true,
