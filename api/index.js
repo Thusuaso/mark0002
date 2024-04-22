@@ -7721,7 +7721,7 @@ order by YEAR(s.SiparisTarihi) desc
 
 
 app.post('/order/shipped/list/filter',async (req,res)=>{
-
+    
     const company = req.body.company.charAt(0).toUpperCase() + req.body.company.slice(1);
     const po = req.body.po.toUpperCase();
     const width = req.body.width.charAt(0).toUpperCase() + req.body.width.slice(1);
@@ -7859,6 +7859,7 @@ order by s.YuklemeTarihi desc
 
 
 `;
+console.log(ordersListSql)
 
 
 await mssql.query(ordersListSql, (err, orders) => {

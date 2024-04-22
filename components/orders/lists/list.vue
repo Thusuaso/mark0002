@@ -792,6 +792,7 @@ export default {
           event.split(" ").forEach((x) => {
             this.filterModel.product += x.charAt(0).toUpperCase() + x.slice(1) + " ";
           });
+          this.filterModel.product = this.filterModel.product.trim();
         }
       } else {
         this.filterModel.product = "";
