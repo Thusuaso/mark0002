@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row mb-6">
     <div class="col-9">
       <div class="row mt-3">
         <div class="col">
@@ -15,10 +15,12 @@
           </span>
         </div>
         <div class="col">
-          <span class="p-float-label">
-            <InputText id="balance" v-model="po.Balanced" disabled />
-            <label for="balance">Balance</label>
-          </span>
+          <CustomInput
+            :value="po.Balanced"
+            text="Balance"
+            @onInput="po.Balanced = $event"
+            :disabled="true"
+          />
         </div>
       </div>
       <div class="row mt-3">
@@ -33,22 +35,28 @@
           </span>
         </div>
         <div class="col">
-          <span class="p-float-label">
-            <InputText id="amount" v-model="model.Tutar" />
-            <label for="amount">Paid Amount</label>
-          </span>
+          <CustomInput
+            :value="model.Tutar"
+            text="Paid Amount"
+            @onInput="model.Tutar = $event"
+            :disabled="false"
+          />
         </div>
         <div class="col">
-          <span class="p-float-label">
-            <InputText id="cost" v-model="model.Masraf" />
-            <label for="cost">Cost</label>
-          </span>
+          <CustomInput
+            :value="model.Masraf"
+            text="Cost"
+            @onInput="model.Masraf = $event"
+            :disabled="false"
+          />
         </div>
         <div class="col">
-          <span class="p-float-label">
-            <InputText id="currency" v-model="model.Kur" />
-            <label for="currency">Currency</label>
-          </span>
+          <CustomInput
+            :value="model.Kur"
+            text="Currency"
+            @onInput="model.Kur = $event"
+            :disabled="false"
+          />
         </div>
       </div>
       <div class="row mt-3">
@@ -106,8 +114,8 @@
 </template>
 <script>
 import date from "../../../plugins/date";
-import currency from "../../../plugins/currency";
 import Cookies from "js-cookie";
+import server from "@/plugins/excel.server";
 
 export default {
   props: {
@@ -172,9 +180,11 @@ export default {
       const year = event.getFullYear();
       const month = event.getMonth() + 1;
       const day = event.getDate();
-      currency.getDateCurrency(year, month, day).then((response) => {
-        this.model.Kur = response;
-      });
+      server
+        .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
+        .then((response) => {
+          this.model.Kur = parseFloat(response.data);
+        });
     },
   },
 };

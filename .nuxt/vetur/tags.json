@@ -2,12 +2,6 @@
   "IoSocketStatus": {
     "description": "Auto imported from node_modules/nuxt-socket-io/lib/components/SocketStatus.js"
   },
-  "AccountsForm": {
-    "description": "Auto imported from components/accounts/form.vue"
-  },
-  "AccountsList": {
-    "description": "Auto imported from components/accounts/list.vue"
-  },
   "CardsForm": {
     "description": "Auto imported from components/cards/form.vue"
   },
@@ -16,6 +10,12 @@
   },
   "AuthForm": {
     "description": "Auto imported from components/auth/authForm.vue"
+  },
+  "AccountsForm": {
+    "description": "Auto imported from components/accounts/form.vue"
+  },
+  "AccountsList": {
+    "description": "Auto imported from components/accounts/list.vue"
   },
   "Home": {
     "description": "Auto imported from components/home/home.vue"
@@ -59,15 +59,6 @@
   "TodoList": {
     "description": "Auto imported from components/todo/list.vue"
   },
-  "TransportCompany": {
-    "description": "Auto imported from components/transport/company.vue"
-  },
-  "TransportInput": {
-    "description": "Auto imported from components/transport/input.vue"
-  },
-  "TransportList": {
-    "description": "Auto imported from components/transport/list.vue"
-  },
   "UploadForm": {
     "description": "Auto imported from components/upload/form.vue"
   },
@@ -79,6 +70,15 @@
   },
   "ContainerFollowList": {
     "description": "Auto imported from components/container/follow/list.vue"
+  },
+  "TransportCompany": {
+    "description": "Auto imported from components/transport/company.vue"
+  },
+  "TransportInput": {
+    "description": "Auto imported from components/transport/input.vue"
+  },
+  "TransportList": {
+    "description": "Auto imported from components/transport/list.vue"
   },
   "ContainerInputForm": {
     "description": "Auto imported from components/container/input/form.vue"

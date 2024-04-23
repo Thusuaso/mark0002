@@ -33,6 +33,7 @@
         </template>
       </Column>
       <Column field="SiparisAciklama" header="Status"></Column>
+      <Column field="Aciklama" header="Desc."></Column>
     </DataTable>
   </div>
 </template>

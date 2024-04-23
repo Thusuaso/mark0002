@@ -207,7 +207,7 @@
           <div class="col">
             <CustomInput
               :value="modelProduct.FobFiyat"
-              text="Fca"
+              text="Fob"
               @onInput="modelProduct.FobFiyat = $event"
               :disabled="id == 0"
             />
@@ -243,7 +243,7 @@
           <div class="col">
             <CustomInput
               :value="modelProduct.CFiyat"
-              text="Fca"
+              text="C"
               @onInput="modelProduct.CFiyat = $event"
               :disabled="id == 0"
             />
@@ -260,7 +260,7 @@
           <div class="col">
             <CustomInput
               :value="modelProduct.DFiyat"
-              text="Fca"
+              text="D"
               @onInput="modelProduct.DFiyat = $event"
               :disabled="id == 0"
             />
@@ -568,10 +568,10 @@ export default {
     }
   },
   methods: {
-    inputSurface(event){
+    inputSurface(event) {
       this.modelProduct.IslemAdi = event;
     },
-    inputThickness(event){
+    inputThickness(event) {
       this.modelProduct.Kalinlik = event;
     },
     inputSize(event) {

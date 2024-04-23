@@ -19,37 +19,28 @@
         </span>
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputText
-            id="pay"
-            v-model="model.Tutar"
-            :disabled="advanced_payment_disabled"
-            @input="model.Tutar = formatPoint($event)"
-          />
-          <label for="pay">Price</label>
-        </span>
+        <CustomInput
+          :value="model.Tutar"
+          text="Price"
+          @onInput="model.Tutar = $event"
+          :disabled="advanced_payment_disabled"
+        />
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputText
-            id="currency"
-            v-model="model.Kur"
-            :disabled="advanced_payment_disabled"
-            @input="model.Kur = formatPoint($event)"
-          />
-          <label for="currency">Currency</label>
-        </span>
+        <CustomInput
+          :value="model.Kur"
+          text="Currency"
+          @onInput="model.Kur = $event"
+          :disabled="advanced_payment_disabled"
+        />
       </div>
       <div class="col">
-        <span class="p-float-label">
-          <InputText
-            id="cost"
-            v-model="model.Masraf"
-            :disabled="advanced_payment_disabled"
-            @input="model.Masraf = formatPoint($event)"
-          />
-          <label for="cost">Cost</label>
-        </span>
+        <CustomInput
+          :value="model.Masraf"
+          text="Cost"
+          @onInput="model.Masraf = $event"
+          :disabled="advanced_payment_disabled"
+        />
       </div>
     </div>
     <div class="row mt-3">
@@ -93,9 +84,9 @@
     >
       <Column field="FirmaAdi" header="Customer"></Column>
       <Column field="SiparisNo" header="Po"></Column>
-      <Column field="Pesinat" header="Price">
+      <Column field="Kalan" header="Price">
         <template #body="slotProps">
-          {{ slotProps.data.Pesinat | formatPriceUsd }}
+          {{ slotProps.data.Kalan | formatPriceUsd }}
         </template>
       </Column>
     </DataTable>
@@ -103,8 +94,8 @@
 </template>
 <script>
 import date from "../../../plugins/date";
-import currency from "../../../plugins/currency";
 import Cookies from "js-cookie";
+import server from "@/plugins/excel.server";
 
 export default {
   props: {
@@ -153,7 +144,7 @@ export default {
       this.model.FirmaAdi = event.data.FirmaAdi;
       this.model.SiparisNo = event.data.SiparisNo;
       this.model.FinansOdemeTurID = 1;
-      this.model.Tutar = event.data.Pesinat;
+      this.model.Tutar = event.data.Kalan;
       this.advanced_payment_disabled = false;
     },
     paymentDateSelected(event) {
@@ -162,9 +153,11 @@ export default {
       const year = event.getFullYear();
       const month = event.getMonth() + 1;
       const day = event.getDate();
-      currency.getDateCurrency(year, month, day).then((response) => {
-        this.model.Kur = response;
-      });
+      server
+        .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
+        .then((response) => {
+          this.model.Kur = parseFloat(response.data);
+        });
     },
   },
 };

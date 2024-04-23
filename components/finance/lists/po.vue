@@ -13,23 +13,48 @@
         sortField="Balanced"
         :sortOrder="-1"
       >
-        <Column field="SiparisNo" header="Purchase Order" headerClass="tableHeader" bodyClass="tableBody">
+        <Column
+          field="SiparisNo"
+          header="Purchase Order"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.SiparisNo }}
           </template>
         </Column>
-        <Column field="SiparisTarihi" header="Order Date" headerClass="tableHeader" bodyClass="tableBody">
+        <Column
+          field="SiparisTarihi"
+          header="Order Date"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.SiparisTarihi | dateToString }}
           </template>
         </Column>
-        <Column field="YuklemeTarihi" header="Shipment Date" headerClass="tableHeader" bodyClass="tableBody">
+        <Column
+          field="YuklemeTarihi"
+          header="Shipment Date"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
           </template>
         </Column>
-        <Column field="Durum" header="Status" headerClass="tableHeader" bodyClass="tableBody"></Column>
-        <Column field="OrderTotal" header="Order Total USD" headerClass="tableHeader" bodyClass="tableBody">
+        <Column
+          field="Durum"
+          header="Status"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        ></Column>
+        <Column
+          field="OrderTotal"
+          header="Order Total USD"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.OrderTotal | formatPriceUsd }}
           </template>
@@ -37,7 +62,12 @@
             {{ poListTotal.order | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Paid" header="Paid Amount" headerClass="tableHeader" bodyClass="tableBody">
+        <Column
+          field="Paid"
+          header="Paid Amount"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.Paid | formatPriceUsd }}
           </template>
@@ -45,7 +75,12 @@
             {{ poListTotal.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Balanced" header="Balance" headerClass="tableHeader" bodyClass="tableBody">
+        <Column
+          field="Balanced"
+          header="Balance"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             <div
               :style="{
@@ -60,7 +95,12 @@
             {{ poListTotal.balanced | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="Pesinat" header="Prepayment" headerClass="tableHeader" bodyClass="tableBody">
+        <Column
+          field="Pesinat"
+          header="Prepayment"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
           <template #body="slotProps">
             {{ slotProps.data.Pesinat | formatPriceUsd }}
           </template>

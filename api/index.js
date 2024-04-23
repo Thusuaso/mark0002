@@ -7064,9 +7064,10 @@ app.get('/finance/advanced/payment/list', (req, res) => {
             m.FirmaAdi,
             s.MusteriID,
             Sum(s.Pesinat) as Pesinat,
-            (Select Sum(o.Tutar) from OdemelerTB o where o.SiparisNo=s.SiparisNo) as Odenen,
+            dbo.Finance_Paid_List_Po(s.SiparisNo) as Odenen,
             (select k.MailAdres from KullaniciTB k where s.SiparisSahibi = k.ID) as Mail,
-			 m.Marketing
+			 m.Marketing,
+             (sum(s.Pesinat)) - dbo.Finance_Paid_List_Po(s.SiparisNo) as Kalan
 
             from
             SiparislerTB s,MusterilerTB m
@@ -7155,7 +7156,7 @@ inner join SiparisDurumTB sd on sd.ID = s.SiparisDurumID
 
 where s.MusteriID = ${req.params.customerId}
 
-order by s.YuklemeTarihi desc
+order by s.SiparisNo desc
     `;
     const paidListSql = `
         select o.Tarih,sum(o.Tutar) as Paid from OdemelerTB o
@@ -7164,11 +7165,13 @@ order by s.YuklemeTarihi desc
         order by o.Tarih desc
     `;
     mssql.query(poListSql, (err, poList) => {
+        const poListData = [];
         poList.recordset.forEach(x => {
             x.Balanced = x.OrderTotal - x.Paid;
             if (x.Durum == 'Sevk Edilen') {
                 x.Pesinat = 0;
             };
+            
             
         })
         mssql.query(paidListSql, (err, paidList) => {
@@ -8914,6 +8917,11 @@ app.get('/order/production/product/document/:po', async (req, res) => {
                 x.Link = `https://file-service.mekmar.com/file/download/40/${x.SiparisNo}`;
                 x.Evrak = 'Özel İşçilik';
             };
+            if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID == 7){
+                x.Link = `https://file-service.mekmar.com/file/download/customer/3/${x.EvrakAdi}`;
+                x.Evrak = 'Gümrük -' + x.KonteynerFirmaAdi;
+            }
+
             if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID==9 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
                 x.Evrak = 'Denizcilik Faturası -' + x.KonteynerFirmaAdi;
