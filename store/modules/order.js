@@ -66,6 +66,19 @@ const state = {
 
 };
 const actions = {
+    setOrderProductionMekmerList(vuexContext){
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get('/order/production/mekmer/list')
+            .then(response => {
+                if (response.data.list) {
+                    vuexContext.commit('setOrderList', response.data.list);
+                    vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                    vuexContext.commit('setOrderListAll', response.data.list);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+                    vuexContext.dispatch('setEndLoadingAction');
+                } 
+            });
+    },
     setOrderProductionTotal(vuexContext,list){
         vuexContext.commit('setOrderProductionTotal',list)
     },
@@ -135,6 +148,20 @@ const actions = {
                 vuexContext.commit('setOrderList', response.data.list);
 vuexContext.commit('setOrderProductionYearsList', response.data.years);
 vuexContext.commit('setOrderProductionTotal',response.data.list);
+
+                vuexContext.dispatch('setEndLoadingAction');
+                };
+            });
+    },
+
+    setOrderShippedMekmerList(vuexContext) {
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get('/order/shipped/mekmer/list')
+            .then(response => {
+                if (response.data.list) {
+                vuexContext.commit('setOrderList', response.data.list);
+                vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                vuexContext.commit('setOrderProductionTotal',response.data.list);
 
                 vuexContext.dispatch('setEndLoadingAction');
                 };
@@ -230,6 +257,14 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 vuexContext.commit('setOrderProductionProductTotal', response.data.list);
                 vuexContext.dispatch('setOrderProductionProductDetailTotal', response.data.list);
             });
+    },
+    setOrderProductionProductDetailMekmerList(vuexContext,po){
+        this.$axios.get(`/order/production/product/detail/mekmer/list/${po}`)
+        .then(response => {
+            vuexContext.commit('setOrderProductionProductDetailList', response.data.list); 
+            vuexContext.commit('setOrderProductionProductTotal', response.data.list);
+            vuexContext.dispatch('setOrderProductionProductDetailTotal', response.data.list);
+        });
     },
     setOrderProductionPo(vuexContext, po) {
         vuexContext.commit('setOrderProductionPo', po);
@@ -340,6 +375,14 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 vuexContext.dispatch('setOrderProductionCheckListTotal', response.data.list);
             });
     },
+    setOrderProductionCheckMekmerList(vuexContext, po) {
+        this.$axios.get(`/order/production/product/check/mekmer/${po}`)
+            .then(response => {
+                vuexContext.commit('setOrderProductionCheckList', response.data.list);
+                vuexContext.dispatch('setOrderProductionCheckListTotal', response.data.list);
+            });
+    },
+
     setOrderProductionCheckListTotal(vuexContext, payload) {
         vuexContext.commit('setOrderProductionCheckListTotal', payload);
     },

@@ -277,6 +277,276 @@
         </template>
       </Column>
     </DataTable>
+
+    <DataTable
+      :value="list"
+      rowGroupMode="rowspan"
+      :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+      :selection.sync="selectedProduction"
+      selectionMode="multiple"
+      @row-click="$emit('production_selected_emit', $event.data)"
+      class="p-datatable-sm"
+      :paginator="true"
+      :rows="25"
+      :loading="loading"
+      style="font-size: 70%; border: 2px solid gray"
+      filterDisplay="row"
+      :filters.sync="filtersShipped"
+      v-if="status == 'Shipped 2'"
+      sortField="YuklemeTarihi"
+      :sortOrder="-1"
+      :rowClass="rowClass2"
+    >
+      <template #header>
+        <div class="flex justify-content-between">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText
+              v-model="globalSearch"
+              placeholder="Keyword Search"
+              @keyup.enter="globalSearchFilter($event)"
+              @input="globalSearchFilterInput($event)"
+            />
+          </span>
+        </div>
+      </template>
+      <Column header="#" headerStyle="width:3rem;font-size:16px;">
+        <template #body="slotProps">
+          {{ slotProps.index + 1 }}
+        </template>
+      </Column>
+      <Column
+        field="YuklemeTarihi"
+        header="Load Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.YuklemeTarihi | dateToString }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="FirmaAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="SiparisNo"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
+        <template #body="slotProps">
+          <div v-if="slotProps.data.EvrakDurum > 0">
+            <a
+              :href="
+                'https://file-service.mekmar.com/file/download/2/' +
+                slotProps.data.SiparisNo
+              "
+            >
+              <i class="pi pi-download" />
+            </a>
+          </div>
+          <div v-else>
+            <a>
+              <i class="pi pi-download" />
+            </a>
+          </div>
+        </template>
+      </Column>
+      <Column
+        field="UrunAdi"
+        header="Product"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="UrunUretimAciklama"
+        header="Details"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      </Column>
+      <Column
+        field="En"
+        header="Width"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+
+      <Column
+        field="Boy"
+        header="Height"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="Kenar"
+        header="Thickness"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="UrunFirmaAdi"
+        header="Supplier"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="Miktar"
+        header="Amount"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.Miktar | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+        <template #footer>
+          {{ total.order | formatDecimal }}
+        </template>
+      </Column>
+      <Column
+        field="BirimAdi"
+        header="Unit"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.BirimAdi }}
+        </template>
+      </Column>
+      <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
+        <template #body="slotProps">
+          {{ slotProps.data.Ton | formatDecimal }}
+        </template>
+        <template #footer>
+          {{ total.ton | formatDecimal }}
+        </template>
+      </Column>
+      <Column
+        field="SatisFiyati"
+        header="Price"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+        </template>
+      </Column>
+      <Column
+        field="SatisToplam"
+        header="Total"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.SatisToplam | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{ total.price | formatPriceUsd }}
+        </template>
+      </Column>
+    </DataTable>
+
     <DataTable
       :value="list"
       rowGroupMode="rowspan"
@@ -607,6 +877,17 @@ export default {
   },
   data() {
     return {
+      filtersShipped: {
+        YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
       globalSearch: null,
       selectedProduction: null,
       filtersOrders: {

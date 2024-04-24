@@ -245,6 +245,20 @@
     "_name": "_0bbe3e66"
   },
   {
+    "name": "mekmer-products-production",
+    "path": "/mekmer/products/production",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\mekmer\\\\products\\\\production.vue",
+    "chunkName": "pages/mekmer/products/production",
+    "_name": "_fa466018"
+  },
+  {
+    "name": "mekmer-products-shipped",
+    "path": "/mekmer/products/shipped",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\mekmer\\\\products\\\\shipped.vue",
+    "chunkName": "pages/mekmer/products/shipped",
+    "_name": "_41d3c828"
+  },
+  {
     "name": "panel-products-notpublished",
     "path": "/panel/products/notpublished",
     "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\panel\\\\products\\\\notpublished.vue",

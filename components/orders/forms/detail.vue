@@ -15,7 +15,7 @@
             @workerman_selected_emit="$emit('workerman_selected_emit', $event)"
           />
         </TabPanel>
-        <TabPanel header="Proforma">
+        <TabPanel header="Proforma" v-if="!statusAlfa">
           <orderDetailProformaForm
             :model="modelProduction"
             :delivery="delivery"
@@ -28,10 +28,10 @@
             @prepayment_is_activated_emit="prePaymentIsActivated($event)"
           />
         </TabPanel>
-        <TabPanel header="Cost">
+        <TabPanel header="Cost" v-if="!statusAlfa">
           <orderDetailCostForm :cost="cost" :total="costTotal" />
         </TabPanel>
-        <TabPanel header="Supplier">
+        <TabPanel header="Supplier" v-if="!statusAlfa">
           <orderDetailSupplierForm
             :modelProduction="modelProduction"
             :productSupplier="productSupplier"
@@ -41,7 +41,7 @@
             :supplierProduct="supplierProduct"
           />
         </TabPanel>
-        <TabPanel header="Document">
+        <TabPanel header="Document" v-if="!statusAlfa">
           <orderDetailDocumentForm
             :list="document"
             @proforma_delete_emit="$emit('proforma_delete_emit', $event)"
@@ -146,6 +146,7 @@
         text="Prepayment"
         @onInput="modelProduction.Pesinat = $event"
         :disabled="prepaymentDisabledForm"
+        v-if="!statusAlfa"
       />
       <table class="table mb-4">
         <thead>
@@ -393,6 +394,10 @@ export default {
       required: false,
     },
     proformaUploadButtonStatus: {
+      type: Boolean,
+      required: false,
+    },
+    statusAlfa: {
       type: Boolean,
       required: false,
     },

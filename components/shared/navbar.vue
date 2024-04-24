@@ -19,10 +19,26 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item">
+          <li class="nav-item" v-if="getAuthorityStatus">
+            <nuxt-link to="/mekmer/products/production" tag="a" class="nav-link"
+              >PRODUCTION</nuxt-link
+            >
+          </li>
+          <li class="nav-item" v-if="getAuthorityStatus">
+            <nuxt-link to="/selection/input" tag="a" class="nav-link"
+              >SELECTION</nuxt-link
+            >
+          </li>
+          <li class="nav-item" v-if="getAuthorityStatus">
+            <nuxt-link to="/operation/cards" tag="a" class="nav-link"
+              >PRODUCT CARDS</nuxt-link
+            >
+          </li>
+
+          <li class="nav-item" v-if="!getAuthorityStatus">
             <nuxt-link to="/" tag="a" class="nav-link">HOME</nuxt-link>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -50,7 +66,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -100,7 +116,7 @@
             </ul>
           </li>
 
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -123,10 +139,10 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!getAuthorityStatus">
             <nuxt-link to="/finance" tag="a" class="nav-link">FINANCE</nuxt-link>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -189,7 +205,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -260,7 +276,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -303,7 +319,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -326,10 +342,10 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!getAuthorityStatus">
             <nuxt-link to="/offers" tag="a" class="nav-link">QUOTES</nuxt-link>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -374,7 +390,7 @@
           </li>
         </ul>
       </div>
-      <div class="d-flex">
+      <div class="d-flex" v-if="!getAuthorityStatus">
         <!-- <Button
           type="button"
           icon="pi pi-calendar"
@@ -434,6 +450,7 @@ export default {
       "getTodoModel",
       "getUserList",
       "getTodoMainListByUsernameButtonStatus",
+      "getAuthorityStatus",
     ]),
   },
   data() {

@@ -2,20 +2,20 @@
   "IoSocketStatus": {
     "description": "Auto imported from node_modules/nuxt-socket-io/lib/components/SocketStatus.js"
   },
-  "CardsForm": {
-    "description": "Auto imported from components/cards/form.vue"
-  },
-  "CardsList": {
-    "description": "Auto imported from components/cards/list.vue"
-  },
-  "AuthForm": {
-    "description": "Auto imported from components/auth/authForm.vue"
-  },
   "AccountsForm": {
     "description": "Auto imported from components/accounts/form.vue"
   },
   "AccountsList": {
     "description": "Auto imported from components/accounts/list.vue"
+  },
+  "AuthForm": {
+    "description": "Auto imported from components/auth/authForm.vue"
+  },
+  "CardsForm": {
+    "description": "Auto imported from components/cards/form.vue"
+  },
+  "CardsList": {
+    "description": "Auto imported from components/cards/list.vue"
   },
   "Home": {
     "description": "Auto imported from components/home/home.vue"
@@ -59,6 +59,15 @@
   "TodoList": {
     "description": "Auto imported from components/todo/list.vue"
   },
+  "TransportCompany": {
+    "description": "Auto imported from components/transport/company.vue"
+  },
+  "TransportInput": {
+    "description": "Auto imported from components/transport/input.vue"
+  },
+  "TransportList": {
+    "description": "Auto imported from components/transport/list.vue"
+  },
   "UploadForm": {
     "description": "Auto imported from components/upload/form.vue"
   },
@@ -70,15 +79,6 @@
   },
   "ContainerFollowList": {
     "description": "Auto imported from components/container/follow/list.vue"
-  },
-  "TransportCompany": {
-    "description": "Auto imported from components/transport/company.vue"
-  },
-  "TransportInput": {
-    "description": "Auto imported from components/transport/input.vue"
-  },
-  "TransportList": {
-    "description": "Auto imported from components/transport/list.vue"
   },
   "ContainerInputForm": {
     "description": "Auto imported from components/container/input/form.vue"
@@ -260,6 +260,12 @@
   "SelectionCratesizeList": {
     "description": "Auto imported from components/selection/cratesize/list.vue"
   },
+  "SharedCustomeInputCurrencyInput": {
+    "description": "Auto imported from components/shared/customeInput/currencyInput.vue"
+  },
+  "SharedCustomeInputCustominput": {
+    "description": "Auto imported from components/shared/customeInput/custominput.vue"
+  },
   "SelectionInputForm": {
     "description": "Auto imported from components/selection/input/form.vue"
   },
@@ -268,12 +274,6 @@
   },
   "Selection": {
     "description": "Auto imported from components/selection/input/selection.vue"
-  },
-  "SharedCustomeInputCurrencyInput": {
-    "description": "Auto imported from components/shared/customeInput/currencyInput.vue"
-  },
-  "SharedCustomeInputCustominput": {
-    "description": "Auto imported from components/shared/customeInput/custominput.vue"
   },
   "TodoMainList": {
     "description": "Auto imported from components/todo/main/list.vue"

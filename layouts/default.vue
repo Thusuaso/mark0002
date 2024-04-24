@@ -6,7 +6,7 @@
 </template>
 <script>
 export default {
-  middleware: ["sessionControl", "authControl"],
+  middleware: ["sessionControl", "authControl", "navbarControl"],
   created() {
     this.$store.dispatch("setCountryList");
     this.$store.dispatch("setUserList");

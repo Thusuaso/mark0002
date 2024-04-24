@@ -120,6 +120,7 @@
         :detailProductCost="getOrderProductionProductDetailCostTotal"
         :saveButtonStatus="getOrderProductionSaveButtonStatus"
         :proformaUploadButtonStatus="getOrderProductionUploadProformaButtonStatus"
+        :statusAlfa="false"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
         "

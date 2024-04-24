@@ -39,6 +39,8 @@ const _2f0edda0 = () => interopDefault(import('..\\pages\\sample\\finance.vue' /
 const _222a7078 = () => interopDefault(import('..\\pages\\sample\\sample.vue' /* webpackChunkName: "pages/sample/sample" */))
 const _d68495a4 = () => interopDefault(import('..\\pages\\selection\\input.vue' /* webpackChunkName: "pages/selection/input" */))
 const _0bbe3e66 = () => interopDefault(import('..\\pages\\selection\\size.vue' /* webpackChunkName: "pages/selection/size" */))
+const _fa466018 = () => interopDefault(import('..\\pages\\mekmer\\products\\production.vue' /* webpackChunkName: "pages/mekmer/products/production" */))
+const _41d3c828 = () => interopDefault(import('..\\pages\\mekmer\\products\\shipped.vue' /* webpackChunkName: "pages/mekmer/products/shipped" */))
 const _4c77f7a3 = () => interopDefault(import('..\\pages\\panel\\products\\notpublished.vue' /* webpackChunkName: "pages/panel/products/notpublished" */))
 const _2f013d14 = () => interopDefault(import('..\\pages\\panel\\products\\published.vue' /* webpackChunkName: "pages/panel/products/published" */))
 const _345a0719 = () => interopDefault(import('..\\pages\\panel\\products\\queue.vue' /* webpackChunkName: "pages/panel/products/queue" */))
@@ -205,6 +207,14 @@ export const routerOptions = {
     path: "/selection/size",
     component: _0bbe3e66,
     name: "selection-size"
+  }, {
+    path: "/mekmer/products/production",
+    component: _fa466018,
+    name: "mekmer-products-production"
+  }, {
+    path: "/mekmer/products/shipped",
+    component: _41d3c828,
+    name: "mekmer-products-shipped"
   }, {
     path: "/panel/products/notpublished",
     component: _4c77f7a3,

@@ -6,6 +6,9 @@ middleware['authControl'] = middleware['authControl'].default || middleware['aut
 middleware['authority'] = require('..\\middleware\\authority.js')
 middleware['authority'] = middleware['authority'].default || middleware['authority']
 
+middleware['navbarControl'] = require('..\\middleware\\navbarControl.js')
+middleware['navbarControl'] = middleware['navbarControl'].default || middleware['navbarControl']
+
 middleware['selectionCustomer'] = require('..\\middleware\\selectionCustomer.js')
 middleware['selectionCustomer'] = middleware['selectionCustomer'].default || middleware['selectionCustomer']
 

@@ -19,7 +19,6 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
-  middleware: ["authority"],
   data() {
     return {
       cards_form_dialog: false,
