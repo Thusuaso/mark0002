@@ -274,6 +274,11 @@
                   >ATL</nuxt-link
                 >
               </li>
+              <li v-if="getAuthorityStatus">
+                <nuxt-link to="/reports/mekmar/forwarding" class="dropdown-item" tag="a"
+                  >Shipped Crates</nuxt-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown" v-if="!getAuthorityStatus">
@@ -294,7 +299,7 @@
               </li>
               <li>
                 <nuxt-link to="/reports/mekmar/loading" class="dropdown-item" tag="a"
-                  >Loading List</nuxt-link
+                  >List of Shipments</nuxt-link
                 >
               </li>
               <li>
@@ -519,6 +524,43 @@ export default {
 };
 </script>
 <style scoped>
+.navbar-brand {
+  color: #108dcf;
+  animation: color 5s linear 0s infinite alternate;
+  font-weight: bold;
+}
+@keyframes color {
+  10% {
+    color: #108dcf;
+  }
+  20% {
+    color: #64b22f;
+  }
+  30% {
+    color: #108dcf;
+  }
+  40% {
+    color: #64b22f;
+  }
+  50% {
+    color: #108dcf;
+  }
+  60% {
+    color: #64b22f;
+  }
+  70% {
+    color: #108dcf;
+  }
+  80% {
+    color: #64b22f;
+  }
+  90% {
+    color: #108dcf;
+  }
+  100% {
+    color: #64b22f;
+  }
+}
 .nav-link {
   font-size: 15px;
   font-weight: bold;

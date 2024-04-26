@@ -379,7 +379,8 @@ const state = {
         sigorta_tutar_satis: 0,
         Vade: '',
         operationMail:'',
-        representativeMail:''
+        representativeMail:'',
+        FaturaKesimTurID:0
     },
     orderProductModel: {
         ID: 0,

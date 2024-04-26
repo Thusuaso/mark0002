@@ -33,12 +33,12 @@
           {{ slotProps.data.Fiyat | formatPriceUsd }}
         </template>
       </Column>
-      <Column field="StokSqft" header="Stock (sqft)">
+      <Column field="StokSqft" header="Sqft (in Stock)">
         <template #body="slotProps">
           {{ slotProps.data.StokSqft | formatDecimal }}
         </template>
       </Column>
-      <Column field="StokBox" header="Stock (Box)">
+      <Column field="StokBox" header="Box (in Stock)">
         <template #body="slotProps">
           {{ slotProps.data.StokBox | formatDecimal }}
         </template>

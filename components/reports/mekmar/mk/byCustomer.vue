@@ -94,7 +94,7 @@
         </Column>
         <Column
           field="temsilci"
-          header="Representative"
+          header="Seller"
           headerStyle="width:60px;"
           bodyStyle="text-align:center"
           style="flex-grow: 1; flex-basis: 100px"

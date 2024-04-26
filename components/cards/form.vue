@@ -84,7 +84,7 @@
             @item-select="edgeSelected($event)"
             @input="edgeChange($event)"
           />
-          <label for="edge">Edge</label>
+          <label for="edge">Thickness</label>
         </span>
       </div>
     </div>
@@ -126,10 +126,7 @@
           {{ slotProps.data.SatisFiyati | formatPriceUsd }}
         </template>
       </Column>
-
-
     </DataTable>
-
   </div>
 </template>
 <script>
@@ -160,10 +157,10 @@ export default {
       type: Array,
       required: true,
     },
-    orders:{
-      type:Array,
-      required:false,
-    }
+    orders: {
+      type: Array,
+      required: false,
+    },
   },
   data() {
     return {

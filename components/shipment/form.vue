@@ -33,7 +33,7 @@
       <div class="col">
         <div class="flex align-items-center">
           <Checkbox class="mr-1" id="follow" v-model="follow" binary />
-          <label for="follow"> Follow </label>
+          <label for="follow"> Track </label>
         </div>
       </div>
       <div class="col">
@@ -44,7 +44,7 @@
             name="dynamic"
             :value="'normal'"
           />
-          <label for="normal" class="ml-2">Normal Shipment</label>
+          <label for="normal" class="ml-2">Regular Shipment</label>
         </div>
         <div class="flex align-items-center">
           <RadioButton
@@ -77,7 +77,7 @@
       <div class="col-3">
         <span class="p-float-label">
           <InputText id="forwardamount" v-model="getShipmentAmount.production" disabled />
-          <label for="forwardamount">Outgoing</label>
+          <label for="forwardamount">Shipped</label>
         </span>
       </div>
       <div class="col-3">
@@ -87,7 +87,7 @@
             v-model="getShipmentAmount.remainder"
             disabled
           />
-          <label for="remainderamount">Remainder</label>
+          <label for="remainderamount">Remained</label>
         </span>
       </div>
     </div>
@@ -331,7 +331,9 @@ export default {
         "setSelectionProductionProductDelete",
         this.selectedProduct.ID
       );
+      this.$store.commit("setShipmentDropProducts", this.selectedProduct.ID);
       this.sending_crate_button_disabled = true;
+      this.selectedProducts = null;
     },
     productSelected(event) {
       this.$store.dispatch("setShipmentAmount", event.value);

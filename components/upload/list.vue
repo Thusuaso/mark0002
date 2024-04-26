@@ -41,7 +41,7 @@ export default {
       return data.Color === "gray" ? "row-gray" : "row-yellow";
     },
     uploadSelected(event) {
-      this.$store.dispatch("setDocumentForm", event.data);
+      this.$emit('document_form_emit',event.data);
     },
   },
 };

@@ -125,7 +125,12 @@
           />
         </template>
       </Column>
-      <Column field="Edge" header="Edge" :showFilterMenu="false" :showClearButton="false">
+      <Column
+        field="Edge"
+        header="Thickness"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -137,7 +142,7 @@
       </Column>
       <Column
         field="Birim"
-        header="Birim"
+        header="Unit"
         :showFilterMenu="false"
         :showClearButton="false"
       >

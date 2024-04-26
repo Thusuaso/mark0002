@@ -233,6 +233,10 @@ const actions = {
         .then(response=>{
             vuexContext.commit('setMonthList',response.data.list);
         })
+    },
+    setShipmentDropProducts(vuexContext,id){
+        vuexContext.commit('setShipmentDropProducts',id);
+    
     }
 
 
@@ -241,6 +245,11 @@ const actions = {
 
 };
 const mutations = {
+    setShipmentDropProducts(state,payload){
+
+        const index = state.orderProductionProductNormalList.findIndex(x=>x.ID == payload);
+        state.orderProductionProductNormalList.splice(index,1);
+    },
     setOrderProductionProductListNormal(state,payload){
         state.orderProductionProductNormalList = payload;
     },

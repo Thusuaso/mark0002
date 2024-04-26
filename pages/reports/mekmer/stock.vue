@@ -8,7 +8,7 @@
           value="Stock"
           @change="statusSelect($event)"
         />
-        <label for="ingredient1" class="ml-2">Sadece Stok</label>
+        <label for="ingredient1" class="ml-2">Only Stock</label>
       </div>
       <div class="flex align-items-center">
         <RadioButton
@@ -17,7 +17,7 @@
           value="Outer"
           @change="statusSelect($event)"
         />
-        <label for="ingredient2" class="ml-2">Dış</label>
+        <label for="ingredient2" class="ml-2">External</label>
       </div>
       <div class="flex align-items-center">
         <RadioButton
@@ -26,7 +26,7 @@
           value="Mekmer"
           @change="statusSelect($event)"
         />
-        <label for="ingredient3" class="ml-2">Mekmer Dış</label>
+        <label for="ingredient3" class="ml-2">Ext. Crates in Mekmer</label>
       </div>
       <div class="flex align-items-center">
         <RadioButton
@@ -53,7 +53,7 @@
           value="All"
           @change="statusSelect($event)"
         />
-        <label for="ingredient4" class="ml-2">Hepsi</label>
+        <label for="ingredient4" class="ml-2">All</label>
       </div>
       <div class="flex align-items-center">
         <!-- <JsonExcel

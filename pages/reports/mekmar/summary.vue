@@ -19,7 +19,7 @@
         :total="getReportsMekmarSummaryOrderListByRepresentativeTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, true)"
         :loading="getLoading"
-        :status="'Representative'"
+        :status="'Seller'"
       />
     </div>
     <div class="row">

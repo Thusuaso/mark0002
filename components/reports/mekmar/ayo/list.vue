@@ -41,7 +41,7 @@
         </Column>
         <Column
           field="operasyon"
-          header="Operasyon"
+          header="Operation"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -62,7 +62,7 @@
         </Column>
         <Column
           field="musteri_adi"
-          header="Müşteri"
+          header="Customer"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -172,7 +172,7 @@
         </Column>
         <Column
           field="yukleme_tarihi"
-          header="S. Date"
+          header="F. Date"
           :showFilterMenu="false"
           :showFilterOperator="false"
           :showClearButton="false"
@@ -271,7 +271,7 @@
         </Column>
         <Column
           field="mekmoz_alim"
-          header="Mekmoz Ü."
+          header="Production (Mek-Moz)"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -386,7 +386,7 @@
         </Column>
         <Column
           field="liman"
-          header="Liman"
+          header="Port"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -408,7 +408,7 @@
         </Column>
         <Column
           field="sigorta"
-          header="Port"
+          header="Insurance"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -576,7 +576,7 @@
         </Column>
         <Column
           field="pazarlama"
-          header="Commision"
+          header="Marketing Cost"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -638,7 +638,7 @@
         </Column>
         <Column
           field="masraf_toplam"
-          header="Toplam"
+          header="Total"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -677,7 +677,7 @@
         </Column>
         <Column
           field="kar_zarar_tl_yuzdesi"
-          header="Kar Zarar(%)"
+          header="Profit (%)"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -687,7 +687,7 @@
         </Column>
         <Column
           field="dosya_kapanma_date"
-          header="Kapanma T."
+          header="Date of Closure"
           headerClass="tableHeader"
           bodyClass="tableBody"
         ></Column>

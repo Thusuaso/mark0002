@@ -110,25 +110,25 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="boxincrate" type="text" v-model="model.KasaKutu" />
-              <label for="boxincrate">Box in Crate</label>
+              <label for="boxincrate">Box (in Crate)</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="pieceincrate" type="text" v-model="model.KasaAdet" />
-              <label for="pieceincrate">Piece in Crate</label>
+              <label for="pieceincrate">Piece (in Crate)</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="amountsqft" type="text" v-model="model.KasaSqft" />
-              <label for="amountsqft">Sqft in Crate</label>
+              <label for="amountsqft">Sqft (in Crate)</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="m2" type="text" v-model="model.KasaM2" />
-              <label for="m2">M2 in Crate</label>
+              <label for="m2">M2 (in Crate)</label>
             </span>
           </div>
         </div>
@@ -136,19 +136,19 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="pieceinbox" type="text" v-model="model.KutuAdet" />
-              <label for="pieceinbox">Piece in Box</label>
+              <label for="pieceinbox">Piece (in Box)</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="sqftinbox" type="text" v-model="model.KutuSqft" />
-              <label for="sqftinbox">Sqft in Box</label>
+              <label for="sqftinbox">Sqft (in Box)</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="m2inbox" type="text" v-model="model.KutuM2" />
-              <label for="m2inbox">M2 in Box</label>
+              <label for="m2inbox">M2 (in Box)</label>
             </span>
           </div>
           <div class="col">
@@ -160,13 +160,13 @@
           <div class="col">
             <span class="p-float-label">
               <InputText id="maxstock" type="text" v-model="model.StokSqft" />
-              <label for="maxstock">Stock (Sqft)</label>
+              <label for="maxstock">Sqft (in Stock)</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
               <InputText id="maxstock" type="text" v-model="model.StokBox" />
-              <label for="maxstock">Stock (Box)</label>
+              <label for="maxstock">Box (in Stock)</label>
             </span>
           </div>
         </div>
@@ -389,7 +389,7 @@
               />
             </template>
           </Column>
-          <Column field="Sira" header="Sıra"> </Column>
+          <Column field="Sira" header="Queue"> </Column>
         </DataTable>
       </TabPanel>
     </TabView>

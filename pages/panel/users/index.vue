@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" label="Yeni" @click="newForm" />
+    <Button type="button" class="p-button-success w-100" label="New User" @click="newForm" />
     <panelUsersList :list="getPanelUsersList" @panel_user_list_selected_emit="panelUserListSelected($event)"/>
 
     <Dialog :visible.sync="panel_user_form" header="" modal>

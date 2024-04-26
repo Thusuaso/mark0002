@@ -52,7 +52,7 @@
       </Column>
       <Column
         field="Kenar"
-        header="Edge"
+        header="Thickness"
         :showFilterMenu="false"
         sortable
         :showClearButton="false"

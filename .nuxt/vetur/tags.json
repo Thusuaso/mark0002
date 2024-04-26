@@ -2,14 +2,14 @@
   "IoSocketStatus": {
     "description": "Auto imported from node_modules/nuxt-socket-io/lib/components/SocketStatus.js"
   },
+  "AuthForm": {
+    "description": "Auto imported from components/auth/authForm.vue"
+  },
   "AccountsForm": {
     "description": "Auto imported from components/accounts/form.vue"
   },
   "AccountsList": {
     "description": "Auto imported from components/accounts/list.vue"
-  },
-  "AuthForm": {
-    "description": "Auto imported from components/auth/authForm.vue"
   },
   "CardsForm": {
     "description": "Auto imported from components/cards/form.vue"
@@ -68,11 +68,20 @@
   "TransportList": {
     "description": "Auto imported from components/transport/list.vue"
   },
+  "UploadDocform": {
+    "description": "Auto imported from components/upload/docform.vue"
+  },
   "UploadForm": {
     "description": "Auto imported from components/upload/form.vue"
   },
+  "UploadIsfform": {
+    "description": "Auto imported from components/upload/isfform.vue"
+  },
   "UploadList": {
     "description": "Auto imported from components/upload/list.vue"
+  },
+  "UploadSupplierform": {
+    "description": "Auto imported from components/upload/supplierform.vue"
   },
   "ContainerFollowForm": {
     "description": "Auto imported from components/container/follow/form.vue"
@@ -260,12 +269,6 @@
   "SelectionCratesizeList": {
     "description": "Auto imported from components/selection/cratesize/list.vue"
   },
-  "SharedCustomeInputCurrencyInput": {
-    "description": "Auto imported from components/shared/customeInput/currencyInput.vue"
-  },
-  "SharedCustomeInputCustominput": {
-    "description": "Auto imported from components/shared/customeInput/custominput.vue"
-  },
   "SelectionInputForm": {
     "description": "Auto imported from components/selection/input/form.vue"
   },
@@ -274,6 +277,12 @@
   },
   "Selection": {
     "description": "Auto imported from components/selection/input/selection.vue"
+  },
+  "SharedCustomeInputCurrencyInput": {
+    "description": "Auto imported from components/shared/customeInput/currencyInput.vue"
+  },
+  "SharedCustomeInputCustominput": {
+    "description": "Auto imported from components/shared/customeInput/custominput.vue"
   },
   "TodoMainList": {
     "description": "Auto imported from components/todo/main/list.vue"

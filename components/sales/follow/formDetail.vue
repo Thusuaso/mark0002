@@ -16,7 +16,7 @@
       </div>
       <span class="p-float-label mt-4">
         <Textarea v-model="followDetail.Aciklama" rows="5" cols="66" />
-        <label>Description</label>
+        <label>Explanation</label>
       </span>
     </div>
     <div class="col-6">

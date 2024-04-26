@@ -95,7 +95,7 @@
           type="button"
           class="p-button-danger"
           @click="download"
-          label="Pdf - Output"
+          label="Download Pdf"
         />
       </div>
       <div class="col">

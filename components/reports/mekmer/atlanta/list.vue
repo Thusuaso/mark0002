@@ -158,7 +158,7 @@
       </Column>
       <Column
         field="StokBox"
-        header="Stock Box"
+        header="Boxes (in Stock)"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -178,7 +178,7 @@
       </Column>
       <Column
         field="StokSqft"
-        header="Stock Sqft"
+        header="Sqft (in Stock)"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"

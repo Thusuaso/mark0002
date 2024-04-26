@@ -25,7 +25,17 @@ export default {
         if (this.isInputActive) {
           return this.value.toString().replace(",", ".");
         } else {
-          return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
+          if (
+            this.value == null ||
+            this.value == undefined ||
+            this.value == "" ||
+            this.value == " "
+          ) {
+            this.value = 0;
+            return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
+          } else {
+            return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
+          }
         }
       },
       set(modifiedValue) {

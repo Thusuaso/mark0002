@@ -2,7 +2,7 @@
   <div>
     <DataTable :value="list" :loading="loading">
       <Column field="NumuneNo" header="Po"></Column>
-      <Column field="NumuneTarihi" header="G.Tarihi">
+      <Column field="NumuneTarihi" header="Shipment Date">
         <template #body="slotProps">
           {{ slotProps.data.NumuneTarihi | dateToString }}
         </template>
@@ -12,7 +12,7 @@
           {{ slotProps.data.YuklemeTarihi | dateToString }}
         </template>
       </Column>
-      <Column field="GonderiAdi" header="Gönderi Tipi"></Column>
+      <Column field="GonderiAdi" header="Shipment Type"></Column>
       <Column field="BankaAdi" header="Banka Tipi"></Column>
       <Column field="KuryeAlis" header="Alış ($)">
         <template #body="slotProps">
@@ -56,8 +56,8 @@ export default {
     },
     loading: {
       type: Boolean,
-      required:false
-    }
+      required: false,
+    },
   },
 };
 </script>

@@ -1220,15 +1220,22 @@ app.post('/shipment/products/save',(req,res)=>{
 
 /*Upload Document*/
 function documentColor(po,doc,cb){
-    const sql = `select YuklemeEvrakID from SiparisFaturaKayitTB where SiparisNo='${po}'`;
+    const sql = `
+    select sp.YuklemeEvrakID,sp.SiparisFaturaTurID,sp.EvrakAdi,
+    (select nfk.FirmaID from NakliyeFaturaKayitTB nfk where nfk.ID = sp.FaturaKayitID) as NakliyeFirmaID,
+    (select (select firma.FirmaAdi from FirmalarTB firma where firma.ID = nfk.FirmaID) from NakliyeFaturaKayitTB nfk where nfk.ID = sp.FaturaKayitID) as NakliyeFirmaAdi,
+                            (select (select firma.FirmaAdi  from FirmalarTB firma  where firma.ID=k.FirmaID) as firma from KonteynerDigerFaturalarKayitTB k where k.ID = sp.FaturaKayitID) as KonteynerFirmaAdi,
+                (select (select firma.ID  from FirmalarTB firma  where firma.ID=k.FirmaID) as firma from KonteynerDigerFaturalarKayitTB k where k.ID = sp.FaturaKayitID) as KonteynerFirmaID
+    from SiparisFaturaKayitTB sp where SiparisNo='${po}'
+    `;
     mssql.query(sql,(err,poDocument)=>{
         let docModel = [];
         for(const item of doc){
             const index = poDocument.recordset.findIndex(x=>x.YuklemeEvrakID == item.ID);
             if(index > -1){
-                docModel.push({'Color':'yellow','SiparisNo':po,...item});
+                docModel.push({...item,'Color':'yellow','SiparisNo':po,'NakliyeFirmaID':poDocument.recordset[index].NakliyeFirmaID,'KonteynerFirmaID':poDocument.recordset[index].KonteynerFirmaID,'DocName':poDocument.recordset[index].EvrakAdi});
             }else{
-                docModel.push({'Color':'gray','SiparisNo':po,...item});
+                docModel.push({...item,'Color':'gray','SiparisNo':po});
             };
         };
         cb(err,docModel);
@@ -8152,7 +8159,7 @@ order by s.YuklemeTarihi desc
 
 
 `;
-console.log(ordersListSql)
+
 
 
 await mssql.query(ordersListSql, (err, orders) => {
@@ -9315,6 +9322,79 @@ app.get('/order/production/product/document/:po', async (req, res) => {
         res.status(200).json({ 'list': document.recordset });
     });
 });
+
+app.get('/upload/document/product/supplier/list/:po',async (req,res)=>{
+    const sql = `
+    select COUNT(su.TedarikciID),su.SiparisNo,su.TedarikciID,(select t.FirmaAdi from TedarikciTB t where t.ID = su.TedarikciID) as TedarikciAdi 
+    from SiparisUrunTB as su where su.SiparisNo='${req.params.po}'
+    group by su.TedarikciID,su.SiparisNo
+    `;
+    await mssql.query(sql,(err,supplier)=>{
+        res.status(200).json({'list':supplier.recordset});
+    });
+});
+
+function documentSupplierId(po){
+    return new Promise((resolve,reject)=>{
+        const sql = `Select count(*) as durum from YeniTedarikciFaturaTB where SiparisNo='${po}'`;
+        mssql.query(sql,(err,docId)=>{
+            resolve(docId.recordset[0].durum);
+        });
+    })
+}
+
+app.post('/upload/document/product/supplier/save',async (req,res)=>{
+
+    await documentSupplierId(req.body.SiparisNo)
+    .then(async docId=>{
+        const sql = `
+        INSERT INTO SiparisFaturaKayitTB (
+            Tarih,
+            FaturaKayitID,
+            SiparisFaturaTurID, 
+            SiparisNo,
+            Tutar,
+           
+            YuklemeEvrakID,
+            YuklemeEvrakDurumID,
+            EvrakYuklemeTarihi,
+            EvrakAdi  ,
+            KullaniciID,
+            
+            YeniEvrakID
+           )   
+               values
+            ('${req.body.date}','${0}','${0}','${req.body.siparisno}','${0}','${30}','${2}','${req.body.date}','${req.body.evrak}','${req.body.kullaniciAdi}','${docId + 101}')
+        `;
+
+        await mssql.query(sql,(err,supplier)=>{
+            if(supplier.rowsAffected[0] == 1){
+                res.status(200).json({'status':true});
+            }else{
+                res.status(200).json({'status':false});
+            }
+        });
+    });
+
+});
+
+
+app.get('/upload/document/supplier/list/:po',async(req,res)=>{
+    const sql = `
+            select 
+
+            *,
+            (select t.FirmaAdi from TedarikciTB t where t.ID = sup.TedarikciID) as TedarikciAdi
+
+        from SiparisUrunTedarikciFormTB sup where SiparisNo='${req.params.po}'
+    `;
+    await mssql.query(sql,(err,supplier)=>{
+        res.status(200).json({'list':supplier.recordset});
+    });
+
+});
+
+
 function __getCategoryMass(category) {
         if(category == 'Travertine'){
             return (2.38);

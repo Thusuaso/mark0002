@@ -101,7 +101,7 @@
       </Column>
       <Column
         field="Kalan"
-        header="Remaining Time"
+        header="Time to Arrival"
         headerClass="tableHeader"
         bodyClass="tableBody"
       ></Column>
@@ -125,7 +125,7 @@
       ></Column>
       <Column
         field="Sorumlu"
-        header="Responsible"
+        header="Seller"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"

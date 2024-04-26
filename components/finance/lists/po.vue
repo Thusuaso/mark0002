@@ -64,7 +64,7 @@
         </Column>
         <Column
           field="Paid"
-          header="Paid Amount"
+          header="Payment Received"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >

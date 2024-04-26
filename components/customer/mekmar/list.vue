@@ -109,7 +109,7 @@
       </Column>
       <Column
         field="SatisciAdi"
-        header="Orderer"
+        header="Seller"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -126,7 +126,7 @@
       </Column>
       <Column
         field="Devir"
-        header="Transfer"
+        header="Assigned"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
@@ -137,7 +137,7 @@
       </Column>
       <Column
         field="Ozel"
-        header="Special"
+        header="Personal"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >

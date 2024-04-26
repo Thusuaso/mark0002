@@ -156,7 +156,13 @@
         <div class="row g-3">
           <div class="col-4">
             <span class="p-float-label">
-              <InputText id="amount" type="text" v-model="amount" class="w-100" />
+              <InputText
+                id="amount"
+                type="text"
+                v-model="amount"
+                class="w-100"
+                @input="amount = $event.replace(',', '.')"
+              />
               <label for="amount">Amount</label>
             </span>
           </div>
@@ -166,6 +172,7 @@
                 id="speacialamount"
                 type="text"
                 v-model="speacialAmount"
+                @input="speacialAmount = $event.replace(',', '.')"
                 class="w-100"
               />
               <label for="speacialamount">Sqm</label>
@@ -205,7 +212,7 @@
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="notFindStatus" inputId="notFind" :binary="true" />
-              <label for="notFind" class="ml-2"> Unknown </label>
+              <label for="notFind" class="ml-2"> Not Found </label>
             </div>
           </div>
         </div>

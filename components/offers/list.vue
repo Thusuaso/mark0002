@@ -10,7 +10,7 @@
       >
         <Column
           field="TeklifSahibi"
-          header="Rep."
+          header="Representative"
           headerClass="tableHeader"
           bodyClass="tableBody"
         ></Column>
@@ -22,13 +22,13 @@
         ></Column>
         <Column
           field="TeklifSayisiA"
-          header="Quote Count A"
+          header="Quotes A"
           headerClass="tableHeader"
           bodyClass="tableBody"
         ></Column>
         <Column
           field="TeklifSayisiB"
-          header="Quote Count B"
+          header="Quotes B"
           headerClass="tableHeader"
           bodyClass="tableBody"
         ></Column>

@@ -32,7 +32,7 @@
       </Column>
       <Column
         field="NumuneTemsilciAdi"
-        header="Representative"
+        header="Seller"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -49,7 +49,7 @@
       </Column>
       <Column
         field="NumuneNo"
-        header="Po"
+        header="Sample Po"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"

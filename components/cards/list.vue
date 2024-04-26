@@ -116,7 +116,7 @@
       </Column>
       <Column
         field="Kenar"
-        header="Edge"
+        header="Thickness"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"

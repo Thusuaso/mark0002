@@ -9,7 +9,12 @@
       :loading="loading"
     >
       <template #header> {{ year }} {{ status }} Summary</template>
-      <Column field="Month" header="Ay" headerClass="tableHeader" bodyClass="tableBody">
+      <Column
+        field="Month"
+        header="Month"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Month | monthToString }}
         </template>

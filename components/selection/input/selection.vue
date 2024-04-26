@@ -67,7 +67,7 @@
       <Button
         type="button"
         class="p-button-danger w-100"
-        label="Unknown"
+        label="Not Found"
         @click="$emit('products_status_selected', 4)"
       />
     </div>

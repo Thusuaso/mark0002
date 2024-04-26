@@ -1,9 +1,9 @@
 <template>
   <div>
-    <DataTable :value="list" class="p-datatable-sm">
+    <DataTable :value="list" class="p-datatable-sm" :loading="loading">
       <Column
         field="SiparisTarihi"
-        header="Tarih"
+        header="Date"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
@@ -122,6 +122,10 @@ export default {
     },
     total: {
       type: Object,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
       required: true,
     },
   },

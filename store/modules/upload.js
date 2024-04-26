@@ -1,7 +1,8 @@
 const state = {
     documentList:[],
     documentModelList:[],
-    docForm:[],
+    documentSupplierList:[],
+    documentProductSupplierList:[],
 };
 const actions = {
     setDocumentList(vuexContext,po){
@@ -16,12 +17,7 @@ const actions = {
             vuexContext.commit('setDocumentModelList',response.data.model);
         });
     },
-    setDocumentForm(vuexContext,data){
-        this.$axios.get(`/upload/document/form/${data.SiparisNo}/${data.ID}`)
-        .then(response=>{
-            vuexContext.commit('setDocumentForm',response.data.doc);
-        });
-    },
+
     setSendDatabaseInvoice(vuexContext,data){
         this.$axios.post('/upload/file',data)
         .then(response=>{
@@ -29,25 +25,55 @@ const actions = {
                 
             }
         });
-      }
+      },
+    setDocumentSupplierList(vuexContext,po){
+        this.$axios.get(`/upload/document/supplier/list/${po}`)
+        .then(response=>{
+            vuexContext.commit('setDocumentSupplierList',response.data.list);
+        });
+    },
+    setDocumentProductSupplierList(vuexContext,po){
+        this.$axios.get(`/upload/document/product/supplier/list/${po}`)
+        .then(response=>{
+            vuexContext.commit('setDocumentProductSupplierList',response.data.list);
+        });
+    },
+    setDocumentSupplierSave(vuexContext,data){
+        this.$axios.post('/upload/document/product/supplier/save',data)
+        .then(response=>{
+            if(response.data.status){
+                this.$toast.success('Successfully Saved');
+            }else{
+                this.$toast.error('Error');
+            }
+        });
+    }
 };
 const mutations = {
 
     setDocumentModelList(state,model){
         state.documentModelList = model;
     },
-    setDocumentForm(state,doc){
-        state.docForm = doc;
+    setDocumentSupplierList(state,payload){
+        state.documentSupplierList = payload;
+    },
+    setDocumentProductSupplierList(state,payload){
+        state.documentProductSupplierList = payload;
     }
+
 };
 const getters = {
 
     getDocumentModelList(state){
         return state.documentModelList;
     },
-    getDocForm(state){
-        return state.docForm;
+    getDocumentSupplierList(state){
+        return state.documentSupplierList;
+    },
+    getDocumentProductSupplierList(state){
+        return state.documentProductSupplierList;
     }
+
 };
 export default {
     state,

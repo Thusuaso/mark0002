@@ -132,7 +132,7 @@
       </div>
       <div class="col" v-if="icpiyasalist.length > 0">
         <DataTable :value="icpiyasalist" style="font-size: 85%" :loading="loading">
-          <template #header>İç Piyasa Shipped </template>
+          <template #header>Local Shipped </template>
           <Column
             field="musteri"
             header="Customer"

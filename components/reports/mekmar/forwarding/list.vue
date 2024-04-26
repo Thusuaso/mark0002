@@ -10,6 +10,7 @@
       class="p-datatable-sm"
       style="font-size: 70%"
       :loading="loading"
+      v-if="!dates"
     >
       <Column
         field="Tarih"
@@ -106,7 +107,7 @@
       </Column>
       <Column
         field="OcakAdi"
-        header="Mine"
+        header="Quarry"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -217,7 +218,7 @@
       </Column>
       <Column
         field="Kenar"
-        header="Edge"
+        header="Thickness"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -235,7 +236,7 @@
       </Column>
       <Column
         field="KutuAdet"
-        header="Box"
+        header="Box in Crate"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -256,7 +257,7 @@
       </Column>
       <Column
         field="Adet"
-        header="Piece"
+        header="Piece in Crate"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -343,6 +344,7 @@
         header="Price"
         headerClass="tableHeader"
         bodyClass="tableBody"
+        v-if="!getAuthorityStatus"
       >
         <template #body="slotProps">
           {{ slotProps.data.BirimFiyat | formatPriceUsd }}
@@ -353,6 +355,7 @@
         header="Total"
         headerClass="tableHeader"
         bodyClass="tableBody"
+        v-if="!getAuthorityStatus"
       >
         <template #body="slotProps">
           {{ slotProps.data.Toplam | formatPriceUsd }}
@@ -362,11 +365,283 @@
         </template>
       </Column>
     </DataTable>
+
+    <DataTable
+      :value="list"
+      paginator
+      :rows="15"
+      :filters.sync="filters2"
+      filterDisplay="row"
+      @filter="reportsMekmarForwardingFiltered($event)"
+      class="p-datatable-sm"
+      style="font-size: 70%"
+      :loading="loading"
+      v-if="dates"
+    >
+      <Column
+        field="Tarih"
+        header="Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.Tarih | dateToString }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="FirmaAdi"
+        header="Customer"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="TedarikciAdi"
+        header="Supplier"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="UrunKartId"
+        header="Product Id"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="KasaNo"
+        header="Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="OcakAdi"
+        header="Quarry"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="KategoriAdi"
+        header="Category"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="UrunAdi"
+        header="Product"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #footer>
+          {{ total.crate | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="YuzeyIslemAdi"
+        header="Surface"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="En"
+        header="Width"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="Boy"
+        header="Height"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="Kenar"
+        header="Thickness"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="KutuAdet"
+        header="Box in Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #footer>
+          {{ total.box | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="Adet"
+        header="Piece in Crate"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.Adet | formatDecimal }}
+        </template>
+        <template #footer>
+          {{ total.piece | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="Miktar"
+        header="Amount"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.Miktar | formatDecimal }}
+        </template>
+        <template #footer>
+          {{ total.amount | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="BirimAdi"
+        header="Unit"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="SiparisAciklama"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="BirimFiyat"
+        header="Price"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+        v-if="!getAuthorityStatus"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.BirimFiyat | formatPriceUsd }}
+        </template>
+      </Column>
+      <Column
+        field="Toplam"
+        header="Total"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+        v-if="!getAuthorityStatus"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.Toplam | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{ total.total | formatPriceUsd }}
+        </template>
+      </Column>
+    </DataTable>
+
+
+
+
   </div>
 </template>
 <script>
 import { FilterMatchMode } from "primevue/api";
+import { mapGetters } from "vuex";
 export default {
+  computed: {
+    ...mapGetters(["getAuthorityStatus"]),
+  },
   props: {
     list: {
       type: Array,
@@ -380,6 +655,9 @@ export default {
       type: Boolean,
       required: false,
     },
+    dates:{
+      
+    }
   },
   data() {
     return {
@@ -422,6 +700,25 @@ export default {
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
+      filters2:{
+        Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        TedarikciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunKartId: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KasaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        OcakAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KategoriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        YuzeyIslemAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SiparisAciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KutuAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      }
     };
   },
   methods: {

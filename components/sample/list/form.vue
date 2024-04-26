@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-9">
       <TabView>
-        <TabPanel header="Bilgiler">
+        <TabPanel header="Information">
           <div class="container">
             <Card class="mb-4">
               <template #title> Product Info</template>
@@ -38,7 +38,7 @@
               </template>
             </Card>
             <Card class="mb-4">
-              <template #title>Paid Info</template>
+              <template #title>Payment Info</template>
               <template #content>
                 <div class="container">
                   <div class="row">
@@ -120,7 +120,7 @@
                     </div>
                     <div class="col">
                       <Card class="mb-4" style="height: 300px">
-                        <template #title>Courier Price</template>
+                        <template #title>Quoted Price</template>
                         <template #content>
                           <span class="p-float-label mb-4">
                             <InputText
@@ -159,13 +159,13 @@
             </span>
           </div>
         </TabPanel>
-        <TabPanel header="Ödemeler">
+        <TabPanel header="Payments">
           <div class="container w-100 mb-4">
             <div class="row">
               <div class="col">
                 <span class="p-float-label">
                   <Calendar v-model="paid_date" inputId="paid_date" />
-                  <label for="paid_date">Paid Date</label>
+                  <label for="paid_date">Payment Date</label>
                 </span>
               </div>
               <div class="col">
@@ -183,7 +183,7 @@
                   v-model="selectedBank"
                   :options="bank"
                   optionLabel="BankaAdi"
-                  placeholder="Banka Seçiniz"
+                  placeholder="Select a Bank"
                   class="w-100"
                 />
               </div>
@@ -192,7 +192,7 @@
               <div class="col">
                 <span class="p-float-label">
                   <Textarea v-model="paidDescription" rows="5" class="w-100" />
-                  <label>Description</label>
+                  <label>Explanation</label>
                 </span>
               </div>
             </div>
@@ -200,7 +200,7 @@
               type="button"
               class="p-button-success w-100 mb-4"
               @click="savePaid"
-              label="Kaydet"
+              label="Save"
             />
             <DataTable :value="paid">
               <Column field="Tarih" header="Date">
@@ -313,7 +313,7 @@
           @complete="searchUser($event)"
           @item-select="userSelected($event)"
         />
-        <label for="user">Representative</label>
+        <label for="user">Seller</label>
       </span>
       <span class="p-float-label mb-4">
         <InputText id="following" v-model="model.TrackingNo" class="w-100" />

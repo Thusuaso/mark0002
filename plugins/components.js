@@ -107,8 +107,16 @@ import salesConsiderList from '~/components/sales/consider/list';
 import todoMainList from '~/components/todo/main/list';
 import accountsList from '~/components/accounts/list';
 import accountsForm from '~/components/accounts/form';
+import docform from '~/components/upload/docform';
+import isfform from '~/components/upload/isfform';
+import supplierform from '~/components/upload/supplierform';
 
 
+Vue.component('supplierform',supplierform);
+
+Vue.component('isfform',isfform);
+
+Vue.component('docform',docform);
 
 Vue.component('accountsList',accountsList);
 Vue.component('accountsForm',accountsForm);

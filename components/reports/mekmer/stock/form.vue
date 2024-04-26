@@ -14,7 +14,7 @@
       <Column field="YuzeyIslemAdi" header="Surface"></Column>
       <Column field="En" header="Width"></Column>
       <Column field="Boy" header="Height"></Column>
-      <Column field="Kenar" header="Edge"></Column>
+      <Column field="Kenar" header="Thickness"></Column>
       <Column field="BirimAdi" header="Unit"></Column>
       <Column field="Miktar" header="Amount">
         <template #body="slotProps">

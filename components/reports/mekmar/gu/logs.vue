@@ -13,7 +13,7 @@
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
-          bodyClass="tableBody"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -30,7 +30,7 @@
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
-          bodyClass="tableBody"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -47,7 +47,7 @@
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
-          bodyClass="tableBody"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -60,11 +60,11 @@
       </Column>
       <Column
         field="DegisiklikYapan"
-        header="Rep."
+        header="Representative"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
-          bodyClass="tableBody"
+        bodyClass="tableBody"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText

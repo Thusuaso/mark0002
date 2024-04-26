@@ -71,7 +71,7 @@
                 </div>
               </div>
             </TabPanel>
-            <TabPanel header="Proforma - Sample">
+            <TabPanel header="Sample Invoice">
               <div class="row">
                 <div class="col">
                   <Button
@@ -109,7 +109,7 @@
                 :disabled="id == 0"
                 style="z-index: 99"
               />
-              <label for="offer_product_date">Date</label>
+              <label for="offer_product_date">Date of Quote</label>
             </span>
           </div>
           <div class="col">
@@ -154,7 +154,7 @@
                 :disabled="id == 0"
                 @input="inputSize($event)"
               />
-              <label for="size">WidthxHeight</label>
+              <label for="size">Width x Lenght</label>
             </span>
           </div>
         </div>
@@ -171,7 +171,7 @@
                 :disabled="id == 0"
                 @input="inputThickness($event)"
               />
-              <label for="thickness">Edge</label>
+              <label for="thickness">Thickness</label>
             </span>
           </div>
           <div class="col">
@@ -321,7 +321,7 @@
               <Column field="UrunAdi" header="Product"></Column>
               <Column field="IslemAdi" header="Surface"></Column>
               <Column field="EnBoy" header="Size"></Column>
-              <Column field="Kalinlik" header="Edge"></Column>
+              <Column field="Kalinlik" header="Thickness"></Column>
               <Column field="Birim" header="Unit"></Column>
 
               <Column field="FobFiyat" header="Fob">

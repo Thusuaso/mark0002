@@ -86,7 +86,7 @@
       </Column>
       <Column
         field="KullaniciAdi"
-        header="Rep."
+        header="Representative"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"

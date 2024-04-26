@@ -106,7 +106,7 @@
                 field="KullaniciAdi"
                 @complete="searchOrderer($event)"
               />
-              <label for="orderer">Orderer</label>
+              <label for="orderer">Seller</label>
             </span>
           </div>
           <div class="col">
@@ -134,13 +134,13 @@
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="modelValue.Devir" inputId="cycle" :binary="true" />
-              <label for="cycle" class="ml-2"> Transfer </label>
+              <label for="cycle" class="ml-2"> Assigned </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="modelValue.Ozel" inputId="special" :binary="true" />
-              <label for="special" class="ml-2"> Special </label>
+              <label for="special" class="ml-2"> Personal </label>
             </div>
           </div>
           <div class="col">

@@ -62,6 +62,7 @@
       :list="getreportsMekmarForwardingList"
       :total="getReportsMekmarForwardingListTotal"
       :loading="getLoading"
+      :dates="selectedDates"
     />
   </div>
 </template>

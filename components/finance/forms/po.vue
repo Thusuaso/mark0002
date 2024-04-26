@@ -53,7 +53,7 @@
         <div class="col">
           <CustomInput
             :value="model.Kur"
-            text="Currency"
+            text="Rate"
             @onInput="model.Kur = $event"
             :disabled="false"
           />

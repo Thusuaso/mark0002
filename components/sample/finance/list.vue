@@ -30,7 +30,7 @@
         </Column>
         <Column
           field="AlisUsd"
-          header="Buying Usd"
+          header="USD Buying"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -43,7 +43,7 @@
         </Column>
         <Column
           field="SatisUsd"
-          header="Selling Usd"
+          header="USD Selling"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -56,7 +56,7 @@
         </Column>
         <Column
           field="AlisEuro"
-          header="Buying Euro"
+          header="Euro Buying"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -69,7 +69,7 @@
         </Column>
         <Column
           field="SatisEuro"
-          header="Selling Euro"
+          header="Euro Selling"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -82,7 +82,7 @@
         </Column>
         <Column
           field="AlisTl"
-          header="Buying Tl"
+          header="TL Buying"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
@@ -95,7 +95,7 @@
         </Column>
         <Column
           field="SatisTl"
-          header="Selling Tl"
+          header="TL Selling"
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
