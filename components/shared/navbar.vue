@@ -251,12 +251,12 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              MEKMER REPORTS
+              MEKMER
             </a>
             <ul class="dropdown-menu">
               <li>
                 <nuxt-link to="/reports/mekmer/production" class="dropdown-item" tag="a"
-                  >Production Report</nuxt-link
+                  >Production Crates</nuxt-link
                 >
               </li>
               <li>
@@ -272,6 +272,21 @@
               <li>
                 <nuxt-link to="/reports/mekmer/atlanta" class="dropdown-item" tag="a"
                   >ATL</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/reports/mekmer/productions" class="dropdown-item" tag="a"
+                  >Production</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/reports/mekmer/shipped" class="dropdown-item" tag="a"
+                  >Shipped</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link to="/reports/mekmer/finance" class="dropdown-item" tag="a"
+                  >Finance</nuxt-link
                 >
               </li>
               <li v-if="getAuthorityStatus">

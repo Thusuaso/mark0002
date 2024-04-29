@@ -111,6 +111,19 @@ const actions = {
             };
         });
     },
+    setOrderProductionMekmer2List(vuexContext) {
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get('/order/production/mekmer2/list')
+            .then(response => {
+                if (response.data.list) {
+                    vuexContext.commit('setOrderList', response.data.list);
+                    vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                    vuexContext.commit('setOrderListAll', response.data.list);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+                    vuexContext.dispatch('setEndLoadingAction');
+                } 
+            });
+    },
     setOrderProductionList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/production/list')
@@ -157,6 +170,19 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
     setOrderShippedMekmerList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/shipped/mekmer/list')
+            .then(response => {
+                if (response.data.list) {
+                vuexContext.commit('setOrderList', response.data.list);
+                vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                vuexContext.commit('setOrderProductionTotal',response.data.list);
+
+                vuexContext.dispatch('setEndLoadingAction');
+                };
+            });
+    },
+    setOrderShippedMekmer2List(vuexContext) {
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get('/order/shipped/mekmer2/list')
             .then(response => {
                 if (response.data.list) {
                 vuexContext.commit('setOrderList', response.data.list);

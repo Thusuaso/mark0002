@@ -9,19 +9,6 @@
           @click="newForm"
         />
       </div>
-      <!-- <div class="col">
-        <div class="p-float-label">
-          <Dropdown
-            v-model="selectedYear"
-            inputId="years"
-            :options="getOrderProductionYearsList"
-            optionLabel="Yil"
-            class="w-100"
-            @change="yearChange($event)"
-          />
-          <label for="years">Year</label>
-        </div>
-      </div> -->
       <div class="col-4 m-auto text-center">
         <div class="m-auto text-center" style="width: 400px">
           <div class="m-auto text-center">
@@ -70,6 +57,7 @@
           </div>
         </div>
       </div>
+
       <div class="col-4">
         <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
       </div>
@@ -554,3 +542,23 @@ export default {
   },
 };
 </script>
+<style scoped>
+.visible{
+  visibility: hidden;
+}
+@media screen and (max-width:576px) {
+  .row{
+    clear:both;
+    display:block;
+    float:left;
+  }
+    .col-4{
+      clear:both;
+      display:block;
+      float:left;
+    }
+    .visible{
+      visibility: visible;
+    }
+}
+</style>

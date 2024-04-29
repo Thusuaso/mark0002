@@ -64,7 +64,7 @@
           :options="getOrderProductionProductNormalList"
           optionLabel="Aciklama"
           placeholder="Select a Product"
-          class="w-50"
+          class="w-100"
           @change="productSelected($event)"
         />
       </div>
@@ -353,3 +353,27 @@ export default {
   },
 };
 </script>
+<style scoped>
+@media screen and (max-width:576px) {
+  .row{
+  clear:both;
+  display:block;
+  width:100%;
+}
+.col{
+  clear:both;
+  display:block;
+  width:100%;
+}
+.col-4{
+  clear:both;
+  display:block;
+  width:100%;
+}
+.col-1{
+  clear:both;
+  display:block;
+  width:100%;
+}
+}
+</style>

@@ -76,6 +76,7 @@ export default {
         this.document_link = `https://file-service.mekmar.com/file/download/8/${po}`;
         this.document_form = true;
       };
+
       if(event.EvrakAdi == 'Konşimento'){
         this.document_link = `https://file-service.mekmar.com/file/download/9/${po}`;
         this.document_form = true;
@@ -122,21 +123,26 @@ export default {
         this.document_form = true;
       };
       if(event.EvrakAdi == 'İlaçlama Notası' ){
-                x.Link = `https://file-service.mekmar.com/file/download/71/${po}`;
+        this.document_link = `https://file-service.mekmar.com/file/download/71/${po}`;
                 this.document_form = true;
 
             };
       if(event.EvrakAdi == 'Fotolar' ){
-          x.Link = `https://file-service.mekmar.com/file/download/72/${po}`;
+        this.document_link = `https://file-service.mekmar.com/file/download/72/${po}`;
           this.document_form = true;
 
       };
 
       if(event.EvrakAdi  == 'Draft' ){
-                x.Link = `https://file-service.mekmar.com/file/download/99/${po}`;
+        this.document_link = `https://file-service.mekmar.com/file/download/99/${po}`;
                 this.document_form = true;
 
             };
+
+
+
+
+
       if(event.EvrakAdi == 'İç Sipariş'){
         this.$store.dispatch('setDocumentSupplierList',po);
         this.document_isf_form = true;

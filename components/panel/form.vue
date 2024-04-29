@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="test">
     <TabView>
       <TabPanel header="Product (En)">
         <div class="row mt-3 mb-3">
@@ -1390,5 +1390,27 @@ export default {
 .header {
   font-size: 18px;
   text-align: center;
+}
+@media screen and (max-width:576px){
+  .row{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col-6{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .test{
+    clear:both;
+    display:block;
+    width:90vw;
+  }
 }
 </style>

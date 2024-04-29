@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="test">
     <div class="row">
       <div class="col">
         <FileUpload
@@ -195,3 +195,27 @@ export default {
   },
 };
 </script>
+<style scoped>
+  @media screen and (max-width:575px) {
+    .row{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col-2{
+    clear:both;
+    display:block;
+    width:100%;
+  }    
+  .test{
+    clear:both;
+    display:block;
+    width:90vw;
+  }
+  }
+</style>

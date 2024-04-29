@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div>
+
+    <div class="card">
       <DataTable
         :value="list"
         rowGroupMode="rowspan"
@@ -19,6 +20,7 @@
         sortField="YuklemeTarihi"
         :sortOrder="-1"
         :rowClass="rowClass2"
+        
       >
         <template #header>
           <div class="flex justify-content-between">
@@ -292,8 +294,11 @@
         :filters.sync="filtersOrders"
         :rowClass="rowClass2"
         @filter="ordersFilter($event)"
+
         v-else
       >
+
+
         <Column
           header="#"
           headerStyle="width:3rem"
@@ -879,6 +884,7 @@ export default {
   },
   data() {
     return {
+
       filtersShipped: {
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },

@@ -110,9 +110,11 @@ import accountsForm from '~/components/accounts/form';
 import docform from '~/components/upload/docform';
 import isfform from '~/components/upload/isfform';
 import supplierform from '~/components/upload/supplierform';
-
+import orderShippedList from '~/components/orders/lists/shipped';
 
 Vue.component('supplierform',supplierform);
+Vue.component('orderShippedList',orderShippedList);
+
 
 Vue.component('isfform',isfform);
 

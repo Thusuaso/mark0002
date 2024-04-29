@@ -574,3 +574,28 @@ export default {
   },
 };
 </script>
+<style scoped>
+@media screen and (max-width:576px) {
+  .row{
+    clear:both;
+    display: block;
+    width:100%;
+  }
+  .col{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col-3{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col-9{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  
+}
+</style>

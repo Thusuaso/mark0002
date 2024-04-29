@@ -329,6 +329,13 @@
     "_name": "_35d2efbd"
   },
   {
+    "name": "reports-mekmer-finance",
+    "path": "/reports/mekmer/finance",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\finance.vue",
+    "chunkName": "pages/reports/mekmer/finance",
+    "_name": "_aa3d2ab8"
+  },
+  {
     "name": "reports-mekmer-mine",
     "path": "/reports/mekmer/mine",
     "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\mine.vue",
@@ -341,6 +348,20 @@
     "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\production.vue",
     "chunkName": "pages/reports/mekmer/production",
     "_name": "_7275545f"
+  },
+  {
+    "name": "reports-mekmer-productions",
+    "path": "/reports/mekmer/productions",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\productions.vue",
+    "chunkName": "pages/reports/mekmer/productions",
+    "_name": "_403e4eb8"
+  },
+  {
+    "name": "reports-mekmer-shipped",
+    "path": "/reports/mekmer/shipped",
+    "component": "C:\\\\Users\\\\Ferdi\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\shipped.vue",
+    "chunkName": "pages/reports/mekmer/shipped",
+    "_name": "_378ed8c6"
   },
   {
     "name": "reports-mekmer-stock",

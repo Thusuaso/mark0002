@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-9">
+    <div :class="status ? 'col-9':'col'">
       <DataTable
         :value="allStatus ? allList : list"
         sortField="balanced"
@@ -142,7 +142,7 @@
         </Column>
       </DataTable>
     </div>
-    <div class="col-3">
+    <div class="col-3" v-if="status">
       <DataTable :value="expiry" :loading="loading">
         <Column
           field="firmaAdi"
@@ -178,7 +178,7 @@
         </Column>
       </DataTable>
     </div>
-    <DataTable :value="maya" :loading="loading">
+    <DataTable :value="maya" :loading="loading" v-if="status">
       <Column
         field="order_date"
         header="Order Date"
@@ -276,6 +276,10 @@ export default {
       type: Array,
       required: false,
     },
+    status:{
+      type:Boolean,
+      required:false
+    }
   },
   data() {
     return {
@@ -292,3 +296,22 @@ export default {
   },
 };
 </script>
+<style scoped>
+@media screen and (max-width:575px) {
+  .row{
+clear:both;
+display:block;
+width:90vw;
+}
+.col-3{
+  clear:both;
+  display:block;
+  width:90vw;
+}
+.col-9{
+  clear:both;
+  display:block;
+  width:90vw;
+}
+}
+</style>

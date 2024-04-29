@@ -142,3 +142,17 @@ export default {
   },
 };
 </script>
+<style scoped>
+@media screen {
+  .row{
+  clear:both;
+  display:block;
+  width:100%;
+}
+.col{
+  clear:both;
+  display:block;
+  width:100%;
+}
+}
+</style>

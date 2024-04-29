@@ -144,7 +144,7 @@
     </div>
     <div class="row">
       <div class="col">
-        <Card style="height: 550px">
+        <Card class="cardClass" >
           <template #title>Selling</template>
           <template #content>
             <div class="row mb-4">
@@ -154,13 +154,14 @@
                     id="freight"
                     v-model="model.NavlunSatis"
                     @input="freightInput($event)"
+                    style="width:100%;"
                   />
                   <label for="freight">Freight</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="freightComp" v-model="model.NavlunFirma" />
+                  <InputText id="freightComp" v-model="model.NavlunFirma" style="width:100%;"/>
                   <label for="freightComp">Freight Company</label>
                 </span>
               </div>
@@ -172,13 +173,14 @@
                     id="detail1"
                     v-model="model.DetayTutar_1"
                     @input="detail1Input($event)"
+                    style="width:100%;"
                   />
                   <label for="detail1">Detail 1</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detailDesc" v-model="model.DetayAciklama_1" />
+                  <InputText id="detailDesc" v-model="model.DetayAciklama_1" style="width:100%;"/>
                   <label for="detailDesc">Detail 1 Description</label>
                 </span>
               </div>
@@ -190,13 +192,14 @@
                     id="detail2"
                     v-model="model.DetayTutar_2"
                     @input="detail2Input($event)"
+                    style="width:100%;"
                   />
                   <label for="detail2">Detail 2</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayAciklama_2" />
+                  <InputText id="detail2Desc" v-model="model.DetayAciklama_2" style="width:100%;" />
                   <label for="detail2Desc">Detail 2 Description</label>
                 </span>
               </div>
@@ -208,13 +211,14 @@
                     id="detail2"
                     v-model="model.DetayTutar_3"
                     @input="detail3Input($event)"
+                    style="width:100%;"
                   />
                   <label for="detail2">Detail 3</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayAciklama_3" />
+                  <InputText id="detail2Desc" v-model="model.DetayAciklama_3" style="width:100%;" />
                   <label for="detail2Desc">Detail 3 Description</label>
                 </span>
               </div>
@@ -226,6 +230,7 @@
                     id="detail4"
                     v-model="model.DetayTutar_4"
                     @input="detail4Input($event)"
+                    style="width:100%;"
                   />
                   <label for="detail4">Mekus</label>
                 </span>
@@ -244,7 +249,7 @@
         </Card>
       </div>
       <div class="col">
-        <Card style="height: 550px">
+        <Card class="cardClass">
           <template #title>Buying</template>
           <template #content>
             <div class="row mb-4">
@@ -254,13 +259,14 @@
                     id="freight"
                     v-model="model.NavlunAlis"
                     @input="getFreightInput($event)"
+                    style="width:100%;"
                   />
                   <label for="freight">Freight</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="freightComp" v-model="model.DetayMekmarNot_1" />
+                  <InputText id="freightComp" v-model="model.DetayMekmarNot_1" style="width:100%;"/>
                   <label for="freightComp">Freight Description</label>
                 </span>
               </div>
@@ -272,13 +278,14 @@
                     id="detail1"
                     v-model="model.DetayAlis_1"
                     @input="getDetail1Input($event)"
+                    style="width:100%;"
                   />
                   <label for="detail1">Detail 1</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detailDesc" v-model="model.DetayMekmarNot_2" />
+                  <InputText id="detailDesc" v-model="model.DetayMekmarNot_2" style="width:100%;"/>
                   <label for="detailDesc">Detail 1 Description</label>
                 </span>
               </div>
@@ -290,13 +297,14 @@
                     id="detail2"
                     v-model="model.DetayAlis_2"
                     @input="getDetail2Input($event)"
+                    style="width:100%;"
                   />
                   <label for="detail2">Detail 2</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" />
+                  <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" style="width:100%;"/>
                   <label for="detail2Desc">Detail 2 Description</label>
                 </span>
               </div>
@@ -308,13 +316,14 @@
                     id="detail3"
                     v-model="model.DetayAlis_3"
                     @input="getDetail3Input($event)"
+                    style="width:100%;"
                   />
                   <label for="detail3">Detail 3</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" />
+                  <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" style="width:100%;"/>
                   <label for="detail2Desc">Detail 3 Description</label>
                 </span>
               </div>
@@ -326,6 +335,7 @@
                     id="insurance"
                     v-model="model.sigorta_Tutar"
                     @input="insuranceInput($event)"
+                    style="width:100%;"
                   />
                   <label for="insurance">Insurance</label>
                 </span>
@@ -655,3 +665,33 @@ export default {
   },
 };
 </script>
+<style scoped>
+.cardClass{
+  height:550px;
+}
+@media screen and (max-width:576px){
+  .row{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col-3{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col-9{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .col{
+    clear:both;
+    display:block;
+    width:100%;
+  }
+  .cardClass{
+    height:auto;
+  }
+}
+</style>

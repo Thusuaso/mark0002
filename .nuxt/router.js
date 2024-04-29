@@ -51,8 +51,11 @@ const _3514d202 = () => interopDefault(import('..\\pages\\reports\\mekmar\\loadi
 const _7545bf70 = () => interopDefault(import('..\\pages\\reports\\mekmar\\mk.vue' /* webpackChunkName: "pages/reports/mekmar/mk" */))
 const _08655928 = () => interopDefault(import('..\\pages\\reports\\mekmar\\summary.vue' /* webpackChunkName: "pages/reports/mekmar/summary" */))
 const _35d2efbd = () => interopDefault(import('..\\pages\\reports\\mekmer\\atlanta.vue' /* webpackChunkName: "pages/reports/mekmer/atlanta" */))
+const _aa3d2ab8 = () => interopDefault(import('..\\pages\\reports\\mekmer\\finance.vue' /* webpackChunkName: "pages/reports/mekmer/finance" */))
 const _03b6ed79 = () => interopDefault(import('..\\pages\\reports\\mekmer\\mine.vue' /* webpackChunkName: "pages/reports/mekmer/mine" */))
 const _7275545f = () => interopDefault(import('..\\pages\\reports\\mekmer\\production.vue' /* webpackChunkName: "pages/reports/mekmer/production" */))
+const _403e4eb8 = () => interopDefault(import('..\\pages\\reports\\mekmer\\productions.vue' /* webpackChunkName: "pages/reports/mekmer/productions" */))
+const _378ed8c6 = () => interopDefault(import('..\\pages\\reports\\mekmer\\shipped.vue' /* webpackChunkName: "pages/reports/mekmer/shipped" */))
 const _cfb48f40 = () => interopDefault(import('..\\pages\\reports\\mekmer\\stock.vue' /* webpackChunkName: "pages/reports/mekmer/stock" */))
 const _33c5e5dc = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages/index" */))
 
@@ -256,6 +259,10 @@ export const routerOptions = {
     component: _35d2efbd,
     name: "reports-mekmer-atlanta"
   }, {
+    path: "/reports/mekmer/finance",
+    component: _aa3d2ab8,
+    name: "reports-mekmer-finance"
+  }, {
     path: "/reports/mekmer/mine",
     component: _03b6ed79,
     name: "reports-mekmer-mine"
@@ -263,6 +270,14 @@ export const routerOptions = {
     path: "/reports/mekmer/production",
     component: _7275545f,
     name: "reports-mekmer-production"
+  }, {
+    path: "/reports/mekmer/productions",
+    component: _403e4eb8,
+    name: "reports-mekmer-productions"
+  }, {
+    path: "/reports/mekmer/shipped",
+    component: _378ed8c6,
+    name: "reports-mekmer-shipped"
   }, {
     path: "/reports/mekmer/stock",
     component: _cfb48f40,

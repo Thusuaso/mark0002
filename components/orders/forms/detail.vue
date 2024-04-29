@@ -536,3 +536,24 @@ export default {
   watch: {},
 };
 </script>
+
+<style scoped>
+  @media screen and (max-width:576px) {
+    .row{
+      clear:both;
+      display:block;
+      width:100%;
+
+    }
+    .col-10{
+      clear:both;
+      display:block;
+      width:100%;
+    }
+    .col-2{
+      clear:both;
+      display: block;
+      width:100%;
+    }
+  }
+</style>

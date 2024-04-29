@@ -612,4 +612,25 @@ export default {
 :deep(.row-accessories) {
   background-color: #81fca0 !important;
 }
+
+@media screen and (max-width:576px) {
+
+  .row .mt-3{
+  display:block;
+  width:100%;
+}
+.col{
+  display:block;
+  width:100%;
+}
+.col-4{
+  display:block;
+  width:100%;
+}
+.col-8{
+  display:block;
+  width:100%;
+}
+}
+
 </style>

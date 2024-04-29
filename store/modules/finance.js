@@ -59,6 +59,21 @@ const actions = {
         //         }
         //     });
     },
+
+    setFinanceListFilter(vuexContext){
+        vuexContext.dispatch('setBeginLoadingAction');
+
+        api.get("/finance/reports/test/filter").then((response) => {
+            if(response.data){
+                vuexContext.commit('setFinanceList', response.data); 
+                vuexContext.commit('setFinanceTotalList',response.data.financeList)
+                vuexContext.dispatch('setEndLoadingAction');
+            }
+            
+          });
+    },
+
+
     setFinanceTotalList(vuexContext,finance) {
       vuexContext.commit('setFinanceTotalList',finance)  
     },

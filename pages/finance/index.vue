@@ -43,6 +43,12 @@
             @click="buttonAllStatus = !buttonAllStatus"
           />
         </div>
+        <div class="col">
+          <div class="field-checkbox">
+            <Checkbox id="binary" v-model="mekmarMekmerList" :binary="true" @change="checkedMekmarMekmer($event)"/>
+            <label for="binary">{{ checked }}</label>
+        </div>
+        </div>
       </div>
     </div>
 
@@ -55,12 +61,14 @@
       @finance_list_selected_emit="financeListSelected($event)"
       :loading="getLoading"
       :maya="getFinanceListMaya"
+      :status="true"
     />
     <Dialog
       :visible.sync="finance_collection_list_form"
       header=""
       modal
       :maximizable="true"
+      
     >
       <financeCollectionList
         :list="getFinanceCollectionList"
@@ -139,6 +147,8 @@ export default {
   },
   data() {
     return {
+      checked:'Mekmer',
+      mekmarMekmerList:false,
       buttonAllStatus: false,
       finance_collection_list_form: false,
       finance_advanced_payment_form: false,
@@ -163,6 +173,17 @@ export default {
     this.$store.dispatch("setFinanceList");
   },
   methods: {
+    checkedMekmarMekmer(event){
+      if(this.mekmarMekmerList){
+        this.checked = 'Mekmar';
+
+        this.$store.dispatch('setFinanceListFilter');
+      }else{
+        this.checked = 'Mekmer';
+
+          this.$store.dispatch('setFinanceList');
+      }
+    },
     excel_output() {
       api.post("/finance/reports/test/excel", this.getfinanceList).then((response) => {
         if (response.status) {
@@ -274,3 +295,18 @@ export default {
   },
 };
 </script>
+<style scoped>
+  @media screen and (max-width:576px) {
+    .row{
+      clear:both;
+      display:block;
+      width:100%;
+    }
+    .col{
+      clear:both;
+      display:block;
+      width:100%;
+    }
+
+  }
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="row" style="width: 1300px">
+  <div class="row">
     <div class="col-9">
       <div class="row">
         <div class="col">
@@ -928,3 +928,27 @@ export default {
   },
 };
 </script>
+<style scoped>
+ @media screen and (max-width:576px) {
+  .row{
+  clear:both;
+  display:block;
+  width:100%;
+}
+.col{
+  clear:both;
+  display:block;
+  width:100%;
+}
+.col-3{
+  clear:both;
+  display:block;
+  width:100%;
+}
+.col-9{
+  clear:both;
+  display:block;
+  width:100%;
+}
+ }
+</style>
