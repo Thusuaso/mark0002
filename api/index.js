@@ -7715,7 +7715,7 @@ inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
-where s.SiparisDurumID = 2 and m.Marketing in ('Mekmer','İç Piyasa')
+where s.SiparisDurumID = 2 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
 order by s.SiparisTarihi desc
 
 
@@ -8284,7 +8284,7 @@ inner join OdemeTurTB ot on ot.ID = s.OdemeTurID
 inner join MusterilerTB m on m.ID = s.MusteriID
 inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 
-where s.SiparisDurumID = 3  and m.Marketing in ('Mekmer','İç Piyasa')
+where s.SiparisDurumID = 3  and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
 order by s.YuklemeTarihi desc
 
 

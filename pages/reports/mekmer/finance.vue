@@ -35,20 +35,7 @@
               />
             </JsonExcel> -->
           </div>
-          <div class="col">
-            <Button
-              type="button"
-              class="p-button-warning w-100"
-              :label="buttonAllStatus ? 'Unpaid Po' : 'All'"
-              @click="buttonAllStatus = !buttonAllStatus"
-            />
-          </div>
-          <!-- <div class="col">
-            <div class="field-checkbox">
-              <Checkbox id="binary" v-model="mekmarMekmerList" :binary="true" @change="checkedMekmarMekmer($event)"/>
-              <label for="binary">{{ checked }}</label>
-          </div>
-          </div> -->
+
         </div>
       </div>
   
