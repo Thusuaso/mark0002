@@ -2,14 +2,14 @@
   "IoSocketStatus": {
     "description": "Auto imported from node_modules/nuxt-socket-io/lib/components/SocketStatus.js"
   },
+  "AuthForm": {
+    "description": "Auto imported from components/auth/authForm.vue"
+  },
   "AccountsForm": {
     "description": "Auto imported from components/accounts/form.vue"
   },
   "AccountsList": {
     "description": "Auto imported from components/accounts/list.vue"
-  },
-  "AuthForm": {
-    "description": "Auto imported from components/auth/authForm.vue"
   },
   "CardsForm": {
     "description": "Auto imported from components/cards/form.vue"
@@ -68,6 +68,12 @@
   "TransportList": {
     "description": "Auto imported from components/transport/list.vue"
   },
+  "CustomerBgpForm": {
+    "description": "Auto imported from components/customer/bgp/form.vue"
+  },
+  "CustomerBgpList": {
+    "description": "Auto imported from components/customer/bgp/list.vue"
+  },
   "UploadDocform": {
     "description": "Auto imported from components/upload/docform.vue"
   },
@@ -82,33 +88,6 @@
   },
   "UploadSupplierform": {
     "description": "Auto imported from components/upload/supplierform.vue"
-  },
-  "FinanceFormsAdvancepayment": {
-    "description": "Auto imported from components/finance/forms/advancepayment.vue"
-  },
-  "FinanceFormsPo": {
-    "description": "Auto imported from components/finance/forms/po.vue"
-  },
-  "FinanceListsCollection": {
-    "description": "Auto imported from components/finance/lists/collection.vue"
-  },
-  "FinanceListsCustomer": {
-    "description": "Auto imported from components/finance/lists/customer.vue"
-  },
-  "FinanceListsList": {
-    "description": "Auto imported from components/finance/lists/list.vue"
-  },
-  "FinanceListsPaid": {
-    "description": "Auto imported from components/finance/lists/paid.vue"
-  },
-  "FinanceListsPo": {
-    "description": "Auto imported from components/finance/lists/po.vue"
-  },
-  "CustomerBgpForm": {
-    "description": "Auto imported from components/customer/bgp/form.vue"
-  },
-  "CustomerBgpList": {
-    "description": "Auto imported from components/customer/bgp/list.vue"
   },
   "CustomerFairForm": {
     "description": "Auto imported from components/customer/fair/form.vue"
@@ -151,6 +130,27 @@
   },
   "ContainerInputList": {
     "description": "Auto imported from components/container/input/list.vue"
+  },
+  "FinanceFormsAdvancepayment": {
+    "description": "Auto imported from components/finance/forms/advancepayment.vue"
+  },
+  "FinanceFormsPo": {
+    "description": "Auto imported from components/finance/forms/po.vue"
+  },
+  "FinanceListsCollection": {
+    "description": "Auto imported from components/finance/lists/collection.vue"
+  },
+  "FinanceListsCustomer": {
+    "description": "Auto imported from components/finance/lists/customer.vue"
+  },
+  "FinanceListsList": {
+    "description": "Auto imported from components/finance/lists/list.vue"
+  },
+  "FinanceListsPaid": {
+    "description": "Auto imported from components/finance/lists/paid.vue"
+  },
+  "FinanceListsPo": {
+    "description": "Auto imported from components/finance/lists/po.vue"
   },
   "OrdersFormsChat": {
     "description": "Auto imported from components/orders/forms/chat.vue"
