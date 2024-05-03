@@ -2,57 +2,31 @@
   <div class="container">
     <div class="flex flex-wrap gap-3 mb-3 ml-3">
       <div class="flex align-items-center">
-        <RadioButton
-          v-model="ingredient"
-          inputId="ingredient1"
-          value="Stock"
-          @change="statusSelect($event)"
-        />
+        <RadioButton v-model="ingredient" inputId="ingredient1" value="Stock" @change="statusSelect($event)" />
         <label for="ingredient1" class="ml-2">Only Stock</label>
       </div>
       <div class="flex align-items-center">
-        <RadioButton
-          v-model="ingredient"
-          inputId="ingredient2"
-          value="Outer"
-          @change="statusSelect($event)"
-        />
+        <RadioButton v-model="ingredient" inputId="ingredient2" value="Outer" @change="statusSelect($event)" />
         <label for="ingredient2" class="ml-2">External</label>
       </div>
       <div class="flex align-items-center">
-        <RadioButton
-          v-model="ingredient"
-          inputId="ingredient3"
-          value="Mekmer"
-          @change="statusSelect($event)"
-        />
+        <RadioButton v-model="ingredient" inputId="ingredient3" value="Mekmer" @change="statusSelect($event)" />
         <label for="ingredient3" class="ml-2">Ext. Crates in Mekmer</label>
       </div>
       <div class="flex align-items-center">
-        <RadioButton
-          v-model="ingredient"
-          inputId="ingredient3"
-          value="MekmerIn"
-          @change="statusSelect($event)"
-        />
+        <RadioButton v-model="ingredient" inputId="ingredient3" value="MekmerIn" @change="statusSelect($event)" />
         <label for="ingredient3" class="ml-2">Mekmer</label>
       </div>
       <div class="flex align-items-center">
-        <RadioButton
-          v-model="ingredient"
-          inputId="ingredient3"
-          value="Mek-Moz"
-          @change="statusSelect($event)"
-        />
+        <RadioButton v-model="ingredient" inputId="ingredient3" value="MekmerOnlyStocks" @change="statusSelect($event)" />
+        <label for="ingredient3" class="ml-2">Mekmer (Only Stocks)</label>
+      </div>
+      <div class="flex align-items-center">
+        <RadioButton v-model="ingredient" inputId="ingredient3" value="Mek-Moz" @change="statusSelect($event)" />
         <label for="ingredient3" class="ml-2">Mek-Moz</label>
       </div>
       <div class="flex align-items-center">
-        <RadioButton
-          v-model="ingredient"
-          inputId="ingredient4"
-          value="All"
-          @change="statusSelect($event)"
-        />
+        <RadioButton v-model="ingredient" inputId="ingredient4" value="All" @change="statusSelect($event)" />
         <label for="ingredient4" class="ml-2">All</label>
       </div>
       <div class="flex align-items-center">
@@ -89,18 +63,11 @@
       </div>
     </div>
 
-    <reportsMekmerStockList
-      :list="getReportsMekmerStockList"
-      :total="getReportsMekmerStockListTotal"
-      @reports_mekmer_stock_list_selected_emit="reportsMekmerStockListSelected($event)"
-      :loading="getLoading"
-    />
+    <reportsMekmerStockList :list="getReportsMekmerStockList" :total="getReportsMekmerStockListTotal"
+      @reports_mekmer_stock_list_selected_emit="reportsMekmerStockListSelected($event)" :loading="getLoading" />
     <Dialog :visible.sync="reports_mekmer_stock_dialog" header="" modal>
-      <reportsMekmerStockForm
-        :list="getReportsStockListDetail"
-        :total="getReportsStockListDetailTotal"
-        :loading="getLoading"
-      />
+      <reportsMekmerStockForm :list="getReportsStockListDetail" :total="getReportsStockListDetailTotal"
+        :loading="getLoading" />
     </Dialog>
   </div>
 </template>
@@ -181,6 +148,8 @@ export default {
         this.$store.dispatch("setReportsMekmerInStockListDetail", event.data);
       } else if (this.ingredient == "Mek-Moz") {
         this.$store.dispatch("setReportsMekmozStockListDetail", event.data);
+      } else if (this.ingredient == "MekmerOnlyStocks") {
+        this.$store.dispatch("setReportsMekmozStockListOnlyStocksMekmerDetail", event.data);
       }
       this.reports_mekmer_stock_dialog = true;
     },
@@ -197,6 +166,8 @@ export default {
         this.$store.dispatch("setReportsMekmerStockListMekmerIn");
       } else if (this.ingredient == "Mek-Moz") {
         this.$store.dispatch("setReportsMekmerStockListMekmoz");
+      } else if (this.ingredient == 'MekmerOnlyStocks'){
+        this.$store.dispatch("setReportsMekmerStockListOnlyStocksMekmer");
       }
     },
   },

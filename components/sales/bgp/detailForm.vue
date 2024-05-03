@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" style="padding:100px 100px 100px 100px">
     <div class="row">
       <div class="col">
         <div class="flex flex-column gap-2">
@@ -58,7 +58,7 @@
       <div class="col">
         <div class="flex flex-column gap-2">
           <label for="reminderdate">Reminder Time</label>
-          <Calendar id="reminderdate" v-model="reminderdate" dateFormat="dd/mm/yy" />
+          <Calendar id="reminderdate" v-model="reminderdate" dateFormat="dd/mm/yy"/>
         </div>
       </div>
     </div>
@@ -78,20 +78,10 @@
     </div>
     <div class="row">
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-success w-100"
-          label="Save"
-          @click="saveProcess"
-        />
+        <Button type="button" class="p-button-success w-100" label="Save" @click="saveProcess" />
       </div>
       <div class="col" v-if="!getBgpDetailButtonStatus">
-        <Button
-          type="button"
-          class="p-button-danger w-100"
-          label="Delete"
-          @click="deleteForm"
-        />
+        <Button type="button" class="p-button-danger w-100" label="Delete" @click="deleteForm" />
       </div>
     </div>
   </div>

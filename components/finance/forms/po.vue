@@ -1,5 +1,5 @@
 <template>
-  <div class="row mb-6">
+  <div class="row mb-6" style="padding:50px 0px;">
     <div class="col-9">
       <div class="row mt-3">
         <div class="col">

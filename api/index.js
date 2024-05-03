@@ -2432,7 +2432,7 @@ inner join KategoriTB k on k.ID = uk.KategoriID
 inner join UrunlerTB ur on ur.ID = uk.UrunID
 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
 inner join OlculerTB ol on ol.ID = uk.OlcuID
-where u.UrunDurumID=1
+where u.UrunDurumID=1 and u.Bulunamadi != 1
 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
 order by ol.En,ol.Boy,ol.Kenar
               `;
@@ -2462,7 +2462,7 @@ inner join KategoriTB k on k.ID = uk.KategoriID
 inner join UrunlerTB ur on ur.ID = uk.UrunID
 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
 inner join OlculerTB ol on ol.ID = uk.OlcuID
-where u.UrunDurumID=1 and UretimTurID=1 and u.Disarda != 1
+where u.UrunDurumID=1 and UretimTurID=1 and u.Disarda != 1 and u.Bulunamadi != 1
 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
 order by ol.En,ol.Boy,ol.Kenar
               `;
@@ -2492,7 +2492,7 @@ app.get('/reports/mekmer/stock/list/mekmer', (req, res) => {
                 inner join UrunlerTB ur on ur.ID = uk.UrunID
                 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
-                where u.UrunDurumID=1 and u.Disarda != 1
+                where u.UrunDurumID=1 and u.Disarda != 1 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
                 order by ol.En,ol.Boy,ol.Kenar
               `;
@@ -2522,7 +2522,7 @@ app.get('/reports/mekmer/stock/list/mekmer/in', (req, res) => {
                 inner join UrunlerTB ur on ur.ID = uk.UrunID
                 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
-                where u.UrunDurumID=1 and u.TedarikciID = 1
+                where u.UrunDurumID=1 and u.TedarikciID = 1 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
                 order by ol.En,ol.Boy,ol.Kenar
               `;
@@ -2552,9 +2552,43 @@ app.get('/reports/mekmer/stock/list/mekmoz', (req, res) => {
                 inner join UrunlerTB ur on ur.ID = uk.UrunID
                 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
-                where u.UrunDurumID=1 and u.TedarikciID = 123
+                where u.UrunDurumID=1 and u.TedarikciID = 123 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
                 order by ol.En,ol.Boy,ol.Kenar
+              `;
+
+    mssql.query(sql, (err, results) => {
+        res.status(200).json({
+            'list': results.recordset
+        });
+    });
+});
+
+app.get('/reports/mekmer/stock/list/only/mekmer', (req, res) => {
+    const sql = `
+                   select 
+
+                    count(k.KategoriAdi) as KasaSayisi,
+                    k.KategoriAdi,
+                    ur.UrunAdi,
+                    yk.YuzeyIslemAdi,
+                    ol.En,
+                    ol.Boy,
+                    ol.Kenar,
+                    sum(u.Miktar) as Toplam
+
+                from UretimTB u
+                inner join UrunKartTB uk on uk.ID = u.UrunKartID
+                inner join KategoriTB k on k.ID = uk.KategoriID
+                inner join UrunlerTB ur on ur.ID = uk.UrunID
+                inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+                inner join OlculerTB ol on ol.ID = uk.OlcuID
+                where u.UrunDurumID=1 and u.TedarikciID in (1,123) and u.UretimTurID=1 and u.Bulunamadi != 1
+                group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar 
+                order by ol.En,ol.Boy,ol.Kenar
+
+
+
               `;
 
     mssql.query(sql, (err, results) => {
@@ -2587,7 +2621,7 @@ app.get('/reports/mekmer/stock/list/outer', (req, res) => {
                 inner join UrunlerTB ur on ur.ID = uk.UrunID
                 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
-                where u.UrunDurumID=1 and u.Disarda = 1
+                where u.UrunDurumID=1 and u.Disarda = 1 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
                 order by ol.En,ol.Boy,ol.Kenar
               `;
@@ -2631,7 +2665,7 @@ inner join TedarikciTB t on t.ID = u.TedarikciID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.UrunDurumID = 1 and
+where u.UrunDurumID = 1 and u.Bulunamadi != 1 and 
 k.KategoriAdi='${req.body.KategoriAdi}' 
 and urun.UrunAdi ='${req.body.UrunAdi}' 
 and yk.YuzeyIslemAdi ='${req.body.YuzeyIslemAdi}' 
@@ -2676,7 +2710,7 @@ inner join TedarikciTB t on t.ID = u.TedarikciID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.UrunDurumID = 1 and u.UretimTurID = 1 and
+where u.UrunDurumID = 1 and u.UretimTurID = 1 and u.Bulunamadi != 1 and
 k.KategoriAdi='${req.body.KategoriAdi}' 
 and urun.UrunAdi ='${req.body.UrunAdi}' 
 and yk.YuzeyIslemAdi ='${req.body.YuzeyIslemAdi}' 
@@ -2721,7 +2755,7 @@ inner join TedarikciTB t on t.ID = u.TedarikciID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.UrunDurumID = 1 and u.Disarda = 1 and
+where u.UrunDurumID = 1 and u.Disarda = 1 and u.Bulunamadi != 1 and
 k.KategoriAdi='${req.body.KategoriAdi}' 
 and urun.UrunAdi ='${req.body.UrunAdi}' 
 and yk.YuzeyIslemAdi ='${req.body.YuzeyIslemAdi}' 
@@ -2766,7 +2800,7 @@ inner join TedarikciTB t on t.ID = u.TedarikciID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.UrunDurumID = 1 and u.Disarda != 1 and
+where u.UrunDurumID = 1 and u.Disarda != 1 and u.Bulunamadi != 1 and
 k.KategoriAdi='${req.body.KategoriAdi}' 
 and urun.UrunAdi ='${req.body.UrunAdi}' 
 and yk.YuzeyIslemAdi ='${req.body.YuzeyIslemAdi}' 
@@ -2812,7 +2846,7 @@ inner join TedarikciTB t on t.ID = u.TedarikciID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.UrunDurumID = 1 and u.TedarikciID = 1 and
+where u.UrunDurumID = 1 and u.TedarikciID = 1 and u.Bulunamadi != 1 and
 k.KategoriAdi='${req.body.KategoriAdi}' 
 and urun.UrunAdi ='${req.body.UrunAdi}' 
 and yk.YuzeyIslemAdi ='${req.body.YuzeyIslemAdi}' 
@@ -2857,7 +2891,7 @@ inner join TedarikciTB t on t.ID = u.TedarikciID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.UrunDurumID = 1 and u.TedarikciID = 123 and
+where u.UrunDurumID = 1 and u.TedarikciID = 123 and u.Bulunamadi != 1 and 
 k.KategoriAdi='${req.body.KategoriAdi}' 
 and urun.UrunAdi ='${req.body.UrunAdi}' 
 and yk.YuzeyIslemAdi ='${req.body.YuzeyIslemAdi}' 
@@ -2869,6 +2903,53 @@ mssql.query(sql, (err, results) => {
     res.status(200).json({ 'list': results.recordset });
 });
 });
+
+app.post('/reports/mekmer/stock/only/stock/mekmer/detail', (req, res) => {
+    const sql = `
+                    select 
+
+u.Tarih,
+u.KasaNo,
+t.FirmaAdi,
+ub.BirimAdi,
+uo.OcakAdi,
+u.Adet,
+u.Miktar,
+u.Aciklama,
+u.SiparisAciklama,
+u.Kutu,
+u.Bagli,
+k.KategoriAdi,
+urun.UrunAdi,
+yk.YuzeyIslemAdi,
+ol.En,
+ol.Boy,
+ol.Kenar
+
+
+from UretimTB u
+inner join UrunKartTB uk on uk.ID = u.UrunKartID
+inner join KategoriTB k on k.ID = uk.KategoriID
+inner join UrunlerTB urun on urun.ID = uk.UrunID
+inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+inner join OlculerTB ol on ol.ID = uk.OlcuID
+inner join TedarikciTB t on t.ID = u.TedarikciID
+inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
+inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
+
+where u.UrunDurumID = 1 and u.TedarikciID in (1,123) and u.UretimTurID=1 and u.Bulunamadi != 1 and 
+k.KategoriAdi='${req.body.KategoriAdi}' 
+and urun.UrunAdi ='${req.body.UrunAdi}' 
+and yk.YuzeyIslemAdi ='${req.body.YuzeyIslemAdi}' 
+and ol.En='${req.body.En}' and 
+ol.Boy='${req.body.Boy}' 
+and ol.Kenar='${req.body.Kenar}'
+            `;
+mssql.query(sql, (err, results) => {
+    res.status(200).json({ 'list': results.recordset });
+});
+});
+
 
 
 
@@ -3490,6 +3571,126 @@ app.get('/reports/loading/list/:year',(req,res)=>{
         res.status(200).json({'months':months.recordset});
     });
 });
+
+app.get('/reports/loading/list/:year/:month',(req,res)=>{
+    const sql = `
+    select  
+    s.YuklemeTarihi,  
+    s.SiparisNo,  
+    m.FirmaAdi as MusteriAdi,  
+    (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) as Fob,  
+    (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+  
+    dbo.Get_SiparisNavlun(s.SiparisNo) as Dtp,  
+    'Konteyner' as Tur,m.Marketing  
+    from  
+    SiparislerTB s,MusterilerTB m  
+    where Year(YuklemeTarihi)=${req.params.year}
+    and Month(YuklemeTarihi)=${req.params.month}
+    and m.ID=s.MusteriID  
+    and m.Marketing not in ('Mekmar Numune','Seleksiyon','Warehouse')  
+    and m.Marketing is not null  
+     
+    union  
+    select  
+    s.Tarih as YuklemeTarihi,  
+    s.CikisNo as SiparisNo,  
+    m.FirmaAdi as MusteriAdi,  
+    Sum(Toplam) as Fob  
+    ,Sum((s.BirimFiyat+7.5)*u.Miktar) as Dtp,  
+    'Depo' as Tur,m.Marketing  
+    from  
+    SevkiyatTB s,MusterilerTB m,UretimTB u  
+    where s.MusteriID=m.ID and u.KasaNo=s.KasaNo  
+    and Year(s.Tarih)=${req.params.year} and Month(s.Tarih)=${req.params.month}
+    and m.Mt_No=1  
+    group by  
+    s.Tarih,s.CikisNo,m.FirmaAdi,m.Marketing
+    `;
+    const yearlySql = `
+    select  
+    s.YuklemeTarihi,  
+    s.SiparisNo,  
+    m.FirmaAdi as MusteriAdi,  
+    (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) as Fob,  
+    (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+  
+    dbo.Get_SiparisNavlun(s.SiparisNo) as Dtp,  
+    'Konteyner' as Tur,m.Marketing  
+    from  
+    SiparislerTB s,MusterilerTB m  
+    where Year(YuklemeTarihi)=${req.params.year}
+    and m.ID=s.MusteriID  
+    and m.Marketing not in ('Mekmar Numune','Seleksiyon','Warehouse')  
+    and m.Marketing is not null  
+     
+    union  
+    select  
+    s.Tarih as YuklemeTarihi,  
+    s.CikisNo as SiparisNo,  
+    m.FirmaAdi as MusteriAdi,  
+    Sum(Toplam) as Fob  
+    ,Sum((s.BirimFiyat+7.5)*u.Miktar) as Dtp,  
+    'Depo' as Tur,m.Marketing  
+    from  
+    SevkiyatTB s,MusterilerTB m,UretimTB u  
+    where s.MusteriID=m.ID and u.KasaNo=s.KasaNo  
+    and Year(s.Tarih)=${req.params.year}
+    and m.Mt_No=1  
+    group by  
+    s.Tarih,s.CikisNo,m.FirmaAdi,m.Marketing
+    `;
+    mssql.query(sql,(err,loading)=>{
+        mssql.query(yearlySql,(err,yearly)=>{
+            res.status(200).json({'list':loading.recordset,'yearly':yearly.recordset});
+
+        });
+        
+    });
+});
+
+app.get('/reports/loading/list/by/customer/:year/:month',(req,res)=>{
+    const sql = `
+    select  
+    m.ID as MusteriId,  
+    m.FirmaAdi as MusteriAdi,  
+     m.Marketing, 
+     
+   (  
+      Select Sum(SatisToplam) from SiparislerTB s, SiparisUrunTB u where s.SiparisNo=u.SiparisNo  
+      and s.SiparisDurumID=3 and s.MusteriID=m.ID and Year(YuklemeTarihi)='${req.params.year}'  and MONTH(YuklemeTarihi) ='${req.params.month}'  and s.SiparisDurumID=3
+   ) 
+       
+   as Fob, 
+   
+   (  
+      Select Sum(SatisToplam) from SiparislerTB s, SiparisUrunTB u where s.SiparisNo=u.SiparisNo  
+      and s.SiparisDurumID=3 and s.MusteriID=m.ID and Year(YuklemeTarihi)='${req.params.year}' and MONTH(YuklemeTarihi) ='${req.params.month}'  and s.SiparisDurumID=3
+   )  +  
+   (  
+       Select Sum(s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3 ) from SiparislerTB s  
+       where s.MusteriID=m.ID and YEAR(s.YuklemeTarihi)='${req.params.year}' and MONTH(s.YuklemeTarihi) ='${req.params.month}'  and s.SiparisDurumID=3
+   )  
+       
+   as Dtp 
+  
+   from  
+   MusterilerTB m,YeniTeklif_UlkeTB u  
+   where 
+   u.Id = m.UlkeId  
+   order by  m.FirmaAdi asc
+    `;
+    mssql.query(sql,(err,results)=>{
+        const data = [];
+        results.recordset.forEach(x=>{
+            if(x.Fob >0){
+                data.push(x);
+            } 
+        })
+        res.status(200).json({'list':data});
+        
+    });
+
+});
+
 
 
 
@@ -8576,14 +8777,14 @@ app.get('/order/shipped/list/filter/global/:filter',async (req,res)=>{
         inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 
         where s.SiparisDurumID = 3  and m.Marketing= 'Mekmar' and 
-        s.YuklemeTarihi Like '${req.params.filter}'  +'%' or 
-        m.FirmaAdi Like '${req.params.filter}' + '%' or
-        s.SiparisNo Like '${req.params.filter}' + '%' or 
-        urun.UrunAdi Like '${req.params.filter}' + '%' or
-        ol.En Like '${req.params.filter}' + '%' or
-        ol.Boy Like '${req.params.filter}' + '%' or
-        ol.Kenar Like '${req.params.filter}' + '%' or 
-        t.FirmaAdi Like '${req.params.filter}' + '%' 
+        s.YuklemeTarihi Like '%'+'${req.params.filter}'  +'%' or 
+        m.FirmaAdi Like '%'+'${req.params.filter}' + '%' or
+        s.SiparisNo Like '%'+'${req.params.filter}' + '%' or 
+        urun.UrunAdi Like '%'+'${req.params.filter}' + '%' or
+        ol.En Like '%'+'${req.params.filter}' + '%' or
+        ol.Boy Like '%'+'${req.params.filter}' + '%' or
+        ol.Kenar Like '%'+'${req.params.filter}' + '%' or 
+        t.FirmaAdi Like '%'+'${req.params.filter}' + '%' 
         order by s.SiparisTarihi desc
 
 

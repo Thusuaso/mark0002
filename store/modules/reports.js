@@ -203,6 +203,19 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
+
+
+    setReportsMekmerStockListOnlyStocksMekmer(vuexContext) {
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get("/reports/mekmer/stock/list/only/mekmer")
+            .then(response => {
+                vuexContext.commit('setReportsMekmerStockList', response.data.list);
+                vuexContext.commit('setReportsMekmerStockListTotal', response.data.list);
+                vuexContext.dispatch('setEndLoadingAction');
+            });
+    },
+
+
     setReportsMekmerStockListTotal(vuexContext, payload) {
         vuexContext.commit('setReportsMekmerStockListTotal', payload);
     },
@@ -260,6 +273,17 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             })
     },
+
+    setReportsMekmozStockListOnlyStocksMekmerDetail(vuexContext, payload) {
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.post('/reports/mekmer/stock/only/stock/mekmer/detail', payload)
+            .then(response => {
+                vuexContext.commit('setReportsStockListDetail', response.data.list);
+                vuexContext.commit('setReportsStockListDetailTotal', response.data.list);
+                vuexContext.dispatch('setEndLoadingAction');
+            })
+    },
+
     setReportsStockListDetailTotal(vuexContext, payload) {
         vuexContext.commit('setReportsStockListDetailTotal',payload)
     },
@@ -332,6 +356,18 @@ const actions = {
             vuexContext.commit('setLoadingList',response.data);
             vuexContext.commit('setReportsMekmarLoadingListTotal',response.data.list);
             vuexContext.commit('setReportsMekmarLoadingListYear',response.data.yearly);
+            vuexContext.dispatch('setEndLoadingAction');
+
+        });
+    },
+    
+    setLoadingByCustomerList(vuexContext,date){
+        vuexContext.dispatch('setBeginLoadingAction');
+
+        this.$axios.get(`/reports/loading/list/by/customer/${date.year}/${date.month}`)
+        .then(response=>{
+            vuexContext.commit('setLoadingCustomerList',response.data.list);
+            vuexContext.commit('setReportsMekmarLoadingListTotal',response.data.list);
             vuexContext.dispatch('setEndLoadingAction');
 
         });
@@ -484,6 +520,9 @@ const mutations = {
     setLoadingList(state,payload){
         state.reportsMekmarLoadingList = payload.list;
         state.reportsMekmarLoadingListYear = payload.yearly;
+    },
+    setLoadingCustomerList(state,payload){
+        state.reportsMekmarLoadingList = payload;
     },
     setReportsMekmerProductionList(state, payload) {
         state.reportsMekmerProductionList = payload;

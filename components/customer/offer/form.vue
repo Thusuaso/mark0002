@@ -143,7 +143,7 @@ export default {
 };
 </script>
 <style scoped>
-@media screen {
+@media screen and (max-width:576px){
   .row{
   clear:both;
   display:block;

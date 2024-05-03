@@ -438,11 +438,14 @@ export default {
       this.selectedUser = this.users.find((x) => x.ID == this.model.NumuneTemsilci);
     },
     deleteProcess() {
-      const data = {
-        id: this.model.ID,
-        po: this.model.NumuneNo,
-      };
-      this.$emit("delete_process", data);
+      if(confrim('Are you sure you want to delete?')){
+        const data = {
+          id: this.model.ID,
+          po: this.model.NumuneNo,
+        };
+        this.$emit("delete_process", data);
+      }
+
     },
     process() {
       this.model.NumuneTarihi = date.dateToString(this.input_date);

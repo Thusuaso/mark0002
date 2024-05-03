@@ -1,5 +1,5 @@
 <template>
-  <div class="row w-100 h-100" style="height: 500px">
+  <div class="row w-100 h-100" style="height: 500px;padding:75px 50px;">
     <div class="col-6">
       <div class="flex flex-column gap-2">
         <label for="savedate">Date</label>

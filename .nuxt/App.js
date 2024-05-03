@@ -12,8 +12,6 @@ import '..\\assets\\css\\bootstrap.css'
 
 import '..\\assets\\css\\bootstrap.min.css'
 
-import '..\\assets\\css\\bootstrap.min.css'
-
 import '..\\node_modules\\primevue\\resources\\themes\\saga-orange\\theme.css'
 
 import '..\\node_modules\\primevue\\resources\\primevue.min.css'
