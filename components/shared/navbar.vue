@@ -8,9 +8,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item" v-if="getAuthorityStatus">
-            <nuxt-link to="/mekmer/products/production" tag="a" class="nav-link">PRODUCTION</nuxt-link>
-          </li>
+
           <li class="nav-item" v-if="getAuthorityStatus">
             <nuxt-link to="/selection/input" tag="a" class="nav-link">SELECTION</nuxt-link>
           </li>

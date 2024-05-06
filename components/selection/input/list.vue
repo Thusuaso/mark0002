@@ -1,6 +1,5 @@
 <template>
-  <div class="row">
-    <div class="col">
+  <div class="" style="display:block;min-width:100%;">
       <DataTable
         :value="products"
         class="p-datatable-sm"
@@ -29,8 +28,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -70,8 +68,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -89,8 +86,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -108,8 +104,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #footer>
             {{ total.kasaadedi }}
@@ -130,8 +125,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -149,8 +143,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -168,8 +161,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -187,8 +179,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -206,8 +197,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #footer>
             {{ total.kutuiciadet | formatDecimal }}
@@ -228,8 +218,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #footer>
             {{ total.kutu | formatDecimal }}
@@ -250,8 +239,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
@@ -273,8 +261,7 @@
           field="Kutu"
           header="Box"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #body="slotProps">
             <div v-if="slotProps.data.Kutu == true">✓</div>
@@ -285,8 +272,7 @@
           field="Bagli"
           header="Binded"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #body="slotProps">
             <div v-if="slotProps.data.Bagli == true">✓</div>
@@ -299,8 +285,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -318,8 +303,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           sortable
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -332,7 +316,6 @@
           </template>
         </Column>
       </DataTable>
-    </div>
   </div>
 </template>
 <script>

@@ -2,84 +2,42 @@
   <div class="">
     <div class="row m-auto text-center">
       <div class="col-6">
-        <Button
-          type="button"
-          class="p-button-success w-100"
-          label="New Order"
-          @click="newForm"
-        />
+        <Button type="button" class="p-button-success w-100" label="New Order" @click="newForm" />
       </div>
 
       <div class="col-6">
         <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
       </div>
     </div>
-    <orderList
-      :list="getOrderList"
-      @production_selected_emit="productionSelected($event)"
-      :loading="getLoading"
-      :status="'Production'"
-      :total="getOrderProductionTotal"
-    />
-    <Dialog
-      :visible.sync="production_detail_form"
-      header=""
-      modal
-      :style="{ width: '100%' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-      :closeOnEscape="false"
-      :closable="false"
-      :maximizable="true"
-    >
-      <orderDetailForm
-        :modelProduction="productionModel"
-        :modelProduct="getOrderProductModel"
-        :status="getOrderProductionButtonStatus"
-        :customer="getCustomersList"
-        :user="getUserList"
-        :productsList="getOrderProductionProductDetailList"
-        :supplier="getSupplierList"
-        :unit="getUnitList"
-        :po="getOrderProductionPo"
-        :delivery="getOrderKindOfDeliveryList"
-        :payment="getOrderKindOfPaymentList"
-        :country="getCountryList"
-        :invoice="getOrderKindOfInvoiceList"
-        :cost="getOrderProductionCostList"
-        :costTotal="getOrderProductionCostTotal"
-        :supplierDelivery="getOrderKindOfDeliverySupplierList"
-        :productSupplier="getOrderProductionSupplierList"
-        :supplierProduct="getOrderSupplierProductList"
-        :document="getOrderProductionDocumentList"
-        :check="getOrderProductionCheckList"
-        :checkTotal="getOrderProductionCheckListTotal"
-        :productCalculation="getOrderProductionProductTotal"
-        :freightCalculation="getOrderProductionFreightTotal"
-        :detailCalculation="getOrderProductionDetailTotal"
+    <orderList2 :list="getOrderList" @production_selected_emit="productionSelected($event)" :loading="getLoading"
+      :status="'Production'" :total="getOrderProductionTotal" />
+    <Dialog :visible.sync="production_detail_form" header="" modal :style="{ width: '100%' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false" :maximizable="true">
+      <orderDetailForm :modelProduction="productionModel" :modelProduct="getOrderProductModel"
+        :status="getOrderProductionButtonStatus" :customer="getCustomersList" :user="getUserList"
+        :productsList="getOrderProductionProductDetailList" :supplier="getSupplierList" :unit="getUnitList"
+        :po="getOrderProductionPo" :delivery="getOrderKindOfDeliveryList" :payment="getOrderKindOfPaymentList"
+        :country="getCountryList" :invoice="getOrderKindOfInvoiceList" :cost="getOrderProductionCostList"
+        :costTotal="getOrderProductionCostTotal" :supplierDelivery="getOrderKindOfDeliverySupplierList"
+        :productSupplier="getOrderProductionSupplierList" :supplierProduct="getOrderSupplierProductList"
+        :document="getOrderProductionDocumentList" :check="getOrderProductionCheckList"
+        :checkTotal="getOrderProductionCheckListTotal" :productCalculation="getOrderProductionProductTotal"
+        :freightCalculation="getOrderProductionFreightTotal" :detailCalculation="getOrderProductionDetailTotal"
         :detailProductTotal="getOrderProductionProductDetailTotal"
         :detailProductCost="getOrderProductionProductDetailCostTotal"
         :saveButtonStatus="getOrderProductionSaveButtonStatus"
-        :proformaUploadButtonStatus="getOrderProductionUploadProformaButtonStatus"
-        :statusAlfa="true"
+        :proformaUploadButtonStatus="getOrderProductionUploadProformaButtonStatus" :statusAlfa="true"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
-        "
-        @process="process"
-        @workerman_selected_emit="workermanSelected($event)"
-        @close_production_form_emit="closeProductionForm"
-        @proforma_delete_emit="proformaDelete($event)"
-        @isf_delete_emit="isfDelete($event)"
-      />
+        " @process="process" @workerman_selected_emit="workermanSelected($event)"
+        @close_production_form_emit="closeProductionForm" @proforma_delete_emit="proformaDelete($event)"
+        @isf_delete_emit="isfDelete($event)" />
     </Dialog>
 
     <Dialog :visible.sync="workerman_dialog_form" header="" modal>
-      <orderDetailWorkermanForm
-        :list="getOrderProductionProductDetailWorkermanList"
-        :model="getOrderProductWorkermanModel"
-        :supplier="getSupplierList"
-        :productId="productId"
-        :po="getOrderProductionPo"
-      />
+      <orderDetailWorkermanForm :list="getOrderProductionProductDetailWorkermanList"
+        :model="getOrderProductWorkermanModel" :supplier="getSupplierList" :productId="productId"
+        :po="getOrderProductionPo" />
     </Dialog>
   </div>
 </template>

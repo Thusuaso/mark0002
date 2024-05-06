@@ -9,19 +9,6 @@
             @click="newForm"
           />
         </div>
-        <div class="col">
-          <div class="p-float-label">
-            <Dropdown
-              v-model="selectedYear"
-              inputId="years"
-              :options="getOrderProductionYearsList"
-              optionLabel="Yil"
-              class="w-100"
-              @change="yearChange($event)"
-            />
-            <label for="years">Year</label>
-          </div>
-        </div>
       </div>
       <orderShippedList
         :list="getOrderList"

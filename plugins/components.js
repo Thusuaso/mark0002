@@ -111,6 +111,15 @@ import docform from '~/components/upload/docform';
 import isfform from '~/components/upload/isfform';
 import supplierform from '~/components/upload/supplierform';
 import orderShippedList from '~/components/orders/lists/shipped';
+import orderList2 from '~/components/orders/lists/list2';
+import orderDetailForm2 from '~/components/orders/forms/detail2';
+import orderDetailOrderForm2 from '~/components/orders/forms/order2';
+Vue.component('orderDetailOrderForm2',orderDetailOrderForm2);
+
+Vue.component('orderDetailForm2',orderDetailForm2);
+
+
+Vue.component('orderList2',orderList2);
 
 Vue.component('supplierform',supplierform);
 Vue.component('orderShippedList',orderShippedList);

@@ -15,7 +15,7 @@
               <div class="col-auto">
                 <i class="fas fa-calendar fa-2x text-gray-300">{{
                   getMonthDate(new Date().getMonth() + 1)
-                }}</i>
+                  }}</i>
               </div>
             </div>
           </div>
@@ -82,7 +82,7 @@
               <div class="col-auto">
                 <i class="fas fa-calendar fa-2x text-gray-300">{{
                   getMonthDate(new Date().getMonth() + 1)
-                }}</i>
+                  }}</i>
               </div>
             </div>
           </div>

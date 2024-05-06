@@ -9,11 +9,11 @@
         <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
       </div>
     </div>
-    <orderList :list="getOrderList" @production_selected_emit="productionSelected($event)" :loading="getLoading"
+    <orderList2 :list="getOrderList" @production_selected_emit="productionSelected($event)" :loading="getLoading"
       :status="'Production'" :total="getOrderProductionTotal" />
     <Dialog :visible.sync="production_detail_form" header="" modal :style="{ width: '100%' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false" :maximizable="true">
-      <orderDetailForm :modelProduction="productionModel" :modelProduct="getOrderProductModel"
+      <orderDetailForm2 :modelProduction="productionModel" :modelProduct="getOrderProductModel"
         :status="getOrderProductionButtonStatus" :customer="getCustomersList" :user="getUserList"
         :productsList="getOrderProductionProductDetailList" :supplier="getSupplierList" :unit="getUnitList"
         :po="getOrderProductionPo" :delivery="getOrderKindOfDeliveryList" :payment="getOrderKindOfPaymentList"
