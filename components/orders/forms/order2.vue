@@ -41,6 +41,10 @@
                         <CustomInput :value="model.AlisFiyati" text="Purchase Price"
                             @onInput="model.AlisFiyati = $event" :disabled="product_form_disabled" />
                     </div>
+                    <div class="col">
+                        <CustomInput :value="model.SatisFiyati" text="Selling Price"
+                            @onInput="model.SatisFiyati = $event" :disabled="product_form_disabled" />
+                    </div>
 
                 </div>
                 <div class="row mb-4">
@@ -185,12 +189,26 @@
                     {{ slotProps.data.OzelMiktar | formatDecimal }}
                 </template>
             </Column>
-            <Column field="AlisFiyati" header="Price">
+            <Column field="SatisFiyati" header="Sales Price">
+                <template #body="slotProps">
+                    {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+                </template>
+            </Column>
+            <Column header="Total (Selling)">
+                <template #body="slotProps">
+                    {{ (slotProps.data.Miktar * slotProps.data.SatisFiyati) | formatPriceUsd }}
+                </template>
+                <template #footer>
+                    {{ totals | formatPriceUsd }}
+                </template>
+            </Column>
+            <Column field="AlisFiyati" header="Purchase Price">
                 <template #body="slotProps">
                     {{ slotProps.data.AlisFiyati | formatPriceUsd }}
                 </template>
             </Column>
-            <Column header="Total">
+
+            <Column header="Total (Purchase)">
                 <template #body="slotProps">
                     {{ (slotProps.data.Miktar * slotProps.data.AlisFiyati) | formatPriceUsd }}
                 </template>

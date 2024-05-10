@@ -1,5 +1,5 @@
 <template>
-  <div class="" style="display:block;min-width:100%;">
+  <div>
       <DataTable
         :value="products"
         class="p-datatable-sm"
@@ -379,3 +379,13 @@ export default {
   },
 };
 </script>
+<style scoped>
+  .p-datatable{
+    clear:both;
+    display:block;
+  }
+  .p-datatable-table .p-datatable-wrapper{
+    clear:both;
+    display:block;
+  }
+</style>

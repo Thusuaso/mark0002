@@ -135,17 +135,30 @@
                         {{ total.ton | formatDecimal }}
                     </template>
                 </Column>
-                <Column field="AlisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
+                <Column field="SatisFiyati" header="Price (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+                    <template #body="slotProps">
+                        {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+                    </template>
+                </Column>
+                <Column header="Total (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+                    <template #body="slotProps">
+                        {{ slotProps.data.SatisFiyati * slotProps.data.Miktar | formatPriceUsd }}
+                    </template>
+                    <template #footer>
+                        {{ totals | formatDecimal }}
+                    </template>
+                </Column>
+                <Column field="AlisFiyati" header="Price (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
                     <template #body="slotProps">
                         {{ slotProps.data.AlisFiyati | formatPriceUsd }}
                     </template>
                 </Column>
-                <Column  header="Total" headerClass="tableHeader" bodyClass="tableBody">
+                <Column header="Total (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
                     <template #body="slotProps">
                         {{ slotProps.data.AlisFiyati * slotProps.data.Miktar | formatPriceUsd }}
                     </template>
                     <template #footer>
-                        {{ totals | formatPriceUsd }}
+                        {{ totals | formatDecimal }}
                     </template>
                 </Column>
             </DataTable>
@@ -301,12 +314,25 @@
                         {{ total.ton | formatDecimal }}
                     </template>
                 </Column>
-                <Column field="AlisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
+                <Column field="SatisFiyati" header="Price (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+                    <template #body="slotProps">
+                        {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+                    </template>
+                </Column>
+                <Column header="Total (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+                    <template #body="slotProps">
+                        {{ slotProps.data.SatisFiyati * slotProps.data.Miktar | formatPriceUsd }}
+                    </template>
+                    <template #footer>
+                        {{ totals | formatDecimal }}
+                    </template>
+                </Column>
+                <Column field="AlisFiyati" header="Price (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
                     <template #body="slotProps">
                         {{ slotProps.data.AlisFiyati | formatPriceUsd }}
                     </template>
                 </Column>
-                <Column header="Total" headerClass="tableHeader" bodyClass="tableBody">
+                <Column header="Total (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
                     <template #body="slotProps">
                         {{ slotProps.data.AlisFiyati * slotProps.data.Miktar | formatPriceUsd }}
                     </template>
@@ -441,17 +467,30 @@
                     {{ total.ton | formatDecimal }}
                 </template>
             </Column>
-            <Column field="AlisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
+            <Column field="SatisFiyati" header="Price (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+                <template #body="slotProps">
+                    {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+                </template>
+            </Column>
+            <Column header="Total (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+                <template #body="slotProps">
+                    {{ slotProps.data.SatisFiyati * slotProps.data.Miktar | formatPriceUsd }}
+                </template>
+                <template #footer>
+                    {{ totals | formatDecimal }}
+                </template>
+            </Column>
+            <Column field="AlisFiyati" header="Price (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
                 <template #body="slotProps">
                     {{ slotProps.data.AlisFiyati | formatPriceUsd }}
                 </template>
             </Column>
-            <Column header="Total" headerClass="tableHeader" bodyClass="tableBody">
+            <Column header="Total (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
                 <template #body="slotProps">
                     {{ slotProps.data.AlisFiyati * slotProps.data.Miktar | formatPriceUsd }}
                 </template>
                 <template #footer>
-                    {{ totals | formatPriceUsd }}
+                    {{ totals | formatDecimal }}
                 </template>
             </Column>
         </DataTable>

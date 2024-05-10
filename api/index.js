@@ -1583,6 +1583,7 @@ app.post('/transport/list/save',(req,res)=>{
             INSERT INTO NakliyeFaturaKayitTB (FirmaID, Tarih, FaturaNo, Tutar,Kur,KayitTarihi,KullaniciID)    values
             ('${x.companyId}','${x.date}','${x.invoiceno}','${x.tl}','${x.currency}','${x.nowDate}','${x.userId}')
         `;
+        console.log(sql);
         mssql.query(sql)
         .then(response=>{
            if(response.rowsAffected[0] == 1){
@@ -1634,6 +1635,7 @@ app.post('/transport/file/list/save',(req,res)=>{
                 values
                 ('${x.date}','${transportProductId}','11','${x.po}','${x.usd}','1','13','${transportInvoiceId}','2','${x.nowDate}','${x.invoiceno}.pdf','${x.userId}')
                 `;
+                console.log(sql);
                 mssql.query(sql);
             });
         });
@@ -1656,7 +1658,7 @@ app.get('/transport/list',(req,res)=>{
                     s.Tarih
                     
                     from SiparisFaturaKayitTB s ,NakliyeFaturaKayitTB n where 
-                    s.YuklemeEvrakID=13 and s.SiparisFaturaTurID=11  and Year(s.Tarih) in (2023,2022,2021)  and n.FaturaNo+'.pdf' = s.EvrakAdi and n.ID = s.FaturaKayitID
+                    s.YuklemeEvrakID=13 and s.SiparisFaturaTurID=11  and Year(s.Tarih) in (2024,2023,2022,2021)  and n.FaturaNo+'.pdf' = s.EvrakAdi and n.ID = s.FaturaKayitID
                 
                     group by s.ID ,s.SiparisNo , n.FaturaNo , n.FirmaID ,s.Tutar,n.Kur,s.Tarih
 
@@ -5796,10 +5798,10 @@ app.post('/panel/product/save', (req, res) => {
                     '${req.body.keywords_en2}',
                     '${req.body.keywords_fr2}',
                     '${req.body.keywords_es2}',
-                    '${req.body.keywords_ru}',
-                    '${req.body.urunadi_ru}',
-                    '${req.body.aciklama_ru}',
-                    '${req.body.anahtarlar_ru}',
+                    N'${req.body.keywords_ru}',
+                    N'${req.body.urunadi_ru}',
+                    N'${req.body.aciklama_ru}',
+                    N'${req.body.anahtarlar_ru}',
                     N'${req.body.urunadi_ar}',
                     N'${req.body.aciklama_ar}',
                     N'${req.body.anahtarlar_ar}',

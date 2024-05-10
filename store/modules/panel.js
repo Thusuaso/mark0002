@@ -701,6 +701,9 @@ const actions = {
             
             }
         });
+    },
+    setPanelProductsFilterReset(vuexContext) {
+        vuexContext.commit('setPanelProductsFilterReset');
     }
 
 
@@ -846,6 +849,17 @@ const mutations = {
     },
     setPanelProductsSizeListUpdate(state,payload){
         state.panelProductSizeList = payload;
+    },
+    setPanelProductsFilterReset(state) {
+        state.panelProductSizeList =  [];
+        state.panelProductFinishList =  [];
+        state.panelProductColorList =  [];
+        state.panelProductAreaList =  [];
+        state.panelProductTypeList =  [];
+        state.panelProductMaterialList =  [];
+        state.panelProductEdgeList =  [];
+        state.panelProductStyleList = [];
+
     }
 
 

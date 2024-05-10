@@ -186,6 +186,9 @@ export default {
       this.$store.dispatch("setPanelProductId", 0);
       this.$store.commit("setPanelProductPhotoListUpdate", []);
       this.$store.dispatch("setPanelProjectSuggestedReset");
+      this.$store.commit('setPanelProductsSizeListUpdate', []);
+      this.$store.commit('setPanelProductsFilterReset', []);
+
       this.model = this.getPanelProductModel;
       this.panel_form_dialog = true;
     },

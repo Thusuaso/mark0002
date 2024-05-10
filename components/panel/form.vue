@@ -1373,7 +1373,7 @@ export default {
     },
     process() {
       if (this.status) {
-        this.productSaveButtonDisabled = true;
+        this.productSaveButtonDisabled = false;
       }
       this.$emit("process_emit", this.model);
     },
