@@ -8,7 +8,7 @@
       @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
       :loading="loading" style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
       :filters.sync="filtersShipped" v-if="status == 'Shipped 2'" sortField="YuklemeTarihi" :sortOrder="-1"
-      :rowClass="rowClass2">
+      :rowClass="rowClass2" @filter="filtersProduction($event)">
       <template #header>
         <div class="flex justify-content-between">
           <span class="p-input-icon-left">
@@ -119,17 +119,30 @@
           {{ total.ton | formatDecimal }}
         </template>
       </Column>
-      <Column field="SatisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
+      <Column field="SatisFiyati" header="Price (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+        <template #body="slotProps">
+          {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+        </template>
+      </Column>
+      <Column header="Total (Selling)" headerClass="tableHeader" bodyClass="tableBody">
+        <template #body="slotProps">
+          {{ slotProps.data.SatisFiyati * slotProps.data.Miktar | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{ totalsPurchase | formatDecimal }}
+        </template>
+      </Column>
+      <Column field="AlisFiyati" header="Price (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.AlisFiyati | formatPriceUsd }}
         </template>
       </Column>
-      <Column header="Total" headerClass="tableHeader" bodyClass="tableBody">
+      <Column header="Total (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.AlisFiyati * slotProps.data.Miktar | formatPriceUsd }}
         </template>
         <template #footer>
-          {{ totals | formatPriceUsd }}
+          {{ totals | formatDecimal }}
         </template>
       </Column>
     </DataTable>
@@ -159,6 +172,7 @@
     },
     data() {
       return {
+        totalsPurchase:0,
         totals:0,
         filtersShipped: {
           YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -199,12 +213,22 @@
       };
     },
     created() {
-      this.totals = 0;
-      this.list.forEach(x => {
-        this.totals += this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
-      });
+
+      this.__totalSum(this.list);
     },
     methods: {
+      filtersProduction(event){
+        this.__totalSum(event.filteredValue);
+      },
+      __totalSum(val){
+        this.totals = 0;
+        this.totalsPurchase = 0;
+        val.forEach(x => {
+          this.totals += this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
+          this.totalsPurchase += this.__noneControl(x.SatisFiyati) * this.__noneControl(x.Miktar);
+        });
+
+      },
       __noneControl(val) {
         if (val == null || val == undefined || val == "") {
           return 0;
