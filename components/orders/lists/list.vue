@@ -7,15 +7,13 @@
         @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
         :loading="loading" style="font-size: 70%; border: 2px solid gray;" filterDisplay="row"
         :filters.sync="filtersOrders" v-if="status == 'Shipped'" sortField="YuklemeTarihi" :sortOrder="-1"
-        :rowClass="rowClass2"
-        
-        >
+        :rowClass="rowClass2">
         <template #header>
           <div class="flex justify-content-between">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
               <InputText v-model="globalSearch" placeholder="Keyword Search" @keyup.enter="globalSearchFilter($event)"
-                @input="globalSearchFilterInput($event)" @keypress="globalSearchFilter($event)" />
+                @input="globalSearchFilterInput($event)" @keyup.prevent="globalSearchFilter($event)" />
             </span>
           </div>
         </template>
@@ -32,14 +30,14 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentLoadDate(filterModel.value)"
               @input="filterShipmentLoadDateInput(filterModel.value)"
-              @keypress="filterShipmentLoadDate(filterModel.value)" class="p-column-filter" />
+              @keyup.prevent="filterShipmentLoadDate(filterModel.value)" class="p-column-filter" />
           </template>
         </Column>
         <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentCompany(filterModel.value)"
-              @keypress="filterShipmentCompany(filterModel.value)"
+              @keyup.prevent="filterShipmentCompany(filterModel.value)"
               @input="filterShipmentCompanyInput(filterModel.value)" class="p-column-filter" />
           </template>
         </Column>
@@ -48,7 +46,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentPo(filterModel.value)"
               @input="filterShipmentPoInput(filterModel.value)" class="p-column-filter"
-              @keypress="filterShipmentPo(filterModel.value)" />
+              @keyup.prevent="filterShipmentPo(filterModel.value)" />
           </template>
         </Column>
         <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
@@ -69,10 +67,10 @@
           </template>
         </Column>
         <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false"
-          headerClass="tableHeader" bodyClass="tableBody" >
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentProduct(filterModel.value)"
-              @keypress="filterShipmentProduct(filterModel.value)"
+              @keyup.prevent="filterShipmentProduct(filterModel.value)"
               @input="filterShipmentProductInput(filterModel.value)" class="p-column-filter" />
           </template>
         </Column>
@@ -82,8 +80,8 @@
           bodyClass="tableBody">
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentWidth(filterModel.value)"
-              @keypress="filterShipmentWidth(filterModel.value)" @input="filterShipmentWidthInput(filterModel.value)"
-              class="p-column-filter" />
+              @keyup.prevent="filterShipmentWidth(filterModel.value)"
+              @input="filterShipmentWidthInput(filterModel.value)" class="p-column-filter" />
           </template>
         </Column>
 
@@ -91,15 +89,15 @@
           bodyClass="tableBody">
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentHeight(filterModel.value)"
-              @keypress="filterShipmentHeight(filterModel.value)" @input="filterShipmentHeightInput(filterModel.value)"
-              class="p-column-filter" />
+              @keyup.prevent="filterShipmentHeight(filterModel.value)"
+              @input="filterShipmentHeightInput(filterModel.value)" class="p-column-filter" />
           </template>
         </Column>
         <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentEdge(filterModel.value)"
-              @keypress="filterShipmentEdge(filterModel.value)" @input="filterShipmentEdgeInput(filterModel.value)"
+              @keyup.prevent="filterShipmentEdge(filterModel.value)" @input="filterShipmentEdgeInput(filterModel.value)"
               class="p-column-filter" />
           </template>
         </Column>
@@ -107,7 +105,7 @@
           headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentSupplier(filterModel.value)"
-              @keypress="filterShipmentSupplier(filterModel.value)"
+              @keyup.prevent="filterShipmentSupplier(filterModel.value)"
               @input="filterShipmentSupplierInput(filterModel.value)" class="p-column-filter" />
           </template>
         </Column>
@@ -118,7 +116,7 @@
           </template>
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentAmount(filterModel.value)"
-              @keypress="filterShipmentAmount(filterModel.value)"
+              @keyup.prevent="filterShipmentAmount(filterModel.value)"
               @input="filterShipmentAmountInput(filterModel.value)" class="p-column-filter" />
           </template>
           <template #footer>

@@ -266,7 +266,7 @@
       </div>
 
       <span class="p-float-label mb-4">
-        <InputText id="sampleno" v-model="model.NumuneNo" class="w-100" />
+        <InputText id="sampleno" v-model="model.NumuneNo" class="w-100" :disabled="!status"/>
         <label for="sampleno">Sample No</label>
       </span>
       <span class="p-float-label mb-4">

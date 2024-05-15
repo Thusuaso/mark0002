@@ -327,9 +327,7 @@ export default {
     },
   },
   mounted() {
-    this.$socket.socketIO.on("production_update_on", () => {
-      this.$store.dispatch("setOrderProductionList");
-    });
+
     this.$socket.socketIO.on("cards_update_on", () => {
       this.$store.dispatch("setCardList");
     });

@@ -2,8 +2,11 @@
   "IoSocketStatus": {
     "description": "Auto imported from node_modules/nuxt-socket-io/lib/components/SocketStatus.js"
   },
-  "AuthForm": {
-    "description": "Auto imported from components/auth/authForm.vue"
+  "CardsForm": {
+    "description": "Auto imported from components/cards/form.vue"
+  },
+  "CardsList": {
+    "description": "Auto imported from components/cards/list.vue"
   },
   "AccountsForm": {
     "description": "Auto imported from components/accounts/form.vue"
@@ -11,11 +14,8 @@
   "AccountsList": {
     "description": "Auto imported from components/accounts/list.vue"
   },
-  "CardsForm": {
-    "description": "Auto imported from components/cards/form.vue"
-  },
-  "CardsList": {
-    "description": "Auto imported from components/cards/list.vue"
+  "AuthForm": {
+    "description": "Auto imported from components/auth/authForm.vue"
   },
   "Home": {
     "description": "Auto imported from components/home/home.vue"
