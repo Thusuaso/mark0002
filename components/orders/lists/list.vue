@@ -27,26 +27,20 @@
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
           </template>
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentLoadDate(filterModel.value)"
-              @input="filterShipmentLoadDateInput(filterModel.value)"
-              @keyup.prevent="filterShipmentLoadDate(filterModel.value)" class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentCompany(filterModel.value)"
-              @keyup.prevent="filterShipmentCompany(filterModel.value)"
-              @input="filterShipmentCompanyInput(filterModel.value)" class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
           bodyClass="tableBody">
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentPo(filterModel.value)"
-              @input="filterShipmentPoInput(filterModel.value)" class="p-column-filter"
-              @keyup.prevent="filterShipmentPo(filterModel.value)" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
@@ -68,45 +62,35 @@
         </Column>
         <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentProduct(filterModel.value)"
-              @keyup.prevent="filterShipmentProduct(filterModel.value)"
-              @input="filterShipmentProductInput(filterModel.value)" class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="UrunUretimAciklama" header="Details" headerClass="tableHeader" bodyClass="tableBody">
         </Column>
         <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
           bodyClass="tableBody">
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentWidth(filterModel.value)"
-              @keyup.prevent="filterShipmentWidth(filterModel.value)"
-              @input="filterShipmentWidthInput(filterModel.value)" class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
 
         <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
           bodyClass="tableBody">
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentHeight(filterModel.value)"
-              @keyup.prevent="filterShipmentHeight(filterModel.value)"
-              @input="filterShipmentHeightInput(filterModel.value)" class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentEdge(filterModel.value)"
-              @keyup.prevent="filterShipmentEdge(filterModel.value)" @input="filterShipmentEdgeInput(filterModel.value)"
-              class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentSupplier(filterModel.value)"
-              @keyup.prevent="filterShipmentSupplier(filterModel.value)"
-              @input="filterShipmentSupplierInput(filterModel.value)" class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false"
@@ -114,10 +98,8 @@
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
-          <template #filter="{ filterModel }">
-            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentAmount(filterModel.value)"
-              @keyup.prevent="filterShipmentAmount(filterModel.value)"
-              @input="filterShipmentAmountInput(filterModel.value)" class="p-column-filter" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
           <template #footer>
             {{ total.order | formatDecimal }}

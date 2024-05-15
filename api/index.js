@@ -8197,7 +8197,7 @@ app.get('/order/shipped/list', async (req, res) => {
     inner join MusterilerTB m on m.ID = s.MusteriID
     inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
     
-    where s.SiparisDurumID = 3  and YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing= 'Mekmar'
+    where s.SiparisDurumID = 3  and m.Marketing= 'Mekmar'
     order by s.YuklemeTarihi desc
 
 

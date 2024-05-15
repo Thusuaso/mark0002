@@ -8,7 +8,7 @@
                         :saveButtonStatus="saveButtonStatus"
                         @workerman_selected_emit="$emit('workerman_selected_emit', $event)" />
                 </TabPanel>
-                <TabPanel header="Proforma" v-if="!statusAlfa">
+                <TabPanel header="Proforma" >
                     <orderDetailProformaForm :model="modelProduction" :delivery="delivery" :payment="payment"
                         :status="status" :country="country" :invoice="invoice" :po="po"
                         :proformaUploadButtonStatus="proformaUploadButtonStatus"
@@ -74,7 +74,7 @@
                 <label for="financeman">Finance</label>
             </span>
             <CustomInput :value="modelProduction.Pesinat" text="Prepayment" @onInput="modelProduction.Pesinat = $event"
-                :disabled="prepaymentDisabledForm" v-if="!statusAlfa" />
+                :disabled="prepaymentDisabledForm"  />
             <table class="table mb-4">
                 <thead>
                     <tr>
