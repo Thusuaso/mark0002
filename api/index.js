@@ -7658,7 +7658,8 @@ s.KonteynerNo,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
     dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
-    dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
+    dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf,
+	(select top 1 uretim.Disarda from UretimTB uretim where uretim.SiparisAciklama = su.SiparisNo and uretim.UrunKartID = su.UrunKartID and uretim.Disarda = 1) as Out
 
 
 from SiparisUrunTB su
@@ -7693,10 +7694,23 @@ order by YEAR(s.SiparisTarihi) desc
         await mssql.query(orderYearListSql, (err, years) => {
             console.log('/order/production/list , year , hata',err)
             let customYearList = [];
+            let ordersList = [];
             years.recordset.forEach(x => {
                 customYearList.push(x);
             });
-               res.status(200).json({'list':orders.recordset,'years':customYearList});
+
+            orders.recordset.forEach(x => {
+                if (x.Uretim == x.Miktar) {
+                    ordersList.push({...x,style:"background-color: green; color: white"})
+                } else if (x.Uretim > x.Miktar) {
+                    ordersList.push({ ...x, style: "background-color: black; color: white" });
+                } else if (x.Uretim < x.Miktar) {
+                    ordersList.push({ ...x, style: "background-color: yellow; color: black" });
+                } else {
+                    ordersList.push({ ...x, style: "background-color: transparent; color: black" });
+                }
+            });
+               res.status(200).json({'list':ordersList,'years':customYearList});
 
         });
     });

@@ -254,19 +254,11 @@
         </Column>
         <Column field="Uretim" header="Produced" style="width:5%;">
           <template #body="slotProps">
-            <div v-if="slotProps.data.Uretim == slotProps.data.Miktar" style="background-color: green; color: white">
+            <div v-if="slotProps.data.Out || slotProps.data.Uretim == slotProps.data.Miktar"
+              style="background-color:blue;color:white">
               {{ slotProps.data.Uretim | formatDecimal }}
             </div>
-            <div v-else-if="slotProps.data.Uretim > slotProps.data.Miktar"
-              style="background-color: black; color: white">
-              {{ slotProps.data.Uretim | formatDecimal }}
-            </div>
-            <div v-else-if="slotProps.data.Uretim < slotProps.data.Miktar"
-              style="background-color: yellow; color: black">
-              {{ slotProps.data.Uretim | formatDecimal }}
-            </div>
-
-            <div v-else>
+            <div :style="slotProps.data.style" v-else>
               {{ slotProps.data.Uretim | formatDecimal }}
             </div>
           </template>
