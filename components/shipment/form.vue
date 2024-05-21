@@ -273,6 +273,45 @@ export default {
       this.selectedProducts = null;
       this.$store.dispatch("setShipmentSendProductionList");
       this.$store.dispatch("setShipmentSendProductionTotalCrateReset");
+      this.$store.dispatch("setShipmentOrderControl", event)
+        .then(response => {
+          if (response.TeslimTurID == 5 || response.TeslimTurID == 6 || response.TeslimTurID == 7) {
+            this.save_button_disabled = false;
+            this.sending_crate_button_disabled = false;
+          } else {
+            if (response.NavlunSatis == 0 || response.NavlunSatis == null || response.NavlunSatis == "" || response.NavlunSatis == undefined) {
+              this.$toast.error("Navlun satış bilgisi girilmeli.Girdikten Sonra Sayfayı Yenileyiniz!");
+              this.save_button_disabled = true;
+              this.sending_crate_button_disabled = true;
+            } else {
+              this.save_button_disabled = false;
+              this.sending_crate_button_disabled = false;
+            }
+          }
+      })
+    },
+    __getPriceControl(payload) {
+      payload.forEach(x => {
+        if (x.TedarikciID == 1 || x.TedarikciID == 123) {
+          if (x.AlisFiyati == 0 || x.AlisFiyati == undefined || x.AlisFiyati == null || x.AlisFiyati == "") {
+            this.$toast.error("Mekmer ürünlerine Alış fiyati girilmeli.Girdikten Sonra Sayfayı Yenileyiniz!");
+            this.save_button_disabled = true;
+            this.sending_crate_button_disabled = true;
+
+
+          } else {
+            this.save_button_disabled = false;
+            this.sending_crate_button_disabled = false;
+          }
+        } else{
+          this.save_button_disabled = false;
+          this.sending_crate_button_disabled = false;
+
+        }
+      });
+    },
+    __getFreightControl(payload) {
+      
     },
     reset() {
       this.selectedOrder = null;
@@ -338,6 +377,8 @@ export default {
     productSelected(event) {
       this.$store.dispatch("setShipmentAmount", event.value);
       this.sending_crate_button_disabled = false;
+      this.__getPriceControl(this.getOrderProductionProductNormalList)
+
     },
     searchOrders(event) {
       let results;

@@ -66,6 +66,19 @@ const state = {
 
 };
 const actions = {
+        setOrderOnHoldMekmerList(vuexContext){
+        vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get('/order/onhold/mekmer/list')
+            .then(response => {
+                if (response.data.list) {
+                    vuexContext.commit('setOrderList', response.data.list);
+                    vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                    vuexContext.commit('setOrderListAll', response.data.list);
+                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+                    vuexContext.dispatch('setEndLoadingAction');
+                } 
+            });
+    },
     setOrderProductionMekmerList(vuexContext){
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/production/mekmer/list')
@@ -522,14 +535,6 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 if(response.data.status){
                     this.$toast.success('Mail Gönderildi.');
                     vuexContext.dispatch('setProductionProductMailReset');
-                    if(production.status == 1){
-                        vuexContext.dispatch('setOrderWaitingList');
-                    } else if (production.status == 2){
-                        vuexContext.dispatch('setOrderProductionList');
-                    } else if (production.status == 3){
-                        vuexContext.dispatch('setOrderShippedList');
-                    }
-                    
                 }
             });
     },

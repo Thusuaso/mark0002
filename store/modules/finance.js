@@ -32,7 +32,9 @@ const state = {
     financePoPaidDetailList:[],
     financeListMaya:[],
     financeCollectionSampleList:[],
-    financeCollectionSampleTotal:0,
+    financeCollectionSampleTotal: 0,
+    financePoPaidListMekmer: [],
+    financeListFilter:[]
     
 };
 const actions = {
@@ -65,7 +67,7 @@ const actions = {
 
         api.get("/finance/reports/test/filter").then((response) => {
             if(response.data){
-                vuexContext.commit('setFinanceList', response.data); 
+                vuexContext.commit('setFinanceListFilter', response.data.financeList); 
                 vuexContext.commit('setFinanceTotalList',response.data.financeList)
                 vuexContext.dispatch('setEndLoadingAction');
             }
@@ -161,11 +163,52 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             })
     },
+    setFinancePoListMekmer(vuexContext, customerId) {
+                vuexContext.dispatch('setBeginLoadingAction');
+
+        this.$axios.get(`/finance/po/list/${customerId}`)
+            .then(response => {
+                vuexContext.commit('setFinancePoListMekmer', response.data);
+                vuexContext.dispatch('setFinancePoListTotal', response.data.poList);
+                vuexContext.dispatch('setFinancePaidListTotal', response.data.paidList);
+                vuexContext.dispatch('setEndLoadingAction');
+            })
+    },
+    setFinancePoMekmerList(vuexContext, customerId) {
+            vuexContext.dispatch('setBeginLoadingAction');
+
+        api.get('/finance/po/list/mekmer/' + customerId)
+            
+            .then(res => {
+                console.log(res.data);
+                vuexContext.commit('setFinancePoListMekmer', res.data);
+                vuexContext.commit('setFinancePoPaidList', res.data.odeme_liste);
+                vuexContext.dispatch('setFinancePoListTotalMekmer', res.data.ayrinti_list);
+                vuexContext.dispatch('setFinancePaidListTotalMekmer', res.data.odeme_liste);
+                vuexContext.dispatch('setEndLoadingAction');
+
+                
+
+                
+
+
+        })
+
+    },
+
+
+
     setFinancePoListTotal(vuexContext, payload) {
         vuexContext.commit('setFinancePoListTotal', payload);
     },
+        setFinancePoListTotalMekmer(vuexContext, payload) {
+        vuexContext.commit('setFinancePoListTotalMekmer', payload);
+    },
     setFinancePaidListTotal(vuexContext, payload) {
         vuexContext.commit('setFinancePaidListTotal', payload);
+    },
+        setFinancePaidListTotalMekmer(vuexContext, payload) {
+        vuexContext.commit('setFinancePaidListTotalMekmer', payload);
     },
     setFinancePoButtonStatus(vuexContext, payload) {
         vuexContext.commit('setFinancePoButtonStatus', payload);
@@ -181,7 +224,6 @@ const actions = {
                     vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'mehmet@mekmer.com' });
                     vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'export1@mekmar.com' });
                     vuexContext.dispatch('setPoPaidSaveSendMail', { ...paid, 'Mail': 'export2@mekmar.com' });
-                    vuexContext.dispatch('setFinancePoPaidList', paid.SiparisNo);
                     vuexContext.dispatch('setFinancePoList', paid.MusteriID);
                     vuexContext.dispatch('setFinanceList');
                     vuexContext.dispatch('setFinancePoModel');
@@ -194,6 +236,31 @@ const actions = {
                 }
             });
     },
+
+    setPoPaidMekmerSave(vuexContext, paid) {
+                            console.log(paid);
+        api.post('/finance/po/paid/mekmer/save', paid)
+            .then(response => {
+                if (response.status) {
+                    this.$toast.success('Ödeme Kaydedildi.');
+                     vuexContext.dispatch('setPoPaidSaveSendMailMekmer', { ...paid, 'Mail': 'bilgiislem@mekmar.com' });
+                    vuexContext.dispatch('setPoPaidSaveSendMailMekmer', { ...paid, 'Mail': 'huseyin@mekmer.com' });
+                    vuexContext.dispatch('setPoPaidSaveSendMailMekmer', { ...paid, 'Mail': 'sergen@mekmer.com' });
+
+                    vuexContext.dispatch('setFinancePoMekmerList', paid.musteri_id);
+                    vuexContext.dispatch('setFinancePoPaidListMekmer', paid.siparisno);
+                    vuexContext.dispatch('setFinanceListFilter');
+                    vuexContext.dispatch('setFinancePoModelMekmer');
+                } else {
+                    this.$toast.success('Ödeme Kaydedilemedi.');
+
+                }
+
+            });
+       
+    },
+
+
     setPoPaidSaveSendMail(vuexContext, paid) {
         this.$axios.post('/finance/po/paid/send/mail', paid)
             .then(response => {
@@ -205,12 +272,35 @@ const actions = {
                     }
             })
     },
+        setPoPaidSaveSendMailMekmer(vuexContext, paid) {
+        this.$axios.post('/finance/po/paid/send/mail/mekmer', paid)
+            .then(response => {
+                if (response.data.status) {
+                    this.$toast.success('Mail Başarıyla Gönderildi.');
+
+                } else {
+                    this.$toast.error('Mail Gönderme Başarısız.');
+                    }
+            })
+    },
+
+
+
     setFinancePoPaidList(vuexContext, po) {
         this.$axios.get(`/finance/po/paid/list/${po}`)
             .then(response => {
                 vuexContext.commit('setFinancePoPaidList', response.data.list);
             });
     },
+        setFinancePoPaidListMekmer(vuexContext, po) {
+        api.get(`/finance/po/paid/list/mekmer/${po}`)
+            .then(response => {
+                vuexContext.commit('setFinancePoPaidListMekmer', response.data.liste);
+            });
+    },
+
+
+
     setPoPaidDelete(vuexContext, paid) {
         this.$axios.delete(`/finance/po/paid/delete/${paid.ID}`)
             .then(response => {
@@ -235,6 +325,33 @@ const actions = {
                 }
             });
     },
+
+    setPoPaidDeleteMekmer(vuexContext, paid) {
+        this.$axios.delete(`/finance/po/paid/delete/mekmer/${paid.id}`)
+            .then(response => {
+                if (response.data.status) {
+                    this.$toast.success('Tahsilat Başarıyla Silindi');
+                    vuexContext.dispatch('setPoPaidDeleteSendMailMekmer', { ...paid, 'Mail': 'bilgiislem@mekmar.com' });
+                    vuexContext.dispatch('setPoPaidDeleteSendMailMekmer', { ...paid, 'Mail': 'huseyin@mekmer.com' });
+                    vuexContext.dispatch('setPoPaidDeleteSendMailMekmer', { ...paid, 'Mail': 'info@mekmar.com' });
+      
+
+
+
+                    vuexContext.dispatch('setFinancePoMekmerList', paid.musteri_id);
+                    vuexContext.dispatch('setFinancePoPaidListMekmer', paid.siparisno);
+                    vuexContext.dispatch('setFinanceListFilter');
+                    vuexContext.dispatch('setFinancePoModelMekmer');
+
+                } else {
+                    this.$toast.error('Tahsilat Silme Başarısız.');
+                }
+            });
+    },
+
+
+
+
     setPoPaidDeleteSendMail(vuexContext, paid) {
         this.$axios.post('/finance/po/paid/delete/send/mail', paid)
             .then(response => {
@@ -245,6 +362,19 @@ const actions = {
                     }
             })
     },
+
+        setPoPaidDeleteSendMailMekmer(vuexContext, paid) {
+        this.$axios.post('/finance/po/paid/delete/send/mail/mekmer', paid)
+            .then(response => {
+                if (response.data.status) {
+                    this.$toast.success('Mail Başarıyla Gönderildi.');
+                } else {
+                    this.$toast.error('Mail Gönderme Başarısız.');
+                    }
+            })
+    },
+
+
     setPoPaidUpdate(vuexContext, paid) {
         this.$axios.put('/finance/po/paid/update', paid)
             .then(response => {
@@ -266,8 +396,39 @@ const actions = {
                 }
             });
     },
+        setPoPaidUpdateMekmer(vuexContext, paid) {
+        this.$axios.put('/finance/po/paid/update/mekmer', paid)
+            .then(response => {
+                if (response.data.status) {
+                                        this.$toast.success('Tahsilat Başarıyla Güncellendi');
+                    vuexContext.dispatch('setPoPaidUpdateSendMailMekmer', { ...paid, 'Mail': 'bilgiislem@mekmar.com' });
+                    vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'huseyin@mekmer.com' });
+                    vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'sergen@mekmer.com' });
+
+
+                    vuexContext.dispatch('setFinancePoMekmerList', paid.musteri_id);
+                                        vuexContext.dispatch('setFinancePoPaidListMekmer', paid.siparisno);
+
+                    vuexContext.dispatch('setFinanceListFilter');
+                    vuexContext.dispatch('setFinancePoModelMekmer');
+                } else {
+                    this.$toast.error('Tahsilat Güncelleme Başarısız.');
+
+                }
+            });
+    },
     setPoPaidUpdateSendMail(vuexContext, paid) {
                 this.$axios.post('/finance/po/paid/update/send/mail', paid)
+            .then(response => {
+                if (response.data.status) {
+                    this.$toast.success('Mail Başarıyla Gönderildi.');
+                } else {
+                    this.$toast.error('Mail Gönderme Başarısız.');
+                    }
+            })
+    },
+        setPoPaidUpdateSendMailMekmer(vuexContext, paid) {
+                this.$axios.post('/finance/po/paid/update/send/mail/mekmer', paid)
             .then(response => {
                 if (response.data.status) {
                     this.$toast.success('Mail Başarıyla Gönderildi.');
@@ -286,6 +447,13 @@ const actions = {
 
 };
 const mutations = {
+    setFinanceListFilter(state, payload) {
+        state.financeListFilter = payload;
+    },
+    setFinancePoPaidListMekmer(state, payload) {
+        state.financePoPaidListMekmer = payload;
+
+    },
     setFinanceCollectionSampleTotal(state,payload){
         state.financeCollectionSampleTotal = 0;
         payload.forEach(x=>{
@@ -370,6 +538,11 @@ const mutations = {
         state.financePoList = payload.poList;
         state.financePaidList = payload.paidList;
     },
+
+        setFinancePoListMekmer(state,payload){
+        state.financePoList = payload.ayrinti_list;
+        state.financePaidList = payload.odeme_liste;
+    },
     setFinancePoListTotal(state, payload) {
         state.financePoListTotal = {
             order: 0,
@@ -387,10 +560,33 @@ const mutations = {
 
         })
     },
+        setFinancePoListTotalMekmer(state, payload) {
+        state.financePoListTotal = {
+            order: 0,
+            advancedPayment: 0,
+            paid: 0,
+            balanced: 0,
+        
+        };
+
+        payload.forEach(x => {
+                state.financePoListTotal.order += x.siparis_total;
+                state.financePoListTotal.advancedPayment += x.pesinat;
+                state.financePoListTotal.paid += x.odenen_tutar;
+                state.financePoListTotal.balanced += x.kalan;
+
+        })
+    },
     setFinancePaidListTotal(state, payload) {
         state.financePaidListTotal = 0;
         payload.forEach(x => {
            state.financePaidListTotal += x.Paid 
+        });
+    },
+        setFinancePaidListTotalMekmer(state, payload) {
+        state.financePaidListTotal = 0;
+        payload.forEach(x => {
+           state.financePaidListTotal += x.tutar 
         });
     },
     setFinancePoButtonStatus(state, payload) {
@@ -406,6 +602,9 @@ const mutations = {
 
 };
 const getters = {
+    getFinanceListFilter(state) {
+      return state.financeListFilter  
+    },
     getfinanceList(state) {
         return state.financeList;
     },
@@ -462,6 +661,9 @@ const getters = {
     },
     getFinanceCollectionSampleTotal(state){
         return state.financeCollectionSampleTotal;
+    },
+    getFinancePoPaidListMekmer(state) {
+        return state.financePoPaidListMekmer;
     }
 };
 

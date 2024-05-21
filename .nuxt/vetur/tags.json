@@ -355,5 +355,26 @@
   },
   "ReportsMekmerStockList": {
     "description": "Auto imported from components/reports/mekmer/stock/list.vue"
+  },
+  "ReportsMekmerFinanceFormsAdvancepayment": {
+    "description": "Auto imported from components/reports/mekmer/finance/forms/advancepayment.vue"
+  },
+  "ReportsMekmerFinanceFormsPo": {
+    "description": "Auto imported from components/reports/mekmer/finance/forms/po.vue"
+  },
+  "ReportsMekmerFinanceListsCollection": {
+    "description": "Auto imported from components/reports/mekmer/finance/lists/collection.vue"
+  },
+  "ReportsMekmerFinanceListsCustomer": {
+    "description": "Auto imported from components/reports/mekmer/finance/lists/customer.vue"
+  },
+  "ReportsMekmerFinanceListsList": {
+    "description": "Auto imported from components/reports/mekmer/finance/lists/list.vue"
+  },
+  "ReportsMekmerFinanceListsPaid": {
+    "description": "Auto imported from components/reports/mekmer/finance/lists/paid.vue"
+  },
+  "ReportsMekmerFinanceListsPo": {
+    "description": "Auto imported from components/reports/mekmer/finance/lists/po.vue"
   }
 }

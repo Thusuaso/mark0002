@@ -7,7 +7,7 @@
             :po="po" :detailProductTotal="detailProductTotal" :status="status" :saveButtonStatus="saveButtonStatus"
             @workerman_selected_emit="$emit('workerman_selected_emit', $event)" />
         </TabPanel>
-        <TabPanel header="Proforma" v-if="!statusAlfa">
+        <TabPanel header="Proforma" >
           <orderDetailProformaForm :model="modelProduction" :delivery="delivery" :payment="payment" :status="status"
             :country="country" :invoice="invoice" :po="po" :proformaUploadButtonStatus="proformaUploadButtonStatus"
             @prepayment_is_activated_emit="prePaymentIsActivated($event)" />

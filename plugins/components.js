@@ -114,6 +114,28 @@ import orderShippedList from '~/components/orders/lists/shipped';
 import orderList2 from '~/components/orders/lists/list2';
 import orderDetailForm2 from '~/components/orders/forms/detail2';
 import orderDetailOrderForm2 from '~/components/orders/forms/order2';
+
+
+import financeListMekmer from '~/components/reports/mekmer/finance/lists/list';
+import financeCollectionListMekmer from '~/components/reports/mekmer/finance/lists/collection';
+import financeAdvancedPaymentFormMekmer from '~/components/reports/mekmer/finance/forms/advancepayment';
+import financePoListMekmer from '~/components/reports/mekmer/finance/lists/po';
+import financePoFormMekmer from '~/components/reports/mekmer/finance/forms/po';
+import FinancePaidListMekmer from '~/components/reports/mekmer/finance/lists/paid';
+
+
+
+
+Vue.component('financeListMekmer',financeListMekmer);
+Vue.component('financeCollectionListMekmer',financeCollectionListMekmer);
+Vue.component('financeAdvancedPaymentFormMekmer',financeAdvancedPaymentFormMekmer);
+Vue.component('financePoListMekmer',financePoListMekmer);
+Vue.component('financePoFormMekmer',financePoFormMekmer);
+Vue.component('FinancePaidListMekmer',FinancePaidListMekmer);
+
+
+
+
 Vue.component('orderDetailOrderForm2',orderDetailOrderForm2);
 
 Vue.component('orderDetailForm2',orderDetailForm2);
@@ -340,8 +362,8 @@ Vue.filter('formatPriceEuro',(value)=>{
 
 
 Vue.filter('dateToString', (value) => {
-    if(value == null){
-        return null;
+    if(value == null || value == NaN-NaN-NaN || value == 'NaN-NaN-NaN' || value == undefined || value == ""){
+        return "";
     } else{
         let date = new Date(value);
         let day = date.getDate();
@@ -358,12 +380,17 @@ Vue.filter('dateToString', (value) => {
     }
 
 });
-Vue.filter('stringToDate',(value)=>{
-    const date = value.split('-');
+Vue.filter('stringToDate', (value) => {
+    if (value == null || value == NaN-NaN-NaN || value == 'NaN-NaN-NaN' || value == undefined || value == "") {
+        return "";
+    } else {
+          const date = value.split('-');
     const day = date[0];
     const month = date[1];
     const year = date[2];
-    return new Date(year,month,day);
+    return new Date(year,month,day);  
+    }
+
 });
 
 Vue.filter('monthToString', (value) => {

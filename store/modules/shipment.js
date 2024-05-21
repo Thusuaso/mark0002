@@ -13,6 +13,16 @@ const state = {
     }
 };
 const actions = {
+    setShipmentOrderControl(vuexContext, po) {
+        return new Promise((resolve, reject) => {
+                    this.$axios.get('/shipment/order/control/' + po)
+            .then(res => {
+                resolve(res.data.po);
+            });
+        });
+
+
+    },
     setShipmentSendProductionList(vuexContext){
       vuexContext.commit('setShipmentSendProductionList')  
     },

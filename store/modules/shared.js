@@ -48,9 +48,8 @@ const state = {
 const actions = {
 
     setOrderProductionProductListNormal(vuexContext,po){
-        console.log(po);
         this.$axios.get(`/order/products/normal/${po}`)
-        .then(response=>{
+            .then(response => {
             vuexContext.commit('setOrderProductionProductListNormal',response.data.products)
         })
     },

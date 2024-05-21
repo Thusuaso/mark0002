@@ -165,8 +165,12 @@
                 <nuxt-link to="/reports/mekmer/shipped" class="dropdown-item" tag="a">Shipped</nuxt-link>
               </li>
               <li>
+                <nuxt-link to="/reports/mekmer/onhold" class="dropdown-item" tag="a">On Hold</nuxt-link>
+              </li>
+              <li>
                 <nuxt-link to="/reports/mekmer/finance" class="dropdown-item" tag="a">Finance</nuxt-link>
               </li>
+
               <li v-if="getAuthorityStatus">
                 <nuxt-link to="/reports/mekmar/forwarding" class="dropdown-item" tag="a">Shipped Crates</nuxt-link>
               </li>

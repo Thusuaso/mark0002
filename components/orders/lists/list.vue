@@ -7,13 +7,13 @@
         @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
         :loading="loading" style="font-size: 70%; border: 2px solid gray;" filterDisplay="row"
         :filters.sync="filtersOrders" v-if="status == 'Shipped'" sortField="YuklemeTarihi" :sortOrder="-1"
-        :rowClass="rowClass2">
+        :rowClass="rowClass2" columnResizeMode="fit" showGridlines responsiveLayout="scroll">
         <template #header>
           <div class="flex justify-content-between">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
               <InputText v-model="globalSearch" placeholder="Keyword Search" @keyup.enter="globalSearchFilter($event)"
-                @input="globalSearchFilterInput($event)" @keyup.prevent="globalSearchFilter($event)" />
+                @input="globalSearchFilterInput($event)" @keyup.stop="globalSearchFilter($event)" />
             </span>
           </div>
         </template>
@@ -27,20 +27,26 @@
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
           </template>
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentLoadDate(filterModel.value)"
+              @input="filterShipmentLoadDateInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentLoadDate(filterModel.value)" />
           </template>
         </Column>
         <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentCompany(filterModel.value)"
+              @input="filterShipmentCompanyInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentCompany(filterModel.value)" />
           </template>
         </Column>
         <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
           bodyClass="tableBody">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentPo(filterModel.value)"
+              @input="filterShipmentPoInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentPo(filterModel.value)" />
           </template>
         </Column>
         <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
@@ -62,35 +68,45 @@
         </Column>
         <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentProduct(filterModel.value)"
+              @input="filterShipmentProductInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentProduct(filterModel.value)" />
           </template>
         </Column>
         <Column field="UrunUretimAciklama" header="Details" headerClass="tableHeader" bodyClass="tableBody">
         </Column>
         <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
           bodyClass="tableBody">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentWidth(filterModel.value)"
+              @input="filterShipmentWidthInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentWidth(filterModel.value)" />
           </template>
         </Column>
 
         <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
           bodyClass="tableBody">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentHeight(filterModel.value)"
+              @input="filterShipmentHeightInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentHeight(filterModel.value)" />
           </template>
         </Column>
         <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentEdge(filterModel.value)"
+              @input="filterShipmentEdgeInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentEdge(filterModel.value)" />
           </template>
         </Column>
         <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentSupplier(filterModel.value)"
+              @input="filterShipmentSupplierInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentSupplier(filterModel.value)" />
           </template>
         </Column>
         <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false"
@@ -98,9 +114,7 @@
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
-          </template>
+
           <template #footer>
             {{ total.order | formatDecimal }}
           </template>
@@ -136,16 +150,17 @@
       <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
         :selection.sync="selectedProduction" selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :loading="loading"
-        filterDisplay="row" :filters.sync="filtersOrders" :rowClass="rowClass2" @filter="ordersFilter($event)" v-else>
+        filterDisplay="row" :filters.sync="filtersOrders" :rowClass="rowClass2" @filter="ordersFilter($event)"
+        columnResizeMode="fit" showGridlines responsiveLayout="scroll" v-else>
 
 
-        <Column header="#" headerStyle="width:3rem" headerClass="tableHeader" bodyClass="tableBody">
+        <Column header="#" headerStyle="width:3rem">
           <template #body="slotProps">
             {{ slotProps.index + 1 }}
           </template>
         </Column>
         <Column field="SiparisTarihi" header="Order Date" :showFilterMenu="false" :showClearButton="false"
-          headerClass="tableHeader" bodyClass="tableBody">
+          style="width:3%;">
           <template #body="slotProps">
             {{ slotProps.data.SiparisTarihi | dateToString }}
           </template>
@@ -153,19 +168,17 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
-          headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false" style="width:5%;">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
-          bodyClass="tableBody">
+        <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false" style="width:5%;">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="PI" header="PI" style="width:5%;">
           <template #body="slotProps">
             <div v-if="slotProps.data.EvrakDurum > 0">
               <a :href="
@@ -182,8 +195,7 @@
             </div>
           </template>
         </Column>
-        <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false"
-          headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false" style="width:5%;">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
@@ -198,29 +210,26 @@
             </div>
           </template>
         </Column>
-        <Column field="UrunUretimAciklama" header="Details" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="UrunUretimAciklama" header="Details" style="width:5%;">
         </Column>
-        <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
-          bodyClass="tableBody">
+        <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false" style="width:5%;">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
 
-        <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
-          bodyClass="tableBody">
+        <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false" style="width:5%;">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false"
-          headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false" style="width:5%;">
           <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
         <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
-          headerClass="tableHeader" bodyClass="tableBody">
+          style="width:5%;">
           <template #body="slotProps">
             <div :style="{ backgroundColor: slotProps.data.Isf ? '' : 'red' }">
               {{ slotProps.data.UrunFirmaAdi }}
@@ -230,8 +239,7 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column field="Miktar" header="Amount" :showClearButton="false" :showFilterMenu="false"
-          headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="Miktar" header="Amount" :showClearButton="false" :showFilterMenu="false" style="width:5%;">
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
@@ -242,9 +250,9 @@
             {{ total.order | formatDecimal }}
           </template>
         </Column>
-        <Column field="BirimAdi" header="Unit" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="BirimAdi" header="Unit" style="width:5%;">
         </Column>
-        <Column field="Uretim" header="Produced" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="Uretim" header="Produced" style="width:5%;">
           <template #body="slotProps">
             <div v-if="slotProps.data.Uretim == slotProps.data.Miktar" style="background-color: green; color: white">
               {{ slotProps.data.Uretim | formatDecimal }}
@@ -266,7 +274,7 @@
             {{ total.production | formatDecimal }}
           </template>
         </Column>
-        <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="Ton" header="Ton" style="width:5%;">
           <template #body="slotProps">
             {{ slotProps.data.Ton | formatDecimal }}
           </template>
@@ -274,12 +282,12 @@
             {{ total.ton | formatDecimal }}
           </template>
         </Column>
-        <Column field="SatisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="SatisFiyati" header="Price" style="width:5%;">
           <template #body="slotProps">
             {{ slotProps.data.SatisFiyati | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="SatisToplam" header="Total" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="SatisToplam" header="Total" style="width:5%;">
           <template #body="slotProps">
             {{ slotProps.data.SatisToplam | formatPriceUsd }}
           </template>
@@ -295,7 +303,7 @@
       @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
       :loading="loading" style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
       :filters.sync="filtersShipped" v-if="status == 'Shipped 2'" sortField="YuklemeTarihi" :sortOrder="-1"
-      :rowClass="rowClass2">
+      :rowClass="rowClass2" columnResizeMode="fit" showGridlines responsiveLayout="scroll">
       <template #header>
         <div class="flex justify-content-between">
           <span class="p-input-icon-left">
@@ -734,4 +742,5 @@ export default {
 :deep(.row-accessories-border) {
   border: 2px solid #313131 !important;
 }
+
 </style>

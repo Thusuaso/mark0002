@@ -5,23 +5,13 @@
         <div class="row mb-4">
           <div class="col-9">
             <span class="p-float-label">
-              <InputText
-                class="w-100"
-                id="productId"
-                v-model="model.UrunKartID"
-                disabled
-              />
+              <InputText class="w-100" id="productId" v-model="model.UrunKartID" disabled />
               <label for="productId">Product Card Id</label>
             </span>
           </div>
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-secondary"
-              label="@"
-              @click="product_cards_form_dialog = true"
-              :disabled="product_form_disabled"
-            />
+            <Button type="button" class="p-button-secondary" label="@" @click="product_cards_form_dialog = true"
+              :disabled="product_form_disabled" />
           </div>
         </div>
         <span class="p-float-label mb-4">
@@ -41,187 +31,97 @@
           <label for="size">Size</label>
         </span>
         <span class="p-float-label mb-4 w-100">
-          <AutoComplete
-            v-model="selectedSupplier"
-            inputId="supplier"
-            :suggestions="filteredSupplier"
-            @complete="searchSupplier($event)"
-            @item-select="supplierSelected($event)"
-            field="FirmaAdi"
-            class="w-100"
-            :disabled="product_form_disabled"
-          />
+          <AutoComplete v-model="selectedSupplier" inputId="supplier" :suggestions="filteredSupplier"
+            @complete="searchSupplier($event)" @item-select="supplierSelected($event)" field="FirmaAdi" class="w-100"
+            :disabled="product_form_disabled" />
           <label for="supplier">Supplier</label>
         </span>
         <div class="row mb-4">
           <div class="col">
-            <CustomInput
-              :value="model.AlisFiyati"
-              text="Purchase Price"
-              @onInput="model.AlisFiyati = $event"
-              :disabled="product_form_disabled"
-            />
+            <CustomInput :value="model.AlisFiyati" text="Purchase Price" @onInput="model.AlisFiyati = $event"
+              :disabled="product_form_disabled" />
           </div>
           <div class="col">
-            <CustomInput
-              :value="model.SatisFiyati"
-              text="Sale Price"
-              @onInput="model.SatisFiyati = $event"
-              :disabled="product_form_disabled"
-            />
+            <CustomInput :value="model.SatisFiyati" text="Sale Price" @onInput="model.SatisFiyati = $event"
+              :disabled="product_form_disabled" />
           </div>
         </div>
         <div class="row mb-4">
           <div class="col">
             <span class="p-float-label w-100">
-              <AutoComplete
-                v-model="selectedUnit"
-                inputId="unit"
-                :suggestions="filteredUnit"
-                @complete="searchUnit($event)"
-                @item-select="unitSelected($event)"
-                field="BirimAdi"
-                class="w-100"
-                :disabled="product_form_disabled"
-              />
+              <AutoComplete v-model="selectedUnit" inputId="unit" :suggestions="filteredUnit"
+                @complete="searchUnit($event)" @item-select="unitSelected($event)" field="BirimAdi" class="w-100"
+                :disabled="product_form_disabled" />
               <label for="unit">Unit</label>
             </span>
           </div>
           <div class="col">
-            <CustomInput
-              :value="model.Miktar"
-              text="Amount"
-              @onInput="model.Miktar = $event"
-              :disabled="product_form_disabled"
-            />
+            <CustomInput :value="model.Miktar" text="Amount" @onInput="model.Miktar = $event"
+              :disabled="product_form_disabled" @change="tonajChange($event)" />
           </div>
           <div class="col">
-            <CustomInput
-              :value="model.Adet"
-              text="Piece"
-              @onInput="model.Adet = $event"
-              :disabled="product_form_disabled"
-            />
+            <CustomInput :value="model.Adet" text="Piece" @onInput="model.Adet = $event"
+              :disabled="product_form_disabled" />
           </div>
         </div>
         <div class="row mb-4">
           <div class="col">
             <span class="p-float-label">
-              <InputText
-                class="w-100"
-                id="queue"
-                v-model="model.SiraNo"
-                :disabled="product_form_disabled"
-              />
+              <InputText class="w-100" id="queue" v-model="model.SiraNo" :disabled="product_form_disabled" />
               <label for="queue">#</label>
             </span>
           </div>
           <div class="col">
-            <CustomInput
-              :value="model.OzelMiktar"
-              text="M2"
-              @onInput="model.OzelMiktar = $event"
-              :disabled="product_form_disabled"
-            />
+            <CustomInput :value="model.OzelMiktar" text="M2" @onInput="model.OzelMiktar = $event"
+              :disabled="product_form_disabled" />
           </div>
           <div class="col">
-            <CustomInput
-              :value="model.Ton"
-              text="Ton"
-              @onInput="model.Ton = $event"
-              :disabled="product_form_disabled"
-            />
+            <CustomInput :value="model.Ton" text="Ton" @onInput="model.Ton = $event"
+              :disabled="product_form_disabled" />
           </div>
         </div>
         <div class="row mb-4">
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-info w-100"
-              label="Labour Cost"
-              @click="$emit('workerman_selected_emit', model.UrunKartID)"
-              :disabled="workerman_button_disabled"
-            />
+            <Button type="button" class="p-button-info w-100" label="Labour Cost"
+              @click="$emit('workerman_selected_emit', model.UrunKartID)" :disabled="workerman_button_disabled" />
           </div>
         </div>
       </div>
       <div class="col-8">
         <span class="p-float-label mb-4">
-          <Textarea
-            v-model="model.MusteriAciklama"
-            rows="10"
-            class="w-100"
-            :disabled="product_form_disabled"
-          />
+          <Textarea v-model="model.MusteriAciklama" rows="10" class="w-100" :disabled="product_form_disabled" />
           <label>Explanation(EN)</label>
         </span>
         <span class="p-float-label">
-          <Textarea
-            v-model="model.UretimAciklama"
-            rows="10"
-            class="w-100"
-            :disabled="product_form_disabled"
-          />
+          <Textarea v-model="model.UretimAciklama" rows="10" class="w-100" :disabled="product_form_disabled" />
           <label>Explanation(TR)</label>
         </span>
         <div class="row mt-4" v-if="po">
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-primary w-100"
-              label="New Product"
-              :disabled="new_button_disabled"
-              @click="newForm"
-            />
+            <Button type="button" class="p-button-primary w-100" label="New Product" :disabled="new_button_disabled"
+              @click="newForm" />
           </div>
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-secondary w-100"
-              label="Cancel"
-              :disabled="cancel_button_disabled"
-              @click="cancelForm"
-            />
+            <Button type="button" class="p-button-secondary w-100" label="Cancel" :disabled="cancel_button_disabled"
+              @click="cancelForm" />
           </div>
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-success w-100"
-              label="Add"
-              :disabled="add_button_disabled"
-              @click="add"
-            />
+            <Button type="button" class="p-button-success w-100" label="Add" :disabled="add_button_disabled"
+              @click="add" />
           </div>
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-warning w-100"
-              label="Update"
-              :disabled="update_button_disabled"
-              @click="update"
-            />
+            <Button type="button" class="p-button-warning w-100" label="Update" :disabled="update_button_disabled"
+              @click="update" />
           </div>
           <div class="col">
-            <Button
-              type="button"
-              class="p-button-danger w-100"
-              label="Delete"
-              :disabled="delete_button_disabled"
-              @click="deleteItem"
-            />
+            <Button type="button" class="p-button-danger w-100" label="Delete" :disabled="delete_button_disabled"
+              @click="deleteItem" />
           </div>
         </div>
       </div>
     </div>
-    <DataTable
-      :value="products"
-      :selection.sync="selectedOrderProducts"
-      selectionMode="single"
-      @row-click="orderProductsSelected($event)"
-      :sortField="'SiraNo'"
-      :sortOrder="1"
-      :rowClass="rowClass"
-    >
+    <DataTable :value="products" :selection.sync="selectedOrderProducts" selectionMode="single"
+      @row-click="orderProductsSelected($event)" :sortField="'SiraNo'" :sortOrder="1" :rowClass="rowClass">
       <Column field="SiraNo" header="#"></Column>
       <Column field="FirmaAdi" header="Supplier"></Column>
       <Column field="UrunAdi" header="Product"></Column>
@@ -231,16 +131,11 @@
       <Column field="Kenar" header="Thickness"></Column>
       <Column header="M2">
         <template #body="slotProps">
-          <div
-            v-if="slotProps.data.UrunBirimID == 1"
-            :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }"
-          >
+          <div v-if="slotProps.data.UrunBirimID == 1"
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }">
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
-          <div
-            v-else
-            :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }"
-          >
+          <div v-else :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }">
             {{ 0 | formatDecimal }}
           </div>
         </template>
@@ -250,16 +145,11 @@
       </Column>
       <Column header="Piece">
         <template #body="slotProps">
-          <div
-            v-if="slotProps.data.UrunBirimID == 2"
-            :style="{ backgroundColor: slotProps.data.UrunBirimID == 2 ? 'red' : '' }"
-          >
+          <div v-if="slotProps.data.UrunBirimID == 2"
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 2 ? 'red' : '' }">
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
-          <div
-            v-else
-            :style="{ backgroundColor: slotProps.data.UrunBirimID == 2 ? 'red' : '' }"
-          >
+          <div v-else :style="{ backgroundColor: slotProps.data.UrunBirimID == 2 ? 'red' : '' }">
             {{ 0 | formatDecimal }}
           </div>
         </template>
@@ -269,16 +159,11 @@
       </Column>
       <Column header="MT">
         <template #body="slotProps">
-          <div
-            v-if="slotProps.data.UrunBirimID == 3"
-            :style="{ backgroundColor: slotProps.data.UrunBirimID == 3 ? 'red' : '' }"
-          >
+          <div v-if="slotProps.data.UrunBirimID == 3"
+            :style="{ backgroundColor: slotProps.data.UrunBirimID == 3 ? 'red' : '' }">
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
-          <div
-            v-else
-            :style="{ backgroundColor: slotProps.data.UrunBirimID == 3 ? 'red' : '' }"
-          >
+          <div v-else :style="{ backgroundColor: slotProps.data.UrunBirimID == 3 ? 'red' : '' }">
             {{ 0 | formatDecimal }}
           </div>
         </template>
@@ -353,6 +238,9 @@ export default {
   },
   data() {
     return {
+      width: 0,
+      height:0,
+      thickness:0,
       product_cards_form_dialog: false,
       categoryName: null,
       productName: null,
@@ -373,6 +261,128 @@ export default {
     };
   },
   methods: {
+    tonajChange(event) {
+      let coefficient = this.productCoefficient(this.categoryName.split(" ")[0]);
+      if (this.width == 'VAR' || this.width == 'Various' || this.width == 'SLAB'){
+        if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab'){
+          this.model.Ton = 0;
+
+        } else{
+          if (this.selectedUnit.ID == 1) {
+            this.model.Ton == ((coefficient * 10 * this.__typeFloatControl(event)) / 1000).toFixed(3);
+          } else {
+            this.model.Ton = 0;
+          }
+
+        }
+
+      } else if (this.height == 'Free' || this.height == 'FREE'){
+         if(this.selectedUnit.ID == 3){
+           const mt = (this.__typeFloatControl(event) * this.__typeFloatControl(this.width)) / 100;
+           this.model.Ton = (((coefficient * 10 * mt * this.__typeFloatControl(this.thickness))) / 1000).toFixed(3);
+
+         } else{
+
+           this.model.Ton;
+         }
+
+      } else{
+        if (this.selectedUnit.ID == 1) {
+          
+          this.model.Ton = parseFloat((coefficient * 10 * this.__typeFloatControl(event) * this.__typeFloatControl(this.thickness)) / 1000)
+
+        } else if (this.selectedUnit.ID == 2) {
+          if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab') {
+            this.model.Ton = 0;
+            this.model.OzelMiktar = 0;
+          } else {
+            const m2 = (this.__typeFloatControl(this.width) * this.__typeFloatControl(this.height) * this.__typeFloatControl(event)) / 10000;
+            this.model.Ton = parseFloat((coefficient * 10 * m2 * this.__typeFloatControl(this.thickness)) / 1000);
+            this.model.OzelMiktar = m2;
+          }
+
+
+        }
+
+      }
+
+
+    },
+
+    __typeFloatControl(payload) {
+      return parseFloat(payload.replace(",", ".")).toFixed(3);
+    },
+    oM2Change(en, boy, miktar, birim) {
+      if (birim == 1) {
+        return miktar;
+      } else if (birim == 2) {
+        if (
+          en == "FR" ||
+          en == "FRENCH" ||
+          en == "VAR" ||
+          en == "Various" ||
+          en == "ANT" ||
+          en == "SLAB" ||
+          en == "1 LT" ||
+          en == "Crazy" ||
+          en == "Other" ||
+          en == "SET" ||
+          en == "MINI" ||
+          boy == "SET" ||
+          boy == "Free" ||
+          boy == "FREE"
+        ) {
+          return 0;
+        } else {
+          return (
+            (parseFloat(en.replace(",", ".")) / 100) *
+            (parseFloat(boy.replace(",", ".")) / 100) *
+            miktar
+          ).toFixed(2);
+        }
+      } else if (birim == 3) {
+        if (
+          en == "FR" ||
+          en == "FRENCH" ||
+          en == "VAR" ||
+          en == "Various" ||
+          en == "ANT" ||
+          en == "SLAB" ||
+          en == "1 LT" ||
+          en == "Crazy" ||
+          en == "Other" ||
+          en == "SET" ||
+          en == "MINI" ||
+          boy == "SET"
+        ) {
+          return 0;
+        } else if (boy == "Free" || boy == "FREE") {
+          return (miktar * (parseFloat(en.replace(",", ".")) / 100)).toFixed(2);
+        } else {
+          let adet = miktar / (parseFloat(boy.replace(",", ".")) / 100);
+          return (
+            adet *
+            (parseFloat(boy.replace(",", ".")) / 100) *
+            (parseFloat(en.replace(",", ".")) / 100)
+          ).toFixed(2);
+        }
+      } else {
+        return 0;
+      }
+    },
+    productCoefficient(event) {
+      if (event == "Travertine") {
+        return 2.38;
+      } else if (event == "Marble") {
+        return 2.82;
+      } else if (event == "Limestone") {
+        return 2.6;
+      } else if (event == "Quarts") {
+        return 2.5;
+      } else {
+        return 0;
+      }
+    },
     rowClass(event) {
       if (
         event.AlisFiyati == 0 ||
@@ -530,6 +540,9 @@ export default {
       this.productName = event.data.UrunAdi;
       this.surfaceName = event.data.YuzeyIslemAdi;
       this.sizeName = event.data.En + "x" + event.data.Boy + "x" + event.data.Kenar;
+      this.width = event.data.En;
+      this.height = event.data.Boy;
+      this.thickness = event.data.Kenar;
 
       const data = {
         SiparisNo: event.data.SiparisNo,
@@ -585,6 +598,9 @@ export default {
       this.productName = event.UrunAdi;
       this.surfaceName = event.YuzeyIslemAdi;
       this.sizeName = event.En + "x" + event.Boy + "x" + event.Kenar;
+      this.width = event.En;
+      this.height = event.Boy;
+      this.thickness = event.Kenar;
       this.model.MusteriAciklama =
         event.KategoriAdi +
         "-" +

@@ -527,6 +527,13 @@ export default {
         this.offer_disabled_button = false;
       } else {
         this.customerModel.Kullanici = Cookies.get("userId");
+        this.customerModel.Company = this.__nullControl(this.customerModel.Company);
+        this.customerModel.Mail = this.__nullControl(this.customerModel.Mail);
+        this.customerModel.Phone = this.__nullControl(this.customerModel.Phone);
+        this.customerModel.Adress = this.__nullControl(this.customerModel.Adress);
+        this.customerModel.Description = this.__nullControl(
+          this.customerModel.Description
+        );
         this.model.KullaniciId = Cookies.get("userId");
         if (this.status) {
           this.model.TakipEt = true;

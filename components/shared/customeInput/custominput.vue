@@ -1,14 +1,7 @@
 <template>
   <span class="p-float-label w-100">
-    <InputText
-      id="freight"
-      v-model="newValueData"
-      @input="changeInput($event)"
-      :disabled="disabled"
-      class="w-100"
-      @blur="isInputActive = false"
-      @focus="isInputActive = true"
-    />
+    <InputText id="freight" v-model="newValueData" @input="change($event)" :disabled="disabled" class="w-100"
+      @blur="isInputActive = false" @focus="isInputActive = true" />
     <label for="freight">{{ text }}</label>
   </span>
 </template>
@@ -62,17 +55,8 @@ export default {
     },
   },
   methods: {
-    changeInput(event) {
-      // if (event) {
-      //   if (event[0] == 0) {
-      //     event = event.substr(1);
-      //     this.$emit("onInput", 0);
-      //   } else {
-      //     this.$emit("onInput", parseFloat(event.replace(",", ".")));
-      //   }
-      // } else {
-      //   this.$emit("onInput", 0);
-      // }
+    change(event) {
+      this.$emit('change',event)
     },
   },
   watch: {

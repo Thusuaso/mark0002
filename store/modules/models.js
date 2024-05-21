@@ -423,6 +423,22 @@ const state = {
         LoginName:'',
         LoginPassword:'',
         Platform:''
+    },
+    financePoModelMekmer: {
+          id:0,
+            tarih: "",
+            musteri_id: "",
+            musteriadi: "",
+            siparisno: "",
+            FinansOdemeTurID: 0,
+            aciklama: "",
+            tutar: 0,
+            masraf: 0,
+            KullaniciID: 0,
+            KullaniciAdi: '',
+            kur: 0,
+            BugunTarih: ""
+
     }
 
 };
@@ -836,6 +852,24 @@ const actions = {
         };
         vuexContext.commit('setFinancePoModel', financePoModel);
     },
+    setFinancePoModelMekmer(vuexContext) {
+        const financePoModel = {
+            id:0,
+            tarih: "",
+            musteri_id: "",
+            musteriadi: "",
+            siparisno: "",
+            FinansOdemeTurID: 0,
+            aciklama: "",
+            tutar: 0,
+            masraf: 0,
+            KullaniciID: 0,
+            KullaniciAdi: '',
+            kur: 0,
+            BugunTarih: ""
+        };
+        vuexContext.commit('setFinancePoModelMekmer', financePoModel);
+    },
     setOrderProductionModel(vuexContext){
         const orderProductionModel = {
             ID: 0,
@@ -943,6 +977,9 @@ const actions = {
 
 }
 const mutations = {
+    setFinancePoModelMekmer(state, payload) {
+        state.financePoModelMekmer = payload;  
+    },
     setAccountsModel(state,payload){
         state.accountsModel = payload;
     },
@@ -1036,6 +1073,9 @@ const mutations = {
 
 }
 const getters = {
+    getFinancePoModelMekmer(state) {
+        return state.financePoModelMekmer;  
+    },
     getAccountsModel(state){
         return state.accountsModel;
     },
