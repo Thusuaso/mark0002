@@ -8,10 +8,8 @@
         :selection.sync="selectedPoList"
         selectionMode="single"
         @row-click="$emit('po_list_selected_emit', $event)"
-        :loading="loading"
         :rowClass="rowClass"
-        sortField="Balanced"
-        :sortOrder="-1"
+
       >
         <Column
           field="SiparisNo"
@@ -118,7 +116,6 @@
         :selection.sync="selectedPoPaidDetailList"
         selectionMode="single"
         @row-click="$emit('po_paid_detail_list_selected_emit', $event)"
-        :loading="loading"
       >
         <Column field="Tarih" header="Date">
           <template #body="slotProps">
@@ -157,10 +154,7 @@ export default {
       type: Number,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

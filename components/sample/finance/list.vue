@@ -7,7 +7,6 @@
         :selection.sync="selectedFinanceList"
         selectionMode="single"
         @row-click="financeListSelected($event)"
-        :loading="loading"
         :filters.sync="filterSampleFinance"
         filterDisplay="row"
       >
@@ -109,7 +108,7 @@
       </DataTable>
     </div>
     <div class="col-3">
-      <DataTable :value="bank" :loading="loading">
+      <DataTable :value="bank" >
         <Column
           field="Banka"
           header="Bank"
@@ -168,10 +167,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col">
-      <DataTable :value="list" scrollable scrollHeight="450px" :loading="loading">
+      <DataTable :value="list" scrollable scrollHeight="450px" >
         <Column
           field="SiparisNo"
           header="Po"
@@ -29,10 +29,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
 };
 </script>

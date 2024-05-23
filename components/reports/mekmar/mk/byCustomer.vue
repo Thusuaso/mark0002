@@ -8,7 +8,6 @@
         style="font-size: 85%"
         :sortOrder="-1"
         sortField="Toplam"
-        :loading="loading"
       >
         <Column
           field="musteri"
@@ -281,7 +280,6 @@ import { FilterMatchMode } from "primevue/api";
 export default {
   props: {
     list: {},
-    loading: {},
   },
   data() {
     return {

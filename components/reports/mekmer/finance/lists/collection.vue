@@ -35,7 +35,6 @@
       scrollable
       scrollHeight="450px"
       @filter="collectionFiltered($event)"
-      :loading="loading"
     >
       <Column
         field="Tarih"
@@ -106,7 +105,7 @@
       </Column>
     </DataTable>
     <br />
-    <DataTable :value="sample" :loading="loading">
+    <DataTable :value="sample" >
       <Column field="Tarih" header="Date" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
@@ -166,10 +165,7 @@ export default {
       type: Number,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
     sample: {
       type: Array,
       required: false,

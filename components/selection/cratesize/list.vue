@@ -7,7 +7,6 @@
       :selection="selectedCrateSize"
       selectionMode="single"
       @row-click="crateSizeSelected($event)"
-      :loading="loading"
     >
       <template #header>
         <Button
@@ -97,10 +96,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

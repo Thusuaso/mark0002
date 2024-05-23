@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Button type="button" class="p-button-success w-100" @click="newForm" label="New" />
-    <productCards @cards_selected_emit="cardsSelected($event)" :loading="getLoading" />
+    <productCards @cards_selected_emit="cardsSelected($event)" />
     <Dialog :visible.sync="cards_form_dialog" header="" modal>
       <cardsForm
         @card_dialog_form_emit="cards_form_dialog = $event"
@@ -32,7 +32,6 @@ export default {
       "getCardSurfacesList",
       "getCardSizesList",
       "getCardsButtonStatus",
-      "getLoading",
       "getCardsOrderList",
     ]),
   },

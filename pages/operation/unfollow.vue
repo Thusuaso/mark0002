@@ -3,7 +3,6 @@
     <containerFollowList
       :list="getContainerUnfollowList"
       @follow-selected-dialog-emit="unfollowSelectedDialogEmit($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="unfollow_dialog_form" header="" modal>
       <containerFollowForm :model="unfollowModel" />
@@ -21,7 +20,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getContainerUnfollowList", "getLoading"]),
+    ...mapGetters(["getContainerUnfollowList"]),
   },
   created() {
     this.$store.dispatch("setContainerUnfollowList");

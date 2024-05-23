@@ -83,7 +83,6 @@ export default {
       "getOrderProductAdded",
       "getOrderProductUpdated",
       "getOrderProductDeleted",
-      "getLoading",
       "getOrderProductionYearsList",
       "getOrderProductionSaveButtonStatus",
       "getLocalUrl",

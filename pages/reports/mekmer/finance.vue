@@ -65,7 +65,6 @@
         "getFinancePoButtonStatus",
         "getFinancePoPaidList",
         "getFinancePoPaidDetailList",
-        "getLoading",
         "getFinanceListMaya",
         "getFinanceCollectionSampleList",
         "getFinanceCollectionSampleTotal",

@@ -5,7 +5,6 @@
         :value="contCountList"
         scrollable
         scrollHeight="450px"
-        :loading="loading"
         :filters.sync="filtersContCount"
         filterDisplay="row"
 
@@ -40,7 +39,6 @@
       <DataTable :value="contCustList" scrollable scrollHeight="450px"
       :filters.sync="filtersContCust"
         filterDisplay="row"
-        :loading="loading"
       >
         <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
         headerClass="tableHeader"
@@ -82,10 +80,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data(){
     return {

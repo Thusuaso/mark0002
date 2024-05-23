@@ -19,27 +19,23 @@
       <TabPanel header="Yearly By Po">
         <reportsMekmarMkYearByPoOrdersList
           :list="getReportsMekmarMkList.byPo"
-          :loading="getLoading"
         />
       </TabPanel>
       <TabPanel header="Up To Date Orders">
         <reportsMekmarMkYearByMarketingOrdersList
           :customer="getReportsMekmarMkList.byCustomer"
           :marketing="getReportsMekmarMkList.byMarketing"
-          :loading="getLoading"
         />
       </TabPanel>
       <TabPanel header="Shipment Reports">
         <reportsMekmarMkYearByMarketingForwardingList
           :marketing="getReportsMekmarMkList.byMarketingYukleme"
           :marketingByDetail="getReportsMekmarMkList.byMarketingDetayYukleme"
-          :loading="getLoading"
         />
       </TabPanel>
       <TabPanel header="Customers Reports">
         <reportsMekmarMkByCustomerList
           :list="getReportsMekmarMkList.byCustomerOrder"
-          :loading="getLoading"
         />
       </TabPanel>
     </TabView>

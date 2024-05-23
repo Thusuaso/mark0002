@@ -9,7 +9,6 @@
       :products="getProductList"
       :total="getProductionSumTotal"
       @product_selected_emit="productSelectedEmit($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="selection_production_dialog_form" header="" modal>
       <selectionForm
@@ -45,7 +44,6 @@ export default {
       "getProductionProductsList",
       "getMineList",
       "getProductionButtonStatus",
-      "getLoading",
       "getOrderProductionList",
     ]),
   },

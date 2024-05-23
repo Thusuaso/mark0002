@@ -6,7 +6,9 @@
       :rows="15"
       :filters.sync="filters1"
       filterDisplay="row"
-      :loading="loading"
+      :selection="selectedTransport"
+      selectionMode="single"
+      @row-click="transportSelected($event)"
     >
       <Column
         field="Tarih"
@@ -122,10 +124,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {
@@ -135,7 +134,13 @@ export default {
         firma_adi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         FaturaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
+      selectedTransport:null,
     };
   },
+  methods: {
+    transportSelected(event) {
+      this.$emit('selected_transport_emit', event.data);
+    }
+  }
 };
 </script>

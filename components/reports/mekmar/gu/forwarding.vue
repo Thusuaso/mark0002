@@ -1,6 +1,6 @@
 <template>
   <div class="col-3">
-    <DataTable :value="list.data" :loading="loading">
+    <DataTable :value="list.data" >
       <template #header>
         {{ list.year }}
       </template>
@@ -35,10 +35,7 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DataTable :value="list" class="p-datatable-sm" :loading="loading">
+    <DataTable :value="list" class="p-datatable-sm" >
       <Column
         field="SiparisTarihi"
         header="Date"
@@ -124,10 +124,7 @@ export default {
       type: Object,
       required: true,
     },
-    loading: {
-      type: Boolean,
-      required: true,
-    },
+
   },
 };
 </script>

@@ -3,7 +3,6 @@
     <DataTable
       :value="list"
       class="p-datatable-sm"
-      :loading="loading"
       :filters.sync="mineFilter"
       filterDisplay="row"
     >
@@ -116,10 +115,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

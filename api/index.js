@@ -1662,12 +1662,14 @@ app.get('/transport/list',(req,res)=>{
                     (select f.ID from FirmalarTB f where f.ID=n.FirmaID ) as firma_id,
                     s.Tutar,
                     n.Kur,
-                    s.Tarih
+                    s.Tarih,
+                    n.ID as NakliyeID,
+					s.ID as SiparisFaturaID
                     
                     from SiparisFaturaKayitTB s ,NakliyeFaturaKayitTB n where 
                     s.YuklemeEvrakID=13 and s.SiparisFaturaTurID=11  and Year(s.Tarih) in (2024,2023,2022,2021)  and n.FaturaNo+'.pdf' = s.EvrakAdi and n.ID = s.FaturaKayitID
                 
-                    group by s.ID ,s.SiparisNo , n.FaturaNo , n.FirmaID ,s.Tutar,n.Kur,s.Tarih
+                    group by s.ID ,s.SiparisNo , n.FaturaNo , n.FirmaID ,s.Tutar,n.Kur,s.Tarih,n.ID
 
                     order by s.Tarih desc`;
     mssql.query(sql)
@@ -1682,7 +1684,40 @@ app.get('/transport/list',(req,res)=>{
         }) 
     });
 });
+app.put('/transport/list/update', async (req, res) => {
+    const transportSql = `update NakliyeFaturaKayitTB SET Tarih='${req.body.date}',FaturaNo='${req.body.invoice}',Tutar='${req.body.tl}',Kur='${req.body.currency}' where ID='${req.body.transportId}'`;
+    const productSql = `update SiparisFaturaKayitTB SET SiparisNo='${req.body.po}',Tutar='${req.body.usd}' where ID='${req.body.productInvoiceId}'`;
+    await mssql.query(transportSql, async (err, transport) => {
+        if (transport.rowsAffected[0] == 1) {
+            await mssql.query(productSql, (err, product) => {
+                if (product.rowsAffected[0] == 1) {
+                    res.status(200).json({ 'status': true });
+                } else {
+                    res.status(200).json({ 'status': false });
+               }
+           })
+        } else {
+            res.status(200).json({ 'status': false });
+       }
+    });
 
+});
+
+app.put('/transport/list/delete', async (req, res) => {
+    const transportIdDelete = `delete NakliyeFaturaKayitTB where ID='${req.body.transportId}'`;
+    const productIdDelete = `delete SiparisFaturaKayitTB where ID='${req.body.productInvoiceId}'`;
+    await mssql.query(transportIdDelete, async (err, transport) => {
+        if (transport.rowsAffected[0] == 1) {
+            await mssql.query(productIdDelete, async (err, product) => {
+                if (product.rowsAffected[0] == 1) {
+                    res.status(200).json({ 'status': true });
+                } else {
+                    res.status(200).json({ 'status': false });
+                }
+            })
+        }
+    })
+})
 
 /*Customer */
 app.get('/customer/mekmar/list',(req,res)=>{
@@ -7373,7 +7408,7 @@ inner join SiparisDurumTB sd on sd.ID = s.SiparisDurumID
 
 where s.MusteriID = ${req.params.customerId}
 
-order by s.SiparisNo desc
+order by s.YuklemeTarihi desc
     `;
     const paidListSql = `
         select o.Tarih,sum(o.Tutar) as Paid from OdemelerTB o
@@ -7388,11 +7423,30 @@ order by s.SiparisNo desc
             if (x.Durum == 'Sevk Edilen') {
                 x.Pesinat = 0;
             };
-            
-            
+        });
+        const uretimde = poList.recordset.filter(x=>x.Durum == 'Üretimde')
+        const sevkiyatta = poList.recordset.filter(x => x.Durum == 'Sevk Edilen');
+        uretimde.forEach(x => {
+            poListData.push(x); 
+        });
+        sevkiyatta.forEach(x => {
+            poListData.push(x);
+        });
+
+        const acikpo = poListData.filter(x => (x.OrderTotal - x.Paid) > 8);
+        const kapalipo = poListData.filter(x => (x.OrderTotal - x.Paid) <= 8);
+
+        const finalDatas = [];
+        acikpo.forEach(x => {
+            finalDatas.push(x); 
+        });
+        kapalipo.forEach(x => {
+            finalDatas.push(x);
         })
+
+
         mssql.query(paidListSql, (err, paidList) => {
-            res.status(200).json({ 'poList': poList.recordset,'paidList':paidList.recordset });
+            res.status(200).json({ 'poList': finalDatas,'paidList':paidList.recordset });
 
         });
     });
@@ -10610,6 +10664,29 @@ app.post('/finance/po/paid/delete/send/mail/mekmer', (req, res) => {
         `
     });
     res.status(200).json({ 'status': true });
+});
+
+app.post('/production/isf/send/mail', (req, res) => {
+        transporter.sendMail({
+        to:'info@mekmar.com',
+        from:'goz@mekmar.com',
+        subject:'İsf Yükleme İşlemi',
+        html: `
+            <h3>${req.body.username} adlı kullanıcı ${req.body.po} ' nun  ${req.body.supplierName} tedarikçisine isf girdi.</h3>
+           
+        `
+        });
+            transporter.sendMail({
+        to:'bilgiislem@mekmar.com',
+        from:'goz@mekmar.com',
+        subject:'İsf Yükleme İşlemi',
+        html: `
+            <h3>${req.body.username} adlı kullanıcı ${req.body.po} ' nun  ${req.body.supplierName} tedarikçisine isf girdi.</h3>
+           
+        `
+    });
+    res.status(200).json({ 'status': true });
+
 });
 
 

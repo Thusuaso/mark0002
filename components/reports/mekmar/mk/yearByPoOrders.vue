@@ -6,7 +6,6 @@
       :filters.sync="filters"
       filterDisplay="row"
       @filter="filtered($event)"
-      :loading="loading"
     >
       <Column
         field="tarih"
@@ -117,7 +116,6 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {},
   },
   data() {
     return {

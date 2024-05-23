@@ -386,18 +386,22 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
 
     },
     setProductionProductSupplierIsfSave(vuexContext,payload){
-            this.$axios.post('/order/production/supplier/isf/save', payload)
+        return new Promise((resolve, reject) => {
+                this.$axios.post('/order/production/supplier/isf/save', payload)
                 .then(response => {
                     if (response.data.status) {
                         this.$toast.success('Başarıyla Kaydedildi.');
                         vuexContext.dispatch('setOrderProductionList');
                         vuexContext.dispatch('setOrderProductionDocumentList', payload.po);
+                        resolve(true);
 
                     } else {
                         this.$toast.error('Kaydetme Başarısız.');
+                        resolve(false)
                     };
 
                 });
+            })
 
     },  
     setOrderProductionDocumentList(vuexContext, po) {
@@ -555,6 +559,15 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
     },
     setOrderProductionUploadProformaButtonStatus(vuexContext,status){
         vuexContext.commit('setOrderProductionUploadProformaButtonStatus',status)
+    },
+    setOrderProductionIsfSendMail(vuexContext, payload) {
+        this.$axios.post('/production/isf/send/mail', payload)
+            .then(response => {
+                if (response.data.status) {
+                    this.$toast.success('Mail Gönderildi.');
+                }
+
+            });
     }
 
 

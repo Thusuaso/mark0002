@@ -61,7 +61,6 @@
     <reportsMekmarForwardingList
       :list="getreportsMekmarForwardingList"
       :total="getReportsMekmarForwardingListTotal"
-      :loading="getLoading"
       :dates="selectedDates"
     />
   </div>
@@ -73,7 +72,6 @@ export default {
     ...mapGetters([
       "getreportsMekmarForwardingList",
       "getReportsMekmarForwardingListTotal",
-      "getLoading",
     ]),
   },
   data() {

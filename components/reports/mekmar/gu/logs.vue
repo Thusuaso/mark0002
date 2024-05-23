@@ -5,7 +5,6 @@
       filterDisplay="row"
       :filters.sync="logsFilter"
       :rowClass="logsRowClass"
-      :loading="loading"
     >
       <Column
         field="DegisiklikTarihi"
@@ -86,10 +85,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

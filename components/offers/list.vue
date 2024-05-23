@@ -6,7 +6,6 @@
         :selection.sync="selectedOfferList"
         selectionMode="single"
         @row-click="offerListSelected($event)"
-        :loading="loading"
       >
         <Column
           field="TeklifSahibi"
@@ -35,7 +34,7 @@
       </DataTable>
     </div>
     <div class="col">
-      <DataTable :value="country" scrollable scrollHeight="450px" :loading="loading">
+      <DataTable :value="country" scrollable scrollHeight="450px" >
         <Column
           field="Ulke"
           header="Country"
@@ -63,10 +62,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

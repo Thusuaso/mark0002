@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DataTable :value="list" :loading="loading">
+    <DataTable :value="list" >
       <Column field="NumuneNo" header="Po"></Column>
       <Column field="NumuneTarihi" header="Shipment Date">
         <template #body="slotProps">
@@ -54,10 +54,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
 };
 </script>

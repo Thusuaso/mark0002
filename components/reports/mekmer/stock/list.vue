@@ -10,7 +10,6 @@
       :selection="selectedReportsMekmerStockList"
       selectionMode="single"
       @row-click="$emit('reports_mekmer_stock_list_selected_emit', $event)"
-      :loading="loading"
       class="p-datatable-sm"
       style="font-size: 90%"
     >
@@ -190,10 +189,7 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

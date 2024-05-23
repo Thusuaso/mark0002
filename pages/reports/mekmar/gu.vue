@@ -15,19 +15,16 @@
         <reportsMekmarGuContList
           :contCountList="getReportsMekmarGuContList"
           :contCustList="getReportsMekmarGuContByCustList"
-          :loading="getLoading"
         />
       </TabPanel>
       <TabPanel header="Mekus">
         <reportsMekmarGuMekusList
           :list="getReportsMekmarGuMekusList"
-          :loading="getLoading"
         />
       </TabPanel>
       <TabPanel header="Logs">
         <reportsMekmarGuLogsList
           :list="getReportsMekmarGuLogsList"
-          :loading="getLoading"
         />
       </TabPanel>
       <TabPanel header="Shipment Summary (Yıl)">
@@ -36,7 +33,6 @@
             v-for="item of getReportsMekmarGuForwList"
             :key="item"
             :list="item"
-            :loading="getLoading"
           />
         </div>
       </TabPanel>
@@ -56,7 +52,6 @@ export default {
       "getReportsMekmarGuMekusList",
       "getReportsMekmarGuLogsList",
       "getReportsMekmarGuForwList",
-      "getLoading",
     ]),
   },
   data() {

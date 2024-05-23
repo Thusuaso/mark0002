@@ -9,7 +9,6 @@
       :selection="selectedCards"
       selectionMode="single"
       @row-click="cardsSelected($event)"
-      :loading="loading"
     >
       <Column
         field="ID"
@@ -139,10 +138,7 @@ import { mapGetters } from "vuex";
 import { FilterMatchMode } from "primevue/api";
 export default {
   props: {
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   computed: {
     ...mapGetters(["getCardList"]),

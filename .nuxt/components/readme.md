@@ -20,6 +20,7 @@ You can directly use them in pages and other components without the need to impo
 - `<OffersProforma>` | `<offers-proforma>` (components/offers/proforma.vue)
 - `<OffersSample>` | `<offers-sample>` (components/offers/sample.vue)
 - `<PanelForm>` | `<panel-form>` (components/panel/form.vue)
+- `<SharedLoading>` | `<shared-loading>` (components/shared/loading.vue)
 - `<SharedNavbar>` | `<shared-navbar>` (components/shared/navbar.vue)
 - `<ShipmentForm>` | `<shipment-form>` (components/shipment/form.vue)
 - `<SupplierForm>` | `<supplier-form>` (components/supplier/form.vue)

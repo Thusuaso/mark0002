@@ -59,7 +59,6 @@
       :allStatus="buttonAllStatus"
       :allList="getFinanceListAll"
       @finance_list_selected_emit="financeListSelected($event)"
-      :loading="getLoading"
       :maya="getFinanceListMaya"
       :status="true"
     />
@@ -75,7 +74,6 @@
         :years="getFinanceCollectionYearList"
         :months="getFinanceCollectionMonthList"
         :total="getFinanceCollectionTotal"
-        :loading="getLoading"
         :sample="getFinanceCollectionSampleList"
         :sampleTotal="getFinanceCollectionSampleTotal"
       />
@@ -95,7 +93,6 @@
         :paidListTotal="getFinancePaidListTotal"
         @po_list_selected_emit="poListSelected($event)"
         @po_paid_detail_list_selected_emit="poPaidDetailListSelected($event)"
-        :loading="getLoading"
       />
     </Dialog>
     <Dialog :visible.sync="finance_po_detail_form" header="" modal>
@@ -138,7 +135,6 @@ export default {
       "getFinancePoButtonStatus",
       "getFinancePoPaidList",
       "getFinancePoPaidDetailList",
-      "getLoading",
       "getFinanceListMaya",
       "getFinanceCollectionSampleList",
       "getFinanceCollectionSampleTotal",

@@ -6,7 +6,6 @@
       :rows="15"
       :filters.sync="filters1"
       filterDisplay="row"
-      :loading="loading"
     >
       <Column
         field="EvrakYuklemeTarihi"
@@ -140,10 +139,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

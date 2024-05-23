@@ -9,7 +9,7 @@
         <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
       </div>
     </div>
-    <orderList2 :list="getOrderList" @production_selected_emit="productionSelected($event)" :loading="getLoading"
+    <orderList2 :list="getOrderList" @production_selected_emit="productionSelected($event)"
       :status="'Production'" :total="getOrderProductionTotal" />
     <Dialog :visible.sync="production_detail_form" header="" modal :style="{ width: '100%' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false" :maximizable="true">
@@ -83,7 +83,6 @@ export default {
       "getOrderProductAdded",
       "getOrderProductUpdated",
       "getOrderProductDeleted",
-      "getLoading",
       "getOrderProductionYearsList",
       "getOrderProductionSaveButtonStatus",
       "getLocalUrl",

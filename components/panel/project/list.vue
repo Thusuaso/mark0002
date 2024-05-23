@@ -5,7 +5,6 @@
       :selection.sync="selectedPanelProject"
       selectionMode="single"
       @row-click="$emit('panel_project_selected_emit', $event.data.ID)"
-      :loading="loading"
       :reorderableColumns="true"
       @row-reorder="colReOrderProject"
       :filters.sync="filterProjects"
@@ -132,10 +131,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

@@ -3,7 +3,6 @@
     <containerFollowList
       :list="getContainerFollowList"
       @follow-selected-dialog-emit="followSelectedDialogEmit($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="follow_dialog_form" header="" modal>
       <containerFollowForm :model="followModel" />
@@ -21,7 +20,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getContainerFollowList", "getLoading"]),
+    ...mapGetters(["getContainerFollowList"]),
   },
   created() {
     this.$store.dispatch("setContainerFollowList");

@@ -6,7 +6,6 @@
       :selection.sync="selectedOrderList"
       selectionMode="single"
       @row-click="$emit('order_selected_list_emit', $event.data)"
-      :loading="loading"
     >
       <template #header> {{ year }} {{ status }} Summary</template>
       <Column
@@ -53,10 +52,7 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+  
     status: {
       type: String,
       required: false,

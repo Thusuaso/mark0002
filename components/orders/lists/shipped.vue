@@ -3,7 +3,7 @@
     <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
       :selection.sync="selectedProduction" :selectionMode="userId != 48 ? 'multiple':''"
       @row-click="userId != 48 ? $emit('production_selected_emit', $event.data):''" class="p-datatable-sm" :paginator="true"
-      :rows="25" :loading="loading" style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
+      :rows="25"  style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
       :filters.sync="filtersShipped" v-if="status == 'Shipped 2'" sortField="YuklemeTarihi" :sortOrder="-1"
       :rowClass="rowClass2" @filter="filtersProduction($event)" columnResizeMode="fit" showGridlines
       responsiveLayout="scroll">
@@ -153,10 +153,6 @@
     props: {
       list: {
         type: Array,
-        required: false,
-      },
-      loading: {
-        type: Boolean,
         required: false,
       },
       status: {

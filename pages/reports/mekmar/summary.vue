@@ -8,7 +8,6 @@
         :year="new Date().getFullYear() - index"
         :total="getReportsMekmarSummaryOrderListTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, true)"
-        :loading="getLoading"
         :status="'Order'"
       />
       <reportsMekmarSummaryList
@@ -18,7 +17,6 @@
         :year="new Date().getFullYear() - index"
         :total="getReportsMekmarSummaryOrderListByRepresentativeTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, true)"
-        :loading="getLoading"
         :status="'Seller'"
       />
     </div>
@@ -30,7 +28,6 @@
         :year="new Date().getFullYear() - index"
         :total="getReportsMekmarSummaryForwardingListTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, false)"
-        :loading="getLoading"
         :status="'Shipment'"
       />
     </div>
@@ -38,7 +35,6 @@
       <reportsMekmarSummaryDetailList
         :list="getReportsMekmarSummaryOrderDetail"
         :total="getReportsMekmarSummaryOrderDetailTotal"
-        :loading="getLoading"
       />
     </Dialog>
   </div>
@@ -60,7 +56,6 @@ export default {
       "getReportsMekmarSummaryOrderListByRepresentative",
       "getReportsMekmarSummaryOrderListByRepresentativeTotal",
 
-      "getLoading",
     ]),
   },
   data() {

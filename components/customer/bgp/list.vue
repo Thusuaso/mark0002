@@ -9,7 +9,6 @@
       @row-click="$emit('bgp_customer_emit', $event)"
       :filters.sync="filters1"
       filterDisplay="row"
-      :loading="loading"
     >
       <Column
         field="Customer"
@@ -108,10 +107,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

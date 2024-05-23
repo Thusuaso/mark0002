@@ -7,7 +7,6 @@
       :filters.sync="filters1"
       filterDisplay="row"
       @filter="mekmerProductionFilter($event)"
-      :loading="loading"
       class="p-datatable-sm"
     >
       <Column
@@ -296,10 +295,7 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

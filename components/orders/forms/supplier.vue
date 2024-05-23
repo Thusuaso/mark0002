@@ -184,8 +184,19 @@ export default {
               m4: this.m4,
               m5: this.m5,
               productionDate: date.dateToString(this.modelProduction.SiparisTarihi),
+              supplierName: this.selectedSupplier.FirmaAdi
             };
-            this.$store.dispatch("setProductionProductSupplierIsfSave", value);
+            this.$store.dispatch("setProductionProductSupplierIsfSave", value).then(res=>{
+              if (res) {
+                this.$store.dispatch('setOrderProductionIsfSendMail', value);
+              } else {
+                this.$toast.error("İşlem gerçekleştirilemedi!");
+              }
+            })
+
+
+
+
           }
         });
       } else {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DataTable :value="list" :loading="loading">
+    <DataTable :value="list" >
       <Column field="Tarih" header="Tarih">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
@@ -48,10 +48,7 @@ export default {
       type: Object,
       required: true,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
 };
 </script>

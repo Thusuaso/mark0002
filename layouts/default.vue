@@ -1,12 +1,17 @@
 <template>
   <div class="">
+    <loadingSpinner v-if="getLoading" />
     <navbar v-if="$store.getters.isAuthenticated" style="margin-bottom: 5px" />
     <nuxt />
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 export default {
   middleware: ["sessionControl", "authControl", "navbarControl"],
+  computed: {
+    ...mapGetters(['getLoading'])
+  },
   created() {
     this.$store.dispatch("setCountryList");
     this.$store.dispatch("setUserList");

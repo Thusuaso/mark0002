@@ -28,7 +28,6 @@
       @row-reorder="reOrderPanelPublishedList($event)"
       :sortOrder="1"
       sortField="sira"
-      :loading="getLoading"
     >
       <Column
         :rowReorder="true"
@@ -52,7 +51,7 @@ import { mapGetters } from "vuex";
 export default {
   middleware: ["authority"],
   computed: {
-    ...mapGetters(["getPanelPublishedList", "getPanelCategoryList", "getLoading"]),
+    ...mapGetters(["getPanelPublishedList", "getPanelCategoryList"]),
   },
   created() {
     this.$store.dispatch("setPanelPublishedList");

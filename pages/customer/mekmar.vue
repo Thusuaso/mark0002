@@ -29,7 +29,6 @@
     <customerMekmarList
       :list="getMekmarList"
       @customer_mekmar_selected_emit="customerMekmarSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="customer_mekmar_dialog_form" header="" modal>
       <customerMekmarForm
@@ -70,7 +69,6 @@ export default {
       "getMekmarDetailOrdersList",
       "getMekmarDetailOrdersPoList",
       "getSetMekmarDetailOrdersPoProductsList",
-      "getLoading",
     ]),
   },
   created() {

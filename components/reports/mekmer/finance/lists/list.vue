@@ -1,11 +1,20 @@
 <template>
   <div class="row">
+    <div>
+      <div class=" flex flex-wrap justify-content-center gap-3">
+        <div class="flex align-items-center">
+          <Checkbox v-model="selectedMekmar" inputId="ingredient1" binary @change="changeMekmar($event)" />
+          <label for="ingredient1" class="ml-2"> Mekmar </label>
+        </div>
 
+      </div>
+
+    </div>
     <div :class="status ? 'col-9':'col'">
-      <DataTable :value="list" sortField="total" :sortOrder="-1" scrollable scrollHeight="650px"
+      <DataTable :value="selectedMekmar ? mekmar:list" sortField="total" :sortOrder="-1" scrollable scrollHeight="650px"
         :filters.sync="filteredFinance" filterDisplay="row" @filter="financeFiltered($event)"
         :selection.sync="selectedFinanceList" selectionMode="single"
-        @row-click="$emit('finance_list_selected_mekmer_emit', $event)" :loading="loading">
+        @row-click="$emit('finance_list_selected_mekmer_emit', $event)"  :rowClass="marketing">
         <Column field="customer_name" header="Customer" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel, filterCallback }">
@@ -57,7 +66,7 @@
       </DataTable>
     </div>
     <div class="col-3" v-if="status">
-      <DataTable :value="expiry" :loading="loading">
+      <DataTable :value="expiry" >
         <Column field="firmaAdi" header="Customer" headerClass="tableHeader" bodyClass="tableBody"></Column>
         <Column field="siparis_no" header="Po" headerClass="tableHeader" bodyClass="tableBody"></Column>
         <Column field="vade_tarih" header="Maturity" headerClass="tableHeader" bodyClass="tableBody">
@@ -72,7 +81,7 @@
         </Column>
       </DataTable>
     </div>
-    <DataTable :value="maya" :loading="loading" v-if="status">
+    <DataTable :value="maya"  v-if="status">
       <Column field="order_date" header="Order Date" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.order_date | dateToString }}
@@ -127,10 +136,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
     maya: {
       type: Array,
       required: false,
@@ -146,9 +152,23 @@ export default {
         customer_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       selectedFinanceList: null,
+      selectedMekmar:false,
+      mekmar:[]
     };
   },
   methods: {
+    changeMekmar(event) {
+      if (this.selectedMekmar) {
+        this.mekmar = this.list.filter(x => {
+          return x.marketing == 'Mekmar';
+        });
+      } 
+    },
+    marketing(event) {
+      if (event.marketing == 'Mekmar') {
+        return 'row-accessories';
+      }
+    },
     financeFiltered(event) {
       this.$store.dispatch("setFinanceTotalList", event.filteredValue);
     },
@@ -172,5 +192,8 @@ width:90vw;
   display:block;
   width:90vw;
 }
+}
+:deep(.row-accessories) {
+  background-color: #ccede2 !important;
 }
 </style>

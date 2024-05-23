@@ -91,7 +91,6 @@
     <reportsMekmarAyoList
       :list="getReportsMekmarAyoList"
       :total="getReportsMekmarAyoListTotal"
-      :loading="getLoading"
     />
   </div>
 </template>
@@ -106,7 +105,6 @@ export default {
       "getReportsMekmarAyoYearList",
       "getReportsMekmarAyoMonthList",
       "getReportsMekmarAyoListTotal",
-      "getLoading",
       "getLocalUrl",
     ]),
   },

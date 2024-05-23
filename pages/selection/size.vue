@@ -3,7 +3,6 @@
     <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
     <crateList
       :list="getProductionCrateSizeList"
-      :loading="getLoading"
       @size_selected_model_emit="sizeSelectedModel($event)"
     />
     <Dialog :visible.sync="production_crate_size_dialog_form" header="" modal>
@@ -27,7 +26,6 @@ export default {
       "getProductionCrateSizeList",
       "getSupplierList",
       "getProductionCrateSizeButtonStatus",
-      "getLoading",
     ]),
   },
   created() {

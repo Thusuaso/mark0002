@@ -31,14 +31,12 @@
       :country="getOfferCountryList"
       @offer_list_selected_emit="offerListSelected($event)"
       @offer_list_b_list_selected_emit="offerBListSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="offer_list_detail" header="" modal :closeOnEscape="false">
       <offerDetail
         :list="getOfferDetailList"
         :bList="getOfferDetailBList"
         @offer_detail_list_form_selected_emit="offerDetailListFormSelected($event)"
-        :loading="getLoading"
         :aListTotal="getOfferDetailTotalA"
         :bListTotal="getOfferDetailTotalB"
       />
@@ -76,7 +74,6 @@
     >
       <offerOld
         :list="getOfferOldList"
-        :loading="getLoading"
         @old_offers_selected_emit="oldOfferSelected($event)"
       ></offerOld>
     </Dialog>
@@ -107,7 +104,6 @@ export default {
       "getOfferId",
       "getOfferAllButtonStatus",
       "getOfferDetailBList",
-      "getLoading",
       "getOfferDetailTotalA",
       "getOfferDetailTotalB",
       "getOfferOldList",

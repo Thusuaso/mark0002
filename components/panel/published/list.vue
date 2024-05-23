@@ -11,7 +11,6 @@
       :selection.sync="selectedPanelPublishedList"
       selectionMode="single"
       @row-click="panelPublishedListSelected($event.data)"
-      :loading="loading"
       sortField="sira"
       :sortOrder="1"
     >
@@ -66,10 +65,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

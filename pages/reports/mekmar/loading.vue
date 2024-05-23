@@ -44,7 +44,6 @@ export default {
         'getReportsMekmarLoadingListTotal',
         'getReportsMekmarLoadingListYear',
         'getReportsMekmarLoadingListYearTotal',
-        'getLoading'
     ])},
     data(){
         return{

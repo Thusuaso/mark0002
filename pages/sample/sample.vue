@@ -22,7 +22,6 @@
     <sampleList
       :list="getSampleList"
       @sample_selected_list="sampleSelectedList($event)"
-      :loading="getLoading"
     />
     <Dialog
       :visible.sync="sample_form_dialog"
@@ -66,7 +65,6 @@ export default {
       "getSampleBankAccountTypeList",
       "getSamplePaidList",
       "getSampleButtonStatus",
-      "getLoading",
     ]),
   },
   beforeCreate() {

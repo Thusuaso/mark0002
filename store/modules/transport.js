@@ -50,6 +50,33 @@ const actions = {
             vuexContext.commit('setTransportList', response.data.transport); 
             vuexContext.dispatch('setEndLoadingAction');
         });
+    },
+    setUpdateTransport(vuexContext, transport) {
+        return new Promise((resolve, reject) => {
+            this.$axios.put('/transport/list/update', transport)
+                .then(response => {
+                    if (response.data.status) {
+                        vuexContext.dispatch('setTransportList');
+                resolve(true);
+                    } else {
+                        resolve(false);
+               }
+           }) 
+        });
+    },
+    setDeleteTransport(vuexContext, transport) {
+        return new Promise((resolve, reject) => {
+            this.$axios.put('/transport/list/delete', transport)
+                .then(res => {
+                    if (res.data.status) {
+                                                vuexContext.dispatch('setTransportList');
+
+                        resolve(true);
+                    } else {
+                        reject(false);
+                }
+            })
+        })
     }
 };
 const mutations = {

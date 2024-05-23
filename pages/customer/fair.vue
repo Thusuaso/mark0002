@@ -4,7 +4,6 @@
     <customerFairList
       :list="getFairCustomerList"
       @fair_customer_selected_emit="fairCustomerSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="fair_customer_dialog_form" header="" modal>
       <customerFairForm
@@ -28,7 +27,6 @@ export default {
       "getFairCustomerModel",
       "getCountryList",
       "getFairCustomerButtonStatus",
-      "getLoading",
     ]),
   },
   data() {

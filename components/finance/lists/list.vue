@@ -13,7 +13,6 @@
         :selection.sync="selectedFinanceList"
         selectionMode="single"
         @row-click="$emit('finance_list_selected_emit', $event)"
-        :loading="loading"
       >
         <Column
           field="customer_name"
@@ -143,7 +142,7 @@
       </DataTable>
     </div>
     <div class="col-3" v-if="status">
-      <DataTable :value="expiry" :loading="loading">
+      <DataTable :value="expiry" >
         <Column
           field="firmaAdi"
           header="Customer"
@@ -178,7 +177,7 @@
         </Column>
       </DataTable>
     </div>
-    <DataTable :value="maya" :loading="loading" v-if="status">
+    <DataTable :value="maya"  v-if="status">
       <Column
         field="order_date"
         header="Order Date"
@@ -268,10 +267,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
     maya: {
       type: Array,
       required: false,

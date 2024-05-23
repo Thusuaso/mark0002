@@ -4,7 +4,6 @@
     <supplierList
       :list="getSupplierList"
       @supplier_model_emit="supplierModelEmit($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="supplier_form_dialog" modal header="">
       <supplierForm
@@ -21,7 +20,7 @@ import { mapGetters } from "vuex";
 export default {
   middleware: ["authority"],
   computed: {
-    ...mapGetters(["getSupplierList", "getSupplierButtonStatus", "getLoading"]),
+    ...mapGetters(["getSupplierList", "getSupplierButtonStatus"]),
   },
   data() {
     return {

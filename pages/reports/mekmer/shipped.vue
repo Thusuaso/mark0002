@@ -13,7 +13,6 @@
       <orderShippedList
         :list="getOrderList"
         @production_selected_emit="productionSelected($event)"
-        :loading="getLoading"
         :status="'Shipped 2'"
         :total="getOrderProductionTotal"
       />
@@ -115,7 +114,6 @@
         "getOrderProductAdded",
         "getOrderProductUpdated",
         "getOrderProductDeleted",
-        "getLoading",
         "getOrderProductionYearsList",
         "getOrderProductionTotal",
       ]),

@@ -5,7 +5,7 @@
             <DataTable :value="list" rowGroupMode="rowspan"
                 :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']" :selection.sync="selectedProduction"
                 selectionMode="multiple" @row-click="$emit('production_selected_emit', $event.data)"
-                class="p-datatable-sm" :paginator="true" :rows="25" :loading="loading"
+                class="p-datatable-sm" :paginator="true" :rows="25" 
                 style="font-size: 70%; border: 2px solid gray" filterDisplay="row" :filters.sync="filtersOrders"
                 v-if="status == 'Shipped'" sortField="YuklemeTarihi" :sortOrder="-1" :rowClass="rowClass2"
                 columnResizeMode="fit" showGridlines responsiveLayout="scroll">
@@ -167,7 +167,7 @@
             <DataTable :value="list" rowGroupMode="rowspan"
                 :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']" :selection.sync="selectedProduction"
                 selectionMode="multiple" @row-click="$emit('production_selected_emit', $event.data)"
-                class="p-datatable-sm" :loading="loading" filterDisplay="row" :filters.sync="filtersOrders"
+                class="p-datatable-sm"  filterDisplay="row" :filters.sync="filtersOrders"
                 :rowClass="rowClass2" @filter="ordersFilter($event)" columnResizeMode="fit" showGridlines
                 responsiveLayout="scroll" v-else>
 
@@ -348,7 +348,7 @@
         <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
             :selection.sync="selectedProduction" selectionMode="multiple"
             @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true"
-            :rows="25" :loading="loading" style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
+            :rows="25"  style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
             :filters.sync="filtersShipped" v-if="status == 'Shipped 2'" sortField="YuklemeTarihi" :sortOrder="-1"
             :rowClass="rowClass2" columnResizeMode="fit" showGridlines responsiveLayout="scroll">
             <template #header>
@@ -508,10 +508,7 @@ export default {
             type: Array,
             required: false,
         },
-        loading: {
-            type: Boolean,
-            required: false,
-        },
+
         status: {
             type: String,
             required: true,

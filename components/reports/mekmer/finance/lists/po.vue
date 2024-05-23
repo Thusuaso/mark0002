@@ -2,8 +2,7 @@
   <div class="row">
     <div class="col-9">
       <DataTable :value="poList" scrollable scrollHeight="600px" :selection.sync="selectedPoList" selectionMode="single"
-        @row-click="$emit('po_list_selected_emit', $event)" :loading="loading" :rowClass="rowClass" sortField="kalan"
-        :sortOrder="-1">
+        @row-click="$emit('po_list_selected_emit', $event)"  :rowClass="rowClass">
         <Column field="siparisno" header="Purchase Order" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.siparisno }}
@@ -32,6 +31,12 @@
             {{ poListTotal.paid | formatPriceUsd }}
           </template>
         </Column>
+        <Column field="iscilik" header="Labour" headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.iscilik | formatPriceUsd }}
+          </template>
+
+        </Column>
         <Column field="kalan" header="Balance" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             <div :style="{
@@ -49,7 +54,7 @@
       </DataTable>
     </div>
     <div class="col-3">
-      <DataTable :value="paidList" scrollable scrollHeight="600px" :loading="loading">
+      <DataTable :value="paidList" scrollable scrollHeight="600px" >
         <Column field="tarih" header="Date">
           <template #body="slotProps">
             {{ slotProps.data.tarih | dateToString }}
@@ -87,10 +92,7 @@ export default {
       type: Number,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

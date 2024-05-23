@@ -5,7 +5,7 @@
       <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
         :selection.sync="selectedProduction" selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
-        :loading="loading" style="font-size: 70%; border: 2px solid gray;" filterDisplay="row"
+         style="font-size: 70%; border: 2px solid gray;" filterDisplay="row"
         :filters.sync="filtersOrders" v-if="status == 'Shipped'" sortField="YuklemeTarihi" :sortOrder="-1"
         :rowClass="rowClass2" columnResizeMode="fit" showGridlines responsiveLayout="scroll">
         <template #header>
@@ -13,7 +13,7 @@
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
               <InputText v-model="globalSearch" placeholder="Keyword Search" @keyup.enter="globalSearchFilter($event)"
-                @input="globalSearchFilterInput($event)" @keyup.stop="globalSearchFilter($event)" />
+                @input="globalSearchFilterInput($event)"  />
             </span>
           </div>
         </template>
@@ -149,7 +149,7 @@
 
       <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
         :selection.sync="selectedProduction" selectionMode="multiple"
-        @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :loading="loading"
+        @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" 
         filterDisplay="row" :filters.sync="filtersOrders" :rowClass="rowClass2" @filter="ordersFilter($event)"
         columnResizeMode="fit" showGridlines responsiveLayout="scroll" v-else>
 
@@ -254,7 +254,7 @@
         </Column>
         <Column field="Uretim" header="Produced" style="width:5%;">
           <template #body="slotProps">
-            <div v-if="slotProps.data.Out || slotProps.data.Uretim == slotProps.data.Miktar"
+            <div v-if="slotProps.data.Out && slotProps.data.Uretim == slotProps.data.Miktar"
               style="background-color:blue;color:white">
               {{ slotProps.data.Uretim | formatDecimal }}
             </div>
@@ -293,7 +293,7 @@
     <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
       :selection.sync="selectedProduction" selectionMode="multiple"
       @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
-      :loading="loading" style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
+       style="font-size: 70%; border: 2px solid gray" filterDisplay="row"
       :filters.sync="filtersShipped" v-if="status == 'Shipped 2'" sortField="YuklemeTarihi" :sortOrder="-1"
       :rowClass="rowClass2" columnResizeMode="fit" showGridlines responsiveLayout="scroll">
       <template #header>
@@ -431,10 +431,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
     status: {
       type: String,
       required: true,

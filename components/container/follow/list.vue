@@ -10,7 +10,6 @@
       @row-click="followSelected($event)"
       paginator
       :rows="10"
-      :loading="loading"
     >
       <Column
         field="MusteriAdi"
@@ -151,10 +150,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

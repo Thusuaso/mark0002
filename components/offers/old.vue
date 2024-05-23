@@ -3,7 +3,6 @@
     <DataTable
       :value="list"
       responsiveLayout="scroll"
-      :loading="loading"
       :paginator="true"
       :rows="10"
       :filters.sync="filteredOldOffers"
@@ -192,10 +191,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: true,
-    },
+
   },
   data() {
     return {

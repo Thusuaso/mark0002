@@ -13,7 +13,6 @@
         @row-click="mekmarAyoSelected($event)"
         scrollable
         scrollHeight="500px"
-        :loading="loading"
         :resizableColumns="true"
         columnResizeMode="fit"
         showGridlines
@@ -705,10 +704,6 @@ export default {
     },
     total: {
       type: Object,
-      required: false,
-    },
-    loading: {
-      type: Boolean,
       required: false,
     },
   },

@@ -8,7 +8,6 @@
       :selection.sync="selectedSample"
       selectionMode="single"
       @row-click="$emit('sample_selected_list', $event)"
-      :loading="loading"
     >
       <Column
         field="NumuneTarihi"
@@ -98,10 +97,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

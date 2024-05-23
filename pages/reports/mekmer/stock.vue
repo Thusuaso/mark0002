@@ -67,7 +67,7 @@
       @reports_mekmer_stock_list_selected_emit="reportsMekmerStockListSelected($event)" :loading="getLoading" />
     <Dialog :visible.sync="reports_mekmer_stock_dialog" header="" modal>
       <reportsMekmerStockForm :list="getReportsStockListDetail" :total="getReportsStockListDetailTotal"
-        :loading="getLoading" />
+         />
     </Dialog>
   </div>
 </template>
@@ -81,7 +81,6 @@ export default {
       "getReportsMekmerStockListTotal",
       "getReportsStockListDetail",
       "getReportsStockListDetailTotal",
-      "getLoading",
       "getLocalUrl",
     ]),
   },

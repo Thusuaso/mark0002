@@ -6,7 +6,6 @@
       :filters.sync="filtersMarketing"
       filterDisplay="row"
       @filter="filteredMarketing($event)"
-      :loading="loading"
     >
       <Column
         field="marketing"
@@ -57,7 +56,7 @@
 
     <div class="row m-auto mt-3">
       <div class="col" v-if="mekmarlist.length > 0">
-        <DataTable :value="mekmarlist" style="font-size: 85%" :loading="loading">
+        <DataTable :value="mekmarlist" style="font-size: 85%" >
           <template #header> Mekmar Shipped </template>
           <Column
             field="musteri"
@@ -94,7 +93,7 @@
         </DataTable>
       </div>
       <div class="col" v-if="mekmerlist.length > 0">
-        <DataTable :value="mekmerlist" style="font-size: 85%" :loading="loading">
+        <DataTable :value="mekmerlist" style="font-size: 85%" >
           <template #header>Mekmer Shipped </template>
           <Column
             field="musteri"
@@ -131,7 +130,7 @@
         </DataTable>
       </div>
       <div class="col" v-if="icpiyasalist.length > 0">
-        <DataTable :value="icpiyasalist" style="font-size: 85%" :loading="loading">
+        <DataTable :value="icpiyasalist" style="font-size: 85%" >
           <template #header>Local Shipped </template>
           <Column
             field="musteri"
@@ -168,7 +167,7 @@
         </DataTable>
       </div>
       <div class="col" v-if="imperial.length > 0">
-        <DataTable :value="imperial" style="font-size: 85%" :loading="loading">
+        <DataTable :value="imperial" style="font-size: 85%" >
           <template #header>Imperial Homes Shipped </template>
           <Column
             field="musteri"
@@ -214,7 +213,6 @@ export default {
   props: {
     marketing: {},
     marketingByDetail: {},
-    loading: {},
   },
   data() {
     return {

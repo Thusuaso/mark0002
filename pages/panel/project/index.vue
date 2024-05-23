@@ -22,7 +22,6 @@
     <panelProjectList
       :list="getPanelProjectList"
       @panel_project_selected_emit="panelProjectSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="panel_project_detail_form" :header="getPanelProjectId" modal>
       <panelProjectForm
@@ -220,7 +219,6 @@ export default {
       "getPanelProjectId",
       "getPanelProductProjectModel",
       "getCountryList",
-      "getLoading",
     ]),
   },
   data() {

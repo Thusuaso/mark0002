@@ -9,7 +9,6 @@
     <customerBgpList
       :list="getBgpCustomerList"
       @bgp_customer_emit="bgpCustomerSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="bgp_customer_dialog_form" modal header="">
       <customerBgpForm
@@ -34,7 +33,6 @@ export default {
       "getBgpCustomerModel",
       "getCountryList",
       "getBgpCustomerButtonStatus",
-      "getLoading",
     ]),
   },
   data() {

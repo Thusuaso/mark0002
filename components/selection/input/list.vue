@@ -4,7 +4,7 @@
       <div class="col">
         <DataTable :value="products" class="p-datatable-sm" paginator :rows="10" :selection="selectedProduct"
           selectionMode="single" @row-select="$emit('product_selected_emit', $event)" :filters.sync="filters1"
-          filterDisplay="row" @filter="filteredProductsList($event)" :loading="loading" 
+          filterDisplay="row" @filter="filteredProductsList($event)" 
           columnResizeMode="fit" showGridlines responsiveLayout="scroll">
           <template #header>
             <Button type="button" icon="pi pi-filter-slash" label="Filtreleri Temizle" outlined
@@ -146,10 +146,7 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

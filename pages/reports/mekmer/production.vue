@@ -63,7 +63,6 @@
     <reportsMekmerProductionList
       :list="getReportsMekmerProductionList"
       :total="getReportsMekmerProductionListTotal"
-      :loading="getLoading"
     />
   </div>
 </template>
@@ -74,7 +73,6 @@ export default {
     ...mapGetters([
       "getReportsMekmerProductionList",
       "getReportsMekmerProductionListTotal",
-      "getLoading",
     ]),
   },
   data() {

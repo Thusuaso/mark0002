@@ -7,7 +7,6 @@
         :selection.sync="selectedSelectionCustomerList"
         selectionMode="single"
         @row-click="$emit('selection_customer_selected_emit', $event)"
-        :loading="loading"
       >
         <Column field="FirstName" header="Customer"></Column>
         <Column field="City" header="Country"></Column>
@@ -25,10 +24,7 @@ export default {
       type: Array,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

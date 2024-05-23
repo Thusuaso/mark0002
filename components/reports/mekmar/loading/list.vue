@@ -6,7 +6,6 @@
         responsiveLayout="scroll"
         sortField="Dtp"
         :sortOrder="-1"
-        :loading="loading"
         :scrollable="true"
         scrollHeight="550px"
         :filters.sync="filtersLoadingMonthly"
@@ -94,7 +93,6 @@
         responsiveLayout="scroll"
         sortField="Dtp"
         :sortOrder="-1"
-        :loading="loading"
         :scrollable="true"
         scrollHeight="550px"
         :filters.sync="filtersLoadingYearly"
@@ -177,10 +175,7 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
   },
   data() {
     return {

@@ -41,6 +41,9 @@
   "PanelForm": {
     "description": "Auto imported from components/panel/form.vue"
   },
+  "SharedLoading": {
+    "description": "Auto imported from components/shared/loading.vue"
+  },
   "SharedNavbar": {
     "description": "Auto imported from components/shared/navbar.vue"
   },

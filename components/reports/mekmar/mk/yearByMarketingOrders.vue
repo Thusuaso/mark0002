@@ -6,7 +6,6 @@
       :filters.sync="filtersMarketing"
       filterDisplay="row"
       @filter="filteredMarketing($event)"
-      :loading="loading"
     >
       <Column
         field="marketing"
@@ -55,7 +54,6 @@
       :filters.sync="filtersCustomer"
       filterDisplay="row"
       @filter="filteredCustomer($event)"
-      :loading="loading"
     >
       <Column
         field="musteriAdi"
@@ -140,7 +138,6 @@ export default {
   props: {
     customer: {},
     marketing: {},
-    loading:{}
   },
   data() {
     return {

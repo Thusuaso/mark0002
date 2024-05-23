@@ -22,7 +22,6 @@
     <panelPublishedList
       :list="getPanelPublishedList"
       @panel_published_list_selected_emit="panelPublishedListSelected($event)"
-      :loading="getLoading"
     />
     <Dialog
       :visible.sync="panel_form_dialog"
@@ -105,7 +104,6 @@ export default {
       "getPanelProductMaterialModel",
       "getPanelProductEdgeModel",
       "getPanelProductSuggestedList",
-      "getLoading",
     ]),
   },
   data() {

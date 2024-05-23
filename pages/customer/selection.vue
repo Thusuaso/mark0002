@@ -4,7 +4,6 @@
     <customerSelectionList
       :list="getSelectionCustomerList"
       @selection_customer_selected_emit="selectionCustomerSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="customer_selection_dialog_form" header="" modal>
       <customerSelectionForm
@@ -31,7 +30,6 @@ export default {
       "getSelectionCustomerModel",
       "getSelectionCustomerButtonStatus",
       "getCountryList",
-      "getLoading",
     ]),
   },
   data() {

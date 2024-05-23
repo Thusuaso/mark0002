@@ -5,7 +5,6 @@
     <customerOfferList
       :offer="getOfferCustomerList"
       @offer_customer_selected="offerCustomerSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="offer_form_dialog" header="" modal>
       <customerOfferForm
@@ -27,7 +26,6 @@ export default {
       "getCountryList",
       "getOfferCustomerButtonStatus",
       "getOfferCustomerModel",
-      "getLoading",
     ]),
   },
   data() {

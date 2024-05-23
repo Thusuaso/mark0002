@@ -1,7 +1,7 @@
 <template>
   <div>
     <DataTable :value="list" paginator :rows="15" :filters.sync="filters1" filterDisplay="row"
-      @filter="reportsMekmarForwardingFiltered($event)" class="p-datatable-sm" style="font-size: 70%" :loading="loading"
+      @filter="reportsMekmarForwardingFiltered($event)" class="p-datatable-sm" style="font-size: 70%" 
       v-if="!dates">
       <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
@@ -176,7 +176,7 @@
     </DataTable>
 
     <DataTable :value="list" paginator :rows="15" :filters.sync="filters2" filterDisplay="row"
-      @filter="reportsMekmarForwardingFiltered($event)" class="p-datatable-sm" style="font-size: 70%" :loading="loading"
+      @filter="reportsMekmarForwardingFiltered($event)" class="p-datatable-sm" style="font-size: 70%" 
       v-if="dates">
       <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
@@ -338,10 +338,7 @@ export default {
       type: Object,
       required: false,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
+
     dates:{
       
     }

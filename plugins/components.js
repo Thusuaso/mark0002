@@ -122,9 +122,10 @@ import financeAdvancedPaymentFormMekmer from '~/components/reports/mekmer/financ
 import financePoListMekmer from '~/components/reports/mekmer/finance/lists/po';
 import financePoFormMekmer from '~/components/reports/mekmer/finance/forms/po';
 import FinancePaidListMekmer from '~/components/reports/mekmer/finance/lists/paid';
+import loadingSpinner from '~/components/shared/loading';
 
 
-
+Vue.component('loadingSpinner',loadingSpinner);
 
 Vue.component('financeListMekmer',financeListMekmer);
 Vue.component('financeCollectionListMekmer',financeCollectionListMekmer);

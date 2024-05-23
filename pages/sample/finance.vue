@@ -17,10 +17,9 @@
       :total="getSampleFinanceListTotal"
       :bank="getSampleFinanceBankList"
       @finance_list_selected_emit="financeListSelected($event)"
-      :loading="getLoading"
     />
     <Dialog :visible.sync="sampleFinanceDetailForm" header="" modal>
-      <sampleFinanceForm :list="getSampleFinanceDetailList" :loading="getLoading" />
+      <sampleFinanceForm :list="getSampleFinanceDetailList"/>
     </Dialog>
   </div>
 </template>
@@ -35,7 +34,6 @@ export default {
       "getSampleFinanceListTotal",
       "getSampleFinanceBankList",
       "getSampleFinanceDetailList",
-      "getLoading",
     ]),
   },
   data() {

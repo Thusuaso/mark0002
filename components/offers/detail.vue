@@ -8,7 +8,6 @@
       selectionMode="single"
       @row-click="$emit('offer_detail_list_form_selected_emit', $event.data)"
       :rowClass="offerClass"
-      :loading="loading"
       :filters.sync="orderFilters"
       filterDisplay="row"
       @filter="aListFiltered($event)"
@@ -132,7 +131,6 @@
       sortField="TeklifOncelik"
       :sortOrder="1"
       :rowClass="offerClass"
-      :loading="loading"
       :filters.sync="orderFiltersB"
       filterDisplay="row"
       @filter="bListFiltered($event)"
@@ -261,10 +259,6 @@ export default {
     },
     bList: {
       type: Array,
-      required: false,
-    },
-    loading: {
-      type: Boolean,
       required: false,
     },
     aListTotal: {
