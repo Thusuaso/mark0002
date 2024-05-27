@@ -34,10 +34,26 @@ const state = {
     financeCollectionSampleList:[],
     financeCollectionSampleTotal: 0,
     financePoPaidListMekmer: [],
-    financeListFilter:[]
+    financeListFilter: [],
     
 };
 const actions = {
+    setFinanceAllListMekmer(vuexContext) {
+        return new Promise((resolve, reject) => {
+            api.get('/finance/reports/mekmer/all')
+                .then(response => {
+                    if (response) {
+                        vuexContext.commit('setFinanceListFilter', response.data.financeList);
+                        vuexContext.commit('setFinanceTotalList', response.data.financeList);
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                });
+
+        });
+
+    },
     setFinanceList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
 
@@ -70,8 +86,7 @@ const actions = {
                 vuexContext.commit('setFinanceListFilter', response.data.financeList); 
                 vuexContext.commit('setFinanceTotalList',response.data.financeList)
                 vuexContext.dispatch('setEndLoadingAction');
-            }
-            
+            };
           });
     },
 
@@ -447,6 +462,9 @@ const actions = {
 
 };
 const mutations = {
+    setFinanceAllListMekmer(state, payload) {
+        state.financeListFilter = payload;
+    },
     setFinanceListFilter(state, payload) {
         state.financeListFilter = payload;
     },

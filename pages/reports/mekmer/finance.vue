@@ -71,7 +71,8 @@
         "getLocalUrl",
         "getFinancePoModelMekmer",
         "getFinancePoPaidListMekmer",
-        "getFinanceListFilter"
+        "getFinanceListFilter",
+        "getLoading"
       ]),
     },
     data() {

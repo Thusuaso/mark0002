@@ -306,6 +306,13 @@ const actions = {
 
             })
     },
+    setReportsMekmarQuarterAyoList(vuexContext, payload) {
+                vuexContext.dispatch('setBeginLoadingAction');
+
+                vuexContext.commit('setReportsMekmarAyoList', payload);
+                vuexContext.dispatch('setReportsMekmarAyoListTotal', payload);
+                vuexContext.dispatch('setEndLoadingAction');
+    },
     setReportsMekmarAyoListYear(vuexContext, year) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/reports/mekmar/ayo/by/year/list/${year}`)

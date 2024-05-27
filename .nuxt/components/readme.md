@@ -7,9 +7,9 @@ You can directly use them in pages and other components without the need to impo
 **Tip:** If a component is conditionally rendered with `v-if` and is big, it is better to use `Lazy` or `lazy-` prefix to lazy load.
 
 - `<IoSocketStatus>` | `<io-socket-status>` (node_modules/nuxt-socket-io/lib/components/SocketStatus.js)
+- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<AccountsForm>` | `<accounts-form>` (components/accounts/form.vue)
 - `<AccountsList>` | `<accounts-list>` (components/accounts/list.vue)
-- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<CardsForm>` | `<cards-form>` (components/cards/form.vue)
 - `<CardsList>` | `<cards-list>` (components/cards/list.vue)
 - `<Home>` | `<home>` (components/home/home.vue)
@@ -126,10 +126,10 @@ You can directly use them in pages and other components without the need to impo
 - `<ReportsMekmerProductionList>` | `<reports-mekmer-production-list>` (components/reports/mekmer/production/list.vue)
 - `<ReportsMekmerStockForm>` | `<reports-mekmer-stock-form>` (components/reports/mekmer/stock/form.vue)
 - `<ReportsMekmerStockList>` | `<reports-mekmer-stock-list>` (components/reports/mekmer/stock/list.vue)
-- `<ReportsMekmerFinanceFormsAdvancepayment>` | `<reports-mekmer-finance-forms-advancepayment>` (components/reports/mekmer/finance/forms/advancepayment.vue)
-- `<ReportsMekmerFinanceFormsPo>` | `<reports-mekmer-finance-forms-po>` (components/reports/mekmer/finance/forms/po.vue)
 - `<ReportsMekmerFinanceListsCollection>` | `<reports-mekmer-finance-lists-collection>` (components/reports/mekmer/finance/lists/collection.vue)
 - `<ReportsMekmerFinanceListsCustomer>` | `<reports-mekmer-finance-lists-customer>` (components/reports/mekmer/finance/lists/customer.vue)
 - `<ReportsMekmerFinanceListsList>` | `<reports-mekmer-finance-lists-list>` (components/reports/mekmer/finance/lists/list.vue)
 - `<ReportsMekmerFinanceListsPaid>` | `<reports-mekmer-finance-lists-paid>` (components/reports/mekmer/finance/lists/paid.vue)
 - `<ReportsMekmerFinanceListsPo>` | `<reports-mekmer-finance-lists-po>` (components/reports/mekmer/finance/lists/po.vue)
+- `<ReportsMekmerFinanceFormsAdvancepayment>` | `<reports-mekmer-finance-forms-advancepayment>` (components/reports/mekmer/finance/forms/advancepayment.vue)
+- `<ReportsMekmerFinanceFormsPo>` | `<reports-mekmer-finance-forms-po>` (components/reports/mekmer/finance/forms/po.vue)

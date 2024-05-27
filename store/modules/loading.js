@@ -1,5 +1,6 @@
 const state = {
-    loading:false,
+    loading: false,
+    loadingDatatable:false,
 };
 const actions = {
     setBeginLoadingAction(vuexContext) {
@@ -7,6 +8,12 @@ const actions = {
     },
     setEndLoadingAction(vuexContext) {
         vuexContext.commit('setEndLoadingAction');
+    },
+    setBeginLoadingDatatableAction(vuexContext) {
+        vuexContext.commit('setBeginLoadingDatatableAction');
+    },
+    setEndLoadingDatatableAction(vuexContext) {
+        vuexContext.commit('setEndLoadingDatatableAction');
     }
 };
 const mutations = {
@@ -15,11 +22,20 @@ const mutations = {
     },
     setEndLoadingAction(state) {
         state.loading = false;
+    },
+    setBeginLoadingDatatableAction(state) {
+        state.loadingDatatable = true;
+    },
+    setEndLoadingDatatableAction(state) {
+        state.loadingDatatable = false;
     }
 };
 const getters = {
     getLoading(state) {
         return state.loading;
+    },
+    getLoadingDatatable(state) {
+        return state.loadingDatatable;
     }
 };
 

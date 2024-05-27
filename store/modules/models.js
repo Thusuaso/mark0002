@@ -1,4 +1,6 @@
 const state = {
+    
+
     customerModel:{
         'FirmaAdi':"",
         'Unvan':"",
@@ -439,6 +441,106 @@ const state = {
             kur: 0,
             BugunTarih: ""
 
+    },
+    divideProductionProductModel: {
+        giden_po: '',
+        kalan_po:'',
+        id: 0,
+        gonderilen: 0,
+        kalan: 0,
+        siparisno: '',
+        tedarikciId: 0,
+        urunKartId: 0,
+        urunBirimId: 0,
+        miktar: 0,
+        ozelMiktar: 0,
+        satisFiyat: 0,
+        satisToplam: 0,
+        uretimAciklama: '',
+        musteriAciklama: '',
+        kullaniciId: 0,
+        alisFiyati: 0,
+        siraNo: 0,
+        ton: 0,
+        musteriId: 0,
+        adet: 0,
+        kalanToplam: 0,
+        gidenToplam:0
+    },
+    divideProductionModel: {
+        id: 0,
+        siparisno: '',
+                    siparisno_giden: '',
+            siparisno_kalan:'',
+        siparisTarihi: '',
+        odemeTurId: 0,
+        teslimTurId: 0,
+        musteriId: 0,
+        pesinat: 0,
+        navlunFirma: '',
+        navlunAlis: 0,
+        navlunSatis: 0,
+        kayitTarihi: '',
+        kullaniciId: 0,
+        siparisDurumId: 0,
+        uretimAciklama: '',
+        sevkiyatAciklama: '',
+        finansAciklama: '',
+        odemeAciklama: '',
+        TahminiYuklemeTarihi: '',
+        vade: '',
+        ulke: '',
+        komisyon: 0,
+        detayAciklama: '',
+        detayMekmarNot_1:'',
+        detayTutar_1: 0,
+        detayAlis_1: 0,
+        detayAciklama_2: '',
+        detayMekmarNot_2: '',
+        detayTutar_2: 0,
+        detayAlis_2: 0,
+        detayAciklama_3: '',
+        detayMekmarNot_3: '',
+        detayTutar_3: 0,
+        detayAlis_3: 0,
+        siparisSahibi: 0,
+        kayitKapali: 1,
+        evrakGideri: 0,
+        konteynerAyrinti: '',
+        ulkeId: 0,
+        faturaKesimTurId: 0,
+        depo_yukleme: 0,
+        detayTutar_4: 0,
+        detayAciklama_4: '',
+        sigortaTutar: 0,
+        operasyon: 0,
+        finansman: 0,
+        iade: 0,
+        malBedeli: 0,
+        sigortaTutarSatis: 0,
+        kalanPesinat: 0,
+        gidenPesinat: 0,
+        kalanNavlunSatis: 0,
+        gidenNavlunSatis: 0,
+        kalanNavlunAlis: 0,
+        gidenNavlunAlis: 0,
+        kalanDetaySatis_1: 0,
+        gidenDetaySatis_1: 0,
+        kalanDetaySatis_2: 0,
+        gidenDetaySatis_2: 0,
+        kalanDetaySatis_3: 0,
+        gidenDetaySatis_3: 0,
+        kalanDetaySatis_4: 0,
+        gidenDetaySatis_4: 0,
+        kalanDetayAlis_1: 0,
+        gidenDetayAlis_1: 0,
+        kalanDetayAlis_2: 0,
+        gidenDetayAlis_2: 0,
+        kalanDetayAlis_3: 0,
+        gidenDetayAlis_3: 0,
+        kalanMalBedeli: 0,
+        gidenMalBedeli:0
+        
     }
 
 };
@@ -972,11 +1074,123 @@ const actions = {
         };
         vuexContext.commit('setSalesPointsOfConsiderModel',salesPointOfConsiderModel)
 
+    },
+    setDivideProductionsModel(vuexContext) {
+        const divideProductionModel = {
+            id: 0,
+            siparisno: '',
+            siparisno_giden: '',
+            siparisno_kalan:'',
+            siparisTarihi: '',
+            odemeTurId: 0,
+            teslimTurId: 0,
+            musteriId: 0,
+            pesinat: 0,
+            navlunFirma: '',
+            navlunAlis: 0,
+            navlunSatis: 0,
+            kayitTarihi: '',
+            kullaniciId: 0,
+            siparisDurumId: 0,
+            uretimAciklama: '',
+            sevkiyatAciklama: '',
+            finansAciklama: '',
+            odemeAciklama: '',
+            TahminiYuklemeTarihi: '',
+            vade: '',
+            ulke: '',
+            komisyon: 0,
+            detayAciklama_1: '',
+            detayMekmarNot_1: '',
+            detayTutar_1: 0,
+            detayAlis_1: 0,
+            detayAciklama_2: '',
+            detayMekmarNot_2: '',
+            detayTutar_2: 0,
+            detayAlis_2: 0,
+            detayAciklama_3: '',
+            detayMekmarNot_3: '',
+            detayTutar_3: 0,
+            detayAlis_3: 0,
+            siparisSahibi: 0,
+            kayitKapali: 1,
+            evrakGideri: 0,
+            konteynerAyrinti: '',
+            ulkeId: 0,
+            faturaKesimTurId: 0,
+            depo_yukleme: 0,
+            detayTutar_4: 0,
+            detayAciklama_4: '',
+            sigortaTutar: 0,
+            operasyon: 0,
+            finansman: 0,
+            iade: 0,
+            malBedeli: 0,
+            sigortaTutarSatis: 0,
+            kalanPesinat: 0,
+            gidenPesinat: 0,
+            kalanNavlunSatis: 0,
+            gidenNavlunSatis: 0,
+            kalanNavlunAlis: 0,
+            gidenNavlunAlis: 0,
+            kalanDetaySatis_1: 0,
+            gidenDetaySatis_1: 0,
+            kalanDetaySatis_2: 0,
+            gidenDetaySatis_2: 0,
+            kalanDetaySatis_3: 0,
+            gidenDetaySatis_3: 0,
+            kalanDetaySatis_4: 0,
+            gidenDetaySatis_4: 0,
+            kalanDetayAlis_1: 0,
+            gidenDetayAlis_1: 0,
+            kalanDetayAlis_2: 0,
+            gidenDetayAlis_2: 0,
+            kalanDetayAlis_3: 0,
+            gidenDetayAlis_3: 0,
+            kalanMalBedeli: 0,
+            gidenMalBedeli: 0
+        
+        };
+        vuexContext.commit('setDivideProductionsModel',divideProductionModel)
+    },
+    setDivideProductionsProductModel(vuexContext) {
+        const divideProductionProductModel = {
+                    giden_po: '',
+        kalan_po:'',
+            id: 0,
+            gonderilen: 0,
+            kalan: 0,
+            siparisno: '',
+            tedarikciId: 0,
+            urunKartId: 0,
+            urunBirimId: 0,
+            miktar: 0,
+            ozelMiktar: 0,
+            satisFiyat: 0,
+            satisToplam: 0,
+            uretimAciklama: '',
+            musteriAciklama: '',
+            kullaniciId: 0,
+            alisFiyati: 0,
+            siraNo: 0,
+            ton: 0,
+            musteriId: 0,
+            adet: 0,
+                    kalanToplam: 0,
+        gidenToplam:0
+        };
+        vuexContext.commit('setDivideProductionsProductModel',divideProductionProductModel)
     }
 
 
 }
 const mutations = {
+    setDivideProductionsProductModel(state, payload) {
+        state.divideProductionProductModel = payload;
+    },
+    setDivideProductionsModel(state, payload) {
+        state.divideProductionModel = payload;
+    },
     setFinancePoModelMekmer(state, payload) {
         state.financePoModelMekmer = payload;  
     },
@@ -1073,6 +1287,12 @@ const mutations = {
 
 }
 const getters = {
+    getDivideProductionProductModel(state) {
+        return state.divideProductionProductModel;  
+    },
+    getDivideProductionModel(state) {
+        return state.divideProductionModel;  
+    },
     getFinancePoModelMekmer(state) {
         return state.financePoModelMekmer;  
     },

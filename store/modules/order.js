@@ -59,13 +59,54 @@ const state = {
         'production':0,
         'ton':0,
         'price':0
-    }
+    },
+    orderProductionDivideList: [],
+    orderProductionDivideOrderList:[]
+
     
 
 
 
 };
 const actions = {
+    setDivide(vuexContext, payload) {
+        return new Promise((resolve, reject) => {
+           this.$axios.post('/order/divide',payload)
+               .then(response => {
+                   if (response.data.status) {
+                       resolve(true);
+                   } else {
+                       resolve(false);
+               }
+           }) 
+        });
+    },
+    setProductionDivideOrderListUpdate(vuexContext, payload) {
+        return new Promise((resolve, reject) => {
+            vuexContext.commit('setProductionDivideOrderListUpdate', payload); 
+            resolve(true);
+        });
+    },
+    setProductionDivideOrderList(vuexContext, payload) {
+        return new Promise((resolve, resject) => {
+            vuexContext.commit('setProductionDivideOrderList', payload);
+            resolve(true);
+        });
+    },
+        setOrdersProductsDivideList(vuexContext, po) {
+        return new Promise(async (resolve, reject) => {
+            await this.$axios.get('/orders/product/divide/list/' + po)
+                .then(response => {
+                    if (response) {
+                        vuexContext.commit('setOrdersProductsDivideList', response.data.list);
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                    
+                });
+        });
+    },
         setOrderOnHoldMekmerList(vuexContext){
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/onhold/mekmer/list')
@@ -208,7 +249,7 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
     },
 
     filterShipment(vuexContext,filter){
-        vuexContext.dispatch('setBeginLoadingAction');
+        vuexContext.dispatch('setBeginLoadingDatatableAction');
 
         this.$axios.post(`/order/shipped/list/filter`,filter)
             .then(response => {
@@ -216,14 +257,14 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 vuexContext.commit('setOrderList', response.data.list);
                 vuexContext.commit('setOrderProductionTotal',response.data.list);
 
-                vuexContext.dispatch('setEndLoadingAction');
+                vuexContext.dispatch('setEndLoadingDatatableAction');
 
                 };
             });
     },
 
     setFilterShipmentGlobal(vuexContext,filter){
-        vuexContext.dispatch('setBeginLoadingAction');
+        vuexContext.dispatch('setBeginLoadingDatatableAction');
 
         this.$axios.get(`/order/shipped/list/filter/global/${filter}`)
             .then(response => {
@@ -232,7 +273,7 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 vuexContext.commit('setOrderList', response.data.list);
                 vuexContext.commit('setOrderProductionTotal',response.data.list);
 
-                vuexContext.dispatch('setEndLoadingAction');
+                vuexContext.dispatch('setEndLoadingDatatableAction');
 
                 };
             });
@@ -577,6 +618,25 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
 
 };
 const mutations = {
+    setProductionDivideOrderListUpdate(state, payload) {
+        if (state.orderProductionDivideOrderList.length > 0) {
+
+            
+            const index = state.orderProductionDivideOrderList.findIndex(x => x.id == payload.id);
+            state.orderProductionDivideOrderList.splice(index, 1, payload);
+        } else {
+            return;
+      }
+    },
+    setProductionDivideOrderList(state, payload) {
+        state.orderProductionDivideOrderList.push(payload);
+    },
+        setProductionDivideOrderListReset(state) {
+            state.orderProductionDivideOrderList = [];
+    },
+    setOrdersProductsDivideList(state, list) {
+        state.orderProductionDivideList = list;
+    },
     setOrderProductionTotal(state,list){
         console.log(15.15+15.15);
         state.orderProductionTotal = {
@@ -906,6 +966,12 @@ const mutations = {
 
 };
 const getters = {
+    getOrderProductionDivideOrderList(state) {
+        return state.orderProductionDivideOrderList;  
+    },
+    getOrderProductionDivideList(state) {
+        return state.orderProductionDivideList;  
+    },
     getOrderProductionTotal(state){
         return state.orderProductionTotal;
     },

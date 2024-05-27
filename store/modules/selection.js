@@ -18,9 +18,12 @@ const state = {
     productionDisMekmerButtonStatus:false,
     productionBulunamadiButtonStatus:false,
     productionCrateSizeList:[],
-    productionCrateSizeButtonStatus:false,
+    productionCrateSizeButtonStatus: false,
 };
 const actions = {
+
+
+
     setSelectionProductsList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/selection/production/list')

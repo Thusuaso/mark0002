@@ -1,58 +1,25 @@
 <template>
   <div class="row">
     <div class="col-9">
-      <DataTable
-        :value="poList"
-        scrollable
-        scrollHeight="600px"
-        :selection.sync="selectedPoList"
-        selectionMode="single"
-        @row-click="$emit('po_list_selected_emit', $event)"
-        :rowClass="rowClass"
-
-      >
-        <Column
-          field="SiparisNo"
-          header="Purchase Order"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+      <DataTable :value="poList" scrollable scrollHeight="600px" :selection.sync="selectedPoList" selectionMode="single"
+        @row-click="$emit('po_list_selected_emit', $event)" :rowClass="rowClass" :loading="loading">
+        <Column field="SiparisNo" header="Purchase Order" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.SiparisNo }}
           </template>
         </Column>
-        <Column
-          field="SiparisTarihi"
-          header="Order Date"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="SiparisTarihi" header="Order Date" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.SiparisTarihi | dateToString }}
           </template>
         </Column>
-        <Column
-          field="YuklemeTarihi"
-          header="Shipment Date"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="YuklemeTarihi" header="Shipment Date" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.YuklemeTarihi | dateToString }}
           </template>
         </Column>
-        <Column
-          field="Durum"
-          header="Status"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        ></Column>
-        <Column
-          field="OrderTotal"
-          header="Order Total USD"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Durum" header="Status" headerClass="tableHeader" bodyClass="tableBody"></Column>
+        <Column field="OrderTotal" header="Order Total USD" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.OrderTotal | formatPriceUsd }}
           </template>
@@ -60,12 +27,7 @@
             {{ poListTotal.order | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="Paid"
-          header="Payment Received"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Paid" header="Payment Received" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Paid | formatPriceUsd }}
           </template>
@@ -73,19 +35,12 @@
             {{ poListTotal.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="Balanced"
-          header="Balance"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Balanced" header="Balance" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
-            <div
-              :style="{
+            <div :style="{
                 backgroundColor: slotProps.data.Balanced > 8 ? 'green' : 'transparent',
                 color: slotProps.data.Balanced > 8 ? 'white' : 'black',
-              }"
-            >
+              }">
               {{ slotProps.data.Balanced | formatPriceUsd }}
             </div>
           </template>
@@ -93,12 +48,7 @@
             {{ poListTotal.balanced | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="Pesinat"
-          header="Prepayment"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Pesinat" header="Prepayment" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Pesinat | formatPriceUsd }}
           </template>
@@ -109,14 +59,8 @@
       </DataTable>
     </div>
     <div class="col-3">
-      <DataTable
-        :value="paidList"
-        scrollable
-        scrollHeight="600px"
-        :selection.sync="selectedPoPaidDetailList"
-        selectionMode="single"
-        @row-click="$emit('po_paid_detail_list_selected_emit', $event)"
-      >
+      <DataTable :value="paidList" scrollable scrollHeight="600px" :selection.sync="selectedPoPaidDetailList"
+        selectionMode="single" @row-click="$emit('po_paid_detail_list_selected_emit', $event)" :loading="loading">
         <Column field="Tarih" header="Date">
           <template #body="slotProps">
             {{ slotProps.data.Tarih | dateToString }}
@@ -154,6 +98,10 @@ export default {
       type: Number,
       required: false,
     },
+    loading: {
+      type: Boolean,
+      required:true
+    }
 
   },
   data() {

@@ -9,8 +9,8 @@
         <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
       </div>
     </div>
-    <orderList2 :list="getOrderList" @production_selected_emit="productionSelected($event)" :loading="getLoading"
-      :status="'Production'" :total="getOrderProductionTotal" />
+    <orderList2 :list="getOrderList" @production_selected_emit="productionSelected($event)"
+      :loading="getLoadingDatatable" :status="'Production'" :total="getOrderProductionTotal" />
     <Dialog :visible.sync="production_detail_form" header="" modal :style="{ width: '100%' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false" :maximizable="true">
       <orderDetailForm2 :modelProduction="productionModel" :modelProduct="getOrderProductModel"
@@ -49,6 +49,7 @@ import api from "@/plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
+    "getLoadingDatatable",
       "getOrderList",
       "getOrderListAll",
       "getOrderProductionModel",

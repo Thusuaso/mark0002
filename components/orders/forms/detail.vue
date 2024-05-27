@@ -33,6 +33,7 @@
         :disabled="saveButtonStatus" />
       <Button type="button" class="p-button-danger w-100 mb-4" label="Exit"
         @click="$emit('close_production_form_emit')" />
+        <!-- <Button type="button" class="p-button-secondary w-100 mb-4" label="Divide" @click="$emit('divide')" /> -->
       <span class="p-float-label mb-4">
         <InputText id="po" v-model="modelProduction.SiparisNo" class="w-100" :disabled="!status"
           @input="inputPo($event)" />
@@ -183,7 +184,7 @@
   </div>
 </template>
 <script>
-import date from "../../../plugins/date";
+import date from "~/plugins/date";
 import { mapGetters } from "vuex";
 export default {
   computed: {

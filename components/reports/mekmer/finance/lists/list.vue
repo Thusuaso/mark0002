@@ -6,6 +6,10 @@
           <Checkbox v-model="selectedMekmar" inputId="ingredient1" binary @change="changeMekmar($event)" />
           <label for="ingredient1" class="ml-2"> Mekmar </label>
         </div>
+        <div class="flex align-items-center">
+          <Checkbox v-model="selectedAll" inputId="ingredient1" binary @change="changeAll($event)" />
+          <label for="ingredient1" class="ml-2"> All </label>
+        </div>
 
       </div>
 
@@ -14,7 +18,7 @@
       <DataTable :value="selectedMekmar ? mekmar:list" sortField="total" :sortOrder="-1" scrollable scrollHeight="650px"
         :filters.sync="filteredFinance" filterDisplay="row" @filter="financeFiltered($event)"
         :selection.sync="selectedFinanceList" selectionMode="single"
-        @row-click="$emit('finance_list_selected_mekmer_emit', $event)"  :rowClass="marketing">
+        @row-click="$emit('finance_list_selected_mekmer_emit', $event)" :rowClass="marketing">
         <Column field="customer_name" header="Customer" :showFilterMenu="false" :showClearButton="false"
           headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel, filterCallback }">
@@ -54,7 +58,8 @@
             {{ total.paid | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="total" header="Balance" headerClass="tableHeader" bodyClass="tableBody">
+
+        <Column field="total" header="Balance (Including Production)" headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.total | formatPriceUsd }}
           </template>
@@ -62,11 +67,17 @@
             {{ total.balanceProduction | formatPriceUsd }}
           </template>
         </Column>
+        <Column field="total" header="Balance (Except Production)" headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.totalExceptProduction | formatPriceUsd }}
+          </template>
+
+        </Column>
 
       </DataTable>
     </div>
     <div class="col-3" v-if="status">
-      <DataTable :value="expiry" >
+      <DataTable :value="expiry">
         <Column field="firmaAdi" header="Customer" headerClass="tableHeader" bodyClass="tableBody"></Column>
         <Column field="siparis_no" header="Po" headerClass="tableHeader" bodyClass="tableBody"></Column>
         <Column field="vade_tarih" header="Maturity" headerClass="tableHeader" bodyClass="tableBody">
@@ -81,7 +92,7 @@
         </Column>
       </DataTable>
     </div>
-    <DataTable :value="maya"  v-if="status">
+    <DataTable :value="maya" v-if="status">
       <Column field="order_date" header="Order Date" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.order_date | dateToString }}
@@ -148,6 +159,7 @@ export default {
   },
   data() {
     return {
+      selectedAll:false,
       filteredFinance: {
         customer_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
@@ -157,6 +169,23 @@ export default {
     };
   },
   methods: {
+    changeAll(event) {
+      this.$store.dispatch('setBeginLoadingAction');
+      if (this.selectedAll) {
+        this.$store.dispatch('setFinanceAllListMekmer')
+          .then(res => {
+            if (res) {
+              this.$store.dispatch('setEndLoadingAction');
+
+            } else {
+              this.$store.dispatch('setEndLoadingAction');
+
+            };
+          });
+      } else {
+        this.$store.dispatch("setFinanceListFilter");
+      }
+    },
     changeMekmar(event) {
       if (this.selectedMekmar) {
         this.mekmar = this.list.filter(x => {

@@ -2,24 +2,12 @@
   <div>
     <div class="row container">
       <div class="col">
-        <Dropdown
-          v-model="selectedYear"
-          :options="getReportsMekmarAyoYearList"
-          optionLabel="Yil"
-          class="w-100"
-          @change="yearSelected($event)"
-          :disabled="date_disabled"
-        />
+        <Dropdown v-model="selectedYear" :options="getReportsMekmarAyoYearList" optionLabel="Yil" class="w-100"
+          @change="yearSelected($event)" :disabled="date_disabled" />
       </div>
       <div class="col">
-        <Dropdown
-          v-model="selectedMonth"
-          :options="getReportsMekmarAyoMonthList"
-          optionLabel="Ay"
-          class="w-100"
-          @change="monthSelected($event)"
-          :disabled="date_disabled"
-        />
+        <Dropdown v-model="selectedMonth" :options="getReportsMekmarAyoMonthList" optionLabel="Ay" class="w-100"
+          @change="monthSelected($event)" :disabled="date_disabled" />
       </div>
       <div class="col">
         <!-- <JsonExcel
@@ -54,19 +42,17 @@
             label="Excel"
           />
         </vue-excel-xlsx> -->
-        <Button
-          type="button"
-          class="p-button-info w-100"
-          icon="pi pi-file-excel"
-          label="Excel"
-          @click="excel_output"
-        />
+        <Button type="button" class="p-button-info w-100" icon="pi pi-file-excel" label="Excel" @click="excel_output" />
       </div>
       <div class="col">
         <span>
           <Checkbox v-model="checked" :binary="true" @change="allAyoList($event)" />
         </span>
         <span style="padding-top: 25px"> Hepsi </span>
+      </div>
+      <div class="col">
+        <Dropdown v-model="selectedQuarter" :options="quarters" optionLabel="quarter" placeholder="Select a Quarter" @change="quarterSelected($event)"/>
+
       </div>
       <div class="col">
         <table class="table">
@@ -88,10 +74,7 @@
       </div>
     </div>
 
-    <reportsMekmarAyoList
-      :list="getReportsMekmarAyoList"
-      :total="getReportsMekmarAyoListTotal"
-    />
+    <reportsMekmarAyoList :list="getReportsMekmarAyoList" :total="getReportsMekmarAyoListTotal" />
   </div>
 </template>
 <script>
@@ -110,6 +93,17 @@ export default {
   },
   data() {
     return {
+      quarters: [
+        { 'quarter': 'All', id: 0 },
+
+        { 'quarter': 'Q1', id: 1 },
+        { 'quarter': 'Q2', id: 2 },
+        { 'quarter': 'Q3', id: 3 },
+        { 'quarter': 'Q4', id: 4 },
+
+        
+      ],
+      selectedQuarter:null,
       checked: false,
       selectedYear: null,
       selectedMonth: null,
@@ -219,6 +213,67 @@ export default {
       });
   },
   methods: {
+    quarterSelected(event){
+
+      if (event.value.id == 0) {
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(
+            `/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`
+          )
+          .then((response) => {
+            this.$store.commit("setReportsMekmarAyoList", response.data);
+            this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+            this.$store.dispatch("setEndLoadingAction");
+            this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+          });
+      } else if (event.value.id == 1) {
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
+          .then((response) => {
+            if (response) {
+              const data = response.data.filter(x => {
+                return (x.yukleme_month >= 1 && x.yukleme_month <= 4)
+              })
+              this.$store.commit("setReportsMekmarAyoList", data);
+              this.$store.commit("setReportsMekmarAyoListTotal", data);
+              this.$store.dispatch("setEndLoadingAction");
+            }
+
+          });
+      }
+      else if (event.value.id == 2) {
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
+          .then((response) => {
+            if (response) {
+              const data = response.data.filter(x => {
+                return (x.yukleme_month >= 5 && x.yukleme_month <= 8)
+              })
+              this.$store.commit("setReportsMekmarAyoList", data);
+              this.$store.commit("setReportsMekmarAyoListTotal", data);
+              this.$store.dispatch("setEndLoadingAction");
+            }
+          });
+      }
+      else if (event.value.id == 3) {
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
+          .then((response) => {
+            if (response) {
+              const data = response.data.filter(x => {
+                return (x.yukleme_month >= 9 && x.yukleme_month <= 12)
+              })
+              this.$store.commit("setReportsMekmarAyoList", data);
+              this.$store.commit("setReportsMekmarAyoListTotal", data);
+              this.$store.dispatch("setEndLoadingAction");
+            }
+          });
+      }
+    },
     excel_output() {
       api
         .post("/maliyet/dosyalar/maliyetRaporExcelListe", this.getReportsMekmarAyoList)
@@ -243,6 +298,7 @@ export default {
             this.$store.commit("setReportsMekmarAyoList", response.data);
             this.$store.commit("setReportsMekmarAyoListTotal", response.data);
             this.$store.dispatch("setEndLoadingAction");
+            this.selectedQuarter = { 'quarter': 'All', id: 0 };
           });
       } else {
         this.$store.dispatch("setReportsMekmarAyoMonthList", this.selectedYear.Yil);
@@ -257,6 +313,8 @@ export default {
             this.$store.commit("setReportsMekmarAyoListTotal", response.data);
             this.$store.dispatch("setEndLoadingAction");
             this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+            this.selectedQuarter = { 'quarter': 'All', id: 0 };
+
           });
       }
     },
@@ -278,6 +336,8 @@ export default {
           this.$store.commit("setReportsMekmarAyoListTotal", response.data);
           this.$store.dispatch("setEndLoadingAction");
           this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+          this.selectedQuarter = { 'quarter': 'All', id: 0 };
+
         });
     },
     monthSelected(event) {
@@ -293,6 +353,8 @@ export default {
           this.$store.commit("setReportsMekmarAyoList", response.data);
           this.$store.commit("setReportsMekmarAyoListTotal", response.data);
           this.$store.dispatch("setEndLoadingAction");
+          this.selectedQuarter = { 'quarter': 'All', id: 0 };
+
         });
     },
   },

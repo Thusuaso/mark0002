@@ -3,20 +3,10 @@
     <div class="container">
       <div class="row">
         <div class="col">
-          <Button
-            type="button"
-            class="p-button-primary w-100"
-            label="Collection"
-            @click="collection"
-          />
+          <Button type="button" class="p-button-primary w-100" label="Collection" @click="collection" />
         </div>
         <div class="col">
-          <Button
-            type="button"
-            class="p-button-secondary w-100"
-            label="Pre-Payment"
-            @click="advancedPayment"
-          />
+          <Button type="button" class="p-button-secondary w-100" label="Pre-Payment" @click="advancedPayment" />
         </div>
         <div class="col">
           <Button class="p-button-warning" label="Excel" @click="excel_output" />
@@ -36,73 +26,39 @@
           </JsonExcel> -->
         </div>
         <div class="col">
-          <Button
-            type="button"
-            class="p-button-warning w-100"
-            :label="buttonAllStatus ? 'Unpaid Po' : 'All'"
-            @click="buttonAllStatus = !buttonAllStatus"
-          />
+          <Button type="button" class="p-button-warning w-100" :label="buttonAllStatus ? 'Unpaid Po' : 'All'"
+            @click="buttonAllStatus = !buttonAllStatus" />
         </div>
         <div class="col">
           <div class="field-checkbox">
-            <Checkbox id="binary" v-model="mekmarMekmerList" :binary="true" @change="checkedMekmarMekmer($event)"/>
+            <Checkbox id="binary" v-model="mekmarMekmerList" :binary="true" @change="checkedMekmarMekmer($event)" />
             <label for="binary">{{ checked }}</label>
-        </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <financeList
-      :list="getfinanceList"
-      :total="getFinanceListTotal"
-      :expiry="getFinanceExpiryList"
-      :allStatus="buttonAllStatus"
-      :allList="getFinanceListAll"
-      @finance_list_selected_emit="financeListSelected($event)"
-      :maya="getFinanceListMaya"
-      :status="true"
-    />
-    <Dialog
-      :visible.sync="finance_collection_list_form"
-      header=""
-      modal
-      :maximizable="true"
-      
-    >
-      <financeCollectionList
-        :list="getFinanceCollectionList"
-        :years="getFinanceCollectionYearList"
-        :months="getFinanceCollectionMonthList"
-        :total="getFinanceCollectionTotal"
-        :sample="getFinanceCollectionSampleList"
-        :sampleTotal="getFinanceCollectionSampleTotal"
-      />
+    <financeList :list="getfinanceList" :total="getFinanceListTotal" :expiry="getFinanceExpiryList"
+      :allStatus="buttonAllStatus" :allList="getFinanceListAll"
+      @finance_list_selected_emit="financeListSelected($event)" :maya="getFinanceListMaya" :status="true" />
+    <Dialog :visible.sync="finance_collection_list_form" header="" modal :maximizable="true">
+      <financeCollectionList :list="getFinanceCollectionList" :years="getFinanceCollectionYearList"
+        :months="getFinanceCollectionMonthList" :total="getFinanceCollectionTotal"
+        :sample="getFinanceCollectionSampleList" :sampleTotal="getFinanceCollectionSampleTotal" />
     </Dialog>
     <Dialog :visible.sync="finance_advanced_payment_form" header="" modal>
-      <financeAdvancedPaymentForm
-        :list="getFinanceAdvancedPaymentList"
-        :model="getFinancePaymentModel"
-        @advanced_payment_save_emit="advancesPaymentSave($event)"
-      />
+      <financeAdvancedPaymentForm :list="getFinanceAdvancedPaymentList" :model="getFinancePaymentModel"
+        @advanced_payment_save_emit="advancesPaymentSave($event)" />
     </Dialog>
     <Dialog :visible.sync="finance_po_list_form" header="" modal>
-      <financePoList
-        :poList="getFinancePoList"
-        :paidList="getFinancePaidList"
-        :poListTotal="getFinancePoListTotal"
-        :paidListTotal="getFinancePaidListTotal"
-        @po_list_selected_emit="poListSelected($event)"
-        @po_paid_detail_list_selected_emit="poPaidDetailListSelected($event)"
-      />
+      <financePoList :poList="getFinancePoList" :paidList="getFinancePaidList" :poListTotal="getFinancePoListTotal"
+        :paidListTotal="getFinancePaidListTotal" @po_list_selected_emit="poListSelected($event)"
+        @po_paid_detail_list_selected_emit="poPaidDetailListSelected($event)" :loading="getLoading" />
     </Dialog>
     <Dialog :visible.sync="finance_po_detail_form" header="" modal>
-      <financePoForm
-        :model="getFinancePoModel"
-        :po="finance_po_list_detail"
-        @po_paid_process_emit="poPaidProcess($event)"
-        :poPaidList="getFinancePoPaidList"
-        @po_paid_delete_emit="poPaidDelete($event)"
-      />
+      <financePoForm :model="getFinancePoModel" :po="finance_po_list_detail"
+        @po_paid_process_emit="poPaidProcess($event)" :poPaidList="getFinancePoPaidList"
+        @po_paid_delete_emit="poPaidDelete($event)" />
     </Dialog>
     <Dialog :visible.sync="finance_po_paid_detail_form" header="" modal>
       <FinancePaidList :list="getFinancePoPaidDetailList" />
@@ -139,6 +95,7 @@ export default {
       "getFinanceCollectionSampleList",
       "getFinanceCollectionSampleTotal",
       "getLocalUrl",
+      "getLoading"
     ]),
   },
   data() {

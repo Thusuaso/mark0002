@@ -12,7 +12,7 @@
     width: 100vw;
     height: 100vh;
     position: fixed;
-    z-index: 50;
+    z-index: 99;
 }
 
 .spinner-wrapper {
