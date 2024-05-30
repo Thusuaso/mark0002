@@ -3,26 +3,21 @@
     <div class="row mt-3">
       <div class="col">
         <span class="p-float-label">
-          <AutoComplete
-            id="supplier"
-            v-model="selectedSupplier"
-            :suggestions="filteredSupplierList"
-            @complete="searchSupplier($event)"
-            field="FirmaAdi"
-          />
+          <AutoComplete id="supplier" v-model="selectedSupplier" :suggestions="filteredSupplierList"
+            @complete="searchSupplier($event)" field="FirmaAdi" />
           <label for="supplier">Supplier</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="stonesize" type="text" v-model="KasaOlculeri" />
-          <label for="stonesize">Tile Size</label>
+          <label for="stonesize">Crate Size</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="cratesize" type="text" v-model="Ebat" />
-          <label for="cratesize">Crate Size</label>
+          <label for="cratesize">Tile Size</label>
         </span>
       </div>
       <div class="col">
@@ -34,20 +29,10 @@
     </div>
     <div class="row mt-3">
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-success w-100"
-          label="Save"
-          @click="saveProcess"
-        />
+        <Button type="button" class="p-button-success w-100" label="Save" @click="saveProcess" />
       </div>
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-danger w-100"
-          label="Delete"
-          @click="deleteForm"
-        />
+        <Button type="button" class="p-button-danger w-100" label="Delete" @click="deleteForm" />
       </div>
     </div>
   </div>

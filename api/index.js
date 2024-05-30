@@ -246,7 +246,7 @@ app.get('/sales/follow',(req,res)=>{
     });
 
 });
-app.get('/sales/follow/detail/:customer',(req,res,next)=>{
+app.get('/sales/follow/detail/:customer',(req,res)=>{
     const sql = `select k.KullaniciAdi,
                 a.ID,
                 a.MusteriAdi,
@@ -263,7 +263,6 @@ app.get('/sales/follow/detail/:customer',(req,res,next)=>{
         res.status(200).json({
             'data':followDetail.recordset,
         });
-        next();
     });
 
 });
@@ -2536,7 +2535,7 @@ app.get('/reports/mekmer/stock/list/mekmer', (req, res) => {
                 inner join UrunlerTB ur on ur.ID = uk.UrunID
                 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
-                where u.UrunDurumID=1 and u.Disarda != 1 and u.Bulunamadi != 1
+                where u.UrunDurumID=1 and u.Disarda != 1 and u.Bulunamadi != 1 and (u.TedarikciID) not in (1,123)
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
                 order by ol.En,ol.Boy,ol.Kenar
               `;
@@ -4020,14 +4019,19 @@ app.get('/reports/mekmar/gu/list', (req, res) => {
                                                 order by MONTH(s.YuklemeTarihi),YEAR(s.YuklemeTarihi)
                                             `;
                             mssql.query(forwSql, (err, forwList) => {
+                                const ayoSql = `select Yil,Usd,Tl from Ayo_Total_Custom`;
+                                mssql.query(ayoSql, (err, ayo) => {
                                 res.status(200).json({
                                     'contByCust':contByCust.recordset,
                                     'contList':contList.recordset,
                                     'yearList': yearList.recordset,
                                     'mekusList':mekusList.recordset,
                                     'logsList': logsList.recordset,
-                                    'forwList':forwList.recordset,
+                                    'forwList': forwList.recordset,
+                                    'ayoList':ayo.recordset
                                 });
+                                });
+
                             });
 
                         });
@@ -9561,14 +9565,24 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID in (1,123)
     });
 });
 
+function __floatNullControl(value) {
+    if (value == 'null' || value == undefined || value == null || value == '' || value == ' ') {
+        return 0;
+    } else {
+        return value;
+    }
+}
 
 app.post('/order/production/product/add', (req, res) => {
-    let buyingPrice = 0;
-    if (req.body.AlisFiyati == 0 || req.body.AlisFiyati == undefined || req.body.AlisFiyati == null || req.body.AlisFiyati == "") {
-        buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
-    } else {
-        buyingPrice = req.body.AlisFiyati;
-    }
+    // let buyingPrice = 0;
+
+    // if (req.body.AlisFiyati == 0 || req.body.AlisFiyati == undefined || req.body.AlisFiyati == null || req.body.AlisFiyati == "") {
+    //     if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
+    //         buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
+    //     }
+    // } else {
+    //     buyingPrice = req.body.AlisFiyati;
+    // }
     const insertSql = `
         insert into SiparisUrunTB(
 	SiparisNo,
@@ -9587,19 +9601,19 @@ app.post('/order/production/product/add', (req, res) => {
 	Adet
 ) VALUES(
 	'${req.body.SiparisNo}',
-	'${req.body.TedarikciID}',
-	'${req.body.UrunKartID}',
-    '${req.body.UrunBirimID}',
+	'${__floatNullControl(req.body.TedarikciID)}',
+	'${__floatNullControl(req.body.UrunKartID)}',
+    '${__floatNullControl(req.body.UrunBirimID)}',
 	'${req.body.Miktar}',
-	'${req.body.OzelMiktar}',
-	'${req.body.SatisFiyati}',
-	'${req.body.SatisToplam}',
+	'${__floatNullControl(req.body.OzelMiktar)}',
+	'${__floatNullControl(req.body.SatisFiyati)}',
+	'${__floatNullControl(req.body.SatisToplam)}',
 	'${req.body.UretimAciklama}',
 	'${req.body.MusteriAciklama}',
-	'${buyingPrice}',
-	'${req.body.SiraNo}',
-	'${req.body.Ton}',
-	'${req.body.Adet}'
+	'${__floatNullControl(req.body.AlisFiyati)}',
+	'${__floatNullControl(req.body.SiraNo)}',
+	'${__floatNullControl(req.body.Ton)}',
+	'${__floatNullControl(req.body.Adet)}'
 
 )
     `;
@@ -9633,22 +9647,31 @@ app.delete('/order/production/product/delete/:id',(req,res)=>{
     });
 });
 app.put('/order/production/product/update', (req, res) => {
+    // let buyingPrice = 0;
+    // if (req.body.AlisFiyati == 0 || req.body.AlisFiyati == undefined || req.body.AlisFiyati == null || req.body.AlisFiyati == "") {
+    //     if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
+    //                 buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
+
+    //     }
+    // } else {
+    //     buyingPrice = req.body.AlisFiyati;
+    // }
     const sql = `
         update SiparisUrunTB SET
-TedarikciID = '${req.body.TedarikciID}',
-UrunKartID = '${req.body.UrunKartID}',
-UrunBirimID = '${req.body.UrunBirimID}',
-Miktar = '${req.body.Miktar}',
-OzelMiktar = '${req.body.OzelMiktar}',
-SatisFiyati = '${req.body.SatisFiyati}',
-SatisToplam = '${req.body.SatisToplam}',
-UretimAciklama = '${req.body.UretimAciklama}',
-MusteriAciklama = '${req.body.MusteriAciklama}',
-AlisFiyati = ${req.body.AlisFiyati},
-SiraNo = '${req.body.SiraNo}',
-Ton = '${req.body.Ton}',
-Adet = '${req.body.Adet}'
-where ID = '${req.body.ID}'
+        TedarikciID = '${__floatNullControl(req.body.TedarikciID)}',
+        UrunKartID = '${__floatNullControl(req.body.UrunKartID)}',
+        UrunBirimID = '${__floatNullControl(req.body.UrunBirimID)}',
+        Miktar = '${__floatNullControl(req.body.Miktar)}',
+        OzelMiktar = '${__floatNullControl(req.body.OzelMiktar)}',
+        SatisFiyati = '${__floatNullControl(req.body.SatisFiyati)}',
+        SatisToplam = '${__floatNullControl(req.body.SatisToplam)}',
+        UretimAciklama = '${req.body.UretimAciklama}',
+        MusteriAciklama = '${req.body.MusteriAciklama}',
+        AlisFiyati = ${__floatNullControl(req.body.AlisFiyati)},
+        SiraNo = '${__floatNullControl(req.body.SiraNo)}',
+        Ton = '${__floatNullControl(req.body.Ton)}',
+        Adet = '${__floatNullControl(req.body.Adet)}'
+        where ID = '${req.body.ID}'
     `;
     mssql.query(sql,(err,product)=>{
        if(product.rowsAffected[0] == 1){
@@ -10572,403 +10595,377 @@ where su.SiparisNo='${req.params.po}'
     });
 });
 
-// app.post('/order/divide',async (req,res)=>{
-//     const orderInsertSqlGiden =  `
-//         insert into SiparislerTB(
-// SiparisNo,
-// SiparisTarihi,
-// OdemeTurID,
-// TeslimTurID,
-// MusteriID,
-// Pesinat,
-// NavlunFirma,
-// NavlunAlis,
-// NavlunSatis,
-// KayitTarihi,
-// KullaniciID,
-// SiparisDurumID,
-// UretimAciklama,
-// SevkiyatAciklama,
-// FinansAciklama,
-// OdemeAciklama,
-// TahminiYuklemeTarihi,
-// Ulke,
-// Komisyon,
-// DetayAciklama_1,
-// DetayMekmarNot_1,
-// DetayTutar_1,
-// DetayAlis_1,
-// DetayAciklama_2,
-// DetayMekmarNot_2,
-// DetayTutar_2,
-// DetayAlis_2,
-// DetayAciklama_3,
-// DetayMekmarNot_3,
-// DetayTutar_3,
-// DetayAlis_3,
-// SiparisSahibi,
-// EvrakGideri,
-// KonteynerAyrinti,
-// UlkeId,
-// depo_yukleme,
-// DetayTutar_4,
-// DetayAciklama_4,
-// sigorta_Tutar,
-// Operasyon,
-// Finansman,
-// Iade,
-// MalBedeli,
-// sigorta_tutar_satis,
-// FaturaKesimTurID
-// )
-// VALUES(
-// 	'${req.body.order.siparisno_giden}',
-// 	'${req.body.order.siparisTarihi}',
-// 	'${req.body.order.odemeTurId}',
-// 	'${req.body.order.teslimTurId}',
-// 	'${req.body.order.musteriId}',
-// 	'${req.body.order.gidenPesinat}',
-// 	'${req.body.order.navlunFirma}',
-// 	'${req.body.order.gidenNavlunAlis}',
-// 	'${req.body.order.gidenNavlunSatis}',
-// 	'${req.body.order.kayitTarihi}',
-// 	'${req.body.order.kullaniciId}',
-// 	'${req.body.order.siparisDurumId}',
-// 	'${req.body.order.odemeAciklama}',
-// 	'${req.body.order.sevkiyatAciklama}',
-// 	'${req.body.order.finansAciklama}',
-// 	'${req.body.order.odemeAciklama}',
-// 	'${req.body.order.TahminiYuklemeTarihi}',
-// 	'${req.body.order.ulke}',
-// 	'${req.body.order.komisyon}',
-// 	'${req.body.order.detayAciklama_1}',
-// 	'${req.body.order.detayMekmarNot_1}',
-// 	'${req.body.order.gidenDetaySatis_1}',
-// 	'${req.body.order.gidenDetayAlis_1}',
-// 	'${req.body.order.detayAciklama_2}',
-// 	'${req.body.order.detayMekmarNot_2}',
-// 	'${req.body.order.gidenDetaySatis_2}',
-// 	'${req.body.order.gidenDetayAlis_2}',
-// 	'${req.body.order.detayAciklama_3}',
-// 	'${req.body.order.detayMekmarNot_3}',
-// 	'${req.body.order.gidenDetaySatis_3}',
-// 	'${req.body.order.gidenDetayAlis_3}',
-// 	'${req.body.order.siparisSahibi}',
-// 	'${req.body.order.evrakGideri}',
-// 	'${req.body.order.konteynerAyrinti}',
-// 	'${req.body.order.ulkeId}',
-// 	'${req.body.order.depo_yukleme}',
-// 	'${0}',
-// 	'${''}',
-// 	'${req.body.order.sigortaTutar}',
-// 	'${req.body.order.operasyon}',
-// 	'${req.body.order.finansman}',
-// 	'${req.body.order.iade}',
-// 	'${req.body.order.malBedeli}',
-// 	'${req.body.order.sigortaTutarSatis}',
-// 	'${req.body.order.faturaKesimTurId}'
-// )
-//     `;
+app.post('/order/divide',async (req,res)=>{
+    const orderInsertSqlGiden =  `
+        insert into SiparislerTB(
+SiparisNo,
+SiparisTarihi,
+OdemeTurID,
+TeslimTurID,
+MusteriID,
+Pesinat,
+NavlunFirma,
+NavlunAlis,
+NavlunSatis,
+KayitTarihi,
+KullaniciID,
+SiparisDurumID,
+UretimAciklama,
+SevkiyatAciklama,
+FinansAciklama,
+OdemeAciklama,
+TahminiYuklemeTarihi,
+Ulke,
+Komisyon,
+DetayAciklama_1,
+DetayMekmarNot_1,
+DetayTutar_1,
+DetayAlis_1,
+DetayAciklama_2,
+DetayMekmarNot_2,
+DetayTutar_2,
+DetayAlis_2,
+DetayAciklama_3,
+DetayMekmarNot_3,
+DetayTutar_3,
+DetayAlis_3,
+SiparisSahibi,
+EvrakGideri,
+KonteynerAyrinti,
+UlkeId,
+depo_yukleme,
+DetayTutar_4,
+DetayAciklama_4,
+sigorta_Tutar,
+Operasyon,
+Finansman,
+Iade,
+MalBedeli,
+sigorta_tutar_satis,
+FaturaKesimTurID
+)
+VALUES(
+	'${req.body.order.siparisno_giden}',
+	'${req.body.order.siparisTarihi}',
+	'${req.body.order.odemeTurId}',
+	'${req.body.order.teslimTurId}',
+	'${req.body.order.musteriId}',
+	'${req.body.order.gidenPesinat}',
+	'${req.body.order.navlunFirma}',
+	'${req.body.order.gidenNavlunAlis}',
+	'${req.body.order.gidenNavlunSatis}',
+	'${req.body.order.kayitTarihi}',
+	'${req.body.order.kullaniciId}',
+	'${req.body.order.siparisDurumId}',
+	'${req.body.order.odemeAciklama}',
+	'${req.body.order.sevkiyatAciklama}',
+	'${req.body.order.finansAciklama}',
+	'${req.body.order.odemeAciklama}',
+	'${req.body.order.TahminiYuklemeTarihi}',
+	'${req.body.order.ulke}',
+	'${req.body.order.komisyon}',
+	'${req.body.order.detayAciklama_1}',
+	'${req.body.order.detayMekmarNot_1}',
+	'${req.body.order.gidenDetaySatis_1}',
+	'${req.body.order.gidenDetayAlis_1}',
+	'${req.body.order.detayAciklama_2}',
+	'${req.body.order.detayMekmarNot_2}',
+	'${req.body.order.gidenDetaySatis_2}',
+	'${req.body.order.gidenDetayAlis_2}',
+	'${req.body.order.detayAciklama_3}',
+	'${req.body.order.detayMekmarNot_3}',
+	'${req.body.order.gidenDetaySatis_3}',
+	'${req.body.order.gidenDetayAlis_3}',
+	'${req.body.order.siparisSahibi}',
+	'${req.body.order.evrakGideri}',
+	'${req.body.order.konteynerAyrinti}',
+	'${req.body.order.ulkeId}',
+	'${req.body.order.depo_yukleme}',
+	'${0}',
+	'${''}',
+	'${req.body.order.sigortaTutar}',
+	'${req.body.order.operasyon}',
+	'${req.body.order.finansman}',
+	'${req.body.order.iade}',
+	'${req.body.order.malBedeli}',
+	'${req.body.order.sigortaTutarSatis}',
+	'${req.body.order.faturaKesimTurId}'
+)
+    `;
 
-//     const orderInsertSqlKalan =  `
-//         insert into SiparislerTB(
-// SiparisNo,
-// SiparisTarihi,
-// OdemeTurID,
-// TeslimTurID,
-// MusteriID,
-// Pesinat,
-// NavlunFirma,
-// NavlunAlis,
-// NavlunSatis,
-// KayitTarihi,
-// KullaniciID,
-// SiparisDurumID,
-// UretimAciklama,
-// SevkiyatAciklama,
-// FinansAciklama,
-// OdemeAciklama,
-// TahminiYuklemeTarihi,
-// Ulke,
-// Komisyon,
-// DetayAciklama_1,
-// DetayMekmarNot_1,
-// DetayTutar_1,
-// DetayAlis_1,
-// DetayAciklama_2,
-// DetayMekmarNot_2,
-// DetayTutar_2,
-// DetayAlis_2,
-// DetayAciklama_3,
-// DetayMekmarNot_3,
-// DetayTutar_3,
-// DetayAlis_3,
-// SiparisSahibi,
-// EvrakGideri,
-// KonteynerAyrinti,
-// UlkeId,
-// depo_yukleme,
-// DetayTutar_4,
-// DetayAciklama_4,
-// sigorta_Tutar,
-// Operasyon,
-// Finansman,
-// Iade,
-// MalBedeli,
-// sigorta_tutar_satis,
-// FaturaKesimTurID
-// )
-// VALUES(
-// 	'${req.body.order.siparisno_kalan}',
-// 	'${req.body.order.siparisTarihi}',
-// 	'${req.body.order.odemeTurId}',
-// 	'${req.body.order.teslimTurId}',
-// 	'${req.body.order.musteriId}',
-// 	'${req.body.order.kalanPesinat}',
-// 	'${req.body.order.navlunFirma}',
-// 	'${req.body.order.kalanNavlunAlis}',
-// 	'${req.body.order.kalanNavlunSatis}',
-// 	'${req.body.order.kayitTarihi}',
-// 	'${req.body.order.kullaniciId}',
-// 	'${req.body.order.siparisDurumId}',
-// 	'${req.body.order.odemeAciklama}',
-// 	'${req.body.order.sevkiyatAciklama}',
-// 	'${req.body.order.finansAciklama}',
-// 	'${req.body.order.odemeAciklama}',
-// 	'${req.body.order.TahminiYuklemeTarihi}',
-// 	'${req.body.order.ulke}',
-// 	'${req.body.order.komisyon}',
-// 	'${req.body.order.detayAciklama_1}',
-// 	'${req.body.order.detayMekmarNot_1}',
-// 	'${req.body.order.kalanDetaySatis_1}',
-// 	'${req.body.order.kalanDetayAlis_1}',
-// 	'${req.body.order.detayAciklama_2}',
-// 	'${req.body.order.detayMekmarNot_2}',
-// 	'${req.body.order.kalanDetaySatis_2}',
-// 	'${req.body.order.kalanDetayAlis_2}',
-// 	'${req.body.order.detayAciklama_3}',
-// 	'${req.body.order.detayMekmarNot_3}',
-// 	'${req.body.order.kalanDetaySatis_3}',
-// 	'${req.body.order.kalanDetayAlis_3}',
-// 	'${req.body.order.siparisSahibi}',
-// 	'${req.body.order.evrakGideri}',
-// 	'${req.body.order.konteynerAyrinti}',
-// 	'${req.body.order.ulkeId}',
-// 	'${req.body.order.depo_yukleme}',
-// 	'${0}',
-// 	'${''}',
-// 	'${req.body.order.sigortaTutar}',
-// 	'${req.body.order.operasyon}',
-// 	'${req.body.order.finansman}',
-// 	'${req.body.order.iade}',
-// 	'${req.body.order.malBedeli}',
-// 	'${req.body.order.sigortaTutarSatis}',
-// 	'${req.body.order.faturaKesimTurId}'
-// )
-//     `;
-
-//     await mssql.query(orderInsertSqlGiden, async (err, giden) => {
-//         if (giden.rowsAffected[0] == 1) {
-//             await mssql.query(orderInsertSqlKalan, async (err, kalan) => {
-//                 if (kalan.rowsAffected[0] == 1) {
-//                     await req.body.product.forEach(async x => {
-                     
-//                         if (x.kalan == 0) {
-//                             const kalanSqlDelete = `delete SiparisUrunTB where ID='${x.id}'`;
-//                             mssql.query(kalanSqlDelete,async (err, kalan) => {
-//                                 if (kalan.rowsAffected[0] == 1) {
-//                                     const gidenUrunSql = `
-//         insert into SiparisUrunTB(
-// 	SiparisNo,
-// 	TedarikciID,
-// 	UrunKartID,
-// 	UrunBirimID,
-// 	Miktar,
-// 	OzelMiktar,
-// 	SatisFiyati,
-// 	SatisToplam,
-// 	UretimAciklama,
-// 	MusteriAciklama,
-// 	AlisFiyati,
-// 	SiraNo,
-// 	Ton,
-// 	Adet
-// ) VALUES(
-// 	'${x.giden_po}',
-// 	'${x.tedarikciId}',
-// 	'${x.urunKartId}',
-//     '${x.urunBirimId}',
-// 	'${x.gonderilen}',
-// 	'${x.gonderilen}',
-// 	'${x.satisFiyat}',
-// 	'${x.gidenToplam}',
-// 	'${x.uretimAciklama}',
-// 	'${x.musteriAciklama}',
-// 	'${x.alisFiyati}',
-// 	'${x.siraNo}',
-// 	'${x.ton}',
-// 	'${x.adet}'
-
-// )
-//                                     `;
-//                                     await mssql.query(gidenUrunSql, async(err, giden) => {
-//                                         if (giden.rowsAffected[0] == 1) {
-//                                     res.status(200).json({ 'status': true });
-                                            
-//                                         } else {
-//                                     res.status(200).json({ 'status': false });
-                                            
-//                                         }
-//                                     })
-//                                 } else {
-//                                     res.status(200).json({ 'status': false });
-                                    
-//                                 }
-//                             });
-//                         } else if (x.gonderilen == 0) {
-//                             const kalanSqlUpdate = `update SiparisUrunTB SET SiparisNo = '${x.kalan_po}' WHERE ID='${x.id}'`;
-//                             mssql.query(kalanSqlUpdate, (err, kalan) => {
-//                                 if (kalan.rowsAffected[0] == 1) {
-//                                     res.status(200).json({ 'status': true });
-//                                 } else {
-//                                     res.status(200).json({ 'status': false });
-                                    
-//                                 }
-//                             });
-//                         } else {
-//                                 const gidenUrunSql = `
-//         insert into SiparisUrunTB(
-// 	SiparisNo,
-// 	TedarikciID,
-// 	UrunKartID,
-// 	UrunBirimID,
-// 	Miktar,
-// 	OzelMiktar,
-// 	SatisFiyati,
-// 	SatisToplam,
-// 	UretimAciklama,
-// 	MusteriAciklama,
-// 	AlisFiyati,
-// 	SiraNo,
-// 	Ton,
-// 	Adet
-// ) VALUES(
-// 	'${x.giden_po}',
-// 	'${x.tedarikciId}',
-// 	'${x.urunKartId}',
-//     '${x.urunBirimId}',
-// 	'${x.gonderilen}',
-// 	'${x.gonderilen}',
-// 	'${x.satisFiyat}',
-// 	'${x.gidenToplam}',
-// 	'${x.uretimAciklama}',
-// 	'${x.musteriAciklama}',
-// 	'${x.alisFiyati}',
-// 	'${x.siraNo}',
-// 	'${x.ton}',
-// 	'${x.adet}'
-
-// )
-//                                 `;
-//                                     const kalanUrunSql = `
-//                     insert into SiparisUrunTB(
-//                 SiparisNo,
-//                 TedarikciID,
-//                 UrunKartID,
-//                 UrunBirimID,
-//                 Miktar,
-//                 OzelMiktar,
-//                 SatisFiyati,
-//                 SatisToplam,
-//                 UretimAciklama,
-//                 MusteriAciklama,
-//                 AlisFiyati,
-//                 SiraNo,
-//                 Ton,
-//                 Adet
-//             ) VALUES(
-//                 '${x.kalan_po}',
-//                 '${x.tedarikciId}',
-//                 '${x.urunKartId}',
-//                 '${x.urunBirimId}',
-//                 '${x.kalan}',
-//                 '${x.kalan}',
-//                 '${x.satisFiyat}',
-//                 '${x.kalanToplam}',
-//                 '${x.uretimAciklama}',
-//                 '${x.musteriAciklama}',
-//                 '${x.alisFiyati}',
-//                 '${x.siraNo}',
-//                 '${x.ton}',
-//                 '${x.adet}'
-
-//             )
-//                                 `;
-//                             const sistemUrunDeleteSql = `delete SiparisUrunTB where ID='${x.id}'`;
-//                             mssql.query(sistemUrunDeleteSql, async (err, sistem) => {
-//                                 if (sistem.rowsAffected[0] == 1) {
-//                                     await mssql.query(gidenUrunSql,async (err, giden) => {
-//                                         if (giden.rowsAffected[0]) {
-//                                             await mssql.query(kalanUrunSql, (err, kalan) => {
-//                                                 if (kalan.rowsAffected[0] == 1) {
-//                                                     res.status(200).json({ 'status': true });
-//                                                 } else {
-//                                                     res.status(200).json({ 'status': false });
-                                                    
-//                                                 }
-//                                             })
-//                                         }
-//                                     });
-//                                 }
-//                             })
-//                         };
+    const orderInsertSqlKalan =  `
+        insert into SiparislerTB(
+SiparisNo,
+SiparisTarihi,
+OdemeTurID,
+TeslimTurID,
+MusteriID,
+Pesinat,
+NavlunFirma,
+NavlunAlis,
+NavlunSatis,
+KayitTarihi,
+KullaniciID,
+SiparisDurumID,
+UretimAciklama,
+SevkiyatAciklama,
+FinansAciklama,
+OdemeAciklama,
+TahminiYuklemeTarihi,
+Ulke,
+Komisyon,
+DetayAciklama_1,
+DetayMekmarNot_1,
+DetayTutar_1,
+DetayAlis_1,
+DetayAciklama_2,
+DetayMekmarNot_2,
+DetayTutar_2,
+DetayAlis_2,
+DetayAciklama_3,
+DetayMekmarNot_3,
+DetayTutar_3,
+DetayAlis_3,
+SiparisSahibi,
+EvrakGideri,
+KonteynerAyrinti,
+UlkeId,
+depo_yukleme,
+DetayTutar_4,
+DetayAciklama_4,
+sigorta_Tutar,
+Operasyon,
+Finansman,
+Iade,
+MalBedeli,
+sigorta_tutar_satis,
+FaturaKesimTurID
+)
+VALUES(
+	'${req.body.order.siparisno_kalan}',
+	'${req.body.order.siparisTarihi}',
+	'${req.body.order.odemeTurId}',
+	'${req.body.order.teslimTurId}',
+	'${req.body.order.musteriId}',
+	'${req.body.order.kalanPesinat}',
+	'${req.body.order.navlunFirma}',
+	'${req.body.order.kalanNavlunAlis}',
+	'${req.body.order.kalanNavlunSatis}',
+	'${req.body.order.kayitTarihi}',
+	'${req.body.order.kullaniciId}',
+	'${req.body.order.siparisDurumId}',
+	'${req.body.order.odemeAciklama}',
+	'${req.body.order.sevkiyatAciklama}',
+	'${req.body.order.finansAciklama}',
+	'${req.body.order.odemeAciklama}',
+	'${req.body.order.TahminiYuklemeTarihi}',
+	'${req.body.order.ulke}',
+	'${req.body.order.komisyon}',
+	'${req.body.order.detayAciklama_1}',
+	'${req.body.order.detayMekmarNot_1}',
+	'${req.body.order.kalanDetaySatis_1}',
+	'${req.body.order.kalanDetayAlis_1}',
+	'${req.body.order.detayAciklama_2}',
+	'${req.body.order.detayMekmarNot_2}',
+	'${req.body.order.kalanDetaySatis_2}',
+	'${req.body.order.kalanDetayAlis_2}',
+	'${req.body.order.detayAciklama_3}',
+	'${req.body.order.detayMekmarNot_3}',
+	'${req.body.order.kalanDetaySatis_3}',
+	'${req.body.order.kalanDetayAlis_3}',
+	'${req.body.order.siparisSahibi}',
+	'${req.body.order.evrakGideri}',
+	'${req.body.order.konteynerAyrinti}',
+	'${req.body.order.ulkeId}',
+	'${req.body.order.depo_yukleme}',
+	'${0}',
+	'${''}',
+	'${req.body.order.sigortaTutar}',
+	'${req.body.order.operasyon}',
+	'${req.body.order.finansman}',
+	'${req.body.order.iade}',
+	'${req.body.order.malBedeli}',
+	'${req.body.order.sigortaTutarSatis}',
+	'${req.body.order.faturaKesimTurId}'
+)
+    `;
 
 
 
-                    
+    await mssql.query(orderInsertSqlGiden, async (err, giden) => {
+        if (giden.rowsAffected[0] == 1) {
+            await mssql.query(orderInsertSqlKalan, async (err, kalan) => {
+                if (kalan.rowsAffected[0] == 1) {
+                    const sistemdeSiparisDeleteSql = `delete SiparislerTB where SiparisNo='${req.body.order.siparisno}'`;
+                    await mssql.query(sistemdeSiparisDeleteSql, async (err, sistemdekiSiparis) => {
+                        if (sistemdekiSiparis.rowsAffected[0] == 1) {
+                           await req.body.product.forEach(async x => {
+                            if (x.kalan == 0) {
+                                const kalanSqlDelete = `delete SiparisUrunTB where ID='${x.id}'`;
+                                mssql.query(kalanSqlDelete,async (err, kalan) => {
+                                    if (kalan.rowsAffected[0] == 1) {
+                                        const gidenUrunSql = `
+                                                insert into SiparisUrunTB(
+                                            SiparisNo,
+                                            TedarikciID,
+                                            UrunKartID,
+                                            UrunBirimID,
+                                            Miktar,
+                                            OzelMiktar,
+                                            SatisFiyati,
+                                            SatisToplam,
+                                            UretimAciklama,
+                                            MusteriAciklama,
+                                            AlisFiyati,
+                                            SiraNo,
+                                            Ton,
+                                            Adet
+                                        ) VALUES(
+                                            '${x.giden_po}',
+                                            '${x.tedarikciId}',
+                                            '${x.urunKartId}',
+                                            '${x.urunBirimId}',
+                                            '${x.gonderilen}',
+                                            '${x.gonderilen}',
+                                            '${x.satisFiyat}',
+                                            '${x.gidenToplam}',
+                                            '${x.uretimAciklama}',
+                                            '${x.musteriAciklama}',
+                                            '${x.alisFiyati}',
+                                            '${x.siraNo}',
+                                            '${x.ton}',
+                                            '${x.adet}'
+
+                                        )
+                                                                            `;
+                                        await mssql.query(gidenUrunSql, async (err, giden) => {
+                                            if (giden.rowsAffected[0] == 1) {
+                                                res.status(200).json({ 'status': true });
+                                                
+                                            } else {
+                                                res.status(200).json({ 'status': false });
+                                                
+                                            }
+                                        });
+                                    } else {
+                                        res.status(200).json({ 'status': false });
+                                        
+                                    }
+                                });
+                            } else if (x.gonderilen == 0) {
+                                const kalanSqlUpdate = `update SiparisUrunTB SET SiparisNo = '${x.kalan_po}' WHERE ID='${x.id}'`;
+                                mssql.query(kalanSqlUpdate, (err, kalan) => {
+                                    if (kalan.rowsAffected[0] == 1) {
+                                        res.status(200).json({ 'status': true });
+                                    } else {
+                                        res.status(200).json({ 'status': false });
+                                        
+                                    }
+                                });
+                            } else {
+                                    const gidenUrunSql = `
+            insert into SiparisUrunTB(
+        SiparisNo,
+        TedarikciID,
+        UrunKartID,
+        UrunBirimID,
+        Miktar,
+        OzelMiktar,
+        SatisFiyati,
+        SatisToplam,
+        UretimAciklama,
+        MusteriAciklama,
+        AlisFiyati,
+        SiraNo,
+        Ton,
+        Adet
+    ) VALUES(
+        '${x.giden_po}',
+        '${x.tedarikciId}',
+        '${x.urunKartId}',
+        '${x.urunBirimId}',
+        '${x.gonderilen}',
+        '${x.gonderilen}',
+        '${x.satisFiyat}',
+        '${x.gidenToplam}',
+        '${x.uretimAciklama}',
+        '${x.musteriAciklama}',
+        '${x.alisFiyati}',
+        '${x.siraNo}',
+        '${x.ton}',
+        '${x.adet}'
+
+    )
+                                    `;
+                                        const kalanUrunSql = `
+                        insert into SiparisUrunTB(
+                    SiparisNo,
+                    TedarikciID,
+                    UrunKartID,
+                    UrunBirimID,
+                    Miktar,
+                    OzelMiktar,
+                    SatisFiyati,
+                    SatisToplam,
+                    UretimAciklama,
+                    MusteriAciklama,
+                    AlisFiyati,
+                    SiraNo,
+                    Ton,
+                    Adet
+                ) VALUES(
+                    '${x.kalan_po}',
+                    '${x.tedarikciId}',
+                    '${x.urunKartId}',
+                    '${x.urunBirimId}',
+                    '${x.kalan}',
+                    '${x.kalan}',
+                    '${x.satisFiyat}',
+                    '${x.kalanToplam}',
+                    '${x.uretimAciklama}',
+                    '${x.musteriAciklama}',
+                    '${x.alisFiyati}',
+                    '${x.siraNo}',
+                    '${x.ton}',
+                    '${x.adet}'
+
+                )
+                                    `;
+                                const sistemUrunDeleteSql = `delete SiparisUrunTB where ID='${x.id}'`;
+                                mssql.query(sistemUrunDeleteSql, async (err, sistem) => {
+                                    if (sistem.rowsAffected[0] == 1) {
+                                        await mssql.query(gidenUrunSql, async (err, giden) => {
+                                            if (giden.rowsAffected[0] == 1) {
+                                                await mssql.query(kalanUrunSql, (err, kalan) => {
+                                                    if (kalan.rowsAffected[0] == 1) {
+                                                        res.status(200).json({ 'status': true });
+                                                    } else {
+                                                        res.status(200).json({ 'status': false });
+                                                    };
+                                                });
+                                            } else {
+                                                res.status(200).json({ 'status': false });
+                                            }
+                                        });
+                                    }
+                                });
+                               };
                         
-//                         // await mssql.query(gidenUrunSql, async (err, gidenUrun) => {
-//                         //     if (gidenUrun.rowsAffected[0] == 1) {
-//                         //         await mssql.query(kalanUrunSql, async (err, kalanUrun) => {
-//                         //             if (kalanUrun.rowsAffected[0] == 1) {
-//                         //                 res.status(200).json({ 'status': true });
-//                         //             } else {
-//                         //                 res.status(200).json({ 'status': false });
-//                         //             }
-//                         //         });
-//                         //     } else {
-//                         //         res.status(200).json({ 'status': false });
-
-//                         //     }
-
-//                         // });
-
-//                         // const ozelIscilikSql = `select COUNT(ID) as durum from SiparisEkstraGiderlerTB where SiparisNo='${x.siparisno}' and UrunKartId = '${x.urunKartId}' and TedarikciID='${x.tedarikciId}'`;
-//                         // mssql.query(ozelIscilikSql, (err, ozelIscilik) => {
-                            
-//                         // });
-
-
-
-
-//                     });
-//                 } else {
-//                     res.status(200).json({ 'status': false });
+                             });
+                        } else {
+                            res.status(200).json({'status':false})
+                       } 
+                    });
                     
-//                 }
-
-//             });
-//         } else {
-//             res.status(200).json({ 'status': false });
-//         }
-
-//     });
-
-
-
-    
-
-// });
+                } else {
+                    res.status(200).json({ 'status': false });
+                }
+            });
+        } else {
+            res.status(200).json({ 'status': false });
+        }
+    });
+});
 
 /*Mailler */
 app.post('/mail/login/server', (req, res) => {

@@ -70,8 +70,8 @@ const state = {
 };
 const actions = {
     setDivide(vuexContext, payload) {
-        return new Promise((resolve, reject) => {
-           this.$axios.post('/order/divide',payload)
+        return new Promise(async (resolve, reject) => {
+           await this.$axios.post('/order/divide',payload)
                .then(response => {
                    if (response.data.status) {
                        resolve(true);
@@ -108,7 +108,6 @@ const actions = {
         });
     },
         setOrderOnHoldMekmerList(vuexContext){
-        vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/onhold/mekmer/list')
             .then(response => {
                 if (response.data.list) {
@@ -116,12 +115,10 @@ const actions = {
                     vuexContext.commit('setOrderProductionYearsList', response.data.years);
                     vuexContext.commit('setOrderListAll', response.data.list);
                     vuexContext.commit('setOrderProductionTotal',response.data.list);
-                    vuexContext.dispatch('setEndLoadingAction');
                 } 
             });
     },
     setOrderProductionMekmerList(vuexContext){
-        vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/production/mekmer/list')
             .then(response => {
                 if (response.data.list) {
@@ -129,7 +126,6 @@ const actions = {
                     vuexContext.commit('setOrderProductionYearsList', response.data.years);
                     vuexContext.commit('setOrderListAll', response.data.list);
                     vuexContext.commit('setOrderProductionTotal',response.data.list);
-                    vuexContext.dispatch('setEndLoadingAction');
                 } 
             });
     },
@@ -137,36 +133,29 @@ const actions = {
         vuexContext.commit('setOrderProductionTotal',list)
     },
     setOrderProductionIsfDelete(vuexContext,event){
-        vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/production/isf/delete/${event.ID}/${event.EvrakAdi}/${event.SiparisNo}`)
         .then(response=>{
             if(response.data.status){
                 vuexContext.dispatch('setEndLoadingAction');
                 this.$toast.success('Isf Silindi.');
                 vuexContext.commit('setOrderProductionProformaDelete',event.ID);
-                vuexContext.dispatch('setOrderProductionList');
             }else{
                 this.$toast.error('Isf Silme Başarısız.');
-                vuexContext.dispatch('setEndLoadingAction');
             };
         });
     },
     setOrderProductionProformaDelete(vuexContext,id){
-        vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/production/proforma/delete/${id}`)
         .then(response=>{
             if(response.data.status){
-                vuexContext.dispatch('setEndLoadingAction');
                 this.$toast.success('Proforma Silindi.');
                 vuexContext.commit('setOrderProductionProformaDelete',id);
             }else{
                 this.$toast.error('Proforma Silme Başarısız.');
-                vuexContext.dispatch('setEndLoadingAction');
             };
         });
     },
     setOrderProductionMekmer2List(vuexContext) {
-        vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/production/mekmer2/list')
             .then(response => {
                 if (response.data.list) {
@@ -174,12 +163,10 @@ const actions = {
                     vuexContext.commit('setOrderProductionYearsList', response.data.years);
                     vuexContext.commit('setOrderListAll', response.data.list);
                     vuexContext.commit('setOrderProductionTotal',response.data.list);
-                    vuexContext.dispatch('setEndLoadingAction');
                 } 
             });
     },
     setOrderProductionList(vuexContext) {
-        vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/order/production/list')
             .then(response => {
                 if (response.data.list) {
@@ -187,19 +174,16 @@ const actions = {
                     vuexContext.commit('setOrderProductionYearsList', response.data.years);
                     vuexContext.commit('setOrderListAll', response.data.list);
                     vuexContext.commit('setOrderProductionTotal',response.data.list);
-                    vuexContext.dispatch('setEndLoadingAction');
                 } 
             });
     },
     setOrderProductionListYear(vuexContext, year) {
-        vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get(`/order/production/list/year/${year}`)
             .then(response => {
                 if (response.data.list) {
                     vuexContext.commit('setOrderList', response.data.list);
                     vuexContext.commit('setOrderProductionTotal',response.data.list);
 
-                    vuexContext.dispatch('setEndLoadingAction');
                     
 
                 
@@ -575,13 +559,14 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
             });
     },
     setProductionProductSaveMail(vuexContext, production) {
-        this.$axios.post('/order/production/product/save/mail', production)
-            .then(response => {
-                if(response.data.status){
-                    this.$toast.success('Mail Gönderildi.');
-                    vuexContext.dispatch('setProductionProductMailReset');
-                }
-            });
+            this.$axios.post('/order/production/product/save/mail', production)
+                .then(response => {
+                    if (response.data.status) {
+                        this.$toast.success('Mail Gönderildi.');
+                        vuexContext.dispatch('setProductionProductMailReset');
+
+                    } 
+                });
     },
     setProductionProductMailReset(vuexContext) {
         vuexContext.commit('setProductionProductMailReset');

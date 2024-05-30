@@ -1,88 +1,33 @@
 <template>
   <div>
-    <DataTable
-      :value="list"
-      :filters.sync="filters1"
-      filterDisplay="row"
-      :selection="selectedCrateSize"
-      selectionMode="single"
-      @row-click="crateSizeSelected($event)"
-    >
+    <DataTable :value="list" :filters.sync="filters1" filterDisplay="row" :selection="selectedCrateSize"
+      selectionMode="single" @row-click="crateSizeSelected($event)">
       <template #header>
-        <Button
-          type="button"
-          icon="pi pi-filter-slash"
-          label="Clear Filters"
-          outlined
-          @click="clearFilter()"
-        />
+        <Button type="button" icon="pi pi-filter-slash" label="Clear Filters" outlined @click="clearFilter()" />
       </template>
-      <Column
-        field="TedarikciAdi"
-        header="Supplier"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
+      <Column field="TedarikciAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            type="text"
-            v-model="filterModel.value"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column
-        field="Ebat"
-        header="Tile Size"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
+      <Column field="KasaOlculeri" header="Crate Size" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            type="text"
-            v-model="filterModel.value"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column
-        field="KasaOlculeri"
-        header="Crate Size"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
+      <Column field="Ebat" header="Tile Size" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+        bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            type="text"
-            v-model="filterModel.value"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column
-        field="Adet"
-        header="Piece"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
+
+      <Column field="Adet" header="Piece" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+        bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            type="text"
-            v-model="filterModel.value"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
     </DataTable>

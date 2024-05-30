@@ -96,7 +96,8 @@ const state = {
     reportsMekmarGuLogsList: [],
     reportsMekmarGuForwList: [],
     reportsMekmerAtlantaList:[],
-    reportsMekmarMkList:[]
+    reportsMekmarMkList: [],
+    reportsMekmarGuAyoList:[]
     
 };
 const actions = {
@@ -802,6 +803,7 @@ const mutations = {
             date = date - 1;
 
         };
+        state.reportsMekmarGuAyoList = payload.ayoList;
 
 
     },
@@ -826,6 +828,9 @@ const mutations = {
 
 };
 const getters = {
+    getReportsMekmarGuAyoList(state) {
+        return state.reportsMekmarGuAyoList;
+    },
     getReportsMekmarMkList(state){
         return state.reportsMekmarMkList;
     },
