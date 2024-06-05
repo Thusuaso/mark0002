@@ -187,7 +187,9 @@ export default {
     };
   },
   methods: {
-    collectionFiltered(event) {},
+    collectionFiltered(event) {
+      this.$store.dispatch('setFinanceCollectionTotal',event.filteredValue);
+    },
     monthChanged(event) {
       const data = {
         month: event.value.Ay,

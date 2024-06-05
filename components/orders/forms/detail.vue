@@ -7,7 +7,7 @@
             :po="po" :detailProductTotal="detailProductTotal" :status="status" :saveButtonStatus="saveButtonStatus"
             @workerman_selected_emit="$emit('workerman_selected_emit', $event)" />
         </TabPanel>
-        <TabPanel header="Proforma" >
+        <TabPanel header="Proforma">
           <orderDetailProformaForm :model="modelProduction" :delivery="delivery" :payment="payment" :status="status"
             :country="country" :invoice="invoice" :po="po" :proformaUploadButtonStatus="proformaUploadButtonStatus"
             @prepayment_is_activated_emit="prePaymentIsActivated($event)" />
@@ -33,7 +33,18 @@
         :disabled="saveButtonStatus" />
       <Button type="button" class="p-button-danger w-100 mb-4" label="Exit"
         @click="$emit('close_production_form_emit')" />
-        <Button type="button" class="p-button-secondary w-100 mb-4" label="Divide" @click="$emit('divide')" />
+      <Button type="button" class="p-button-secondary w-100 mb-4" label="Divide" @click="$emit('divide')" />
+      <div class="flex flex-wrap justify-content-center gap-3 mb-4">
+        <div class="flex align-items-center">
+          <Checkbox v-model="selectedControlBoolean" inputId="ingredient1" binary
+            @change="controlBooleanSelected($event)" />
+          <label for="ingredient1" class="ml-2"> Control </label>
+        </div>
+      </div>
+
+
+
+
       <span class="p-float-label mb-4">
         <InputText id="po" v-model="modelProduction.SiparisNo" class="w-100" :disabled="!status"
           @input="inputPo($event)" />
@@ -310,6 +321,7 @@ export default {
   },
   data() {
     return {
+      selectedControlBoolean:false,
       prepaymentDisabledForm: true,
       guess_loading_date: null,
       order_date: null,
@@ -331,6 +343,9 @@ export default {
     }
   },
   methods: {
+    controlBooleanSelected(event){
+      this.modelProduction.SiparisKontrol = this.selectedControlBoolean;
+    },
     inputPo(event) {
       const index = this.getOrdersAllList.find((x) => x.SiparisNo == event);
       if (index) {
@@ -437,6 +452,11 @@ export default {
       );
       this.load_date = date.stringToDate(this.modelProduction.YuklemeTarihi);
       this.eta_date = date.stringToDate(this.modelProduction.Eta);
+      if (this.modelProduction.SiparisKontrol == null || this.modelProduction.SiparisKontrol == '' || this.modelProduction.SiparisKontrol == 'null') {
+        this.selectedControlBoolean = false;
+      } else {
+        this.selectedControlBoolean = true;
+      }
     },
   },
   watch: {},

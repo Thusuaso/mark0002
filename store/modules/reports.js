@@ -97,10 +97,100 @@ const state = {
     reportsMekmarGuForwList: [],
     reportsMekmerAtlantaList:[],
     reportsMekmarMkList: [],
-    reportsMekmarGuAyoList:[]
+    reportsMekmarGuAyoList: [],
+    reportsMekmarGuOrdererThisYear: [],
+    reportsMekmarGuOrdererThisYearTotal: {
+        'fob': 0,
+        'ddp':0,
+    },
+    reportsMekmarGuOrdererPreviousYear: [],
+    reportsMekmarGuOrdererPreviousYearTotal: {
+        'fob': 0,
+        'ddp':0,
+    },
+        reportsMekmarGuOrdererTwoYearAgo: [],
+    reportsMekmarGuOrdererTwoYearAgoTotal: {
+        'fob': 0,
+        'ddp':0,
+    },
+        reportsMekmarGuOperationThisYear: [],
+    reportsMekmarGuOperationThisYearTotal: {
+        'fob': 0,
+        'ddp':0,
+    },
+    reportsMekmarGuOperationPreviousYear: [],
+    reportsMekmarGuOperationPreviousYearTotal: {
+        'fob': 0,
+        'ddp':0,
+    },
+        reportsMekmarGuOperationTwoYearAgo: [],
+    reportsMekmarGuOperationTwoYearAgoTotal: {
+        'fob': 0,
+        'ddp':0,
+    },
+    mekmarGuSellerOrderDetailList: [],
+    mekmarGuSellerOrderDetailListTotal: {
+        'fob': 0,
+        'ddp': 0,
+        'navlun': 0,
+        'detail1': 0,
+        'detail2': 0,
+        'detail3': 0,
+        'detail4':0,
+    }
+
+    
     
 };
+
 const actions = {
+    /* */
+    setMekmarGuSellerOrderDetail(vuexContext, payload) {
+        return new Promise((resolve,reject) => {
+            this.$axios.get(`/reports/gu/mekmar/order/seller/${payload.month}/${payload.year}/${payload.userId}`)
+                .then(response => {
+                    if (response) {
+                        vuexContext.commit('setMekmarGuSellerOrderDetail', response.data.detail);
+                        resolve(true);
+
+                    } else {
+                        resolve(false);
+                }
+            });
+        })
+    },
+        setMekmarGuOperationOrderDetail(vuexContext, payload) {
+        return new Promise((resolve,reject) => {
+            this.$axios.get(`/reports/gu/mekmar/order/operation/${payload.month}/${payload.year}/${payload.userId}`)
+                .then(response => {
+                    if (response) {
+                        vuexContext.commit('setMekmarGuSellerOrderDetail', response.data.detail);
+                        resolve(true);
+
+                    } else {
+                        resolve(false);
+                }
+            });
+        })
+    },
+    /* */
+
+
+
+    setMekmarGuOrdererOperationList(vuexContext, userId) {
+
+        return new Promise((resolve, reject) => {
+            this.$axios.get('/reports/mekmar/gu/operation/orderer/list/' + userId)
+                .then(response => {
+                    if (response) {
+                        vuexContext.commit('setMekmarGuOrdererOperationList', response.data);
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                }
+            });
+        })
+    },
     setReportsMekmarMkList(vuexContext,payload){
         vuexContext.commit('setReportsMekmarMkList',payload)
     },
@@ -110,6 +200,15 @@ const actions = {
             vuexContext.commit('setReportsMekmarSummaryOrderListByRepresentative',response.data.items);
             vuexContext.dispatch('setReportsMekmarSummaryOrderListByRepresentativeTotal',response.data.items);
         });
+    },
+    setReportsMekmarSummaryOrderDetailRepresentative(vuexContext, payload) {
+        
+        this.$axios.get(`/reports/mekmar/summary/order/list/by/representative/detail/${payload.userId}/${payload.month}/${payload.year}`)
+            .then(response => {
+                                vuexContext.commit('setReportsMekmarSummaryOrderDetail', response.data.list);
+                vuexContext.dispatch('setReportsMekmarSummaryOrderDetailTotal', response.data.list);
+                vuexContext.dispatch('setEndLoadingAction');
+            });
     },
     setReportsMekmarSummaryOrderListByRepresentativeTotal(vuexContext,payload){
         vuexContext.commit('setReportsMekmarSummaryOrderListByRepresentativeTotal',payload);
@@ -133,10 +232,6 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             })
     },
-
-
-
-
     setReportsMekmerProductionDate(vuexContext, payload) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.post('/reports/mekmer/production/date', payload)
@@ -204,8 +299,6 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
-
-
     setReportsMekmerStockListOnlyStocksMekmer(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get("/reports/mekmer/stock/list/only/mekmer")
@@ -215,8 +308,6 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
-
-
     setReportsMekmerStockListTotal(vuexContext, payload) {
         vuexContext.commit('setReportsMekmerStockListTotal', payload);
     },
@@ -522,6 +613,96 @@ const actions = {
 
 };
 const mutations = {
+    setMekmarGuSellerOrderDetail(state, payload) {
+        state.mekmarGuSellerOrderDetailListTotal = {
+            'fob': 0,
+            'ddp': 0,
+            'navlun': 0,
+            'detail1': 0,
+            'detail2': 0,
+            'detail3': 0,
+            'detail4': 0,
+        };
+        state.mekmarGuSellerOrderDetailList = payload;
+        payload.forEach(x => {
+            state.mekmarGuSellerOrderDetailListTotal.fob += x.FOB;
+            state.mekmarGuSellerOrderDetailListTotal.ddp += x.DDP;
+            state.mekmarGuSellerOrderDetailListTotal.navlun += x.Navlun;
+            state.mekmarGuSellerOrderDetailListTotal.detail1 += x.Detay1;
+            state.mekmarGuSellerOrderDetailListTotal.detail2 += x.Detay2;
+            state.mekmarGuSellerOrderDetailListTotal.detail3 += x.Detay3;
+            state.mekmarGuSellerOrderDetailListTotal.detail4 += x.Detay4;
+        });
+    },
+    setMekmarGuOrdererOperationList(state, payload) {
+            state.reportsMekmarGuOrdererThisYear = [];
+    state.reportsMekmarGuOrdererThisYearTotal = {
+        'fob': 0,
+        'ddp':0,
+    };
+    state.reportsMekmarGuOrdererPreviousYear = [];
+    state.reportsMekmarGuOrdererPreviousYearTotal = {
+        'fob': 0,
+        'ddp':0,
+    };
+        state.reportsMekmarGuOrdererTwoYearAgo = [];
+    state.reportsMekmarGuOrdererTwoYearAgoTotal = {
+        'fob': 0,
+        'ddp':0,
+    };
+        state.reportsMekmarGuOperationThisYear =  [];
+        state.reportsMekmarGuOperationThisYearTotal= {
+            'fob': 0,
+            'ddp':0,
+        };
+        state.reportsMekmarGuOperationPreviousYear= [];
+        state.reportsMekmarGuOperationPreviousYearTotal= {
+            'fob': 0,
+            'ddp':0,
+        };
+        state.reportsMekmarGuOperationTwoYearAgo= [],
+        state.reportsMekmarGuOperationTwoYearAgoTotal= {
+            'fob': 0,
+            'ddp':0,
+            };
+        state.reportsMekmarGuOrdererThisYear = payload.thisYearOrderer;
+        state.reportsMekmarGuOrdererPreviousYear = payload.previusYearOrderer;
+        state.reportsMekmarGuOrdererTwoYearAgo = payload.twoYearOrderer;
+        state.reportsMekmarGuOperationThisYear = payload.thisYearOperation;
+        state.reportsMekmarGuOperationPreviousYear = payload.previusYearOperation;
+        state.reportsMekmarGuOperationTwoYearAgo = payload.twoYearOperation;
+
+        payload.thisYearOrderer.forEach(x => {
+            state.reportsMekmarGuOrdererThisYearTotal.fob += x.FOB;
+            state.reportsMekmarGuOrdererThisYearTotal.ddp += x.DDP;
+
+        });
+        payload.previusYearOrderer.forEach(x => {
+            state.reportsMekmarGuOrdererPreviousYearTotal.fob += x.FOB;
+            state.reportsMekmarGuOrdererPreviousYearTotal.ddp += x.DDP;
+        });
+                payload.twoYearOrderer.forEach(x => {
+            state.reportsMekmarGuOrdererTwoYearAgoTotal.fob += x.FOB;
+            state.reportsMekmarGuOrdererTwoYearAgoTotal.ddp += x.DDP;
+                });
+        
+         payload.thisYearOperation.forEach(x => {
+            state.reportsMekmarGuOperationThisYearTotal.fob += x.FOB;
+            state.reportsMekmarGuOperationThisYearTotal.ddp += x.DDP;
+         });
+                 payload.previusYearOperation.forEach(x => {
+            state.reportsMekmarGuOperationPreviousYearTotal.fob += x.FOB;
+            state.reportsMekmarGuOperationPreviousYearTotal.ddp += x.DDP;
+        });
+                 payload.twoYearOperation.forEach(x => {
+            state.reportsMekmarGuOperationTwoYearAgoTotal.fob += x.FOB;
+            state.reportsMekmarGuOperationTwoYearAgoTotal.ddp += x.DDP;
+        });
+        
+        
+        
+        
+    },
     setReportsMekmarMkList(state,payload){
         state.reportsMekmarMkList = payload;
     },
@@ -828,6 +1009,56 @@ const mutations = {
 
 };
 const getters = {
+    getMekmarGuSellerOrderDetailListTotal(state) {
+        return state.mekmarGuSellerOrderDetailListTotal;  
+    },
+    getMekmarGuSellerOrderDetailList(state) {
+        return state.mekmarGuSellerOrderDetailList;  
+    },
+    getReportsMekmarGuOrdererThisYear(state) {
+        return state.reportsMekmarGuOrdererThisYear;
+    },
+    getReportsMekmarGuOrdererThisYearTotal(state) {
+        return state.reportsMekmarGuOrdererThisYearTotal;
+    },
+    getReportsMekmarGuOrdererPreviousYear(state) {
+        return state.reportsMekmarGuOrdererPreviousYear;
+    },
+    getReportsMekmarGuOrdererPreviousYearTotal(state) {
+        return state.reportsMekmarGuOrdererPreviousYearTotal;
+    },
+    getReportsMekmarGuOrdererTwoYearAgo(state) {
+        return state.reportsMekmarGuOrdererTwoYearAgo;
+    },
+    getReportsMekmarGuOrdererTwoYearAgoTotal(state) {
+        return state.reportsMekmarGuOrdererTwoYearAgoTotal;
+    },
+    getReportsMekmarGuOperationThisYear(state) {
+        return state.reportsMekmarGuOperationThisYear;
+    },
+    getReportsMekmarGuOperationThisYearTotal(state) {
+        return state.reportsMekmarGuOperationThisYearTotal;
+    },
+    getReportsMekmarGuOperationPreviousYear(state) {
+        return state.reportsMekmarGuOperationPreviousYear;
+    },
+    getReportsMekmarGuOperationPreviousYearTotal(state) {
+        return state.reportsMekmarGuOperationPreviousYearTotal;
+    },
+    getReportsMekmarGuOperationTwoYearAgo(state) {
+        return state.reportsMekmarGuOperationTwoYearAgo;
+    },
+    getReportsMekmarGuOperationTwoYearAgoTotal(state) {
+        return state.reportsMekmarGuOperationTwoYearAgoTotal;
+    },
+
+
+
+
+
+
+
+
     getReportsMekmarGuAyoList(state) {
         return state.reportsMekmarGuAyoList;
     },

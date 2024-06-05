@@ -382,7 +382,9 @@ const state = {
         Vade: '',
         operationMail:'',
         representativeMail:'',
-        FaturaKesimTurID:0
+        FaturaKesimTurID: 0,
+        SiparisKontrol: false,
+        SiparisKontrolEden:0
     },
     orderProductModel: {
         ID: 0,
@@ -1025,7 +1027,9 @@ const actions = {
             sigorta_tutar_satis: 0,
             Vade: '',
             operationMail:'',
-            representativeMail:''
+            representativeMail: '',
+                    SiparisKontrol: false,
+        SiparisKontrolEden:0
         };
         vuexContext.commit('setOrderProductionModel',orderProductionModel)
     },

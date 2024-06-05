@@ -193,10 +193,10 @@ export default {
         month: event.value.Ay,
         year: this.selectedYear.Yil,
       };
-      this.$store.dispatch("setFinanceCollectionListMonth", data);
+      this.$store.dispatch("setFinanceCollectionListMekmerMonth", data);
     },
     yearChanged(event) {
-      this.$store.dispatch("setFinanceCollectionListYear", event.value.Yil);
+      this.$store.dispatch("setFinanceCollectionListMekmerYear", event.value.Yil);
     },
   },
   watch: {

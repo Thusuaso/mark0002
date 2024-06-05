@@ -3907,28 +3907,27 @@ app.post('/reports/mekmar/summary/forwarding/detail/list', (req, res) => {
 
 app.get('/reports/mekmar/summary/order/list/by/representative/:userId', (req, res) => {
     const sqlThisYear = `
-    select 
-    dbo.SiparisUrunler_Toplami_by_representative_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE()),'${req.params.userId}') as FOB,
-    sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) + sum(s.DetayTutar_4) + dbo.SiparisUrunler_Toplami_by_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE())) as DDP,
-    MONTH(s.SiparisTarihi) as Month,
-    YEAR(s.SiparisTarihi) as Year
-    from SiparislerTB s 
-    inner join MusterilerTB m on m.ID = s.MusteriID
-    where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and m.Marketing = 'Mekmar' and s.SiparisSahibi='${req.params.userId}'
+select 
+dbo.SiparisUrunler_Ozet_Temsilci_Toplam_2(MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi),'${req.params.userId}','${req.params.userId}') as FOB,
+sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) + sum(s.DetayTutar_4) +dbo.SiparisUrunler_Ozet_Temsilci_Toplam_2(MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi),'${req.params.userId}','${req.params.userId}') as DDP,
+MONTH(s.SiparisTarihi) as Month,
+YEAR(s.SiparisTarihi) as Year
 
-    group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
+
+from SiparislerTB s
+where (s.SiparisSahibi = '${req.params.userId}' or s.Operasyon = '${req.params.userId}') and YEAR(s.SiparisTarihi) = YEAR(GETDATE())
+group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
                 `;
     const sqlPreviousYear = `
-                           select 
-                    dbo.SiparisUrunler_Toplami_by_representative_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE())-1,'${req.params.userId}') as FOB,
-                    sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) + sum(s.DetayTutar_4) + dbo.SiparisUrunler_Toplami_by_SipTarihi(MONTH(s.SiparisTarihi),YEAR(GETDATE())-1) as DDP,
-                    MONTH(s.SiparisTarihi) as Month,
-					YEAR(s.SiparisTarihi) as Year
-                    from SiparislerTB s 
-                    inner join MusterilerTB m on m.ID = s.MusteriID
-                    where YEAR(s.SiparisTarihi) = YEAR(GETDATE())-1 and m.Marketing = 'Mekmar' and s.SiparisSahibi='${req.params.userId}'
+select 
+dbo.SiparisUrunler_Ozet_Temsilci_Toplam_2(MONTH(s.SiparisTarihi),YEAR(GETDATE()) - 1,'${req.params.userId}','${req.params.userId}') as FOB,
+sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) + sum(s.DetayTutar_4) +dbo.SiparisUrunler_Ozet_Temsilci_Toplam_2(MONTH(s.SiparisTarihi),YEAR(GETDATE()) - 1,'${req.params.userId}','${req.params.userId}') as DDP,
+MONTH(s.SiparisTarihi) as Month,
+YEAR(s.SiparisTarihi) as Year
 
-                    group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
+from SiparislerTB s
+where (s.SiparisSahibi = '${req.params.userId}' or s.Operasyon = '${req.params.userId}') and YEAR(s.SiparisTarihi) = YEAR(GETDATE()) - 1
+group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
     `;
     mssql.query(sqlThisYear, (err, thisYear) => {
         mssql.query(sqlPreviousYear, (err, previousYear) => {
@@ -3937,6 +3936,33 @@ app.get('/reports/mekmar/summary/order/list/by/representative/:userId', (req, re
         });
     });
 });
+app.get('/reports/mekmar/summary/order/list/by/representative/detail/:userId/:month/:year', (req, res) => {
+    const detailSql = `
+    select 
+
+                        dbo.SiparisUrunler_Toplami_by_Po(s.SiparisNo) as Fob,
+                        s.NavlunSatis + s.DetayTutar_1 +s.DetayTutar_2+s.DetayTutar_3 + s.DetayTutar_4 + dbo.SiparisUrunler_Toplami_by_Po(s.SiparisNo) as Ddp,
+                        s.SiparisNo,
+                        s.SiparisTarihi,
+                        st.TeslimTur,
+                        s.NavlunSatis,
+                        s.DetayTutar_1,
+                        s.DetayTutar_2,
+                        s.DetayTutar_3,
+                        s.DetayTutar_4,
+                        	m.FirmaAdi
+
+
+                    from SiparislerTB s
+                    inner join MusterilerTB m on m.ID = s.MusteriID
+                    inner join SiparisTeslimTurTB st on st.ID = s.TeslimTurID
+                    where YEAR(s.SiparisTarihi) = ${req.params.year} and MONTH(s.SiparisTarihi) = ${req.params.month} and m.Marketing = 'Mekmar' and (s.SiparisSahibi=${req.params.userId} or s.Operasyon=${req.params.userId})
+    `;
+    mssql.query(detailSql, (err, detail) => {
+        res.status(200).json({ 'list': detail.recordset });
+    });
+});
+
 
 
 
@@ -4145,6 +4171,154 @@ app.get('/reports/mekmar/gu/list/:year', (req, res) => {
         
     });
 });
+
+app.get('/reports/mekmar/gu/operation/orderer/list/:userId',async (req,res)=>{
+    const thisYearSqlOrderer = `
+        select 
+            MONTH(s.SiparisTarihi) as Month,
+            dbo.Gu_Reports_by_Orderer(MONTH(s.SiparisTarihi),YEAR(GETDATE()),'${req.params.userId}') as FOB,
+            SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+            +dbo.Gu_Reports_by_Orderer(MONTH(s.SiparisTarihi),YEAR(GETDATE()),'${req.params.userId}') as DDP
+        from SiparislerTB s
+
+        where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and s.SiparisSahibi = '${req.params.userId}'
+
+        group by MONTH(s.SiparisTarihi)
+    `;
+    const previousYearSqlOrderer = `
+                select 
+            MONTH(s.SiparisTarihi) as Month,
+            dbo.Gu_Reports_by_Orderer(MONTH(s.SiparisTarihi),YEAR(GETDATE()) - 1,'${req.params.userId}') as FOB,
+            SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+            +dbo.Gu_Reports_by_Orderer(MONTH(s.SiparisTarihi),YEAR(GETDATE())- 1,'${req.params.userId}') as DDP
+        from SiparislerTB s
+
+        where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) - 1 and s.SiparisSahibi = '${req.params.userId}'
+
+        group by MONTH(s.SiparisTarihi)
+    `;
+    const twoYearsAgoSqlOrderer = `
+                select 
+            MONTH(s.SiparisTarihi) as Month,
+            dbo.Gu_Reports_by_Orderer(MONTH(s.SiparisTarihi),YEAR(GETDATE())-2,'${req.params.userId}') as FOB,
+            SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+            +dbo.Gu_Reports_by_Orderer(MONTH(s.SiparisTarihi),YEAR(GETDATE()) - 2,'${req.params.userId}') as DDP
+        from SiparislerTB s
+
+        where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) - 2 and s.SiparisSahibi = '${req.params.userId}'
+
+        group by MONTH(s.SiparisTarihi)
+    `;
+
+    const thisYearSqlOperation = `
+        select 
+	MONTH(s.SiparisTarihi) as Month,
+	dbo.Gu_Reports_by_Operation(MONTH(s.SiparisTarihi),YEAR(GETDATE()),'${req.params.userId}') as FOB,
+	SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+	+dbo.Gu_Reports_by_Operation(MONTH(s.SiparisTarihi),YEAR(GETDATE()),'${req.params.userId}') as DDP
+from SiparislerTB s
+
+where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and s.Operasyon = '${req.params.userId}'
+
+group by MONTH(s.SiparisTarihi)
+    `;
+    const previousYearSqlOperation = `
+                select 
+	MONTH(s.SiparisTarihi) as Month,
+	dbo.Gu_Reports_by_Operation(MONTH(s.SiparisTarihi),YEAR(GETDATE())-1,'${req.params.userId}') as FOB,
+	SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+	+dbo.Gu_Reports_by_Operation(MONTH(s.SiparisTarihi),YEAR(GETDATE())-1,'${req.params.userId}') as DDP
+from SiparislerTB s
+
+where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) -1 and s.Operasyon = '${req.params.userId}'
+
+group by MONTH(s.SiparisTarihi)
+    `;
+    const twoYearsAgoSqlOperation = `
+                        select 
+	MONTH(s.SiparisTarihi) as Month,
+	dbo.Gu_Reports_by_Operation(MONTH(s.SiparisTarihi),YEAR(GETDATE())-2,'${req.params.userId}') as FOB,
+	SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+	+dbo.Gu_Reports_by_Operation(MONTH(s.SiparisTarihi),YEAR(GETDATE())-2,'${req.params.userId}') as DDP
+from SiparislerTB s
+
+where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) -2 and s.Operasyon = '${req.params.userId}'
+
+group by MONTH(s.SiparisTarihi)
+    `;
+
+
+    await mssql.query(thisYearSqlOrderer, async (err, thisyear) => {
+        await mssql.query(previousYearSqlOrderer, async (err, previusyear) => {
+            await mssql.query(twoYearsAgoSqlOrderer, async (err, twoyear) => {
+                await mssql.query(thisYearSqlOperation, async (err, thisyearop) => {
+                    await mssql.query(previousYearSqlOperation, async (err, previusyearop) => {
+                        await mssql.query(twoYearsAgoSqlOperation, async (err, twoyearop) => {
+                            res.status(200).json({
+                                'thisYearOrderer': thisyear.recordset,
+                                'previusYearOrderer': previusyear.recordset,
+                                'twoYearOrderer': twoyear.recordset,
+                                'thisYearOperation': thisyearop.recordset,
+                                'previusYearOperation': previusyearop.recordset,
+                                'twoYearOperation': twoyearop.recordset,
+                            });
+                        });
+                   })
+               })
+            });
+        });
+    });
+
+});
+app.get('/reports/gu/mekmar/order/seller/:month/:year/:userId', async (req, res) => {
+    
+    const sql = `
+        select 
+	s.SiparisNo,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) + SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) as DDP,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) as FOB,
+	SUM(s.NavlunSatis) as Navlun,
+	SUM(s.DetayTutar_1) as Detay1,
+	SUM(s.DetayTutar_2) as Detay2,
+	SUM(s.DetayTutar_3) as Detay3,
+	SUM(s.DetayTutar_4) as Detay4
+
+from SiparislerTB s
+
+where YEAR(s.SiparisTarihi) = '${req.params.year}' and MONTH(s.SiparisTarihi) = '${req.params.month}' and s.SiparisSahibi='${req.params.userId}'
+group by s.SiparisNo
+    `;
+    mssql.query(sql, (err, seller) => {
+        res.status(200).json({ 'detail': seller.recordset });
+    });
+    
+});
+
+app.get('/reports/gu/mekmar/order/operation/:month/:year/:userId', async (req, res) => {
+    
+    const sql = `
+        select 
+	s.SiparisNo,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) + SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) as DDP,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) as FOB,
+	SUM(s.NavlunSatis) as Navlun,
+	SUM(s.DetayTutar_1) as Detay1,
+	SUM(s.DetayTutar_2) as Detay2,
+	SUM(s.DetayTutar_3) as Detay3,
+	SUM(s.DetayTutar_4) as Detay4
+
+from SiparislerTB s
+
+where YEAR(s.SiparisTarihi) = '${req.params.year}' and MONTH(s.SiparisTarihi) = '${req.params.month}' and s.Operasyon='${req.params.userId}'
+group by s.SiparisNo
+    `;
+    mssql.query(sql, (err, seller) => {
+        res.status(200).json({ 'detail': seller.recordset });
+    });
+    
+});
+
+
 
 /*Sample */
 app.get('/sample/list',(req,res)=>{
@@ -7248,6 +7422,55 @@ app.get('/finance/collection/list', (req, res) => {
                 const collectionListSql = `
                     select o.ID,o.Tarih,o.MusteriID,m.FirmaAdi,o.Tutar,o.SiparisNo from OdemelerTB o 
                     inner join MusterilerTB m on m.ID = o.MusteriID
+                    where YEAR(o.Tarih) = ${year} and MONTH(o.Tarih) =${month} and m.Marketing in ('Mekmar','Imperial Homes') 
+                    order by o.Tarih desc    
+                `;
+                mssql.query(collectionListSql, (err, collection) => {
+                    const collectionSampleListSql = `
+                    select numune.Tarih,numune.NumuneNo,numune.Tutar,numune.Banka,ytm.MusteriAdi
+from NumuneOdemelerTB numune
+inner join YeniTeklif_MusterilerTB ytm on ytm.Id = numune.MusteriID
+where YEAR(numune.Tarih) = ${year} 
+                    `;
+                    mssql.query(collectionSampleListSql,(err,sample)=>{
+                        res.status(200).json({'list':collection.recordset,'years':years.recordset,'months':months.recordset,'sample':sample.recordset});
+
+                    });
+
+                });
+
+            })
+    });
+});
+app.get('/finance/collection/list/mekmer', (req, res) => {
+    const yearListSql = `
+        select 
+
+            YEAR(o.Tarih) as Yil
+
+        from OdemelerTB o
+
+        group by YEAR(o.Tarih)
+        order by YEAR(o.Tarih) desc
+    `;
+
+    mssql.query(yearListSql, (err, years) => {
+        const year = years.recordset[0].Yil;
+            const monthListSql = `
+        select 
+
+            MONTH(o.Tarih) as Ay
+
+        from OdemelerTB o
+        where YEAR(o.Tarih) = '${year}'
+        group by MONTH(o.Tarih)
+        order by MONTH(o.Tarih) desc
+            `;
+            mssql.query(monthListSql,(err,months)=>{
+                const month = months.recordset[0].Ay;
+                const collectionListSql = `
+                    select o.ID,o.Tarih,o.MusteriID,m.FirmaAdi,o.Tutar,o.SiparisNo from Odemeler_MekmerTB o 
+                    inner join MusterilerTB m on m.ID = o.MusteriID
                     where YEAR(o.Tarih) = ${year} and MONTH(o.Tarih) =${month}
                     order by o.Tarih desc    
                 `;
@@ -7268,6 +7491,71 @@ where YEAR(numune.Tarih) = ${year}
             })
     });
 });
+
+app.get('/finance/collection/list/mekmer/year/:year', (req, res) => {
+
+    const year = req.params.year;
+            const monthListSql = `
+        select 
+
+            MONTH(o.Tarih) as Ay
+
+        from OdemelerTB o
+        where YEAR(o.Tarih) = '${year}'
+        group by MONTH(o.Tarih)
+        order by MONTH(o.Tarih) desc
+            `;
+            mssql.query(monthListSql,(err,months)=>{
+                const month = months.recordset[0].Ay;
+                const collectionListSql = `
+                    select o.ID,o.Tarih,o.MusteriID,m.FirmaAdi,o.Tutar,o.SiparisNo from Odemeler_MekmerTB o 
+                    inner join MusterilerTB m on m.ID = o.MusteriID
+                    where YEAR(o.Tarih) = ${year} and MONTH(o.Tarih) =${month}
+                    order by o.Tarih desc    
+                `;
+                mssql.query(collectionListSql, (err, collection) => {
+                    const collectionSampleListSql = `
+                    select numune.Tarih,numune.NumuneNo,numune.Tutar,numune.Banka,ytm.MusteriAdi
+from NumuneOdemelerTB numune
+inner join YeniTeklif_MusterilerTB ytm on ytm.Id = numune.MusteriID
+where YEAR(numune.Tarih) = ${year} 
+                    `;
+                    mssql.query(collectionSampleListSql,(err,sample)=>{
+                        res.status(200).json({'list':collection.recordset,'months':months.recordset,'sample':sample.recordset});
+
+                    });
+
+                });
+
+            })
+
+});
+app.get('/finance/collection/list/mekmer/month/:year/:month', (req, res) => {
+    const month = req.params.month;
+    const year = req.params.year;
+            const collectionListSql = `
+                select o.ID,o.Tarih,o.MusteriID,m.FirmaAdi,o.Tutar,o.SiparisNo from Odemeler_MekmerTB o 
+                inner join MusterilerTB m on m.ID = o.MusteriID
+                where YEAR(o.Tarih) = ${year} and MONTH(o.Tarih) =${month}
+                order by o.Tarih desc    
+            `;
+            mssql.query(collectionListSql, (err, collection) => {
+                const collectionSampleListSql = `
+                select numune.Tarih,numune.NumuneNo,numune.Tutar,numune.Banka,ytm.MusteriAdi
+from NumuneOdemelerTB numune
+inner join YeniTeklif_MusterilerTB ytm on ytm.Id = numune.MusteriID
+where YEAR(numune.Tarih) = ${year} 
+                `;
+                mssql.query(collectionSampleListSql,(err,sample)=>{
+                    res.status(200).json({'list':collection.recordset,'sample':sample.recordset});
+
+                });
+
+            });
+});
+
+
+
 app.get('/finance/collection/list/year/:year', (req, res) => {
     const monthListSql = `
         select 
@@ -7687,6 +7975,8 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
+s.SiparisKontrol,
+s.SiparisKontrolEden,
 
 
 	su.ID as UrunId,
@@ -7986,6 +8276,8 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
+s.SiparisKontrol,
+s.SiparisKontrolEden,
 
 
 	su.ID as UrunId,
@@ -8276,6 +8568,8 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
+s.SiparisKontrol,
+s.SiparisKontrolEden,
 
 
 	su.ID as UrunId,
@@ -9269,6 +9563,8 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
+s.SiparisKontrol,
+s.SiparisKontrolEden,
 
 
 	su.ID as UrunId,
@@ -9411,6 +9707,8 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
+s.SiparisKontrol,
+s.SiparisKontrolEden,
 
 
 	su.ID as UrunId,
@@ -10369,6 +10667,7 @@ Iade,
 MalBedeli,
 sigorta_tutar_satis,
 FaturaKesimTurID
+
 )
 VALUES(
 	'${req.body.SiparisNo}',
@@ -10418,6 +10717,8 @@ VALUES(
 	'${req.body.MalBedeli}',
 	'${req.body.sigorta_tutar_satis}',
 	'${req.body.FaturaKesimTurID}'
+
+
 )
     `;
     const sqlId = `select top 1 ID from SiparislerTB order by ID desc
@@ -10482,6 +10783,8 @@ SET
 	Operasyon='${req.body.Operasyon}',
 	Finansman='${req.body.Finansman}',
 	Iade='${req.body.Iade}',
+    SiparisKontrol='${req.body.SiparisKontrol}',
+    SiparisKontrolEden='${req.body.SiparisKontrolEden}',
 	sigorta_tutar_satis='${req.body.sigorta_tutar_satis}'
 where
 ID='${req.body.SiparisId}'

@@ -73,7 +73,7 @@
           </div>
           <div class="col">
             <CustomInput :value="model.OzelMiktar" text="M2" @onInput="model.OzelMiktar = $event"
-              :disabled="product_form_disabled" />
+              :disabled="product_form_disabled" @change="tonajChange2($event)" />
           </div>
           <div class="col">
             <CustomInput :value="model.Ton" text="Ton" @onInput="model.Ton = $event"
@@ -121,9 +121,15 @@
       </div>
     </div>
     <DataTable :value="products" :selection.sync="selectedOrderProducts" selectionMode="single"
-      @row-click="orderProductsSelected($event)" :sortField="'SiraNo'" :sortOrder="1" :rowClass="rowClass">
+      @row-click="orderProductsSelected($event)" :sortField="'SiraNo'" :sortOrder="1">
       <Column field="SiraNo" header="#"></Column>
-      <Column field="FirmaAdi" header="Supplier"></Column>
+      <Column field="FirmaAdi" header="Supplier">
+        <template #body="slotProps">
+          <div :style="{ 'backgroundColor': rowClass(slotProps.data.AlisFiyati) ? '#81fca0':'#fff'}">
+            {{slotProps.data.FirmaAdi}}
+          </div>
+        </template>
+      </Column>
       <Column field="UrunAdi" header="Product"></Column>
       <Column field="YuzeyIslemAdi" header="Surface"></Column>
       <Column field="En" header="Width"></Column>
@@ -206,6 +212,9 @@
 </template>
 <script>
 export default {
+  computed:{
+    
+  },
   props: {
     model: {
       type: Object,
@@ -261,56 +270,162 @@ export default {
     };
   },
   methods: {
-    tonajChange(event) {
+    tonajChange2(event) {
+      if (event == 0) {
+        this.model.Ton = 0;
+        return;
+      }
       let coefficient = this.productCoefficient(this.categoryName.split(" ")[0]);
-      if (this.width == 'VAR' || this.width == 'Various' || this.width == 'SLAB'){
-        if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab'){
-          this.model.Ton = 0;
 
-        } else{
-          if (this.selectedUnit.ID == 1) {
-            this.model.Ton == ((coefficient * 10 * this.__typeFloatControl(event)) / 1000).toFixed(3);
-          } else {
-            this.model.Ton = 0;
-          }
+      if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab') {
+        this.model.Ton = 0;
+      } else {
 
-        }
-
-      } else if (this.height == 'Free' || this.height == 'FREE'){
-         if(this.selectedUnit.ID == 3){
-           const mt = (this.__typeFloatControl(event) * this.__typeFloatControl(this.width)) / 100;
-           this.model.Ton = (((coefficient * 10 * mt * this.__typeFloatControl(this.thickness))) / 1000).toFixed(3);
-
-         } else{
-
-           this.model.Ton;
-         }
-
-      } else{
         if (this.selectedUnit.ID == 1) {
-          
-          this.model.Ton = parseFloat((coefficient * 10 * this.__typeFloatControl(event) * this.__typeFloatControl(this.thickness)) / 1000)
+          this.model.Ton = ((coefficient * 10 * this.__typeFloatControl(event) * parseFloat(this.thickness.replace(',', '.'))) / 1000);
+        } else {
+          this.model.Ton = ((coefficient * 10 * this.__typeFloatControl(event) * parseFloat(this.thickness.replace(',', '.'))) / 1000);
+        }
+      };
+    },
+    rowClass(event) {
+      if (
+        event == 0 ||
+        event == null ||
+        event == undefined
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    tonajChange(event) {
+      if (event == 0) {
+        this.model.Ton = 0;
+        this.model.OzelMiktar = 0;
+        this.model.Adet = 0;
+        return;
+      }
+      if (this.height == 'Free'
+        || this.height == 'FREE'
+        || this.height == 'VAR'
+        || this.height == 'Var'
+        || this.heiht == 'Various'
+        || this.height == 'SLAB'
+        || this.height == 'Slab'
+        || this.height == 'PAT'
+        || this.height == 'Pat'
+        || this.height == 'SET'
+        || this.height == 'SINK'
+        || this.width == 'Ant'
+        || this.width == 'ANT'
+        || this.width == 'FRENCH'
+        || this.width == 'MINI'
+        || this.thickness == 'Other'
+        || this.width == 'özel'
+        || this.width == '1 LT'
+      ) {
+        if (this.selectedUnit.ID == 1) {
+          this.model.OzelMiktar = this.model.Miktar;
 
         } else if (this.selectedUnit.ID == 2) {
-          if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab') {
-            this.model.Ton = 0;
-            this.model.OzelMiktar = 0;
-          } else {
-            const m2 = (this.__typeFloatControl(this.width) * this.__typeFloatControl(this.height) * this.__typeFloatControl(event)) / 10000;
-            this.model.Ton = parseFloat((coefficient * 10 * m2 * this.__typeFloatControl(this.thickness)) / 1000);
-            this.model.OzelMiktar = m2;
-          }
-
+          this.model.Adet = this.model.Miktar;
+        }
+        else {
+          this.model.OzelMiktar = 0;
 
         }
+      } else {
+        if (this.selectedUnit.ID == 1) {
+          this.model.OzelMiktar = this.model.Miktar;
+          this.model.Adet = parseInt(((this.__typeFloatControl(event) / (this.__typeFloatControl(this.width) / 100)) / (this.__typeFloatControl(this.height) / 100)));
+        } else if (this.selectedUnit.ID == 2) {
+          this.model.OzelMiktar = (this.__typeFloatControl(this.width) * this.__typeFloatControl(this.height) * this.__typeFloatControl(event)) / 10000;
+          this.model.Adet = this.model.Miktar;
+        } else if (this.selectedUnit.ID == 3) {
+          this.model.OzelMiktar = (this.__typeFloatControl(event) * this.__typeFloatControl(this.width)) / 100;
+          this.model.Adet = parseInt(((this.__typeFloatControl(this.model.OzelMiktar) / (this.__typeFloatControl(this.width) / 100)) / (this.__typeFloatControl(this.height) / 100)));
 
+        }
       }
+      let coefficient = this.productCoefficient(this.categoryName.split(" ")[0]);
+
+      if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab') {
+        this.model.Ton = 0;
+      }else{
+
+        if (this.selectedUnit.ID == 1) {
+          this.model.Ton = ((coefficient * 10 * this.__typeFloatControl(event) * parseFloat(this.thickness.replace(',','.'))) / 1000);
+        } else  {
+          this.model.Ton = ((coefficient * 10 * this.__typeFloatControl(this.model.OzelMiktar) * parseFloat(this.thickness.replace(',', '.'))) / 1000);
+        }
+      };
+
+      
+
+
+
+
+
+
+
+
+
+      // if (this.width == 'VAR' || this.width == 'Various' || this.width == 'SLAB'){
+      //   if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab'){
+      //     this.model.Ton = 0;
+
+      //   } else{
+      //     if (this.selectedUnit.ID == 1) {
+      //       this.model.Ton == ((coefficient * 10 * this.__typeFloatControl(event)) / 1000).toFixed(3);
+      //     } else {
+      //       this.model.Ton = 0;
+      //     }
+
+      //   }
+
+      //   } else if (this.height == 'Free' || this.height == 'FREE'){
+      //     if(this.selectedUnit.ID == 3){
+      //       const mt = (this.__typeFloatControl(event) * this.__typeFloatControl(this.width)) / 100;
+      //       this.model.Ton = (((coefficient * 10 * mt * this.__typeFloatControl(this.thickness))) / 1000).toFixed(3);
+
+      //     } else{
+
+      //       this.model.Ton;
+      //     }
+
+      //   } else{
+      //     if (this.selectedUnit.ID == 1) {
+            
+      //       this.model.Ton = parseFloat((coefficient * 10 * this.__typeFloatControl(event) * this.__typeFloatControl(this.thickness)) / 1000)
+
+      //     } else if (this.selectedUnit.ID == 2) {
+      //       if (this.thickness == 'VAR' || this.thickness == 'Various' || this.thickness == 'SLAB' || this.thickness == 'Slab') {
+      //         this.model.Ton = 0;
+      //         this.model.OzelMiktar = 0;
+      //       } else {
+      //         const m2 = (this.__typeFloatControl(this.width) * this.__typeFloatControl(this.height) * this.__typeFloatControl(event)) / 10000;
+      //         this.model.Ton = parseFloat((coefficient * 10 * m2 * this.__typeFloatControl(this.thickness)) / 1000);
+      //         this.model.OzelMiktar = m2;
+      //       }
+
+
+      //     }
+
+      //   }
 
 
     },
 
     __typeFloatControl(payload) {
-      return parseFloat(payload.replace(",", ".")).toFixed(3);
+      if (payload.toString().indexOf(',') == -1) {
+        return parseFloat(payload);
+
+
+      } else {
+        return parseFloat(payload.replace(",", "."));
+
+      }
     },
     oM2Change(en, boy, miktar, birim) {
       if (birim == 1) {
@@ -372,7 +487,7 @@ export default {
     },
     productCoefficient(event) {
       if (event == "Travertine") {
-        return 2.38;
+        return 2.4;
       } else if (event == "Marble") {
         return 2.82;
       } else if (event == "Limestone") {
@@ -383,15 +498,7 @@ export default {
         return 0;
       }
     },
-    rowClass(event) {
-      if (
-        event.AlisFiyati == 0 ||
-        event.AlisFiyati == null ||
-        event.AlisFiyati == undefined
-      ) {
-        return "row-accessories";
-      }
-    },
+
     __nullControl(value) {
       if (value == null || value == "" || value == undefined) {
         return 0;

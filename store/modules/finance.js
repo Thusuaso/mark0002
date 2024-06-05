@@ -26,6 +26,14 @@ const state = {
         paid: 0,
         balanced:0,
     },
+    financeTotalListMekmer: {
+        order: 0,
+        shipped: 0,
+        produced: 0,
+        paid: 0,
+        balanced: 0,
+        balancedExceptProduction:0,
+    },
     financePaidListTotal: 0,
     financePoButtonStatus: true,
     financePoPaidList: [],
@@ -84,7 +92,7 @@ const actions = {
         api.get("/finance/reports/test/filter").then((response) => {
             if(response.data){
                 vuexContext.commit('setFinanceListFilter', response.data.financeList); 
-                vuexContext.commit('setFinanceTotalList',response.data.financeList)
+                vuexContext.commit('setFinanceTotalListMekmer', response.data.financeList);
                 vuexContext.dispatch('setEndLoadingAction');
             };
           });
@@ -93,6 +101,9 @@ const actions = {
 
     setFinanceTotalList(vuexContext,finance) {
       vuexContext.commit('setFinanceTotalList',finance)  
+    },
+    setFinanceTotalListMekmer(vuexContext, finance) {
+        vuexContext.commit('setFinanceTotalListMekmer', finance);  
     },
     setFinanceCollectionList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
@@ -105,6 +116,47 @@ const actions = {
                 vuexContext.dispatch('setEndLoadingAction');
             });
     },
+    setFinanceCollectionListMekmer(vuexContext) {
+                vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get('/finance/collection/list/mekmer')
+            .then(response => {
+                vuexContext.commit('setFinanceCollectionList', response.data); 
+                vuexContext.dispatch('setFinanceCollectionTotal', response.data.list);
+                vuexContext.commit('setFinanceCollectionSampleTotal',response.data.sample);
+
+                vuexContext.dispatch('setEndLoadingAction');
+            });
+    },
+    setFinanceCollectionListMekmerYear(vuexContext,year) {
+                vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get(`/finance/collection/list/mekmer/year/${year}`)
+            .then(response => {
+                vuexContext.commit('setFinanceCollectionListMekmerYear', response.data); 
+                vuexContext.dispatch('setFinanceCollectionTotal', response.data.list);
+                vuexContext.commit('setFinanceCollectionSampleTotal',response.data.sample);
+
+                vuexContext.dispatch('setEndLoadingAction');
+            });
+    },
+
+        setFinanceCollectionListMekmerMonth(vuexContext,data) {
+                vuexContext.dispatch('setBeginLoadingAction');
+        this.$axios.get(`/finance/collection/list/mekmer/month/${data.year}/${data.month}`)
+            .then(response => {
+                vuexContext.commit('setFinanceCollectionListMekmerMonth', response.data); 
+                vuexContext.dispatch('setFinanceCollectionTotal', response.data.list);
+                vuexContext.commit('setFinanceCollectionSampleTotal',response.data.sample);
+
+                vuexContext.dispatch('setEndLoadingAction');
+            });
+    },
+
+
+
+
+
+
+
     setFinanceCollectionTotal(vuexContext, payload) {
         vuexContext.commit('setFinanceCollectionTotal', payload);
     },
@@ -462,6 +514,27 @@ const actions = {
 
 };
 const mutations = {
+    setFinanceTotalListMekmer(state, payload) {
+        state.financeTotalListMekmer = {
+            order: 0,
+            shipped: 0,
+            produced: 0,
+            paid: 0,
+            balanced: 0,
+            balancedExceptProduction: 0,
+        };
+        payload.forEach(x => {
+            state.financeTotalListMekmer.order += x.total_order_amount;
+            state.financeTotalListMekmer.shipped += x.forwarding;
+            state.financeTotalListMekmer.produced += x.production;
+            state.financeTotalListMekmer.paid += x.paid;
+            state.financeTotalListMekmer.balanced += x.total;
+            state.financeTotalListMekmer.balancedExceptProduction += x.totalExceptProduction;
+
+
+
+        });
+    },
     setFinanceAllListMekmer(state, payload) {
         state.financeListFilter = payload;
     },
@@ -499,6 +572,8 @@ const mutations = {
         })
 
     },
+
+
     setFinanceList(state, payload) {
         state.financeList =  [];
             state.financeListAll =  [];
@@ -531,6 +606,15 @@ const mutations = {
         state.financeCollectionList = payload.list;
         state.financeCollectionYearList = payload.years;
         state.financeCollectionMonthList = payload.months;
+        state.financeCollectionSampleList = payload.sample;
+    },
+        setFinanceCollectionListMekmerYear(state, payload) {
+        state.financeCollectionList = payload.list;
+        state.financeCollectionMonthList = payload.months;
+        state.financeCollectionSampleList = payload.sample;
+    },
+        setFinanceCollectionListMekmerMonth(state, payload) {
+        state.financeCollectionList = payload.list;
         state.financeCollectionSampleList = payload.sample;
     },
     setFinanceCollectionTotal(state, payload) {
@@ -620,6 +704,9 @@ const mutations = {
 
 };
 const getters = {
+    getFinanceTotalListMekmer(state) {
+        return state.financeTotalListMekmer;  
+    },
     getFinanceListFilter(state) {
       return state.financeListFilter  
     },

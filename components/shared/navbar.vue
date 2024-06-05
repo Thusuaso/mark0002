@@ -1,5 +1,6 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="font-size: 100%" data-bs-theme="blue">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="font-size: 100%" data-bs-theme="blue"
+   >
     <div class="container-fluid">
       <a class="navbar-brand" href="#">GOZ</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -246,6 +247,7 @@
         </ul>
       </div>
       <div class="d-flex" v-if="!getAuthorityStatus">
+        <div><Button clas="p-button-danger mr-5" label="Logout" @click="logout" /></div>
         <i v-badge.danger="parseInt(getToDoMainListByUsernameLenght)" class="pi pi-calendar"
           style="font-size: 2rem; cursor: pointer" @click="visibleRight = true" />
 
@@ -284,6 +286,7 @@ export default {
       "getUserList",
       "getTodoMainListByUsernameButtonStatus",
       "getAuthorityStatus",
+      "isAuthenticated"
     ]),
   },
   data() {
@@ -291,7 +294,7 @@ export default {
       visibleRight: false,
       to_do_form: false,
       model: {},
-      items: []
+      items: [],
     };
   },
 
@@ -303,9 +306,25 @@ export default {
 
 
 
-
   },
+
   methods: {
+    logout(){
+      if (confirm("Are you sure you want to log out?")) {
+        Cookies.remove('mail');
+        Cookies.remove('token');
+        Cookies.remove('userId');
+        Cookies.remove('username');
+        localStorage.removeItem('mail');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        this.$router.push('/auth');
+
+
+
+      }
+    },
     __stringCharacterChange(event) {
       const data = event.split("'");
       let value = "";
@@ -357,6 +376,9 @@ export default {
       this.to_do_form = true;
     },
   },
+  watch: {
+
+  }
 };
 </script>
 <style scoped>

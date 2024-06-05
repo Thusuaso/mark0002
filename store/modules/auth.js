@@ -3,7 +3,7 @@ const state = {
     token:null,
     userId:null,
     username:null,
-    mail:null,
+    mail: null,
 };
 const actions = {
     sessionControl(vuexContext,context){
@@ -46,7 +46,7 @@ const actions = {
             .then(response=>{
                 if(response.data.status){
                     this.$toast.success('Giriş Başarılı ' + 'Hoşgeldin ' + response.data.username.charAt(0).toUpperCase() + response.data.username.slice(1));
-                    vuexContext.commit('login',response.data);
+                    vuexContext.commit('login', response.data);
                     this.$router.push('/');
                     resolve(true)
                 } else{
@@ -69,8 +69,10 @@ const actions = {
             })
     },
 
+
 };
 const mutations = {
+
     setToken(state,user){
         state.token = user.token;
         state.userId = user.userId;
@@ -96,6 +98,7 @@ const mutations = {
 
 };
 const getters = {
+
     isAuthenticated(state){
         return state.token != null;
     },

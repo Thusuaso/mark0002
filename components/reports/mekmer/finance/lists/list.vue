@@ -6,6 +6,7 @@
           <Checkbox v-model="selectedMekmar" inputId="ingredient1" binary @change="changeMekmar($event)" />
           <label for="ingredient1" class="ml-2"> Mekmar </label>
         </div>
+
         <div class="flex align-items-center">
           <Checkbox v-model="selectedAll" inputId="ingredient1" binary @change="changeAll($event)" />
           <label for="ingredient1" class="ml-2"> All </label>
@@ -15,8 +16,8 @@
 
     </div>
     <div :class="status ? 'col-9':'col'">
-      <DataTable :value="selectedMekmar ? mekmar:list" sortField="total" :sortOrder="-1" scrollable scrollHeight="650px"
-        :filters.sync="filteredFinance" filterDisplay="row" @filter="financeFiltered($event)"
+      <DataTable :value="selectedMekmar ? mekmar:list" sortField="totalExceptProduction" :sortOrder="-1" scrollable
+        scrollHeight="650px" :filters.sync="filteredFinance" filterDisplay="row" @filter="financeFiltered($event)"
         :selection.sync="selectedFinanceList" selectionMode="single"
         @row-click="$emit('finance_list_selected_mekmer_emit', $event)" :rowClass="marketing">
         <Column field="customer_name" header="Customer" :showFilterMenu="false" :showClearButton="false"
@@ -30,7 +31,7 @@
             {{ slotProps.data.total_order_amount | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.total | formatPriceUsd }}
+            {{ total.order | formatPriceUsd }}
           </template>
         </Column>
         <Column field="production" header="On Production" headerClass="tableHeader" bodyClass="tableBody">
@@ -38,7 +39,7 @@
             {{ slotProps.data.production | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.production | formatPriceUsd }}
+            {{ total.produced | formatPriceUsd }}
           </template>
         </Column>
         <Column field="forwarding" header="Shipped" headerClass="tableHeader" bodyClass="tableBody">
@@ -46,7 +47,7 @@
             {{ slotProps.data.forwarding | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.forwarding | formatPriceUsd }}
+            {{ total.shipped | formatPriceUsd }}
           </template>
         </Column>
 
@@ -64,12 +65,16 @@
             {{ slotProps.data.total | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.balanceProduction | formatPriceUsd }}
+            {{ total.balanced | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="total" header="Balance (Except Production)" headerClass="tableHeader" bodyClass="tableBody">
+        <Column field="totalExceptProduction" header="Balance (Except Production)" headerClass="tableHeader"
+          bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.totalExceptProduction | formatPriceUsd }}
+          </template>
+          <template #footer>
+            {{ total.balancedExceptProduction | formatPriceUsd }}
           </template>
 
         </Column>
@@ -191,7 +196,12 @@ export default {
         this.mekmar = this.list.filter(x => {
           return x.marketing == 'Mekmar';
         });
-      } 
+        this.$store.dispatch('setFinanceTotalListMekmer', this.mekmar);
+
+      } else {
+        this.$store.dispatch('setFinanceTotalListMekmer', this.list);
+
+      }
     },
     marketing(event) {
       if (event.marketing == 'Mekmar') {
@@ -199,7 +209,7 @@ export default {
       }
     },
     financeFiltered(event) {
-      this.$store.dispatch("setFinanceTotalList", event.filteredValue);
+      this.$store.dispatch("setFinanceTotalListMekmer", event.filteredValue);
     },
   },
 };

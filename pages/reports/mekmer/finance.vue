@@ -8,11 +8,14 @@
           <Button class="p-button-warning" label="Excel" @click="excel_output" />
 
         </div>
+        <div class="col">
+          <Button class="p-button-info" label="Collection" @click="collectionClick" />
+        </div>
 
       </div>
     </div>
 
-    <financeListMekmer :list="getFinanceListFilter" :total="getFinanceListTotal" :expiry="getFinanceExpiryList"
+    <financeListMekmer :list="getFinanceListFilter" :total="getFinanceTotalListMekmer" :expiry="getFinanceExpiryList"
       :allStatus="buttonAllStatus" :allList="getFinanceListAll"
       @finance_list_selected_mekmer_emit="financeListSelected($event)" :loading="getLoading" :maya="getFinanceListMaya"
       :status="false" />
@@ -48,6 +51,7 @@
   export default {
     computed: {
       ...mapGetters([
+      "getFinanceTotalListMekmer",
         "getfinanceList",
         "getFinanceListTotal",
         "getFinanceExpiryList",
@@ -77,6 +81,7 @@
     },
     data() {
       return {
+        finance_collection_list_form:false,
         checked:'Mekmer',
         mekmarMekmerList:false,
         buttonAllStatus: false,
@@ -103,6 +108,10 @@
       this.$store.dispatch("setFinanceListFilter");
     },
     methods: {
+      collectionClick() {
+        this.$store.dispatch("setFinanceCollectionListMekmer");
+        this.finance_collection_list_form = true;
+      },
       checkedMekmarMekmer(event){
         if(this.mekmarMekmerList){
           this.checked = 'Mekmar';
@@ -115,10 +124,10 @@
         }
       },
       excel_output() {
-        api.post("/finance/reports/test/excel", this.getfinanceList).then((response) => {
+        api.post("/finance/reports/test/excel/mekmer", this.getFinanceListFilter).then((response) => {
           if (response.status) {
             const link = document.createElement("a");
-            link.href = this.getLocalUrl + "finance/reports/test/excel";
+            link.href = this.getLocalUrl + "/finance/reports/test/excel/mekmer";
   
             link.setAttribute("download", "finans_test_list.xlsx");
             document.body.appendChild(link);
@@ -218,10 +227,7 @@
         this.$store.dispatch("setFinancePaymentModel");
         this.finance_advanced_payment_form = true;
       },
-      collection() {
-        this.$store.dispatch("setFinanceCollectionList");
-        this.finance_collection_list_form = true;
-      },
+
     },
   };
   </script>

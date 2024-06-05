@@ -1,41 +1,22 @@
 <template>
   <div class="container">
     <div class="row">
-      <reportsMekmarSummaryList
-        v-for="(item, index) of getReportsMekmarSummaryOrderList"
-        :key="item.Month"
-        :list="item"
-        :year="new Date().getFullYear() - index"
-        :total="getReportsMekmarSummaryOrderListTotal[index]"
-        @order_selected_list_emit="orderSelectedList($event, true)"
-        :status="'Order'"
-      />
-      <reportsMekmarSummaryList
-        v-for="(item, index) of getReportsMekmarSummaryOrderListByRepresentative"
-        :key="item.Month"
-        :list="item"
-        :year="new Date().getFullYear() - index"
+      <reportsMekmarSummaryList v-for="(item, index) of getReportsMekmarSummaryOrderList" :key="item.Month" :list="item"
+        :year="new Date().getFullYear() - index" :total="getReportsMekmarSummaryOrderListTotal[index]"
+        @order_selected_list_emit="orderSelectedList($event, true)" :status="'Order'" />
+      <reportsMekmarSummaryList v-for="(item, index) of getReportsMekmarSummaryOrderListByRepresentative"
+        :key="item.Month" :list="item" :year="new Date().getFullYear() - index"
         :total="getReportsMekmarSummaryOrderListByRepresentativeTotal[index]"
-        @order_selected_list_emit="orderSelectedList($event, true)"
-        :status="'Seller'"
-      />
+        @order_selected_list_emit="orderSelectedListOrderer($event, true)" :status="'Seller'" />
     </div>
     <div class="row">
-      <reportsMekmarSummaryList
-        v-for="(item, index) of getReportsMekmarSummaryForwardingList"
-        :key="item.Month"
-        :list="item"
-        :year="new Date().getFullYear() - index"
-        :total="getReportsMekmarSummaryForwardingListTotal[index]"
-        @order_selected_list_emit="orderSelectedList($event, false)"
-        :status="'Shipment'"
-      />
+      <reportsMekmarSummaryList v-for="(item, index) of getReportsMekmarSummaryForwardingList" :key="item.Month"
+        :list="item" :year="new Date().getFullYear() - index" :total="getReportsMekmarSummaryForwardingListTotal[index]"
+        @order_selected_list_emit="orderSelectedList($event, false)" :status="'Shipment'" />
     </div>
     <Dialog :visible.sync="reports_mekmar_summary_list_detail_dialog" header="" modal>
-      <reportsMekmarSummaryDetailList
-        :list="getReportsMekmarSummaryOrderDetail"
-        :total="getReportsMekmarSummaryOrderDetailTotal"
-      />
+      <reportsMekmarSummaryDetailList :list="getReportsMekmarSummaryOrderDetail"
+        :total="getReportsMekmarSummaryOrderDetailTotal" />
     </Dialog>
   </div>
 </template>
@@ -52,7 +33,6 @@ export default {
       "getReportsMekmarSummaryOrderDetailTotal",
       "getReportsMekmarSummaryForwardingList",
       "getReportsMekmarSummaryForwardingListTotal",
-
       "getReportsMekmarSummaryOrderListByRepresentative",
       "getReportsMekmarSummaryOrderListByRepresentativeTotal",
 
@@ -68,8 +48,23 @@ export default {
     this.$store.dispatch("setReportsMekmarSummaryOrderList");
     this.$store.dispatch("setReportsMekmarSummaryForwardingList");
     this.userId = Cookies.get("userId");
+    this.$store.dispatch(
+      "setReportsMekmarSummaryOrderListByRepresentative",
+      this.userId
+    );
   },
   methods: {
+    orderSelectedListOrderer(event,status) {
+      console.log(event, status);
+      const data = {
+        'month': event.Month,
+        'year': event.Year,
+        'userId': Cookies.get('userId')
+      }
+      this.$store.dispatch('setReportsMekmarSummaryOrderDetailRepresentative', data);
+      this.reports_mekmar_summary_list_detail_dialog = true;
+
+    },
     orderSelectedList(event, status) {
       if (status) {
         this.$store.dispatch("setReportsMekmarSummaryOrderDetail", event);

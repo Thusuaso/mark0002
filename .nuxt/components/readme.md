@@ -7,9 +7,9 @@ You can directly use them in pages and other components without the need to impo
 **Tip:** If a component is conditionally rendered with `v-if` and is big, it is better to use `Lazy` or `lazy-` prefix to lazy load.
 
 - `<IoSocketStatus>` | `<io-socket-status>` (node_modules/nuxt-socket-io/lib/components/SocketStatus.js)
+- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<AccountsForm>` | `<accounts-form>` (components/accounts/form.vue)
 - `<AccountsList>` | `<accounts-list>` (components/accounts/list.vue)
-- `<AuthForm>` | `<auth-form>` (components/auth/authForm.vue)
 - `<CardsForm>` | `<cards-form>` (components/cards/form.vue)
 - `<CardsList>` | `<cards-list>` (components/cards/list.vue)
 - `<Home>` | `<home>` (components/home/home.vue)
@@ -114,6 +114,7 @@ You can directly use them in pages and other components without the need to impo
 - `<ReportsMekmarGuForwarding>` | `<reports-mekmar-gu-forwarding>` (components/reports/mekmar/gu/forwarding.vue)
 - `<ReportsMekmarGuLogs>` | `<reports-mekmar-gu-logs>` (components/reports/mekmar/gu/logs.vue)
 - `<ReportsMekmarGuMekus>` | `<reports-mekmar-gu-mekus>` (components/reports/mekmar/gu/mekus.vue)
+- `<ReportsMekmarGuOrdererOperation>` | `<reports-mekmar-gu-orderer-operation>` (components/reports/mekmar/gu/ordererOperation.vue)
 - `<ReportsMekmarLoadingList>` | `<reports-mekmar-loading-list>` (components/reports/mekmar/loading/list.vue)
 - `<ReportsMekmarMkByCustomer>` | `<reports-mekmar-mk-by-customer>` (components/reports/mekmar/mk/byCustomer.vue)
 - `<ReportsMekmarMkYearByMarketingForwarding>` | `<reports-mekmar-mk-year-by-marketing-forwarding>` (components/reports/mekmar/mk/yearByMarketingForwarding.vue)

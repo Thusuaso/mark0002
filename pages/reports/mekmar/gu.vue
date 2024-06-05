@@ -46,6 +46,12 @@
 
 
       </TabPanel>
+      <TabPanel header="Orderer and Operation">
+        <ordererOperation/>
+
+
+
+      </TabPanel>
     </TabView>
   </div>
 </template>

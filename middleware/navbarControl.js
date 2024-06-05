@@ -4,7 +4,6 @@ export default function(context){
         let userId = cookie.split(';').find(x=>x.trim().startsWith('userId='));
         if(userId) userId = userId.split('=')[1];
         if(userId == 48 ){
-            console.log(context.req.url);
             context.store.dispatch('setAuthorityNavbarStatus',true);
             if(context.req.url == '/'){
                 context.redirect('/mekmer/products/production');

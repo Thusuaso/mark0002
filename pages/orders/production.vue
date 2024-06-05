@@ -880,6 +880,7 @@ export default {
       this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
+      this.productionModel.SiparisKontrolEden = Cookies.get('userId');
       this.$store.dispatch("setOrderProductionUpdate", {
         ...this.productionModel,
         SiparisId: this.getOrderProductionId,

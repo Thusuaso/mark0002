@@ -124,6 +124,10 @@ import financePoFormMekmer from '~/components/reports/mekmer/finance/forms/po';
 import FinancePaidListMekmer from '~/components/reports/mekmer/finance/lists/paid';
 import loadingSpinner from '~/components/shared/loading';
 
+import ordererOperation from '~/components/reports/mekmar/gu/ordererOperation';
+
+
+Vue.component('ordererOperation',ordererOperation);
 
 Vue.component('loadingSpinner',loadingSpinner);
 
