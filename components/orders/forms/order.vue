@@ -57,11 +57,11 @@
           </div>
           <div class="col">
             <CustomInput :value="model.Miktar" text="Amount" @onInput="model.Miktar = $event"
-              :disabled="product_form_disabled" @change="tonajChange($event)" />
+              :disabled="(product_form_disabled || amount_disabled)" @change="tonajChange($event)" />
           </div>
           <div class="col">
             <CustomInput :value="model.Adet" text="Piece" @onInput="model.Adet = $event"
-              :disabled="product_form_disabled" />
+              :disabled="(product_form_disabled || amount_disabled)" />
           </div>
         </div>
         <div class="row mb-4">
@@ -73,7 +73,7 @@
           </div>
           <div class="col">
             <CustomInput :value="model.OzelMiktar" text="M2" @onInput="model.OzelMiktar = $event"
-              :disabled="product_form_disabled" @change="tonajChange2($event)" />
+              :disabled="(product_form_disabled || amount_disabled)" @change="tonajChange2($event)" />
           </div>
           <div class="col">
             <CustomInput :value="model.Ton" text="Ton" @onInput="model.Ton = $event"
@@ -247,6 +247,7 @@ export default {
   },
   data() {
     return {
+      amount_disabled:false,
       width: 0,
       height:0,
       thickness:0,
@@ -631,6 +632,7 @@ export default {
       this.add_button_disabled = false;
       this.product_form_disabled = false;
       this.model.SiraNo = this.products.length + 1;
+      this.amount_disabled = true;
     },
     orderProductsSelected(event) {
       this.product_form_disabled = false;
@@ -671,6 +673,9 @@ export default {
     },
     unitSelected(event) {
       this.model.UrunBirimID = event.value.ID;
+      this.amount_disabled = false;
+
+
     },
     searchUnit(event) {
       let results;

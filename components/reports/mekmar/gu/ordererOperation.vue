@@ -190,6 +190,202 @@
                 </DataTable>
             </div>
         </div>
+
+
+        <div class="row">
+            <div class="col">
+                <DataTable :value="getReportsMekmarGuOrdererThisYearForw" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single" @row-select="thisYearOrdererSelectedForw($event)"
+                    :loading="loading">
+                    <template #header>
+                        {{ new Date().getFullYear() }} Seller Forwarding
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOrdererThisYearTotalForw.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOrdererThisYearTotalForw.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+            <div class="col">
+                <DataTable :value="getReportsMekmarGuOrdererPreviousYearForw" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single"
+                    @row-select="previousYearOrdererSelectedForw($event)" :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 1 }} Seller Forwarding
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOrdererPreviousYearTotalForw.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOrdererPreviousYearTotalForw.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+            <div class="col">
+                <DataTable :value="getReportsMekmarGuOrdererTwoYearAgoForw" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single" @row-select="twoYearAgoOrdererSelectedForw($event)"
+                    :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 2 }} Seller Forwarding
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOrdererTwoYearAgoTotalForw.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOrdererTwoYearAgoTotalForw.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col">
+                <DataTable :value="getreportsMekmarGuOperationThisYearForw" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single" @row-select="thisYearOperationSelectedForw($event)"
+                    :loading="loading">
+                    <template #header>
+                        {{ new Date().getFullYear() }} Operation Forwarding
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOperationThisYearTotalForw.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOperationThisYearTotalForw.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+            <div class="col">
+                <DataTable :value="getReportsMekmarGuOperationPreviousYearForw" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single"
+                    @row-select="previousYearOperationSelectedForw($event)" :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 1 }} Operation Forwarding
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOperationPreviousYearTotalForw.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOperationPreviousYearTotalForw.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+            <div class="col">
+                <DataTable :value="getReportsMekmarGuOperationTwoYearAgoForw" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single"
+                    @row-select="twoYearAgoOperationSelectedForw($event)" :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 2 }} Seller Forwarding
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOperationTwoYearAgoTotalForw.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ getReportsMekmarGuOperationTwoYearAgoTotalForw.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+        </div>
+
+
+
+
         <Dialog :visible.sync="detail_dialog_form" header="" modal>
             <DataTable :value="getMekmarGuSellerOrderDetailList" responsiveLayout="scroll">
                 <Column field="SiparisNo" header="Po"></Column>
@@ -278,7 +474,20 @@ export default {
             'getReportsMekmarGuOperationTwoYearAgo',
             'getReportsMekmarGuOperationTwoYearAgoTotal',
             'getMekmarGuSellerOrderDetailList',
-            'getMekmarGuSellerOrderDetailListTotal'
+            'getMekmarGuSellerOrderDetailListTotal',
+
+            'getReportsMekmarGuOrdererThisYearForw',
+            'getReportsMekmarGuOrdererThisYearTotalForw',
+            'getReportsMekmarGuOrdererPreviousYearForw',
+            'getReportsMekmarGuOrdererPreviousYearTotalForw',
+            'getReportsMekmarGuOrdererTwoYearAgoForw',
+            'getReportsMekmarGuOrdererTwoYearAgoTotalForw',
+            'getreportsMekmarGuOperationThisYearForw',
+            'getReportsMekmarGuOperationThisYearTotalForw',
+            'getReportsMekmarGuOperationPreviousYearForw',
+            'getReportsMekmarGuOperationPreviousYearTotalForw',
+            'getReportsMekmarGuOperationTwoYearAgoForw',
+            'getReportsMekmarGuOperationTwoYearAgoTotalForw'
         ])  
     },
     beforeCreate() {
@@ -295,9 +504,93 @@ export default {
             selectedThisYearOrderer:null,
             detail_dialog_form: false,
             loading:false,
+            selectedForw:null,
         }
     },
     methods: {
+        twoYearAgoOperationSelectedForw(event) {
+            const payload = {
+                'month': event.data.Month,
+                'year': new Date().getFullYear() - 2,
+                'userId': this.selectedUser.id
+            };
+            this.$store.dispatch('setMekmarGuOperationForwardingDetail', payload).then(res => {
+                if (res) {
+                    this.detail_dialog_form = true;
+                }
+            });
+        },
+        previousYearOperationSelectedForw(event) {
+            const payload = {
+                'month': event.data.Month,
+                'year': new Date().getFullYear() - 1,
+                'userId': this.selectedUser.id
+            };
+            this.$store.dispatch('setMekmarGuOperationForwardingDetail', payload).then(res => {
+                if (res) {
+                    this.detail_dialog_form = true;
+                }
+            });
+        },
+
+        thisYearOperationSelectedForw(event) {
+            const payload = {
+                'month': event.data.Month,
+                'year': new Date().getFullYear(),
+                'userId': this.selectedUser.id
+            };
+            this.$store.dispatch('setMekmarGuOperationForwardingDetail', payload).then(res => {
+                if (res) {
+                    this.detail_dialog_form = true;
+                }
+            });
+        },
+        
+
+
+
+
+        twoYearAgoOrdererSelectedForw(event) {
+            const payload = {
+                'month': event.data.Month,
+                'year': new Date().getFullYear() - 2,
+                'userId': this.selectedUser.id
+            };
+            this.$store.dispatch('setMekmarGuSellerForwardingDetail', payload).then(res => {
+                if (res) {
+                    this.detail_dialog_form = true;
+                }
+            });
+        },
+        previousYearOrdererSelectedForw(event) {
+            const payload = {
+                'month': event.data.Month,
+                'year': new Date().getFullYear() - 1,
+                'userId': this.selectedUser.id
+            };
+            this.$store.dispatch('setMekmarGuSellerForwardingDetail', payload).then(res => {
+                if (res) {
+                    this.detail_dialog_form = true;
+                }
+            });
+        },
+
+        thisYearOrdererSelectedForw(event) {
+            const payload = {
+                'month': event.data.Month,
+                'year': new Date().getFullYear(),
+                'userId': this.selectedUser.id
+            };
+            this.$store.dispatch('setMekmarGuSellerForwardingDetail', payload).then(res => {
+                if (res) {
+                    this.detail_dialog_form = true;
+                }
+            });
+        },
+
+
+
+
         twoYearAgoOperationSelected(event) {
             const payload = {
                 'month': event.data.Month,

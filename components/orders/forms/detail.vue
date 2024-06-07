@@ -343,7 +343,7 @@ export default {
     }
   },
   methods: {
-    controlBooleanSelected(event){
+    controlBooleanSelected(event) {
       this.modelProduction.SiparisKontrol = this.selectedControlBoolean;
     },
     inputPo(event) {
@@ -454,9 +454,11 @@ export default {
       this.eta_date = date.stringToDate(this.modelProduction.Eta);
       if (this.modelProduction.SiparisKontrol == null || this.modelProduction.SiparisKontrol == '' || this.modelProduction.SiparisKontrol == 'null') {
         this.selectedControlBoolean = false;
+        this.modelProduction.SiparisKontrol = false;
       } else {
         this.selectedControlBoolean = true;
-      }
+        this.modelProduction.SiparisKontrol = true;
+      };
     },
   },
   watch: {},

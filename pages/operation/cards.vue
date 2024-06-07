@@ -38,6 +38,7 @@ export default {
   methods: {
     newForm() {
       this.$store.dispatch("setCardsButtonStatus", true);
+      this.$store.commit('setCardsOrderList', []);
       this.model = {};
       this.cards_form_dialog = true;
     },

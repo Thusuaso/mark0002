@@ -128,6 +128,7 @@ const state = {
         'fob': 0,
         'ddp':0,
     },
+
     mekmarGuSellerOrderDetailList: [],
     mekmarGuSellerOrderDetailListTotal: {
         'fob': 0,
@@ -137,7 +138,39 @@ const state = {
         'detail2': 0,
         'detail3': 0,
         'detail4':0,
-    }
+    },
+
+
+        reportsMekmarGuOrdererThisYearForw: [],
+    reportsMekmarGuOrdererThisYearTotalForw: {
+        'fob': 0,
+        'ddp':0,
+    },
+    reportsMekmarGuOrdererPreviousYearForw: [],
+    reportsMekmarGuOrdererPreviousYearTotalForw: {
+        'fob': 0,
+        'ddp':0,
+    },
+        reportsMekmarGuOrdererTwoYearAgoForw: [],
+    reportsMekmarGuOrdererTwoYearAgoTotalForw: {
+        'fob': 0,
+        'ddp':0,
+    },
+        reportsMekmarGuOperationThisYearForw: [],
+    reportsMekmarGuOperationThisYearTotalForw: {
+        'fob': 0,
+        'ddp':0,
+    },
+    reportsMekmarGuOperationPreviousYearForw: [],
+    reportsMekmarGuOperationPreviousYearTotalForw: {
+        'fob': 0,
+        'ddp':0,
+    },
+        reportsMekmarGuOperationTwoYearAgoForw: [],
+    reportsMekmarGuOperationTwoYearAgoTotalForw: {
+        'fob': 0,
+        'ddp':0,
+    },
 
     
     
@@ -173,6 +206,36 @@ const actions = {
             });
         })
     },
+    setMekmarGuSellerForwardingDetail(vuexContext, payload) {
+            return new Promise((resolve,reject) => {
+            this.$axios.get(`/reports/gu/mekmar/forwarding/seller/${payload.month}/${payload.year}/${payload.userId}`)
+                .then(response => {
+                    if (response) {
+                        vuexContext.commit('setMekmarGuSellerOrderDetail', response.data.detail);
+                        resolve(true);
+
+                    } else {
+                        resolve(false);
+                }
+            });
+        })
+    },
+    
+        setMekmarGuOperationForwardingDetail(vuexContext, payload) {
+            return new Promise((resolve,reject) => {
+            this.$axios.get(`/reports/gu/mekmar/forwarding/operation/${payload.month}/${payload.year}/${payload.userId}`)
+                .then(response => {
+                    if (response) {
+                        vuexContext.commit('setMekmarGuSellerOrderDetail', response.data.detail);
+                        resolve(true);
+
+                    } else {
+                        resolve(false);
+                }
+            });
+        })
+        },
+        
     /* */
 
 
@@ -699,6 +762,85 @@ const mutations = {
             state.reportsMekmarGuOperationTwoYearAgoTotal.ddp += x.DDP;
         });
         
+
+        /*Forw */
+        state.reportsMekmarGuOrdererThisYearForw = [],
+        state.reportsMekmarGuOrdererThisYearTotalForw = {
+            'fob': 0,
+            'ddp': 0,
+            };
+        state.reportsMekmarGuOrdererThisYearForw = payload.thisYearForwarding;
+        payload.thisYearForwarding.forEach(x => {
+                        state.reportsMekmarGuOrdererThisYearTotalForw.fob += x.FOB;
+            state.reportsMekmarGuOrdererThisYearTotalForw.ddp += x.DDP;
+        });
+        
+        
+        
+        state.reportsMekmarGuOrdererPreviousYearForw = [];
+        state.reportsMekmarGuOrdererPreviousYearTotalForw = {
+            'fob': 0,
+            'ddp': 0,
+        };
+
+                state.reportsMekmarGuOrdererPreviousYearForw = payload.previousYearForwarding;
+        payload.previousYearForwarding.forEach(x => {
+                        state.reportsMekmarGuOrdererPreviousYearTotalForw.fob += x.FOB;
+            state.reportsMekmarGuOrdererPreviousYearTotalForw.ddp += x.DDP;
+        });
+
+
+
+        state.reportsMekmarGuOrdererTwoYearAgoForw = [];
+        state.reportsMekmarGuOrdererTwoYearAgoTotalForw = {
+            'fob': 0,
+            'ddp': 0,
+        };
+
+         state.reportsMekmarGuOrdererTwoYearAgoForw = payload.twoYearAgoForwarding;
+        payload.twoYearAgoForwarding.forEach(x => {
+                        state.reportsMekmarGuOrdererTwoYearAgoTotalForw.fob += x.FOB;
+            state.reportsMekmarGuOrdererTwoYearAgoTotalForw.ddp += x.DDP;
+        });
+
+
+
+
+
+        state.reportsMekmarGuOperationThisYearForw = [];
+        state.reportsMekmarGuOperationThisYearTotalForw = {
+            'fob': 0,
+            'ddp': 0,
+        };
+
+                 state.reportsMekmarGuOperationThisYearForw = payload.thisYearOperationForwarding;
+        payload.thisYearOperationForwarding.forEach(x => {
+                        state.reportsMekmarGuOperationThisYearTotalForw.fob += x.FOB;
+            state.reportsMekmarGuOperationThisYearTotalForw.ddp += x.DDP;
+        });
+
+
+
+        state.reportsMekmarGuOperationPreviousYearForw = [];
+    state.reportsMekmarGuOperationPreviousYearTotalForw =  {
+        'fob': 0,
+        'ddp':0,
+        };
+                         state.reportsMekmarGuOperationPreviousYearForw = payload.previousYearOperationForwarding;
+        payload.previousYearOperationForwarding.forEach(x => {
+                        state.reportsMekmarGuOperationPreviousYearTotalForw.fob += x.FOB;
+            state.reportsMekmarGuOperationPreviousYearTotalForw.ddp += x.DDP;
+        });
+        state.reportsMekmarGuOperationTwoYearAgoForw = [];
+        state.reportsMekmarGuOperationTwoYearAgoTotalForw = {
+            'fob': 0,
+            'ddp': 0,
+        };
+         state.reportsMekmarGuOperationTwoYearAgoForw = payload.twoYearAgoOperationForwarding;
+        payload.twoYearAgoOperationForwarding.forEach(x => {
+                        state.reportsMekmarGuOperationTwoYearAgoTotalForw.fob += x.FOB;
+            state.reportsMekmarGuOperationTwoYearAgoTotalForw.ddp += x.DDP;
+        });
         
         
         
@@ -1009,6 +1151,46 @@ const mutations = {
 
 };
 const getters = {
+
+    getReportsMekmarGuOrdererThisYearForw(state) {
+        return state.reportsMekmarGuOrdererThisYearForw;  
+    },
+    getReportsMekmarGuOrdererThisYearTotalForw(state) {
+        return state.reportsMekmarGuOrdererThisYearTotalForw;
+    },
+    getReportsMekmarGuOrdererPreviousYearForw(state) {
+        return state.reportsMekmarGuOrdererPreviousYearForw;
+    },
+    getReportsMekmarGuOrdererPreviousYearTotalForw(state) {
+        return state.reportsMekmarGuOrdererPreviousYearTotalForw;
+    },
+    getReportsMekmarGuOrdererTwoYearAgoForw(state) {
+        return state.reportsMekmarGuOrdererTwoYearAgoForw;
+    },
+    getReportsMekmarGuOrdererTwoYearAgoTotalForw(state) {
+        return state.reportsMekmarGuOrdererTwoYearAgoTotalForw;
+    },
+    getreportsMekmarGuOperationThisYearForw(state) {
+        return state.reportsMekmarGuOperationThisYearForw;
+    },
+    getReportsMekmarGuOperationThisYearTotalForw(state){
+        return state.reportsMekmarGuOperationThisYearTotalForw;
+    },
+    getReportsMekmarGuOperationPreviousYearForw(state) {
+        return state.reportsMekmarGuOperationPreviousYearForw;
+    },
+    getReportsMekmarGuOperationPreviousYearTotalForw(state) {
+        return state.reportsMekmarGuOperationPreviousYearTotalForw;
+    },
+    getReportsMekmarGuOperationTwoYearAgoForw(state) {
+        return state.reportsMekmarGuOperationTwoYearAgoForw;
+    },
+    getReportsMekmarGuOperationTwoYearAgoTotalForw(state) {
+        return state.reportsMekmarGuOperationTwoYearAgoTotalForw;
+    },
+
+
+
     getMekmarGuSellerOrderDetailListTotal(state) {
         return state.mekmarGuSellerOrderDetailListTotal;  
     },

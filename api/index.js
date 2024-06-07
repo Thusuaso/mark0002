@@ -4248,19 +4248,120 @@ group by MONTH(s.SiparisTarihi)
     `;
 
 
+
+
+    const thisYearSqlOrdererForw = `
+select 
+            MONTH(s.YuklemeTarihi) as Month,
+            dbo.Gu_Reports_by_Orderer_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()),'${req.params.userId}') as FOB,
+            SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+            +dbo.Gu_Reports_by_Orderer_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()),'${req.params.userId}') as DDP
+        from SiparislerTB s
+
+        where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisSahibi = '${req.params.userId}' and s.SiparisDurumID=3
+
+        group by MONTH(s.YuklemeTarihi)
+    `;
+    const previousYearSqlOrdererForw = `
+select 
+            MONTH(s.YuklemeTarihi) as Month,
+            dbo.Gu_Reports_by_Orderer_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 1,'${req.params.userId}') as FOB,
+            SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+            +dbo.Gu_Reports_by_Orderer_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 1,'${req.params.userId}') as DDP
+        from SiparislerTB s
+
+        where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 1 and s.SiparisSahibi = '${req.params.userId}' and s.SiparisDurumID=3
+
+        group by MONTH(s.YuklemeTarihi)
+    `;
+    const twoYearsAgoSqlOrdererForw = `
+                select 
+            MONTH(s.YuklemeTarihi) as Month,
+            dbo.Gu_Reports_by_Orderer_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 2,'${req.params.userId}') as FOB,
+            SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+            +dbo.Gu_Reports_by_Orderer_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 2,'${req.params.userId}') as DDP
+        from SiparislerTB s
+
+        where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 2 and s.SiparisSahibi = '${req.params.userId}' and s.SiparisDurumID=3
+
+        group by MONTH(s.YuklemeTarihi)
+    `;
+
+    const thisYearSqlOperationForw = `
+        select 
+	MONTH(s.YuklemeTarihi) as Month,
+	dbo.Gu_Reports_by_Operation_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()),'${req.params.userId}') as FOB,
+	SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+	+dbo.Gu_Reports_by_Operation_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()),'${req.params.userId}') as DDP
+from SiparislerTB s
+
+where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.Operasyon = '${req.params.userId}'
+
+group by MONTH(s.YuklemeTarihi)
+    `;
+    const previousYearSqlOperationForw = `
+                      select 
+	MONTH(s.YuklemeTarihi) as Month,
+	dbo.Gu_Reports_by_Operation_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 1,'${req.params.userId}') as FOB,
+	SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+	+dbo.Gu_Reports_by_Operation_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 1,'${req.params.userId}') as DDP
+from SiparislerTB s
+
+where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 1 and s.Operasyon = '${req.params.userId}'
+
+group by MONTH(s.YuklemeTarihi)
+    `;
+    const twoYearsAgoSqlOperationForw = `
+                                             select 
+	MONTH(s.YuklemeTarihi) as Month,
+	dbo.Gu_Reports_by_Operation_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 2,'${req.params.userId}') as FOB,
+	SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) 
+	+dbo.Gu_Reports_by_Operation_Forw(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 2,'${req.params.userId}') as DDP
+from SiparislerTB s
+
+where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 2 and s.Operasyon = '${req.params.userId}'
+
+group by MONTH(s.YuklemeTarihi)
+    `;
+
+
+
+
+
+
+
     await mssql.query(thisYearSqlOrderer, async (err, thisyear) => {
         await mssql.query(previousYearSqlOrderer, async (err, previusyear) => {
             await mssql.query(twoYearsAgoSqlOrderer, async (err, twoyear) => {
                 await mssql.query(thisYearSqlOperation, async (err, thisyearop) => {
                     await mssql.query(previousYearSqlOperation, async (err, previusyearop) => {
                         await mssql.query(twoYearsAgoSqlOperation, async (err, twoyearop) => {
-                            res.status(200).json({
-                                'thisYearOrderer': thisyear.recordset,
-                                'previusYearOrderer': previusyear.recordset,
-                                'twoYearOrderer': twoyear.recordset,
-                                'thisYearOperation': thisyearop.recordset,
-                                'previusYearOperation': previusyearop.recordset,
-                                'twoYearOperation': twoyearop.recordset,
+                            await mssql.query(thisYearSqlOrdererForw, async (err, thisyearForw) => {
+                                await mssql.query(previousYearSqlOrdererForw, async (err, previousyearForw) => {
+                                    await mssql.query(twoYearsAgoSqlOrdererForw, async (err, twoyearagoForw) => {
+                                        await mssql.query(thisYearSqlOperationForw, async (err, thisyearopForw) => {
+                                            await mssql.query(previousYearSqlOperationForw, async (err, previousopForw) => {
+                                                await mssql.query(twoYearsAgoSqlOperationForw, async (err, twoyearagoopForw) => {
+                                                   
+                                                    res.status(200).json({
+                                                        'thisYearOrderer': thisyear.recordset,
+                                                        'previusYearOrderer': previusyear.recordset,
+                                                        'twoYearOrderer': twoyear.recordset,
+                                                        'thisYearOperation': thisyearop.recordset,
+                                                        'previusYearOperation': previusyearop.recordset,
+                                                        'twoYearOperation': twoyearop.recordset,
+                                                        'thisYearForwarding': thisyearForw.recordset,
+                                                        'previousYearForwarding': previousyearForw.recordset,
+                                                        'twoYearAgoForwarding': twoyearagoForw.recordset,
+                                                        'thisYearOperationForwarding': thisyearopForw.recordset,
+                                                        'previousYearOperationForwarding': previousopForw.recordset,
+                                                        'twoYearAgoOperationForwarding':twoyearagoopForw.recordset
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
                             });
                         });
                    })
@@ -4294,6 +4395,31 @@ group by s.SiparisNo
     
 });
 
+app.get('/reports/gu/mekmar/forwarding/seller/:month/:year/:userId', async (req, res) => {
+        const sql = `
+        select 
+	s.SiparisNo,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) + SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) as DDP,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) as FOB,
+	SUM(s.NavlunSatis) as Navlun,
+	SUM(s.DetayTutar_1) as Detay1,
+	SUM(s.DetayTutar_2) as Detay2,
+	SUM(s.DetayTutar_3) as Detay3,
+	SUM(s.DetayTutar_4) as Detay4
+
+from SiparislerTB s
+
+where YEAR(s.YuklemeTarihi) = '${req.params.year}' and MONTH(s.YuklemeTarihi) = '${req.params.month}' and s.SiparisSahibi='${req.params.userId}'
+and s.SiparisDurumID=3
+group by s.SiparisNo
+    `;
+    mssql.query(sql, (err, seller) => {
+        res.status(200).json({ 'detail': seller.recordset });
+    });
+});
+
+
+
 app.get('/reports/gu/mekmar/order/operation/:month/:year/:userId', async (req, res) => {
     
     const sql = `
@@ -4316,6 +4442,29 @@ group by s.SiparisNo
         res.status(200).json({ 'detail': seller.recordset });
     });
     
+});
+
+app.get('/reports/gu/mekmar/forwarding/operation/:month/:year/:userId', async (req, res) => {
+        const sql = `
+        select 
+	s.SiparisNo,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) + SUM(s.NavlunSatis) + SUM(s.DetayTutar_1) + SUM(s.DetayTutar_2) + SUM(s.DetayTutar_3) + SUM(s.DetayTutar_4) as DDP,
+	dbo.Gu_Reports_by_Seller_Detail(s.SiparisNo) as FOB,
+	SUM(s.NavlunSatis) as Navlun,
+	SUM(s.DetayTutar_1) as Detay1,
+	SUM(s.DetayTutar_2) as Detay2,
+	SUM(s.DetayTutar_3) as Detay3,
+	SUM(s.DetayTutar_4) as Detay4
+
+from SiparislerTB s
+
+where YEAR(s.YuklemeTarihi) = '${req.params.year}' and MONTH(s.YuklemeTarihi) = '${req.params.month}' and s.Operasyon='${req.params.userId}'
+and s.SiparisDurumID=3
+group by s.SiparisNo
+    `;
+    mssql.query(sql, (err, seller) => {
+        res.status(200).json({ 'detail': seller.recordset });
+    });
 });
 
 
@@ -8708,6 +8857,8 @@ app.get('/order/shipped/list', async (req, res) => {
     s.MayaControl,
     s.FaturaKesimTurID,
     s.KonteynerNo,
+    s.SiparisKontrol,
+s.SiparisKontrolEden,
     
     
         su.ID as UrunId,
@@ -9563,6 +9714,8 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
+s.SiparisKontrol,
+s.SiparisKontrolEden,
 s.SiparisKontrol,
 s.SiparisKontrolEden,
 
