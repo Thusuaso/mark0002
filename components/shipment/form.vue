@@ -3,24 +3,14 @@
     <div class="row mb-4">
       <div class="col">
         <span class="p-float-label">
-          <AutoComplete
-            v-model="selectedOrder"
-            inputId="order"
-            :suggestions="filteredOrders"
-            @complete="searchOrders($event)"
-            field="SiparisNo"
-            @item-select="ordersSelected($event.value.SiparisNo)"
-          />
+          <AutoComplete v-model="selectedOrder" inputId="order" :suggestions="filteredOrders"
+            @complete="searchOrders($event)" field="SiparisNo" @item-select="ordersSelected($event.value.SiparisNo)" />
           <label for="order">Orders</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
-          <Calendar
-            v-model="forwardingDate"
-            inputId="forwardingdate"
-            dateFormat="dd/mm/yy"
-          />
+          <Calendar v-model="forwardingDate" inputId="forwardingdate" dateFormat="dd/mm/yy" />
           <label for="forwardingdate">Shipment Date</label>
         </span>
       </div>
@@ -38,35 +28,19 @@
       </div>
       <div class="col">
         <div class="flex align-items-center">
-          <RadioButton
-            id="normal"
-            v-model="forwardingstatus"
-            name="dynamic"
-            :value="'normal'"
-          />
+          <RadioButton id="normal" v-model="forwardingstatus" name="dynamic" :value="'normal'" />
           <label for="normal" class="ml-2">Regular Shipment</label>
         </div>
         <div class="flex align-items-center">
-          <RadioButton
-            id="fast"
-            v-model="forwardingstatus"
-            name="dynamic"
-            :value="'fast'"
-          />
+          <RadioButton id="fast" v-model="forwardingstatus" name="dynamic" :value="'fast'" />
           <label for="fast" class="ml-2">Fast Shipment</label>
         </div>
       </div>
     </div>
     <div class="row mb-4">
       <div class="col-3">
-        <Dropdown
-          v-model="selectedProduct"
-          :options="getOrderProductionProductNormalList"
-          optionLabel="Aciklama"
-          placeholder="Select a Product"
-          class="w-100"
-          @change="productSelected($event)"
-        />
+        <Dropdown v-model="selectedProduct" :options="getOrderProductionProductNormalList" optionLabel="Aciklama"
+          placeholder="Select a Product" class="w-100" @change="productSelected($event)" />
       </div>
       <div class="col-3">
         <span class="p-float-label">
@@ -82,118 +56,50 @@
       </div>
       <div class="col-3">
         <span class="p-float-label">
-          <InputText
-            id="remainderamount"
-            v-model="getShipmentAmount.remainder"
-            disabled
-          />
+          <InputText id="remainderamount" v-model="getShipmentAmount.remainder" disabled />
           <label for="remainderamount">Remained</label>
         </span>
       </div>
     </div>
     <div class="row mb-4">
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-success w-100"
-          label="Ship"
-          @click="save"
-          :disabled="save_button_disabled"
-        />
+        <Button type="button" class="p-button-success w-100" label="Ship" @click="save"
+          :disabled="save_button_disabled" />
       </div>
     </div>
     <div class="row mb-4">
       <div class="col-4">
-        <DataTable
-          :value="getShipmentProductionList"
-          dataKey="ID"
-          :selection.sync="selectedProducts"
-          :scrollable="true"
-          scrollHeight="400px"
-        >
-          <Column
-            selectionMode="multiple"
-            headerStyle="width: 2rem"
-            header="All"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          ></Column>
-          <Column
-            field="KasaNo"
-            header="Crate No"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          ></Column>
-          <Column
-            field="Miktar"
-            header="Amount"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          ></Column>
-          <Column
-            field="BirimAdi"
-            header="Unit"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          ></Column>
+        <DataTable :value="getShipmentProductionList" dataKey="ID" :selection.sync="selectedProducts" :scrollable="true"
+          scrollHeight="400px">
+          <Column selectionMode="multiple" headerStyle="width: 2rem" header="All" headerClass="tableHeader"
+            bodyClass="tableBody"></Column>
+          <Column field="KasaNo" header="Crate No" headerClass="tableHeader" bodyClass="tableBody"></Column>
+          <Column field="Miktar" header="Amount" headerClass="tableHeader" bodyClass="tableBody"></Column>
+          <Column field="BirimAdi" header="Unit" headerClass="tableHeader" bodyClass="tableBody"></Column>
         </DataTable>
       </div>
       <div class="col-1">
-        <Button
-          type="button"
-          class="p-button-primary"
-          label="Send Crate"
-          @click="sendingCrate"
-          :disabled="sending_crate_button_disabled"
-        />
+        <Button type="button" class="p-button-primary" label="Send Crate" @click="sendingCrate"
+          :disabled="sending_crate_button_disabled" />
       </div>
       <div class="col">
-        <DataTable
-          :value="getShipmentSendProductionList"
-          :scrollable="true"
-          scrollHeight="400px"
-        >
-          <Column
-            field="KasaNo"
-            header="Crate No"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          ></Column>
-          <Column
-            field="UrunAdi"
-            header="Product"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          >
+        <DataTable :value="getShipmentSendProductionList" :scrollable="true" scrollHeight="400px">
+          <Column field="KasaNo" header="Crate No" headerClass="tableHeader" bodyClass="tableBody"></Column>
+          <Column field="UrunAdi" header="Product" headerClass="tableHeader" bodyClass="tableBody">
             <template #footer>
               {{ getShipmentSendProductionTotal.crate }}
             </template>
           </Column>
-          <Column
-            field="YuzeyIslemAdi"
-            header="Surface"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          ></Column>
+          <Column field="YuzeyIslemAdi" header="Surface" headerClass="tableHeader" bodyClass="tableBody"></Column>
           <Column header="Size" headerClass="tableHeader" bodyClass="tableBody">
             <template #body="slotProps">
               {{
-                slotProps.data.En + "x" + slotProps.data.Boy + "x" + slotProps.data.Kenar
+              slotProps.data.En + "x" + slotProps.data.Boy + "x" + slotProps.data.Kenar
               }}
             </template>
           </Column>
-          <Column
-            field="BirimAdi"
-            header="Unit"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          ></Column>
-          <Column
-            field="Miktar"
-            header="Amount"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          >
+          <Column field="BirimAdi" header="Unit" headerClass="tableHeader" bodyClass="tableBody"></Column>
+          <Column field="Miktar" header="Amount" headerClass="tableHeader" bodyClass="tableBody">
             <template #body="slotProps">
               {{ slotProps.data.Miktar | formatDecimal }}
             </template>
@@ -201,17 +107,12 @@
               {{ getShipmentSendProductionTotal.amount | formatDecimal }}
             </template>
           </Column>
-          <Column
-            field="TotalProduct"
-            header="Total"
-            headerClass="tableHeader"
-            bodyClass="tableBody"
-          >
+          <Column field="TotalProduct" header="Total" headerClass="tableHeader" bodyClass="tableBody">
             <template #body="slotProps">
-              {{ slotProps.data.TotalProduct | formatDecimal }}
+              {{ slotProps.data.TotalProduct | formatPriceUsd }}
             </template>
             <template #footer>
-              {{ getShipmentSendProductionTotal.total | formatDecimal }}
+              {{ getShipmentSendProductionTotal.total | formatPriceUsd }}
             </template>
           </Column>
         </DataTable>

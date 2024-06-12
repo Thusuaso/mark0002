@@ -107,6 +107,7 @@ export { default as ReportsMekmarGuForwarding } from '../..\\components\\reports
 export { default as ReportsMekmarGuLogs } from '../..\\components\\reports\\mekmar\\gu\\logs.vue'
 export { default as ReportsMekmarGuMekus } from '../..\\components\\reports\\mekmar\\gu\\mekus.vue'
 export { default as ReportsMekmarGuOrdererOperation } from '../..\\components\\reports\\mekmar\\gu\\ordererOperation.vue'
+export { default as ReportsMekmarGuShippedOperation } from '../..\\components\\reports\\mekmar\\gu\\shippedOperation.vue'
 export { default as ReportsMekmarLoadingList } from '../..\\components\\reports\\mekmar\\loading\\list.vue'
 export { default as ReportsMekmarMkByCustomer } from '../..\\components\\reports\\mekmar\\mk\\byCustomer.vue'
 export { default as ReportsMekmarMkYearByMarketingForwarding } from '../..\\components\\reports\\mekmar\\mk\\yearByMarketingForwarding.vue'

@@ -17,189 +17,80 @@
       </JsonExcel> -->
 
       <Button class="p-button-primary w-100" label="Excel" @click="excel_test" />
-      <DataTable
-        :value="list"
-        filterDisplay="row"
-        :filters.sync="filtersCheck"
-        @filter="checkFilters($event)"
-      >
+      <DataTable :value="list" filterDisplay="row" :filters.sync="filtersCheck" @filter="checkFilters($event)"
+        >
         <Column field="Sira" header="#"></Column>
-        <Column
-          field="KasaNo"
-          header="Crate No"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="KasaNo" header="Crate No" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="TedarikciAdi"
-          header="Supplier"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="TedarikciAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="KategoriAdi"
-          header="Category"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="KategoriAdi" header="Category" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="UrunAdi"
-          header="Product"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #footer>
             {{ total.crate | formatDecimal }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="YuzeyIslem"
-          header="Surface"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="YuzeyIslem" header="Surface" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="En"
-          header="Width"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.En }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="Boy"
-          header="Height"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Boy }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="Kenar"
-          header="Thickness"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Kenar }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="BirimAdi"
-          header="Unit"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="BirimAdi" header="Unit" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.BirimAdi }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="KutuAdet"
-          header="Box"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="KutuAdet" header="Box" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.KutuAdet | formatDecimal }}
           </template>
@@ -207,22 +98,11 @@
             {{ total.box | formatDecimal }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="Adet"
-          header="Piece"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Adet" header="Piece" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Adet | formatDecimal }}
           </template>
@@ -230,22 +110,11 @@
             {{ total.piece | formatDecimal }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="Miktar"
-          header="Amount"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
@@ -253,22 +122,11 @@
             {{ total.amount | formatDecimal }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
-        <Column
-          field="Ton"
-          header="Ton"
-          :showFilterMenu="false"
-          :showClearButton="false"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
-        >
+        <Column field="Ton" header="Ton" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
           <template #body="slotProps">
             {{ slotProps.data.Ton | formatDecimal }}
           </template>
@@ -276,12 +134,7 @@
             {{ total.ton | formatDecimal }}
           </template>
           <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+            <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
       </DataTable>

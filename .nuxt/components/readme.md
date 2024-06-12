@@ -115,6 +115,7 @@ You can directly use them in pages and other components without the need to impo
 - `<ReportsMekmarGuLogs>` | `<reports-mekmar-gu-logs>` (components/reports/mekmar/gu/logs.vue)
 - `<ReportsMekmarGuMekus>` | `<reports-mekmar-gu-mekus>` (components/reports/mekmar/gu/mekus.vue)
 - `<ReportsMekmarGuOrdererOperation>` | `<reports-mekmar-gu-orderer-operation>` (components/reports/mekmar/gu/ordererOperation.vue)
+- `<ReportsMekmarGuShippedOperation>` | `<reports-mekmar-gu-shipped-operation>` (components/reports/mekmar/gu/shippedOperation.vue)
 - `<ReportsMekmarLoadingList>` | `<reports-mekmar-loading-list>` (components/reports/mekmar/loading/list.vue)
 - `<ReportsMekmarMkByCustomer>` | `<reports-mekmar-mk-by-customer>` (components/reports/mekmar/mk/byCustomer.vue)
 - `<ReportsMekmarMkYearByMarketingForwarding>` | `<reports-mekmar-mk-year-by-marketing-forwarding>` (components/reports/mekmar/mk/yearByMarketingForwarding.vue)

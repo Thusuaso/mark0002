@@ -326,6 +326,9 @@
   "ReportsMekmarGuOrdererOperation": {
     "description": "Auto imported from components/reports/mekmar/gu/ordererOperation.vue"
   },
+  "ReportsMekmarGuShippedOperation": {
+    "description": "Auto imported from components/reports/mekmar/gu/shippedOperation.vue"
+  },
   "ReportsMekmarLoadingList": {
     "description": "Auto imported from components/reports/mekmar/loading/list.vue"
   },

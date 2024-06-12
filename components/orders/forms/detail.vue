@@ -197,6 +197,7 @@
 <script>
 import date from "~/plugins/date";
 import { mapGetters } from "vuex";
+import Cookies from "js-cookie";
 export default {
   computed: {
     ...mapGetters(["getOrdersAllList"]),
@@ -352,13 +353,26 @@ export default {
         this.$toast.success("Bu po ya ait sipariş bulunmakta.");
       }
     },
+    __nullControl(value){
+      if (value == null || value == 'null' || value == undefined || value == "") {
+        return 0;
+      } else {
+        return parseFloat(value);
+      }
+    },
     prePaymentIsActivated(event) {
       let prepayment = 0;
       this.productsList.forEach((product) => {
         prepayment += product.SatisToplam;
       });
+      prepayment += this.__nullControl(this.modelProduction.NavlunSatis);
+      prepayment += this.__nullControl(this.modelProduction.DetayTutar_1);
+      prepayment += this.__nullControl(this.modelProduction.DetayTutar_2);
+      prepayment += this.__nullControl(this.modelProduction.DetayTutar_3);
+
+
       if (event == 1) {
-        this.prepaymentDisabledForm = false;
+        this.prepaymentDisabledForm = true;
         this.modelProduction.Pesinat = prepayment;
       } else if (event == 2) {
         this.prepaymentDisabledForm = false;
@@ -452,6 +466,7 @@ export default {
       );
       this.load_date = date.stringToDate(this.modelProduction.YuklemeTarihi);
       this.eta_date = date.stringToDate(this.modelProduction.Eta);
+      this.modelProduction.SiparisKontrolEden = Cookies.get('userId');
       if (this.modelProduction.SiparisKontrol == null || this.modelProduction.SiparisKontrol == '' || this.modelProduction.SiparisKontrol == 'null') {
         this.selectedControlBoolean = false;
         this.modelProduction.SiparisKontrol = false;
@@ -462,6 +477,9 @@ export default {
     },
   },
   watch: {},
+  mounted(){
+
+  }
 };
 </script>
 

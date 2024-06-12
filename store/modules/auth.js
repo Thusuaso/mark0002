@@ -88,10 +88,10 @@ const mutations = {
         Cookies.set('userId',user.userId);
         Cookies.set('username',user.username);
         Cookies.set('mail',user.mail);
-        process.isClient ? localStorage.setItem('token',user.token):false;
-        process.isClient ? localStorage.setItem('userId',user.userId):false;
-        process.isClient ? localStorage.setItem('username',user.username):false;
-        process.isClient ? localStorage.setItem('mail',user.mail):false;
+        localStorage.setItem('token',user.token);
+        localStorage.setItem('userId',user.userId);
+        localStorage.setItem('username',user.username);
+        localStorage.setItem('mail',user.mail);
 
 
     },

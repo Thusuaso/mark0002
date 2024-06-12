@@ -46,12 +46,13 @@
 
 
       </TabPanel>
-      <TabPanel header="Orderer and Operation">
-        <ordererOperation/>
-
-
-
+      <TabPanel header="Seller and Operation Orders">
+        <ordererOperation />
       </TabPanel>
+      <TabPanel header="Seller and Operation Shipped">
+        <shippedOperation />
+      </TabPanel>
+
     </TabView>
   </div>
 </template>

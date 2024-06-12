@@ -171,12 +171,16 @@ const state = {
         'fob': 0,
         'ddp':0,
     },
+    mekmarGuSelectedUser: {},
 
     
     
 };
 
 const actions = {
+    setMekmarGuSelectedUser(vuexContext, payload) {
+        vuexContext.commit('setMekmarGuSelectedUser', payload);  
+    },
     /* */
     setMekmarGuSellerOrderDetail(vuexContext, payload) {
         return new Promise((resolve,reject) => {
@@ -676,6 +680,9 @@ const actions = {
 
 };
 const mutations = {
+    setMekmarGuSelectedUser(state, payload) {
+        state.mekmarGuSelectedUser = payload;
+    },
     setMekmarGuSellerOrderDetail(state, payload) {
         state.mekmarGuSellerOrderDetailListTotal = {
             'fob': 0,
@@ -1151,7 +1158,9 @@ const mutations = {
 
 };
 const getters = {
-
+    getMekmarGuSelectedUser(state) {
+        return state.mekmarGuSelectedUser;  
+    },
     getReportsMekmarGuOrdererThisYearForw(state) {
         return state.reportsMekmarGuOrdererThisYearForw;  
     },

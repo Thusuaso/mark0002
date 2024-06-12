@@ -228,9 +228,9 @@ export default {
           " fatura no ile " +
           this.selectedInvoice.name +
           " faturası $" +
-          this.usd.toFixed(2) +
+          this.usd.toFixed(4) +
           " ve $" +
-          this.currency.toFixed(2) +
+          this.currency.toFixed(4) +
           " kur girilmiştir.",
         po: this.selectedPo.SiparisNo,
         color: "#ffec31",

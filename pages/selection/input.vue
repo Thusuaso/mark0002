@@ -1,25 +1,14 @@
 <template>
   <div class="">
-    <selection
-      :productionTotal="getProductionTotal"
-      @products_status_selected="productsStatusSelected($event)"
+    <selection :productionTotal="getProductionTotal" @products_status_selected="productsStatusSelected($event)"
       @selection_production_dialog="selection_production_dialog_form = true"
-    />
-    <selectionList
-      :products="getProductList"
-      :total="getProductionSumTotal"
-      @product_selected_emit="productSelectedEmit($event)"
-    />
+       />
+    <selectionList :products="getProductList" :total="getProductionSumTotal"
+      @product_selected_emit="productSelectedEmit($event)" />
     <Dialog :visible.sync="selection_production_dialog_form" header="" modal>
-      <selectionForm
-        @selection_production_dialog_form="selection_production_dialog_form = $event"
-        :suppliers="getSupplierList"
-        :orders="getOrderProductionList"
-        :products="getProductionProductsList"
-        :mines="getMineList"
-        :model="model"
-        :buttonStatus="getProductionButtonStatus"
-      />
+      <selectionForm @selection_production_dialog_form="selection_production_dialog_form = $event"
+        :suppliers="getSupplierList" :orders="getOrderProductionList" :products="getProductionProductsList"
+        :mines="getMineList" :model="model" :buttonStatus="getProductionButtonStatus" />
     </Dialog>
   </div>
 </template>
@@ -52,6 +41,8 @@ export default {
     this.$store.dispatch("setSelectionProductionTotal");
     this.$store.dispatch("setSelectionProductsList");
     this.$store.dispatch("setSelectionProductionMekmerButtonStatus");
+
+
   },
   methods: {
     productsStatusSelected(event) {

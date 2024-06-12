@@ -49,7 +49,7 @@ import api from "@/plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
-    "getLoadingDatatable",
+      "getLoadingDatatable",
       "getOrderList",
       "getOrderListAll",
       "getOrderProductionModel",
@@ -116,7 +116,7 @@ export default {
   },
 
   created() {
-    this.$store.dispatch("setOrderProductionMekmerList");
+    this.$store.dispatch("setOrderProductionMekmerList")
   },
   methods: {
     isfDelete(event) {

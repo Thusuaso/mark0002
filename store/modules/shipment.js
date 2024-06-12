@@ -73,9 +73,9 @@ const mutations = {
       state.shipmentSendProductionList = [];  
     },
     setShipmentAmount(state,shipmentAmount){
-        state.shipmentAmount.order = shipmentAmount.order.toFixed(2);
-        state.shipmentAmount.production = shipmentAmount.production.toFixed(2);
-        state.shipmentAmount.remainder = shipmentAmount.remainder.toFixed(2);
+        state.shipmentAmount.order = shipmentAmount.order.toFixed(4);
+        state.shipmentAmount.production = shipmentAmount.production.toFixed(4);
+        state.shipmentAmount.remainder = shipmentAmount.remainder.toFixed(4);
     },
     setShipmentProductionList(state,productionList){
         state.shipmentProductionList = productionList;

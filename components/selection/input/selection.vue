@@ -28,12 +28,10 @@
           <tr>
             <th>Total</th>
             <td>
-              <b
-                >{{ productionTotal.monthTotal | formatDecimal }} ({{
-                  (productionTotal.mekmerMonth + productionTotal.mekmozMonth)
-                    | formatDecimal
-                }})</b
-              >
+              <b>{{ productionTotal.monthTotal | formatDecimal }} ({{
+                (productionTotal.mekmerMonth + productionTotal.mekmozMonth)
+                | formatDecimal
+                }})</b>
             </td>
             <td>
               <b>{{ productionTotal.yearTotal | formatDecimal }}</b>
@@ -46,32 +44,16 @@
       <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
     </div>
     <div class="col-2">
-      <Button
-        type="button"
-        class="p-button-primary w-100 mb-2"
-        label="Mekmer"
-        @click="$emit('products_status_selected', 1)"
-      />
-      <Button
-        type="button"
-        class="p-button-secondary w-100 mb-2"
-        label="External Crates"
-        @click="$emit('products_status_selected', 2)"
-      />
-      <Button
-        type="button"
-        class="p-button-warning w-100 mb-2"
-        label="Ext. Crates in Mekmer"
-        @click="$emit('products_status_selected', 3)"
-      />
-      <Button
-        type="button"
-        class="p-button-danger w-100"
-        label="Not Found"
-        @click="$emit('products_status_selected', 4)"
-      />
+      <Button type="button" class="p-button-primary w-100 mb-2" label="Mekmer"
+        @click="$emit('products_status_selected', 1)" />
+      <Button type="button" class="p-button-secondary w-100 mb-2" label="External Crates"
+        @click="$emit('products_status_selected', 2)" />
+      <Button type="button" class="p-button-warning w-100 mb-2" label="Ext. Crates in Mekmer"
+        @click="$emit('products_status_selected', 3)" />
+      <Button type="button" class="p-button-danger w-100" label="Not Found"
+        @click="$emit('products_status_selected', 4)" />
     </div>
-    <div class="col-3">
+    <div class="col-1">
       <!-- <JsonExcel
         class="btn w-100"
         :data="getProductList"
@@ -158,62 +140,30 @@
           />
         </vue-excel-editor>
       </div> -->
-      <vue-excel-xlsx
-        :data="getProductList"
-        :columns="excelColumnsField"
-        :file-name="'Seleksiyon'"
-        :file-type="'xlsx'"
-        :sheet-name="'sheetname'"
-        style="border: none; background-color: white"
-      >
-        <Button
-          type="button"
-          class="p-button-info w-100"
-          icon="pi pi-file-excel"
-          label="Excel"
-        />
+      <vue-excel-xlsx :data="getProductList" :columns="excelColumnsField" :file-name="'Seleksiyon'" :file-type="'xlsx'"
+        :sheet-name="'sheetname'" style="border: none; background-color: white">
+        <Button type="button" class="p-button-info w-100" icon="pi pi-file-excel" label="Excel" />
       </vue-excel-xlsx>
       <br />
 
-      <Dropdown
-        class="mt-1"
-        v-model="selectedEfeTicket"
-        :options="efeTickets"
-        optionLabel="name"
-        placeholder="EFE Labels"
-        @change="downloadEfeTicket($event)"
-      />
+      <Dropdown class="mt-1" v-model="selectedEfeTicket" :options="efeTickets" optionLabel="name"
+        placeholder="EFE Labels" @change="downloadEfeTicket($event)" />
 
-      <a
-        :href="ticketLink"
-        download
-        type="button"
-        class="btn btn-secondary"
-        v-if="!isEfeTicketForm"
-        >Download</a
-      >
+      <a :href="ticketLink" download type="button" class="btn btn-secondary" v-if="!isEfeTicketForm">Download</a>
+    </div>
+    <div class="col-1">
+      <Button class="p-button-secondary" type="button" label="Orders Excel" @click="orders_click_excel"
+        :disabled="selection_orders_disabled" />
     </div>
     <div class="col-3">
       <div class="row">
         <div class="col-6">
-          <Dropdown
-            v-model="selectedVeikBox"
-            :options="etiketlerVeikKutu"
-            optionLabel="urun"
-            placeholder="VEIK Box Labels"
-            class="w-100 mb-2"
-            @change="isDropDownChange($event)"
-          />
+          <Dropdown v-model="selectedVeikBox" :options="etiketlerVeikKutu" optionLabel="urun"
+            placeholder="VEIK Box Labels" class="w-100 mb-2" @change="isDropDownChange($event)" />
         </div>
         <div class="col-6">
-          <Dropdown
-            v-model="selectedVeikCrate"
-            :options="etiketlerVeikKasa"
-            optionLabel="urun"
-            placeholder="Veik Crate Labels"
-            class="w-100 mb-2"
-            @change="isDropDownChange($event)"
-          />
+          <Dropdown v-model="selectedVeikCrate" :options="etiketlerVeikKasa" optionLabel="urun"
+            placeholder="Veik Crate Labels" class="w-100 mb-2" @change="isDropDownChange($event)" />
         </div>
       </div>
       <!-- <div class="row">
@@ -228,9 +178,7 @@
       </div> -->
       <div class="row">
         <div class="col">
-          <a :href="boxCrateTicket" download type="button" class="btn btn-secondary w-100"
-            >Download</a
-          >
+          <a :href="boxCrateTicket" download type="button" class="btn btn-secondary w-100">Download</a>
         </div>
       </div>
     </div>
@@ -239,18 +187,21 @@
 
 <script>
 import { mapGetters } from "vuex";
+import api from '@/plugins/excel.server';
 export default {
   computed: {
-    ...mapGetters(["getProductList"]),
+    ...mapGetters(["getProductList", "getLocalUrl","getOrderList"]),
   },
   props: {
     productionTotal: {
       type: Object,
       required: true,
     },
+
   },
   data() {
     return {
+      selection_orders_disabled:true,
       boxCrateTicket: null,
       code: null,
       etiketlerVeikKutu: [
@@ -558,7 +509,31 @@ export default {
       ],
     };
   },
+  created() {
+    this.$store.dispatch("setOrderProductionMekmerList")
+      .then(res => {
+        console.log('setOrderProductionMekmerList',res)
+        if (res) {
+          this.selection_orders_disabled = false;
+
+        }
+      });
+  },
   methods: {
+    orders_click_excel(){
+      api
+        .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
+
+            link.setAttribute("download", "Uretim_list.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
+    },
     isDropDownChange(event) {
       this.code = event.value.code;
       this.boxCrateTicket = event.value.link;

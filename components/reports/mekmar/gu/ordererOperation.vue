@@ -2,6 +2,10 @@
     <div class="container">
         <Dropdown v-model="selectedUser" :options="users" optionLabel="username" placeholder="Select a User"
             style="width:50%;" @change="userSelected($event)" />
+
+        <Button type="button" class="p-button-primary" @click="excel_output" label="Excel" :disabled="disabled" />
+
+
         <div class="row">
             <div class="col">
                 <DataTable :value="getReportsMekmarGuOrdererThisYear" class="p-datatable-sm"
@@ -192,13 +196,13 @@
         </div>
 
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="col">
                 <DataTable :value="getReportsMekmarGuOrdererThisYearForw" class="p-datatable-sm"
                     :selection="selectedForw" selectionMode="single" @row-select="thisYearOrdererSelectedForw($event)"
                     :loading="loading">
                     <template #header>
-                        {{ new Date().getFullYear() }} Seller Forwarding
+                        {{ new Date().getFullYear() }} Seller Shipped
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -229,7 +233,7 @@
                     @row-select="previousYearOrdererSelectedForw($event)" :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 1 }} Seller Forwarding
+                        {{ new Date().getFullYear() - 1 }} Seller Shipped
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -260,7 +264,7 @@
                     :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 2 }} Seller Forwarding
+                        {{ new Date().getFullYear() - 2 }} Seller Shipped
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -294,7 +298,7 @@
                     :selection="selectedForw" selectionMode="single" @row-select="thisYearOperationSelectedForw($event)"
                     :loading="loading">
                     <template #header>
-                        {{ new Date().getFullYear() }} Operation Forwarding
+                        {{ new Date().getFullYear() }} Operation Shipped
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -325,7 +329,7 @@
                     @row-select="previousYearOperationSelectedForw($event)" :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 1 }} Operation Forwarding
+                        {{ new Date().getFullYear() - 1 }} Operation Shipped
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -356,7 +360,7 @@
                     @row-select="twoYearAgoOperationSelectedForw($event)" :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 2 }} Seller Forwarding
+                        {{ new Date().getFullYear() - 2 }} Seller Shipped
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -381,7 +385,7 @@
                     </Column>
                 </DataTable>
             </div>
-        </div>
+        </div> -->
 
 
 
@@ -458,9 +462,13 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
+import api from '../../../../plugins/excel.server';
 export default {
     computed: {
         ...mapGetters([
+        'getLocalUrl',
+            'getMekmarGuSelectedUser',
+        
             'getReportsMekmarGuOrdererThisYear',
             'getReportsMekmarGuOrdererThisYearTotal',
             'getReportsMekmarGuOrdererPreviousYear',
@@ -504,15 +512,39 @@ export default {
             selectedThisYearOrderer:null,
             detail_dialog_form: false,
             loading:false,
-            selectedForw:null,
+            selectedForw: null,
+            disabled:true
         }
     },
     methods: {
+        excel_output(event){
+            const data = {
+                'thisYearSeller': this.getReportsMekmarGuOrdererThisYear,
+                'previousYearSeller': this.getReportsMekmarGuOrdererPreviousYear,
+                'twoYearAgoYearSeller': this.getReportsMekmarGuOrdererTwoYearAgo,
+                'thisYearOperation': this.getReportsMekmarGuOperationThisYear,
+                'previousYearOperation': this.getReportsMekmarGuOperationPreviousYear,
+                'twoYearAgoOperation': this.getReportsMekmarGuOperationTwoYearAgo
+            };
+            api.post('/gu/reports/seller/operation/orders', data)
+                .then(response => {
+                    if (response.status) {
+                        const link = document.createElement("a");
+                        link.href = this.getLocalUrl + "gu/reports/seller/operation/orders";
+                        link.setAttribute("download", "gu_reports_summary.xlsx");
+                        document.body.appendChild(link);
+                        link.click();
+                        this.$store.dispatch("setEndLoadingAction");
+                    }
+            })
+
+
+        },
         twoYearAgoOperationSelectedForw(event) {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 2,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuOperationForwardingDetail', payload).then(res => {
                 if (res) {
@@ -524,7 +556,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 1,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuOperationForwardingDetail', payload).then(res => {
                 if (res) {
@@ -537,7 +569,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear(),
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuOperationForwardingDetail', payload).then(res => {
                 if (res) {
@@ -546,15 +578,11 @@ export default {
             });
         },
         
-
-
-
-
         twoYearAgoOrdererSelectedForw(event) {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 2,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuSellerForwardingDetail', payload).then(res => {
                 if (res) {
@@ -566,7 +594,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 1,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuSellerForwardingDetail', payload).then(res => {
                 if (res) {
@@ -579,7 +607,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear(),
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuSellerForwardingDetail', payload).then(res => {
                 if (res) {
@@ -587,15 +615,11 @@ export default {
                 }
             });
         },
-
-
-
-
         twoYearAgoOperationSelected(event) {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 2,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuOperationOrderDetail', payload).then(res => {
                 if (res) {
@@ -607,7 +631,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 1,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuOperationOrderDetail', payload).then(res => {
                 if (res) {
@@ -619,7 +643,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear(),
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuOperationOrderDetail', payload).then(res => {
                 if (res) {
@@ -631,7 +655,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 2,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuSellerOrderDetail', payload).then(res => {
                 if (res) {
@@ -644,7 +668,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear() - 1,
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuSellerOrderDetail', payload).then(res => {
                 if (res) {
@@ -657,7 +681,7 @@ export default {
             const payload = {
                 'month': event.data.Month,
                 'year': new Date().getFullYear(),
-                'userId': this.selectedUser.id
+                'userId': this.getMekmarGuSelectedUser.id
             };
             this.$store.dispatch('setMekmarGuSellerOrderDetail', payload).then(res => {
                 if (res) {
@@ -667,10 +691,12 @@ export default {
 
         },
         userSelected(event) {
+            this.$store.dispatch('setMekmarGuSelectedUser', event.value);
             this.loading = true;
-            this.$store.dispatch('setMekmarGuOrdererOperationList',this.selectedUser.id).then(res=>{
+            this.$store.dispatch('setMekmarGuOrdererOperationList', this.getMekmarGuSelectedUser.id).then(res=>{
                 if (res) {
                     this.loading = false;
+                    this.disabled = false;
                 } else {
                     this.loading = false
                 }

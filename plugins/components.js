@@ -125,7 +125,10 @@ import FinancePaidListMekmer from '~/components/reports/mekmer/finance/lists/pai
 import loadingSpinner from '~/components/shared/loading';
 
 import ordererOperation from '~/components/reports/mekmar/gu/ordererOperation';
+import shippedOperation from '~/components/reports/mekmar/gu/shippedOperation';
 
+
+Vue.component('shippedOperation',shippedOperation);
 
 Vue.component('ordererOperation',ordererOperation);
 
@@ -351,8 +354,8 @@ Vue.filter('formatDecimal', (value) => {
     if (value == 'null' || value == null || value == ' ') {
         return 0.0;
     } else {
-        const val = (value / 1).toFixed(2).replace(".", ",");
-    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        const val = (value / 1).toFixed(4).replace('.',',');
+    return val.toString().replace(/\B(?=(\d{4})+(?!\d))/g, ".");
     }
 
 });

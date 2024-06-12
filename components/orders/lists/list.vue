@@ -114,7 +114,11 @@
           <template #body="slotProps">
             {{ slotProps.data.Miktar | formatDecimal }}
           </template>
-
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentAmount(filterModel.value)"
+              @input="filterShipmentAmountInput(filterModel.value)" class="p-column-filter"
+              @keyup.stop="filterShipmentAmount(filterModel.value)" />
+          </template>
           <template #footer>
             {{ total.order | formatDecimal }}
           </template>
@@ -487,6 +491,8 @@ export default {
     };
   },
   methods: {
+
+
     ordersFilter(event) {
       this.$store.dispatch("setOrderProductionTotal", event.filteredValue);
     },

@@ -47,11 +47,7 @@ export default {
   created() {
     this.$store.dispatch("setReportsMekmarSummaryOrderList");
     this.$store.dispatch("setReportsMekmarSummaryForwardingList");
-    this.userId = Cookies.get("userId");
-    this.$store.dispatch(
-      "setReportsMekmarSummaryOrderListByRepresentative",
-      this.userId
-    );
+
   },
   methods: {
     orderSelectedListOrderer(event,status) {
@@ -83,5 +79,12 @@ export default {
       );
     },
   },
+  mounted() {
+    this.userId = Cookies.get("userId");
+    this.$store.dispatch(
+      "setReportsMekmarSummaryOrderListByRepresentative",
+      this.userId
+    );
+  }
 };
 </script>

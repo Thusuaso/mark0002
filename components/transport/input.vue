@@ -284,9 +284,9 @@ export default {
           " po ya " +
           this.invoiceno +
           " fatura no ile Nakliye Faturası $" +
-          this.usd.toFixed(2) +
+          this.usd.toFixed(4) +
           " ve $" +
-          this.currency.toFixed(2) +
+          this.currency.toFixed(4) +
           " kur girilmiştir.",
         po: this.selectedPo.SiparisNo,
         color: "#ffec31",

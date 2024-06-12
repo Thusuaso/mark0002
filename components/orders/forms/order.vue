@@ -454,7 +454,7 @@ export default {
             (parseFloat(en.replace(",", ".")) / 100) *
             (parseFloat(boy.replace(",", ".")) / 100) *
             miktar
-          ).toFixed(2);
+          ).toFixed(4);
         }
       } else if (birim == 3) {
         if (
@@ -473,14 +473,14 @@ export default {
         ) {
           return 0;
         } else if (boy == "Free" || boy == "FREE") {
-          return (miktar * (parseFloat(en.replace(",", ".")) / 100)).toFixed(2);
+          return (miktar * (parseFloat(en.replace(",", ".")) / 100)).toFixed(4);
         } else {
           let adet = miktar / (parseFloat(boy.replace(",", ".")) / 100);
           return (
             adet *
             (parseFloat(boy.replace(",", ".")) / 100) *
             (parseFloat(en.replace(",", ".")) / 100)
-          ).toFixed(2);
+          ).toFixed(4);
         }
       } else {
         return 0;
@@ -631,6 +631,12 @@ export default {
       this.cancel_button_disabled = false;
       this.add_button_disabled = false;
       this.product_form_disabled = false;
+      // if (this.products.length > 0) {
+      //   console.log(this.products.length - 1)
+      //   this.model.SiraNo = this.products[this.products.length - 1].SiraNo + 1;
+      // }else{
+      //   this.model.SiraNo = 1;
+      // }
       this.model.SiraNo = this.products.length + 1;
       this.amount_disabled = true;
     },

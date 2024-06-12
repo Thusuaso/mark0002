@@ -107,7 +107,8 @@ const actions = {
         vuexContext.commit('setOfferButtonStatus', status);
     },
     setOfferSave(vuexContext, payload) {
-        this.$axios.post('/offer/save', payload)
+        return new Promise(async (resolve, reject) => {
+                   this.$axios.post('/offer/save', payload)
             .then(response => {
                 if (response.data.status) {
                    
@@ -117,11 +118,16 @@ const actions = {
                     vuexContext.commit('setOfferButtonStatus', false);
                     vuexContext.dispatch('setOfferCustomerList');
                     this.$toast.success('Başarıyla Kaydedildi');
+                    resolve(true);
 
                 } else {
                     this.$toast.error('Kaydetme Başarısız');
+                    resolve(false);
+
                 }
             });
+        });
+
     },
     setOfferUpdate(vuexContext, payload) {
         this.$axios.put('/offer/update',payload)

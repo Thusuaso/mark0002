@@ -126,7 +126,7 @@ export default {
     this.$store.dispatch("setReportsMekmerProductionList");
   },
   methods: {
-
+    
     formatDecimal(value) {
       const data = value.toString().replace(".", ",");
       return data;

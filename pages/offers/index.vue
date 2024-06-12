@@ -2,80 +2,32 @@
   <div class="container">
     <div class="row">
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-success w-100"
-          label="New Quotes"
-          @click="newOffer"
-        />
+        <Button type="button" class="p-button-success w-100" label="New Quotes" @click="newOffer" />
       </div>
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-primary w-100"
-          label="Current Quotes"
-          @click="offers"
-        />
+        <Button type="button" class="p-button-primary w-100" label="Current Quotes" @click="offers" />
       </div>
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-secondary w-100"
-          label="Old Quotes"
-          @click="oldOffers"
-        />
+        <Button type="button" class="p-button-secondary w-100" label="Old Quotes" @click="oldOffers" />
       </div>
     </div>
-    <offerList
-      :list="getOfferList"
-      :country="getOfferCountryList"
-      @offer_list_selected_emit="offerListSelected($event)"
-      @offer_list_b_list_selected_emit="offerBListSelected($event)"
-    />
+    <offerList :list="getOfferList" :country="getOfferCountryList" @offer_list_selected_emit="offerListSelected($event)"
+      @offer_list_b_list_selected_emit="offerBListSelected($event)" />
     <Dialog :visible.sync="offer_list_detail" header="" modal :closeOnEscape="false">
-      <offerDetail
-        :list="getOfferDetailList"
-        :bList="getOfferDetailBList"
-        @offer_detail_list_form_selected_emit="offerDetailListFormSelected($event)"
-        :aListTotal="getOfferDetailTotalA"
-        :bListTotal="getOfferDetailTotalB"
-      />
+      <offerDetail :list="getOfferDetailList" :bList="getOfferDetailBList"
+        @offer_detail_list_form_selected_emit="offerDetailListFormSelected($event)" :aListTotal="getOfferDetailTotalA"
+        :bListTotal="getOfferDetailTotalB" />
     </Dialog>
-    <Dialog
-      :visible.sync="offer_list_detail_form"
-      :header="offer_id"
-      modal
-      :closeOnEscape="false"
-    >
-      <offerForm
-        :model="model"
-        :category="getOfferCategoryList"
-        :product="getOfferProductList"
-        :size="getOfferSizeList"
-        :thickness="getOfferThicknessList"
-        :surface="getOfferSurfaceList"
-        :unit="getOfferUnitList"
-        :productsList="getOfferDetailProductsList"
-        :modelProduct="getOfferProductModel"
-        :status="getOfferButtonStatus"
-        :customer="getOfferCustomerList"
-        :country="getCountryList"
-        :customerModel="getOfferCustomerModel"
-        @offer_process_emit="offerProcess($event)"
-        :id="getOfferId"
-        @offer_delete_emit="offerDelete($event)"
-      />
+    <Dialog :visible.sync="offer_list_detail_form" :header="offer_id" modal :closeOnEscape="false">
+      <offerForm :model="model" :category="getOfferCategoryList" :product="getOfferProductList" :size="getOfferSizeList"
+        :thickness="getOfferThicknessList" :surface="getOfferSurfaceList" :unit="getOfferUnitList"
+        :productsList="getOfferDetailProductsList" :modelProduct="getOfferProductModel" :status="getOfferButtonStatus"
+        :customer="getOfferCustomerList" :country="getCountryList" :customerModel="getOfferCustomerModel"
+        @offer_process_emit="offerProcess($event)" :id="getOfferId" @offer_delete_emit="offerDelete($event)"
+        :disabled_button_status="disabled_offer_button_status" />
     </Dialog>
-    <Dialog
-      :visible.sync="offer_list_detail_old"
-      header="Old Quotes"
-      :closeOnEscape="false"
-      modal
-    >
-      <offerOld
-        :list="getOfferOldList"
-        @old_offers_selected_emit="oldOfferSelected($event)"
-      ></offerOld>
+    <Dialog :visible.sync="offer_list_detail_old" header="Old Quotes" :closeOnEscape="false" modal>
+      <offerOld :list="getOfferOldList" @old_offers_selected_emit="oldOfferSelected($event)"></offerOld>
     </Dialog>
   </div>
 </template>
@@ -117,6 +69,7 @@ export default {
       offer_updated_list_form: false,
       offer_id: null,
       offer_list_detail_old: false,
+      disabled_offer_button_status:false,
     };
   },
   created() {
@@ -148,10 +101,8 @@ export default {
       this.$store.dispatch("setOfferAllButtonStatus", true);
     },
     offerDelete(event) {
-      if (confirm("Silmek istiyor musunuz?")) {
         this.$store.dispatch("setOfferDelete", event);
         this.offer_list_detail_form = false;
-      }
     },
     newOffer() {
       this.$store.dispatch("setOfferAllButtonStatus", false);
@@ -173,7 +124,19 @@ export default {
       }
     },
     save(event) {
-      this.$store.dispatch("setOfferSave", event);
+      this.disabled_offer_button_status = true;
+
+      this.$store.dispatch("setOfferSave", event)
+        .then(res => {
+          if (res) {
+            this.disabled_offer_button_status = false;
+
+          } else {
+            this.disabled_offer_button_status = false;
+
+          }
+    });
+        
     },
     update(event) {
       this.$store.dispatch("setOfferUpdate", event);

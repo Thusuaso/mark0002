@@ -232,7 +232,7 @@
         <div class="row">
           <div class="col">
             <Button type="button" class="p-button-success w-100 mb-4" label="Save" @click="process"
-              :disabled="offer_disabled_button" />
+              :disabled="disabled_button_status" />
           </div>
           <div class="col" v-if="!status">
             <Button type="button" class="p-button-danger w-100" label="Delete" @click="deleteProcess" />
@@ -352,6 +352,10 @@ export default {
       type: Number,
       required: false,
     },
+    disabled_button_status:{
+      type:Boolean,
+      required:true
+    }
   },
   data() {
     return {
@@ -526,13 +530,13 @@ export default {
         alert("Hatalı Giriş");
         this.offer_disabled_button = false;
       } else {
-        this.customerModel.Kullanici = Cookies.get("userId");
-        this.customerModel.Company = this.__nullControl(this.customerModel.Company);
-        this.customerModel.Mail = this.__nullControl(this.customerModel.Mail);
-        this.customerModel.Phone = this.__nullControl(this.customerModel.Phone);
-        this.customerModel.Adress = this.__nullControl(this.customerModel.Adress);
-        this.customerModel.Description = this.__nullControl(
-          this.customerModel.Description
+          this.customerModel.Kullanici = Cookies.get("userId");
+          this.customerModel.Company = this.__nullControl(this.customerModel.Company);
+          this.customerModel.Mail = this.__nullControl(this.customerModel.Mail);
+          this.customerModel.Phone = this.__nullControl(this.customerModel.Phone);
+          this.customerModel.Adress = this.__nullControl(this.customerModel.Adress);
+          this.customerModel.Description = this.__nullControl(
+            this.customerModel.Description
         );
         this.model.KullaniciId = Cookies.get("userId");
         if (this.status) {

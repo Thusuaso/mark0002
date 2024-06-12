@@ -3906,6 +3906,7 @@ app.post('/reports/mekmar/summary/forwarding/detail/list', (req, res) => {
 });
 
 app.get('/reports/mekmar/summary/order/list/by/representative/:userId', (req, res) => {
+    
     const sqlThisYear = `
 select 
 dbo.SiparisUrunler_Ozet_Temsilci_Toplam_2(MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi),'${req.params.userId}','${req.params.userId}') as FOB,
@@ -3929,6 +3930,7 @@ from SiparislerTB s
 where (s.SiparisSahibi = '${req.params.userId}' or s.Operasyon = '${req.params.userId}') and YEAR(s.SiparisTarihi) = YEAR(GETDATE()) - 1
 group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
     `;
+
     mssql.query(sqlThisYear, (err, thisYear) => {
         mssql.query(sqlPreviousYear, (err, previousYear) => {
             res.status(200).json({ items: [thisYear.recordset, previousYear.recordset] });
@@ -3968,9 +3970,9 @@ app.get('/reports/mekmar/summary/order/list/by/representative/detail/:userId/:mo
 
 function noneControl(value) {
     if (value == null || value == undefined) {
-        return parseFloat(0).toFixed(2);
+        return parseFloat(0).toFixed(4);
     } else{
-        return parseFloat(value).toFixed(2);
+        return parseFloat(value).toFixed(4);
     }
 };
 
@@ -6361,7 +6363,14 @@ order by sira
                        mssql.query(photoListSql, (err, photo) => {
                            mssql.query(suggestedAllListSql, (err, suggestedAll) => {
                                mssql.query(suggestedListSql, (err, suggestedList) => {
-                                mssql.query(edgeListSql,(err,edge)=>{
+                                   mssql.query(edgeListSql, (err, edge) => {
+                                       const photosSuggested = [];
+                                       let index = 1;
+                                       photo.recordset.forEach(x => {
+                                           photosSuggested.push({ ...x, sira: index });
+                                             index += 1
+
+                                       });
                                     res.status(200).json({
                                         'edge':edge.recordset,
                                         'size': size.recordset,
@@ -6371,7 +6380,7 @@ order by sira
                                         'type': type.recordset,
                                         'material': material.recordset,
                                         'style': style.recordset,
-                                        'photo': photo.recordset,
+                                        'photo': photosSuggested,
                                         'suggestedall':suggestedAll.recordset,
                                         'suggestedlist':suggestedList.recordset,
                                     });
@@ -10644,14 +10653,14 @@ UretimTB u,UrunBirimTB b,TedarikciTB t
 where u.SiparisAciklama='${req.params.po}'   
 and b.ID = u.UrunBirimID    
 and t.ID = u.TedarikciID    
-order by u.UrunKartID asc    
+order by u.UrunKartID,KasaNo asc      
     `;
    await mssql.query(checkListSql, (err, check) => {
         let queue = 1;
         check.recordset.forEach(x => {
             x.Sira = queue;
             queue++;
-            x.Ton = __getCategoryMass(x.KategoriAdi.split(' ')[0]) * 10 * x.Miktar * parseFloat(x.Kenar.replace(',','.')).toFixed(2);
+            x.Ton = __getCategoryMass(x.KategoriAdi.split(' ')[0]) * 10 * x.Miktar * parseFloat(x.Kenar.replace(',','.')).toFixed(4);
         });
         res.status(200).json({ 'list': check.recordset });
     });
@@ -10686,7 +10695,7 @@ order by u.UrunKartID asc
         check.recordset.forEach(x => {
             x.Sira = queue;
             queue++;
-            x.Ton = __getCategoryMass(x.KategoriAdi.split(' ')[0]) * 10 * x.Miktar * parseFloat(x.Kenar.replace(',','.')).toFixed(2);
+            x.Ton = __getCategoryMass(x.KategoriAdi.split(' ')[0]) * 10 * x.Miktar * parseFloat(x.Kenar.replace(',','.')).toFixed(4);
         });
         res.status(200).json({ 'list': check.recordset });
     });

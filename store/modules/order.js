@@ -118,16 +118,20 @@ const actions = {
                 } 
             });
     },
-    setOrderProductionMekmerList(vuexContext){
-        this.$axios.get('/order/production/mekmer/list')
+    setOrderProductionMekmerList(vuexContext) {
+        return new Promise(async (resolve, reject) => {
+                    this.$axios.get('/order/production/mekmer/list')
             .then(response => {
                 if (response.data.list) {
                     vuexContext.commit('setOrderList', response.data.list);
                     vuexContext.commit('setOrderProductionYearsList', response.data.years);
                     vuexContext.commit('setOrderListAll', response.data.list);
-                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+                    vuexContext.commit('setOrderProductionTotal', response.data.list);
+                    resolve(true);
                 } 
             });
+        })
+
     },
     setOrderProductionTotal(vuexContext,list){
         vuexContext.commit('setOrderProductionTotal',list)

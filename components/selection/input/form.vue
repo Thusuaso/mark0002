@@ -396,7 +396,7 @@ export default {
           this.amount = (
             (width * height * parseInt(event.replace(",", "."))) /
             10000
-          ).toFixed(2);
+          ).toFixed(4);
           this.speacialAmount = this.amount;
         } else {
           const width = parseFloat(this.width.replace(",", "."));
@@ -404,7 +404,7 @@ export default {
           this.speacialAmount = (
             (width * height * parseInt(event.replace(",", "."))) /
             10000
-          ).toFixed(2);
+          ).toFixed(4);
           this.amount = event;
         }
       }
@@ -420,10 +420,10 @@ export default {
 
       if (event) {
         if ((this.height == "Set" || this.height == "SET") && this.width == "20,3") {
-          this.amount = (setM2 * event).toFixed(2);
+          this.amount = (setM2 * event).toFixed(4);
           this.speacialAmount = this.amount;
         } else {
-          this.amount = (boxM2 * event).toFixed(2);
+          this.amount = (boxM2 * event).toFixed(4);
           this.speacialAmount = this.amount;
         }
       }
