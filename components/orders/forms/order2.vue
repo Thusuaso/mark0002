@@ -199,7 +199,7 @@
                     {{ (slotProps.data.Miktar * slotProps.data.SatisFiyati) | formatPriceUsd }}
                 </template>
                 <template #footer>
-                    {{ totals | formatPriceUsd }}
+                    {{ detailProductTotal.total | formatPriceUsd }}
                 </template>
             </Column>
             <Column field="AlisFiyati" header="Purchase Price">
@@ -213,7 +213,7 @@
                     {{ (slotProps.data.Miktar * slotProps.data.AlisFiyati) | formatPriceUsd }}
                 </template>
                 <template #footer>
-                    {{ totals | formatPriceUsd }}
+                    {{ detailProductTotal.total | formatPriceUsd }}
                 </template>
             </Column>
         </DataTable>
@@ -254,6 +254,7 @@ export default {
             type: Boolean,
             required: false,
         },
+
     },
     data() {
         return {
@@ -277,7 +278,8 @@ export default {
             workerman_button_disabled: true,
         };
     },
-    created(){
+    mounted() {
+        console.log('order2', this.products);
         this.totals = 0;
         this.products.forEach(x => {
             this.totals += this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);

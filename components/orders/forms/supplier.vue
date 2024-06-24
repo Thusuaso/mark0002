@@ -3,38 +3,22 @@
     <div class="row">
       <div class="col">
         <div class="p-float-label w-full md:w-14rem">
-          <Dropdown
-            v-model="selectedSupplier"
-            inputId="supplier"
-            :options="productSupplier"
-            optionLabel="FirmaAdi"
-            class="w-100"
-            @change="supplierSelected($event)"
-          />
+          <Dropdown v-model="selectedSupplier" inputId="supplier" :options="productSupplier" optionLabel="FirmaAdi"
+            class="w-100" @change="supplierSelected($event)" />
           <label for="supplier">Supplier</label>
         </div>
       </div>
       <div class="col">
         <div class="p-float-label w-full md:w-14rem">
-          <Dropdown
-            v-model="selectedInvoice"
-            inputId="supplier"
-            :options="invoice"
-            optionLabel="FaturaAdi"
-            class="w-100"
-          />
+          <Dropdown v-model="selectedInvoice" inputId="supplier" :options="invoice" optionLabel="FaturaAdi"
+            class="w-100" />
           <label for="supplier">Kind of Invoice</label>
         </div>
       </div>
       <div class="col">
         <div class="p-float-label w-full md:w-14rem">
-          <Dropdown
-            v-model="selectedDelivery"
-            inputId="delivery"
-            :options="supplierDelivery"
-            optionLabel="TeslimAdi"
-            class="w-100"
-          />
+          <Dropdown v-model="selectedDelivery" inputId="delivery" :options="supplierDelivery" optionLabel="TeslimAdi"
+            class="w-100" />
           <label for="delivery">Kind of Delivery</label>
         </div>
       </div>
@@ -85,27 +69,16 @@
           {{ (slotProps.data.AlisFiyati * slotProps.data.Miktar) | formatPriceUsd }}
         </template>
         <template #footer>
-          {{ total.sum | formatDecimal }}
+          {{ total.sum | formatPriceUsd }}
         </template>
       </Column>
     </DataTable>
     <div class="row">
       <div class="col">
-        <Button
-          type="button"
-          class="p-button-danger"
-          @click="download"
-          label="Download Pdf"
-        />
+        <Button type="button" class="p-button-danger" @click="download" label="Download Pdf" />
       </div>
       <div class="col">
-        <FileUpload
-          mode="basic"
-          accept=".pdf"
-          customUpload
-          @select="isfUpload($event)"
-          chooseLabel="Upload Isf"
-        />
+        <FileUpload mode="basic" accept=".pdf" customUpload @select="isfUpload($event)" chooseLabel="Upload Isf" />
       </div>
     </div>
   </div>

@@ -44,16 +44,22 @@ const actions = {
            vuexContext.commit('setMekmarDetailOrdersPoProductsList',response.data.products);
         });
     },
-    setMekmarCustomerSave(vuexContext,payload){
-        this.$axios.post('/customer/mekmar/save',payload)
+    setMekmarCustomerSave(vuexContext, payload) {
+        return new Promise((resolve, reject) => {
+                   this.$axios.post('/customer/mekmar/save',payload)
         .then(response=>{
             if(response.data.status == 1){
                 this.$toast.success('Başarıyla Kaydedildi.');
                 vuexContext.dispatch('setMekmarList');
+                resolve(true);
             } else{
                 this.$toast.error('Kaydetme Başarışız.');
+                resolve(false);
+
             }
-        })
+        }) 
+        });
+
     },
     setMekmarCustomerDelete(vuexContext,id){
         this.$axios.delete(`/customer/mekmar/delete/${id}`)

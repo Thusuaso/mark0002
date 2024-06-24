@@ -319,7 +319,12 @@ export default {
         this.modelValue.SonKullanici = 0;
       }
 
-      this.$store.dispatch("setMekmarCustomerSave", this.modelValue);
+      this.$store.dispatch("setMekmarCustomerSave", this.modelValue)
+        .then(res => {
+          if (res) {
+            this.$socket.socketIO.emit('customer_list_emit');
+          };
+      })
       this.$emit("customer_mekmar_dialog", false);
     },
     deleteForm() {

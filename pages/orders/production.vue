@@ -1088,6 +1088,10 @@ export default {
     this.$socket.socketIO.on("cards_update_on", () => {
       this.$store.dispatch("setCardList");
     });
+    this.$socket.socketIO.on('customer_list_on', () => {
+      this.$store.dispatch('setCustomerList');
+    });
+
   },
 
   watch: {

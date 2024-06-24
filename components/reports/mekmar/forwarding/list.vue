@@ -10,7 +10,7 @@
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterDate(filterModel.value)"
-            @keyup.stop="filterDate(filterModel.value)" @input="filterDateInput(filterModel.value)"
+             @input="filterDateInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -18,7 +18,7 @@
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterTo(filterModel.value)"
-            @keyup.stop="filterTo(filterModel.value)" @input="filterToInput(filterModel.value)"
+             @input="filterToInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -26,7 +26,7 @@
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterFromWho(filterModel.value)"
-            @keyup.stop="filterFromWho(filterModel.value)" @input="filterFromWhoInput(filterModel.value)"
+             @input="filterFromWhoInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -34,7 +34,7 @@
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterProductId(filterModel.value)"
-            @keyup.stop="filterProductId(filterModel.value)" @input="filterProductIdInput(filterModel.value)"
+             @input="filterProductIdInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -42,7 +42,7 @@
         bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterCrate(filterModel.value)"
-            @keyup.stop="filterCrate(filterModel.value)" @input="filterCrateInput(filterModel.value)"
+             @input="filterCrateInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -50,7 +50,7 @@
         bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterMine(filterModel.value)"
-            @keyup.stop="filterMine(filterModel.value)" @input="filterMineInput(filterModel.value)"
+             @input="filterMineInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -58,7 +58,7 @@
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterCategory(filterModel.value)"
-            @keyup.stop="filterCategory(filterModel.value)" @input="filterCategoryInput(filterModel.value)"
+             @input="filterCategoryInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -69,7 +69,7 @@
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterProduct(filterModel.value)"
-            @keyup.stop="filterProduct(filterModel.value)" @input="filterProductInput(filterModel.value)"
+             @input="filterProductInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -77,7 +77,7 @@
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterSurface(filterModel.value)"
-            @keyup.stop="filterSurface(filterModel.value)" @input="filterSurfaceInput(filterModel.value)"
+             @input="filterSurfaceInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -85,7 +85,7 @@
         bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterWidth(filterModel.value)"
-            @keyup.stop="filterWidth(filterModel.value)" @input="filterWidthInput(filterModel.value)"
+             @input="filterWidthInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -93,7 +93,7 @@
         bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterHeight(filterModel.value)"
-            @keyup.stop="filterHeight(filterModel.value)" @input="filterHeightInput(filterModel.value)"
+             @input="filterHeightInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -101,7 +101,7 @@
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterEdge(filterModel.value)"
-            @keyup.stop="filterEdge(filterModel.value)" @input="filterEdgeInput(filterModel.value)"
+             @input="filterEdgeInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -112,7 +112,7 @@
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterBox(filterModel.value)"
-            @keyup.stop="filterBox(filterModel.value)" @input="filterBoxInput(filterModel.value)"
+            @input="filterBoxInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -126,7 +126,7 @@
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterPiece(filterModel.value)"
-            @keyup.stop="filterPiece(filterModel.value)" @input="filterPieceInput(filterModel.value)"
+             @input="filterPieceInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -140,7 +140,7 @@
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterAmount(filterModel.value)"
-            @keyup.stop="filterAmount(filterModel.value)" @input="filterAmountInput(filterModel.value)"
+             @input="filterAmountInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -148,7 +148,7 @@
         bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterUnit(filterModel.value)"
-            @keyup.stop="filterUnit(filterModel.value)" @input="filterUnitInput(filterModel.value)"
+             @input="filterUnitInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>
@@ -156,7 +156,7 @@
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" @keyup.enter="filterPo(filterModel.value)"
-            @keyup.stop="filterPo(filterModel.value)" @input="filterPoInput(filterModel.value)"
+             @input="filterPoInput(filterModel.value)"
             class="p-column-filter" />
         </template>
       </Column>

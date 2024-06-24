@@ -1,7 +1,7 @@
 import bodyParser from "body-parser"
 export default {
   typescript: {
-    shim:false
+    shim: false
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -16,24 +16,24 @@ export default {
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      {rel:'primevue/resources/themes/vela-orange/theme.css'}
+      { rel: 'primevue/resources/themes/vela-orange/theme.css' }
     ],
-    script:[
-      {src:'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'}
+    script: [
+      { src: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js' }
 
     ]
   },
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
-      'primeflex/primeflex.css',
-      '~/assets/css/bootstrap.css',
-      '~/assets/css/bootstrap.min.css',
+    'primeflex/primeflex.css',
+    '~/assets/css/bootstrap.css',
+    '~/assets/css/bootstrap.min.css',
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '~/plugins/components.js',
-    { src:'~/plugins/excel.js',mode: 'client'},
+    { src: '~/plugins/excel.js', mode: 'client' },
     '~/plugins/socket.io.js',
     '~/plugins/logs.js',
     '~/plugins/cookies',
@@ -52,13 +52,13 @@ export default {
     // Doc: https://www.primefaces.org/primevue/showcase-v2/#/setup
     [
       'primevue/nuxt',
-    {
-      theme: 'saga-orange',
-      ripple: true,
+      {
+        theme: 'saga-orange',
+        ripple: true,
 
-  },
+      },
     ],
-    
+
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/toast',
@@ -73,14 +73,14 @@ export default {
         default: true,
         vuex: { /* see section below */ },
         namespaces: { /* see section below */ }
-      }, 
+      },
     ]
   },
-  
+
 
   toast: {
     position: 'top-center',
-    duration:3000,
+    duration: 3000,
     register: [ // Register custom toasts
       {
         name: 'my-error',
@@ -90,7 +90,7 @@ export default {
         }
       }
     ]
-},
+  },
 
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -104,20 +104,20 @@ export default {
     // https://github.com/primefaces/primevue/issues/844
     transpile: ['primevue'],
     standalone: false,
-    loaders:  {
+    loaders: {
       vue: {
-         prettify: false
+        prettify: false
       }
     }
 
   },
-  serverMiddleware:[
+  serverMiddleware: [
     bodyParser.json(),
     '~/api'
   ],
   devServer: {
     port: 3000
   },
-  
+
 
 }

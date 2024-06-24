@@ -438,7 +438,7 @@ export default {
       this.selectedUser = this.users.find((x) => x.ID == this.model.NumuneTemsilci);
     },
     deleteProcess() {
-      if(confrim('Are you sure you want to delete?')){
+      if(confirm('Are you sure you want to delete?')){
         const data = {
           id: this.model.ID,
           po: this.model.NumuneNo,
