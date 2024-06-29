@@ -2,10 +2,7 @@
   <div class="row">
     <div>
       <div class=" flex flex-wrap justify-content-center gap-3">
-        <div class="flex align-items-center">
-          <Checkbox v-model="selectedMekmar" inputId="ingredient1" binary @change="changeMekmar($event)" />
-          <label for="ingredient1" class="ml-2"> Mekmar </label>
-        </div>
+
 
         <div class="flex align-items-center">
           <Checkbox v-model="selectedAll" inputId="ingredient1" binary @change="changeAll($event)" />

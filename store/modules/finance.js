@@ -247,7 +247,6 @@ const actions = {
         api.get('/finance/po/list/mekmer/' + customerId)
             
             .then(res => {
-                console.log(res.data);
                 vuexContext.commit('setFinancePoListMekmer', res.data);
                 vuexContext.commit('setFinancePoPaidList', res.data.odeme_liste);
                 vuexContext.dispatch('setFinancePoListTotalMekmer', res.data.ayrinti_list);

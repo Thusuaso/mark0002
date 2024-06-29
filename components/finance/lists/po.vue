@@ -1,5 +1,10 @@
 <template>
+
   <div class="row">
+    <vue-excel-xlsx :data="poList.filter(x=>x.Balanced>0)" :columns="excelColumnsField" :file-name="'Finance Detail'"
+      :file-type="'xlsx'" :sheet-name="'sheetname'" style="border: none; background-color: white">
+      <Button type="button" class="p-button-info w-100" icon="pi pi-file-excel" label="Excel" />
+    </vue-excel-xlsx>
     <div class="col-9">
       <DataTable :value="poList" scrollable scrollHeight="600px" :selection.sync="selectedPoList" selectionMode="single"
         @row-click="$emit('po_list_selected_emit', $event)" :rowClass="rowClass" :loading="loading">
@@ -106,15 +111,95 @@ export default {
   },
   data() {
     return {
+      filteredPoList:[],
       selectedPoList: null,
       selectedPoPaidDetailList: null,
+      excelColumnsField: [
+        {
+          label: "Customer Name",
+          field: "FirmaAdi",
+        },
+        {
+          label: "Po",
+          field: "SiparisNo",
+        },
+        {
+          label: "Order Date",
+          field: "SiparisTarihi",
+          dataFormat: this.formatDecimalDate,
+        },
+        {
+          label: "Shipped Date",
+          field: "YuklemeTarihi",
+          dataFormat: this.formatDecimalDate,
+        },
+        {
+          label: "Order Total",
+          field: "OrderTotal",
+          dataFormat: this.formatDecimalUsd,
+
+        },
+        {
+          label: "Advanced Payment",
+          field: "Pesinat",
+          dataFormat: this.formatDecimalUsd,
+
+        },
+        {
+          label: "Paid",
+          field: "Paid",
+          dataFormat: this.formatDecimalUsd,
+
+        },
+        {
+          label: "Balanced",
+          field: "Balanced",
+          dataFormat: this.formatDecimalUsd,
+        },
+      ],
+      json_meta: [
+        [
+          {
+            key: "charset",
+            value: "utf-8",
+          },
+        ],
+      ],
     };
   },
   methods: {
     rowClass(event) {
       return event.MayaControl ? "red-row" : "";
     },
+    formatDecimalUsd(value) {
+      if (value == null || value == undefined) {
+        return '$0';
+      } else {
+        const val = (value / 1).toFixed(2).replace(".", ",");
+        return "$" + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+    },
+    formatDecimalDate(value) {
+      if (value == null || value == NaN - NaN - NaN || value == 'NaN-NaN-NaN' || value == undefined || value == "") {
+        return "";
+      } else {
+        let date = new Date(value);
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+        if (month.toString().length == 1) {
+          month = '0' + month;
+        };
+        if (day.toString().length == 1) {
+          day = '0' + day;
+        }
+
+        return year + "-" + month + "-" + day;
+      }
+    }
   },
+
+
 };
 </script>
 <style scoped>

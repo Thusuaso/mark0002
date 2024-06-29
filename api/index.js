@@ -1003,51 +1003,190 @@ app.post('/card/save',(req,res)=>{
     });
 });
 
-app.put('/card/update',(req,res)=>{
-    const sizeSql = `select ID from OlculerTB where En='${req.body.En}' and Boy ='${req.body.Boy}' and Kenar='${req.body.Kenar}'`;
-    mssql.query(sizeSql)
-    .then(response=>{
-       if(response.recordset.length >0){
-            const sizeId = response.recordset[0].ID;
-            const cardSql = `update UrunKartTB SET UrunID='${req.body.UrunId}', YuzeyID='${req.body.YuzeyId}',OlcuID='${sizeId}',KategoriID='${req.body.KategoriId}' where ID='${req.body.ID}'`
-            mssql.query(cardSql)
-            .then(response=>{
-                if(response.rowsAffected[0] == 1){
-                    res.status(200).json({
-                        'status':true,
-                    });
-                } else{
-                    res.status(200).json({
-                        'status':false,
-                    });
-                };
 
+function sizeIdControl(width, height, thickness, id) {
+    return new Promise((resolve, reject) => {
+        if (id == null || id == '' || id == undefined) {
+            const controlSql = `select top 1 * from OlculerTB where En='${width}' and Boy='${height}' and Kenar='${thickness}'`;
+            mssql.query(controlSql, (err, control) => {
+                if (control.recordset.length > 0) {
+                    resolve(control.recordset[0].ID);
+                } else {
+                    const insertSizeSql = `insert into OlculerTB(En,Boy,Kenar) VALUES('${width}','${height}','${thickness}')`;
+                    mssql.query(insertSizeSql, (err, insert) => {
+                        if (insert.rowsAffected[0] == 1) {
+                            const getSizeIdSql = `select top 1 ID from OlculerTB order by ID desc`;
+                            mssql.query(getSizeIdSql, (err, getId) => {
+                                resolve(getId.recordset[0].ID);
+                            })
+                        }
+                    });
+               }
             });
-        }else{
-            const sizeSql = `insert into OlculerTB(En,Boy,Kenar,KullaniciID,KayitTarihi) VALUES('${req.body.En}','${req.body.Boy}','${req.body.Kenar}','${req.body.userId}','${req.body.date}')`;
-            mssql.query(sizeSql).then(response=>{
-               const sizeIdSql = `select top 1 ID from OlculerTB order by ID desc`;
-                mssql.query(sizeIdSql).then(id=>{
-                    const sizeId = id.recordset[0].ID;
-                    const cardSql = `update UrunKartTB SET UrunID='${req.body.UrunId}', YuzeyID='${req.body.YuzeyId}',OlcuID='${sizeId}',KategoriID='${req.body.KategoriId}' where ID='${req.body.ID}'`
 
-                    mssql.query(cardSql)
-                    .then(response=>{
-                        if(response.rowsAffected[0] == 1){
-                            res.status(200).json({
-                                'status':true,
-                            });
-                        } else{
-                            res.status(200).json({
-                                'status':false,
-                            });
-                        };
-                    });
-                });
-
-            });
+        } else {
+            resolve(id);
         }
     });
+}
+function productIdControl(productName, productId) {
+    return new Promise((resolve, reject) => {
+    if (productId == null || productId == undefined || productId == '' || productId == ' ') {
+        const productControl = `select top 1 * from UrunlerTB where UrunAdi='${productName}'`;
+        mssql.query(productControl, (err, productControlId) => {
+            if (productControlId.recordset.length > 0) {
+                resolve(productControlId.recordset[0].ID);
+            } else {
+                const insertProductSql = `insert into UrunlerTB(UrunAdi) VALUES('${productName}')`;
+                mssql.query(insertProductSql, (err, insertProduct) => {
+                    if (insertProduct.rowsAffected[0] == 1) {
+                        const getProductIdSql = `select top 1 ID from UrunlerTB order by ID desc`;
+                        mssql.query(getProductIdSql, (err,getProductId) => {
+                            resolve(getProductId.recordset[0].ID); 
+                        });
+                    }
+                });
+                        }
+        });
+    } else {
+        resolve(productId);
+    }
+    });
+
+
+};
+function categoryIdControl(categoryName, categoryId) {
+    return new Promise((resolve, reject) => {
+    if (categoryId == null || categoryId == undefined || categoryId == '' || categoryId == ' ') {
+        const controlCategorySql = `select top 1 * from KategoriTB where KategoriAdi='${categoryName}'`;
+        mssql.query(controlCategorySql, (err, controlCategory) => {
+            if (controlCategory.recordset.length > 0) {
+                resolve(controlCategory.recordset[0].ID)
+            } else {
+                const insertCategorySql = `insert into KategoriTB(KategoriAdi) VALUES('${categoryName}')`;
+                mssql.query(insertCategorySql, (err, insertCategory) => {
+                    if (insertCategory.rowsAffected[0] == 1) {
+                        const getCategoryIdSql = `select top 1 ID from KategoriTB order by ID desc`;
+                        mssql.query(getCategoryIdSql, (err, getCategoryId) => {
+                            if (getCategoryId.recordset.length > 0) {
+                                resolve(getCategoryId.recordset[0].ID);
+                            }
+                        });
+                    }
+                })
+            }
+        });
+    } else {
+                resolve(categoryId);
+    }
+    });
+
+};
+function surfaceIdControl(surfaceName, surfaceId) {
+    return new Promise((resolve, reject) => {
+    if (surfaceId == null || surfaceId == undefined || surfaceId == '' || surfaceId == ' ') {
+        const controlSurfaceSql = `select top 1 * from YuzeyKenarTB where YuzeyIslemAdi='${surfaceName}'`;
+        mssql.query(controlSurfaceSql, (err, controlSurface) => {
+            if (controlSurface.recordset.length > 0) {
+                resolve(controlSurface.recordset[0].ID)
+            } else {
+                const insertSurfaceSql = `insert into YuzeyKenarTB(YuzeyIslemAdi) VALUES('${surfaceName}')`;
+                mssql.query(insertSurfaceSql, (err, insertSurface) => {
+                    if (insertSurface.rowsAffected[0] == 1) {
+                        const getSurfaceIdSql = `select top 1 ID from YuzeyKenarTB order by ID desc`;
+                        mssql.query(getSurfaceIdSql, (err, getSurfaceId) => {
+                            if (getSurfaceId.recordset.length > 0) {
+                                resolve(getSurfaceId.recordset[0].ID);
+                            }
+                        });
+                    }
+                })
+            }
+        });
+    } else {
+                resolve(surfaceId);
+    }
+    });
+
+};
+
+
+
+app.put('/card/update', (req, res) => {
+    
+    sizeIdControl(req.body.En, req.body.Boy, req.body.Kenar, req.body.OlcuId)
+        .then(sizeId => {
+            
+            if (sizeId) {
+                productIdControl(req.body.UrunAdi, req.body.UrunId)
+                    .then(productId => {
+                        if (productId) {
+                            categoryIdControl(req.body.KategoriAdi, req.body.KategoriId)
+                                .then(categoryId => {
+                                    if (categoryId) {
+                                        surfaceIdControl(req.body.YuzeyIslemAdi, req.body.YuzeyId)
+                                            .then(surfaceId => {
+                                                const updateCardSql = `update UrunKartTB SET UrunID='${productId}', YuzeyID='${surfaceId}',OlcuID='${sizeId}',KategoriID='${categoryId}' where ID='${req.body.ID}'`;
+                                                mssql.query(updateCardSql, (err, updateCard) => {
+                                                    if (updateCard.rowsAffected[0] == 1) {
+                                                        res.status(200).json({ 'status': true });
+                                                    } else {
+                                                        res.status(200).json({ 'status': false });
+                                                        
+                                                    }
+                                                });
+                                            });
+                                    }
+                                });
+                        }
+                    });
+            }
+    })
+
+    // const sizeSql = `select ID from OlculerTB where En='${req.body.En}' and Boy ='${req.body.Boy}' and Kenar='${req.body.Kenar}'`;
+    // mssql.query(sizeSql)
+    // .then(response=>{
+    //    if(response.recordset.length >0){
+    //         const sizeId = response.recordset[0].ID;
+    //         const cardSql = `update UrunKartTB SET UrunID='${req.body.UrunId}', YuzeyID='${req.body.YuzeyId}',OlcuID='${sizeId}',KategoriID='${req.body.KategoriId}' where ID='${req.body.ID}'`
+    //         mssql.query(cardSql)
+    //         .then(response=>{
+    //             if(response.rowsAffected[0] == 1){
+    //                 res.status(200).json({
+    //                     'status':true,
+    //                 });
+    //             } else{
+    //                 res.status(200).json({
+    //                     'status':false,
+    //                 });
+    //             };
+
+    //         });
+    //     }else{
+    //         const sizeSql = `insert into OlculerTB(En,Boy,Kenar,KullaniciID,KayitTarihi) VALUES('${req.body.En}','${req.body.Boy}','${req.body.Kenar}','${req.body.userId}','${req.body.date}')`;
+    //         mssql.query(sizeSql).then(response=>{
+    //            const sizeIdSql = `select top 1 ID from OlculerTB order by ID desc`;
+    //             mssql.query(sizeIdSql).then(id=>{
+    //                 const sizeId = id.recordset[0].ID;
+    //                 const cardSql = `update UrunKartTB SET UrunID='${req.body.UrunId}', YuzeyID='${req.body.YuzeyId}',OlcuID='${sizeId}',KategoriID='${req.body.KategoriId}' where ID='${req.body.ID}'`
+
+    //                 mssql.query(cardSql)
+    //                 .then(response=>{
+    //                     if(response.rowsAffected[0] == 1){
+    //                         res.status(200).json({
+    //                             'status':true,
+    //                         });
+    //                     } else{
+    //                         res.status(200).json({
+    //                             'status':false,
+    //                         });
+    //                     };
+    //                 });
+    //             });
+
+    //         });
+    //     }
+    // });
 });
 
 
@@ -4034,7 +4173,7 @@ app.get('/reports/mekmar/gu/list', (req, res) => {
                             const forwSql = `
                                                 select 
                                                     MONTH(s.YuklemeTarihi) as Ay,
-                                                    (sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3)+
+                                                    (sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3)+sum(s.DetayTutar_4)+
                                                     dbo.Gu_Sevk_Ozet_Sip_Urn_Turkey(YEAR(s.YuklemeTarihi),MONTH(s.YuklemeTarihi))
                                                     ) as Ddp,
                                                     dbo.Gu_Sevk_Ozet_Sip_Urn_Turkey(YEAR(s.YuklemeTarihi),MONTH(s.YuklemeTarihi)) as Fob,
