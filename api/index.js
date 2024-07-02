@@ -11195,6 +11195,27 @@ function __getCategoryMass(category) {
     
 
 };
+function __amount(amount,unit,w,h,t){
+    if(unit == 'Sqm'){
+
+        return amount;
+    } 
+    else if (unit == 'Pcs'){
+
+        if(w == 'Free' || w == 'FREE' || w == 'Ant' || w == 'VAR' || w == 'Various' || w == 'SLAB' || w == 'Slab' || h == 'Free' || h == 'FREE' || w == 'MINI' || w == 'Mini'){
+            return 0;
+        }else{
+            return (amount * parseFloat(w.toString().replace(',','.')) * parseFloat(h.toString().replace(',','.'))) / 10000
+        }
+    } else if (unit == 'Mt'){
+
+        if(w == 'Free' || w == 'FREE' || w=='Slab' || w == 'SLAB' || w == 'VAR' || w == 'Var' || w == 'Various'){
+            return 0;
+        }else{
+            return (amount * parseFloat(w.toString().replace(',','.'))) / 100
+        }
+    }
+}
 app.get('/order/production/product/check/:po',async (req,res)=>{
     const checkListSql = `
         select    
@@ -11224,7 +11245,7 @@ order by u.UrunKartID,KasaNo asc
         check.recordset.forEach(x => {
             x.Sira = queue;
             queue++;
-            x.Ton = __getCategoryMass(x.KategoriAdi.split(' ')[0]) * 10 * x.Miktar * parseFloat(x.Kenar.replace(',','.')).toFixed(4);
+            x.Ton = __getCategoryMass(x.KategoriAdi.split(' ')[0]) * 10 * __amount(x.Miktar,x.BirimAdi,x.En,x.Boy,x.Kenar) * parseFloat(x.Kenar.replace(',','.')).toFixed(4);
         });
         res.status(200).json({ 'list': check.recordset });
     });

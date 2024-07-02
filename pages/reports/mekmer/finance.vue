@@ -21,11 +21,36 @@
       :status="false" />
 
     <div class="row">
-      <Dropdown v-model="selectedMonth" :options="months" optionLabel="name" @change="monthSelected($event)" />
+      <div class="row">
+        <div class="col-sm-6">
+          <Dropdown class="w-100" v-model="selectedMonth" :options="months" optionLabel="name" @change="monthSelected($event)" />
+
+        </div>
+        <div class="col-sm-6">
+          <vue-excel-xlsx
+      :data="monthly_mekmar_finance_list"
+      :columns="getFinanceMekmerToMekmarFields"
+      :file-name="'Finance'"
+      :file-type="'xlsx'"
+      :sheet-name="'sheetname'"
+      style="border: none; background-color: white; width: 100%"
+    >
+      <Button
+        type="button"
+        class="p-button-info w-100"
+        icon="pi pi-file-excel"
+        label="Excel"
+      />
+    </vue-excel-xlsx>
+        </div>
+
+      </div>
 
       <div class="col-12">
         <DataTable :value="monthly_mekmar_finance_list" scrollable scrollHeight="600px"
-          :selection.sync="selectedMonthlyFinance" selectionMode="single" @row-select="financeMonthlySelected($event)">
+          :selection.sync="selectedMonthlyFinance" selectionMode="single" @row-select="financeMonthlySelected($event)"
+          sortField="yuklemetarihi" :sortOrder="-1"
+          >
           <template #header>
             MEKMAR => MEKMER DEN SATIN ALDIĞI ÜRÜNLERİN BEDELLERİ
           </template>
@@ -192,6 +217,13 @@
     },
     data() {
       return {
+        getFinanceMekmerToMekmarFields: [
+        { label: "Po", field: "siparisno" },
+        { label: "Shipped Date", field: "yuklemetarihi" },
+        { label: "Order", field: "toplam" },
+        { label: "Labour", field: "iscilik" },
+        { label: "Balanced", field: "kalan" },
+      ],
         paid_date:null,
         selectedMonthlyFinance:null,
         monthly_mekmar_finance_list:[],

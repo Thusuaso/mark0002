@@ -155,6 +155,10 @@
       <Button class="p-button-secondary" type="button" label="Orders Excel" @click="orders_click_excel"
         :disabled="selection_orders_disabled" />
     </div>
+    <div class="col-1">
+      <Button class="p-button-secondary" type="button" label="Ticket" @click="ticket_click_excel"
+         />
+    </div>
     <div class="col-3">
       <div class="row">
         <div class="col-6">
@@ -190,7 +194,7 @@ import { mapGetters } from "vuex";
 import api from '@/plugins/excel.server';
 export default {
   computed: {
-    ...mapGetters(["getProductList", "getLocalUrl","getOrderList"]),
+    ...mapGetters(["getProductList", "getLocalUrl","getOrderList","getFilteredSelectionList"]),
   },
   props: {
     productionTotal: {
@@ -520,6 +524,20 @@ export default {
       });
   },
   methods: {
+    ticket_click_excel(){
+
+      api.post('/seleksiyon/etiket/excel',this.getFilteredSelectionList)
+      .then(res=>{
+        if (res.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "seleksiyon/etiket/excel";
+
+            link.setAttribute("download", "seleksiyon_etiket.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+      });
+    },
     orders_click_excel(){
       api
         .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)

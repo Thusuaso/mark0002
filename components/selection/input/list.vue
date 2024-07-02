@@ -127,7 +127,6 @@
           </Column>
         </DataTable>
       </div>
-
     </div>
   </div>
 
@@ -188,6 +187,7 @@ export default {
     },
     filteredProductsList(event) {
       this.$store.commit("setSelectionProductTotalList", event.filteredValue);
+      this.$store.dispatch("setSelectionProductFilteredList",event.filteredValue);
     },
   },
 };

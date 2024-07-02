@@ -147,7 +147,7 @@ import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from 'vuex';
 export default {
   computed: {
-    ...mapGetters(['getLocalUrl'])
+    ...mapGetters(['getLocalUrl','getOrderProductionPo'])
   },
   props: {
     list: {
@@ -199,7 +199,11 @@ export default {
       this.$store.dispatch("setOrderProductionCheckListTotal", event.filteredValue);
     },
     excel_test() {
-      api.post("/excel/check/list", this.list).then((response) => {
+      const data = {
+        'list':this.list,
+        'po':this.getOrderProductionPo
+      }
+      api.post("/excel/check/list", data).then((response) => {
         if (response) {
           const link = document.createElement("a");
           link.href = this.getLocalUrl + "excel/check/list";

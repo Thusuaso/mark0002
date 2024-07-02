@@ -19,11 +19,13 @@ const state = {
     productionBulunamadiButtonStatus:false,
     productionCrateSizeList:[],
     productionCrateSizeButtonStatus: false,
+    filteredSelectionList:[]
 };
 const actions = {
 
-
-
+    setSelectionProductFilteredList(vuexContext,payload){
+        vuexContext.commit('setSelectionProductFilteredList',payload)
+    },
     setSelectionProductsList(vuexContext) {
         vuexContext.dispatch('setBeginLoadingAction');
         this.$axios.get('/selection/production/list')
@@ -201,6 +203,9 @@ const actions = {
 
 };
 const mutations = {
+    setSelectionProductFilteredList(state,list){
+        state.filteredSelectionList = list;
+    },
     setSelectionProductionCrateSizeDelete(state,cratesize){
         const index = state.productionCrateSizeList.findIndex(x => x.Id === cratesize.Id);
         state.productionCrateSizeList.splice(index,1);
@@ -283,6 +288,9 @@ const mutations = {
 
 };
 const getters = {
+    getFilteredSelectionList(state){
+        return state.filteredSelectionList;
+    },
     getProductionTotal(state){
         return state.productionTotal;
     },
