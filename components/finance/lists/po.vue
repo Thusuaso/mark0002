@@ -1,7 +1,7 @@
 <template>
 
   <div class="row">
-    <Button v-if="userId == 47" class="p-button-warning" label="Excel" @click="excel_output_custom"/>
+    <Button v-if="userId == 10" class="p-button-warning" label="Excel" @click="excel_output_custom"/>
 
     <vue-excel-xlsx v-else :data="poList.filter(x=>x.Balanced>0)" :columns="excelColumnsField" :file-name="'Finance Detail'"
       :file-type="'xlsx'" :sheet-name="'sheetname'" style="border: none; background-color: white">
