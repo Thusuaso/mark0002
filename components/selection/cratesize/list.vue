@@ -5,26 +5,40 @@
       <template #header>
         <Button type="button" icon="pi pi-filter-slash" label="Clear Filters" outlined @click="clearFilter()" />
       </template>
-      <Column field="TedarikciAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
+      <Column field="Supplier" header="Supplier" :showFilterMenu="false" :showClearButton="false"
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
           <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column field="KasaOlculeri" header="Crate Size" :showFilterMenu="false" :showClearButton="false"
+      <Column field="Crate_Width" header="Crate Width" :showFilterMenu="false" :showClearButton="false"
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
           <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column field="Ebat" header="Tile Size" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+
+      <Column field="Crate_Height" header="Crate Height" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader" bodyClass="tableBody">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column field="Crate_Thickness" header="Crate Thickness" :showFilterMenu="false" :showClearButton="false"
+        headerClass="tableHeader" bodyClass="tableBody">
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+
+      <Column field="Stone_Size" header="Tile Size" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
           <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
 
-      <Column field="Adet" header="Piece" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+      <Column field="Piece" header="Piece" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
           <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
@@ -47,20 +61,26 @@ export default {
     return {
       selectedCrateSize: null,
       filters1: {
-        TedarikciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Ebat: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        KasaOlculeri: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Supplier: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Crate_Width: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Crate_Height: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Crate_Thickness: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        
+        Stone_Size: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Piece: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
     };
   },
   methods: {
     clearFilter(event) {
       this.filters1 = {
-        TedarikciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Ebat: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        KasaOlculeri: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Supplier: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Crate_Width: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Crate_Height: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Crate_Thickness: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        
+        Stone_Size: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Piece: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       };
     },
     crateSizeSelected(event) {

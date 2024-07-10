@@ -830,7 +830,21 @@ app.delete('/selection/production/delete/:crateNo',(req,res)=>{
 });
 /*Crate Sizes */
 app.get('/selection/production/cratesize',(req,res)=>{
-    const sql = 'select kdo.Id,kdo.Ebat,kdo.Tedarikci as TedarikciId,kdo.KasaOlculeri,kdo.Adet,t.FirmaAdi as TedarikciAdi from kasa_detay_olculeri kdo inner join TedarikciTB t on t.ID = kdo.Tedarikci';
+    const sql = `
+        select 
+
+	kdy.ID,
+	kdy.Crate_Width,
+	kdy.Crate_Height,
+	kdy.Crate_Thickness,
+	kdy.Stone_Size,
+	kdy.SupplierId,
+	kdy.Supplier,
+	kdy.Piece
+
+from Kasa_Detaylari_Yeni kdy
+
+    `;
     mssql.query(sql,(err,cratesize)=>{
         res.status(200).json({
             'cratesize':cratesize.recordset
@@ -838,15 +852,11 @@ app.get('/selection/production/cratesize',(req,res)=>{
     });
 });
 app.post('/selection/production/cratesize/save',(req,res)=>{
-    const sql = `insert into kasa_detay_olculeri(Ebat,Tedarikci,KasaOlculeri,Adet) VALUES('${req.body.Ebat}','${req.body.TedarikciId}','${req.body.KasaOlculeri}','${req.body.Adet}')`;
-    const sql2 = `select top 1 kdo.Id,
-                kdo.KasaOlculeri,
-                kdo.Adet,
-                kdo.Tedarikci as TedarikciId,
-                t.FirmaAdi as TedarikciAdi,
-                kdo.Ebat
-                from kasa_detay_olculeri kdo inner join TedarikciTB t on t.ID = kdo.Tedarikci
-                order by kdo.Id desc`;
+
+    const sql = `insert into Kasa_Detaylari_Yeni(Crate_Width,Crate_Height,Crate_Thickness,Stone_Size,SupplierId,Supplier,Piece)
+VALUES('${req.body.width}','${req.body.height}','${req.body.thickness}','${req.body.Ebat}','${req.body.TedarikciId}','${req.body.TedarikciAdi}','${req.body.Adet}')`;
+
+    const sql2 = `select top 1 * from Kasa_Detaylari_Yeni order by ID desc`;
     mssql.query(sql,(err,results)=>{
         mssql.query(sql2,(err,cratesize)=>{
            if(cratesize.rowsAffected[0] == 1){
@@ -864,7 +874,10 @@ app.post('/selection/production/cratesize/save',(req,res)=>{
     });
 });
 app.put('/selection/production/cratesize/update',(req,res)=>{
-    const sql = `update kasa_detay_olculeri SET Ebat='${req.body.Ebat}',Tedarikci='${req.body.TedarikciId}',KasaOlculeri='${req.body.KasaOlculeri}',Adet='${req.body.Adet}' where Id='${req.body.Id}'`;
+    const sql = `
+        update Kasa_Detaylari_Yeni SET Crate_Width='${req.body.width}',Crate_Height='${req.body.height}',Crate_Thickness='${req.body.thickness}',Stone_Size='${req.body.Ebat}',SupplierId='${req.body.TedarikciId}',Supplier='${req.body.TedarikciAdi}',Piece='${req.body.Adet}'
+WHERE ID='${req.body.ID}'
+    `;
     mssql.query(sql,(err,results)=>{
         if(results.rowsAffected[0] == 1){
             res.status(200).json({
@@ -879,7 +892,7 @@ app.put('/selection/production/cratesize/update',(req,res)=>{
     });
 });
 app.delete('/selection/production/cratesize/delete/:id',(req,res)=>{
-    const sql = `delete kasa_detay_olculeri where Id='${req.params.id}'`;
+    const sql = `delete Kasa_Detaylari_Yeni where Id='${req.params.id}'`;
     mssql.query(sql,(err,results)=>{
         if(results.rowsAffected[0] == 1){
             res.status(200).json({
@@ -1728,7 +1741,6 @@ app.post('/transport/list/save',(req,res)=>{
             INSERT INTO NakliyeFaturaKayitTB (FirmaID, Tarih, FaturaNo, Tutar,Kur,KayitTarihi,KullaniciID)    values
             ('${x.companyId}','${x.date}','${x.invoiceno}','${x.tl}','${x.currency}','${x.nowDate}','${x.userId}')
         `;
-        console.log(sql);
         mssql.query(sql)
         .then(response=>{
            if(response.rowsAffected[0] == 1){
@@ -1780,7 +1792,6 @@ app.post('/transport/file/list/save',(req,res)=>{
                 values
                 ('${x.date}','${transportProductId}','11','${x.po}','${x.usd}','1','13','${transportInvoiceId}','2','${x.nowDate}','${x.invoiceno}.pdf','${x.userId}')
                 `;
-                console.log(sql);
                 mssql.query(sql);
             });
         });
@@ -4953,7 +4964,6 @@ app.delete('/sample/delete/:id/:po',(req,res)=>{
 
 });
 app.put('/sample/update', (req, res) => {
-    console.log(req.body);
     if(req.body.MusteriID){
         const sql = `
                     
@@ -6979,6 +6989,7 @@ app.get('/panel/usa/stock/photos/list/:product_id',(req,res)=>{
     });
 
 });
+
 app.put('/panel/usa/stock/update',(req,res)=>{
     const updateStock = `
     update MekmarCom_StockListYeni
@@ -6988,50 +6999,51 @@ app.put('/panel/usa/stock/update',(req,res)=>{
     WHERE
         SkuNo='${req.body.SkuNo}'
     `;
-    const updatePrice = `
+    const updateDetail = `
     select * from DepoUrunKart_MekmarSiteTB
 
     update DepoUrunKart_MekmarSiteTB
     SET
-        UrunAdi='${req.body.UrunAdi}',
-        Aciklama='${req.body.Aciklama}',
-        Anahtarlar='${req.body.Anahtarlar}',
-        Size='${req.body.Size}',
-        Renk='${req.body.Renk}',
+        UrunAdi='${__stringCharacterChange(req.body.UrunAdi)}',
+        Aciklama='${__stringCharacterChange(req.body.Aciklama)}',
+        Anahtarlar='${__stringCharacterChange(req.body.Anahtarlar)}',
+        Size='${__stringCharacterChange(req.body.Size)}',
+        Renk='${__stringCharacterChange(req.body.Renk)}',
         Fiyat='${req.body.Fiyat}',
         MaxStock='${req.body.MaxStock}',
-        KutuDetay='${req.body.KutuDetay}',
-        KasaDetay='${req.body.KasaDetay}',
-        Surface='${req.body.Surface}',
-        Edge='${req.body.Edge}',
+        KutuDetay='${__stringCharacterChange(req.body.KutuDetay)}',
+        KasaDetay='${__stringCharacterChange(req.body.KasaDetay)}',
+        Surface='${__stringCharacterChange(req.body.Surface)}',
+        Edge='${__stringCharacterChange(req.body.Edge)}',
         Yayinla='${req.body.Yayinla}',
-        urunadi_en='${req.body.UrunAdi}',
-        aciklama_en='${req.body.Aciklama}',
-        anahtarlar_en='${req.body.Anahtarlar}',
-        renk_en='${req.body.Renk}',
-        kutudetay_en='${req.body.KutuDetay}',
-        kasadetay_en='${req.body.KasaDetay}',
-        surface_en='${req.body.Size}',
-        edge_en='${req.body.Edge}',
-        urunadi_fr='${req.body.urunadi_fr}',
-        aciklama_fr='${req.body.aciklama_fr}',
-        anahtarlar_fr='${req.body.anahtarlar_fr}',
-        renk_fr='${req.body.renk_fr}',
-        kutudetay_fr='${req.body.kutudetay_fr}',
-        kasadetay_fr='${req.body.kasadetay_fr}',
-        surface_fr='${req.body.surface_fr}',
-        edge_fr='${req.body.edge_fr}',
-        urunadi_es='${req.body.urunadi_es}',
-        aciklama_es='${req.body.aciklama_es}',
-        anahtarlar_es='${req.body.anahtarlar_es}',
-        renk_es='${req.body.renk_es}',
-        kutudetay_es='${req.body.kutudetay_es}',
-        kasadetay_es='${req.body.kasadetay_es}',
-        surface_es='${req.body.surface_es}',
-        edge_es='${req.body.edge_es}'
+        urunadi_en='${__stringCharacterChange(req.body.UrunAdi)}',
+        aciklama_en='${__stringCharacterChange(req.body.Aciklama)}',
+        anahtarlar_en='${__stringCharacterChange(req.body.Anahtarlar)}',
+        renk_en='${__stringCharacterChange(req.body.Renk)}',
+        kutudetay_en='${__stringCharacterChange(req.body.KutuDetay)}',
+        kasadetay_en='${__stringCharacterChange(req.body.KasaDetay)}',
+        surface_en='${__stringCharacterChange(req.body.Size)}',
+        edge_en='${__stringCharacterChange(req.body.Edge)}',
+        urunadi_fr='${__stringCharacterChange(req.body.urunadi_fr)}',
+        aciklama_fr='${__stringCharacterChange(req.body.aciklama_fr)}',
+        anahtarlar_fr='${__stringCharacterChange(req.body.anahtarlar_fr)}',
+        renk_fr='${__stringCharacterChange(req.body.renk_fr)}',
+        kutudetay_fr='${__stringCharacterChange(req.body.kutudetay_fr)}',
+        kasadetay_fr='${__stringCharacterChange(req.body.kasadetay_fr)}',
+        surface_fr='${__stringCharacterChange(req.body.surface_fr)}',
+        edge_fr='${__stringCharacterChange(req.body.edge_fr)}',
+        urunadi_es='${__stringCharacterChange(req.body.urunadi_es)}',
+        aciklama_es='${__stringCharacterChange(req.body.aciklama_es)}',
+        anahtarlar_es='${__stringCharacterChange(req.body.anahtarlar_es)}',
+        renk_es='${__stringCharacterChange(req.body.renk_es)}',
+        kutudetay_es='${__stringCharacterChange(req.body.kutudetay_es)}',
+        kasadetay_es='${__stringCharacterChange(req.body.kasadetay_es)}',
+        surface_es='${__stringCharacterChange(req.body.surface_es)}',
+        edge_es='${__stringCharacterChange(req.body.edge_es)}'
     where Id='${req.body.Id}'
 
     `;
+    mssql.query(updateDetail);
 
     mssql.query(updateStock,(err,stock)=>{
         if(stock.rowsAffected[0]==1){
@@ -8203,6 +8215,23 @@ app.put('/finance/po/paid/update/mekmer', (req, res) => {
         }
     })
 });
+app.post('/finance/cost/control',(req,res)=>{
+    const sql = `
+        insert into Finance_Cost_Logs(
+        Date,
+        Po,
+        Freight_Selling,
+        Freight_Purchase,
+        Detail_1_Selling,
+        Detail_2_Selling,
+        Detail_3_Selling,
+        Detail_1_Purchase,
+        Detail_2_Purchase,
+        Detail_3_Purchase)
+        VALUES('${req.body.now}','${req.body.po}','${req.body.freight_selling}','${req.body.freight_purchase}','${req.body.detail_1_selling}','${req.body.detail_2_selling}','${req.body.detail_3_selling}','${req.body.detail_1_purchase}','${req.body.detail_2_purchase}','${req.body.detail_3_purchase}')
+    `;
+    mssql.query(sql);
+});
 
 /*Orders*/
 app.get('/order/production/list', async (req, res) => {
@@ -8338,9 +8367,7 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
    await mssql.query(ordersListSql, async (err, orders) => {
-        console.log('/order/production/list , hata',err)
         await mssql.query(orderYearListSql, (err, years) => {
-            console.log('/order/production/list , year , hata',err)
             let customYearList = [];
             let ordersList = [];
             years.recordset.forEach(x => {
@@ -8765,9 +8792,7 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
    await mssql.query(ordersListSql, async (err, orders) => {
-        console.log('/order/production/list , hata',err)
         await mssql.query(orderYearListSql, (err, years) => {
-            console.log('/order/production/list , year , hata',err)
             let customYearList = [];
             years.recordset.forEach(x => {
                 customYearList.push(x);
@@ -8908,9 +8933,7 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
    await mssql.query(ordersListSql, async (err, orders) => {
-        console.log('/order/production/list , hata',err)
         await mssql.query(orderYearListSql, (err, years) => {
-            console.log('/order/production/list , year , hata',err)
             let customYearList = [];
             years.recordset.forEach(x => {
                 customYearList.push(x);
@@ -9050,7 +9073,6 @@ order by s.SiparisTarihi desc
 
     `;
     await mssql.query(productionListYearSql,(err,production)=>{
-        console.log('/order/production/list/year/:year , hata',err)
         res.status(200).json({ 'list': production.recordset });
     });
 
@@ -9188,9 +9210,7 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
     await mssql.query(ordersListSql,async (err, orders) => {
-        console.log('/order/shipped/list , hata', err)
                await mssql.query(orderYearListSql, (err, years) => {
-                console.log('/order/shipped/list , year ,  hata', err)
 
             let customYearList = [];
             years.recordset.forEach(x => {
@@ -9882,7 +9902,6 @@ order by s.YuklemeTarihi desc
 
 
 await mssql.query(ordersListSql, (err, orders) => {
-    console.log('/order/shipped/list/filter/load/date/ , hata', err)
     res.status(200).json({'list':orders.recordset});
 
 });
@@ -10023,7 +10042,6 @@ app.get('/order/shipped/list/filter/global/:filter',async (req,res)=>{
     `;
 
     await mssql.query(ordersListSql, (err, orders) => {
-        console.log('/order/shipped/list/filter/load/date/ , hata', err)
         res.status(200).json({'list':orders.recordset});
 
     });
@@ -10161,7 +10179,6 @@ order by s.SiparisTarihi desc
 
     `;
     await mssql.query(shippedListYearSql,(err,shipped)=>{
-        console.log('/order/shipped/list/year/:year ,  hata', err)
 
         res.status(200).json({ 'list': shipped.recordset });
     });
@@ -10243,8 +10260,7 @@ s.FaturaKesimTurID,
 s.KonteynerNo,
 s.SiparisKontrol,
 s.SiparisKontrolEden,
-s.SiparisKontrol,
-s.SiparisKontrolEden,
+
 
 
 	su.ID as UrunId,
@@ -10583,7 +10599,6 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID not in (1,123) and mus.
     `;
     await mssql.query(sqlMekmer, async(err, mekmer) => {
         await mssql.query(sqlMekmar, (err, mekmar) => {
-            console.log(mekmer.recordset.concat(mekmar.recordset) )
             res.status(200).json({ 'list': mekmer.recordset.concat(mekmar.recordset) }); 
         });
     });
@@ -11537,7 +11552,6 @@ where
 ID='${req.body.SiparisId}'
     `;
     mssql.query(sql,(err,production)=>{
-        console.log('/order/production/update , hata',err);
         if(production.rowsAffected[0] == 1){
             res.status(200).json({'status':true});
         } else {
@@ -12798,6 +12812,24 @@ app.post('/shipment/products/save/mail',(req,res)=>{
         });
 
 
+});
+
+app.post('/mail/product/control/send',(req,res)=>{
+    let content = `
+        <h3>${req.body.kontrol_eden} Adlı Kullanıcı ${req.body.po} Siparişini ${req.body.date} Tarihinde Kontrol Etmiştir.</h3>
+    `;
+    transporter.sendMail({
+        to: 'bilgiislem@mekmar.com',
+        from: 'goz@mekmar.com',
+        subject: 'Sipariş Kontrol Maili',
+        html: content
+    })        .then(response=>{
+        if(response.response == '250 message sent ok '){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+        };
+    });
 });
 
 

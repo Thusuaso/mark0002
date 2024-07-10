@@ -293,6 +293,7 @@ export default {
         { code: "FP-10", urun: "SILVER RUSTIC KENARI KIRIK (FP-10)" },
       ],
       etiketlerVeikKasa: [
+        
         {
           code: "SNS-01-K",
           urun: "MINA RUSTIC KENARI KIRIK (SNS01)",
@@ -368,6 +369,27 @@ export default {
           urun: "ELA MOSAIC (SAS01)",
           link: "https://file-service.mekmar.com/file/download/etiket/1/SAS01.doc",
         },
+        {
+          code:"SBR-01-1",
+          urun:"SILVER MINI PATTERN",
+          link:"https://cdn.mekmarimage.com/etiket/SBR-01-1.doc"
+        },
+        {
+          code:"SBY-02-1",
+          urun:"ELA MINI PATTERN",
+          link:"https://cdn.mekmarimage.com/etiket/SBY-02-1.doc"
+        },
+        {
+          code:"ST448-1",
+          urun:"Silver 15,25x30,5 Unfilled Brushed",
+          link:"https://cdn.mekmarimage.com/etiket/ST448-1.doc"
+        },
+        {
+          code:"ST450-1",
+          urun:"Mina Rustic 15,25x30,5 Unfilled Brushed",
+          link:"https://cdn.mekmarimage.com/etiket/ST450-1.doc"
+        }
+
       ],
       etiketlerNovaKasa: [
         { code: "FP-01-K", urun: "SCABOS KENARI KIRIK (FP-01)" },

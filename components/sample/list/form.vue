@@ -169,14 +169,13 @@
                 </span>
               </div>
               <div class="col">
-                <span class="p-float-label mb-4">
-                  <InputText
-                    id="usd"
-                    v-model="freigthCost"
-                    @input="freigthCost = formatPoint($event)"
-                  />
-                  <label for="usd">$</label>
-                </span>
+                <CustomInput
+          :value="freigthCost"
+          text="($)"
+          @onInput="freigthCost = $event"
+          :disabled="false"
+        />
+                
               </div>
               <div class="col">
                 <Dropdown

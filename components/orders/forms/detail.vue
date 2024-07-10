@@ -346,6 +346,29 @@ export default {
   methods: {
     controlBooleanSelected(event) {
       this.modelProduction.SiparisKontrol = this.selectedControlBoolean;
+      if(this.selectedControlBoolean){
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hour = date.getHours();
+        const minutes = date.getMinutes();
+
+        const payload = {
+          'po':this.modelProduction.SiparisNo,
+          'kontrol_eden':Cookies.get('username'),
+          'date':year + '/' + month + '/' + day + '/' + ' ' + hour + ':' + minutes
+
+        }
+        this.$axios.post('/mail/product/control/send',payload)
+            .then(response => {
+                if (response.data.status) {
+                  this.$toast.success('Mail gönderildi. Kaydetmeyi unutmayınız.');
+                } else {
+                this.$toast.error('Mail gönderilemedi.');
+                }
+            })
+      }
     },
     inputPo(event) {
       const index = this.getOrdersAllList.find((x) => x.SiparisNo == event);
@@ -467,7 +490,7 @@ export default {
       this.load_date = date.stringToDate(this.modelProduction.YuklemeTarihi);
       this.eta_date = date.stringToDate(this.modelProduction.Eta);
       this.modelProduction.SiparisKontrolEden = Cookies.get('userId');
-      if (this.modelProduction.SiparisKontrol == null || this.modelProduction.SiparisKontrol == '' || this.modelProduction.SiparisKontrol == 'null') {
+      if (this.modelProduction.SiparisKontrol == null || this.modelProduction.SiparisKontrol == '' || this.modelProduction.SiparisKontrol == 'null' || this.modelProduction.SiparisKontrol == undefined || this.modelProduction.SiparisKontrol == false) {
         this.selectedControlBoolean = false;
         this.modelProduction.SiparisKontrol = false;
       } else {

@@ -1,10 +1,13 @@
 <template>
 
   <div class="row">
-    <vue-excel-xlsx :data="poList.filter(x=>x.Balanced>0)" :columns="excelColumnsField" :file-name="'Finance Detail'"
+    <Button v-if="userId == 47" class="p-button-warning" label="Excel" @click="excel_output_custom"/>
+
+    <vue-excel-xlsx v-else :data="poList.filter(x=>x.Balanced>0)" :columns="excelColumnsField" :file-name="'Finance Detail'"
       :file-type="'xlsx'" :sheet-name="'sheetname'" style="border: none; background-color: white">
       <Button type="button" class="p-button-info w-100" icon="pi pi-file-excel" label="Excel" />
     </vue-excel-xlsx>
+
     <div class="col-9">
       <DataTable :value="poList" scrollable scrollHeight="600px" :selection.sync="selectedPoList" selectionMode="single"
         @row-click="$emit('po_list_selected_emit', $event)" :rowClass="rowClass" :loading="loading">
@@ -85,7 +88,14 @@
   </div>
 </template>
 <script>
+import Cookies from "js-cookie";
+import {mapGetters} from 'vuex';
+import api from "~/plugins/excel.server";
+
 export default {
+  computed:{
+    ...mapGetters(['getLocalUrl'])
+  },
   props: {
     poList: {
       type: Array,
@@ -165,9 +175,31 @@ export default {
           },
         ],
       ],
+      userId:null,
     };
   },
+  created(){
+    this.userId = Cookies.get('userId');
+  },
   methods: {
+    excel_output_custom(){
+
+      const data =  {
+        'po':this.poList,
+        'paid':this.paidList
+      }
+
+      api.post("/finance/mekmar/excel/custom", data).then((response) => {
+        if (response.status) {
+          const link = document.createElement("a");
+          link.href = this.getLocalUrl + "finance/mekmar/excel/custom";
+
+          link.setAttribute("download", "finance_detail_custom.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+    },
     rowClass(event) {
       return event.MayaControl ? "red-row" : "";
     },

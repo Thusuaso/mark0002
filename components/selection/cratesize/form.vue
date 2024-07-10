@@ -10,8 +10,20 @@
       </div>
       <div class="col">
         <span class="p-float-label">
-          <InputText id="stonesize" type="text" v-model="KasaOlculeri" />
-          <label for="stonesize">Crate Size</label>
+          <InputText id="stonesize" type="text" v-model="width" @input="width = width.replace(',','.')"/>
+          <label for="stonesize">Width</label>
+        </span>
+      </div>
+      <div class="col">
+        <span class="p-float-label">
+          <InputText id="stonesize" type="text" v-model="height" @input="height = height.replace(',','.')"/>
+          <label for="stonesize">Height</label>
+        </span>
+      </div>
+      <div class="col">
+        <span class="p-float-label">
+          <InputText id="stonesize" type="text" v-model="thickness" @input="thickness = thickness.replace(',','.')"/>
+          <label for="stonesize">Thickness</label>
         </span>
       </div>
       <div class="col">
@@ -22,7 +34,7 @@
       </div>
       <div class="col">
         <span class="p-float-label">
-          <InputText id="amount" type="text" v-model="Adet" />
+          <InputText id="amount" type="text" v-model="Adet" @input="Adet = Adet.replace(',','.')"/>
           <label for="amount">Piece</label>
         </span>
       </div>
@@ -55,9 +67,11 @@ export default {
   },
   data() {
     return {
-      KasaOlculeri: null,
+      thickness:null,
+      height:null,
+      width: null,
       Ebat: null,
-      Adet: null,
+      Adet: 0,
       stoneSize: null,
       selectedSupplier: null,
       filteredSupplierList: null,
@@ -65,31 +79,40 @@ export default {
   },
   created() {
     if (!this.status) {
-      this.selectedSupplier = this.supplier.find((x) => x.ID == this.model.TedarikciId);
-      this.Ebat = this.model.Ebat;
-      this.KasaOlculeri = this.model.KasaOlculeri;
-      this.Adet = this.model.Adet;
+      this.selectedSupplier = this.supplier.find((x) => x.ID == this.model.SupplierId);
+      this.Ebat = this.model.Stone_Size;
+      this.Adet = this.model.Piece;
+
+      
+      this.thickness = this.model.Crate_Thickness;
+      this.height = this.model.Crate_Height;
+      this.width =  this.model.Crate_Width;
     }
   },
   methods: {
     deleteForm() {
-      this.$store.dispatch("setSelectionProductionCrateSizeDelete", this.model.Id);
+      this.$store.dispatch("setSelectionProductionCrateSizeDelete", this.model.ID);
       this.$emit("selection_production_crate_size_dialog_close");
     },
     update() {
       this.model.TedarikciId = this.selectedSupplier.ID;
       this.model.TedarikciAdi = this.selectedSupplier.FirmaAdi;
-      this.model.KasaOlculeri = this.KasaOlculeri;
       this.model.Ebat = this.Ebat;
       this.model.Adet = this.Adet;
+      this.model.width = this.width;
+      this.model.height = this.height;
+      this.model.thickness = this.thickness;
       this.$store.dispatch("setSelectionProductionCrateSizeUpdate", this.model);
     },
     save() {
       const data = {
         Ebat: this.Ebat,
-        KasaOlculeri: this.KasaOlculeri,
+        width:this.width,
+        height:this.height,
+        thickness:this.thickness,
         Adet: this.Adet,
         TedarikciId: this.selectedSupplier.ID,
+        TedarikciAdi:this.selectedSupplier.FirmaAdi
       };
       this.$store.dispatch("setSelectionProductionCrateSizeSave", data);
       this.$emit("selection_production_crate_size_dialog_close");

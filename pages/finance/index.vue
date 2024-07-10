@@ -126,6 +126,7 @@ export default {
     this.$store.dispatch("setFinanceList");
   },
   methods: {
+
     checkedMekmarMekmer(event){
       if(this.mekmarMekmerList){
         this.checked = 'Mekmar';

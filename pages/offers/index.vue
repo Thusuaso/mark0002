@@ -76,6 +76,7 @@ export default {
     this.$store.dispatch("setOfferMainList");
     this.$store.dispatch("setOfferSharedList");
     this.$store.dispatch("setOfferCustomerList");
+    this.$store.dispatch("setCountryList");
   },
   methods: {
     oldOfferSelected(event) {
@@ -101,7 +102,21 @@ export default {
       this.$store.dispatch("setOfferAllButtonStatus", true);
     },
     offerDelete(event) {
-        this.$store.dispatch("setOfferDelete", event);
+      const date = new Date();
+       const year = date.getFullYear();
+       const month = this.__zeroControl(date.getMonth() + 1);
+       const day = this.__zeroControl(date.getDate());
+       const hour = this.__zeroControl(date.getHours());
+       const minute = this.__zeroControl(date.getMinutes());
+       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+       const desc = `${event.offer.KullaniciAdi} adlı kullanıcı ${event.customer.MusteriAdi} müşterisine ${now} tarihli teklifini sildi.`;
+       const log = {
+        description:desc,
+        po: '',
+        color: "",
+       }
+       this.$logs.save(log);
+        this.$store.dispatch("setOfferDelete", event.id);
         this.offer_list_detail_form = false;
     },
     newOffer() {
@@ -123,9 +138,30 @@ export default {
         this.update(event);
       }
     },
+    __zeroControl(event){
+      console.log(event.toString().length);
+      if(event.toString().length == 1){
+        return "0" + event.toString();
+      }else{
+        return event.toString();
+      }
+    },
     save(event) {
       this.disabled_offer_button_status = true;
-
+       const date = new Date();
+       const year = date.getFullYear();
+       const month = this.__zeroControl(date.getMonth() + 1);
+       const day = this.__zeroControl(date.getDate());
+       const hour = this.__zeroControl(date.getHours());
+       const minute = this.__zeroControl(date.getMinutes());
+       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+       const desc = `${event.offer.KullaniciAdi} adlı kullanıcı ${event.customer.MusteriAdi} müşterisine ${now} tarihli teklif girişi yaptı.`;
+       const log = {
+        description:desc,
+        po: '',
+        color: "",
+       }
+       this.$logs.save(log);
       this.$store.dispatch("setOfferSave", event)
         .then(res => {
           if (res) {
@@ -139,6 +175,21 @@ export default {
         
     },
     update(event) {
+      const date = new Date();
+       const year = date.getFullYear();
+       const month = this.__zeroControl(date.getMonth() + 1);
+       const day = this.__zeroControl(date.getDate());
+       const hour = this.__zeroControl(date.getHours());
+       const minute = this.__zeroControl(date.getMinutes());
+       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+       const desc = `${event.offer.KullaniciAdi} adlı kullanıcı ${event.customer.MusteriAdi} müşterisine ${now} tarihli teklif güncellemesi yaptı.`;
+       const log = {
+        description:desc,
+        po: '',
+        color: "",
+       }
+       
+      this.$logs.save(log);
       this.$store.dispatch("setOfferUpdate", event);
       this.offer_list_detail_form = false;
     },

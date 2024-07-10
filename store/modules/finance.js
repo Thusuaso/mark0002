@@ -508,6 +508,12 @@ const actions = {
             .then(response => {
                 vuexContext.commit('setPoPaidDetailList', response.data.list); 
             });
+    },
+    setFinanceCost(vuexContext,payload){
+        this.$axios.post('/finance/cost/control',payload)
+        .then(res=>{
+            
+        })
     }
 
 

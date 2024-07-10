@@ -169,6 +169,8 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.commit('setSelectionProductionCrateSizeSave',response.data.cratesize);
+                vuexContext.dispatch('setSelectionProductionCrateSizeList');
+
                 this.$toast.success('Başarıyla Kaydedildi.');
             }else{
                 this.$toast.error('Kaydetme Başarısız.');
@@ -181,6 +183,7 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.commit('setSelectionProductionCrateSizeUpdate',cratesize);
+                vuexContext.dispatch('setSelectionProductionCrateSizeList');
                 this.$toast.success('Başarıyla Güncellendi.');
             }else{
                 this.$toast.error('Güncelleme Başarısız.');
@@ -193,6 +196,8 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.commit('setSelectionProductionCrateSizeDelete',response.data.id);
+                vuexContext.dispatch('setSelectionProductionCrateSizeList');
+
                 this.$toast.success('Başarıyla Silindi.');
             }else{
                 this.$toast.error('Silme Başarısız.');

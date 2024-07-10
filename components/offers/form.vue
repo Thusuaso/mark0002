@@ -499,7 +499,8 @@ export default {
     },
     deleteProcess() {
       if (confirm("Are you sure you want to delete?")) {
-        this.$emit("offer_delete_emit", this.model.Id);
+        const data = { offer: this.model, customer: this.customerModel,'id':this.model.Id };
+        this.$emit("offer_delete_emit", data);
       }
     },
     customerInput(event) {
@@ -539,6 +540,8 @@ export default {
             this.customerModel.Description
         );
         this.model.KullaniciId = Cookies.get("userId");
+        this.model.KullaniciAdi = Cookies.get("username");
+
         if (this.status) {
           this.model.TakipEt = true;
         }
@@ -546,6 +549,8 @@ export default {
 
         this.model.Tarih = date.dateToString(this.offerDate);
         const data = { offer: this.model, customer: this.customerModel };
+
+
         this.$emit("offer_process_emit", data);
         this.offer_disabled_button = false;
       }
@@ -686,20 +691,75 @@ export default {
       this.modelProduct.Tarih = date.dateToString(event);
     },
     deleteProduct() {
+      const date = new Date();
+       const year = date.getFullYear();
+       const month = this.__zeroControl(date.getMonth() + 1);
+       const day = this.__zeroControl(date.getDate());
+       const hour = this.__zeroControl(date.getHours());
+       const minute = this.__zeroControl(date.getMinutes());
+       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+      const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
+      const desc = `${this.model.KullaniciAdi}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü sildi.`;
+
+      const log = {
+        description:desc,
+        po:'',
+        color:''
+      };
+      this.$logs.save(log);
       if (confirm("Are you sure you want to delete?")) {
         this.$store.dispatch("setOfferDetailProductsDelete", this.modelProduct.Id);
         this.productReset();
       }
     },
     updateProduct() {
+      const date = new Date();
+       const year = date.getFullYear();
+       const month = this.__zeroControl(date.getMonth() + 1);
+       const day = this.__zeroControl(date.getDate());
+       const hour = this.__zeroControl(date.getHours());
+       const minute = this.__zeroControl(date.getMinutes());
+       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+      const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
+      const desc = `${this.model.KullaniciAdi}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü güncelledi.`;
+
+      const log = {
+        description:desc,
+        po:'',
+        color:''
+      };
+      this.$logs.save(log);
       this.$store.dispatch("setOfferDetailProductsUpdate", this.modelProduct);
 
       this.productReset();
     },
+    __zeroControl(event){
+      console.log(event.toString().length);
+      if(event.toString().length == 1){
+        return "0" + event.toString();
+      }else{
+        return event.toString();
+      }
+    },
     addProduct() {
+      const date = new Date();
+       const year = date.getFullYear();
+       const month = this.__zeroControl(date.getMonth() + 1);
+       const day = this.__zeroControl(date.getDate());
+       const hour = this.__zeroControl(date.getHours());
+       const minute = this.__zeroControl(date.getMinutes());
+       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+       const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
+      const desc = `${this.model.KullaniciAdi}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisine  ${size} cm ürününü girdi.`;
+
+      const log = {
+        description:desc,
+        po:'',
+        color:''
+      };
+      this.$logs.save(log);
       this.modelProduct.TeklifId = this.id;
       this.$store.dispatch("setOfferDetailProductsAdd", this.modelProduct);
-
       this.productReset();
     },
     formatPoint(value) {

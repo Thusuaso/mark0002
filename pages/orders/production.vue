@@ -881,10 +881,18 @@ export default {
         this.productionModel.DetayMekmarNot_3
       );
       this.productionModel.SiparisKontrolEden = Cookies.get('userId');
+      
       this.$store.dispatch("setOrderProductionUpdate", {
         ...this.productionModel,
         SiparisId: this.getOrderProductionId,
       });
+    },
+    __zeroControl(event){
+      if(event.toString().length == 1){
+        return "0" + event.toString();
+      }else{
+        return event.toString();
+      }
     },
     save() {
       if (
