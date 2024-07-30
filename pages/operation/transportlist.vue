@@ -6,7 +6,7 @@
         <div class="col">
 
           <span class="p-float-label">
-            <Calendar v-model="selectedDate" @date-select="dateSelected($event)" dateFormat="dd.mm.yy"
+            <Calendar v-model="selectedDate" @date-select="dateSelected($event)" dateFormat="dd/mm/yy"
               :showIcon="true" />
             <label for="username">Date</label>
           </span>

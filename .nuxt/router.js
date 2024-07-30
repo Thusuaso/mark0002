@@ -58,6 +58,7 @@ const _2120f070 = () => interopDefault(import('..\\pages\\reports\\mekmer\\produ
 const _022d125b = () => interopDefault(import('..\\pages\\reports\\mekmer\\productions.vue' /* webpackChunkName: "pages/reports/mekmer/productions" */))
 const _b1c77e58 = () => interopDefault(import('..\\pages\\reports\\mekmer\\shipped.vue' /* webpackChunkName: "pages/reports/mekmer/shipped" */))
 const _0fb14757 = () => interopDefault(import('..\\pages\\reports\\mekmer\\stock.vue' /* webpackChunkName: "pages/reports/mekmer/stock" */))
+const _7e08a8e8 = () => interopDefault(import('..\\pages\\reports\\mekmer\\suppliercost.vue' /* webpackChunkName: "pages/reports/mekmer/suppliercost" */))
 const _3113b53b = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages/index" */))
 
 const emptyFn = () => {}
@@ -287,6 +288,10 @@ export const routerOptions = {
     path: "/reports/mekmer/stock",
     component: _0fb14757,
     name: "reports-mekmer-stock"
+  }, {
+    path: "/reports/mekmer/suppliercost",
+    component: _7e08a8e8,
+    name: "reports-mekmer-suppliercost"
   }, {
     path: "/",
     component: _3113b53b,

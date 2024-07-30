@@ -31,6 +31,7 @@
             inputId="date"
             @date-select="transportDateSelected($event)"
             :disabled="disabled"
+            dateFormat="dd/mm/yy"
           />
           <label for="date">Date</label>
         </span>

@@ -21,7 +21,7 @@
       <div class="row mt-3">
         <div class="col">
           <span class="p-float-label">
-            <Calendar v-model="paid_date" inputId="date" @date-select="paidDateSelected($event)" />
+            <Calendar v-model="paid_date" inputId="date" @date-select="paidDateSelected($event)" dateFormat="dd/mm/yy"/>
             <label for="date">Date</label>
           </span>
         </div>

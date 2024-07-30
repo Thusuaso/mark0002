@@ -172,12 +172,12 @@ const actions = {
     },
     setOrderProductionList(vuexContext) {
         this.$axios.get('/order/production/list')
-            .then(response => {
+            .then(async response => {
                 if (response.data.list) {
-                    vuexContext.commit('setOrderList', response.data.list);
-                    vuexContext.commit('setOrderProductionYearsList', response.data.years);
-                    vuexContext.commit('setOrderListAll', response.data.list);
-                    vuexContext.commit('setOrderProductionTotal',response.data.list);
+                    await vuexContext.commit('setOrderList', response.data.list);
+                    await vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                    await vuexContext.commit('setOrderListAll', response.data.list);
+                    await vuexContext.commit('setOrderProductionTotal',response.data.list);
                 } 
             });
     },

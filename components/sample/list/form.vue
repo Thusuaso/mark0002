@@ -164,7 +164,7 @@
             <div class="row">
               <div class="col">
                 <span class="p-float-label">
-                  <Calendar v-model="paid_date" inputId="paid_date" />
+                  <Calendar v-model="paid_date" inputId="paid_date" dateFormat="dd/mm/yy"/>
                   <label for="paid_date">Payment Date</label>
                 </span>
               </div>
@@ -269,11 +269,11 @@
         <label for="sampleno">Sample No</label>
       </span>
       <span class="p-float-label mb-4">
-        <Calendar v-model="input_date" inputId="inputdate" class="w-100" />
+        <Calendar v-model="input_date" inputId="inputdate" class="w-100" dateFormat="dd/mm/yy"/>
         <label for="inputdate">Input Date</label>
       </span>
       <span class="p-float-label mb-4">
-        <Calendar v-model="output_date" inputId="outputdate" class="w-100" />
+        <Calendar v-model="output_date" inputId="outputdate" class="w-100" dateFormat="dd/mm/yy"/>
         <label for="outputdate">Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">

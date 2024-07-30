@@ -103,7 +103,7 @@
           />
           <label for="ac">Supplier</label>
         </span>
-        <Calendar v-model="selectedDate" dateFormat="dd.mm.yy" class="w-100 mb-3" />
+        <Calendar v-model="selectedDate" dateFormat="dd/mm/yy" class="w-100 mb-3" />
         <div class="row mb-3">
           <div v-for="(item, index) of amountStatus" :key="item.id" class="col-3">
             <RadioButton

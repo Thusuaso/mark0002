@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+    <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
       :selection.sync="selectedProduction" :selectionMode="userId != 48 ? 'multiple':''"
       @row-click="userId != 48 ? $emit('production_selected_emit', $event.data):''" class="p-datatable-sm" :paginator="true"
       :rows="25"  style="font-size: 70%; border: 2px solid gray" filterDisplay="row"

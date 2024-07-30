@@ -43,6 +43,7 @@
             inputId="date"
             @date-select="containerDateSelected($event)"
             :disabled="disabled"
+            dateFormat="dd/mm/yy"
           />
           <label for="date">Tarih</label>
         </span>

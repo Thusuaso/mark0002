@@ -175,6 +175,9 @@
               <li v-if="getAuthorityStatus">
                 <nuxt-link to="/reports/mekmar/forwarding" class="dropdown-item" tag="a">Shipped Crates</nuxt-link>
               </li>
+              <li v-if="getAuthorityStatus">
+                <nuxt-link to="/reports/mekmer/suppliercost" class="dropdown-item" tag="a">Supplier</nuxt-link>
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown" v-if="!getAuthorityStatus">

@@ -27,7 +27,7 @@
             <TabPanel header="Reminder">
               <div class="row">
                 <div class="col">
-                  <Calendar v-model="reminder_date" @date-select="reminderDateSelected($event)" placeholder="Date" />
+                  <Calendar v-model="reminder_date" @date-select="reminderDateSelected($event)" placeholder="Date" dateFormat="dd/mm/yy"/>
                 </div>
                 <div class="col">
                   <FileUpload mode="basic" @select="uploadReminder($event)" />
@@ -63,7 +63,7 @@
           <div class="col">
             <span class="p-float-label">
               <Calendar v-model="offerProductDate" inputId="offer_product_date"
-                @date-select="offerProductDateSelected($event)" :disabled="id == 0" style="z-index: 99" />
+                @date-select="offerProductDateSelected($event)" :disabled="id == 0" style="z-index: 99" dateFormat="dd/mm/yy"/>
               <label for="offer_product_date">Date of Quote</label>
             </span>
           </div>
@@ -250,7 +250,7 @@
         </div>
         <span class="p-float-label mb-4">
           <Calendar v-model="offerDate" inputId="offer_date" style="width: 100%"
-            @date-select="offerDateSelected($event)" />
+            @date-select="offerDateSelected($event)" dateFormat="dd/mm/yy"/>
           <label for="offer_date">Date</label>
         </span>
         <span class="p-float-label mb-4">

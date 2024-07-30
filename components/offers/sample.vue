@@ -15,6 +15,7 @@
           <Calendar
             v-model="selectedSampleReminderDate"
             @date-select="sampleReminderDateSelected($event)"
+            dateFormat="dd/mm/yy"
           />
           <label for="po">Reminder Date</label>
         </span>

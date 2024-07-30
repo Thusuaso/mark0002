@@ -12,6 +12,7 @@
           <Calendar
             v-model="selectedProformaDate"
             @date-select="proformatDateSelected($event)"
+            dateFormat="dd/mm/yy"
           />
           <label for="po">Proforma Date</label>
         </span>

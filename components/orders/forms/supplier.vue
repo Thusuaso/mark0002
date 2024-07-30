@@ -24,7 +24,7 @@
       </div>
       <div class="col">
         <span class="p-float-label">
-          <Calendar v-model="supplier_date" inputId="date" />
+          <Calendar v-model="supplier_date" inputId="date" dateFormat="dd/mm/yy"/>
           <label for="date">Date</label>
         </span>
       </div>

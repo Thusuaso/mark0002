@@ -8367,7 +8367,7 @@ group by YEAR(s.SiparisTarihi)
 order by YEAR(s.SiparisTarihi) desc
     `;
    await mssql.query(ordersListSql, async (err, orders) => {
-        await mssql.query(orderYearListSql, (err, years) => {
+        await mssql.query(orderYearListSql, async (err, years) => {
             let customYearList = [];
             let ordersList = [];
             years.recordset.forEach(x => {
@@ -8385,7 +8385,7 @@ order by YEAR(s.SiparisTarihi) desc
                     ordersList.push({ ...x, style: "background-color: transparent; color: black" });
                 }
             });
-               res.status(200).json({'list':ordersList,'years':customYearList});
+               await res.status(200).json({'list':ordersList,'years':customYearList});
 
         });
     });
@@ -8632,7 +8632,7 @@ inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
-where s.SiparisDurumID = 2 and m.Marketing in ('Mekmer','İç Piyasa')
+where s.SiparisDurumID = 2 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
 order by s.SiparisTarihi desc
 
 
@@ -9463,7 +9463,7 @@ inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
-where s.SiparisDurumID = 3 and m.Marketing in ('Mekmer','İç Piyasa')
+where s.SiparisDurumID = 3 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
 order by s.SiparisTarihi desc
 
 
@@ -9733,7 +9733,7 @@ inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
-where s.SiparisDurumID = 3 and m.Marketing in ('Mekmer','İç Piyasa')
+where s.SiparisDurumID = 3 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
 order by s.SiparisTarihi desc
 
 
@@ -12910,6 +12910,163 @@ app.delete('/accounts/delete/:id',(req,res)=>{
     });
 });
 
+/*Quarries Supplier Cost */
+app.get('/reports/mekmer/quarries/supplier/:year/:month',(req,res)=>{
+    const sqlList = `
+    select ID,Date,Supplier,Quarry,SupplierCost,Strip,StripPrice,ProduceM2,Cost,Currency from QuarriesSupplierCostTB
+where YEAR(Date) = '${req.params.year}' and MONTH(Date) = '${req.params.month}'
+    `;
+    const suppliersList = 'select ID,FirmaAdi from TedarikciTB';
+    const stripsList = 'select ID,Strips from StripsTB';
+    const quarriesList = 'select ID,OcakAdi from UrunOcakTB';
+    mssql.query(sqlList,(err,list)=>{
+        mssql.query(suppliersList,(err,suppliers)=>{
+            mssql.query(stripsList,(err,strips)=>{
+                mssql.query(quarriesList,(err,quarries)=>{
+                    res.status(200).json({
+                        'list':list.recordset,
+                        'suppliers':suppliers.recordset,
+                        'strips':strips.recordset,
+                        'quarries':quarries.recordset
+                    })
+                });
+            });
+        });
+    });
+});
+app.get('/reports/mekmer/quarries/:quarry/:year/:month',async (req,res)=>{
+    const sql = `
+        select 
+
+	urun.UrunOcakID,
+	urun.UrunBirimID,
+	urun.Miktar,
+	ol.En,
+	ol.Boy
+
+from UretimTB urun 
+inner join UrunKartTB uk on uk.ID = urun.UrunKartID
+inner join OlculerTB ol on ol.ID = uk.OlcuID
+where 
+urun.UrunOcakID='${req.params.quarry}' and 
+YEAR(urun.Tarih) = '${req.params.year}' and 
+MONTH(urun.Tarih) = '${req.params.month}' 
+    `;
+    await mssql.query(sql,async (err,produced)=>{
+        let total = 0;
+        produced.recordset.forEach(x=>{
+            if(x.UrunBirimID == 1){
+                total += x.Miktar;
+            } else{
+                if(x.En =='' ||
+                     x.En == undefined || 
+                     x.En == null || 
+                     x.En == 'VAR' || 
+                     x.En == 'VARIOUS' || 
+                     x.En == 'Slab' || 
+                     x.En == 'Various' ||
+                     x.En == 'SLAB' || 
+                     x.En == 'MINI' || 
+                     x.En == 'Ant' ||
+                     x.En == 'ANT' ||
+                     x.En == '1 LT' || 
+                     x.En == 'Mini' ||
+                     x.En == 'OZEL' ||
+                     x.En == 'özel' ||
+                     x.En == 'Ozel'
+                    
+                    ){
+                        console.log('')
+                    }else{
+                        const en = (parseFloat((x.En.toString()).replace(',','.'))).toFixed(2);
+                        const boy = (parseFloat((x.Boy.toString()).replace(',','.'))).toFixed(2);
+                        const m2 = (parseFloat((x.Miktar.toString()).replace(',','.'))).toFixed(2);
+                        const _m2 = (en * boy * m2) / 10000;
+                        total += _m2;
+                        console.log(en,boy,_m2);
+                    }
+            }
+        });
+        await res.status(200).json({'total':total});
+    });
+});
+function supplierId(id,supplier){
+    return new Promise(async (resolve,reject)=>{
+        if(id == null || id == '' || id == ' ' || id == undefined || id == 0){
+            const insertSql = `insert into TedarikciTB(FirmaAdi) VALUES('${supplier}')`;
+            const getIdSql = `select top 1 ID from TedarikciTB order by ID desc`;
+            await mssql.query(insertSql,async (err,insert)=>{
+                if(insert.rowsAffected[0] == 1){
+                    await mssql.query(getIdSql,async (err,getId)=>{
+                        if(getId.recordset){
+                            await resolve(getId.recordset[0].ID);
+                        }
+                    })
+                }
+            });
+        }else{
+            await resolve(id);
+        }
+    });
+};
+function stripId(id,strip){
+    return new Promise(async(resolve,reject)=>{
+        if(id == null || id == '' || id == 0 || id == undefined || id == ''){
+            const insertSql = `insert into StripsTB(Strips) VALUES('${strip}')`;
+            const getIdSql = `select top 1 ID from StripsTB order by ID desc`;
+            await mssql.query(insertSql,async (err,insert)=>{
+                if(insert.rowsAffected[0] == 1){
+                    await mssql.query(getIdSql,async (err,_getId)=>{
+                        if(_getId.recordset){
+                            await resolve(_getId.recordset[0].ID);
+                        }else{
+                            await reject('Strip Hata Veriyor');
+                        }
+                    })
+                }
+            })
+        }else{
+            await resolve(id);
+        }
+    });
+}
+app.post('/reports/mekmer/quarries/supplier/save',async(req,res)=>{
+    const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
+    const __stripId = await stripId(req.body.stripId,req.body.stripName);
+    const insertSql = `
+        insert into 
+        QuarriesSupplierCostTB(
+            Date,
+            Supplier,
+            Quarry,
+            SupplierCost,
+            Strip,
+            StripPrice,
+            ProduceM2,
+            Cost,
+            Currency,
+            StripM2
+        )
+        VALUES('${req.body.date}',
+        '${__supplierId}',
+        '${req.body.quarryId}',
+        '${req.body.supplierCost}',
+        '${__stripId}',
+        '${req.body.stripPrice}',
+        '${req.body.produce_m2}',
+        '${req.body.cost}',
+        '${req.body.currency}',
+        '${req.body.stripM2}')
+    `;
+    console.log(insertSql)
+    mssql.query(insertSql,(err,insert)=>{
+        if(insert.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        };
+    })
+})
 /*Shared*/
 app.get('/orders/production/list',(req,res)=>{
     const sql = `

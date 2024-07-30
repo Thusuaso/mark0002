@@ -7,6 +7,7 @@
             v-model="workerman_date"
             inputId="workerman_date"
             @date-select="workermanDateSelected($event)"
+            dateFormat="dd/mm/yy"
           />
           <label for="workerman_date">Date</label>
         </span>

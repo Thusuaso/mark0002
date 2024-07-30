@@ -52,12 +52,12 @@
       </span>
       <span class="p-float-label mb-4">
         <Calendar v-model="order_date" inputId="order_date" class="w-100" @date-select="orderDateSelected($event)"
-          :disabled="!status" />
+          :disabled="!status" dateFormat="dd/mm/yy"/>
         <label for="order_date">Date</label>
       </span>
       <span class="p-float-label mb-4">
         <Calendar v-model="guess_loading_date" inputId="guess_loading_date" class="w-100"
-          @date-select="guessLoadingDateSelected($event)" :disabled="!status" />
+          @date-select="guessLoadingDateSelected($event)" :disabled="!status" dateFormat="dd/mm/yy" />
         <label for="guess_loading_date">Estimated Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">

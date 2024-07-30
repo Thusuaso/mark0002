@@ -384,7 +384,7 @@ Vue.filter('dateToString', (value) => {
             day = '0' + day;
         }
 
-        return year + "-" + month + "-" + day;
+        return day + "-" + month + "-" + year;
     }
 
 });
@@ -393,9 +393,9 @@ Vue.filter('stringToDate', (value) => {
         return "";
     } else {
           const date = value.split('-');
-    const day = date[0];
+    const day = date[2];
     const month = date[1];
-    const year = date[2];
+    const year = date[0];
     return new Date(year,month,day);  
     }
 

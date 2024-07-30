@@ -8,6 +8,7 @@
             inputId="payment_date"
             @date-select="paymentDateSelected($event)"
             :disabled="advanced_payment_disabled"
+            dateFormat="dd/mm/yy"
           />
           <label for="payment_date">Date</label>
         </span>

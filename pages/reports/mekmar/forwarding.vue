@@ -8,6 +8,7 @@
           :manualInput="false"
           placeholder="Select a Date Range"
           class="w-100"
+          dateFormat="dd/mm/yy"
         />
       </div>
       <div class="col">

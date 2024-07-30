@@ -2,7 +2,7 @@
   <div>
 
     <div class="card">
-      <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+      <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
         :selection.sync="selectedProduction" selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
         style="font-size: 70%; border: 2px solid gray;" filterDisplay="row" :filters.sync="filtersOrders"
@@ -294,7 +294,7 @@
       </DataTable>
     </div>
 
-    <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+    <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
       :selection.sync="selectedProduction" selectionMode="multiple"
       @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
       style="font-size: 70%; border: 2px solid gray" filterDisplay="row" :filters.sync="filtersShipped"

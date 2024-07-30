@@ -3,7 +3,7 @@
 
         <div class="card">
             <DataTable :value="list" rowGroupMode="rowspan"
-                :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']" :selection.sync="selectedProduction"
+                :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']" :selection.sync="selectedProduction"
                 selectionMode="multiple" @row-click="$emit('production_selected_emit', $event.data)"
                 class="p-datatable-sm" :paginator="true" :rows="25" 
                 style="font-size: 70%; border: 2px solid gray" filterDisplay="row" :filters.sync="filtersOrders"
@@ -308,6 +308,33 @@
                         {{ total.production | formatDecimal }}
                     </template>
                 </Column>
+                <Column field="Kalan" header="Remainder" headerClass="tableHeader" bodyClass="tableBody">
+                    <template #body="slotProps">
+                        <div 
+                            v-if="slotProps.data.Miktar-slotProps.data.Uretim == 0"
+                            style="background-color: yellow ;color: black"
+                        >
+                            {{ slotProps.data.Miktar-slotProps.data.Uretim  | formatDecimal }}
+
+                        </div>
+                        <div 
+                            v-else-if="slotProps.data.Miktar-slotProps.data.Uretim > 0"
+                            style="background-color: blue ;color: white"
+                        >
+                            {{ slotProps.data.Miktar-slotProps.data.Uretim  | formatDecimal }}
+
+                        </div>
+                        <div 
+                            v-else-if="slotProps.data.Miktar-slotProps.data.Uretim < 0"
+                            style="background-color: black ;color: white"
+                        >
+                            {{ slotProps.data.Miktar-slotProps.data.Uretim  | formatDecimal }}
+
+                        </div>
+
+                    </template>
+
+                </Column>
                 <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
                     <template #body="slotProps">
                         {{ slotProps.data.Ton | formatDecimal }}
@@ -345,7 +372,7 @@
             </DataTable>
         </div>
 
-        <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['SiparisTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+        <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
             :selection.sync="selectedProduction" selectionMode="multiple"
             @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true"
             :rows="25"  style="font-size: 70%; border: 2px solid gray" filterDisplay="row"

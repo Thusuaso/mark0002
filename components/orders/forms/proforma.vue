@@ -54,6 +54,7 @@
             inputId="maturity"
             @date-select="maturityDateSelected($event)"
             class="w-100"
+            dateFormat="dd/mm/yy"
           />
           <label for="maturity">Maturity</label>
         </span>

@@ -20,6 +20,7 @@
             v-model="eta_date"
             inputId="eta_date"
             style="z-index: 99"
+            dateFormat="dd/mm/yy"
           />
           <label for="eta_date">Estimated Date</label>
         </span>
