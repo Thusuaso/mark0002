@@ -90,7 +90,7 @@ async function createApp(ssrContext, config = {}) {
   // here we inject the router and store to all child components,
   // making them available everywhere as `this.$router` and `this.$store`.
   const app = {
-    head: {"title":"GOZ","htmlAttrs":{"lang":"en"},"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"hid":"description","name":"description","content":""},{"name":"format-detection","content":"telephone=no"}],"link":[{"rel":"primevue\u002Fresources\u002Fthemes\u002Fvela-orange\u002Ftheme.css"}],"script":[{"src":"https:\u002F\u002Fcdn.jsdelivr.net\u002Fnpm\u002Fbootstrap@5.3.2\u002Fdist\u002Fjs\u002Fbootstrap.bundle.min.js"}],"style":[]},
+    head: {"title":"GOZ","htmlAttrs":{"lang":"en"},"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"hid":"description","name":"description","content":""},{"name":"format-detection","content":"telephone=no"},{"name":"google-site-verification","content":"-2spBZ_-lBKXZMQ9r5jpKUNxQ_KOI1Gf_CVKyn7URHA"}],"link":[{"rel":"primevue\u002Fresources\u002Fthemes\u002Fvela-orange\u002Ftheme.css"}],"script":[{"src":"https:\u002F\u002Fcdn.jsdelivr.net\u002Fnpm\u002Fbootstrap@5.3.2\u002Fdist\u002Fjs\u002Fbootstrap.bundle.min.js"}],"style":[]},
 
     store,
     router,

@@ -378,11 +378,11 @@
     "_name": "_0fb14757"
   },
   {
-    "name": "reports-mekmer-suppliercost",
-    "path": "/reports/mekmer/suppliercost",
-    "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\suppliercost.vue",
-    "chunkName": "pages/reports/mekmer/suppliercost",
-    "_name": "_7e08a8e8"
+    "name": "reports-mekmer-strips",
+    "path": "/reports/mekmer/strips",
+    "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\strips.vue",
+    "chunkName": "pages/reports/mekmer/strips",
+    "_name": "_67b469ea"
   },
   {
     "name": "index",

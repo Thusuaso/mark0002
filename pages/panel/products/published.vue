@@ -104,6 +104,7 @@ export default {
       "getPanelProductMaterialModel",
       "getPanelProductEdgeModel",
       "getPanelProductSuggestedList",
+      "getProductId"
     ]),
   },
   data() {
@@ -154,7 +155,7 @@ export default {
       event.anahtarlar_es2 = this.__stringCharacterChange(event.anahtarlar_es);
       event.keywords_es2 = this.__stringCharacterChange(event.keywords_es);
       event.urunadi_fr2 = this.__stringCharacterChange(event.urunadi_fr);
-
+      this.$store.dispatch('setPanelProductButtonStatus',false);
       this.$store.dispatch("setPanelProductsSave", event);
     },
     update(event) {
@@ -168,11 +169,11 @@ export default {
       event.anahtarlar_es2 = this.__stringCharacterChange(event.anahtarlar_es);
       event.keywords_es2 = this.__stringCharacterChange(event.keywords_es);
       event.urunadi_fr2 = this.__stringCharacterChange(event.urunadi_fr);
-
-      this.$store.dispatch("setPanelProductsUpdate", event);
+      this.$store.dispatch("setPanelProductsUpdate", {...event,'Id':this.getProductId});
     },
     process(event) {
-      if (this.getPanelProductButtonStatus) {
+      console.log(this.getPanelProductId)
+      if (this.getPanelProductId == 0) {
         this.save(event);
       } else {
         this.update(event);

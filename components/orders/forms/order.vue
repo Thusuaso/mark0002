@@ -537,7 +537,10 @@ export default {
       this.update_button_disabled = true;
       this.delete_button_disabled = true;
       this.workerman_button_disabled = true;
-      this.$store.dispatch("setOrderProductDeleted", this.model);
+      if(confirm('Bu ürüne ait kasalar stoğa alınacaktır, onaylıyor musunuz?')){
+        this.$store.dispatch("setOrderProductDeleted", this.model);
+
+      }
     },
     add() {
       const log = {

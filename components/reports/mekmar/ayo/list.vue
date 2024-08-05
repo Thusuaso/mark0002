@@ -93,7 +93,7 @@
           bodyClass="tableBody"
         >
           <template #body="slotProps">
-            <div :style="{ backgroundColor: slotProps.data.alisFiyatiKontrol }">
+            <div :style="{ 'backgroundColor': slotProps.data.dosya_kapanma_date == '-' ? '#fae8b3':'' }">
               {{ slotProps.data.siparis_no }}
             </div>
           </template>

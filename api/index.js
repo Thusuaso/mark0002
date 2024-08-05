@@ -6385,6 +6385,11 @@ app.put('/panel/product/update', (req, res) => {
 
             where Id = '${req.body.Id}'
     `;
+    console.log(updateProductSql)
+    if(!req.body.yayinla){
+        const suggestedSqlDelete = `delete MekmarCom_OnerilenUrunler where onerilenurunid='${req.body.urunid}'`;
+        mssql.query(suggestedSqlDelete);
+    }
     mssql.query(updateProductSql, (err, product) => {
         if(product.rowsAffected[0] == 1){
             res.status(200).json({'status':true});
@@ -6404,6 +6409,7 @@ app.delete('/panel/product/delete/:productId', (req, res) => {
     const materialDeleteSql = `delete MekmarCom_MateryalFiltered where UrunId='${req.params.productId}'`;
     const photoDeleteSql = `delete MekmarCom_Fotolar where urunid=${req.params.productId}`;
     const suggestedDeleteSql = `delete MekmarCom_OnerilenUrunler where urunid='${req.params.productId}'`;
+    const suggestedSqlDelete = `delete MekmarCom_OnerilenUrunler where onerilenurunid='${req.body.urunid}'`;
     mssql.query(productDeleteSql,(err,product)=>{
         if (product.rowsAffected[0] == 1) {
                mssql.query(sizeDeleteSql);
@@ -6415,6 +6421,8 @@ app.delete('/panel/product/delete/:productId', (req, res) => {
                 mssql.query(materialDeleteSql);
             mssql.query(photoDeleteSql);
             mssql.query(suggestedDeleteSql);
+            mssql.query(suggestedSqlDelete);
+
            res.status(200).json({ 'status': true });
     } else{
            res.status(200).json({ 'status': false });
@@ -10676,14 +10684,23 @@ order by ID desc
     });
 });
 app.delete('/order/production/product/delete/:id',(req,res)=>{
+    const getIdSql = `select SiparisNo,TedarikciID,UrunKartID from SiparisUrunTB where ID='${req.params.id}' `;
     const deleteSql = `delete SiparisUrunTB where ID='${req.params.id}'`;
-    mssql.query(deleteSql, (err, product) => {
-        if (product.rowsAffected[0] == 1) {
-            res.status(200).json({ 'status': true });
-        } else {
-            res.status(200).json({ 'status': false });
+    mssql.query(getIdSql,(err,id)=>{
+        if(id.recordset.length >0){
+            const updateProductionSql = `update UretimTB SET SiparisAciklama='Stok',UretimTurID=1 where SiparisAciklama='${id.recordset[0].SiparisNo}' and UrunKartID='${id.recordset[0].UrunKartID}'`;
+            mssql.query(updateProductionSql,(err,update)=>{
+                mssql.query(deleteSql, (err, product) => {
+                    if (product.rowsAffected[0] == 1) {
+                        res.status(200).json({ 'status': true });
+                    } else {
+                        res.status(200).json({ 'status': false });
+                    }
+                });
+            })
         }
     });
+
 });
 app.put('/order/production/product/update', (req, res) => {
     // let buyingPrice = 0;
@@ -11252,7 +11269,9 @@ from
 UretimTB u,UrunBirimTB b,TedarikciTB t    
 where u.SiparisAciklama='${req.params.po}'   
 and b.ID = u.UrunBirimID    
-and t.ID = u.TedarikciID    
+and t.ID = u.TedarikciID
+and u.TedarikciID in (select surun.TedarikciID from SiparisUrunTB surun where surun.SiparisNo = u.SiparisAciklama)
+
 order by u.UrunKartID,KasaNo asc      
     `;
    await mssql.query(checkListSql, (err, check) => {
@@ -12913,7 +12932,20 @@ app.delete('/accounts/delete/:id',(req,res)=>{
 /*Quarries Supplier Cost */
 app.get('/reports/mekmer/quarries/supplier/:year/:month',(req,res)=>{
     const sqlList = `
-    select ID,Date,Supplier,Quarry,SupplierCost,Strip,StripPrice,ProduceM2,Cost,Currency from QuarriesSupplierCostTB
+ select qs.ID,qs.Date,qs.Supplier,qs.Quarry,qs.StripCost,qs.Strip,qs.StripPrice,qs.StripM2,qs.StripPiece,qs.StripWidth,qs.StripHeight,
+
+
+	t.FirmaAdi as SupplierName,
+	uo.OcakAdi as QuarryName,
+	s.Strips as StripName
+
+
+
+
+from QuarriesSupplierStripsTB qs
+inner join TedarikciTB t on t.ID = qs.Supplier
+inner join UrunOcakTB uo on uo.ID = qs.Quarry
+inner join StripsTB s on s.ID = qs.Strip
 where YEAR(Date) = '${req.params.year}' and MONTH(Date) = '${req.params.month}'
     `;
     const suppliersList = 'select ID,FirmaAdi from TedarikciTB';
@@ -12934,62 +12966,7 @@ where YEAR(Date) = '${req.params.year}' and MONTH(Date) = '${req.params.month}'
         });
     });
 });
-app.get('/reports/mekmer/quarries/:quarry/:year/:month',async (req,res)=>{
-    const sql = `
-        select 
 
-	urun.UrunOcakID,
-	urun.UrunBirimID,
-	urun.Miktar,
-	ol.En,
-	ol.Boy
-
-from UretimTB urun 
-inner join UrunKartTB uk on uk.ID = urun.UrunKartID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-where 
-urun.UrunOcakID='${req.params.quarry}' and 
-YEAR(urun.Tarih) = '${req.params.year}' and 
-MONTH(urun.Tarih) = '${req.params.month}' 
-    `;
-    await mssql.query(sql,async (err,produced)=>{
-        let total = 0;
-        produced.recordset.forEach(x=>{
-            if(x.UrunBirimID == 1){
-                total += x.Miktar;
-            } else{
-                if(x.En =='' ||
-                     x.En == undefined || 
-                     x.En == null || 
-                     x.En == 'VAR' || 
-                     x.En == 'VARIOUS' || 
-                     x.En == 'Slab' || 
-                     x.En == 'Various' ||
-                     x.En == 'SLAB' || 
-                     x.En == 'MINI' || 
-                     x.En == 'Ant' ||
-                     x.En == 'ANT' ||
-                     x.En == '1 LT' || 
-                     x.En == 'Mini' ||
-                     x.En == 'OZEL' ||
-                     x.En == 'özel' ||
-                     x.En == 'Ozel'
-                    
-                    ){
-                        console.log('')
-                    }else{
-                        const en = (parseFloat((x.En.toString()).replace(',','.'))).toFixed(2);
-                        const boy = (parseFloat((x.Boy.toString()).replace(',','.'))).toFixed(2);
-                        const m2 = (parseFloat((x.Miktar.toString()).replace(',','.'))).toFixed(2);
-                        const _m2 = (en * boy * m2) / 10000;
-                        total += _m2;
-                        console.log(en,boy,_m2);
-                    }
-            }
-        });
-        await res.status(200).json({'total':total});
-    });
-});
 function supplierId(id,supplier){
     return new Promise(async (resolve,reject)=>{
         if(id == null || id == '' || id == ' ' || id == undefined || id == 0){
@@ -13030,35 +13007,38 @@ function stripId(id,strip){
         }
     });
 }
-app.post('/reports/mekmer/quarries/supplier/save',async(req,res)=>{
+function quarryId(id,quarry){
+    return new Promise(async (resolve,reject)=>{
+        if(id == null || id == '' || id == ' ' || id == undefined || id == 0){
+            const insertSql = `insert into UrunOcakTB(OcakAdi) VALUES('${quarry}')`;
+            const _getIdSql = `select top 1 ID from UrunOcakTB order by ID desc`;
+            await mssql.query(insertSql,async (err,_insert)=>{
+                if(_insert.rowsAffected[0] == 1){
+                    await mssql.query(_getIdSql,async (err,_getId)=>{
+                        if(_getId.recordset.length >0){
+                            await resolve(_getId.recordset[0].ID);
+                        }else{
+                            console.err('Ocak id eklenirken hata oluştu!');
+                        }
+                    });
+                }else{
+                    console.err('Ocak id eklenirken hata oluştu!');
+                }
+            });
+        }else{  
+            await resolve(id);
+        }
+    });
+    
+}
+app.post('/reports/mekmer/quarries/supplier/strips/save',async(req,res)=>{
     const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
     const __stripId = await stripId(req.body.stripId,req.body.stripName);
+    const __quarryId = await quarryId(req.body.quarryId,req.body.quarryName);
     const insertSql = `
-        insert into 
-        QuarriesSupplierCostTB(
-            Date,
-            Supplier,
-            Quarry,
-            SupplierCost,
-            Strip,
-            StripPrice,
-            ProduceM2,
-            Cost,
-            Currency,
-            StripM2
-        )
-        VALUES('${req.body.date}',
-        '${__supplierId}',
-        '${req.body.quarryId}',
-        '${req.body.supplierCost}',
-        '${__stripId}',
-        '${req.body.stripPrice}',
-        '${req.body.produce_m2}',
-        '${req.body.cost}',
-        '${req.body.currency}',
-        '${req.body.stripM2}')
+        insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight)
+VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}')
     `;
-    console.log(insertSql)
     mssql.query(insertSql,(err,insert)=>{
         if(insert.rowsAffected[0] == 1){
             res.status(200).json({'status':true});
@@ -13066,7 +13046,50 @@ app.post('/reports/mekmer/quarries/supplier/save',async(req,res)=>{
             res.status(200).json({'status':false});
         };
     })
+});
+app.put('/reports/mekmer/quarries/supplier/strips/update',async(req,res)=>{
+    const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
+    const __stripId = await stripId(req.body.stripId,req.body.stripName);
+    const __quarryId = await quarryId(req.body.quarryId,req.body.quarryName);
+    const updateSql = `
+    update QuarriesSupplierStripsTB 
+
+SET
+	Date='${req.body.date}',
+	Supplier='${__supplierId}',
+	Quarry='${__quarryId}',
+	StripCost='${req.body.stripCost}',
+	Strip='${__stripId}',
+	StripPrice='${req.body.stripPrice}',
+	StripM2='${req.body.stripM2}',
+	StripPiece='${req.body.stripPiece}',
+	StripWidth='${req.body.stripWidth}',
+	StripHeight='${req.body.stripHeight}'
+WHERE
+	ID = '${req.body.Id}'
+
+`;
+mssql.query(updateSql,(err,_update)=>{
+    if(_update.rowsAffected[0] == 1){
+        res.status(200).json({'status':true});
+    }else{
+        res.status(200).json({'status':false});
+    };
 })
+})
+app.delete('/reports/mekmer/quarries/supplier/strips/delete/:id',async(req,res)=>{
+    const _deleteSql = `delete QuarriesSupplierStripsTB where ID='${req.params.id}'`;
+    await mssql.query(_deleteSql,(err,_delete)=>{
+        if(_delete.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        }
+    });
+
+})
+
+
 /*Shared*/
 app.get('/orders/production/list',(req,res)=>{
     const sql = `

@@ -24,7 +24,8 @@ const state = {
     panelUsersButtonStatus:false,
     panelUsaStockList:[],
     panelUsaStockPhotosList:[],
-    panelUsaStockButtonStatus:false
+    panelUsaStockButtonStatus:false,
+    panelId:0
 };
 const actions = {
     setPanelProjectMainPhotoChange(vuexContext,photo){
@@ -112,6 +113,7 @@ const actions = {
                 if (response.data.status) {
                     this.$toast.success("Başarıyla Kaydedildi.");
                     vuexContext.dispatch('setPanelProductId', response.data.productId);
+                    vuexContext.dispatch('setPanelId',response.data.id)
                     vuexContext.commit("setPanelProductAdd", { ...product, 'Id': response.data.id,'urunid':response.data.productId ,'sira':response.data.queue});
                 } else {
                     this.$toast.error("Kaydetme Başarısız.");
@@ -143,6 +145,9 @@ const actions = {
     },
     setPanelProductId(vuexContext, id) {
         vuexContext.commit('setPanelProductId', id);
+    },
+    setPanelId(vuexContext,id){
+        vuexContext.commit('setPanelId',id);
     },
     setPanelProductFiltersList(vuexContext, data) {
         this.$axios.post(`/panel/product/filtered/list`,data)
@@ -709,6 +714,9 @@ const actions = {
 
 };
 const mutations = {
+    setPanelId(state,payload){
+        state.panelId = payload;
+    },
     setPanelPublishedList(state, payload) {
         state.panelPublishedList = payload.list;
         state.panelCategoryList = payload.category;
@@ -865,6 +873,9 @@ const mutations = {
 
 };
 const getters = {
+    getProductId(state){
+        return state.panelId;
+    },
     getPanelPublishedList(state) {
         return state.panelPublishedList;
     },
