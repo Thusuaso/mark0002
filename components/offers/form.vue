@@ -539,8 +539,6 @@ export default {
           this.customerModel.Description = this.__nullControl(
             this.customerModel.Description
         );
-        this.model.KullaniciId = Cookies.get("userId");
-        this.model.KullaniciAdi = Cookies.get("username");
 
         if (this.status) {
           this.model.TakipEt = true;

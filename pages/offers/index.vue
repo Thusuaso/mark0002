@@ -133,7 +133,8 @@ export default {
     },
     offerProcess(event) {
       if (this.getOfferButtonStatus) {
-        this.save(event);
+
+        this.save({...event,"KullaniciId":Cookies.get('userId'),'KullaniciAdi':Cookies.get('username')});
       } else {
         this.update(event);
       }
