@@ -15,7 +15,7 @@ const sql = {
 };
 mssql.connect(sql);
 let transporter = nodemailer.createTransport({
-  host: "mail.mekmar.com",
+  host: "mail.kurumsaleposta.com",
   port: 465,
   secure: true, // use TLS
   auth: {
@@ -3672,6 +3672,7 @@ order by s.Tarih desc
 
 
     `;
+    console.log(sql);
     mssql.query(sql, (err, results) => {
        res.status(200).json({'list':results.recordset}) 
     });

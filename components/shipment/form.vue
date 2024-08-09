@@ -133,6 +133,7 @@ export default {
       "getShipmentProductionList",
       "getShipmentSendProductionList",
       "getShipmentSendProductionTotal",
+      "getSupplierList"
     ]),
   },
   props: {
@@ -192,11 +193,16 @@ export default {
       })
     },
     __getPriceControl(payload) {
+
+
+          const supplierName = this.getSupplierList.find(x=>x.ID == payload.TedarikciID).FirmaAdi;
           if (payload.SatisFiyati == 0 || payload.SatisFiyati == undefined || payload.SatisFiyati == null || payload.SatisFiyati == "") {
-            this.$toast.error("Mekmer ürünlerine satış fiyati girilmeli.Girdikten Sonra Sayfayı Yenileyiniz!");
+            this.$toast.error(`${supplierName} ürünlerine satış fiyati girilmeli.Girdikten Sonra Sayfayı Yenileyiniz!`);
             this.save_button_disabled = false;
             this.sending_crate_button_disabled = false;
           } else {
+            this.$toast.error(`${supplierName} ürünlerine satış fiyati girilmeli.Girdikten Sonra Sayfayı Yenileyiniz!`);
+
             this.save_button_disabled = false;
             this.sending_crate_button_disabled = false;
           }

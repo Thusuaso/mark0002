@@ -33,6 +33,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import Cookies from "js-cookie";
 export default {
   middleware: ["authority"],
   computed: {
@@ -133,14 +134,17 @@ export default {
     },
     offerProcess(event) {
       if (this.getOfferButtonStatus) {
-
-        this.save({...event,"KullaniciId":Cookies.get('userId'),'KullaniciAdi':Cookies.get('username')});
+        console.log(event);
+        const data = {
+          customer:event.customer,
+          offer:{...event.offer,"KullaniciId":Cookies.get('userId'),'KullaniciAdi':Cookies.get('username')}
+        };
+        this.save(data);
       } else {
         this.update(event);
       }
     },
     __zeroControl(event){
-      console.log(event.toString().length);
       if(event.toString().length == 1){
         return "0" + event.toString();
       }else{

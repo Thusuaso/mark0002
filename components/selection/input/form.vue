@@ -161,7 +161,7 @@
                 type="text"
                 v-model="amount"
                 class="w-100"
-                @input="amount = $event.replace(',', '.')"
+                @input="amountInput($event)"
               />
               <label for="amount">Amount</label>
             </span>
@@ -367,6 +367,11 @@ export default {
     }
   },
   methods: {
+  amountInput(event){
+    this.amount = event.replace(',', '.');
+    this.speacialAmount = this.amount;
+
+  },
     __nullNoneTrueFalseControl(value) {
       if (value == null || value == undefined || value == "" || value == " ") {
         return false;

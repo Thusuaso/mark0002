@@ -5,10 +5,8 @@
         <Calendar
           v-model="selectedDates"
           selectionMode="range"
-          :manualInput="false"
+          :manualInput="true"
           placeholder="Select a Date Range"
-          class="w-100"
-          dateFormat="dd/mm/yy"
         />
       </div>
       <div class="col">
@@ -144,11 +142,17 @@ export default {
       }
     },
     searchDateList() {
-      const date1 = this.selectedDates[0];
-      const date2 = this.selectedDates[1];
+      // const date1 = this.selectedDates[0];
+      // const date2 = this.selectedDates[1];
+
+      const _date1 = new Date(this.selectedDates[0]);
+      const _date2 = new Date(this.selectedDates[1]);
+      const _date_1_format = _date1.getFullYear() + '-' + (_date1.getMonth() + 1) + '-' + _date1.getDate();
+      const _date_2_format = _date2.getFullYear() + '-' + (_date2.getMonth() + 1) + '-' + _date2.getDate();
+
       const payload = {
-        date1: date1,
-        date2: date2,
+        date1: _date_1_format,
+        date2: _date_2_format,
       };
       this.$store.dispatch("setReportsMekmarForwardingDate", payload);
     },
