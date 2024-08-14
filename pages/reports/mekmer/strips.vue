@@ -100,6 +100,68 @@
                 </DataTable>
 
             </div>
+            <div class="col-6">
+                <DataTable :value="moloz_list" responsiveLayout="scroll" class="p-datatable-sm" :resizableColumns="true" columnResizeMode="fit" showGridlines
+                :selection.sync="selectedMolozData" selectionMode="single"
+                @row-click="molozDatatableSelected($event)"
+                >
+                <template #header>MOLOZLAR</template>
+                    <Column field="Date" header="Tarih">
+                        <template #body="slotProps">
+                            {{ slotProps.data.Date | dateToString }}
+                        </template>
+                    </Column>
+                    <Column field="Supplier" header="Tedarikçi Adı">
+                        <template #body="slotProps">
+                            {{ _getSupplierName(slotProps.data.Supplier) }}
+                        </template>
+                    </Column>
+                    <Column field="Quarry" header="Ocak Adı">
+                        <template #body="slotProps">
+                            {{ _getQuarryName(slotProps.data.Quarry) }}
+                        </template>
+                    </Column>
+                    <Column field="Strip" header="Strip Adı">
+                        <template #body="slotProps">
+                            {{ _getStripName(slotProps.data.Strip) }}
+                        </template>
+                    </Column>
+                    <Column field="Ton" header="Ton">
+                        <template #body="slotProps">
+                            {{ slotProps.data.Ton | formatDecimal }}
+                        </template>
+                        <template #footer>
+                            {{ total_moloz.ton | formatDecimal }}
+                        </template>
+                    </Column>
+                    <Column field="PriceTl" header="Fiyat (TL)">
+                        <template #body="slotProps">
+                            {{ slotProps.data.PriceTl | formatPriceTl }}
+                        </template>
+                    </Column>
+                    <Column field="PriceUsd" header="Fiyat ($)">
+                        <template #body="slotProps">
+                            {{ slotProps.data.PriceUsd | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="Currency" header="Kur">
+                        <template #body="slotProps">
+                            {{ slotProps.data.Currency | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="Total" header="Toplam">
+                        <template #body="slotProps">
+                            {{ slotProps.data.Total | formatPriceTl }}
+                        </template>
+                        <template #footer>
+                            {{ total_moloz.total  | formatPriceTl }}
+                        </template>
+                    </Column>
+
+
+                </DataTable>
+
+            </div>
         </div>
         <Dialog :header="dialog_header" :visible.sync="cost_supplier_dialog"  modal style="width:100%;">
             <div class="row mt-5">
@@ -206,7 +268,7 @@
 
         </Dialog>
         <Dialog :header="dialog_header_moloz" :visible.sync="cost_supplier_dialog_moloz"  modal style="width:100%;">
-            <Dropdown class="mt-3" v-model="selectedCurrencyStatus" :options="currency_status" optionLabel="currency" placeholder="USD // TL" @change="disabled_calendar_moloz = false"/>
+            <Dropdown class="mt-3" v-model="selectedCurrencyStatus" :options="currency_status" optionLabel="currency" placeholder="USD // TL" @change="molozPriceStatusSelected($event)"/>
 
             <div class="row mt-5">
                 <div class="col-4">
@@ -244,25 +306,27 @@
                     </div>
                     <div class="row mt-5">
                         <div class="col">
-                            <CustomInput
-                            :value="moloz_model.ton"
-                            text="Tonaj"
-                            @onInput="moloz_model.ton = $event"
-                            
-                            />
+                
+                            <InputNumber v-model="moloz_model.ton" placeholder="Tonaj" mode="decimal" :minFractionDigits="2" :maxFracionDigits="2"  @input="molozTonInput($event)"/>
+
+
+
+                        </div>
+                        <div class="col">
+              
+                            <InputNumber v-model="moloz_model.price_tl" mode="currency" currency="TRY" locale="en-US" :minFractionDigits="2" :disabled="tl_disabled" @input="molozTlInput($event)"/>
+
+                        </div>
+                        <div class="col">
+     
+
+                            <InputNumber v-model="moloz_model.price_usd" currency="USD" mode="currency" locale="en-US" :minFractionDigits="2" :disabled="usd_disabled" @input="molozUsdInput($event)"/>
 
                         </div>
                         <div class="col">
                             <CustomInput
-                            :value="moloz_model.price"
-                            text="Fiyat"
-                            @onInput="moloz_model.price = $event"
-                            />
-                        </div>
-                        <div class="col">
-                            <CustomInput
                             :value="moloz_model.total"
-                            text="Toplam"
+                            text="Toplam (TL)"
                             @onInput="moloz_model.total = $event"
                             :disabled="true"
                             />
@@ -276,11 +340,9 @@
             </div>
 
             <div class="row mt-4">
+
                 <div class="col">
-                    <Button  type="button" class="p-button-info w-100" label="Hesapla"  @click="calculateMoloz"/>
-                </div>
-                <div class="col">
-                    <Button class="w-100 p-button-primary" type="button" label="Kaydet" :disabled="button_disabled_2" @click="processMoloz"/>
+                    <Button class="w-100 p-button-primary" type="button" label="Kaydet" :disabled="moloz_model.total > 0 ? false : true" @click="processMoloz"/>
                 </div>
                 <div class="col" v-if="!new_button_status_moloz">
                     <Button class="w-100 p-button-danger" type="button" label="Sil"  @click="deleteProcessMoloz"/>
@@ -296,13 +358,21 @@
 <script>
 import server from "../../../plugins/excel.server";
 import date from "../../../plugins/date";
-import {mapGetters} from 'vuex';
+import { mapGetters } from 'vuex';
 export default {
     computed:{
         ...mapGetters(['getLocalUrl'])
     },
     data(){
         return{
+            moloz_list:[],
+            selectedMolozData:{},
+            total_moloz:{
+                'ton':0,
+                'total':0
+            },
+            tl_disabled:true,
+            usd_disabled:true,
             disabled_calendar_moloz:true,
             selectedCurrencyStatus:null,
             dialog_header_moloz:'',
@@ -368,7 +438,8 @@ export default {
                 'stripId':null,
                 'stripName':null,
                 'ton':null,
-                'price':0,
+                'price_tl':0,
+                'price_usd':0,
                 'total':0,
                 'currency':0
             },
@@ -407,14 +478,116 @@ export default {
 
     },
     methods:{
-        updateMoloz(){
+        molozTonInput(event){
+            this.moloz_model.total = this.moloz_model.price_tl * event;
+        },
+        molozDatatableSelected(event){
+            this.new_button_status_moloz = false;
+            this.moloz_model.id = event.data.ID;
+            this.moloz_model.date = event.data.Date;
+            this.moloz_model.supplierId = event.data.Supplier;
+            this.moloz_model.quarryId = event.data.Quarry;
+            this.moloz_model.stripId = event.data.Strip;
+            this.moloz_model.ton = event.data.Ton;
+            this.moloz_model.price_tl = event.data.PriceTl;
+            this.moloz_model.price_usd = event.data.PriceUsd;
+            this.moloz_model.currency = event.data.Currency;
+            this.moloz_model.total = event.data.Total;
+            this.selectedDate = date.stringToDate(event.data.Date);
+            this.selectedSupplier = this.suppliers.find(x=>{
+                return x.ID = event.data.Supplier;
+            });
+            this.selectedQuarry = this.quarries.find(x=>{
+                return x.ID = event.data.Quarry;
+            });
+            this.selectedStrip = this.strips.find(x=>{
+                return x.ID = event.data.Strip;
+            });
+            this.dialog_header_moloz = this.selectedQuarry.OcakAdi + ' - ' + this.selectedStrip.Strips ;
 
+
+
+            this.cost_supplier_dialog_moloz = true;
+        },
+        __molozSumTotal(data){
+            this.total_moloz = {
+                'ton':0,
+                'total':0
+            };
+            data.forEach(x=>{
+                this.total_moloz.ton += x.Ton;
+                this.total_moloz.total += x.Total;
+            });
+        },
+        molozTlInput(event){
+            this.moloz_model.price_usd = event / this.moloz_model.currency;
+            this.moloz_model.total = this.moloz_model.price_tl * this.moloz_model.ton;
+        },
+        molozUsdInput(event){
+            this.moloz_model.price_tl = event * this.moloz_model.currency;
+            this.moloz_model.total = this.moloz_model.price_tl * this.moloz_model.ton;
+
+        },
+        molozPriceStatusSelected(event){
+            this.disabled_calendar_moloz = false;
+            if(event.value.id == 1){
+                this.usd_disabled = false;
+                this.tl_disabled = true;
+
+            }else if (event.value.id == 2){
+                this.usd_disabled = true;
+                this.tl_disabled = false;
+            }
+        },
+        updateMoloz(){
+            this.$store.dispatch('setBeginLoadingAction');
+
+            this.$axios.put('/reports/mekmer/moloz/update',this.moloz_model)
+            .then(res=>{
+                if(res.status){
+                    this.__created();
+
+                    this.$toast.success('Güncelleme Başarılı.');
+                    this.$store.dispatch('setEndLoadingAction');
+
+
+                }else{
+                    this.$toast.error('Güncelleme Başarısız.');
+                    
+                }
+            });
         },
         saveMoloz(){
-            console.log(this.moloz_model)
+            this.$axios.post('/reports/mekmer/moloz/save',this.moloz_model)
+            .then(res=>{
+                if(res.status){
+                    this.__created();
+                    this.reset();
+                    this.new_button_status_moloz = false;
+                    this.cost_supplier_dialog_moloz = false;
+                    this.$toast.success('Kayıt Başarılı.');
+
+                }else{
+                    this.$toast.error('Kayıt Başarısız.');
+
+                }
+            });
+            
         },
         deleteProcessMoloz(){
+            this.$axios.delete(`/reports/mekmer/moloz/delete/${this.moloz_model.id}`)
+            .then(res=>{
+                if(res.status){
+                    this.$toast.success('Silme İşlemi Başarılı');
+                    this.__created();
+                    this.cost_supplier_dialog_moloz = false;
+                    this.reset();
 
+                }else{
+                    this.$toast.error('Silme İşlemi Başarısız');
+
+                }
+            })
         },
         processMoloz(){
             if(this.new_button_status_moloz){
@@ -434,7 +607,7 @@ export default {
         },
         stripSelectedMoloz(event){
             this.moloz_model.stripId = event.value.ID;
-            this.moloz_model.stripName = event.value.StripName;
+            this.moloz_model.stripName = event.value.Strips;
         },
         quarryInputMoloz(event){
             this.moloz_model.quarryId = null;
@@ -475,7 +648,17 @@ export default {
             this.new_button_status_moloz = true;
         },
         excel_strip_output_moloz(){
+            server.post('/reports/mekmer/moloz/excel',this.moloz_list)
+            .then(res=>{
+                if (res.status) {
+                    const link = document.createElement("a");
+                    link.href = this.getLocalUrl + "reports/mekmer/moloz/excel";
 
+                    link.setAttribute("download", "reports_mekmer_moloz.xlsx");
+                    document.body.appendChild(link);
+                    link.click();
+                }
+            })
         },
         deleteProcess(){
             this.$axios.delete(`/reports/mekmer/quarries/supplier/strips/delete/${this.model.Id}`)
@@ -550,32 +733,58 @@ export default {
         },
         calculate(){
             this.model.stripCost = (parseFloat(this.model.stripM2) * parseFloat(this.model.stripPrice));
-            this.model.stripPiece = Math.ceil((parseFloat(this.model.stripWidth) / 100) * (parseFloat(this.model.stripHeight) / 100) * (parseFloat(this.model.stripM2)));
+            this.model.stripPiece = Math.ceil((parseFloat(this.model.stripM2)) / (parseFloat(this.model.stripWidth) / 100) / (parseFloat(this.model.stripHeight) / 100) );
             this.button_disabled_2 = false
 
         },
         __created(){
-            this.$axios.get(`/reports/mekmer/quarries/supplier/${this.selectedYear.year}/${this.selectedMonth.month_id}`)
-        .then(res=>{
-            this.suppliers = res.data.suppliers;
-            this.list = res.data.list
-            this.strips = res.data.strips;
-            this.quarries = res.data.quarries;
-            this.totalStrips(res.data.list);
+            this.$store.dispatch('setBeginLoadingAction');
+
+            this.$axios.get(`/reports/mekmer/quarries/supplier/${this.selectedYear.year}/${this.selectedMonth.month_id}`).then(res=>{
+                        this.suppliers = res.data.suppliers;
+                        this.list = res.data.list
+                        this.strips = res.data.strips;
+                        this.quarries = res.data.quarries;
+                        this.totalStrips(res.data.list);
+                    this.$axios.get(`/reports/mekmer/moloz/list/${this.selectedYear.year}/${this.selectedMonth.month_id}`).then(res=>{
+                        this.moloz_list = res.data.list;
+                        this.suppliers = res.data.suppliers;
+                        this.strips = res.data.strips;
+                        this.quarries = res.data.quarries;
+                        this.__molozSumTotal(res.data.list);
+                        this.$store.dispatch('setEndLoadingAction');
+
+                        
+                        
+                    });
+
         }).catch(err=>{
             console.log("err",err);
         })
+
+
+            
+
+
         },
         yearSelected(event){
             
         },
         monthSelected(event){
-            this.$axios.get(`/reports/mekmer/quarries/supplier/${this.selectedYear.year}/${this.selectedMonth.month_id}`)
+            this.$axios.get(`/reports/mekmer/quarries/supplier/${this.selectedYear.year}/${this.selectedMonth.month_id}`).then(res=>{
+                    this.suppliers = res.data.suppliers;
+                    this.list = res.data.list
+                    this.strips = res.data.strips;
+                    this.quarries = res.data.quarries;
+                    this.totalStrips(res.data.list);
+                }).catch(err=>{
+                    console.log("err",err);
+                })
+            this.$axios.get(`/reports/mekmer/moloz/list/${this.selectedYear.year}/${this.selectedMonth.month_id}`)
             .then(res=>{
-                this.suppliers = res.data.suppliers;
-                this.list = res.data.list
-                this.strips = res.data.strips;
-                this.quarries = res.data.quarries;
+                this.moloz_list = res.data.list;
+            this.__molozSumTotal(res.data.list);
+
             });
         },
         searchSupplier(event){
@@ -732,19 +941,19 @@ export default {
         },
         _getSupplierName(_id){
             let name = this.suppliers.find(x=>{
-                return x.ID = _id;
+                return x.ID == _id;
             }).FirmaAdi;
             return name;
         },
         _getQuarryName(_id){
             let name = this.quarries.find(x=>{
-                return x.ID = _id;
+                return x.ID == _id;
             }).OcakAdi;
             return name;
         },
         _getStripName(_id){
             let name = this.strips.find(x=>{
-                return x.ID = _id;
+                return x.ID == _id;
             }).Strips;
             return name;
         }

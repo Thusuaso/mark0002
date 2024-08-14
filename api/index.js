@@ -13036,6 +13036,10 @@ app.post('/reports/mekmer/quarries/supplier/strips/save',async(req,res)=>{
     const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
     const __stripId = await stripId(req.body.stripId,req.body.stripName);
     const __quarryId = await quarryId(req.body.quarryId,req.body.quarryName);
+    console.log("__supplierId",__supplierId)
+    console.log("__stripId",__stripId)
+    console.log("__quarryId",__quarryId)
+
     const insertSql = `
         insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight)
 VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}')
@@ -13046,7 +13050,7 @@ VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCos
         }else{
             res.status(200).json({'status':false});
         };
-    })
+    });
 });
 app.put('/reports/mekmer/quarries/supplier/strips/update',async(req,res)=>{
     const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
@@ -13088,7 +13092,97 @@ app.delete('/reports/mekmer/quarries/supplier/strips/delete/:id',async(req,res)=
         }
     });
 
-})
+});
+
+/*Molozlar*/
+app.post('/reports/mekmer/moloz/save',async(req,res)=>{
+    const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
+    const __stripId = await stripId(req.body.stripId,req.body.stripName);
+    const __quarryId = await quarryId(req.body.quarryId,req.body.quarryName);
+    const insertSql = `
+        insert into QuarriesSupplierMolozTB(Date,Supplier,Quarry,Strip,Ton,PriceTl,PriceUsd,Currency,Total)
+        VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${__stripId}','${req.body.ton}','${req.body.price_tl}','${req.body.price_usd}','${req.body.currency}','${req.body.total}')
+    `;
+    mssql.query(insertSql,(err,insert)=>{
+        if(insert.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        };
+    });
+});
+app.get('/reports/mekmer/moloz/list/:year/:month',async(req,res)=>{
+    const sql = `
+
+        select qsm.ID,qsm.Date,qsm.Supplier,qsm.Quarry,qsm.Strip,qsm.Ton,qsm.PriceTl,qsm.PriceUsd,qsm.Currency,qsm.Total,
+        t.FirmaAdi as SupplierName,
+        uo.OcakAdi as QuarryName,
+        s.Strips as StripName
+
+        from QuarriesSupplierMolozTB qsm
+        inner join TedarikciTB t on t.ID = qsm.Supplier
+        inner join UrunOcakTB uo on uo.ID = qsm.Quarry
+        inner join StripsTB s on s.ID = qsm.Strip
+        where YEAR(Date) = '${req.params.year}' and MONTH(Date)= '${req.params.month}'
+    `;
+    const suppliersList = 'select ID,FirmaAdi from TedarikciTB';
+    const stripsList = 'select ID,Strips from StripsTB';
+    const quarriesList = 'select ID,OcakAdi from UrunOcakTB';
+    mssql.query(sql,(err,list)=>{
+        mssql.query(suppliersList,(err,suppliers)=>{
+            mssql.query(stripsList,(err,strips)=>{
+                mssql.query(quarriesList,(err,quarries)=>{
+                    res.status(200).json({
+                        'list':list.recordset,
+                        'suppliers':suppliers.recordset,
+                        'strips':strips.recordset,
+                        'quarries':quarries.recordset
+                    })
+                });
+            });
+        });
+    });
+});
+app.put('/reports/mekmer/moloz/update',async(req,res)=>{
+    const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
+    const __stripId = await stripId(req.body.stripId,req.body.stripName);
+    const __quarryId = await quarryId(req.body.quarryId,req.body.quarryName);
+    const updateSql = `
+        Update QuarriesSupplierMolozTB SET 
+        Date='${req.body.date}',
+        Supplier='${__supplierId}',
+        Quarry='${__quarryId}',
+        Strip='${__stripId}',
+        Ton='${req.body.ton}',
+        PriceTl='${req.body.price_tl}',
+        PriceUsd='${req.body.price_usd}',
+        Currency='${req.body.currency}',
+        Total = '${req.body.total}'
+
+        where ID = '${req.body.id}'
+
+    `;
+    mssql.query(updateSql,(err,_update)=>{
+        if(_update.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        };
+    });
+});
+app.delete('/reports/mekmer/moloz/delete/:id',async(req,res)=>{
+    const deleteSql = `delete QuarriesSupplierMolozTB where ID='${req.params.id}'`;
+    mssql.query(deleteSql,(err,_delete)=>{
+        if(_delete.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+
+        }else{
+            res.status(200).json({'status':false});
+
+
+        }
+    })
+});
 
 
 /*Shared*/

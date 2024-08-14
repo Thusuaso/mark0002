@@ -234,7 +234,7 @@ export default {
           .then((response) => {
             if (response) {
               const data = response.data.filter(x => {
-                return (x.yukleme_month >= 1 && x.yukleme_month <= 4)
+                return (x.yukleme_month >= 1 && x.yukleme_month <= 3)
               })
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
@@ -250,7 +250,7 @@ export default {
           .then((response) => {
             if (response) {
               const data = response.data.filter(x => {
-                return (x.yukleme_month >= 5 && x.yukleme_month <= 8)
+                return (x.yukleme_month >= 4 && x.yukleme_month <= 6)
               })
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
@@ -265,7 +265,22 @@ export default {
           .then((response) => {
             if (response) {
               const data = response.data.filter(x => {
-                return (x.yukleme_month >= 9 && x.yukleme_month <= 12)
+                return (x.yukleme_month >= 7 && x.yukleme_month <= 9)
+              })
+              this.$store.commit("setReportsMekmarAyoList", data);
+              this.$store.commit("setReportsMekmarAyoListTotal", data);
+              this.$store.dispatch("setEndLoadingAction");
+            }
+          });
+      }
+      else if (event.value.id == 4) {
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
+          .then((response) => {
+            if (response) {
+              const data = response.data.filter(x => {
+                return (x.yukleme_month >= 10 && x.yukleme_month <= 12)
               })
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);

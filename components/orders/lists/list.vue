@@ -30,7 +30,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentLoadDate(filterModel.value)"
               @input="filterShipmentLoadDateInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentLoadDate(filterModel.value)" />
+               />
           </template>
         </Column>
         <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
@@ -38,7 +38,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentCompany(filterModel.value)"
               @input="filterShipmentCompanyInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentCompany(filterModel.value)" />
+               />
           </template>
         </Column>
         <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
@@ -46,7 +46,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentPo(filterModel.value)"
               @input="filterShipmentPoInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentPo(filterModel.value)" />
+               />
           </template>
         </Column>
         <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
@@ -71,7 +71,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentProduct(filterModel.value)"
               @input="filterShipmentProductInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentProduct(filterModel.value)" />
+               />
           </template>
         </Column>
         <Column field="UrunUretimAciklama" header="Details" headerClass="tableHeader" bodyClass="tableBody">
@@ -81,7 +81,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentWidth(filterModel.value)"
               @input="filterShipmentWidthInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentWidth(filterModel.value)" />
+               />
           </template>
         </Column>
 
@@ -90,7 +90,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentHeight(filterModel.value)"
               @input="filterShipmentHeightInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentHeight(filterModel.value)" />
+              />
           </template>
         </Column>
         <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false"
@@ -98,7 +98,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentEdge(filterModel.value)"
               @input="filterShipmentEdgeInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentEdge(filterModel.value)" />
+               />
           </template>
         </Column>
         <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
@@ -106,7 +106,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentSupplier(filterModel.value)"
               @input="filterShipmentSupplierInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentSupplier(filterModel.value)" />
+               />
           </template>
         </Column>
         <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false"
@@ -117,7 +117,7 @@
           <template #filter="{ filterModel }">
             <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentAmount(filterModel.value)"
               @input="filterShipmentAmountInput(filterModel.value)" class="p-column-filter"
-              @keyup.stop="filterShipmentAmount(filterModel.value)" />
+               />
           </template>
           <template #footer>
             {{ total.order | formatDecimal }}
