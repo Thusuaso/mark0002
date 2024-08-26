@@ -1,5 +1,6 @@
 <template>
     <div class="row mt-4  m-auto ml-2 mr-2">
+        {{ strips }}
         <div class="row m-auto text-center">
             <div class="col-sm-3">
                 <Button class="w-100 mb-5 p-button-success" type="button" label="Yeni Strip" @click="newForm"/>
@@ -57,6 +58,9 @@
                         <template #body="slotProps">
                             {{ _getStripName(slotProps.data.Strip) }}
                         </template>
+                    </Column>
+                    <Column field="Invoice" header="Invoice">
+
                     </Column>
                     <Column field="StripM2" header="Strip (M2)">
                         <template #body="slotProps">
@@ -121,7 +125,7 @@
                             {{ _getQuarryName(slotProps.data.Quarry) }}
                         </template>
                     </Column>
-                    <Column field="Strip" header="Strip Adı">
+                    <Column field="Strip" header="Ürün Adı">
                         <template #body="slotProps">
                             {{ _getStripName(slotProps.data.Strip) }}
                         </template>
@@ -172,7 +176,7 @@
                 <div class="col-8">
                     <div class="row mt-5">
 
-                        <div class="col-4">
+                        <div class="col-3">
                             <span class="p-float-label ">
                                 <AutoComplete :disabled="disabled_1" id="supplier" v-model="selectedSupplier" :suggestions="filteredSupplier" @complete="searchSupplier($event)" field="FirmaAdi" @item-select="supplierSelected($event)"
                                     @input="supplierInput($event)"
@@ -180,7 +184,7 @@
                                 <label for="supplier">Tedarikçi</label>
                             </span>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <span class="p-float-label">
                                 <AutoComplete :disabled="disabled_2" id="quarry" v-model="selectedQuarry" :suggestions="filteredQuarry" @complete="searchQuarry($event)" field="OcakAdi" @item-select="quarrySelected($event)"
                                     @input="quarryInput($event)"
@@ -188,7 +192,7 @@
                                 <label for="quarry">Ocaklar</label>
                             </span>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <span class="p-float-label">
                                 <AutoComplete :disabled="disabled_3" id="strip" v-model="selectedStrip" :suggestions="filteredStrip" @complete="searchStrip($event)" field="Strips" @item-select="stripSelected($event)"
                                     @input="stripInput($event)"
@@ -196,7 +200,12 @@
                                 <label for="strip">Stripler</label>
                             </span>
                         </div>
-
+                        <div class="col-3">
+                            <span class="p-float-label">
+                                <InputText id="invoice" type="text" v-model="model.invoice" />
+                                <label for="invoice">Invoice</label>
+                            </span>
+                        </div>
                     </div>
                     <div class="row mt-5">
                         <div class="col">
@@ -299,28 +308,34 @@
                                 <AutoComplete :disabled="disabled_3" id="strip" v-model="selectedStrip" :suggestions="filteredStrip" @complete="searchStrip($event)" field="Strips" @item-select="stripSelectedMoloz($event)"
                                     @input="stripInputMoloz($event)"
                                 />
-                                <label for="strip">Stripler</label>
+                                <label for="strip">Ürün Adı</label>
                             </span>
                         </div>
 
                     </div>
                     <div class="row mt-5">
                         <div class="col">
-                
-                            <InputNumber v-model="moloz_model.ton" placeholder="Tonaj" mode="decimal" :minFractionDigits="2" :maxFracionDigits="2"  @input="molozTonInput($event)"/>
+                            <span class="p-float-label">
+                                <InputNumber v-model="moloz_model.ton" placeholder="Tonaj" mode="decimal" :minFractionDigits="2" :maxFracionDigits="2"  @input="molozTonInput($event)"/>
+                                <label for="username">Ton</label>
+                            </span>
 
 
 
                         </div>
                         <div class="col">
-              
-                            <InputNumber v-model="moloz_model.price_tl" mode="currency" currency="TRY" locale="en-US" :minFractionDigits="2" :disabled="tl_disabled" @input="molozTlInput($event)"/>
+                                <span class="p-float-label">
+                                    <InputNumber v-model="moloz_model.price_tl" mode="currency" currency="TRY" locale="en-US" :minFractionDigits="2" :disabled="tl_disabled" @input="molozTlInput($event)"/>
+                                    <label for="username">TL</label>
+                                </span>
 
                         </div>
                         <div class="col">
-     
+                            <span class="p-float-label">
+                                <InputNumber v-model="moloz_model.price_usd" currency="USD" mode="currency" locale="en-US" :minFractionDigits="2" :disabled="usd_disabled" @input="molozUsdInput($event)"/>
+                                <label for="username">USD</label>
+                                </span>
 
-                            <InputNumber v-model="moloz_model.price_usd" currency="USD" mode="currency" locale="en-US" :minFractionDigits="2" :disabled="usd_disabled" @input="molozUsdInput($event)"/>
 
                         </div>
                         <div class="col">
@@ -409,6 +424,7 @@ export default {
                 'stripWidth':0,
                 'stripHeight':0,
                 'stripPiece':0,
+                'invoice':''
             },
             selectedQuarry:null,
             filteredQuarry:null,
@@ -479,7 +495,7 @@ export default {
     },
     methods:{
         molozTonInput(event){
-            this.moloz_model.total = this.moloz_model.price_tl * event;
+            this.moloz_model.total = (this.moloz_model.price_tl * event) / 1000;
         },
         molozDatatableSelected(event){
             this.new_button_status_moloz = false;
@@ -521,11 +537,11 @@ export default {
         },
         molozTlInput(event){
             this.moloz_model.price_usd = event / this.moloz_model.currency;
-            this.moloz_model.total = this.moloz_model.price_tl * this.moloz_model.ton;
+            this.moloz_model.total = (this.moloz_model.price_tl * this.moloz_model.ton)/1000;
         },
         molozUsdInput(event){
             this.moloz_model.price_tl = event * this.moloz_model.currency;
-            this.moloz_model.total = this.moloz_model.price_tl * this.moloz_model.ton;
+            this.moloz_model.total = (this.moloz_model.price_tl * this.moloz_model.ton)/1000;
 
         },
         molozPriceStatusSelected(event){
@@ -620,10 +636,13 @@ export default {
         },
         dateSelectedMoloz(event){
             this.moloz_model.date = event;
+            
             this.disabled_1 = false;
             const year = event.getFullYear();
             const month = event.getMonth() + 1;
             const day = event.getDate();
+
+
             server
                 .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
                 .then((response) => {
@@ -713,15 +732,16 @@ export default {
             this.model.stripWidth = event.data.StripWidth;
             this.model.stripHeight = event.data.StripHeight;
             this.model.stripPiece = event.data.StripPiece;
+            this.model.invoice= event.data.Invoice;
             this.selectedDate = date.stringToDate(event.data.Date);
             this.selectedSupplier = this.suppliers.find(x=>{
-                return x.ID = event.data.Supplier;
+                return x.ID == event.data.Supplier;
             });
             this.selectedQuarry = this.quarries.find(x=>{
-                return x.ID = event.data.Quarry;
+                return x.ID == event.data.Quarry;
             });
             this.selectedStrip = this.strips.find(x=>{
-                return x.ID = event.data.Strip;
+                return x.ID == event.data.Strip;
             });
             this.dialog_header = this.selectedQuarry.OcakAdi + ' - ' + this.selectedStrip.Strips ;
 
@@ -872,7 +892,8 @@ export default {
                 'stripCost':0,
                 'stripWidth':0,
                 'stripHeight':0,
-                'stripPiece':0
+                'stripPiece':0,
+                'invoice':''
             },
             this.selectedQuarry = null;
             this.selectedStrip = null;

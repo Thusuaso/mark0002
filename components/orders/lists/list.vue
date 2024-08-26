@@ -235,7 +235,10 @@
         <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
           style="width:5%;">
           <template #body="slotProps">
-            <div :style="{ backgroundColor: slotProps.data.Isf ? '' : 'red' }">
+            <div v-if="slotProps.data.TedarikciID == 1 || slotProps.data.TedarikciID == 123" >
+              {{ slotProps.data.UrunFirmaAdi }}
+            </div>
+            <div v-else :style="{ color: slotProps.data.Isf ? '' : 'red' }">
               {{ slotProps.data.UrunFirmaAdi }}
             </div>
           </template>

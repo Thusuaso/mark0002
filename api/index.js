@@ -10622,15 +10622,15 @@ function __floatNullControl(value) {
 }
 
 app.post('/order/production/product/add', (req, res) => {
-    // let buyingPrice = 0;
+    let buyingPrice = 0;
 
-    // if (req.body.AlisFiyati == 0 || req.body.AlisFiyati == undefined || req.body.AlisFiyati == null || req.body.AlisFiyati == "") {
-    //     if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
-    //         buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
-    //     }
-    // } else {
-    //     buyingPrice = req.body.AlisFiyati;
-    // }
+    if (req.body.AlisFiyati == 0 || req.body.AlisFiyati == undefined || req.body.AlisFiyati == null || req.body.AlisFiyati == "") {
+        if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
+            buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
+        }
+    } else {
+        buyingPrice = req.body.AlisFiyati;
+    }
     const insertSql = `
         insert into SiparisUrunTB(
 	SiparisNo,
@@ -10658,7 +10658,7 @@ app.post('/order/production/product/add', (req, res) => {
 	'${__floatNullControl(req.body.SatisToplam)}',
 	'${req.body.UretimAciklama}',
 	'${req.body.MusteriAciklama}',
-	'${__floatNullControl(req.body.AlisFiyati)}',
+	'${__floatNullControl(buyingPrice)}',
 	'${__floatNullControl(req.body.SiraNo)}',
 	'${__floatNullControl(req.body.Ton)}',
 	'${__floatNullControl(req.body.Adet)}'
@@ -10704,15 +10704,15 @@ app.delete('/order/production/product/delete/:id',(req,res)=>{
 
 });
 app.put('/order/production/product/update', (req, res) => {
-    // let buyingPrice = 0;
-    // if (req.body.AlisFiyati == 0 || req.body.AlisFiyati == undefined || req.body.AlisFiyati == null || req.body.AlisFiyati == "") {
-    //     if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
-    //                 buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
+    let buyingPrice = 0;
+    if (req.body.AlisFiyati == 0 || req.body.AlisFiyati == undefined || req.body.AlisFiyati == null || req.body.AlisFiyati == "") {
+        if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
+                    buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
 
-    //     }
-    // } else {
-    //     buyingPrice = req.body.AlisFiyati;
-    // }
+        }
+    } else {
+        buyingPrice = req.body.AlisFiyati;
+    }
     const sql = `
         update SiparisUrunTB SET
         TedarikciID = '${__floatNullControl(req.body.TedarikciID)}',
@@ -10724,7 +10724,7 @@ app.put('/order/production/product/update', (req, res) => {
         SatisToplam = '${__floatNullControl(req.body.SatisToplam)}',
         UretimAciklama = '${req.body.UretimAciklama}',
         MusteriAciklama = '${req.body.MusteriAciklama}',
-        AlisFiyati = ${__floatNullControl(req.body.AlisFiyati)},
+        AlisFiyati = ${__floatNullControl(buyingPrice)},
         SiraNo = '${__floatNullControl(req.body.SiraNo)}',
         Ton = '${__floatNullControl(req.body.Ton)}',
         Adet = '${__floatNullControl(req.body.Adet)}'
@@ -12938,7 +12938,8 @@ app.get('/reports/mekmer/quarries/supplier/:year/:month',(req,res)=>{
 
 	t.FirmaAdi as SupplierName,
 	uo.OcakAdi as QuarryName,
-	s.Strips as StripName
+	s.Strips as StripName,
+    qs.Invoice
 
 
 
@@ -13036,13 +13037,11 @@ app.post('/reports/mekmer/quarries/supplier/strips/save',async(req,res)=>{
     const __supplierId = await supplierId(req.body.supplierId,req.body.supplierName);
     const __stripId = await stripId(req.body.stripId,req.body.stripName);
     const __quarryId = await quarryId(req.body.quarryId,req.body.quarryName);
-    console.log("__supplierId",__supplierId)
-    console.log("__stripId",__stripId)
-    console.log("__quarryId",__quarryId)
+
 
     const insertSql = `
-        insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight)
-VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}')
+        insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight,Invoice)
+VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}','${req.body.invoce}')
     `;
     mssql.query(insertSql,(err,insert)=>{
         if(insert.rowsAffected[0] == 1){
@@ -13069,7 +13068,8 @@ SET
 	StripM2='${req.body.stripM2}',
 	StripPiece='${req.body.stripPiece}',
 	StripWidth='${req.body.stripWidth}',
-	StripHeight='${req.body.stripHeight}'
+	StripHeight='${req.body.stripHeight}',
+    Invoice='${req.body.invoice}'
 WHERE
 	ID = '${req.body.Id}'
 
