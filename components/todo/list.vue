@@ -66,8 +66,6 @@ export default {
 </script>
 <style scoped>
 :deep(.red-row) {
-  background-color: rgba(255, 0, 0, 0.789) !important;
-  border: 1px solid gray !important;
-  color: white !important;
+  color: rgba(255, 0, 0, 0.789) !important;
 }
 </style>

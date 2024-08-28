@@ -713,7 +713,7 @@ app.get('/selection/production/total',(req,res)=>{
 });
 
 app.get('/selection/production/crateno/in',(req,res)=>{
-    const sql = 'select top 1 u.KasaNo + 1 as KasaNo from UretimTB u where u.TedarikciID in (1,123) and u.Disarda = 0 and u.UrunDurumID=1 order by u.KasaNo desc';
+    const sql = 'select top 1 u.KasaNo + 1 as KasaNo from UretimTB u where u.TedarikciID in (1,123) and u.Disarda = 0  order by u.ID desc';
     mssql.query(sql,(err,no)=>{
         res.status(200).json({
            'no':no.recordset[0].KasaNo,
@@ -728,6 +728,9 @@ app.get('/selection/production/crateno/out',(req,res)=>{
         });
     });
 });
+
+
+
 app.post('/selection/production/save',(req,res)=>{
     let crateNo = req.body.KasaNo;
     for (let i = 1; i <= req.body.KasaKayıtAdedi; i += 1) {
@@ -758,7 +761,7 @@ app.post('/selection/production/save',(req,res)=>{
                 '${req.body.UrunKartID}','${req.body.TedarikciID}',
                 '${req.body.UrunBirimID}','${req.body.UrunOcakID}',
                 '${req.body.Adet}','${req.body.KutuAdet}',
-                '${req.body.Miktar}','${req.body.Aciklama}',
+                '${req.body.Miktar}','${__stringCharacterChange(req.body.Aciklama)}',
                 '${req.body.UretimTurID}','${req.body.UrunDurumID}',
                 '${req.body.SiparisAciklama}','${req.body.Kutu}',
                 '${req.body.Duzenleyen}','${req.body.Kasalayan}',
@@ -786,7 +789,7 @@ app.put('/selection/production/update',(req,res)=>{
     UrunOcakID='${req.body.UrunOcakID}',
     Adet='${req.body.Adet}',
     Miktar='${req.body.Miktar}',
-    Aciklama='${req.body.Aciklama}',
+    Aciklama='${__stringCharacterChange(req.body.Aciklama)}',
     UretimTurID='${req.body.UretimTurID}',
     SiparisAciklama='${req.body.SiparisAciklama}',
     Kutu='${req.body.Kutu}',
