@@ -1,5 +1,6 @@
 <template>
   <div class="row m-auto">
+
     <div class="col">
       <DataTable
         :value="list"
@@ -255,8 +256,7 @@
             <div
               :style="{
                 'background-color':
-                  slotProps.data.mekmar_alim > 0 &&
-                  slotProps.data.mekmar_alim_evrak.length <= 0
+                  slotProps.data.mekmer_alim_alis_kontrol > 0 
                     ? '#F1948A'
                     : '',
               }"
@@ -278,8 +278,7 @@
             <div
               :style="{
                 'background-color':
-                  slotProps.data.mekmoz_alim > 0 &&
-                  slotProps.data.mekmoz_alim_evrak.length <= 0
+                  slotProps.data.mekmoz_alim_alis_kontrol > 0 
                     ? '#F1948A'
                     : '',
               }"
@@ -301,10 +300,8 @@
             <div
               :style="{
                 'background-color':
-                  (slotProps.data.dis_alim > 0 &&
-                    slotProps.data.dis_alim_tedarikci_sayisi !=
-                      slotProps.data.tedarikci_sayisi) ||
-                  slotProps.data.dis_alim_fatura_sayisi != slotProps.data.tedarikci_sayisi
+                  slotProps.data.dis_alim_alis_kontrol > 0 
+
                     ? '#F1948A'
                     : '',
               }"

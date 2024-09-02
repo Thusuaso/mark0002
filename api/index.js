@@ -6389,7 +6389,6 @@ app.put('/panel/product/update', (req, res) => {
 
             where Id = '${req.body.Id}'
     `;
-    console.log(updateProductSql)
     if(!req.body.yayinla){
         const suggestedSqlDelete = `delete MekmarCom_OnerilenUrunler where onerilenurunid='${req.body.urunid}'`;
         mssql.query(suggestedSqlDelete);
@@ -7055,6 +7054,8 @@ app.put('/panel/usa/stock/update',(req,res)=>{
     where Id='${req.body.Id}'
 
     `;
+
+
     mssql.query(updateDetail);
 
     mssql.query(updateStock,(err,stock)=>{
