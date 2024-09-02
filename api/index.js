@@ -1022,27 +1022,23 @@ app.post('/card/save',(req,res)=>{
 
 function sizeIdControl(width, height, thickness, id) {
     return new Promise((resolve, reject) => {
-        if (id == null || id == '' || id == undefined) {
-            const controlSql = `select top 1 * from OlculerTB where En='${width}' and Boy='${height}' and Kenar='${thickness}'`;
-            mssql.query(controlSql, (err, control) => {
-                if (control.recordset.length > 0) {
-                    resolve(control.recordset[0].ID);
-                } else {
-                    const insertSizeSql = `insert into OlculerTB(En,Boy,Kenar) VALUES('${width}','${height}','${thickness}')`;
-                    mssql.query(insertSizeSql, (err, insert) => {
-                        if (insert.rowsAffected[0] == 1) {
-                            const getSizeIdSql = `select top 1 ID from OlculerTB order by ID desc`;
-                            mssql.query(getSizeIdSql, (err, getId) => {
-                                resolve(getId.recordset[0].ID);
-                            })
-                        }
-                    });
-               }
-            });
-
-        } else {
-            resolve(id);
-        }
+        const controlSql = `select top 1 * from OlculerTB where En='${width}' and Boy='${height}' and Kenar='${thickness}'`;
+        console.log(controlSql);
+        mssql.query(controlSql, (err, control) => {
+            if (control.recordset.length > 0) {
+                resolve(control.recordset[0].ID);
+            } else {
+                const insertSizeSql = `insert into OlculerTB(En,Boy,Kenar) VALUES('${width}','${height}','${thickness}')`;
+                mssql.query(insertSizeSql, (err, insert) => {
+                    if (insert.rowsAffected[0] == 1) {
+                        const getSizeIdSql = `select top 1 ID from OlculerTB order by ID desc`;
+                        mssql.query(getSizeIdSql, (err, getId) => {
+                            resolve(getId.recordset[0].ID);
+                        })
+                    }
+                });
+           }
+        });
     });
 }
 function productIdControl(productName, productId) {
