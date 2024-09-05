@@ -4,7 +4,7 @@
     <div class="card">
       <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
         :selection.sync="selectedProduction" selectionMode="multiple"
-        @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" :paginator="true" :rows="25"
+        @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm customShipped" :paginator="true" :rows="25"
         style="font-size: 70%; border: 2px solid gray;" filterDisplay="row" :filters.sync="filtersOrders"
         v-if="status == 'Shipped'" sortField="YuklemeTarihi" :sortOrder="-1" :rowClass="rowClass2"
         columnResizeMode="fit" showGridlines responsiveLayout="scroll" :loading="loading">
@@ -120,7 +120,7 @@
                />
           </template>
           <template #footer>
-            {{ total.order | formatDecimal }}
+            {{ total.order | formatDecimal2 }}
           </template>
         </Column>
         <Column field="BirimAdi" header="Unit" headerClass="tableHeader" bodyClass="tableBody">
@@ -133,7 +133,161 @@
             {{ slotProps.data.Ton | formatDecimal }}
           </template>
           <template #footer>
-            {{ total.ton | formatDecimal }}
+            {{ total.ton | formatDecimal2 }}
+          </template>
+        </Column>
+        <Column field="SatisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column field="SatisToplam" header="Total" headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.SatisToplam | formatPriceUsd }}
+          </template>
+          <template #footer>
+            {{ total.price | formatPriceUsd }}
+          </template>
+        </Column>
+      </DataTable>
+      <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+        :selection.sync="selectedProduction" selectionMode="multiple"
+        @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm customShipped2" :paginator="true" :rows="25"
+        style="font-size: 70%; border: 2px solid gray;" filterDisplay="row" :filters.sync="filtersOrders"
+        v-if="status == 'Shipped'" sortField="YuklemeTarihi" :sortOrder="-1" :rowClass="rowClass2"
+        columnResizeMode="fit" showGridlines responsiveLayout="scroll" :loading="loading">
+        <template #header>
+          <div class="flex justify-content-between">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText v-model="globalSearch" placeholder="Keyword Search" @keyup.enter="globalSearchFilter($event)"
+                @input="globalSearchFilterInput($event)" />
+            </span>
+          </div>
+        </template>
+
+        <Column field="YuklemeTarihi" header="Load Date" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.YuklemeTarihi | dateToString }}
+          </template>
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentLoadDate(filterModel.value)"
+              @input="filterShipmentLoadDateInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentLoadDate(filterModel.value)"
+               />
+          </template>
+        </Column>
+        <Column field="FirmaAdi" header="Customer" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentCompany(filterModel.value)"
+              @input="filterShipmentCompanyInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentCompany(filterModel.value)"
+               />
+          </template>
+        </Column>
+        <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentPo(filterModel.value)"
+              @input="filterShipmentPoInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentPo(filterModel.value)"
+               />
+          </template>
+        </Column>
+        <Column field="PI" header="PI" headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            <div v-if="slotProps.data.EvrakDurum > 0">
+              <a :href="
+                  'https://file-service.mekmar.com/file/download/2/' +
+                  slotProps.data.SiparisNo
+                ">
+                <i class="pi pi-download" />
+              </a>
+            </div>
+            <div v-else>
+              <a>
+                <i class="pi pi-download" />
+              </a>
+            </div>
+          </template>
+        </Column>
+        <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentProduct(filterModel.value)"
+              @input="filterShipmentProductInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentProduct(filterModel.value)"
+
+               />
+          </template>
+        </Column>
+        <Column field="UrunUretimAciklama" header="Details" headerClass="tableHeader" bodyClass="tableBody">
+        </Column>
+        <Column field="En" header="Width" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentWidth(filterModel.value)"
+              @input="filterShipmentWidthInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentWidth(filterModel.value)"
+               />
+          </template>
+        </Column>
+
+        <Column field="Boy" header="Height" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+          bodyClass="tableBody">
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentHeight(filterModel.value)"
+              @input="filterShipmentHeightInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentHeight(filterModel.value)"
+              />
+          </template>
+        </Column>
+        <Column field="Kenar" header="Thickness" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentEdge(filterModel.value)"
+              @input="filterShipmentEdgeInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentEdge(filterModel.value)"
+               />
+          </template>
+        </Column>
+        <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentSupplier(filterModel.value)"
+              @input="filterShipmentSupplierInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentSupplier(filterModel.value)"
+               />
+          </template>
+        </Column>
+        <Column field="Miktar" header="Amount" :showFilterMenu="false" :showClearButton="false"
+          headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.Miktar | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel }">
+            <InputText v-model="filterModel.value" type="text" @keyup.enter="filterShipmentAmount(filterModel.value)"
+              @input="filterShipmentAmountInput(filterModel.value)" class="p-column-filter"
+              @blur="filterShipmentAmount(filterModel.value)"
+               />
+          </template>
+          <template #footer>
+            {{ total.order | formatDecimal2 }}
+          </template>
+        </Column>
+        <Column field="BirimAdi" header="Unit" headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.BirimAdi }}
+          </template>
+        </Column>
+        <Column field="Ton" header="Ton" headerClass="tableHeader" bodyClass="tableBody">
+          <template #body="slotProps">
+            {{ slotProps.data.Ton | formatDecimal }}
+          </template>
+          <template #footer>
+            {{ total.ton | formatDecimal2 }}
           </template>
         </Column>
         <Column field="SatisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
@@ -254,7 +408,7 @@
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
           </template>
           <template #footer>
-            {{ total.order | formatDecimal }}
+            {{ total.order | formatDecimal2 }}
           </template>
         </Column>
         <Column field="BirimAdi" header="Unit" style="width:5%;">
@@ -270,7 +424,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.production | formatDecimal }}
+            {{ total.production | formatDecimal2 }}
           </template>
         </Column>
         <Column field="Ton" header="Ton" style="width:5%;">
@@ -278,7 +432,7 @@
             {{ slotProps.data.Ton | formatDecimal }}
           </template>
           <template #footer>
-            {{ total.ton | formatDecimal }}
+            {{ total.ton | formatDecimal2 }}
           </template>
         </Column>
         <Column field="SatisFiyati" header="Price" style="width:5%;">
@@ -291,7 +445,7 @@
             {{ slotProps.data.SatisToplam | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.price | formatDecimal }}
+            {{ total.price | formatPriceUsd }}
           </template>
         </Column>
       </DataTable>
@@ -397,7 +551,7 @@
           <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
         <template #footer>
-          {{ total.order | formatDecimal }}
+          {{ total.order | formatDecimal2 }}
         </template>
       </Column>
       <Column field="BirimAdi" header="Unit" headerClass="tableHeader" bodyClass="tableBody">
@@ -410,7 +564,7 @@
           {{ slotProps.data.Ton | formatDecimal }}
         </template>
         <template #footer>
-          {{ total.ton | formatDecimal }}
+          {{ total.ton | formatDecimal2 }}
         </template>
       </Column>
       <Column field="SatisFiyati" header="Price" headerClass="tableHeader" bodyClass="tableBody">
@@ -733,6 +887,22 @@ export default {
 };
 </script>
 <style scoped>
+.customShipped2{
+  display: none;
+}
+.customShipped{
+    display:block;
+  }
+@media screen and (max-width:576px) {
+  .customShipped2{
+    display: block;
+  }
+  .customShipped{
+    display: none;
+  }
+}
+
+
 .colorChange {
   background-color: yellow;
 }

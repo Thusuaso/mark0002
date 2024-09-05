@@ -73,7 +73,7 @@
           </Column>
           <Column field="Adet" header="Pcs in Box" :showFilterMenu="false" :showClearButton="false" sortable>
             <template #footer>
-              {{ total.kutuiciadet | formatDecimal }}
+              {{ total.kutuiciadet | formatDecimal2 }}
             </template>
             <template #filter="{ filterModel, filterCallback }">
               <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
@@ -82,7 +82,7 @@
           </Column>
           <Column field="KutuAdet" header="Box Amount" :showFilterMenu="false" :showClearButton="false" sortable>
             <template #footer>
-              {{ total.kutu | formatDecimal }}
+              {{ total.kutu | formatDecimal2 }}
             </template>
             <template #filter="{ filterModel, filterCallback }">
               <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
@@ -94,7 +94,7 @@
               {{ slotProps.data.Miktar | formatDecimal }}
             </template>
             <template #footer>
-              {{ total.miktar | formatDecimal }}
+              {{ total.miktar | formatDecimal2 }}
             </template>
             <template #filter="{ filterModel, filterCallback }">
               <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"

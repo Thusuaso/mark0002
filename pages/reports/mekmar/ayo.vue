@@ -55,6 +55,10 @@
 
       </div>
       <div class="col">
+        <Dropdown v-model="selectedHalfMonths" :options="halfmonths" optionLabel="month" placeholder="Select a Months" @change="halfMonthsSelected($event)"/>
+
+      </div>
+      <div class="col">
         <table class="table">
           <thead>
             <tr>
@@ -93,8 +97,15 @@ export default {
   },
   data() {
     return {
+      selectedHalfMonths:null,
+      halfmonths:[
+        {'month':'This Month','id':2},
+        {'month':'First 6 Months','id':0},
+        {'month':'Last 6 Months','id':1},
+
+      ],
       quarters: [
-        { 'quarter': 'All', id: 0 },
+        { 'quarter': 'This Month', id: 0 },
 
         { 'quarter': 'Q1', id: 1 },
         { 'quarter': 'Q2', id: 2 },
@@ -213,6 +224,51 @@ export default {
       });
   },
   methods: {
+    halfMonthsSelected(event){
+      if(event.value.id == 0){
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
+          .then((response) => {
+            if (response) {
+              const data = response.data.filter(x => {
+                return (x.yukleme_month >= 1 && x.yukleme_month <= 6)
+              })
+              this.$store.commit("setReportsMekmarAyoList", data);
+              this.$store.commit("setReportsMekmarAyoListTotal", data);
+              this.$store.dispatch("setEndLoadingAction");
+            }
+
+          });
+      }else if (event.value.id == 1){
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
+          .then((response) => {
+            if (response) {
+              const data = response.data.filter(x => {
+                return (x.yukleme_month >= 7 && x.yukleme_month <= 12)
+              })
+              this.$store.commit("setReportsMekmarAyoList", data);
+              this.$store.commit("setReportsMekmarAyoListTotal", data);
+              this.$store.dispatch("setEndLoadingAction");
+            }
+
+          });
+      } else if (event.value.id == 2){
+        this.$store.dispatch("setBeginLoadingAction");
+        api
+          .get(
+            `/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`
+          )
+          .then((response) => {
+            this.$store.commit("setReportsMekmarAyoList", response.data);
+            this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+            this.$store.dispatch("setEndLoadingAction");
+            this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+          });
+      }
+    },
     quarterSelected(event){
 
       if (event.value.id == 0) {

@@ -55,6 +55,7 @@
             @date-select="maturityDateSelected($event)"
             class="w-100"
             dateFormat="dd/mm/yy"
+            @change="maturityDateChange($event)"
           />
           <label for="maturity">Maturity</label>
         </span>
@@ -406,6 +407,9 @@ export default {
     }
   },
   methods: {
+    maturityDateChange(event){
+      this.model.Vade = '';
+    },
     __nullControl(value) {
       if (value == null || value == undefined) {
         return 0;

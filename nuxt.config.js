@@ -116,7 +116,7 @@ export default {
     '~/api'
   ],
   devServer: {
-    port: 3000
+    port: 3001
   },
 
 

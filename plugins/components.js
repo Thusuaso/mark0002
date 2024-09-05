@@ -368,6 +368,17 @@ Vue.filter('formatPriceEuro',(value)=>{
     return "€" + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 });
 
+Vue.filter('formatDecimal2', (value) => {
+    if (value == 'null' || value == null || value == ' ') {
+        return 0.0;
+    } else {
+        const val = (value / 1).toFixed(2).replace('.',',');
+        return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+});
+
+
 
 Vue.filter('dateToString', (value) => {
     if(value == null || value == NaN-NaN-NaN || value == 'NaN-NaN-NaN' || value == undefined || value == ""){
