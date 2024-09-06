@@ -121,6 +121,8 @@ export default {
   methods: {
     panelPublishedListSelected(event) {
       this.$store.dispatch("setPanelProductId", event.urunid);
+      this.$store.dispatch('setPanelId',event.Id);
+
       const data = {
         productId: event.urunid,
         categoryId: this.selectedCategory.Id,

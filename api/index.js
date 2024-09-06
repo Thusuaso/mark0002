@@ -6388,7 +6388,7 @@ app.put('/panel/product/update', (req, res) => {
     if(!req.body.yayinla){
         const suggestedSqlDelete = `delete MekmarCom_OnerilenUrunler where onerilenurunid='${req.body.urunid}'`;
         mssql.query(suggestedSqlDelete);
-    }
+    };
     mssql.query(updateProductSql, (err, product) => {
         if(product.rowsAffected[0] == 1){
             res.status(200).json({'status':true});
