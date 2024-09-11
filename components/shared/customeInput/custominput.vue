@@ -25,9 +25,9 @@ export default {
             this.value == " "
           ) {
             this.value = 0;
-            return this.value.toFixed(4).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
+            return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
           } else {
-            return this.value.toFixed(4).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
+            return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
           }
         }
       },

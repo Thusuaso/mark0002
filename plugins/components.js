@@ -354,8 +354,8 @@ Vue.filter('formatDecimal', (value) => {
     if (value == 'null' || value == null || value == ' ') {
         return 0.00;
     } else {
-        const val = (value / 1).toFixed(4).replace('.',',');
-        return val.toString().replace(/\B(?=(\d{4})+(?!\d))/g, ".");
+        const val = (value / 1).toFixed(2).replace('.',',');
+        return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
 });
