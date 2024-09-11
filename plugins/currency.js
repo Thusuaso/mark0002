@@ -30,22 +30,21 @@ function xmlToJson(xml) {
 const currency = {
     
     getDateCurrency(year, month, day) {
-        return new Promise((resolve, reject) => {
-                if (day.toString().length == 1) {
+        return new Promise(async (resolve, reject) => {
+        if (day.toString().length == 1) {
             day = '0' + day;
-        }
+        };
         if (month.toString().length == 1) {
             month = '0' + month;
-        }
+        };
         const link = '/' + (year) + '' + (month) + '/' + (day) + (month) + (year) + '.xml';
-        api.get(link)
-            .then(response => {
-                xmlToJson(response.data).then(data => {
-                    resolve(parseFloat(data[0].BanknoteSelling[0]));
+        await api.get(link)
+            .then(async (response) => {
+                await xmlToJson(response.data).then(async (data) => {
+                    await resolve(parseFloat(data[0].BanknoteSelling[0]));
                 })
    
             });
-            
         })
 
         // const now = new Date();

@@ -1,6 +1,5 @@
 <template>
     <div class="row mt-4  m-auto ml-2 mr-2">
-        {{ strips }}
         <div class="row m-auto text-center">
             <div class="col-sm-3">
                 <Button class="w-100 mb-5 p-button-success" type="button" label="Yeni Strip" @click="newForm"/>
@@ -635,7 +634,7 @@ export default {
             this.moloz_model.quarryName = event.value.OcakAdi;
         },
         dateSelectedMoloz(event){
-            this.moloz_model.date = event;
+            this.moloz_model.date = date.dateToString(event);
             
             this.disabled_1 = false;
             const year = event.getFullYear();
@@ -748,7 +747,8 @@ export default {
 
         },  
         dateSelected (event){
-            this.model.date = event;
+            
+            this.model.date = date.dateToString(event);
             this.disabled_1 = false;
         },
         calculate(){

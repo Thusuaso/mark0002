@@ -2,6 +2,8 @@ import express from 'express';
 import mssql from 'mssql';
 import nodemailer from 'nodemailer';
 import currency from "../plugins/currency";
+import server from '../plugins/excel.server';
+
 const app = express();
 const sql = {
     user:'userEC52E044DE',
@@ -713,7 +715,12 @@ app.get('/selection/production/total',(req,res)=>{
 });
 
 app.get('/selection/production/crateno/in',(req,res)=>{
-    const sql = 'select top 1 u.KasaNo + 1 as KasaNo from UretimTB u where u.TedarikciID in (1,123) and u.Disarda = 0  order by u.ID desc';
+    const sql = `
+        select top 1 u.KasaNo + 1 as KasaNo from UretimTB u where u.TedarikciID in (1,123) and u.Disarda = 0
+and LEN(u.KasaNo) != 6
+order by u.KasaNo desc
+
+    `;
     mssql.query(sql,(err,no)=>{
         res.status(200).json({
            'no':no.recordset[0].KasaNo,
@@ -4622,7 +4629,7 @@ group by s.SiparisNo
 
 
 /*Sample */
-app.get('/sample/list',(req,res)=>{
+app.get('/sample/list',async (req,res)=>{
     const yearSql = `
                 select 
 
@@ -4634,7 +4641,7 @@ app.get('/sample/list',(req,res)=>{
         order by YEAR(n.NumuneTarihi) desc
     `;
 
-    mssql.query(yearSql, (err, yearList) => {
+    await mssql.query(yearSql, async (err, yearList) => {
         let year = yearList.recordset[0].Yil;
         const sampleSql = `
 select 
@@ -4642,6 +4649,7 @@ select
 	n.ID,
 	n.NumuneNo,
 	n.NumuneTarihi,
+    n.DhlTarihi,
 	n.NumuneTemsilci,
 	n.MusteriID,
 	n.Ulke,
@@ -4681,13 +4689,15 @@ LTRIM(str(n.ID))  + '/' + n.Numune_Cloud_Dosya2 as ArkaYuzFoto
 from NumunelerTB n
 where YEAR(n.NumuneTarihi) = '${year}'
         `;
-        mssql.query(sampleSql, (err, sampleList) => {
+        await mssql.query(sampleSql, (err, sampleList) => {
            res.status(200).json({
                'list': sampleList.recordset,
                'years':yearList.recordset
             }) 
         });
     });
+
+
 });
 app.get('/sample/list/:year',(req,res)=>{
     const yearSql = `
@@ -4709,6 +4719,7 @@ app.get('/sample/list/:year',(req,res)=>{
 	n.NumuneNo,
 	n.NumuneTarihi,
 	n.NumuneTemsilci,
+    n.DhlTarihi,
 	n.MusteriID,
 	n.Ulke,
 	n.Adres,
@@ -4826,6 +4837,9 @@ function getSampleCustomerId(event){
 }
 
 
+
+
+
 app.post('/sample/save', (req, res) => {
     if(req.body.MusteriID){
         const sql = `
@@ -4850,7 +4864,9 @@ app.post('/sample/save', (req, res) => {
                     TL_Alis,
                     TL_Satis,
                     Euro_Alis,
-                    Euro_Satis)
+                    Euro_Satis,
+                    DhlTarihi
+                    )
                     VALUES(
                     '${req.body.NumuneNo}',
                     '${req.body.NumuneTarihi}',
@@ -4872,7 +4888,8 @@ app.post('/sample/save', (req, res) => {
                     '${req.body.TL_Alis}',
                     '${req.body.TL_Satis}',
                     '${req.body.Euro_Alis}',
-                    '${req.body.Euro_Satis}'
+                    '${req.body.Euro_Satis}',
+                    '${req.body.DhlTarihi}'
                     )
     `;
     mssql.query(sql, (err, results) => {
@@ -4907,7 +4924,9 @@ app.post('/sample/save', (req, res) => {
                     TL_Alis,
                     TL_Satis,
                     Euro_Alis,
-                    Euro_Satis)
+                    Euro_Satis,
+                    DhlTarihi
+                    )
                     VALUES(
                     '${req.body.NumuneNo}',
                     '${req.body.NumuneTarihi}',
@@ -4929,7 +4948,8 @@ app.post('/sample/save', (req, res) => {
                     '${req.body.TL_Alis}',
                     '${req.body.TL_Satis}',
                     '${req.body.Euro_Alis}',
-                    '${req.body.Euro_Satis}'
+                    '${req.body.Euro_Satis}',
+                    '${req.body.DhlTarihi}'
                     )
     `;
     mssql.query(sql, (err, results) => {
@@ -4963,7 +4983,137 @@ app.delete('/sample/delete/:id/:po',(req,res)=>{
     })
 
 });
-app.put('/sample/update', (req, res) => {
+
+function __getTlToUsdorEuro(date,value){
+    const newDate = new Date(date);
+    const year = newDate.getFullYear();
+    const month = newDate.getMonth() + 1;
+    const day = newDate.getDate();
+    return new Promise(async ( resolve,reject)=>{
+       await server
+      .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
+      .then( async (tl_to_usd) => {
+         await server.get('/finance/doviz/liste/euro/to/tl/'+year + "/" + month + "/" + day)
+        .then((tl_to_euro)=>{
+          resolve({
+            'usd':(parseFloat(value) / parseFloat(tl_to_usd.data)).toFixed(2),
+            'euro':(parseFloat(value) / parseFloat(tl_to_euro.data)).toFixed(2)
+          })
+        });
+      });
+    });
+  };
+  function __getUsdToTlorEuro(date,value){
+    const newDate = new Date(date);
+    const year = newDate.getFullYear();
+    const month = newDate.getMonth() + 1;
+    const day = newDate.getDate();
+    return new Promise(async ( resolve,reject)=>{
+       await server
+      .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
+      .then(async (usd_to_tl) => {
+         await server.get('/finance/doviz/liste/usd/to/euro/'+year + "/" + month + "/" + day)
+        .then( async (usd_to_euro)=>{
+          resolve({
+            'tl':(parseFloat(value) * parseFloat(usd_to_tl.data)).toFixed(2),
+            'euro':(parseFloat(value) * parseFloat(usd_to_euro.data)).toFixed(2)
+          })
+        });
+      });
+    });
+
+  };
+  function __getUsdToTlorUsd(date,value){
+    const newDate = new Date(date);
+    const year = newDate.getFullYear();
+    const month = newDate.getMonth() + 1;
+    const day = newDate.getDate();
+    return new Promise(( resolve,reject)=>{
+      server
+      .get("/finance/doviz/liste/euro/to/tl/" + year + "/" + month + "/" + day)
+      .then( (euro_to_tl) => {
+        server.get('/finance/doviz/liste/usd/to/euro/'+year + "/" + month + "/" + day)
+        .then((usd_to_euro)=>{
+          resolve({
+            'tl':(parseFloat(value) * parseFloat(euro_to_tl.data)).toFixed(2),
+            'usd':(parseFloat(value) / parseFloat(usd_to_euro.data)).toFixed(2)
+          })
+        });
+      });
+    });
+
+  };
+
+
+app.put('/sample/update',async (req, res) => {
+    if(req.body.DhlTarihi == null || req.body.DhlTarihi == '' || req.body.DhlTarihi == undefined || req.body.DhlTarihi == '1900-01-01' || req.body.DhlTarihi == '1900-01-01T00:00:00.000Z'){
+        console.log('');
+    }else{
+        if(req.body.KuryeAlis == null || req.body.KuryeAlis == 0 || req.body.KuryeAlis == ' ' || req.body.KuryeAlis == undefined){
+            console.log();
+          }else{
+            await __getUsdToTlorEuro(req.body.DhlTarihi,req.body.KuryeAlis)
+            .then((res)=>{
+                req.body.Euro_Alis = parseFloat(res.euro);
+                req.body.TL_Alis = parseFloat(res.tl);
+            });
+          }
+          if(req.body.Euro_Alis == null || req.body.Euro_Alis == 0 || req.body.Euro_Alis == ' ' || req.body.Euro_Alis == undefined){
+            console.log();
+          }else{
+            await __getUsdToTlorUsd(req.body.DhlTarihi,req.body.Euro_Alis)
+            .then(res=>{
+                req.body.KuryeAlis = res.usd;
+                req.body.TL_Alis = res.tl;
+            });
+          }
+          if(req.body.TL_Alis == null || req.body.TL_Alis == 0 || req.body.TL_Alis == ' ' || req.body.TL_Alis == undefined){
+            console.log();
+          }else{
+            await __getTlToUsdorEuro(req.body.DhlTarihi,req.body.TL_Alis)
+            .then(res=>{
+                req.body.KuryeAlis = res.usd;
+                req.body.Euro_Alis = res.euro;
+            });
+          }
+    
+    
+    
+          if(req.body.KuryeSatis == null || req.body.KuryeSatis == 0 || req.body.KuryeSatis == ' ' || req.body.KuryeSatis == undefined){
+            console.log();
+          }else{
+            await __getUsdToTlorEuro(req.body.DhlTarihi,req.body.KuryeSatis)
+            .then((res)=>{
+                req.body.Euro_Satis = parseFloat(res.euro);
+                req.body.TL_Satis = parseFloat(res.tl);
+            });
+          }
+          if(req.body.Euro_Satis == null || req.body.Euro_Satis == 0 || req.body.Euro_Satis == ' ' || req.body.Euro_Satis == undefined){
+            console.log();
+          }else{
+            await __getUsdToTlorUsd(req.body.DhlTarihi,req.body.Euro_Satis)
+            .then(res=>{
+                req.body.KuryeSatis = res.usd;
+                req.body.TL_Satis = res.tl;
+            });
+          }
+          if(req.body.TL_Satis == null || req.body.TL_Satis == 0 || req.body.TL_Satis == ' ' || req.body.TL_Satis == undefined){
+            console.log();
+          }else{
+            await __getTlToUsdorEuro(req.body.DhlTarihi,req.body.TL_Satis)
+            .then(res=>{
+                req.body.KuryeSatis = res.usd;
+                req.body.Euro_Satis = res.euro;
+            });
+          }
+    }
+
+
+
+
+
+
+
     if(req.body.MusteriID){
         const sql = `
                     
@@ -4987,19 +5137,21 @@ app.put('/sample/update', (req, res) => {
         TL_Satis='${req.body.TL_Satis}',
         Euro_Alis='${req.body.Euro_Alis}',
         Euro_Satis='${req.body.Euro_Satis}',
-        NumuneTarihi='${req.body.NumuneTarihi}'
+        NumuneTarihi='${req.body.NumuneTarihi}',
+        DhlTarihi='${req.body.DhlTarihi}'
         where ID='${req.body.ID}'
 
         `;
-mssql.query(sql, (err, results) => {
-if(results.rowsAffected[0] == 1){
-    res.status(200).json({ 'status': true});
-}else{
-    res.status(200).json({'status': false});
-}
-});
+
+        mssql.query(sql, (err, results) => {
+                if(results.rowsAffected[0] == 1){
+                    res.status(200).json({ 'status': true});
+                }else{
+                    res.status(200).json({'status': false});
+                };
+        });
     } else{
-        getSampleCustomerId(req.body).then(customer_id=>{
+        getSampleCustomerId(req.body).then((customer_id)=>{
             const sql = `
                     
             update NumunelerTB SET
@@ -5037,12 +5189,7 @@ if(results.rowsAffected[0] == 1){
         });
 
 
-    }
-
-
-            
-
-
+    };
 });
 app.get('/sample/detail/paid/list/:po',(req,res)=>{
     const sql = `select nu.ID,nu.Tarih,nu.MusteriID,nu.NumuneNo,nu.Aciklama,nu.Tutar,nu.Banka from NumuneOdemelerTB nu where nu.NumuneNo='${req.params.po}'`;
@@ -13041,7 +13188,7 @@ app.post('/reports/mekmer/quarries/supplier/strips/save',async(req,res)=>{
 
     const insertSql = `
         insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight,Invoice)
-VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}','${req.body.invoce}')
+VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}','${req.body.invoice}')
     `;
     mssql.query(insertSql,(err,insert)=>{
         if(insert.rowsAffected[0] == 1){

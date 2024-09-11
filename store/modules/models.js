@@ -81,6 +81,7 @@ const state = {
         UserId:"",
     },
     sampleModel: {
+        'DhlTarihi':'',
         'NumuneNo': '',
         'NumuneTarihi': '',
         'NumuneTemsilci': 0,
@@ -652,6 +653,7 @@ const actions = {
     },
     setSampleModel(vuexContext) {
         const payload = {
+            'DhlTarihi':'',
             'NumuneNo': '',
             'NumuneTarihi': '',
             'NumuneTemsilci': 0,

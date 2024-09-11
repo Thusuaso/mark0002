@@ -343,7 +343,7 @@ Vue.component('CustomInput', CustomInput)
 /*Filters */
 Vue.filter('formatPriceUsd',(value)=>{
     if(value == null || value == undefined){
-        return '$0';
+        return '$0.00';
     }else{
         const val = (value / 1).toFixed(2).replace(".", ",");
         return "$" + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -352,7 +352,7 @@ Vue.filter('formatPriceUsd',(value)=>{
 });
 Vue.filter('formatDecimal', (value) => {
     if (value == 'null' || value == null || value == ' ') {
-        return 0.0;
+        return 0.00;
     } else {
         const val = (value / 1).toFixed(4).replace('.',',');
         return val.toString().replace(/\B(?=(\d{4})+(?!\d))/g, ".");
@@ -370,7 +370,7 @@ Vue.filter('formatPriceEuro',(value)=>{
 
 Vue.filter('formatDecimal2', (value) => {
     if (value == 'null' || value == null || value == ' ') {
-        return 0.0;
+        return 0.00;
     } else {
         const val = (value / 1).toFixed(2).replace('.',',');
         return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

@@ -55,7 +55,7 @@
 
       </div>
       <div class="col">
-        <Dropdown v-model="selectedHalfMonths" :options="halfmonths" optionLabel="month" placeholder="Select a Months" @change="halfMonthsSelected($event)"/>
+        <Dropdown v-model="selectedHalfMonths" :options="halfmonths" optionLabel="month" placeholder="Select a Month" @change="halfMonthsSelected($event)"/>
 
       </div>
       <div class="col">

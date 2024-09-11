@@ -277,6 +277,10 @@
         <label for="outputdate">Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
+        <Calendar v-model="dhl_date" inputId="dhl_date" class="w-100" dateFormat="dd/mm/yy" @date-select="dhlDateSelected($event)"/>
+        <label for="dhl_date">Dhl Date</label>
+      </span>
+      <span class="p-float-label mb-4">
         <AutoComplete
           v-model="selectedCustomer"
           inputId="customer"
@@ -330,6 +334,7 @@
 import date from "../../../plugins/date";
 import upload from "../../../plugins/upload";
 import Cookies from "js-cookie";
+import server from "@/plugins/excel.server";
 
 export default {
   computed: {},
@@ -377,6 +382,7 @@ export default {
   },
   data() {
     return {
+      dhl_date:null,
       input_date: null,
       output_date: null,
       filteredCustomers: null,
@@ -404,6 +410,10 @@ export default {
     }
   },
   methods: {
+    dhlDateSelected(event){
+      this.model.DhlTarihi = date.dateToString(event);
+    },
+
     customerInput(event) {
       this.model.FirmaAdi = event;
     },
@@ -417,20 +427,27 @@ export default {
         this.bankTypeDisabled = true;
       }
 
-      if (this.model.BankaSecim == null || this.model.BankaSecim == 0) {
+      if (this.model.BankaSecim == null || this.model.BankaSecim == 0 || this.model.BankaSecim == 'null' || this.model.BankaSecim == undefined || this.model.BankaSecim == 0) {
         this.selectedBankType = null;
+        this.model.BankaSecim = 0
       } else {
         this.selectedBankType = this.bank.find((x) => x.ID == this.model.BankaSecim).ID;
       }
-      if (this.model.NumuneTarihi == null || this.model.NumuneTarihi == " ") {
+      if (this.model.NumuneTarihi == null || this.model.NumuneTarihi == " " || this.model.NumuneTarihi == undefined || this.model.NumuneTarihi == '1900-01-01' || this.model.NumuneTarihi== '1900-01-01T00:00:00.000Z') {
         this.input_date = null;
       } else {
         this.input_date = date.stringToDate(this.model.NumuneTarihi);
       }
-      if (this.model.YuklemeTarihi == null || this.model.YuklemeTarihi == " ") {
+      if (this.model.YuklemeTarihi == null || this.model.YuklemeTarihi == " " || this.model.YuklemeTarihi == undefined || this.model.YuklemeTarihi == '1900-01-01' || this.model.YuklemeTarihi== '1900-01-01T00:00:00.000Z') {
         this.output_date = null;
       } else {
         this.output_date = date.stringToDate(this.model.YuklemeTarihi);
+      };
+      if(this.model.DhlTarihi == null || this.model.DhlTarihi == '' || this.model.DhlTarihi == undefined || this.model.DhlTarihi == '1900-01-01' || this.model.DhlTarihi== '1900-01-01T00:00:00.000Z'){
+        this.dhl_date = '';
+      }else{
+        this.dhl_date = date.stringToDate(this.model.DhlTarihi);
+
       }
       this.selectedCustomer = this.customers.find((x) => x.Id == this.model.MusteriID);
       this.selectedCountry = this.country.find((x) => x.Id == this.model.Ulke);
@@ -447,12 +464,19 @@ export default {
 
     },
     process() {
+
+
+      
       this.model.NumuneTarihi = date.dateToString(this.input_date);
-      if (this.output_date == null || this.output_date == " ") {
+      if (this.output_date == null || this.output_date == " " || this.output_date == '1900-01-01' || this.output_date == undefined || this.output_date== '1900-01-01T00:00:00.000Z') {
         this.model.YuklemeTarihi = "";
       } else {
         this.model.YuklemeTarihi = date.dateToString(this.output_date);
+      };
+      if(this.model.DhlTarihi == null || this.model.DhlTarihi == '1900-01-01' || this.model.DhlTarihi == undefined || this.model.DhlTarihi== '1900-01-01T00:00:00.000Z'){
+        this.model.DhlTarihi = '';
       }
+      
       this.$emit("process", this.model);
     },
     backPhotoSelected(event) {

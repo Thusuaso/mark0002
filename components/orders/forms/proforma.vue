@@ -206,38 +206,7 @@
                 </span>
               </div>
             </div>
-            <div class="row mb-4">
-              <div class="col">
-                <span class="p-float-label">
-                  <InputText
-                    id="detail2"
-                    v-model="model.DetayTutar_3"
-                    @input="detail3Input($event)"
-                    style="width:100%;"
-                  />
-                  <label for="detail2">Detail 3</label>
-                </span>
-              </div>
-              <div class="col">
-                <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayAciklama_3" style="width:100%;" />
-                  <label for="detail2Desc">Detail 3 Description</label>
-                </span>
-              </div>
-            </div>
-            <div class="row mb-4">
-              <div class="col">
-                <span class="p-float-label">
-                  <InputText
-                    id="detail4"
-                    v-model="model.DetayTutar_4"
-                    @input="detail4Input($event)"
-                    style="width:100%;"
-                  />
-                  <label for="detail4">Mekus</label>
-                </span>
-              </div>
-            </div>
+
             <div class="row mb-4">
               <div class="col">
                 <CustomInput
@@ -311,25 +280,7 @@
                 </span>
               </div>
             </div>
-            <div class="row mb-4">
-              <div class="col">
-                <span class="p-float-label">
-                  <InputText
-                    id="detail3"
-                    v-model="model.DetayAlis_3"
-                    @input="getDetail3Input($event)"
-                    style="width:100%;"
-                  />
-                  <label for="detail3">Detail 3</label>
-                </span>
-              </div>
-              <div class="col">
-                <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" style="width:100%;"/>
-                  <label for="detail2Desc">Detail 3 Description</label>
-                </span>
-              </div>
-            </div>
+
             <div class="row mb-4">
               <div class="col">
                 <span class="p-float-label">
@@ -672,7 +623,7 @@ export default {
 </script>
 <style scoped>
 .cardClass{
-  height:550px;
+  height:350px;
 }
 @media screen and (max-width:576px){
   .row{
