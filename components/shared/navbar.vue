@@ -185,10 +185,10 @@
               MEKMAR REPORTS
             </a>
             <ul class="dropdown-menu">
-              <li>
+              <li v-if="userId == 10 || userId == 47 || userId == 9">
                 <nuxt-link to="/reports/mekmar/ayo" class="dropdown-item" tag="a">AYO</nuxt-link>
               </li>
-              <li>
+              <li v-if="userId == 10 || userId == 47 || userId == 9">
                 <nuxt-link to="/reports/mekmar/ayo-compare" class="dropdown-item" tag="a">AYO Compare</nuxt-link>
               </li>
               <li>
@@ -200,10 +200,10 @@
               <li>
                 <nuxt-link to="/reports/mekmar/summary" class="dropdown-item" tag="a">Order Summary</nuxt-link>
               </li>
-              <li>
+              <li v-if="userId == 10 || userId == 47 || userId == 13">
                 <nuxt-link to="/reports/mekmar/mk" class="dropdown-item" tag="a">MK Reports</nuxt-link>
               </li>
-              <li>
+              <li v-if="userId == 10 || userId == 47 || userId == 13">
                 <nuxt-link to="/reports/mekmar/gu" class="dropdown-item" tag="a">GU Reports</nuxt-link>
               </li>
             </ul>
@@ -301,12 +301,13 @@ export default {
       to_do_form: false,
       model: {},
       items: [],
+      userId:null,
     };
   },
 
   created() {
     this.$store.dispatch("setToDoListByUsername", Cookies.get("username"));
-
+    this.userId = Cookies.get("userId");
 
 
 

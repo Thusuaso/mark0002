@@ -128,6 +128,12 @@ import ordererOperation from '~/components/reports/mekmar/gu/ordererOperation';
 import shippedOperation from '~/components/reports/mekmar/gu/shippedOperation';
 
 
+import creditCardForm from '~/components/reports/mekmar/ayo/formc';
+import quarterAyoForm from '~/components/reports/mekmar/ayo/formq';
+Vue.component('quarterAyoForm',quarterAyoForm);
+
+Vue.component('creditCardForm',creditCardForm);
+
 Vue.component('shippedOperation',shippedOperation);
 
 Vue.component('ordererOperation',ordererOperation);
@@ -300,7 +306,6 @@ import TabPanel from 'primevue/tabpanel';
 import Card from 'primevue/card';
 import PickList from 'primevue/picklist';
 import OverlayPanel from 'primevue/overlaypanel';
-import BadgeDirective from 'primevue/badgedirective';
 import Sidebar from 'primevue/sidebar';
 import Chips from 'primevue/chips';
 
@@ -331,7 +336,6 @@ Vue.component('Sidebar', Sidebar);
 Vue.component('Chips', Chips);
 
 
-Vue.directive('badge', BadgeDirective);
 
 
 /*Custome Input */

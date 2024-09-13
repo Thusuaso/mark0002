@@ -287,15 +287,15 @@
                 </Column>
                 <Column field="Uretim" header="Produced" headerClass="tableHeader" bodyClass="tableBody">
                     <template #body="slotProps">
-                        <div v-if="slotProps.data.Uretim == slotProps.data.Miktar"
+                        <div v-if="__amountControl(slotProps.data.Uretim) == __amountControl(slotProps.data.Miktar)"
                             style="background-color: green; color: white">
                             {{ slotProps.data.Uretim | formatDecimal }}
                         </div>
-                        <div v-else-if="slotProps.data.Uretim > slotProps.data.Miktar"
+                        <div v-else-if="__amountControl(slotProps.data.Uretim) > __amountControl(slotProps.data.Miktar)"
                             style="background-color: black; color: white">
                             {{ slotProps.data.Uretim | formatDecimal }}
                         </div>
-                        <div v-else-if="slotProps.data.Uretim < slotProps.data.Miktar"
+                        <div v-else-if="__amountControl(slotProps.data.Uretim) < __amountControl(slotProps.data.Miktar)"
                             style="background-color: yellow; color: black">
                             {{ slotProps.data.Uretim | formatDecimal }}
                         </div>
@@ -311,24 +311,24 @@
                 <Column field="Kalan" header="Remainder" headerClass="tableHeader" bodyClass="tableBody">
                     <template #body="slotProps">
                         <div 
-                            v-if="slotProps.data.Miktar-slotProps.data.Uretim == 0"
+                            v-if="__amountControl(slotProps.data.Miktar)-__amountControl(slotProps.data.Uretim) == 0"
                             style="background-color: yellow ;color: black"
                         >
-                            {{ slotProps.data.Miktar-slotProps.data.Uretim  | formatDecimal }}
+                            {{ __amountControl(slotProps.data.Miktar)-__amountControl(slotProps.data.Uretim)  | formatDecimal }}
 
                         </div>
                         <div 
-                            v-else-if="slotProps.data.Miktar-slotProps.data.Uretim > 0"
+                            v-else-if="__amountControl(slotProps.data.Miktar)-__amountControl(slotProps.data.Uretim) > 0"
                             style="background-color: blue ;color: white"
                         >
-                            {{ slotProps.data.Miktar-slotProps.data.Uretim  | formatDecimal }}
+                            {{ __amountControl(slotProps.data.Miktar)-__amountControl(slotProps.data.Uretim)  | formatDecimal }}
 
                         </div>
                         <div 
-                            v-else-if="slotProps.data.Miktar-slotProps.data.Uretim < 0"
+                            v-else-if="__amountControl(slotProps.data.Miktar)-__amountControl(slotProps.data.Uretim) < 0"
                             style="background-color: black ;color: white"
                         >
-                            {{ slotProps.data.Miktar-slotProps.data.Uretim  | formatDecimal }}
+                            {{ __amountControl(slotProps.data.Miktar)-__amountControl(slotProps.data.Uretim)  | formatDecimal }}
 
                         </div>
 
@@ -594,6 +594,13 @@ export default {
         });
     },
     methods: {
+        __amountControl(val){
+    if(val == 0 || val == undefined || val == '' || val == ' ' || val == null){
+        return 0;
+    }else{
+        return parseFloat(val).toFixed(2);
+    }
+},
         __noneControl(val){
             if(val == null || val == undefined || val == ""){
                 return 0;

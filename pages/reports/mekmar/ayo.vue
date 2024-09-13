@@ -50,14 +50,7 @@
         </span>
         <span style="padding-top: 25px"> Hepsi </span>
       </div>
-      <div class="col">
-        <Dropdown v-model="selectedQuarter" :options="quarters" optionLabel="quarter" placeholder="Select a Quarter" @change="quarterSelected($event)"/>
 
-      </div>
-      <div class="col">
-        <Dropdown v-model="selectedHalfMonths" :options="halfmonths" optionLabel="month" placeholder="Select a Month" @change="halfMonthsSelected($event)"/>
-
-      </div>
       <div class="col">
         <table class="table">
           <thead>
@@ -70,20 +63,108 @@
           <tbody>
             <tr>
               <th scope="row">Total</th>
-              <td>{{ getReportsMekmarAyoListTotal.profitUsd | formatPriceUsd }}</td>
-              <td>{{ getReportsMekmarAyoListTotal.profitTl | formatPriceTl }}</td>
+              <td>{{ (getReportsMekmarAyoListTotal.profitUsd - cost_usd) | formatPriceUsd }}</td>
+              <td>{{ (getReportsMekmarAyoListTotal.profitTl - cost_tl) | formatPriceTl }}</td>
             </tr>
           </tbody>
         </table>
+      </div>
+      
+    </div>
+    <div class="container row">
+      <div class="col">
+        <Dropdown class="w-100" v-model="selectedQuarter" :options="quarters" optionLabel="quarter" placeholder="Select a Quarter" @change="quarterSelected($event)"/>
+
+      </div>
+      <div class="col">
+        <Dropdown class="w-100" v-model="selectedHalfMonths" :options="halfmonths" optionLabel="month" placeholder="Select a Month" @change="halfMonthsSelected($event)"/>
+
+      </div>
+      <div class="col">
+        <Button type="button" class="p-button-warning w-100" label="Credit Card" @click="creditCardToggle"/>
+        <Dialog :visible.sync="credit_card_form_visible" header="Credit Card Cost" modal >
+          <creditCardForm style="margin-bottom:5px;" v-for="item in creditCardCostList" :key="item" :month="item.month" :value="item.value"
+          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+          @credit_card_cost_list_updated_emit="creditCardCostListUpdated"
+          @cost_save_emit="creditCardCostSave($event)"
+          @cost_update_emit="creditCardCostUpdate($event)"
+          />
+
+        </Dialog>
+
+      </div>
+      <div class="col">
+        <Button type="button" class="p-button-info w-100" label="Travel Cost" @click="travelCost"/>
+        <Dialog :visible.sync="travel_cost_form_visible" header="Travel Cost" modal >
+          <creditCardForm style="margin-bottom:5px;" v-for="item in travelCostList" :key="item" :month="item.month" :value="item.value"
+          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+          @credit_card_cost_list_updated_emit="travelCostListUpdated"
+          @cost_save_emit="travelCostSave($event)"
+          @cost_update_emit="travelCostUpdate($event)"
+          />
+
+        </Dialog>
+      </div>
+      <div class="col">
+        <Button type="button" class="p-button-secondary w-100" label="Wage Cost" @click="wageCost"/>
+        <Dialog :visible.sync="wage_cost_form_visible" header="Wage Cost" modal >
+          <creditCardForm style="margin-bottom:5px;" v-for="item in wageCostList" :key="item" :month="item.month" :value="item.value"
+          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+          @credit_card_cost_list_updated_emit="wageCostListUpdated"
+          @cost_save_emit="wageCostSave($event)"
+          @cost_update_emit="wageCostUpdate($event)"
+          />
+
+        </Dialog>
+      </div>
+      <!-- <div class="col">
+        <Button type="button" class="p-button-danger w-100" label="Abroad Cost" @click="abroadCost"/>
+        <Dialog :visible.sync="abroad_cost_form_visible" header="Abroad Cost" modal >
+          <creditCardForm style="margin-bottom:5px;" v-for="item in abroadCostList" :key="item" :month="item.month" :value="item.value"
+          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+          @credit_card_cost_list_updated_emit="abroadCostListUpdated"
+          @cost_save_emit="abroadCostSave($event)"
+          @cost_update_emit="abroadCostUpdate($event)"
+          />
+
+        </Dialog>
+      </div> -->
+      <div class="col">
+        <Button type="button" class="p-button-help w-100" label="Sample Cost" @click="sampleCost"/>
+        <Dialog :visible.sync="sample_cost_form_visible" header="Wage Cost" modal >
+          <creditCardForm style="margin-bottom:5px;" v-for="item in sampleCostList" :key="item" :month="item.month" :value="item.value"
+          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+          @credit_card_cost_list_updated_emit="sampleCostListUpdated"
+          @cost_save_emit="sampleCostSave($event)"
+          @cost_update_emit="sampleCostUpdate($event)"
+          />
+
+        </Dialog>
+      </div>
+      <div class="col">
+        <Button type="button" class="p-button-success w-100" label="Other Cost" @click="otherCost"/>
+
+        <Dialog :visible.sync="other_cost_form_visible" header="Wage Cost" modal >
+          <creditCardForm style="margin-bottom:5px;" v-for="item in otherCostList" :key="item" :month="item.month" :value="item.value"
+          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+          @credit_card_cost_list_updated_emit="otherCostListUpdated"
+          @cost_save_emit="otherCostSave($event)"
+          @cost_update_emit="otherCostUpdate($event)"
+          />
+
+        </Dialog>
       </div>
     </div>
 
     <reportsMekmarAyoList :list="getReportsMekmarAyoList" :total="getReportsMekmarAyoListTotal" />
   </div>
+
+
 </template>
 <script>
 import { mapGetters } from "vuex";
 import api from "../../../plugins/excel.server";
+import currency from "../../../plugins/currency";
 export default {
   middleware: ["authority"],
   computed: {
@@ -97,6 +178,20 @@ export default {
   },
   data() {
     return {
+      cost_tl:0,
+      cost_usd:0,
+      other_cost_form_visible:false,
+      otherCostList:[],
+      sampleCostList:[],
+      sample_cost_form_visible:false,
+      abroadCostList:[],
+      abroad_cost_form_visible:false,
+      wage_cost_form_visible:false,
+      wageCostList:[],
+      travelCostList:[],
+      travel_cost_form_visible:false,
+      creditCardCostList:[],
+      credit_card_form_visible:false,
       selectedHalfMonths:null,
       halfmonths:[
         {'month':'This Month','id':2},
@@ -220,10 +315,213 @@ export default {
       .then((response) => {
         this.$store.commit("setReportsMekmarAyoList", response.data);
         this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+        this.__getMonthlyCostList(date.year,date.month);
         this.$store.dispatch("setEndLoadingAction");
       });
   },
   methods: {
+    __getHalfCostList(month_1,month_2,year){
+      this.$axios.get(`/reports/ayo/costs/half/${month_1}/${month_2}/${year}`)
+      .then(res=>{
+        this.cost_tl = res.data.tl;
+        this.cost_usd = res.data.usd;
+      });
+    },
+    __getQuarterCostList(quarter_1,quarter_2,year){
+      this.$axios.get(`/reports/ayo/costs/quarter/${quarter_1}/${quarter_2}/${year}`)
+      .then(res=>{
+        this.cost_tl = res.data.tl;
+        this.cost_usd = res.data.usd;
+      });
+    },
+    __getMonthlyCostList(year,month){
+      this.$axios.get(`/reports/ayo/costs/list/${year}/${month}`)
+      .then(res=>{
+        this.cost_tl = res.data.tl;
+        this.cost_usd = res.data.usd;
+      });
+    },
+    __getYearlyCostList(year){
+      this.$axios.get(`/reports/ayo/costs/yearly/${year}`)
+      .then(res=>{
+        this.cost_tl = res.data.tl;
+        this.cost_usd = res.data.usd;
+      });
+    },
+
+
+
+    otherCostListUpdated(){
+      this.$axios.get(`/reports/ayo/other/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.otherCostList = res.data.list;
+      });
+    },
+    otherCostUpdate(event){
+      this.$axios.put('/reports/ayo/other/cost/update',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Güncellendi.');
+      });
+    },
+    otherCostSave(event){
+      this.$axios.post('/reports/ayo/other/cost/save',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Kaydedildi.');
+        this.otherCostListUpdated();
+
+      });
+    },
+    otherCost(){
+      this.$axios.get(`/reports/ayo/other/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.otherCostList = res.data.list;
+        this.other_cost_form_visible = true;
+      });
+    },
+
+
+
+
+    sampleCostListUpdated(){
+      this.$axios.get(`/reports/ayo/sample/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.sampleCostList = res.data.list;
+      });
+    },
+    sampleCostUpdate(event){
+      this.$axios.put('/reports/ayo/sample/cost/update',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Güncellendi.');
+
+      });
+    },
+    sampleCostSave(event){
+      this.$axios.post('/reports/ayo/sample/cost/save',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Kaydedildi.');
+        this.sampleCostListUpdated();
+
+      });
+
+    },
+    sampleCost(){
+      this.$axios.get(`/reports/ayo/sample/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.sampleCostList = res.data.list;
+        this.sample_cost_form_visible = true;
+      });
+    },
+    abroadCostListUpdated(){
+      this.$axios.get(`/reports/ayo/abroad/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.abroadCostList = res.data.list;
+      });
+    },
+    abroadCostUpdate(event){
+      this.$axios.put('/reports/ayo/abroad/cost/update',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Güncellendi.');
+      });
+    },
+    abroadCostSave(event){
+      this.$axios.post('/reports/ayo/abroad/cost/save',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Kaydedildi.');
+        this.abroadCostListUpdated();
+      });
+    },
+    abroadCost(){
+      this.$axios.get(`/reports/ayo/abroad/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.abroadCostList = res.data.list;
+        this.abroad_cost_form_visible = true;
+      });
+    },
+
+    wageCostUpdate(event){
+      this.$axios.put('/reports/ayo/wage/cost/update',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Güncellendi.');
+      });
+    },
+    wageCostSave(event){
+      this.$axios.post('/reports/ayo/wage/cost/save',event)
+      .then(res=>{
+        this.wageCostList = res.data.list;
+        this.$toast.success('Başarıyla Kaydedildi.');
+        this.wageCostListUpdated();
+      });
+    },
+    wageCostListUpdated(){
+      this.$axios.get(`/reports/ayo/wage/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.wageCostList = res.data.list;
+      });
+    },
+    wageCost(){
+      this.$axios.get(`/reports/ayo/wage/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.wageCostList = res.data.list;
+        this.wage_cost_form_visible = true;
+      });
+    },
+    travelCostUpdate(event){
+      this.$axios.put('/reports/ayo/travel/cost/update',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Güncellendi.');
+      });
+    },
+    travelCostSave(event){
+      this.$axios.post('/reports/ayo/travel/cost/save',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Kaydedildi.');
+        this.travelCostListUpdated();
+      });
+    },
+    creditCardCostUpdate(event){
+      this.$axios.put('/reports/ayo/credit/card/cost/update',event)
+            .then(res=>{
+                this.$toast.success('Başarıyla Güncellendi.');
+            });
+    },
+    creditCardCostSave(event){
+      this.$axios.post('/reports/ayo/credit/card/cost/save',event)
+            .then(res=>{
+                this.$toast.success('Başarıyla Kaydedildi.');
+                this.creditCardCostListUpdated();
+            });
+    },
+    travelCostListUpdated(){
+      this.$axios.get(`/reports/ayo/travel/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.travelCostList = res.data.list;
+      });
+    },
+    creditCardCostListUpdated(){
+      this.$axios.get(`/reports/ayo/credit/card/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.creditCardCostList = res.data.list;
+      });
+    },
+    travelCost(){
+      this.$axios.get(`/reports/ayo/travel/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.travelCostList = res.data.list;
+        this.travel_cost_form_visible = true;
+      });
+    },
+    creditCardToggle(){
+      this.$axios.get(`/reports/ayo/credit/card/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.creditCardCostList = res.data.list;
+        this.credit_card_form_visible = true;
+      });
+
+
+
+
+
+    },
     halfMonthsSelected(event){
       if(event.value.id == 0){
         this.$store.dispatch("setBeginLoadingAction");
@@ -233,7 +531,8 @@ export default {
             if (response) {
               const data = response.data.filter(x => {
                 return (x.yukleme_month >= 1 && x.yukleme_month <= 6)
-              })
+              });
+              this.__getHalfCostList(1,6,this.selectedYear.Yil);
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
@@ -248,7 +547,9 @@ export default {
             if (response) {
               const data = response.data.filter(x => {
                 return (x.yukleme_month >= 7 && x.yukleme_month <= 12)
-              })
+              });
+              this.__getHalfCostList(7,12,this.selectedYear.Yil);
+
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
@@ -265,6 +566,7 @@ export default {
             this.$store.commit("setReportsMekmarAyoList", response.data);
             this.$store.commit("setReportsMekmarAyoListTotal", response.data);
             this.$store.dispatch("setEndLoadingAction");
+            this.__getMonthlyCostList(this.selectedYear.Yil,this.getReportsMekmarAyoMonthList[0].Ay)
             this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
           });
       }
@@ -281,6 +583,7 @@ export default {
             this.$store.commit("setReportsMekmarAyoList", response.data);
             this.$store.commit("setReportsMekmarAyoListTotal", response.data);
             this.$store.dispatch("setEndLoadingAction");
+            this.__getMonthlyCostList(this.selectedYear.Yil,this.getReportsMekmarAyoMonthList[0].Ay)
             this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
           });
       } else if (event.value.id == 1) {
@@ -294,6 +597,7 @@ export default {
               })
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
+              this.__getQuarterCostList(1,3,this.selectedYear.Yil);
               this.$store.dispatch("setEndLoadingAction");
             }
 
@@ -311,6 +615,8 @@ export default {
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
+              this.__getQuarterCostList(4,6,this.selectedYear.Yil);
+
             }
           });
       }
@@ -326,6 +632,8 @@ export default {
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
+              this.__getQuarterCostList(7,9,this.selectedYear.Yil);
+
             }
           });
       }
@@ -341,6 +649,8 @@ export default {
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
+              this.__getQuarterCostList(10,12,this.selectedYear.Yil);
+
             }
           });
       }
@@ -369,6 +679,7 @@ export default {
             this.$store.commit("setReportsMekmarAyoList", response.data);
             this.$store.commit("setReportsMekmarAyoListTotal", response.data);
             this.$store.dispatch("setEndLoadingAction");
+            this.__getYearlyCostList(this.selectedYear.Yil);
             this.selectedQuarter = { 'quarter': 'All', id: 0 };
           });
       } else {
@@ -383,6 +694,7 @@ export default {
             this.$store.commit("setReportsMekmarAyoList", response.data);
             this.$store.commit("setReportsMekmarAyoListTotal", response.data);
             this.$store.dispatch("setEndLoadingAction");
+            this.__getMonthlyCostList(this.selectedYear.Yil,this.getReportsMekmarAyoMonthList[0].Ay);
             this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
             this.selectedQuarter = { 'quarter': 'All', id: 0 };
 
@@ -423,6 +735,7 @@ export default {
         .then((response) => {
           this.$store.commit("setReportsMekmarAyoList", response.data);
           this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+          this.__getMonthlyCostList(date.year,date.month);
           this.$store.dispatch("setEndLoadingAction");
           this.selectedQuarter = { 'quarter': 'All', id: 0 };
 

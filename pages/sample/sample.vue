@@ -100,6 +100,10 @@ export default {
       this.sample_form_dialog = false;
     },
     update(event) {
+      
+
+
+
       this.$store.dispatch("setSampleUpdate", event);
       this.sample_form_dialog = false;
     },

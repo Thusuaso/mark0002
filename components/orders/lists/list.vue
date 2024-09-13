@@ -415,7 +415,7 @@
         </Column>
         <Column field="Uretim" header="Produced" style="width:5%;">
           <template #body="slotProps">
-            <div v-if="slotProps.data.Out && slotProps.data.Uretim == slotProps.data.Miktar"
+            <div v-if="__amountControl(slotProps.data.Out) && __amountControl(slotProps.data.Uretim) == __amountControl(slotProps.data.Miktar)"
               style="background-color:blue;color:white">
               {{ slotProps.data.Uretim | formatDecimal }}
             </div>
@@ -649,7 +649,13 @@ export default {
   },
   methods: {
 
-
+    __amountControl(val){
+    if(val == 0 || val == undefined || val == '' || val == ' ' || val == null){
+        return 0;
+    }else{
+        return parseFloat(val).toFixed(2);
+    }
+},
     ordersFilter(event) {
       this.$store.dispatch("setOrderProductionTotal", event.filteredValue);
     },
