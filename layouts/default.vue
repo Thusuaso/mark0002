@@ -12,6 +12,10 @@ export default {
   computed: {
     ...mapGetters(['getLoading'])
   },
+  data(){
+    return {
+    }
+  },
   created() {
     this.$store.dispatch("setCountryList");
     this.$store.dispatch("setUserList");
@@ -38,6 +42,7 @@ export default {
     this.$store.dispatch("setOrderKindOfDeliverySupplierList");
     this.$store.dispatch("setYearList");
     this.$store.dispatch("setMonthList");
+
   },
 };
 </script>

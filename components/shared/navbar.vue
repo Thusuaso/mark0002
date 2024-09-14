@@ -10,17 +10,17 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
 
-          <li class="nav-item" v-if="getAuthorityStatus">
+          <li class="nav-item" v-show="getAuthorityStatus">
             <nuxt-link to="/selection/input" tag="a" class="nav-link">SELECTION</nuxt-link>
           </li>
-          <li class="nav-item" v-if="getAuthorityStatus">
+          <li class="nav-item" v-show="getAuthorityStatus">
             <nuxt-link to="/operation/cards" tag="a" class="nav-link">PRODUCT CARDS</nuxt-link>
           </li>
 
-          <li class="nav-item" v-if="!getAuthorityStatus">
+          <li class="nav-item" v-show="!getAuthorityStatus">
             <nuxt-link to="/" tag="a" class="nav-link">HOME</nuxt-link>
           </li>
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               ORDERS
             </a>
@@ -36,7 +36,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               SALES
             </a>
@@ -66,7 +66,7 @@
             </ul>
           </li>
 
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               SELECTION
             </a>
@@ -79,10 +79,10 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item" v-if="!getAuthorityStatus">
+          <li class="nav-item" v-show="!getAuthorityStatus">
             <nuxt-link to="/finance" tag="a" class="nav-link">FINANCE</nuxt-link>
           </li>
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               OPERATION
             </a>
@@ -119,7 +119,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               CUSTOMERS
             </a>
@@ -172,23 +172,23 @@
                 <nuxt-link to="/reports/mekmer/finance" class="dropdown-item" tag="a">Finance</nuxt-link>
               </li>
 
-              <li v-if="getAuthorityStatus">
+              <li v-show="getAuthorityStatus">
                 <nuxt-link to="/reports/mekmar/forwarding" class="dropdown-item" tag="a">Shipped Crates</nuxt-link>
               </li>
-              <li v-if="getAuthorityStatus">
+              <li v-show="getAuthorityStatus">
                 <nuxt-link to="/reports/mekmer/strips" class="dropdown-item" tag="a">Stripler</nuxt-link>
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               MEKMAR REPORTS
             </a>
             <ul class="dropdown-menu">
-              <li v-if="userId == 10 || userId == 47 || userId == 9">
+              <li v-show="userId == 10 || userId == 47 || userId == 9">
                 <nuxt-link to="/reports/mekmar/ayo" class="dropdown-item" tag="a">AYO</nuxt-link>
               </li>
-              <li v-if="userId == 10 || userId == 47 || userId == 9">
+              <li v-show="userId == 10 || userId == 47 || userId == 9">
                 <nuxt-link to="/reports/mekmar/ayo-compare" class="dropdown-item" tag="a">AYO Compare</nuxt-link>
               </li>
               <li>
@@ -200,15 +200,15 @@
               <li>
                 <nuxt-link to="/reports/mekmar/summary" class="dropdown-item" tag="a">Order Summary</nuxt-link>
               </li>
-              <li v-if="userId == 10 || userId == 47 || userId == 13">
+              <li v-show="userId == 10 || userId == 47 || userId == 13">
                 <nuxt-link to="/reports/mekmar/mk" class="dropdown-item" tag="a">MK Reports</nuxt-link>
               </li>
-              <li v-if="userId == 10 || userId == 47 || userId == 13">
+              <li v-show="userId == 10 || userId == 47 || userId == 13">
                 <nuxt-link to="/reports/mekmar/gu" class="dropdown-item" tag="a">GU Reports</nuxt-link>
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               SAMPLE
             </a>
@@ -221,10 +221,10 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item" v-if="!getAuthorityStatus">
+          <li class="nav-item" v-show="!getAuthorityStatus">
             <nuxt-link to="/offers" tag="a" class="nav-link">QUOTES</nuxt-link>
           </li>
-          <li class="nav-item dropdown" v-if="!getAuthorityStatus">
+          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               W. PANEL
             </a>

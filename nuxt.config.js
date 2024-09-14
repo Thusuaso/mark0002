@@ -115,9 +115,7 @@ export default {
     bodyParser.json(),
     '~/api'
   ],
-  devServer: {
-    port: 3001
-  },
+
 
 
 
