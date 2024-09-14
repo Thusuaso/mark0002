@@ -252,7 +252,7 @@
           </li>
         </ul>
       </div>
-      <div class="d-flex" v-if="!getAuthorityStatus">
+      <div class="d-flex" v-show="!getAuthorityStatus">
         <div><Button clas="p-button-danger mr-5" label="Logout" @click="logout" /></div>
         <i v-badge.danger="parseInt(getToDoMainListByUsernameLenght)" class="pi pi-calendar"
           style="font-size: 2rem; cursor: pointer" @click="visibleRight = true" />

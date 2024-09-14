@@ -344,6 +344,8 @@ Vue.component('CustomInput', CustomInput)
 
 
 
+
+
 /*Filters */
 Vue.filter('formatPriceUsd',(value)=>{
     if(value == null || value == undefined){

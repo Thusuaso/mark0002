@@ -1,7 +1,7 @@
 <template>
   <div class="">
-    <loadingSpinner v-if="getLoading" />
-    <navbar v-if="$store.getters.isAuthenticated" style="margin-bottom: 5px" />
+    <loadingSpinner v-show="getLoading" />
+    <navbar v-show="$store.getters.isAuthenticated" style="margin-bottom: 5px" />
     <nuxt />
   </div>
 </template>
