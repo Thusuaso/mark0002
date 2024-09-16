@@ -14,7 +14,7 @@
                 :value="currency"
                 text="Currency"
                 @onInput="currency = $event"
-                :disabled="false"
+                :disabled="true"
           />
         </div>
         <div class="col">

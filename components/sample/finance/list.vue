@@ -141,9 +141,9 @@
         </thead>
         <tbody>
           <tr>
-            <th>{{ (total.setUsd - total.getUsd) | formatPriceUsd }}</th>
-            <td>{{ (total.setEuro - total.getEuro) | formatPriceUsd }}</td>
-            <td>{{ (total.setTl - total.getTl) | formatPriceUsd }}</td>
+            <td>{{ (total.setUsd - total.getUsd) | formatPriceUsd }}</td>
+            <td>{{ (total.setEuro - total.getEuro) | formatPriceEuro }}</td>
+            <td>{{ (total.setTl - total.getTl) | formatPriceTl }}</td>
           </tr>
         </tbody>
       </table>

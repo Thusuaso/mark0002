@@ -131,14 +131,19 @@ export default {
       this.$store.dispatch("setFinancePaymentModel");
     },
     save() {
-      this.model.BugunTarih = date.dateToString(new Date());
-      this.model.KullaniciID = Cookies.get("userId");
-      this.model.KullaniciAdi = Cookies.get("username");
-      this.$emit("advanced_payment_save_emit", this.model);
-      this.advanced_payment_disabled = true;
-      this.payment_date = null;
-      this.selectedAdvancedPayment = null;
-      this.$store.dispatch("setFinancePaymentModel");
+      if(this.model.Kur == 0){
+        this.$toast.error('Kur girilmesi zorunludur.')
+        }else{
+          this.model.BugunTarih = date.dateToString(new Date());
+          this.model.KullaniciID = Cookies.get("userId");
+          this.model.KullaniciAdi = Cookies.get("username");
+          this.$emit("advanced_payment_save_emit", this.model);
+          this.advanced_payment_disabled = true;
+          this.payment_date = null;
+          this.selectedAdvancedPayment = null;
+          this.$store.dispatch("setFinancePaymentModel");
+      }
+
     },
     advancedPaymentSelected(event) {
       this.model.MusteriID = event.data.MusteriID;

@@ -130,6 +130,10 @@ import shippedOperation from '~/components/reports/mekmar/gu/shippedOperation';
 
 import creditCardForm from '~/components/reports/mekmar/ayo/formc';
 import quarterAyoForm from '~/components/reports/mekmar/ayo/formq';
+import formCurrency from '~/components/reports/mekmar/ayo/formcurrency';
+Vue.component('formCurrency',formCurrency);
+
+
 Vue.component('quarterAyoForm',quarterAyoForm);
 
 Vue.component('creditCardForm',creditCardForm);
@@ -356,6 +360,26 @@ Vue.filter('formatPriceUsd',(value)=>{
     }
 
 });
+
+Vue.filter('formatPriceEuro',(value)=>{
+    if(value == null || value == undefined){
+        return '€0.00';
+    }else{
+        const val = (value / 1).toFixed(2).replace(".", ",");
+        return "€" + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+});
+Vue.filter('formatPriceTl',(value)=>{
+    if(value == null || value == undefined){
+        return '₺0.00';
+    }else{
+        const val = (value / 1).toFixed(2).replace(".", ",");
+        return "₺" + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+});
+
 Vue.filter('formatDecimal', (value) => {
     if (value == 'null' || value == null || value == ' ') {
         return 0.00;

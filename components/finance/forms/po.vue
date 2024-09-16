@@ -165,16 +165,23 @@ export default {
       this.model.BugunTarih = date.dateToString(new Date());
     },
     process() {
-      this.model.MusteriID = this.po.MusteriID;
-      this.model.Tarih = date.dateToString(this.paid_date);
-      this.model.FirmaAdi = this.po.FirmaAdi;
-      this.model.SiparisNo = this.po.SiparisNo;
-      this.model.FinansOdemeTurID = 2;
-      this.model.KullaniciID = Cookies.get("userId");
-      this.model.KullaniciAdi = Cookies.get("username");
-      this.model.BugunTarih = date.dateToString(new Date());
-      this.$emit("po_paid_process_emit", this.model);
-      this.paid_date = null;
+      if(this.model.Kur == 0){
+        console.log(this.model.Kur);
+        this.$toast.error('Kur girilmesi zorunludur.');
+      }else{
+              this.model.MusteriID = this.po.MusteriID;
+              this.model.Tarih = date.dateToString(this.paid_date);
+              this.model.FirmaAdi = this.po.FirmaAdi;
+              this.model.SiparisNo = this.po.SiparisNo;
+              this.model.FinansOdemeTurID = 2;
+              this.model.KullaniciID = Cookies.get("userId");
+              this.model.KullaniciAdi = Cookies.get("username");
+              this.model.BugunTarih = date.dateToString(new Date());
+              this.$emit("po_paid_process_emit", this.model);
+              this.paid_date = null;
+
+      }
+
     },
     paidDateSelected(event) {
       this.model.Tarih = date.dateToString(event);

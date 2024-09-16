@@ -154,6 +154,18 @@
 
         </Dialog>
       </div>
+      <div class="col">
+        <Button label="Currency" class="p-button-danger" @click="currency" />
+        <Dialog :visible.sync="currency_form_visible" modal >
+          <formCurrency v-for="cur in currency_list" :key="cur" 
+            :month="cur.month" :id="cur.id" :month_id="cur.month_id" :currency="cur.currency"
+            @cost_save_emit="saveCurrency($event)"
+            @cost_update_emit="updateCurrency($event)"
+            :year="selectedYear.Yil"
+          />
+
+        </Dialog>
+      </div>
     </div>
 
     <reportsMekmarAyoList :list="getReportsMekmarAyoList" :total="getReportsMekmarAyoListTotal" />
@@ -178,6 +190,8 @@ export default {
   },
   data() {
     return {
+      currency_list:[],
+      currency_form_visible:false,
       cost_tl:0,
       cost_usd:0,
       other_cost_form_visible:false,
@@ -320,6 +334,34 @@ export default {
       });
   },
   methods: {
+    updatedCurrencyList(){
+      this.$axios.get(`/reports/ayo/currency/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.currency_list = res.data.list;
+
+      })
+    },
+    updateCurrency(event){
+      this.$axios.put('/reports/ayo/currency/update',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Güncellendi.');
+      });
+    },
+    saveCurrency(event){
+      this.$axios.post('/reports/ayo/currency/save',event)
+      .then(res=>{
+        this.updatedCurrencyList();
+        this.$toast.success('Başarıyla Kaydedildi.');
+      });
+    },
+    currency(){
+      this.$axios.get(`/reports/ayo/currency/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.currency_list = res.data.list;
+        this.currency_form_visible = true;
+
+      })
+    },
     __getHalfCostList(month_1,month_2,year){
       this.$axios.get(`/reports/ayo/costs/half/${month_1}/${month_2}/${year}`)
       .then(res=>{

@@ -13771,16 +13771,161 @@ app.get('/month/list',(req,res)=>{
     });
 });
 
-
-app.get('/reports/ayo/credit/card/cost/list/:year',(req,res)=>{
+app.get('/reports/ayo/currency/list/:year',(req,res)=>{
     const year = req.params.year;
     const sql = `
-        select * from AyoCreditCardCostTB where YEAR='${year}'
+        select * from AyoCurrency where YEAR='${year}'
     `;
     mssql.query(sql,(err,cost)=>{
         if(cost.recordset.length == 0){
             res.status(200).json({
                 'list':[
+                    {'month_id':1,'month':'January','currency':0},
+                    {'month_id':2,'month':'February','currency':0},
+                    {'month_id':3,'month':'March','currency':0},
+                    {'month_id':4,'month':'April','currency':0},
+                    {'month_id':5,'month':'May','currency':0},
+                    {'month_id':6,'month':'June','currency':0},
+                    {'month_id':7,'month':'July','currency':0},
+                    {'month_id':8,'month':'August','currency':0},
+                    {'month_id':9,'month':'September','currency':0},
+                    {'month_id':10,'month':'October','currency':0},
+                    {'month_id':11,'month':'November','currency':0},
+                    {'month_id':12,'month':'December','currency':0}
+
+                ]
+            })
+
+        }else{
+            const liste = [
+                    {'id':0,'month_id':1,'month':'January','currency':0},
+                    {'id':0,'month_id':2,'month':'February','currency':0},
+                    {'id':0,'month_id':3,'month':'March','currency':0},
+                    {'id':0,'month_id':4,'month':'April','currency':0},
+                    {'id':0,'month_id':5,'month':'May','currency':0},
+                    {'id':0,'month_id':6,'month':'June','currency':0},
+                    {'id':0,'month_id':7,'month':'July','currency':0},
+                    {'id':0,'month_id':8,'month':'August','currency':0},
+                    {'id':0,'month_id':9,'month':'September','currency':0},
+                    {'id':0,'month_id':10,'month':'October','currency':0},
+                    {'id':0,'month_id':11,'month':'November','currency':0},
+                    {'id':0,'month_id':12,'month':'December','currency':0}
+
+            ]
+            cost.recordset.forEach(x=>{
+                if(x.MONTH === 1){
+                    liste[0].id = x.ID;
+                    liste[0].currency = x.CURRENCY;
+                }else if(x.MONTH === 2){
+                    liste[1].id = x.ID;
+
+                    liste[1].currency = x.CURRENCY;
+                }else if(x.MONTH === 3){
+                    liste[2].id = x.ID;
+
+                    liste[2].currency = x.CURRENCY;
+                }else if(x.MONTH === 4){
+                    liste[3].id = x.ID;
+
+                    liste[3].currency = x.CURRENCY;
+                }else if(x.MONTH === 5){
+                    liste[4].id = x.ID;
+
+                    liste[4].currency = x.CURRENCY;
+                }else if(x.MONTH === 6){
+                    liste[5].id = x.ID;
+
+                    liste[5].currency = x.CURRENCY;
+                }else if(x.MONTH === 7){
+                    liste[6].id = x.ID;
+
+                    liste[6].currency = x.CURRENCY;
+                }else if(x.MONTH === 8){
+                    liste[7].id = x.ID;
+
+                    liste[7].currency = x.CURRENCY;
+                }else if(x.MONTH === 9){
+                    liste[8].id = x.ID;
+
+                    liste[8].currency = x.CURRENCY;
+                }else if(x.MONTH === 10){
+                    liste[9].id = x.ID;
+
+                    liste[9].currency = x.CURRENCY;
+                }else if(x.MONTH === 11){
+                    liste[10].id = x.ID;
+
+                    liste[10].currency = x.CURRENCY;
+                }else if(x.MONTH === 12){
+                    liste[11].id = x.ID;
+
+                    liste[11].currency = x.CURRENCY;
+                }
+            });
+            res.status(200).json({'list':liste})
+        }
+        
+    });
+});
+app.post('/reports/ayo/currency/save',(req,res)=>{
+    const body = req.body;
+    const insertSql = `
+        insert into AyoCurrency(YEAR,MONTH,CURRENCY)
+        VALUES('${body.year}','${body.month}','${body.currency}')
+    `;
+    mssql.query(insertSql,(err,currency)=>{
+        if(currency.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+
+        }
+    });
+});
+
+app.put('/reports/ayo/currency/update',(req,res)=>{
+    const body = req.body;
+    const updateSql = `
+        update AyoCurrency SET CURRENCY='${body.currency}' WHERE ID='${body.id}'
+    `;
+    console.log(updateSql);
+    mssql.query(updateSql,(err,currency)=>{
+        if(currency.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+            
+        }
+    });
+});
+
+function getCurrencySql(year){
+    const currencySql = `select * from AyoCurrency where YEAR='${year}'`;
+    return new Promise(async (resolve,reject)=>{
+        await mssql.query(currencySql,(err,currency)=>{
+            resolve(currency.recordset);
+        });
+    });
+};
+
+app.get('/reports/ayo/credit/card/cost/list/:year', (req,res)=>{
+    const year = req.params.year;
+    const sql = `
+                        select 
+
+                    ac.ID,
+                    ac.YEAR,
+                    ac.MONTH,
+                    ac.CreditCardUsd,
+                    ac.CreditCardTl,
+                    (select cur.CURRENCY from AyoCurrency cur where cur.YEAR = ac.YEAR and cur.MONTH = ac.MONTH) as Currency
+
+                from AyoCreditCardCostTB ac where ac.YEAR='${year}'
+    `;
+    mssql.query(sql, async(err,cost)=>{
+        if(cost.recordset.length == 0){
+            const currencySql = `select * from AyoCurrency where YEAR='${year}'`;
+            let list= [
                     {'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
                     {'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
                     {'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
@@ -13795,10 +13940,45 @@ app.get('/reports/ayo/credit/card/cost/list/:year',(req,res)=>{
                     {'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
 
                 ]
-            })
+            mssql.query(currencySql,(err,currency)=>{
+                currency.recordset.forEach(x=>{
+                    if(x.MONTH == 1){
+                        list[0].currency = x.CURRENCY;
+                    }else if (x.MONTH == 2){
+                        list[1].currency = x.CURRENCY;
+                    }else if (x.MONTH == 3){
+                        list[2].currency = x.CURRENCY;
+                    }else if (x.MONTH == 4){
+                        list[3].currency = x.CURRENCY;
+                    }else if (x.MONTH == 5){
+                        list[4].currency = x.CURRENCY;
+                    }else if (x.MONTH == 6){
+                        list[5].currency = x.CURRENCY;
+                    }else if (x.MONTH == 7){
+                        list[6].currency = x.CURRENCY;
+                    }else if (x.MONTH == 8){
+                        list[7].currency = x.CURRENCY;
+                    }else if (x.MONTH == 9){
+                        list[8].currency = x.CURRENCY;
+                    }else if (x.MONTH == 10){
+                        list[9].currency = x.CURRENCY;
+                    }else if (x.MONTH == 11){
+                        list[10].currency = x.CURRENCY;
+                    }else if (x.MONTH == 12){
+                        list[11].currency = x.CURRENCY;
+                    }
+                });
+                res.status(200).json({
+                    'list':list
+                });
+            });
+
+            
 
         }else{
-            const liste = [
+            const currencySql = `select * from AyoCurrency where YEAR='${year}'`;
+
+            let liste = [
                     {'id':0,'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
                     {'id':0,'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
                     {'id':0,'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
@@ -13812,7 +13992,37 @@ app.get('/reports/ayo/credit/card/cost/list/:year',(req,res)=>{
                     {'id':0,'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
                     {'id':0,'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
 
-            ]
+            ];
+
+            const currency =await getCurrencySql(year);
+            currency.forEach(x=>{
+                    if(x.MONTH == 1){
+                        liste[0].currency = x.CURRENCY;
+                    }else if (x.MONTH == 2){
+                        liste[1].currency = x.CURRENCY;
+                    }else if (x.MONTH == 3){
+                        liste[2].currency = x.CURRENCY;
+                    }else if (x.MONTH == 4){
+                        liste[3].currency = x.CURRENCY;
+                    }else if (x.MONTH == 5){
+                        liste[4].currency = x.CURRENCY;
+                    }else if (x.MONTH == 6){
+                        liste[5].currency = x.CURRENCY;
+                    }else if (x.MONTH == 7){
+                        liste[6].currency = x.CURRENCY;
+                    }else if (x.MONTH == 8){
+                        liste[7].currency = x.CURRENCY;
+                    }else if (x.MONTH == 9){
+                        liste[8].currency = x.CURRENCY;
+                    }else if (x.MONTH == 10){
+                        liste[9].currency = x.CURRENCY;
+                    }else if (x.MONTH == 11){
+                        liste[10].currency = x.CURRENCY;
+                    }else if (x.MONTH == 12){
+                        liste[11].currency = x.CURRENCY;
+                    }
+                });
+
             cost.recordset.forEach(x=>{
                 if(x.MONTH === 1){
                     liste[0].id = x.ID;
@@ -13933,27 +14143,67 @@ app.put('/reports/ayo/credit/card/cost/update',(req,res)=>{
 app.get('/reports/ayo/travel/cost/list/:year',(req,res)=>{
     const year = req.params.year;
     const sql = `
-        select * from AyoTravelCostTB where YEAR='${year}'
-    `;
-    mssql.query(sql,(err,cost)=>{
-        if(cost.recordset.length == 0){
-            res.status(200).json({
-                'list':[
-                    {'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
-                    {'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
-                    {'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
-                    {'month_id':4,'month':'April','value':0,'currency':0,'usd':0},
-                    {'month_id':5,'month':'May','value':0,'currency':0,'usd':0},
-                    {'month_id':6,'month':'June','value':0,'currency':0,'usd':0},
-                    {'month_id':7,'month':'July','value':0,'currency':0,'usd':0},
-                    {'month_id':8,'month':'August','value':0,'currency':0,'usd':0},
-                    {'month_id':9,'month':'September','value':0,'currency':0,'usd':0},
-                    {'month_id':10,'month':'October','value':0,'currency':0,'usd':0},
-                    {'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
-                    {'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
+        select 
 
-                ]
-            })
+	ac.ID,
+	ac.YEAR,
+	ac.MONTH,
+	ac.USD,
+	ac.TL,
+	(select cur.CURRENCY from AyoCurrency cur where cur.YEAR = ac.YEAR and cur.MONTH = ac.MONTH) as CURRENCY
+
+from AyoTravelCostTB ac where ac.YEAR='${year}'
+    `;
+    mssql.query(sql,async(err,cost)=>{
+        const currency = await getCurrencySql(year);
+        if(cost.recordset.length == 0){
+            let list = [
+                {'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
+                {'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
+                {'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
+                {'month_id':4,'month':'April','value':0,'currency':0,'usd':0},
+                {'month_id':5,'month':'May','value':0,'currency':0,'usd':0},
+                {'month_id':6,'month':'June','value':0,'currency':0,'usd':0},
+                {'month_id':7,'month':'July','value':0,'currency':0,'usd':0},
+                {'month_id':8,'month':'August','value':0,'currency':0,'usd':0},
+                {'month_id':9,'month':'September','value':0,'currency':0,'usd':0},
+                {'month_id':10,'month':'October','value':0,'currency':0,'usd':0},
+                {'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
+                {'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
+
+            ];
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    list[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    list[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    list[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    list[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    list[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    list[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    list[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    list[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    list[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    list[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    list[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    list[11].currency = x.CURRENCY;
+                }
+            });
+
+
+            res.status(200).json({
+                list:list
+            });
 
         }else{
             const liste = [
@@ -13970,7 +14220,36 @@ app.get('/reports/ayo/travel/cost/list/:year',(req,res)=>{
                     {'id':0,'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
                     {'id':0,'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
 
-            ]
+            ];
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    liste[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    liste[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    liste[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    liste[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    liste[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    liste[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    liste[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    liste[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    liste[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    liste[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    liste[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    liste[11].currency = x.CURRENCY;
+                }
+            });
+
+
             cost.recordset.forEach(x=>{
                 if(x.MONTH === 1){
                     liste[0].id = x.ID;
@@ -14092,12 +14371,22 @@ app.put('/reports/ayo/travel/cost/update',(req,res)=>{
 app.get('/reports/ayo/wage/cost/list/:year',(req,res)=>{
     const year = req.params.year;
     const sql = `
-        select * from AyoWageCostTB where YEAR='${year}'
+                select 
+
+	ac.ID,
+	ac.YEAR,
+	ac.MONTH,
+	ac.USD,
+	ac.TL,
+	(select cur.CURRENCY from AyoCurrency cur where cur.YEAR = ac.YEAR and cur.MONTH = ac.MONTH) as CURRENCY
+
+from AyoWageCostTB ac where ac.YEAR='${year}'
     `;
-    mssql.query(sql,(err,cost)=>{
+    mssql.query(sql,async (err,cost)=>{
+        const currency = await getCurrencySql(year);
+
         if(cost.recordset.length == 0){
-            res.status(200).json({
-                'list':[
+            const list = [
                     {'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
                     {'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
                     {'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
@@ -14111,7 +14400,37 @@ app.get('/reports/ayo/wage/cost/list/:year',(req,res)=>{
                     {'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
                     {'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
 
-                ]
+            ];
+
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    list[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    list[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    list[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    list[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    list[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    list[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    list[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    list[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    list[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    list[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    list[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    list[11].currency = x.CURRENCY;
+                }
+            });
+            res.status(200).json({
+                'list':list
             })
 
         }else{
@@ -14129,7 +14448,34 @@ app.get('/reports/ayo/wage/cost/list/:year',(req,res)=>{
                     {'id':0,'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
                     {'id':0,'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
 
-            ]
+            ];
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    liste[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    liste[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    liste[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    liste[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    liste[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    liste[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    liste[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    liste[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    liste[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    liste[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    liste[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    liste[11].currency = x.CURRENCY;
+                }
+            });
             cost.recordset.forEach(x=>{
                 if(x.MONTH === 1){
                     liste[0].id = x.ID;
@@ -14907,10 +15253,11 @@ app.get('/reports/ayo/other/cost/list/:year',(req,res)=>{
     const sql = `
         select * from AyoOtherCostTB where YEAR='${year}'
     `;
-    mssql.query(sql,(err,cost)=>{
+    mssql.query(sql,async (err,cost)=>{
+        const currency = await getCurrencySql(year);
+
         if(cost.recordset.length == 0){
-            res.status(200).json({
-                'list':[
+            const list = [
                     {'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
                     {'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
                     {'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
@@ -14924,8 +15271,38 @@ app.get('/reports/ayo/other/cost/list/:year',(req,res)=>{
                     {'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
                     {'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
 
-                ]
-            })
+                ];
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    list[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    list[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    list[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    list[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    list[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    list[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    list[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    list[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    list[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    list[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    list[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    list[11].currency = x.CURRENCY;
+                }
+            });
+
+            res.status(200).json({
+                'list':list
+            });
 
         }else{
             const liste = [
@@ -14942,7 +15319,35 @@ app.get('/reports/ayo/other/cost/list/:year',(req,res)=>{
                     {'id':0,'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
                     {'id':0,'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
 
-            ]
+            ];
+
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    liste[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    liste[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    liste[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    liste[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    liste[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    liste[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    liste[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    liste[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    liste[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    liste[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    liste[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    liste[11].currency = x.CURRENCY;
+                }
+            });
             cost.recordset.forEach(x=>{
                 if(x.MONTH === 1){
                     liste[0].id = x.ID;
