@@ -1602,12 +1602,7 @@ app.post('/container/input/save',(req,res)=>{
 });
 
 app.post('/container/input/file/save',(req,res)=>{
-    let invoicedocumentid;
-    if(req.body.invoiceid == 7){
-        invoicedocumentid = 70;
-    } else{
-        invoicedocumentid = 50;
-    }
+
     const sql = `
                     INSERT INTO SiparisFaturaKayitTB (
                         Tarih,
@@ -1622,8 +1617,9 @@ app.post('/container/input/file/save',(req,res)=>{
                         EvrakAdi ,KullaniciID
                         )   
                     VALUES
-                    ('${req.body.date}','${req.body.invoiceid}','${req.body.invoicekindid}','${req.body.po}','${req.body.usd}','${1}','${invoicedocumentid}','${2}','${req.body.nowDate}','${req.body.invoiceno + '.pdf'}','${req.body.userId}')
+                    ('${req.body.date}','${req.body.invoiceid}','${req.body.invoicekindid}','${req.body.po}','${req.body.usd}','${1}','${req.body.invoicedocumentid}','${2}','${req.body.nowDate}','${req.body.invoiceno + '.pdf'}','${req.body.userId}')
                 `;
+
     mssql.query(sql)
     .then(response=>{
         if(response.rowsAffected[0] == 1){

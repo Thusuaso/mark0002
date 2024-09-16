@@ -34,6 +34,7 @@
           optionLabel="name"
           placeholder="Kind of Invoice"
           :disabled="disabled"
+          @change="invoiceSelected($event)"
         />
       </div>
       <div class="col">
@@ -170,9 +171,17 @@ export default {
       disabledNewForm: false,
       disabledSaveForm: true,
       containerdata: {},
+      invoice_document_id:0
     };
   },
   methods: {
+    invoiceSelected(event){
+      if(event.value.id == 7){
+        this.invoice_document_id = 70;
+      }else{
+        this.invoice_document_id = 50;
+      }
+    },
     inputUsd(event) {
       this.usd = event;
       this.tl = event * this.currency;
@@ -187,7 +196,8 @@ export default {
         this.getContainerResults.FirmaID,
         this.getContainerResults.FaturaNo + ".pdf"
       );
-      const data = { invoiceid: this.getContainerResults.ID, ...this.containerdata };
+      console.log(this.invoice_document_id)
+      const data = { 'invoicedocumentid': this.invoice_document_id,'invoiceid':this.getContainerResults.ID, ...this.containerdata };
       this.$store.dispatch("setContainerInputFileSave", data);
     },
     reset() {
