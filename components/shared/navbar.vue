@@ -185,10 +185,10 @@
               MEKMAR REPORTS
             </a>
             <ul class="dropdown-menu">
-              <li v-show="userId == 10 || userId == 47 || userId == 9">
+              <li v-show="userId == 10 || userId == 47 || userId == 13">
                 <nuxt-link to="/reports/mekmar/ayo" class="dropdown-item" tag="a">AYO</nuxt-link>
               </li>
-              <li v-show="userId == 10 || userId == 47 || userId == 9">
+              <li v-show="userId == 10 || userId == 47 || userId == 13">
                 <nuxt-link to="/reports/mekmar/ayo-compare" class="dropdown-item" tag="a">AYO Compare</nuxt-link>
               </li>
               <li>
