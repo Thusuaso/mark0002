@@ -5,6 +5,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import Cookies from "js-cookie";
 export default {
   computed: {
     ...mapGetters(["getUserList"]),
@@ -12,6 +13,8 @@ export default {
   methods: {
     onSubmit(user) {
       this.$store.dispatch("login", user).then((res) => {
+        const userId = Cookies.get('userId');
+        this.$store.dispatch('setUserId',userId);
         if (res) {
           const date = new Date();
           user.innerDate =

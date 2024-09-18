@@ -6,6 +6,9 @@ middleware['authControl'] = middleware['authControl'].default || middleware['aut
 middleware['authority'] = require('..\\middleware\\authority.js')
 middleware['authority'] = middleware['authority'].default || middleware['authority']
 
+middleware['ayoControl'] = require('..\\middleware\\ayoControl.js')
+middleware['ayoControl'] = middleware['ayoControl'].default || middleware['ayoControl']
+
 middleware['navbarControl'] = require('..\\middleware\\navbarControl.js')
 middleware['navbarControl'] = middleware['navbarControl'].default || middleware['navbarControl']
 

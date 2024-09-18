@@ -13004,6 +13004,43 @@ app.post('/mail/product/control/send',(req,res)=>{
             res.status(200).json({'status':false});
         };
     });
+    transporter.sendMail({
+        to: 'export1@mekmar.com',
+        from: 'goz@mekmar.com',
+        subject: 'Sipariş Kontrol Maili',
+        html: content
+    })        .then(response=>{
+        if(response.response == '250 message sent ok '){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+        };
+    });
+
+    transporter.sendMail({
+        to: 'export2@mekmar.com',
+        from: 'goz@mekmar.com',
+        subject: 'Sipariş Kontrol Maili',
+        html: content
+    })        .then(response=>{
+        if(response.response == '250 message sent ok '){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+        };
+    });
+    transporter.sendMail({
+        to: 'export@mekmar.com',
+        from: 'goz@mekmar.com',
+        subject: 'Sipariş Kontrol Maili',
+        html: content
+    })        .then(response=>{
+        if(response.response == '250 message sent ok '){
+            res.status(200).json({'status':true});
+        } else{
+            res.status(200).json({'status':false});
+        };
+    });
 });
 
 

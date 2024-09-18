@@ -8,7 +8,7 @@
 <script>
 import { mapGetters } from 'vuex';
 export default {
-  middleware: ["sessionControl", "authControl", "navbarControl"],
+  middleware: ["sessionControl", "authControl", "navbarControl","ayoControl"],
   computed: {
     ...mapGetters(['getLoading'])
   },

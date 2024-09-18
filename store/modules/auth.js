@@ -4,6 +4,7 @@ const state = {
     userId:null,
     username:null,
     mail: null,
+    ayo_status:false,
 };
 const actions = {
     sessionControl(vuexContext,context){
@@ -68,6 +69,12 @@ const actions = {
                 }
             })
     },
+    setUserId(vuexContext,userId){
+        vuexContext.commit('setUserId',userId);
+    },
+    setAyoControlStatus(vuexContext,status){
+        vuexContext.commit('setAyoControlStatus',status);
+    }
 
 
 };
@@ -95,6 +102,12 @@ const mutations = {
 
 
     },
+    setUserId(state,id){
+        state.userId = id;
+    },
+    setAyoControlStatus(state,status){
+        state.ayo_status = status
+    }
 
 };
 const getters = {
@@ -107,6 +120,9 @@ const getters = {
     },
     getUsername(state){
         return state.username;
+    },
+    getAyoStatus(state){
+        return state.ayo_status;
     }
 };
 

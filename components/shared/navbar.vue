@@ -185,10 +185,10 @@
               MEKMAR REPORTS
             </a>
             <ul class="dropdown-menu">
-              <li v-show="userId == 10 || userId == 47 || userId == 13">
+              <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/ayo" class="dropdown-item" tag="a">AYO</nuxt-link>
               </li>
-              <li v-show="userId == 10 || userId == 47 || userId == 13">
+              <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/ayo-compare" class="dropdown-item" tag="a">AYO Compare</nuxt-link>
               </li>
               <li>
@@ -200,10 +200,10 @@
               <li>
                 <nuxt-link to="/reports/mekmar/summary" class="dropdown-item" tag="a">Order Summary</nuxt-link>
               </li>
-              <li v-show="userId == 10 || userId == 47 || userId == 13">
+              <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/mk" class="dropdown-item" tag="a">MK Reports</nuxt-link>
               </li>
-              <li v-show="userId == 10 || userId == 47 || userId == 13">
+              <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/gu" class="dropdown-item" tag="a">GU Reports</nuxt-link>
               </li>
             </ul>
@@ -292,7 +292,9 @@ export default {
       "getUserList",
       "getTodoMainListByUsernameButtonStatus",
       "getAuthorityStatus",
-      "isAuthenticated"
+      "isAuthenticated",
+      "getUserId",
+      "getAyoStatus"
     ]),
   },
   data() {
@@ -306,13 +308,16 @@ export default {
   },
 
   created() {
+    console.log("getAyoStatus",this.getAyoStatus)
     this.$store.dispatch("setToDoListByUsername", Cookies.get("username"));
+
+
+
+
+
+  },
+  mounted(){
     this.userId = Cookies.get("userId");
-
-
-
-
-
   },
 
   methods: {

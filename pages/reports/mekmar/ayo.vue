@@ -166,6 +166,9 @@
 
         </Dialog>
       </div>
+      <div class="col">
+        <Button icon="pi pi-file-excel" @click="cost_excel" class="p-button-raised p-button-rounded" style="font-size: 2rem"/>
+      </div>
     </div>
 
     <reportsMekmarAyoList :list="getReportsMekmarAyoList" :total="getReportsMekmarAyoListTotal" />
@@ -334,12 +337,53 @@ export default {
       });
   },
   methods: {
+    cost_excel(){
+      this.$axios.get(`/reports/ayo/other/cost/list/${this.selectedYear.Yil}`)
+      .then(other=>{
+        this.$axios.get(`/reports/ayo/sample/cost/list/${this.selectedYear.Yil}`)
+        .then(sample=>{
+          this.$axios.get(`/reports/ayo/wage/cost/list/${this.selectedYear.Yil}`)
+          .then(wage=>{
+            this.$axios.get(`/reports/ayo/travel/cost/list/${this.selectedYear.Yil}`)
+            .then(travel=>{
+              this.$axios.get(`/reports/ayo/credit/card/cost/list/${this.selectedYear.Yil}`)
+              .then(credit=>{
+                const data = {
+                  'other':other.data.list,
+                  'sample':sample.data.list,
+                  'wage':wage.data.list,
+                  'travel':travel.data.list,
+                  'credit':credit.data.list
+                };
+
+                api
+                .post("/reports/mekmar/ayo/cost/excel", data)
+                .then((response) => {
+                  if (response.status) {
+                    const link = document.createElement("a");
+                    link.href = this.getLocalUrl + "reports/mekmar/ayo/cost/excel";
+
+                    link.setAttribute("download", "ayo_cost_excel.xlsx");
+                    document.body.appendChild(link);
+                    link.click();
+                  }
+                });
+              });
+
+            });
+
+          });
+          
+          
+        });
+      });
+    },
     updatedCurrencyList(){
       this.$axios.get(`/reports/ayo/currency/list/${this.selectedYear.Yil}`)
       .then(res=>{
         this.currency_list = res.data.list;
 
-      })
+      });
     },
     updateCurrency(event){
       this.$axios.put('/reports/ayo/currency/update',event)
@@ -483,6 +527,7 @@ export default {
     wageCostUpdate(event){
       this.$axios.put('/reports/ayo/wage/cost/update',event)
       .then(res=>{
+        
         this.$toast.success('Başarıyla Güncellendi.');
       });
     },

@@ -2,7 +2,7 @@
     <div class="container">
         <Dropdown v-model="getMekmarGuSelectedUser" :options="users" optionLabel="username" placeholder="Select a User"
             style="width:50%;" @change="userSelected($event)" />
-        <Button type="button" class="p-button-primary" @click="excel_output" label="Excel" :disabled="disabled" />
+        <Button type="button" class="p-button-primary" @click="excel_output" label="Excel"/>
 
         <!-- <div class="row">
             <div class="col">
@@ -497,6 +497,8 @@ export default {
     data() {
         return {
             users: [
+            { 'id': 13, 'username': 'Mehmet' },
+
                 { 'id': 44, 'username': 'Hakan' },
                 { 'id': 19, 'username': 'Özlem' },
                 { 'id': 10, 'username': 'Gizem' },
