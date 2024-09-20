@@ -131,6 +131,11 @@ import shippedOperation from '~/components/reports/mekmar/gu/shippedOperation';
 import creditCardForm from '~/components/reports/mekmar/ayo/formc';
 import quarterAyoForm from '~/components/reports/mekmar/ayo/formq';
 import formCurrency from '~/components/reports/mekmar/ayo/formcurrency';
+
+import profitGu from '~/components/reports/mekmar/gu/profit';
+
+Vue.component('profitGu',profitGu);
+
 Vue.component('formCurrency',formCurrency);
 
 

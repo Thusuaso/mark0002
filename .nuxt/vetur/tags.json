@@ -8,14 +8,14 @@
   "AccountsList": {
     "description": "Auto imported from components/accounts/list.vue"
   },
-  "AuthForm": {
-    "description": "Auto imported from components/auth/authForm.vue"
-  },
   "CardsForm": {
     "description": "Auto imported from components/cards/form.vue"
   },
   "CardsList": {
     "description": "Auto imported from components/cards/list.vue"
+  },
+  "AuthForm": {
+    "description": "Auto imported from components/auth/authForm.vue"
   },
   "Home": {
     "description": "Auto imported from components/home/home.vue"
@@ -41,6 +41,12 @@
   "PanelForm": {
     "description": "Auto imported from components/panel/form.vue"
   },
+  "SharedLoading": {
+    "description": "Auto imported from components/shared/loading.vue"
+  },
+  "SharedNavbar": {
+    "description": "Auto imported from components/shared/navbar.vue"
+  },
   "ShipmentForm": {
     "description": "Auto imported from components/shipment/form.vue"
   },
@@ -49,12 +55,6 @@
   },
   "SupplierList": {
     "description": "Auto imported from components/supplier/list.vue"
-  },
-  "SharedLoading": {
-    "description": "Auto imported from components/shared/loading.vue"
-  },
-  "SharedNavbar": {
-    "description": "Auto imported from components/shared/navbar.vue"
   },
   "TodoForm": {
     "description": "Auto imported from components/todo/form.vue"
@@ -86,12 +86,6 @@
   "UploadSupplierform": {
     "description": "Auto imported from components/upload/supplierform.vue"
   },
-  "ContainerFollowForm": {
-    "description": "Auto imported from components/container/follow/form.vue"
-  },
-  "ContainerFollowList": {
-    "description": "Auto imported from components/container/follow/list.vue"
-  },
   "FinanceFormsAdvancepayment": {
     "description": "Auto imported from components/finance/forms/advancepayment.vue"
   },
@@ -112,12 +106,6 @@
   },
   "FinanceListsPo": {
     "description": "Auto imported from components/finance/lists/po.vue"
-  },
-  "ContainerInputForm": {
-    "description": "Auto imported from components/container/input/form.vue"
-  },
-  "ContainerInputList": {
-    "description": "Auto imported from components/container/input/list.vue"
   },
   "CustomerBgpForm": {
     "description": "Auto imported from components/customer/bgp/form.vue"
@@ -154,6 +142,18 @@
   },
   "CustomerSelectionList": {
     "description": "Auto imported from components/customer/selection/list.vue"
+  },
+  "ContainerFollowForm": {
+    "description": "Auto imported from components/container/follow/form.vue"
+  },
+  "ContainerFollowList": {
+    "description": "Auto imported from components/container/follow/list.vue"
+  },
+  "ContainerInputForm": {
+    "description": "Auto imported from components/container/input/form.vue"
+  },
+  "ContainerInputList": {
+    "description": "Auto imported from components/container/input/list.vue"
   },
   "OrdersFormsChat": {
     "description": "Auto imported from components/orders/forms/chat.vue"
@@ -221,33 +221,6 @@
   "PanelUsersList": {
     "description": "Auto imported from components/panel/users/list.vue"
   },
-  "SelectionCratesizeForm": {
-    "description": "Auto imported from components/selection/cratesize/form.vue"
-  },
-  "SelectionCratesizeList": {
-    "description": "Auto imported from components/selection/cratesize/list.vue"
-  },
-  "SelectionInputForm": {
-    "description": "Auto imported from components/selection/input/form.vue"
-  },
-  "SelectionInputList": {
-    "description": "Auto imported from components/selection/input/list.vue"
-  },
-  "Selection": {
-    "description": "Auto imported from components/selection/input/selection.vue"
-  },
-  "SampleFinanceForm": {
-    "description": "Auto imported from components/sample/finance/form.vue"
-  },
-  "SampleFinanceList": {
-    "description": "Auto imported from components/sample/finance/list.vue"
-  },
-  "SampleListForm": {
-    "description": "Auto imported from components/sample/list/form.vue"
-  },
-  "SampleList": {
-    "description": "Auto imported from components/sample/list/list.vue"
-  },
   "SalesBgpDetailForm": {
     "description": "Auto imported from components/sales/bgp/detailForm.vue"
   },
@@ -293,6 +266,33 @@
   "SalesTodoTodos": {
     "description": "Auto imported from components/sales/todo/todos.vue"
   },
+  "SampleFinanceForm": {
+    "description": "Auto imported from components/sample/finance/form.vue"
+  },
+  "SampleFinanceList": {
+    "description": "Auto imported from components/sample/finance/list.vue"
+  },
+  "SampleListForm": {
+    "description": "Auto imported from components/sample/list/form.vue"
+  },
+  "SampleList": {
+    "description": "Auto imported from components/sample/list/list.vue"
+  },
+  "SelectionCratesizeForm": {
+    "description": "Auto imported from components/selection/cratesize/form.vue"
+  },
+  "SelectionCratesizeList": {
+    "description": "Auto imported from components/selection/cratesize/list.vue"
+  },
+  "SelectionInputForm": {
+    "description": "Auto imported from components/selection/input/form.vue"
+  },
+  "SelectionInputList": {
+    "description": "Auto imported from components/selection/input/list.vue"
+  },
+  "Selection": {
+    "description": "Auto imported from components/selection/input/selection.vue"
+  },
   "SharedCustomeInputCurrencyInput": {
     "description": "Auto imported from components/shared/customeInput/currencyInput.vue"
   },
@@ -301,6 +301,12 @@
   },
   "TodoMainList": {
     "description": "Auto imported from components/todo/main/list.vue"
+  },
+  "ReportsMekmerAtlantaList": {
+    "description": "Auto imported from components/reports/mekmer/atlanta/list.vue"
+  },
+  "ReportsMekmerProductionList": {
+    "description": "Auto imported from components/reports/mekmer/production/list.vue"
   },
   "ReportsMekmarAyoForm": {
     "description": "Auto imported from components/reports/mekmar/ayo/form.vue"
@@ -320,21 +326,6 @@
   "ReportsMekmarForwardingList": {
     "description": "Auto imported from components/reports/mekmar/forwarding/list.vue"
   },
-  "ReportsMekmarLoadingList": {
-    "description": "Auto imported from components/reports/mekmar/loading/list.vue"
-  },
-  "ReportsMekmarMkByCustomer": {
-    "description": "Auto imported from components/reports/mekmar/mk/byCustomer.vue"
-  },
-  "ReportsMekmarMkYearByMarketingForwarding": {
-    "description": "Auto imported from components/reports/mekmar/mk/yearByMarketingForwarding.vue"
-  },
-  "ReportsMekmarMkYearByMarketingOrders": {
-    "description": "Auto imported from components/reports/mekmar/mk/yearByMarketingOrders.vue"
-  },
-  "ReportsMekmarMkYearByPoOrders": {
-    "description": "Auto imported from components/reports/mekmar/mk/yearByPoOrders.vue"
-  },
   "ReportsMekmarGuCont": {
     "description": "Auto imported from components/reports/mekmar/gu/cont.vue"
   },
@@ -350,8 +341,32 @@
   "ReportsMekmarGuOrdererOperation": {
     "description": "Auto imported from components/reports/mekmar/gu/ordererOperation.vue"
   },
+  "ReportsMekmarGuProfit": {
+    "description": "Auto imported from components/reports/mekmar/gu/profit.vue"
+  },
   "ReportsMekmarGuShippedOperation": {
     "description": "Auto imported from components/reports/mekmar/gu/shippedOperation.vue"
+  },
+  "ReportsMekmarLoadingList": {
+    "description": "Auto imported from components/reports/mekmar/loading/list.vue"
+  },
+  "ReportsMekmerStockForm": {
+    "description": "Auto imported from components/reports/mekmer/stock/form.vue"
+  },
+  "ReportsMekmerStockList": {
+    "description": "Auto imported from components/reports/mekmer/stock/list.vue"
+  },
+  "ReportsMekmarMkByCustomer": {
+    "description": "Auto imported from components/reports/mekmar/mk/byCustomer.vue"
+  },
+  "ReportsMekmarMkYearByMarketingForwarding": {
+    "description": "Auto imported from components/reports/mekmar/mk/yearByMarketingForwarding.vue"
+  },
+  "ReportsMekmarMkYearByMarketingOrders": {
+    "description": "Auto imported from components/reports/mekmar/mk/yearByMarketingOrders.vue"
+  },
+  "ReportsMekmarMkYearByPoOrders": {
+    "description": "Auto imported from components/reports/mekmar/mk/yearByPoOrders.vue"
   },
   "ReportsMekmarSummaryDetail": {
     "description": "Auto imported from components/reports/mekmar/summary/detail.vue"
@@ -359,20 +374,8 @@
   "ReportsMekmarSummaryList": {
     "description": "Auto imported from components/reports/mekmar/summary/list.vue"
   },
-  "ReportsMekmerAtlantaList": {
-    "description": "Auto imported from components/reports/mekmer/atlanta/list.vue"
-  },
   "ReportsMekmerMineList": {
     "description": "Auto imported from components/reports/mekmer/mine/list.vue"
-  },
-  "ReportsMekmerProductionList": {
-    "description": "Auto imported from components/reports/mekmer/production/list.vue"
-  },
-  "ReportsMekmerStockForm": {
-    "description": "Auto imported from components/reports/mekmer/stock/form.vue"
-  },
-  "ReportsMekmerStockList": {
-    "description": "Auto imported from components/reports/mekmer/stock/list.vue"
   },
   "ReportsMekmerFinanceFormsAdvancepayment": {
     "description": "Auto imported from components/reports/mekmer/finance/forms/advancepayment.vue"

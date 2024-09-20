@@ -1665,7 +1665,7 @@ function containerInvoiceKind(x,cb){
 }
 app.get('/container/input/list',(req,res)=>{
     const sql = `
-                    select (select a.FirmaAdi from FirmalarTB a where a.ID=k.FirmaID)  as firma,
+select (select a.FirmaAdi from FirmalarTB a where a.ID=k.FirmaID)  as firma,
                     f.EvrakYuklemeTarihi ,
                     f.SiparisFaturaTurID, 
                     f.SiparisNo ,
@@ -1677,8 +1677,9 @@ app.get('/container/input/list',(req,res)=>{
                     k.ID,
                     f.Tutar,
                     k.Aciklama
-                    from SiparisFaturaKayitTB f , KonteynerDigerFaturalarKayitTB k 
-                    where k.ID=f.FaturaKayitID and f.SiparisFaturaTurID !=0 and f.SiparisNo !=''
+                    from SiparisFaturaKayitTB f , KonteynerDigerFaturalarKayitTB k  
+                    where k.ID=f.FaturaKayitID and f.SiparisFaturaTurID !=0 and f.SiparisNo !='' and
+					f.SiparisFaturaTurID != 11 and f.YuklemeEvrakID !=13
                     order by f.EvrakYuklemeTarihi desc
                 `;
     mssql.query(sql,(err,results)=>{

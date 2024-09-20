@@ -94,6 +94,8 @@ const mutations = {
     },
     setShipmentSendProductionTotalCrateReset(state){
         state.shipmentSendProductionTotal.crate = 0;
+        state.shipmentSendProductionTotal.total = 0;
+        state.shipmentSendProductionTotal.amount = 0;
     }
 
 };

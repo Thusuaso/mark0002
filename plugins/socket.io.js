@@ -4,8 +4,11 @@ export default (context, inject) => {
     // socketIO: io('http://localhost:5001'),
     socketIO: io('https://real-time-mark0002.mekmar.com'),
         headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
+          "Access-Control-Allow-Origin": "*",
+        },
+        cors:{
+          origin: '*'
+        }
     }
   // Inject $hello(msg) in Vue, context and store.
   inject('socket', socket)

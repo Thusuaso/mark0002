@@ -335,6 +335,10 @@ export default {
         this.__getMonthlyCostList(date.year,date.month);
         this.$store.dispatch("setEndLoadingAction");
       });
+
+
+
+
   },
   methods: {
     cost_excel(){

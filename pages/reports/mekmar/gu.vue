@@ -52,12 +52,20 @@
       <TabPanel header="Seller and Operation Shipped">
         <shippedOperation />
       </TabPanel>
+      <TabPanel header="Seller and Operation Shipped Profit">
+        <profitGu :thisyear="ayoListThisYear" :oneyear="ayoListOneYearAgo"
+          :twoyear="ayoListTwoYearAgo"
+        />
+
+
+      </TabPanel>
 
     </TabView>
   </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
+import api from '~/plugins/excel.server.js';
 export default {
   middleware: ["authority"],
   computed: {
@@ -76,7 +84,10 @@ export default {
     return {
       selectedYear: null,
       ayoUsdTotal:0,
-      ayoTlTotal:0
+      ayoTlTotal:0,
+      ayoListThisYear:[],
+      ayoListOneYearAgo:[],
+      ayoListTwoYearAgo:[]
     };
   },
   beforeCreate() {
@@ -84,7 +95,19 @@ export default {
   },
   created() {
     this.selectedYear = { Year: 2024 };
+    api.get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year}`)
+      .then(res=>{
+        this.ayoListThisYear = res.data;
+      });
 
+    api.get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 1}`)
+      .then(res=>{
+        this.ayoListOneYearAgo = res.data;
+      });
+      api.get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 2}`)
+      .then(res=>{
+        this.ayoListTwoYearAgo = res.data;
+      });
   },
 
   methods: {
