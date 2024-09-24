@@ -227,15 +227,20 @@ export default {
     },
     edgeChange(event) {
       this.model.OlcuId = null;
-      this.model.Kenar = event;
+      this.model.Kenar = event.replace('.',',');
+      this.selectedEdge = event.replace('.',',');
     },
     heightChange(event) {
       this.model.OlcuId = null;
-      this.model.Boy = event;
+      this.model.Boy = event.replace('.',',');
+      this.selectedHeight = event.replace('.',',');
+
     },
     widthSurface(event) {
       this.model.OlcuId = null;
-      this.model.En = event;
+      this.model.En = event.replace('.',',');
+      this.selectedWidth = event.replace('.',',');
+
     },
     surfaceChange(event) {
       this.model.YuzeyId = null;

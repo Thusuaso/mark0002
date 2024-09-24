@@ -213,6 +213,8 @@
                 </template>
               </Column>
               <Column field="Banka" header="Bank"></Column>
+              <Column field="Aciklama" header="Exp."></Column>
+
             </DataTable>
           </div>
         </TabPanel>

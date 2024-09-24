@@ -14974,55 +14974,71 @@ app.get('/reports/ayo/costs/list/:year/:month',async(req,res)=>{
         select cost.MONTH,cost.USD,cost.TL from AyoOtherCostTB cost
         where cost.YEAR = '${year}' and cost.MONTH = '${month}'
     `;
+    const sqlSix = `
+    select cost.MONTH,cost.USD,cost.TL from AyoMekmerCostTB cost
+    where cost.YEAR = '${year}' and cost.MONTH = '${month}'
+`;
     await mssql.query(sqlOne, async (err,one)=>{
         await mssql.query(sqlTwo, async (err,two)=>{
             await mssql.query(sqlThree,async (err,three)=>{
                 await mssql.query(sqlFour,async(err,four)=>{
                     await mssql.query(sqlFive,async (err,five)=>{
-                       let usd = 0;
-                       let tl = 0;
-                       if(one.recordset.length > 0){
-                            await one.recordset.forEach(x=>{
-                               usd += x.CreditCardUsd,
-                               tl += x.CreditCardTl;
-                           });
-                       };
+                        await mssql.query(sqlSix,async(err,six)=>{
+                            let usd = 0;
+                            let tl = 0;
+                            if(one.recordset.length > 0){
+                                 await one.recordset.forEach(x=>{
+                                    usd += x.CreditCardUsd,
+                                    tl += x.CreditCardTl;
+                                });
+                            };
+     
+                            if(two.recordset.length > 0){
+                                 await two.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+     
+                            };
+     
+                            if(three.recordset.length > 0){
+                                 await three.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+                            };
+                            if(four.recordset.length > 0){
+                                 await four.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+                            };
+                            if(five.recordset.length > 0){
+                                
+                            
+                             await five.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                            });
+     
+                            };
 
-                       if(two.recordset.length > 0){
-                            await two.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-
-                       };
-
-                       if(three.recordset.length > 0){
-                            await three.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-                       };
-                       if(four.recordset.length > 0){
-                            await four.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-                       };
-                       if(five.recordset.length > 0){
-                           
-                       
-                        await five.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                       });
-
-                       };
-
-
-                       res.status(200).json({
-                        'usd':usd,
-                         'tl':tl,
-                       })
+                            if(six.recordset.length > 0){
+                                
+                            
+                                await six.recordset.forEach(x=>{
+                                       usd += x.USD,
+                                       tl += x.TL;
+                               });
+        
+                               };
+     
+     
+                            res.status(200).json({
+                             'usd':usd,
+                              'tl':tl,
+                            })
+                        });
                    });
                });
            });
@@ -15054,12 +15070,18 @@ app.get('/reports/ayo/costs/yearly/:year',async(req,res)=>{
         select cost.MONTH,cost.USD,cost.TL from AyoOtherCostTB cost
         where cost.YEAR = '${year}'
     `;
+    const sqlSix = `
+            select cost.MONTH,cost.USD,cost.TL from AyoMekmerCostTB cost
+        where cost.YEAR = '${year}'
+    `;
+
     await mssql.query(sqlOne, async (err,one)=>{
         await mssql.query(sqlTwo, async (err,two)=>{
             await mssql.query(sqlThree,async (err,three)=>{
                 await mssql.query(sqlFour,async(err,four)=>{
                     await mssql.query(sqlFive,async (err,five)=>{
-                       let usd = 0;
+                       await mssql.query(sqlSix,async(err,six)=>{
+                        let usd = 0;
                        let tl = 0;
                        if(one.recordset.length > 0){
                             await one.recordset.forEach(x=>{
@@ -15097,12 +15119,24 @@ app.get('/reports/ayo/costs/yearly/:year',async(req,res)=>{
                        });
 
                        };
+                       if(six.recordset.length > 0){
+                           
+                       
+                        await six.recordset.forEach(x=>{
+                               usd += x.USD,
+                               tl += x.TL;
+                       });
+
+                       };
 
 
                        res.status(200).json({
                         'usd':usd,
                          'tl':tl,
                        });
+
+
+                       })
                        
                    });
                });
@@ -15137,55 +15171,72 @@ app.get('/reports/ayo/costs/quarter/:q1/:q2/:year',async(req,res)=>{
         select cost.MONTH,cost.USD,cost.TL from AyoOtherCostTB cost
         where cost.YEAR = '${year}'and (cost.MONTH >= '${q1}' and cost.MONTH <='${q2}')
     `;
+    const sqlSix = `
+    select cost.MONTH,cost.USD,cost.TL from AyoMekmerCostTB cost
+    where cost.YEAR = '${year}'and (cost.MONTH >= '${q1}' and cost.MONTH <='${q2}')
+`;
+
+
     await mssql.query(sqlOne, async (err,one)=>{
         await mssql.query(sqlTwo, async (err,two)=>{
             await mssql.query(sqlThree,async (err,three)=>{
                 await mssql.query(sqlFour,async(err,four)=>{
                     await mssql.query(sqlFive,async (err,five)=>{
-                       let usd = 0;
-                       let tl = 0;
-                       if(one.recordset.length > 0){
-                            await one.recordset.forEach(x=>{
-                               usd += x.CreditCardUsd,
-                               tl += x.CreditCardTl;
-                           });
-                       };
-
-                       if(two.recordset.length > 0){
-                            await two.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-
-                       };
-
-                       if(three.recordset.length > 0){
-                            await three.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-                       };
-                       if(four.recordset.length > 0){
-                            await four.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-                       };
-                       if(five.recordset.length > 0){
-                           
-                       
-                        await five.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                       });
-
-                       };
-
-
-                       res.status(200).json({
-                        'usd':usd,
-                         'tl':tl,
-                       });
+                        await mssql.query(sqlSix,async(err,six)=>{
+                            let usd = 0;
+                            let tl = 0;
+                            if(one.recordset.length > 0){
+                                 await one.recordset.forEach(x=>{
+                                    usd += x.CreditCardUsd,
+                                    tl += x.CreditCardTl;
+                                });
+                            };
+     
+                            if(two.recordset.length > 0){
+                                 await two.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+     
+                            };
+     
+                            if(three.recordset.length > 0){
+                                 await three.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+                            };
+                            if(four.recordset.length > 0){
+                                 await four.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+                            };
+                            if(five.recordset.length > 0){
+                                
+                            
+                             await five.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                            });
+     
+                            };
+                            if(six.recordset.length > 0){
+                                
+                            
+                                await six.recordset.forEach(x=>{
+                                       usd += x.USD,
+                                       tl += x.TL;
+                               });
+        
+                               };
+     
+     
+                            res.status(200).json({
+                             'usd':usd,
+                              'tl':tl,
+                            });
+                        })
                        
                    });
                });
@@ -15219,55 +15270,72 @@ app.get('/reports/ayo/costs/half/:month_1/:month_2/:year',async(req,res)=>{
         select cost.MONTH,cost.USD,cost.TL from AyoOtherCostTB cost
         where cost.YEAR = '${year}'and (cost.MONTH >= '${month_1}' and cost.MONTH <='${month_2}')
     `;
+    const sqlSix = `
+    select cost.MONTH,cost.USD,cost.TL from AyoMekmerCostTB cost
+    where cost.YEAR = '${year}'and (cost.MONTH >= '${month_1}' and cost.MONTH <='${month_2}')
+`;
+
     await mssql.query(sqlOne, async (err,one)=>{
         await mssql.query(sqlTwo, async (err,two)=>{
             await mssql.query(sqlThree,async (err,three)=>{
                 await mssql.query(sqlFour,async(err,four)=>{
                     await mssql.query(sqlFive,async (err,five)=>{
-                       let usd = 0;
-                       let tl = 0;
-                       if(one.recordset.length > 0){
-                            await one.recordset.forEach(x=>{
-                               usd += x.CreditCardUsd,
-                               tl += x.CreditCardTl;
-                           });
-                       };
+                        await mssql.query(sqlSix,async(err,six)=>{
+                            let usd = 0;
+                            let tl = 0;
+                            if(one.recordset.length > 0){
+                                 await one.recordset.forEach(x=>{
+                                    usd += x.CreditCardUsd,
+                                    tl += x.CreditCardTl;
+                                });
+                            };
+     
+                            if(two.recordset.length > 0){
+                                 await two.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+     
+                            };
+     
+                            if(three.recordset.length > 0){
+                                 await three.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+                            };
+                            if(four.recordset.length > 0){
+                                 await four.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                                });
+                            };
+                            if(five.recordset.length > 0){
+                                
+                            
+                             await five.recordset.forEach(x=>{
+                                    usd += x.USD,
+                                    tl += x.TL;
+                            });
+     
+                            };
 
-                       if(two.recordset.length > 0){
-                            await two.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-
-                       };
-
-                       if(three.recordset.length > 0){
-                            await three.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-                       };
-                       if(four.recordset.length > 0){
-                            await four.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                           });
-                       };
-                       if(five.recordset.length > 0){
-                           
-                       
-                        await five.recordset.forEach(x=>{
-                               usd += x.USD,
-                               tl += x.TL;
-                       });
-
-                       };
-
-
-                       res.status(200).json({
-                        'usd':usd,
-                         'tl':tl,
-                       });
+                            if(six.recordset.length > 0){
+                                
+                            
+                                await six.recordset.forEach(x=>{
+                                       usd += x.USD,
+                                       tl += x.TL;
+                               });
+        
+                               };
+     
+     
+                            res.status(200).json({
+                             'usd':usd,
+                              'tl':tl,
+                            });
+                        });
                        
                    });
                });
@@ -15501,6 +15569,229 @@ app.put('/reports/ayo/other/cost/update',(req,res)=>{
         res.status(200).json({'message':'Saved successfully'})
     });
 });
+
+/* */
+app.get('/reports/ayo/mekmer/cost/list/:year',(req,res)=>{
+    const year = req.params.year;
+    const sql = `
+        select * from AyoMekmerCostTB where YEAR='${year}'
+    `;
+    mssql.query(sql,async (err,cost)=>{
+        const currency = await getCurrencySql(year);
+
+        if(cost.recordset.length == 0){
+            const list = [
+                    {'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
+                    {'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
+                    {'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
+                    {'month_id':4,'month':'April','value':0,'currency':0,'usd':0},
+                    {'month_id':5,'month':'May','value':0,'currency':0,'usd':0},
+                    {'month_id':6,'month':'June','value':0,'currency':0,'usd':0},
+                    {'month_id':7,'month':'July','value':0,'currency':0,'usd':0},
+                    {'month_id':8,'month':'August','value':0,'currency':0,'usd':0},
+                    {'month_id':9,'month':'September','value':0,'currency':0,'usd':0},
+                    {'month_id':10,'month':'October','value':0,'currency':0,'usd':0},
+                    {'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
+                    {'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
+
+                ];
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    list[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    list[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    list[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    list[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    list[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    list[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    list[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    list[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    list[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    list[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    list[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    list[11].currency = x.CURRENCY;
+                }
+            });
+
+            res.status(200).json({
+                'list':list
+            });
+
+        }else{
+            const liste = [
+                    {'id':0,'month_id':1,'month':'January','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':2,'month':'February','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':3,'month':'March','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':4,'month':'April','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':5,'month':'May','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':6,'month':'June','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':7,'month':'July','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':8,'month':'August','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':9,'month':'September','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':10,'month':'October','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':11,'month':'November','value':0,'currency':0,'usd':0},
+                    {'id':0,'month_id':12,'month':'December','value':0,'currency':0,'usd':0}
+
+            ];
+
+            await currency.forEach(x=>{
+                if(x.MONTH == 1){
+                    liste[0].currency = x.CURRENCY;
+                }else if (x.MONTH == 2){
+                    liste[1].currency = x.CURRENCY;
+                }else if (x.MONTH == 3){
+                    liste[2].currency = x.CURRENCY;
+                }else if (x.MONTH == 4){
+                    liste[3].currency = x.CURRENCY;
+                }else if (x.MONTH == 5){
+                    liste[4].currency = x.CURRENCY;
+                }else if (x.MONTH == 6){
+                    liste[5].currency = x.CURRENCY;
+                }else if (x.MONTH == 7){
+                    liste[6].currency = x.CURRENCY;
+                }else if (x.MONTH == 8){
+                    liste[7].currency = x.CURRENCY;
+                }else if (x.MONTH == 9){
+                    liste[8].currency = x.CURRENCY;
+                }else if (x.MONTH == 10){
+                    liste[9].currency = x.CURRENCY;
+                }else if (x.MONTH == 11){
+                    liste[10].currency = x.CURRENCY;
+                }else if (x.MONTH == 12){
+                    liste[11].currency = x.CURRENCY;
+                }
+            });
+            cost.recordset.forEach(x=>{
+                if(x.MONTH === 1){
+                    liste[0].id = x.ID;
+                    liste[0].value = x.TL;
+                    liste[0].currency = x.CURRENCY;
+                    liste[0].usd = x.USD;
+                }else if(x.MONTH === 2){
+                    liste[1].id = x.ID;
+
+                    liste[1].value = x.TL;
+                    liste[1].currency = x.CURRENCY;
+                    liste[1].usd = x.USD;
+                }else if(x.MONTH === 3){
+                    liste[2].id = x.ID;
+
+                    liste[2].value = x.TL;
+                    liste[2].currency = x.CURRENCY;
+                    liste[2].usd = x.USD;
+                }else if(x.MONTH === 4){
+                    liste[3].id = x.ID;
+
+                    liste[3].value = x.TL;
+                    liste[3].currency = x.CURRENCY;
+                    liste[3].usd = x.USD;
+                }else if(x.MONTH === 5){
+                    liste[4].id = x.ID;
+
+                    liste[4].value = x.TL;
+                    liste[4].currency = x.CURRENCY;
+                    liste[4].usd = x.USD;
+                }else if(x.MONTH === 6){
+                    liste[5].id = x.ID;
+
+                    liste[5].value = x.TL;
+                    liste[5].currency = x.CURRENCY;
+                    liste[5].usd = x.USD;
+                }else if(x.MONTH === 7){
+                    liste[6].id = x.ID;
+
+                    liste[6].value = x.TL;
+                    liste[6].currency = x.CURRENCY;
+                    liste[6].usd = x.USD;
+                }else if(x.MONTH === 8){
+                    liste[7].id = x.ID;
+
+                    liste[7].value = x.TL;
+                    liste[7].currency = x.CURRENCY;
+                    liste[7].usd = x.USD;
+                }else if(x.MONTH === 9){
+                    liste[8].id = x.ID;
+
+                    liste[8].value = x.TL;
+                    liste[8].currency = x.CURRENCY;
+                    liste[8].usd = x.USD;
+                }else if(x.MONTH === 10){
+                    liste[9].id = x.ID;
+
+                    liste[9].value = x.TL;
+                    liste[9].currency = x.CURRENCY;
+                    liste[9].usd = x.USD;
+                }else if(x.MONTH === 11){
+                    liste[10].id = x.ID;
+
+                    liste[10].value = x.TL;
+                    liste[10].currency = x.CURRENCY;
+                    liste[10].usd = x.USD;
+                }else if(x.MONTH === 12){
+                    liste[11].id = x.ID;
+
+                    liste[11].value = x.TL;
+                    liste[11].currency = x.CURRENCY;
+                    liste[11].usd = x.USD;
+                }
+            });
+            res.status(200).json({'list':liste})
+        }
+        
+    });
+});
+
+app.post('/reports/ayo/mekmer/cost/save',(req,res)=>{
+    const body = req.body;
+    const insertSql = `
+        
+insert into AyoMekmerCostTB
+(
+	YEAR,
+	MONTH,
+	USD,
+	TL,
+	CURRENCY
+) VALUES('${body.year}','${body.month}','${body.usd}','${body.value}','${body.currency}')
+    `;
+    mssql.query(insertSql,(err,result)=>{
+        if(err) throw err;
+        res.status(200).json({'message':'Saved successfully'})
+    })
+});
+
+app.put('/reports/ayo/mekmer/cost/update',(req,res)=>{
+    const body = req.body;
+    const updateSql = `
+        
+        update AyoMekmerCostTB
+        SET
+            YEAR='${body.year}',
+            MONTH='${body.month}',
+            USD='${body.usd}',
+            TL='${body.value}',
+            CURRENCY='${body.currency}'
+        WHERE
+        ID ='${body.id}'
+        
+    `;
+    mssql.query(updateSql,(err,result)=>{
+        if(err) throw err;
+        res.status(200).json({'message':'Saved successfully'})
+    });
+});
+
+/* */
 
 
 

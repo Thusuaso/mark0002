@@ -131,7 +131,7 @@
       </div> -->
       <div class="col">
         <Button type="button" class="p-button-help w-100" label="Sample Cost" @click="sampleCost"/>
-        <Dialog :visible.sync="sample_cost_form_visible" header="Wage Cost" modal >
+        <Dialog :visible.sync="sample_cost_form_visible" header="Sample Cost" modal >
           <creditCardForm style="margin-bottom:5px;" v-for="item in sampleCostList" :key="item" :month="item.month" :value="item.value"
           :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
           @credit_card_cost_list_updated_emit="sampleCostListUpdated"
@@ -144,7 +144,7 @@
       <div class="col">
         <Button type="button" class="p-button-success w-100" label="Other Cost" @click="otherCost"/>
 
-        <Dialog :visible.sync="other_cost_form_visible" header="Wage Cost" modal >
+        <Dialog :visible.sync="other_cost_form_visible" header="Other Cost" modal >
           <creditCardForm style="margin-bottom:5px;" v-for="item in otherCostList" :key="item" :month="item.month" :value="item.value"
           :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
           @credit_card_cost_list_updated_emit="otherCostListUpdated"
@@ -154,6 +154,22 @@
 
         </Dialog>
       </div>
+
+      <div class="col">
+        <Button type="button" class="p-button w-100" label="Mekmer Cost" @click="mekmerCost" style="background-color:blueviolet;color:white;"/>
+
+        <Dialog :visible.sync="mekmer_cost_form_visible" header="Mekmer Cost" modal >
+          <creditCardForm style="margin-bottom:5px;" v-for="item in mekmerCostList" :key="item" :month="item.month" :value="item.value"
+          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+          @credit_card_cost_list_updated_emit="mekmerCostListUpdated"
+          @cost_save_emit="mekmerCostSave($event)"
+          @cost_update_emit="mekmerCostUpdate($event)"
+          />
+
+        </Dialog>
+      </div>
+
+
       <div class="col">
         <Button label="Currency" class="p-button-danger" @click="currency" />
         <Dialog :visible.sync="currency_form_visible" modal >
@@ -164,8 +180,13 @@
             :year="selectedYear.Yil"
           />
 
+
+
         </Dialog>
       </div>
+
+
+
       <div class="col">
         <Button icon="pi pi-file-excel" @click="cost_excel" class="p-button-raised p-button-rounded" style="font-size: 2rem"/>
       </div>
@@ -193,6 +214,9 @@ export default {
   },
   data() {
     return {
+      mekmer_cost_form_visible:false,
+      mekmerCostList:[],
+
       currency_list:[],
       currency_form_visible:false,
       cost_tl:0,
@@ -341,6 +365,42 @@ export default {
 
   },
   methods: {
+    /* */
+    mekmerCost(){
+      this.$axios.get(`/reports/ayo/mekmer/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.mekmerCostList = res.data.list;
+        this.mekmer_cost_form_visible = true;
+      });
+    },
+    mekmerCostListUpdated(){
+      this.$axios.get(`/reports/ayo/mekmer/cost/list/${this.selectedYear.Yil}`)
+      .then(res=>{
+        this.mekmerCostList = res.data.list;
+      });
+    },
+    mekmerCostUpdate(event){
+      this.$axios.put('/reports/ayo/mekmer/cost/update',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Güncellendi.');
+      });
+    },
+    mekmerCostSave(event){
+      this.$axios.post('/reports/ayo/mekmer/cost/save',event)
+      .then(res=>{
+        this.$toast.success('Başarıyla Kaydedildi.');
+        this.mekmerCostListUpdated();
+
+      });
+    },
+
+
+
+    /* */
+
+
+
+
     cost_excel(){
       this.$axios.get(`/reports/ayo/other/cost/list/${this.selectedYear.Yil}`)
       .then(other=>{
