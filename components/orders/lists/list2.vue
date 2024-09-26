@@ -598,7 +598,7 @@ export default {
     if(val == 0 || val == undefined || val == '' || val == ' ' || val == null){
         return 0;
     }else{
-        return parseFloat(val).toFixed(2);
+        return +val.toFixed(2);
     }
 },
         __noneControl(val){

@@ -8389,7 +8389,7 @@ function __amountControl(val){
     if(val == 0 || val == undefined || val == '' || val == ' ' || val == null){
         return 0;
     }else{
-        return parseFloat(val).toFixed(2);
+        return +val.toFixed(2);
     }
 };
 
@@ -8542,12 +8542,12 @@ order by s.SiparisTarihi desc
                 if (__amountControl(x.Uretim) == __amountControl(x.Miktar)) {
                     ordersList.push({...x,style:"background-color: green; color: white"})
                 } else if (__amountControl(x.Uretim) > __amountControl(x.Miktar)) {
+
                     ordersList.push({ ...x, style: "background-color: black; color: white" });
                 } else if (__amountControl(x.Uretim) < __amountControl(x.Miktar)) {
+
                     ordersList.push({ ...x, style: "background-color: yellow; color: black" });
-                } else {
-                    ordersList.push({ ...x, style: "background-color: transparent; color: black" });
-                }
+                } 
             });
                await res.status(200).json({'list':ordersList,'years':customYearList});
 
@@ -10776,6 +10776,8 @@ function __floatNullControl(value) {
     }
 }
 
+
+
 app.post('/order/production/product/add', (req, res) => {
     let buyingPrice = 0;
 
@@ -10867,7 +10869,10 @@ app.put('/order/production/product/update', (req, res) => {
         }
     } else {
         buyingPrice = req.body.AlisFiyati;
-    }
+    };
+
+
+
     const sql = `
         update SiparisUrunTB SET
         TedarikciID = '${__floatNullControl(req.body.TedarikciID)}',
@@ -11554,7 +11559,9 @@ WHERE
         }
     });
 });
-app.post('/order/production/save', (req, res) => {
+app.post('/order/production/save', async(req, res) => {
+    const dhl = await __getDocumentCost(req.body.UlkeId,req.body.TeslimTurID);
+
     const sql = `
         insert into SiparislerTB(
 SiparisNo,
@@ -11639,7 +11646,7 @@ VALUES(
 	'${req.body.DetayTutar_3}',
 	'${req.body.DetayAlis_3}',
 	'${req.body.SiparisSahibi}',
-	'${req.body.EvrakGideri}',
+	'${dhl}',
 	'${req.body.Eta}',
 	'${req.body.KonteynerAyrinti}',
 	'${req.body.UlkeId}',
@@ -11660,7 +11667,7 @@ VALUES(
     `;
     const sqlId = `select top 1 ID from SiparislerTB order by ID desc
     `;
-    mssql.query(sql, (err, production) => {
+    await mssql.query(sql, (err, production) => {
         if (production.rowsAffected[0] == 1) {
             mssql.query(sqlId,(err,id)=>{
                 if(id.rowsAffected[0] == 1){
@@ -11677,7 +11684,31 @@ VALUES(
     });
 
 });
-app.put('/order/production/update', (req, res) => {
+
+function __getDocumentCost(country,kind){
+    if(kind == 7 || kind == 8 || kind == 10 || kind == 12 || kind ==9){
+        const sql = `
+select 
+
+	dhl,
+	DhlFiyat
+
+from YeniTeklif_UlkeTB ytu
+inner join DhlFiyatlari dhl on dhl.ID = ytu.dhl
+where ytu.Id='${country}'
+        `;
+        return new Promise(async(resolve,reject)=>{
+            await mssql.query(sql,(err,dhl)=>{
+                resolve((dhl.recordset[0].DhlFiyat * 1.33))
+            });
+        });
+    }else{
+        return 0;
+    }
+};
+
+app.put('/order/production/update', async (req, res) => {
+    const dhl = await __getDocumentCost(req.body.UlkeId,req.body.TeslimTurID);
     const sql = `
         update SiparislerTB 
 SET
@@ -11709,7 +11740,7 @@ SET
 	DetayTutar_3='${req.body.DetayTutar_3}',
 	DetayAlis_3='${req.body.DetayAlis_3}',
 	SiparisSahibi='${req.body.SiparisSahibi}',
-	EvrakGideri='${req.body.EvrakGideri}',
+	EvrakGideri='${dhl}',
 	KonteynerAyrinti='${req.body.KonteynerAyrinti}',
 	UlkeId='${req.body.UlkeId}',
 	FaturaKesimTurID='${req.body.FaturaKesimTurID}',
@@ -11726,7 +11757,11 @@ SET
 where
 ID='${req.body.SiparisId}'
     `;
-    mssql.query(sql,(err,production)=>{
+
+
+
+
+    await mssql.query(sql,(err,production)=>{
         if(production.rowsAffected[0] == 1){
             res.status(200).json({'status':true});
         } else {
@@ -13740,12 +13775,12 @@ app.get('/customers/list', (req, res) => {
     const sql = `
         select 
 
-	ID,
-	FirmaAdi,
-	Ulke,
-	UlkeId
+            ID,
+            FirmaAdi,
+            Ulke,
+            UlkeId
 
-from MusterilerTB
+        from MusterilerTB
     `;
     mssql.query(sql,(err,customer)=>{
        res.status(200).json({'list':customer.recordset}) 

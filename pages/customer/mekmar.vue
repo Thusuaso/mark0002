@@ -7,21 +7,7 @@
 
       </div>
       <div class="col">
-        <vue-excel-xlsx
-        :data="getMekmarList"
-        :columns="excelColumnsField"
-        :file-name="'Customer'"
-        :file-type="'xlsx'"
-        :sheet-name="'sheetname'"
-        style="border: none; background-color: white"
-      >
-        <Button
-          type="button"
-          class="p-button-info w-100"
-          icon="pi pi-file-excel"
-          label="Excel"
-        />
-      </vue-excel-xlsx>
+        <Button class="w-100 p-button-primary" @click="customer_excel_output" label="Excel"/>
 
       </div>
 
@@ -56,6 +42,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import api from "../../plugins/excel.server";
 
 export default {
   middleware: ["authority"],
@@ -69,6 +56,7 @@ export default {
       "getMekmarDetailOrdersList",
       "getMekmarDetailOrdersPoList",
       "getSetMekmarDetailOrdersPoProductsList",
+      "getLocalUrl"
     ]),
   },
   created() {
@@ -126,6 +114,20 @@ export default {
     };
   },
   methods: {
+    customer_excel_output(){
+      api
+        .post("/customer/mekmar/excel", this.getMekmarList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "customer/mekmar/excel";
+
+            link.setAttribute("download", "Customers.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
+    },
     customerOrderPoSelectedEmit(po) {
       this.$store.dispatch("setMekmarDetailOrdersPoProductsList", po);
       this.cusomer_mekmar_orders_products_dialog_form = true;

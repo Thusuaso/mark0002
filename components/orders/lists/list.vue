@@ -415,7 +415,7 @@
         </Column>
         <Column field="Uretim" header="Produced" style="width:5%;">
           <template #body="slotProps">
-            <div v-if="__amountControl(slotProps.data.Out) && __amountControl(slotProps.data.Uretim) == __amountControl(slotProps.data.Miktar)"
+            <div v-if="(__amountControl(slotProps.data.Out) && __amountControl(slotProps.data.Uretim)) == __amountControl(slotProps.data.Miktar)"
               style="background-color:blue;color:white">
               {{ slotProps.data.Uretim | formatDecimal }}
             </div>
