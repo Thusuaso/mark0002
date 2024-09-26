@@ -8544,10 +8544,13 @@ order by s.SiparisTarihi desc
                 } else if (__amountControl(x.Uretim) > __amountControl(x.Miktar)) {
 
                     ordersList.push({ ...x, style: "background-color: black; color: white" });
-                } else if (__amountControl(x.Uretim) < __amountControl(x.Miktar)) {
+                } else if ((__amountControl(x.Uretim) < __amountControl(x.Miktar) && __amountControl(x.Uretim) != 0)) {
 
                     ordersList.push({ ...x, style: "background-color: yellow; color: black" });
-                } 
+                }else{
+                    ordersList.push({ ...x, style: "background-color:transparent; color: black" });
+
+                }
             });
                await res.status(200).json({'list':ordersList,'years':customYearList});
 
