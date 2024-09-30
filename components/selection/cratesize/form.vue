@@ -17,13 +17,13 @@
       <div class="col">
         <span class="p-float-label">
           <InputText id="stonesize" type="text" v-model="height" @input="height = height.replace(',','.')"/>
-          <label for="stonesize">Height</label>
+          <label for="stonesize">Length</label>
         </span>
       </div>
       <div class="col">
         <span class="p-float-label">
           <InputText id="stonesize" type="text" v-model="thickness" @input="thickness = thickness.replace(',','.')"/>
-          <label for="stonesize">Thickness</label>
+          <label for="stonesize">Height</label>
         </span>
       </div>
       <div class="col">

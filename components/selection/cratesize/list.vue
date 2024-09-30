@@ -18,13 +18,13 @@
         </template>
       </Column>
 
-      <Column field="Crate_Height" header="Crate Height" :showFilterMenu="false" :showClearButton="false"
+      <Column field="Crate_Height" header="Crate Lenght" :showFilterMenu="false" :showClearButton="false"
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
           <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
         </template>
       </Column>
-      <Column field="Crate_Thickness" header="Crate Thickness" :showFilterMenu="false" :showClearButton="false"
+      <Column field="Crate_Thickness" header="Crate Height" :showFilterMenu="false" :showClearButton="false"
         headerClass="tableHeader" bodyClass="tableBody">
         <template #filter="{ filterModel, filterCallback }">
           <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />

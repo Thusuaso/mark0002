@@ -418,7 +418,9 @@ export default {
                 return (x.siparisci == event.value.username);
             });
 
-            this.representative_this_year.forEach(x=>{
+
+            if(this.representative_this_year.length >0){
+                this.representative_this_year.forEach(x=>{
                 this.representative_this_year_sum.profit_tl += x.kar_zarar_tl;
                 this.representative_this_year_sum.profit_usd += x.kar_zarar;
                 if(x.yukleme_month == 1){
@@ -459,8 +461,27 @@ export default {
                     this.representative_this_year_total[11].profit_usd += x.kar_zarar;
                 }
             });
+            }else{
+                this.representative_this_year_total = [
+            {'month':1,'profit_tl':0,'profit_usd':0},
+                {'month':2,'profit_tl':0,'profit_usd':0},
+                {'month':3,'profit_tl':0,'profit_usd':0},
+                {'month':4,'profit_tl':0,'profit_usd':0},
+                {'month':5,'profit_tl':0,'profit_usd':0},
+                {'month':6,'profit_tl':0,'profit_usd':0},
+                {'month':7,'profit_tl':0,'profit_usd':0},
+                {'month':8,'profit_tl':0,'profit_usd':0},
+                {'month':9,'profit_tl':0,'profit_usd':0},
+                {'month':10,'profit_tl':0,'profit_usd':0},
+                {'month':11,'profit_tl':0,'profit_usd':0},
+                {'month':12,'profit_tl':0,'profit_usd':0}
+            ];
+            };
 
-            this.representative_two_year.forEach(x=>{
+
+
+            if(this.representative_two_year.length >0){
+                this.representative_two_year.forEach(x=>{
                 this.representative_one_year_sum.profit_tl += x.kar_zarar_tl;
                 this.representative_one_year_sum.profit_usd += x.kar_zarar;
                 if(x.yukleme_month == 1){
@@ -501,8 +522,25 @@ export default {
                     this.representative_two_year_total[11].profit_usd += x.kar_zarar;
                 }
             });
+            }else{
+                this.representative_two_year_total = [
+            {'month':1,'profit_tl':0,'profit_usd':0},
+                {'month':2,'profit_tl':0,'profit_usd':0},
+                {'month':3,'profit_tl':0,'profit_usd':0},
+                {'month':4,'profit_tl':0,'profit_usd':0},
+                {'month':5,'profit_tl':0,'profit_usd':0},
+                {'month':6,'profit_tl':0,'profit_usd':0},
+                {'month':7,'profit_tl':0,'profit_usd':0},
+                {'month':8,'profit_tl':0,'profit_usd':0},
+                {'month':9,'profit_tl':0,'profit_usd':0},
+                {'month':10,'profit_tl':0,'profit_usd':0},
+                {'month':11,'profit_tl':0,'profit_usd':0},
+                {'month':12,'profit_tl':0,'profit_usd':0}
+            ];
+            };
 
-            this.representative_three_year.forEach(x=>{
+            if(this.representative_three_year.length >0){
+                this.representative_three_year.forEach(x=>{
                 this.representative_two_year_sum.profit_tl += x.kar_zarar_tl;
                 this.representative_two_year_sum.profit_usd += x.kar_zarar;
                 if(x.yukleme_month == 1){
@@ -543,11 +581,29 @@ export default {
                     this.representative_three_year_total[11].profit_usd += x.kar_zarar;
                 }
             });
+            }else{
+                this.representative_three_year_total = [
+            {'month':1,'profit_tl':0,'profit_usd':0},
+                {'month':2,'profit_tl':0,'profit_usd':0},
+                {'month':3,'profit_tl':0,'profit_usd':0},
+                {'month':4,'profit_tl':0,'profit_usd':0},
+                {'month':5,'profit_tl':0,'profit_usd':0},
+                {'month':6,'profit_tl':0,'profit_usd':0},
+                {'month':7,'profit_tl':0,'profit_usd':0},
+                {'month':8,'profit_tl':0,'profit_usd':0},
+                {'month':9,'profit_tl':0,'profit_usd':0},
+                {'month':10,'profit_tl':0,'profit_usd':0},
+                {'month':11,'profit_tl':0,'profit_usd':0},
+                {'month':12,'profit_tl':0,'profit_usd':0}
+            ];
+            };
+
 
 
 
             /* */
-            this.operation_this_year.forEach(x=>{
+            if(this.operation_this_year.length >0){
+                this.operation_this_year.forEach(x=>{
                 this.operation_this_year_sum.profit_tl += x.kar_zarar_tl;
                 this.operation_this_year_sum.profit_usd += x.kar_zarar;
                 if(x.yukleme_month == 1){
@@ -588,8 +644,25 @@ export default {
                     this.operation_this_year_total[11].profit_usd += x.kar_zarar;
                 }
             });
+            }else{
+                this.operation_this_year_total = [
+                {'month':1,'profit_tl':0,'profit_usd':0},
+                {'month':2,'profit_tl':0,'profit_usd':0},
+                {'month':3,'profit_tl':0,'profit_usd':0},
+                {'month':4,'profit_tl':0,'profit_usd':0},
+                {'month':5,'profit_tl':0,'profit_usd':0},
+                {'month':6,'profit_tl':0,'profit_usd':0},
+                {'month':7,'profit_tl':0,'profit_usd':0},
+                {'month':8,'profit_tl':0,'profit_usd':0},
+                {'month':9,'profit_tl':0,'profit_usd':0},
+                {'month':10,'profit_tl':0,'profit_usd':0},
+                {'month':11,'profit_tl':0,'profit_usd':0},
+                {'month':12,'profit_tl':0,'profit_usd':0}
+            ];
+            }
 
-            this.operation_two_year.forEach(x=>{
+            if(this.operation_two_year.length >0){
+                this.operation_two_year.forEach(x=>{
                 this.operation_one_year_sum.profit_tl += x.kar_zarar_tl;
                 this.operation_one_year_sum.profit_usd += x.kar_zarar;
                 if(x.yukleme_month == 1){
@@ -630,8 +703,25 @@ export default {
                     this.operation_two_year_total[11].profit_usd += x.kar_zarar;
                 }
             });
+            }else{
+                this.operation_two_year_total = [
+                {'month':1,'profit_tl':0,'profit_usd':0},
+                {'month':2,'profit_tl':0,'profit_usd':0},
+                {'month':3,'profit_tl':0,'profit_usd':0},
+                {'month':4,'profit_tl':0,'profit_usd':0},
+                {'month':5,'profit_tl':0,'profit_usd':0},
+                {'month':6,'profit_tl':0,'profit_usd':0},
+                {'month':7,'profit_tl':0,'profit_usd':0},
+                {'month':8,'profit_tl':0,'profit_usd':0},
+                {'month':9,'profit_tl':0,'profit_usd':0},
+                {'month':10,'profit_tl':0,'profit_usd':0},
+                {'month':11,'profit_tl':0,'profit_usd':0},
+                {'month':12,'profit_tl':0,'profit_usd':0}
+            ];
+            };
 
-            this.operation_three_year.forEach(x=>{
+            if(this.operation_three_year.length >0){
+                this.operation_three_year.forEach(x=>{
                 this.operation_two_year_sum.profit_tl += x.kar_zarar_tl;
                 this.operation_two_year_sum.profit_usd += x.kar_zarar;
                 if(x.yukleme_month == 1){
@@ -672,6 +762,23 @@ export default {
                     this.operation_three_year_total[11].profit_usd += x.kar_zarar;
                 }
             });
+            }else{
+                this.operation_three_year_total = [
+                {'month':1,'profit_tl':0,'profit_usd':0},
+                {'month':2,'profit_tl':0,'profit_usd':0},
+                {'month':3,'profit_tl':0,'profit_usd':0},
+                {'month':4,'profit_tl':0,'profit_usd':0},
+                {'month':5,'profit_tl':0,'profit_usd':0},
+                {'month':6,'profit_tl':0,'profit_usd':0},
+                {'month':7,'profit_tl':0,'profit_usd':0},
+                {'month':8,'profit_tl':0,'profit_usd':0},
+                {'month':9,'profit_tl':0,'profit_usd':0},
+                {'month':10,'profit_tl':0,'profit_usd':0},
+                {'month':11,'profit_tl':0,'profit_usd':0},
+                {'month':12,'profit_tl':0,'profit_usd':0}
+            ];
+            };
+
 
 
 
