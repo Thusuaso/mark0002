@@ -206,6 +206,9 @@
               <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/gu" class="dropdown-item" tag="a">GU Reports</nuxt-link>
               </li>
+              <li v-show="getAyoStatus">
+                <nuxt-link to="/reports/mekmar/filter-finance" class="dropdown-item" tag="a">GU Finance</nuxt-link>
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown" v-show="!getAuthorityStatus">

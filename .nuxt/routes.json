@@ -294,6 +294,13 @@
     "_name": "_18a9d368"
   },
   {
+    "name": "reports-mekmar-filter-finance",
+    "path": "/reports/mekmar/filter-finance",
+    "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\filter-finance.vue",
+    "chunkName": "pages/reports/mekmar/filter-finance",
+    "_name": "_bc78ccd0"
+  },
+  {
     "name": "reports-mekmar-forwarding",
     "path": "/reports/mekmar/forwarding",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\forwarding.vue",
