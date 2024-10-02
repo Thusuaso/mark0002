@@ -79,7 +79,9 @@
           <label for="container">Container Detail</label>
         </span>
         <span class="p-float-label mb-4">
-          <InputText id="document" v-model="model.EvrakGideri" class="w-100" />
+          <InputText id="document" v-model="model.EvrakGideri" class="w-100" 
+            @input="evrakGideri($event)"
+          />
           <label for="document">Document Cost</label>
         </span>
         <span class="p-float-label mb-4">
@@ -92,7 +94,9 @@
           <label for="commission">Commission</label>
         </span>
         <span class="p-float-label mb-4">
-          <InputText id="return" v-model="model.Iade" class="w-100" />
+          <InputText id="return" v-model="model.Iade" class="w-100" 
+            @input="refund($event)"
+          />
           <label for="return">Refund</label>
         </span>
         <div class="p-float-label">
@@ -358,6 +362,34 @@ export default {
     }
   },
   methods: {
+    refund(event){
+      if (event) {
+        if (event[0] == 0) {
+          event = event.substr(1);
+        }
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.Iade = event.replace(",", ".");
+      } else {
+        this.model.Iade = 0;
+      }
+    },
+    evrakGideri(event){
+      if (event) {
+        if (event[0] == 0) {
+          event = event.substr(1);
+        }
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.EvrakGideri = event.replace(",", ".");
+        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+      } else {
+        this.model.EvrakGideri = 0;
+        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+      }
+    },
     maturityDateChange(event){
       this.model.Vade = '';
     },
@@ -382,6 +414,9 @@ export default {
       if (event) {
         if (event[0] == 0) {
           event = event.substr(1);
+        }
+        if (event == null || event == undefined) {
+          event = 0;
         }
         this.model.Komisyon = event.replace(",", ".");
         this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);

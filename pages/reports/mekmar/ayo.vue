@@ -345,20 +345,19 @@ export default {
   created() {
     this.$store.dispatch("setReportsMekmarAyoYearList");
     this.$store.dispatch("setReportsMekmarAyoMonthList", new Date().getFullYear());
-    const date = {
-      year: new Date().getFullYear(),
-      month: new Date().getMonth() + 1,
-    };
-    this.$store.dispatch("setBeginLoadingAction");
+    // const date = {
+    //   year: new Date().getFullYear(),
+    //   month: new Date().getMonth() + 1,
+    // };
 
-    api
-      .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
-      .then((response) => {
-        this.$store.commit("setReportsMekmarAyoList", response.data);
-        this.$store.commit("setReportsMekmarAyoListTotal", response.data);
-        this.__getMonthlyCostList(date.year,date.month);
-        this.$store.dispatch("setEndLoadingAction");
-      });
+    // api
+    //   .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
+    //   .then((response) => {
+    //     this.$store.commit("setReportsMekmarAyoList", response.data);
+    //     this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+    //     this.__getMonthlyCostList(date.year,date.month);
+    //     this.$store.dispatch("setEndLoadingAction");
+    //   });
 
 
 
@@ -899,6 +898,17 @@ export default {
     },
     getReportsMekmarAyoMonthList() {
       this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+      this.$store.dispatch("setBeginLoadingAction");
+      api
+      .get(`/maliyet/listeler/maliyetListesi/${new Date().getFullYear()}/${this.selectedMonth.Ay}`)
+      .then((response) => {
+        this.$store.commit("setReportsMekmarAyoList", response.data);
+        this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+        this.__getMonthlyCostList(new Date().getFullYear(),this.selectedMonth.Ay);
+        this.$store.dispatch("setEndLoadingAction");
+      });
+
+
     },
   },
 };

@@ -3504,7 +3504,8 @@ order by YEAR(s.YuklemeTarihi) desc
 app.get('/reports/mekmar/ayo/month/list/:year', (req, res) => {
     const sql = `
                    select MONTH(s.YuklemeTarihi) as Ay from SiparislerTB s 
-where MONTH(s.YuklemeTarihi) is not null and YEAR(s.YuklemeTarihi) = '${req.params.year}'
+				   inner join MusterilerTB m on m.ID = s.MusteriID
+where MONTH(s.YuklemeTarihi) is not null and m.Marketing='Mekmar' and YEAR(s.YuklemeTarihi) = '${req.params.year}'
 group by MONTH(s.YuklemeTarihi)
 order by MONTH(s.YuklemeTarihi) desc
                 `;

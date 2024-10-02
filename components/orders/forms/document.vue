@@ -44,10 +44,16 @@ export default {
   },
   methods: {
     isfDelete(event) {
-      this.$emit("isf_delete_emit", event);
+      if(confirm('Are you sure you want to delete?')){
+        this.$emit("isf_delete_emit", event);
+
+      }
     },
     proformaDelete(id) {
-      this.$emit("proforma_delete_emit", id);
+      if(confirm('Are you sure you want to delete?')){
+        this.$emit("proforma_delete_emit", id);
+
+      }
     },
   },
   watch: {
