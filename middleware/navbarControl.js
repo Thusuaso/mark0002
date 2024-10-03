@@ -5,10 +5,7 @@ export default function(context){
         if(userId) userId = userId.split('=')[1];
         if(userId == 48 ){
             context.store.dispatch('setAuthorityNavbarStatus',true);
-            if(context.req.url == '/'){
-                context.redirect('/mekmer/products/production');
 
-            }
         }else{
             context.store.dispatch('setAuthorityNavbarStatus',false);
         }

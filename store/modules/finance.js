@@ -304,7 +304,6 @@ const actions = {
     },
 
     setPoPaidMekmerSave(vuexContext, paid) {
-                            console.log(paid);
         api.post('/finance/po/paid/mekmer/save', paid)
             .then(response => {
                 if (response.status) {

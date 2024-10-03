@@ -166,7 +166,6 @@ export default {
     },
     process() {
       if(this.model.Kur == 0){
-        console.log(this.model.Kur);
         this.$toast.error('Kur girilmesi zorunludur.');
       }else{
               this.model.MusteriID = this.po.MusteriID;

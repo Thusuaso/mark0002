@@ -578,7 +578,6 @@ export default {
       this.selectedSupplier = this.suppliers.find(
         (x) => x.FirmaAdi == this.model.FirmaAdi
       );
-      console.log(this.model);
       this.selectedDate = date.stringToDate(this.model.Tarih);
       this.selectedAmountStatus = this.model.UrunBirimAdi;
       this.productCardId = this.model.UrunKartId;

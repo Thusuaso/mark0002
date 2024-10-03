@@ -134,7 +134,6 @@ export default {
     },
     offerProcess(event) {
       if (this.getOfferButtonStatus) {
-        console.log(event);
         const data = {
           customer:event.customer,
           offer:{...event.offer,"KullaniciId":Cookies.get('userId'),'KullaniciAdi':Cookies.get('username')}

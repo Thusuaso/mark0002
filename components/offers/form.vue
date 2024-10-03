@@ -732,7 +732,6 @@ export default {
       this.productReset();
     },
     __zeroControl(event){
-      console.log(event.toString().length);
       if(event.toString().length == 1){
         return "0" + event.toString();
       }else{

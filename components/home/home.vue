@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <div class="row">
+    <div class="row" v-show="userId != 48">
       <!-- Earnings (Monthly) Card Example -->
       <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
@@ -140,7 +140,7 @@
         </div>
       </div>
     </div>
-    <div class="row m-auto text-center">
+    <div class="row m-auto text-center" v-show="userId != 48">
       <div class="col">
         <Card>
           <template #header>
@@ -188,7 +188,7 @@
       </Card>
 
       </div>
-      <div class="col">
+      <div class="col" v-show="userId != 48">
         <Card>
           <template #header>
             <h3>Monthly Offers Report</h3>
@@ -207,10 +207,16 @@
   </div>
 </template>
 <script>
+  import {mapGetters} from 'vuex';
+  import Cookies from "js-cookie";
+
 export default {
-  computed: {},
+  computed: {
+    ...mapGetters(['getUserId'])
+  },
   data() {
     return {
+      userId:null,
       chartOptions: {
         maintainAspectRatio: false,
         aspectRatio: 0.8,
@@ -319,6 +325,9 @@ export default {
       return monthList[month];
     },
   },
+  created(){
+    this.userId = Cookies.get('userId');
+  }
 };
 </script>
 <style scoped>

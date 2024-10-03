@@ -627,7 +627,6 @@ const mutations = {
         state.orderProductionDivideList = list;
     },
     setOrderProductionTotal(state,list){
-        console.log(15.15+15.15);
         state.orderProductionTotal = {
             'order':0,
             'production':0,

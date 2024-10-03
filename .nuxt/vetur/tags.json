@@ -86,11 +86,23 @@
   "UploadSupplierform": {
     "description": "Auto imported from components/upload/supplierform.vue"
   },
+  "ContainerFollowForm": {
+    "description": "Auto imported from components/container/follow/form.vue"
+  },
+  "ContainerFollowList": {
+    "description": "Auto imported from components/container/follow/list.vue"
+  },
   "CustomerBgpForm": {
     "description": "Auto imported from components/customer/bgp/form.vue"
   },
   "CustomerBgpList": {
     "description": "Auto imported from components/customer/bgp/list.vue"
+  },
+  "ContainerInputForm": {
+    "description": "Auto imported from components/container/input/form.vue"
+  },
+  "ContainerInputList": {
+    "description": "Auto imported from components/container/input/list.vue"
   },
   "CustomerFairForm": {
     "description": "Auto imported from components/customer/fair/form.vue"
@@ -121,18 +133,6 @@
   },
   "CustomerSelectionList": {
     "description": "Auto imported from components/customer/selection/list.vue"
-  },
-  "ContainerFollowForm": {
-    "description": "Auto imported from components/container/follow/form.vue"
-  },
-  "ContainerFollowList": {
-    "description": "Auto imported from components/container/follow/list.vue"
-  },
-  "ContainerInputForm": {
-    "description": "Auto imported from components/container/input/form.vue"
-  },
-  "ContainerInputList": {
-    "description": "Auto imported from components/container/input/list.vue"
   },
   "FinanceFormsAdvancepayment": {
     "description": "Auto imported from components/finance/forms/advancepayment.vue"
@@ -200,14 +200,14 @@
   "OrdersListsShipped": {
     "description": "Auto imported from components/orders/lists/shipped.vue"
   },
-  "PanelPublishedList": {
-    "description": "Auto imported from components/panel/published/list.vue"
-  },
   "PanelProjectForm": {
     "description": "Auto imported from components/panel/project/form.vue"
   },
   "PanelProjectList": {
     "description": "Auto imported from components/panel/project/list.vue"
+  },
+  "PanelPublishedList": {
+    "description": "Auto imported from components/panel/published/list.vue"
   },
   "PanelUsaForm": {
     "description": "Auto imported from components/panel/usa/form.vue"

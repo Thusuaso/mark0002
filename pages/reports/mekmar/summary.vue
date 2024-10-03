@@ -51,7 +51,6 @@ export default {
   },
   methods: {
     orderSelectedListOrderer(event,status) {
-      console.log(event, status);
       const data = {
         'month': event.Month,
         'year': event.Year,

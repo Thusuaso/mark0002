@@ -79,7 +79,6 @@ export default {
         this.folderProductInfo.kullaniciId = Cookies.get("userId");
         this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
         this.sendDatabase(this.folderProductInfo);
-        console.log(item.name);
 
       }
       this.$store.dispatch("setDocumentList", this.selectedOrder.SiparisNo);

@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg bg-body-tertiary" style="font-size: 100%" data-bs-theme="blue"
    >
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">GOZ</a>
+      <a class="navbar-brand" href="/">GOZ</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -311,7 +311,6 @@ export default {
   },
 
   created() {
-    console.log("getAyoStatus",this.getAyoStatus)
     this.$store.dispatch("setToDoListByUsername", Cookies.get("username"));
 
 

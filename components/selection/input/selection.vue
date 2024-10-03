@@ -538,7 +538,6 @@ export default {
   created() {
     this.$store.dispatch("setOrderProductionMekmerList")
       .then(res => {
-        console.log('setOrderProductionMekmerList',res)
         if (res) {
           this.selection_orders_disabled = false;
 

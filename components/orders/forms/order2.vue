@@ -282,7 +282,6 @@ export default {
         };
     },
     mounted() {
-        console.log('order2', this.products);
         this.totals = 0;
         this.products.forEach(x => {
             this.totals += this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);

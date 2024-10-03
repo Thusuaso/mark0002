@@ -196,7 +196,6 @@ export default {
         this.getContainerResults.FirmaID,
         this.getContainerResults.FaturaNo + ".pdf"
       );
-      console.log(this.invoice_document_id)
       const data = { 'invoicedocumentid': this.invoice_document_id,'invoiceid':this.getContainerResults.ID, ...this.containerdata };
       this.$store.dispatch("setContainerInputFileSave", data);
     },

@@ -174,7 +174,6 @@ export default {
       this.$store.dispatch("setPanelProductsUpdate", {...event,'Id':this.getProductId});
     },
     process(event) {
-      console.log(this.getPanelProductId)
       if (this.getPanelProductId == 0) {
         this.save(event);
       } else {
