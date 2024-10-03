@@ -140,7 +140,70 @@
         </div>
       </div>
     </div>
-    <Chart type="bar" :data="home.chartOne" :options="chartOptions" class="h-30rem" />
+    <div class="row m-auto text-center">
+      <div class="col">
+        <Card>
+          <template #header>
+            <h3>Monthly Shipped Report</h3>
+            
+          </template>
+
+          <template #content>
+            <Chart type="bar" :data="home.chartOne" :options="chartOptions" style="height:550px;width: 100%;" />
+          </template>
+
+      </Card>
+
+
+
+
+      </div>
+      <div class="col">
+        <Card>
+          <template #header>
+            <h3>Shipped by Marketing Report</h3>
+            
+          </template>
+
+          <template #content>
+            <Chart type="doughnut" :data="home.chartCustomerShipped" :options="chartOptionsTwo" style="height:550px;width: 100%;" />
+          </template>
+
+      </Card>
+
+      </div>
+    </div>
+    <div class="row m-auto text-center">
+      <div class="col">
+        <Card>
+          <template #header>
+            <h3>Monthly Production Report</h3>
+            
+          </template>
+
+          <template #content>
+            <Chart type="bar" :data="home.chartProducts" :options="chartOptionsThree" style="height:550px;width: 100%;" />
+          </template>
+
+      </Card>
+
+      </div>
+      <div class="col">
+        <Card>
+          <template #header>
+            <h3>Monthly Offers Report</h3>
+            
+          </template>
+
+          <template #content>
+            <Chart type="bar" :data="home.chartOffers" :options="chartOptions" style="height:550px;width: 100%;" />
+          </template>
+
+      </Card>
+      </div>
+
+    </div>
+
   </div>
 </template>
 <script>
@@ -182,6 +245,53 @@ export default {
           },
         },
       },
+      chartOptionsTwo:{
+        maintainAspectRatio: false,
+        aspectRatio: 0.8,
+        plugins: {
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                    color: 'grey'
+                }
+            }
+        }
+      },
+      chartOptionsThree:{
+        maintainAspectRatio: false,
+        aspectRatio: 1,
+        plugins: {
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            legend: {
+                labels: {
+                    color: 'grey'
+                }
+            }
+        },
+        scales: {
+            x: {
+                stacked: true,
+                ticks: {
+                    color: 'grey'
+                },
+                grid: {
+                    color: 'grey'
+                }
+            },
+            y: {
+                stacked: true,
+                ticks: {
+                    color: 'grey'
+                },
+                grid: {
+                    color: 'grey'
+                }
+            }
+        }
+      }
     };
   },
   props: {
