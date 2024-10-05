@@ -1,8 +1,7 @@
 import { io } from 'socket.io-client';
 export default (context, inject) => {
   const socket = {
-    // socketIO: io('http://localhost:5001'),
-    socketIO: io('https://real-time-mark0002.mekmar.com'),
+    socketIO: io('http://localhost:3001'),
         headers: {
           "Access-Control-Allow-Origin": "*",
         },

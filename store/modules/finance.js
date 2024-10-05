@@ -467,8 +467,8 @@ const actions = {
                 if (response.data.status) {
                                         this.$toast.success('Tahsilat Başarıyla Güncellendi');
                     vuexContext.dispatch('setPoPaidUpdateSendMailMekmer', { ...paid, 'Mail': 'bilgiislem@mekmar.com' });
-                    vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'huseyin@mekmer.com' });
-                    vuexContext.dispatch('setPoPaidUpdateSendMail', { ...paid, 'Mail': 'sergen@mekmer.com' });
+                    vuexContext.dispatch('setPoPaidUpdateSendMailMekmer', { ...paid, 'Mail': 'huseyin@mekmer.com' });
+                    vuexContext.dispatch('setPoPaidUpdateSendMailMekmer', { ...paid, 'Mail': 'sergen@mekmer.com' });
 
 
                     vuexContext.dispatch('setFinancePoMekmerList', paid.musteri_id);

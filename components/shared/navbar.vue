@@ -200,7 +200,7 @@
               <li>
                 <nuxt-link to="/reports/mekmar/summary" class="dropdown-item" tag="a">Order Summary</nuxt-link>
               </li>
-              <li v-show="getAyoStatus">
+              <li>
                 <nuxt-link to="/reports/mekmar/mk" class="dropdown-item" tag="a">MK Reports</nuxt-link>
               </li>
               <li v-show="getAyoStatus">

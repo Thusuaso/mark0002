@@ -54,7 +54,11 @@
       </DataTable>
     </div>
     <div class="col-3">
-      <DataTable :value="paidList" scrollable scrollHeight="600px" >
+      <DataTable :value="paidList" scrollable scrollHeight="600px" 
+      :selection.sync="selectedPaid"
+      selectionMode="single"
+      @row-click="paidSelected($event)"
+      >
         <Column field="tarih" header="Date">
           <template #body="slotProps">
             {{ slotProps.data.tarih | dateToString }}
@@ -98,12 +102,18 @@ export default {
     return {
       selectedPoList: null,
       selectedPoPaidDetailList: null,
+      selectedPaid:null
+      
     };
   },
   methods: {
     rowClass(event) {
       return event.MayaControl ? "red-row" : "";
     },
+    paidSelected(event){
+      this.$emit('paid_selected_emit',event.data);
+    }
+
   },
 };
 </script>

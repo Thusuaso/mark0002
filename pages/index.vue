@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { io } from "socket.io-client";
+
 export default {
   computed: {
     home() {
@@ -18,9 +20,12 @@ export default {
   beforeMount() {},
   created() {
     this.$store.dispatch("getHome");
+
   },
   mounted() {},
-  methods: {},
+  methods: {
+
+  },
 };
 </script>
 <style></style>

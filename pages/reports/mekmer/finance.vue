@@ -28,24 +28,22 @@
         </div>
         <div class="col-sm-6">
           <vue-excel-xlsx
-      :data="monthly_mekmar_finance_list"
-      :columns="getFinanceMekmerToMekmarFields"
-      :file-name="'Finance'"
-      :file-type="'xlsx'"
-      :sheet-name="'sheetname'"
-      style="border: none; background-color: white; width: 100%"
-    >
-      <Button
-        type="button"
-        class="p-button-info w-100"
-        icon="pi pi-file-excel"
-        label="Excel"
-      />
-    </vue-excel-xlsx>
+            :data="monthly_mekmar_finance_list"
+            :columns="getFinanceMekmerToMekmarFields"
+            :file-name="'Finance'"
+            :file-type="'xlsx'"
+            :sheet-name="'sheetname'"
+            style="border: none; background-color: white; width: 100%"
+          >
+            <Button
+              type="button"
+              class="p-button-info w-100"
+              icon="pi pi-file-excel"
+              label="Excel"
+            />
+          </vue-excel-xlsx>
         </div>
-
       </div>
-
       <div class="col-12">
         <DataTable :value="monthly_mekmar_finance_list" scrollable scrollHeight="600px"
           :selection.sync="selectedMonthlyFinance" selectionMode="single" @row-select="financeMonthlySelected($event)"
@@ -101,12 +99,7 @@
 
         </DataTable>
       </div>
-
     </div>
-
-
-
-
     <Dialog :visible.sync="finance_collection_list_form" header="" modal :maximizable="true">
       <financeCollectionListMekmer :list="getFinanceCollectionList" :years="getFinanceCollectionYearList"
         :months="getFinanceCollectionMonthList" :total="getFinanceCollectionTotal" :loading="getLoading"
@@ -120,7 +113,9 @@
       <financePoListMekmer :poList="getFinancePoList" :paidList="getFinancePaidList"
         :poListTotal="getFinancePoListTotal" :paidListTotal="getFinancePaidListTotal"
         @po_list_selected_emit="poListSelected($event)"
-        @po_paid_detail_list_selected_emit="poPaidDetailListSelected($event)" :loading="getLoading" />
+        @po_paid_detail_list_selected_emit="poPaidDetailListSelected($event)" :loading="getLoading" 
+        @paid_selected_emit="paidDetailSelected($event)"
+        />
     </Dialog>
     <Dialog :visible.sync="finance_po_detail_form" header="" modal>
       <financePoFormMekmer :model="getFinancePoModelMekmer" :po="finance_po_list_detail"
@@ -136,12 +131,9 @@
       <br /> <br />
       <br />
       <br />
-
       <div class="row m-auto text-center">
         <div class="col-sm-6">
           <CustomInput :value="model.balanced" text="Balanced" @onInput="model.balanced = $event" :disabled="true" />
-
-
         </div>
         <div class="col-sm-6">
           <span class="p-float-label">
@@ -149,13 +141,10 @@
             <label for="date">Date</label>
           </span>
         </div>
-
       </div>
       <br />
       <br />
       <br />
-
-
       <div class="row m-auto text-center">
         <div class="col-sm-3">
           <CustomInput :value="model.paid" text="Paid Amount" @onInput="model.paid = $event" :disabled="false" />
@@ -166,15 +155,81 @@
         <div class="col-sm-3">
           <CustomInput :value="model.currency" text="Rate" @onInput="model.currency = $event" :disabled="false" />
         </div>
-
       </div>
       <div class="row">
         <div class="col"><Button type="button" class="p-button-success w-100" label="Save" @click="saveFinanceMekmar"/></div>
       </div>
+    </Dialog>
+    <Dialog :visible.sync="po_paid_detail_list_dialog_visible" header="" modal
+    >
+      <DataTable :value="poPaidDetailList" responsiveLayout="scroll"
+        :selection.sync="selectedPoPaidDetailList"
+        selectionMode="single"
+        @row-click="poPaidDetailListSelectedDataTable($event)"
+      
+      >
+          <Column field="Tarih" header="Date">
+            <template #body="slotProps">
+              {{ slotProps.data.Tarih | dateToString }}
+            </template>
+          </Column>
+          <Column field="SiparisNo" header="Po"></Column>
+          <Column field="Aciklama" header="Desc."></Column>
+          <Column field="Tutar" header="Paid">
+            <template #body="slotProps">
+                {{ slotProps.data.Tutar | formatPriceUsd }}
+            </template>
+          </Column>
+          <Column field="Masraf" header="Currency">
+            <template #body="slotProps">
+                {{ slotProps.data.Masraf | formatPriceUsd }}
+            </template>
+          </Column>
+          <Column field="Kur" header="Currency">
+            <template #body="slotProps">
+                {{ slotProps.data.Kur | formatPriceUsd }}
+            </template>
+          </Column>
+
+      </DataTable>
+
+    </Dialog>
+    <Dialog :visible.sync="po_paid_detail_list_detail_dialog_visible" header="" modal
+    >
+      <div class="row m-auto text-center mt-5 mb-5">
+        <div class="col">
+          <Calendar v-model="modelPaidPo.Tarih" />
+
+        </div>
+        <div class="col">
+          <CustomInput :value="modelPaidPo.Tutar" text="Paid" @onInput="model.Tutar = $event"/>
 
 
+        </div>
+        <div class="col">
+          <CustomInput :value="modelPaidPo.Masraf" text="Cost" @onInput="model.Masraf = $event"/>
 
 
+        </div>
+        <div class="col">
+          <CustomInput :value="modelPaidPo.Kur" text="Currency" @onInput="model.Currency = $event"/>
+
+
+        </div>
+        <div class="col">
+          <Textarea v-model="modelPaidPo.Aciklama" rows="5" cols="30" />
+
+        </div>
+      </div>
+      <div class="row m-auto text-center mt-5">
+        <div class="col">
+          <Button class="p-button-success w-100" label="Update" @click="updatePoPaid"/>
+        </div>
+        <div class="col">
+          <Button class="p-button-danger w-100" label="Delete" @click="deletePoPaid"/>
+
+        </div>
+      </div>
     </Dialog>
   </div>
 </template>
@@ -217,6 +272,11 @@
     },
     data() {
       return {
+        poPaidDetailSelectedList:{},
+        po_paid_detail_list_detail_dialog_visible:false,
+        selectedPoPaidDetailList:{},
+        po_paid_detail_list_dialog_visible:false,
+        poPaidDetailList:[],
         getFinanceMekmerToMekmarFields: [
         { label: "Po", field: "siparisno" },
         { label: "Shipped Date", field: "yuklemetarihi" },
@@ -278,6 +338,14 @@
           date: '',
           po: '',
           customer:0
+        },
+        modelPaidPo:{
+          ID:0,
+          Tarih:'',
+          Aciklama:'',
+          Tutar:0,
+          Masraf:0,
+          Kur:0
         }
       };
     },
@@ -303,6 +371,45 @@
         });
     },
     methods: {
+      deletePoPaid(){
+        if(confirm("Are you sure you want to delete")){
+          this.$axios.delete(`/finance/mekmer/paid/detail/list/delete/${this.modelPaidPo.ID}`)
+        .then(res=>{
+          if(res.data.status){
+            this.$toast.success('Silme işlemi başarıyla gerçekleştirildi.');
+          }else{
+            this.$toast.error('Silme işlemi başarısız.');
+          }
+        });
+        }
+
+      },
+      updatePoPaid(){
+          this.$axios.put('/finance/mekmer/paid/detail/list/update',this.modelPaidPo)
+          .then(res=>{
+            if(res.data.status){
+
+            }
+          });
+      },
+      poPaidDetailListSelectedDataTable(event){
+        this.poPaidDetailSelectedList = event.data;
+        this.modelPaidPo.ID = event.data.ID;
+        this.modelPaidPo.Tarih = date.dateToString(event.data.Tarih) ;
+        this.modelPaidPo.Aciklama = event.data.Aciklama;
+        this.modelPaidPo.Tutar = event.data.Tutar;
+        this.modelPaidPo.Masraf = event.data.Masraf;
+        this.modelPaidPo.Kur = event.data.Kur;
+
+        this.po_paid_detail_list_detail_dialog_visible = true;
+      },
+      paidDetailSelected(event){
+        this.$axios.get(`/finance/mekmer/paid/detail/list/${event.tarih}/${this.customerId}`)
+        .then(res=>{
+          this.poPaidDetailList = res.data.list;
+          this.po_paid_detail_list_dialog_visible = true;
+        });
+      },
       saveFinanceMekmar() {
         api.post('/finance/mekmar/po/paid/save', this.model)
           .then(res => {
@@ -340,7 +447,6 @@
           .then(res => {
             this.monthly_mekmar_finance_list = res.data.ayrinti_list;
           });
-
       },
       collectionClick() {
         this.$store.dispatch("setFinanceCollectionListMekmer");
@@ -349,12 +455,10 @@
       checkedMekmarMekmer(event){
         if(this.mekmarMekmerList){
           this.checked = 'Mekmar';
-  
           this.$store.dispatch('setFinanceListFilter');
         }else{
           this.checked = 'Mekmer';
-  
-            this.$store.dispatch('setFinanceList');
+          this.$store.dispatch('setFinanceList');
         }
       },
       excel_output() {
@@ -362,7 +466,6 @@
           if (response.status) {
             const link = document.createElement("a");
             link.href = this.getLocalUrl + "/finance/reports/test/excel/mekmer";
-  
             link.setAttribute("download", "finans_test_list.xlsx");
             document.body.appendChild(link);
             link.click();

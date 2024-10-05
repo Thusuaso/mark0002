@@ -159,7 +159,7 @@ export default {
        const hour = this.__zeroControl(date.getHours());
        const minute = this.__zeroControl(date.getMinutes());
        const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
-       const desc = `${event.offer.KullaniciAdi} adlı kullanıcı ${event.customer.MusteriAdi} müşterisine ${now} tarihli teklif girişi yaptı.`;
+       const desc = `${Cookies.get('username')} adlı kullanıcı ${event.customer.MusteriAdi} müşterisine ${now} tarihli teklif girişi yaptı.`;
        const log = {
         description:desc,
         po: '',
@@ -186,7 +186,7 @@ export default {
        const hour = this.__zeroControl(date.getHours());
        const minute = this.__zeroControl(date.getMinutes());
        const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
-       const desc = `${event.offer.KullaniciAdi} adlı kullanıcı ${event.customer.MusteriAdi} müşterisine ${now} tarihli teklif güncellemesi yaptı.`;
+       const desc = `${Cookies.get('username')} adlı kullanıcı ${event.customer.MusteriAdi} müşterisine ${now} tarihli teklif güncellemesi yaptı.`;
        const log = {
         description:desc,
         po: '',

@@ -131,6 +131,7 @@
 </template>
 <script>
 import Cookies from "js-cookie";
+import { io } from "socket.io-client";
 export default {
   props: {
     status: {
@@ -176,12 +177,16 @@ export default {
       filteredHeight: null,
       selectedEdge: null,
       filteredEdge: null,
+      socket:null
     };
   },
   created() {
     if (!this.status) {
       this.createdProcess();
-    }
+    };
+    // this.socket = io("http://localhost:3001",{
+    //   reconnectionDelayMax: 10000,
+    // })
   },
   methods: {
     reset() {
@@ -226,20 +231,30 @@ export default {
       this.selectedEdge = this.sizes.find((x) => x.ID == this.model.OlcuId);
     },
     edgeChange(event) {
-      this.model.OlcuId = null;
+      if(typeof (event) == 'string'){
+        this.model.OlcuId = null;
       this.model.Kenar = event.replace('.',',');
       this.selectedEdge = event.replace('.',',');
+      }
+
+
     },
     heightChange(event) {
-      this.model.OlcuId = null;
+      if(typeof (event) == 'string'){
+        this.model.OlcuId = null;
       this.model.Boy = event.replace('.',',');
       this.selectedHeight = event.replace('.',',');
+      }
+
 
     },
     widthSurface(event) {
+      if(typeof (event) == 'string'){
       this.model.OlcuId = null;
       this.model.En = event.replace('.',',');
       this.selectedWidth = event.replace('.',',');
+      }
+
 
     },
     surfaceChange(event) {

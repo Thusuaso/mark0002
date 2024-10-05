@@ -697,7 +697,7 @@ export default {
        const minute = this.__zeroControl(date.getMinutes());
        const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
       const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
-      const desc = `${this.model.KullaniciAdi}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü sildi.`;
+      const desc = `${Cookies.get('username')}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü sildi.`;
 
       const log = {
         description:desc,
@@ -719,7 +719,7 @@ export default {
        const minute = this.__zeroControl(date.getMinutes());
        const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
       const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
-      const desc = `${this.model.KullaniciAdi}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü güncelledi.`;
+      const desc = `${Cookies.get('username')}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü güncelledi.`;
 
       const log = {
         description:desc,
@@ -747,7 +747,7 @@ export default {
        const minute = this.__zeroControl(date.getMinutes());
        const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
        const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
-      const desc = `${this.model.KullaniciAdi}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisine  ${size} cm ürününü girdi.`;
+      const desc = `${Cookies.get('username')}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisine  ${size} cm ürününü girdi.`;
 
       const log = {
         description:desc,

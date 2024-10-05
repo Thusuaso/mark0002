@@ -86,7 +86,7 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: process.env.server
+    baseURL: process.env.client
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
@@ -105,6 +105,13 @@ export default {
     bodyParser.json(),
     '~/api'
   ],
+  io: {
+    // module options
+    sockets: [{
+      name: 'main',
+      url: 'real-time-mark0002.mekmar.com'
+    }]
+  }
 
 
 

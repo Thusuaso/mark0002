@@ -1,6 +1,8 @@
 <template>
   <div>
-    <DataTable :value="list">
+    <DataTable :value="list"
+
+    >
       <Column field="Tarih" header="Date" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
@@ -61,6 +63,9 @@ export default {
     return {
       total: 0,
     };
+  },
+  methods:{
+
   },
 
   watch: {

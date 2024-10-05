@@ -12,7 +12,7 @@ const sql = {
     server:'94.73.151.2',
     options: {
         encrypt: false, // for azure
-        trustServerCertificate: true // change to true for local dev / self-signed certs
+        trustServerCertificate: false // change to true for local dev / self-signed certs
       }
 };
 mssql.connect(sql);
@@ -12705,6 +12705,40 @@ app.post('/finance/po/paid/send/mail/mekmer', (req, res) => {
 
 
 
+
+app.get('/finance/mekmer/paid/detail/list/:date/:customer',(req,res)=>{
+    const sql = `
+        select * from Odemeler_MekmerTB where Tarih='${req.params.date}' and MusteriID='${req.params.customer}'
+    `;
+    mssql.query(sql,(err,paidDetail)=>{
+        res.status(200).json({
+            'list':paidDetail.recordset
+        });
+    });
+
+
+});
+
+app.put('/finance/mekmer/paid/detail/list/update',(req,res)=>{
+    const sql = `update Odemeler_MekmerTB SET Tarih='${req.body.Tarih}',Aciklama='${req.body.Aciklama}',Tutar='${req.body.Tutar}',Masraf='${req.body.Masraf}',Kur='${req.body.Kur}' where ID='${req.body.ID}'`;
+    mssql.query(sql,(err,updated)=>{
+        if(updated.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        }
+    });
+});
+app.delete('/finance/mekmer/paid/detail/list/delete/:id',(req,res)=>{
+    const sql = `delete Odemeler_MekmerTB where ID='${req.params.id}'`;
+    mssql.query(sql,(err,deleted)=>{
+        if(deleted.rowsAffected[0] == 1){
+            res.status(200).json({'status':true});
+        }else{
+            res.status(200).json({'status':false});
+        }
+    });
+});
 
 
 
