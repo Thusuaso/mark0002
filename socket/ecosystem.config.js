@@ -4,7 +4,12 @@ module.exports = {
         name: 'SocketIO',
         exec_mode: 'cluster',
         instances: '1',
-        script: './node_modules/nuxt/bin/nuxt.js',
-      }
+        script: './api.js',
+        // env_production: {
+        //   PORT: 3001,
+        //   exec_mode: "cluster_mode",
+        // },
+      },
+      
     ]
   }
