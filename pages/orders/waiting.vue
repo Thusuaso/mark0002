@@ -714,7 +714,11 @@ export default {
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
-        this.$socket.socketIO.emit("production_update_emit");
+        if (this.$route.path == '/orders/production') {
+          this.$store.dispatch("setOrderProductionList");
+        } else if (this.$route.path == '/orders/waiting'){
+          this.$store.dispatch("setOrderWaitingList")
+        }
         this.production_detail_form = false;
 
       }
@@ -1082,7 +1086,9 @@ export default {
     this.$socket.socketIO.on("production_update_on", () => {
       if (this.$route.path == '/orders/production') {
         this.$store.dispatch("setOrderProductionList");
-      };
+      } else if (this.$route.path == '/orders/waiting'){
+        this.$store.dispatch("setOrderWaitingList")
+      }
     });
     this.$socket.socketIO.on("cards_update_on", () => {
       this.$store.dispatch("setCardList");

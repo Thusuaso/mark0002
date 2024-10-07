@@ -187,6 +187,7 @@ export default {
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
+        this.$socket.socketIO.emit('production_update_emit');
         this.production_detail_form = false;
       }
     },

@@ -13650,7 +13650,7 @@ app.delete('/reports/mekmer/moloz/delete/:id',async(req,res)=>{
 /*Shared*/
 app.get('/orders/production/list',(req,res)=>{
     const sql = `
-    select s.SiparisNo,s.MusteriID from SiparislerTB s where s.SiparisDurumID=2 order by s.SiparisTarihi desc
+    select s.SiparisNo,s.MusteriID from SiparislerTB s where s.SiparisDurumID in (1,2) order by s.SiparisTarihi desc
     `;
     mssql.query(sql,(err,order)=>{
         res.status(200).json({'list':order.recordset});
@@ -13709,7 +13709,7 @@ app.get('/cards',(req,res)=>{
                 inner join UrunlerTB u on u.ID = uk.UrunID
                 inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
                 inner join OlculerTB o on o.ID = uk.OlcuID
-                order by uk.ID desc
+                order by uk.ID
                 `;
     mssql.query(sql,(err,results)=>{
        res.status(200).json({
@@ -13755,7 +13755,7 @@ app.get('/order/products/normal/:po',(req,res)=>{
     inner join OlculerTB ol on ol.ID = uk.OlcuID
     inner join TedarikciTB t on t.ID = su.TedarikciID
     
-    where s.SiparisDurumID=2 and  s.SiparisNo='${req.params.po}'
+    where s.SiparisDurumID in (1,2) and  s.SiparisNo='${req.params.po}'
     `;
     mssql.query(sql,(err,products)=>{
         res.status(200).json({
@@ -13775,7 +13775,7 @@ app.get('/order/products/:po',(req,res)=>{
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
                 inner join TedarikciTB t on t.ID = su.TedarikciID
                 
-                where s.SiparisDurumID=2 and dbo.Production_Total_Control_Fk(s.SiparisNo,su.UrunKartID) < su.Miktar and  s.SiparisNo='${req.params.po}'
+                where s.SiparisDurumID in (1,2) and dbo.Production_Total_Control_Fk(s.SiparisNo,su.UrunKartID) < su.Miktar and  s.SiparisNo='${req.params.po}'
     `;
     mssql.query(sql,(err,products)=>{
         res.status(200).json({
