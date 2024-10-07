@@ -567,7 +567,6 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 .then(response => {
                     if (response.data.status) {
                         this.$toast.success('Mail Gönderildi.');
-                        this.$socket.socketIO.emit('production_update_emit');
                         
                         vuexContext.dispatch('setProductionProductMailReset');
 
