@@ -125,8 +125,8 @@ export default {
           this.sendDatabase(this.folderProductInfo);
         }
 
-        else if (item.name == "Dolaşım Belgeleri.pdf") {
-          this.folderProductInfo.id = 11;
+        else if (item.name == "ATR.pdf"  || item.name == "atr.pdf") {
+          this.folderProductInfo.id = 75;
           this.folderProductInfo.siparisno = this.selectedOrder.SiparisNo;
           this.folderProductInfo.kullaniciId = Cookies.get("userId");
           this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
@@ -202,6 +202,13 @@ export default {
           this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
           this.sendDatabase(this.folderProductInfo);
         }
+        else if (item.name == "Certificate of Origin.pdf") {
+          this.folderProductInfo.id = 74;
+          this.folderProductInfo.siparisno = this.selectedOrder.SiparisNo;
+          this.folderProductInfo.kullaniciId = Cookies.get("userId");
+          this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
+          this.sendDatabase(this.folderProductInfo);
+        }
         else{
 
         }
@@ -209,7 +216,7 @@ export default {
 
 
 
-      }
+      };
       this.$store.dispatch("setDocumentList", this.selectedOrder.SiparisNo);
       this.$toast.success("Kayıt Başarılı.");
     },

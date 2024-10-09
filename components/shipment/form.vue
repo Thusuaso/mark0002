@@ -194,15 +194,15 @@ export default {
     },
     __getPriceControl(payload) {
 
-          const supplierName = this.getSupplierList.find(x=>x.ID == payload.TedarikciID).FirmaAdi;
-          if (payload.SatisFiyati == 0 || payload.SatisFiyati == undefined || payload.SatisFiyati == null || payload.SatisFiyati == "") {
-            this.$toast.error(`${supplierName} ürünlerine satış fiyati girilmeli.Girdikten Sonra Sayfayı Yenileyiniz!`);
-            this.save_button_disabled = false;
-            this.sending_crate_button_disabled = false;
-          } else {
-            this.save_button_disabled = false;
-            this.sending_crate_button_disabled = false;
-          }
+      const supplierName = this.getSupplierList.find(x=>x.ID == payload.TedarikciID).FirmaAdi;
+      if (payload.SatisFiyati == 0 || payload.SatisFiyati == undefined || payload.SatisFiyati == null || payload.SatisFiyati == "") {
+        this.$toast.error(`${supplierName} ürünlerine satış fiyati girilmeli.Girdikten Sonra Sayfayı Yenileyiniz!`);
+        this.save_button_disabled = false;
+        this.sending_crate_button_disabled = false;
+      } else {
+        this.save_button_disabled = false;
+        this.sending_crate_button_disabled = false;
+      };
     },
     __getFreightControl(payload) {
       
@@ -222,6 +222,7 @@ export default {
       this.$store.dispatch("setShipmentSendProductionList");
     },
     save() {
+      if(this.getOrderProductionProductNormalList.length  == 0){
       this.save_button_disabled = true;
       if (confirm("Sevk etmek istiyor musunuz?")) {
         const data = this.getShipmentSendProductionList;
@@ -255,7 +256,12 @@ export default {
         });
       } else {
         this.save_button_disabled = false;
-      }
+      };
+
+      }else{
+        this.$toast.error("Gönderilmemiş Ürünler Mevcut. Kontrol edip tekrar dene...");
+      };
+
     },
     sendingCrate() {
       this.$store.dispatch("setShipmentSendingProduction", this.selectedProducts);
@@ -272,7 +278,6 @@ export default {
       this.$store.dispatch("setShipmentAmount", event.value);
       this.sending_crate_button_disabled = false;
       this.__getPriceControl(event.value)
-
     },
     searchOrders(event) {
       let results;
