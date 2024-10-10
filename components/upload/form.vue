@@ -209,6 +209,20 @@ export default {
           this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
           this.sendDatabase(this.folderProductInfo);
         }
+        else if (item.name == "Dispatch Note.pdf") {
+          this.folderProductInfo.id = 76;
+          this.folderProductInfo.siparisno = this.selectedOrder.SiparisNo;
+          this.folderProductInfo.kullaniciId = Cookies.get("userId");
+          this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
+          this.sendDatabase(this.folderProductInfo);
+        }
+        else if (item.name == "Other.pdf") {
+          this.folderProductInfo.id = 77;
+          this.folderProductInfo.siparisno = this.selectedOrder.SiparisNo;
+          this.folderProductInfo.kullaniciId = Cookies.get("userId");
+          this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
+          this.sendDatabase(this.folderProductInfo);
+        }
         else{
 
         }

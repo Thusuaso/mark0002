@@ -11493,6 +11493,14 @@ app.get('/order/production/product/document/:po', async (req, res) => {
                 x.Link = `https://file-service.mekmar.com/file/download/75/${x.SiparisNo}`;
                 x.Evrak = 'ATR';
             };
+            if(x.YuklemeEvrakID == 76 ){
+                x.Link = `https://file-service.mekmar.com/file/download/76/${x.SiparisNo}`;
+                x.Evrak = 'Dispatch Note (İrsaliye)';
+            };
+            if(x.YuklemeEvrakID == 77 ){
+                x.Link = `https://file-service.mekmar.com/file/download/77/${x.SiparisNo}`;
+                x.Evrak = 'Other (Diğer)';
+            };
 
             if(x.YuklemeEvrakID == 99 ){
                 x.Link = `https://file-service.mekmar.com/file/download/99/${x.SiparisNo}`;
