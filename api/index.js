@@ -10922,46 +10922,46 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID in (1,123)
         const sqlMekmar = `
                 select 
 
-	su.ID,
-	su.SiparisNo,
-	su.TedarikciID,
-	t.FirmaAdi,
-	su.UrunKartID,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar,
-	su.Miktar,
-	su.OzelMiktar,
-	su.KasaAdet,
-	su.SatisFiyati,
-	su.SatisToplam,
-	su.UretimAciklama,
-	su.MusteriAciklama,
-	su.AlisFiyati,
-	su.SiraNo,
-	su.Ton,
-	su.musteriID,
-	su.Adet,
-    su.UrunBirimID,
-    dbo.Product_Workerman_Cost(su.SiparisNo,su.UrunKartID) as Iscilik
+                su.ID,
+                su.SiparisNo,
+                su.TedarikciID,
+                t.FirmaAdi,
+                su.UrunKartID,
+                k.KategoriAdi,
+                urun.UrunAdi,
+                yk.YuzeyIslemAdi,
+                ol.En,
+                ol.Boy,
+                ol.Kenar,
+                su.Miktar,
+                su.OzelMiktar,
+                su.KasaAdet,
+                su.SatisFiyati,
+                su.SatisToplam,
+                su.UretimAciklama,
+                su.MusteriAciklama,
+                su.AlisFiyati,
+                su.SiraNo,
+                su.Ton,
+                su.musteriID,
+                su.Adet,
+                su.UrunBirimID,
+                dbo.Product_Workerman_Cost(su.SiparisNo,su.UrunKartID) as Iscilik
 
 
-from SiparisUrunTB su
-inner join TedarikciTB t on t.ID = su.TedarikciID
-inner join UrunKartTB uk on uk.ID = su.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
-inner join SiparislerTB sip on sip.SiparisNo = su.SiparisNo
-inner join MusterilerTB mus on mus.ID = sip.MusteriID
+            from SiparisUrunTB su
+            inner join TedarikciTB t on t.ID = su.TedarikciID
+            inner join UrunKartTB uk on uk.ID = su.UrunKartID
+            inner join KategoriTB k on k.ID = uk.KategoriID
+            inner join UrunlerTB urun on urun.ID = uk.UrunID
+            inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+            inner join OlculerTB ol on ol.ID = uk.OlcuID
+            inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
+            inner join SiparislerTB sip on sip.SiparisNo = su.SiparisNo
+            inner join MusterilerTB mus on mus.ID = sip.MusteriID
 
-where su.SiparisNo='${req.params.po}' and su.TedarikciID not in (1,123) and mus.Marketing in ('Mekmer','İç Piyasa')
-    `;
+            where su.SiparisNo='${req.params.po}' and su.TedarikciID not in (1,123) and mus.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
+                `;
     await mssql.query(sqlMekmer, async(err, mekmer) => {
         await mssql.query(sqlMekmar, (err, mekmar) => {
             res.status(200).json({ 'list': mekmer.recordset.concat(mekmar.recordset) }); 

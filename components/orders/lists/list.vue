@@ -150,7 +150,7 @@
           </template>
         </Column>
       </DataTable>
-      <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+      <DataTable :value="list" rowGroupMode="rowspan" :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI',]"
         :selection.sync="selectedProduction" selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm customShipped2" :paginator="true" :rows="25"
         style="font-size: 70%; border: 2px solid gray;" filterDisplay="row" :filters.sync="filtersOrders"
@@ -309,7 +309,8 @@
         :selection.sync="selectedProduction" selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)" class="p-datatable-sm" filterDisplay="row"
         :filters.sync="filtersOrders" :rowClass="rowClass2" @filter="ordersFilter($event)" columnResizeMode="fit"
-        showGridlines responsiveLayout="scroll" v-else>
+        showGridlines responsiveLayout="scroll" 
+        v-else>
 
 
         <Column header="#" headerStyle="width:3rem">
