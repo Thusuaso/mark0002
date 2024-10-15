@@ -109,7 +109,7 @@ export default {
     // module options
     sockets: [{
       name: 'main',
-      url: 'real-time-mark0002.mekmar.com'
+      url: 'socket-io.mekmar.com'
     }]
   }
 

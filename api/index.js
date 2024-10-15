@@ -3738,7 +3738,8 @@ app.get('/reports/mekmar/forwarding/list', (req, res) => {
     ol.Kenar,
     uoc.OcakAdi,
     ub.BirimAdi,
-    t.FirmaAdi as TedarikciAdi
+    t.FirmaAdi as TedarikciAdi,
+    u.Aciklama
     
     from SevkiyatTB s 
     inner join UretimTB u on u.KasaNo = s.KasaNo
@@ -3789,7 +3790,8 @@ app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
     ol.Kenar,
     uoc.OcakAdi,
     ub.BirimAdi,
-    t.FirmaAdi as TedarikciAdi
+    t.FirmaAdi as TedarikciAdi,
+    u.Aciklama
     
     from SevkiyatTB s 
     inner join UretimTB u on u.KasaNo = s.KasaNo
@@ -3855,7 +3857,8 @@ ol.Boy,
 ol.Kenar,
 uoc.OcakAdi,
 ub.BirimAdi,
-t.FirmaAdi as TedarikciAdi
+t.FirmaAdi as TedarikciAdi,
+u.Aciklama
 
 from SevkiyatTB s 
 inner join UretimTB u on u.KasaNo = s.KasaNo

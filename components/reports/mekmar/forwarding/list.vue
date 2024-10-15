@@ -2,7 +2,9 @@
   <div>
     <DataTable :value="list" paginator :rows="15" :filters.sync="filters1" filterDisplay="row"
       @filter="reportsMekmarForwardingFiltered($event)" class="p-datatable-sm" style="font-size: 70%" 
-      v-if="!dates">
+      v-if="!dates"
+      
+      >
       <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
         <template #body="slotProps">
@@ -160,6 +162,8 @@
             class="p-column-filter" />
         </template>
       </Column>
+      <Column field="Aciklama" header="Desc.">
+      </Column>
       <Column field="BirimFiyat" header="Price" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.BirimFiyat | formatPriceUsd }}
@@ -177,7 +181,9 @@
 
     <DataTable :value="list" paginator :rows="15" :filters.sync="filters2" filterDisplay="row"
       @filter="reportsMekmarForwardingFiltered($event)" class="p-datatable-sm" style="font-size: 70%" 
-      v-if="dates">
+      v-if="dates"
+      
+      >
       <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
         <template #body="slotProps">
@@ -300,6 +306,8 @@
         <template #filter="{ filterModel, filterCallback }">
           <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
         </template>
+      </Column>
+      <Column field="Aciklama" header="Desc.">
       </Column>
       <Column field="BirimFiyat" header="Price" headerClass="tableHeader" bodyClass="tableBody"
         v-if="!getAuthorityStatus">
