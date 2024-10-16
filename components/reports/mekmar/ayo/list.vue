@@ -582,10 +582,10 @@
 
         >
           <template #body="slotProps">
-            {{ slotProps.data.kar_zarar_tl | formatPriceUsd }}
+            {{ slotProps.data.kar_zarar_tl | formatPriceTl }}
           </template>
           <template #footer>
-            {{ total.profitTl | formatPriceUsd }}
+            {{ total.profitTl | formatPriceTl }}
           </template>
         </Column>
         <Column
@@ -640,7 +640,10 @@ export default {
     mekmarAyoFilter(event) {
       this.$store.dispatch("setReportsMekmarAyoListTotal", event.filteredValue);
     },
-    mekmarAyoSelected(event) {},
+    mekmarAyoSelected(event) {
+      this.$emit('mekmar_ayo_selected_emit',event.data);
+
+    },
   },
 };
 </script>

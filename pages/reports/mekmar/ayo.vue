@@ -192,7 +192,30 @@
       </div>
     </div>
 
-    <reportsMekmarAyoList :list="getReportsMekmarAyoList" :total="getReportsMekmarAyoListTotal" />
+    <reportsMekmarAyoList :list="getReportsMekmarAyoList" :total="getReportsMekmarAyoListTotal" 
+      @mekmar_ayo_selected_emit="mekmarAyoSelected($event)"
+    />
+
+    <Dialog :visible.sync="mekmar_ayo_detail_dialog" :header="detail_header" modal >
+
+      <DataTable :value="getOrderProductionDocumentList">
+      <Column field="Tarih" header="Upload Date">
+        <template #body="slotProps">
+          {{ slotProps.data.Tarih | dateToString }}
+        </template>
+      </Column>
+      <Column field="Evrak" header="Document Name"></Column>
+      <Column field="Link" header="Link">
+        <template #body="slotProps">
+          <a :href="slotProps.data.Link">
+            <i class="pi pi-download"></i>
+          </a>
+        </template>
+      </Column>
+      <Column field="kullanici" header="Document Rep"> </Column>
+    </DataTable>
+    </Dialog>
+
   </div>
 
 
@@ -210,10 +233,13 @@ export default {
       "getReportsMekmarAyoMonthList",
       "getReportsMekmarAyoListTotal",
       "getLocalUrl",
+      "getOrderProductionDocumentList"
     ]),
   },
   data() {
     return {
+      detail_header:'',
+      mekmar_ayo_detail_dialog:false,
       mekmer_cost_form_visible:false,
       mekmerCostList:[],
 
@@ -364,6 +390,12 @@ export default {
 
   },
   methods: {
+    mekmarAyoSelected(event){
+      this.$store.dispatch('setOrderProductionDocumentList',event.siparis_no);
+      this.detail_header = event.siparis_no;
+      this.mekmar_ayo_detail_dialog = true;
+    },
+
     /* */
     mekmerCost(){
       this.$axios.get(`/reports/ayo/mekmer/cost/list/${this.selectedYear.Yil}`)
