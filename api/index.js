@@ -115,6 +115,13 @@ app.get('/home',(req,res)=>{
     group by MONTH(t.Tarih),t.KullaniciId
     order by MONTH(t.Tarih)
     `;
+
+    let sqlChartProductSpecial = `
+        select YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se 
+inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
+where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
+    `;
+
     function _forSum(data){
         let sum = 0;
         if(data.length == 0){
@@ -174,7 +181,7 @@ app.get('/home',(req,res)=>{
         });
         return chart;
     };
-    function _chartProductsSum(data){
+    function _chartProductsSum(data,data2){
         const chart_sqm = [0,0,0,0,0,0,0,0,0,0,0,0];
         const chart_piece = [0,0,0,0,0,0,0,0,0,0,0,0];
         const chart_mt = [0,0,0,0,0,0,0,0,0,0,0,0];
@@ -187,6 +194,17 @@ app.get('/home',(req,res)=>{
                 chart_mt[x.month - 1] += x.total;
             }
         });
+
+        data2.forEach(x=>{
+            if(x.UrunBirimID == 1){
+                chart_sqm[x.Month - 1] += x.Miktar;
+            }else if (x.UrunBirimID == 2){
+                chart_piece[x.Month - 1] += x.Miktar;
+            }else if (x.UrunBirimID == 3){
+                chart_mt[x.Month - 1] += x.Miktar;
+            }
+        });
+
         return {
             'sqm':chart_sqm,
             'piece':chart_piece,
@@ -297,86 +315,92 @@ app.get('/home',(req,res)=>{
                                         mssql.query(sqlChartCustomerShipped,(err,chartShippedCustomer)=>{
                                             mssql.query(sqlChartProduct,(err,chartProducts)=>{
                                                 mssql.query(sqlChartOffers,(err,chartOffers)=>{
-                                                    let _productsChartData = _chartProductsSum(chartProducts?.recordset);
-                                                let _offeresChartData = _chartOffersSum(chartOffers?.recordset);
-                                                res.status(200).json({
-                                                    'aylikSiparis':totalMonthOrder,
-                                                    'yillikSiparis':totalYearOrder,
-                                                    'ortalamaSiparis':totalYearOrder / (new Date().getMonth() + 1),
-                                                    'tahminiYillikSiparis':(totalYearOrder / (new Date().getMonth() + 1)) * 12,
-                                                    'aylikYukleme':totalMonthForwarding,
-                                                    'yillikYukleme':totalYearForwarding,
-                                                    'ortalamaYukleme':totalYearForwarding / (new Date().getMonth() + 1),
-                                                    'tahminiYillikYukleme':(totalYearForwarding / (new Date().getMonth() + 1)) * 12,
-                                                    'chartOne':{
-                                                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                                                        datasets: [
-                                                            {
-                                                                label: new Date().getFullYear(),
-                                                                backgroundColor: 'grey',
-                                                                borderColor: 'black',
-                                                                data: chartOne
+                                                    mssql.query(sqlChartProductSpecial,(err,chartProductsSpecial)=>{
+                                                        let _productsChartData = _chartProductsSum(chartProducts?.recordset,chartProductsSpecial.recordset);
+                                                        let _offeresChartData = _chartOffersSum(chartOffers?.recordset);
+                                                        res.status(200).json({
+                                                            'aylikSiparis':totalMonthOrder,
+                                                            'yillikSiparis':totalYearOrder,
+                                                            'ortalamaSiparis':totalYearOrder / (new Date().getMonth() + 1),
+                                                            'tahminiYillikSiparis':(totalYearOrder / (new Date().getMonth() + 1)) * 12,
+                                                            'aylikYukleme':totalMonthForwarding,
+                                                            'yillikYukleme':totalYearForwarding,
+                                                            'ortalamaYukleme':totalYearForwarding / (new Date().getMonth() + 1),
+                                                            'tahminiYillikYukleme':(totalYearForwarding / (new Date().getMonth() + 1)) * 12,
+                                                            'chartOne':{
+                                                                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                                                                datasets: [
+                                                                    {
+                                                                        label: new Date().getFullYear(),
+                                                                        backgroundColor: 'grey',
+                                                                        borderColor: 'black',
+                                                                        data: chartOne
+                                                                    },
+                                                                    {
+                                                                        label: new Date().getFullYear() - 1,
+                                                                        backgroundColor: 'black',
+                                                                        borderColor: 'grey',
+                                                                        data: chartTwo
+                                                                    }
+                                                                ]
                                                             },
-                                                            {
-                                                                label: new Date().getFullYear() - 1,
-                                                                backgroundColor: 'black',
-                                                                borderColor: 'grey',
-                                                                data: chartTwo
-                                                            }
-                                                        ]
-                                                    },
-                                                    'chartCustomerShipped':{
-                                                        labels: ['Mekmar', 'İç Piyasa', 'Imperial Homes', 'Mekmer'],
-                                                        datasets: [
-                                                            {
-                                                                data: _chartCustomerShippedSum(chartShippedCustomer?.recordset),
-                                                                backgroundColor: ['#aba34f','#ab6e4f','#4fab9f','#ab4f86'],
-                                                                hoverBackgroundColor: ['grey','grey','grey','grey']
-                                                            }
-                                                        ]
-                                                    },
-                                                    'chartProducts':{
-                                                        labels: ['January', 'February', 'March','April','May','June','July','August','September','October','November','December'],
-                                                        datasets: [
-                                                            {
-                                                                type: 'bar',
-                                                                label: 'SQM',
-                                                                backgroundColor: '#f2bf33',
-                                                                data: _productsChartData.sqm
+                                                            'chartCustomerShipped':{
+                                                                labels: ['Mekmar', 'İç Piyasa', 'Imperial Homes', 'Mekmer'],
+                                                                datasets: [
+                                                                    {
+                                                                        data: _chartCustomerShippedSum(chartShippedCustomer?.recordset),
+                                                                        backgroundColor: ['#aba34f','#ab6e4f','#4fab9f','#ab4f86'],
+                                                                        hoverBackgroundColor: ['grey','grey','grey','grey']
+                                                                    }
+                                                                ]
                                                             },
-                                                            {
-                                                                type: 'bar',
-                                                                label: 'PIECE',
-                                                                backgroundColor: '#33f2e2',
-                                                                data: _productsChartData.piece
+                                                            'chartProducts':{
+                                                                labels: ['January', 'February', 'March','April','May','June','July','August','September','October','November','December'],
+                                                                datasets: [
+                                                                    {
+                                                                        type: 'bar',
+                                                                        label: 'SQM',
+                                                                        backgroundColor: '#f2bf33',
+                                                                        data: _productsChartData.sqm
+                                                                    },
+                                                                    {
+                                                                        type: 'bar',
+                                                                        label: 'PIECE',
+                                                                        backgroundColor: '#33f2e2',
+                                                                        data: _productsChartData.piece
+                                                                    },
+                                                                    {
+                                                                        type: 'bar',
+                                                                        label: 'MT',
+                                                                        backgroundColor: '#5333f2',
+                                                                        data: _productsChartData.mt
+                                                                    }
+                                                                ]
                                                             },
-                                                            {
-                                                                type: 'bar',
-                                                                label: 'MT',
-                                                                backgroundColor: '#5333f2',
-                                                                data: _productsChartData.mt
-                                                            }
-                                                        ]
-                                                    },
-                                                    'chartOffers':{
-                                                            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                                                            datasets: [
-                                                                {
-                                                                    label: 'Özlem',
-                                                                    backgroundColor: '#e86db3',
-                                                                    borderColor: 'grey',
-                                                                    data: _offeresChartData.chart_o
-                                                                },
-                                                                {
-                                                                    label: 'Hakan',
-                                                                    backgroundColor: '#6d94e8',
-                                                                    borderColor: 'grey',
-                                                                    data: _offeresChartData.chart_h
+                                                            'chartOffers':{
+                                                                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                                                                    datasets: [
+                                                                        {
+                                                                            label: 'Özlem',
+                                                                            backgroundColor: '#e86db3',
+                                                                            borderColor: 'grey',
+                                                                            data: _offeresChartData.chart_o
+                                                                        },
+                                                                        {
+                                                                            label: 'Hakan',
+                                                                            backgroundColor: '#6d94e8',
+                                                                            borderColor: 'grey',
+                                                                            data: _offeresChartData.chart_h
+                                                                        }
+                                                                    ]
                                                                 }
-                                                            ]
-                                                        }
-                                                });
-                                                });
+                                                        });
+                                                        });
+                                                    });
+
+
+                                                    
+                                                
                                             });
 
 
@@ -867,45 +891,213 @@ app.get('/selection/production/list',(req,res)=>{
 });
 
 app.get('/selection/production/total',(req,res)=>{
-    const sql = 'select sum(u.Miktar) as Miktar,(select t.FirmaAdi from TedarikciTB t where t.ID = u.TedarikciID) as TedarikciAdi,u.TedarikciID from UretimTB u where u.UrunBirimID = 1 and YEAR(u.Tarih) = YEAR(GETDATE()) and MONTH(u.Tarih) = MONTH(GETDATE()) group by u.TedarikciID';
-    const sql2 = 'select sum(u.Miktar) as Miktar,(select t.FirmaAdi from TedarikciTB t where t.ID = u.TedarikciID) as TedarikciAdi,u.TedarikciID from UretimTB u where u.UrunBirimID = 1 and YEAR(u.Tarih) = YEAR(GETDATE()) group by u.TedarikciID';
+    const sql = 'select u.UrunBirimID,sum(u.Miktar) as Miktar,(select t.FirmaAdi from TedarikciTB t where t.ID = u.TedarikciID) as TedarikciAdi,u.TedarikciID from UretimTB u where  YEAR(u.Tarih) = YEAR(GETDATE()) and MONTH(u.Tarih) = MONTH(GETDATE()) group by u.TedarikciID,u.UrunBirimID';
+    const sql2 = `
+        select sum(u.Miktar) as Miktar,(select t.FirmaAdi from TedarikciTB t where 
+        t.ID = u.TedarikciID) as TedarikciAdi,u.TedarikciID,u.UrunBirimID from UretimTB u where u.UrunBirimID = 1 and YEAR(u.Tarih) = YEAR(GETDATE()) 
+        group by u.TedarikciID,u.UrunBirimID
+    `;
+    const sql3 = `
+    select su.TedarikciID,YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se 
+    inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
+    where YEAR(se.Tarih) = YEAR(GETDATE()) and MONTH(se.Tarih) = MONTH(GETDATE())
+
+    `;
+    const sql4 = `
+            select su.TedarikciID,YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se 
+    inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
+    where YEAR(se.Tarih) = YEAR(GETDATE()) 
+
+        
+    `;
+    
     mssql.query(sql,(err,productMonth)=>{
         mssql.query(sql2,(err,productYear)=>{
-            let data = {
-                'mekmerMonth':0,
-                'mekmozMonth':0,
-                'disMonth':0,
-                'mekmerYear':0,
-                'mekmozYear':0,
-                'disYear':0,
-                'monthTotal':0,
-                'yearTotal':0,
-            };
-            productMonth.recordset.forEach(x =>{
-                data.monthTotal += x.Miktar;
-                if(x.TedarikciID == 1){
-                    data.mekmerMonth += x.Miktar;
-                }else if (x.TedarikciID == 123){
-                    data.mekmozMonth += x.Miktar;
-                } else {
-                    data.disMonth += x.Miktar;
-                }
+            mssql.query(sql3,(err,productSelectionMonth)=>{
+                mssql.query(sql4,(err,productSelectionYear)=>{
+                    let data = {
+                        'mekmerMonthSqm':0,
+                        'mekmerMonthPcs':0,
+                        'mekmerMonthMt':0,
+    
+                        'mekmozMonthSqm':0,
+                        'mekmozMonthPcs':0,
+                        'mekmozMonthMt':0,
+    
+                        'disMonthSqm':0,
+                        'disMonthPcs':0,
+                        'disMonthMt':0,
+    
+                        'mekmerYearSqm':0,
+                        'mekmerYearPcs':0,
+                        'mekmerYearMt':0,
+    
+                        'mekmozYearSqm':0,
+                        'mekmozYearPcs':0,
+                        'mekmozYearMt':0,
+    
+                        'disYearSqm':0,
+                        'disYearPcs':0,
+                        'disYearMt':0,
+    
+                        'monthTotalSqm':0,
+                        'monthTotalPcs':0,
+                        'monthTotalMt':0,
+    
+                        'yearTotalSqm':0,
+                        'yearTotalPcs':0,
+                        'yearTotalMt':0,
+    
+                    };
+                    productMonth.recordset.forEach(x =>{
+                        if(x.UrunBirimID == 1){
+                            data.monthTotalSqm += x.Miktar;
+                        }else if (x.UrunBirimID == 2){
+                            data.monthTotalPcs += x.Miktar;
+                        }else if (x.UrunBirimID == 3){
+                            data.monthTotalMt += x.Miktar;
+                        }
+                        if(x.TedarikciID == 1){
+                            if(x.UrunBirimID == 1){
+                                data.mekmerMonthSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmerMonthPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmerMonthMt += x.Miktar;
+                            }
+                        }else if (x.TedarikciID == 123){
+                            if(x.UrunBirimID == 1){
+                                data.mekmozMonthSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmozMonthPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmozMonthMt += x.Miktar;
+                            }
+                        } else {
+                            if(x.UrunBirimID == 1){
+                                data.disMonthSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.disMonthPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.disMonthMt += x.Miktar;
+                            }
+                        }
+                    });
+        
+                    productYear.recordset.forEach(x=>{
+                        if(x.UrunBirimID == 1){
+                            data.yearTotalSqm += x.Miktar;
+                        }else if (x.UrunBirimID == 2){
+                            data.yearTotalPcs += x.Miktar;
+                        }else if (x.UrunBirimID == 3){
+                            data.yearTotalMt += x.Miktar;
+                        }
+                        if(x.TedarikciID == 1){
+                            if(x.UrunBirimID == 1){
+                                data.mekmerYearSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmerYearPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmerYearMt += x.Miktar;
+                            }
+                        }else if (x.TedarikciID == 123){
+                            if(x.UrunBirimID == 1){
+                                data.mekmozYearSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmozYearPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmozYearMt += x.Miktar;
+                            }
+                        } else {
+                            if(x.UrunBirimID == 1){
+                                data.disYearSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.disYearPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.disYearMt += x.Miktar;
+                            }
+                        }
+                    });
+                    productSelectionMonth.recordset.forEach(x=>{
+                        if(x.UrunBirimID == 1){
+                            data.monthTotalSqm += x.Miktar;
+                        }else if (x.UrunBirimID == 2){
+                            data.monthTotalPcs += x.Miktar;
+                        }else if (x.UrunBirimID == 3){
+                            data.monthTotalMt += x.Miktar;
+                        };
+                        if(x.TedarikciID == 1){
+                            if(x.UrunBirimID == 1){
+                                data.mekmerMonthSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmerMonthPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmerMonthMt += x.Miktar;
+                            }
+                        }else if (x.TedarikciID == 123){
+    
+                            if(x.UrunBirimID == 1){
+                                data.mekmozMonthSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmozMonthPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmozMonthMt += x.Miktar;
+                            }
+                        }else{
+                            if(x.UrunBirimID == 1){
+                                data.disMonthSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.disMonthPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.disMonthMt += x.Miktar;
+                            }
+                        }
+                    });
+                    productSelectionYear.recordset.forEach(x=>{
+                        if(x.UrunBirimID == 1){
+                            data.yearTotalSqm += x.Miktar;
+                        }else if (x.UrunBirimID == 2){
+                            data.yearTotalPcs += x.Miktar;
+                        }else if (x.UrunBirimID == 3){
+                            data.yearTotalMt += x.Miktar;
+                        };
+                        if(x.TedarikciID == 1){
+                            if(x.UrunBirimID == 1){
+                                data.mekmerYearSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmerYearPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmerYearMt += x.Miktar;
+                            }
+                        }else if (x.TedarikciID == 123){
+    
+                            if(x.UrunBirimID == 1){
+                                data.mekmozYearSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.mekmozYearPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.mekmozYearMt += x.Miktar;
+                            }
+                        }else{
+                            if(x.UrunBirimID == 1){
+                                data.disYearSqm += x.Miktar;
+                            }else if (x.UrunBirimID == 2){
+                                data.disYearPcs += x.Miktar;
+                            }else if (x.UrunBirimID == 3){
+                                data.disYearMt += x.Miktar;
+                            }
+                        }
+                    });
+    
+    
+    
+            
+                    res.status(200).json({
+                        'data':data,
+                    });
+                });
             });
 
-            productYear.recordset.forEach(x=>{
-                data.yearTotal += x.Miktar;
-                if(x.TedarikciID == 1){
-                    data.mekmerYear += x.Miktar;
-                }else if (x.TedarikciID == 123){
-                    data.mekmozYear += x.Miktar;
-                } else {
-                    data.disYear += x.Miktar;
-                }
-            });
-    
-            res.status(200).json({
-                'data':data,
-            })
         });
         
     });

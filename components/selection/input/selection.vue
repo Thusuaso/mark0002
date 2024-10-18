@@ -1,41 +1,77 @@
 <template>
   <div class="row">
-    <div class="col-3">
+    <div class="col-4">
       <table class="table">
         <thead>
           <tr>
             <th scope="col">Producer</th>
-            <th scope="col">Month</th>
-            <th scope="col">Year</th>
+            <th scope="col">Month (SQM)</th>
+            <th scope="col">Month (PCS)</th>
+            <th scope="col">Month (MT)</th>
+
+            <th scope="col">Year (SQM)</th>
+            <th scope="col">Year (PCS)</th>
+            <th scope="col">Year (MT)</th>
+
+            
           </tr>
         </thead>
         <tbody>
           <tr>
             <th>Mekmer</th>
-            <td>{{ productionTotal.mekmerMonth | formatDecimal }}</td>
-            <td>{{ productionTotal.mekmerYear | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmerMonthSqm | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmerMonthPcs | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmerMonthMt | formatDecimal }}</td>
+
+            <td>{{ productionTotal.mekmerYearSqm | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmerYearPcs | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmerYearMt | formatDecimal }}</td>
+
+
           </tr>
           <tr>
             <th>Mekmoz</th>
-            <td>{{ productionTotal.mekmozMonth | formatDecimal }}</td>
-            <td>{{ productionTotal.mekmozYear | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmozMonthSqm | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmozMonthPcs | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmozMonthMt | formatDecimal }}</td>
+
+            <td>{{ productionTotal.mekmozYearSqm | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmozYearPcs | formatDecimal }}</td>
+            <td>{{ productionTotal.mekmozYearMt | formatDecimal }}</td>
+
+
           </tr>
           <tr>
             <th>External Crates</th>
-            <td>{{ productionTotal.disMonth | formatDecimal }}</td>
-            <td>{{ productionTotal.disYear | formatDecimal }}</td>
+            <td>{{ productionTotal.disMonthSqm | formatDecimal }}</td>
+            <td>{{ productionTotal.disMonthPcs | formatDecimal }}</td>
+            <td>{{ productionTotal.disMonthMt | formatDecimal }}</td>
+            <td>{{ productionTotal.disYearSqm | formatDecimal }}</td>
+            <td>{{ productionTotal.disYearPcs | formatDecimal }}</td>
+            <td>{{ productionTotal.disYearMt | formatDecimal }}</td>
           </tr>
           <tr>
             <th>Total</th>
+
             <td>
-              <b>{{ productionTotal.monthTotal | formatDecimal }} ({{
-                (productionTotal.mekmerMonth + productionTotal.mekmozMonth)
-                | formatDecimal
-                }})</b>
+              <b>{{ productionTotal.monthTotalSqm | formatDecimal }}</b>
             </td>
             <td>
-              <b>{{ productionTotal.yearTotal | formatDecimal }}</b>
+              <b>{{ productionTotal.monthTotalPcs | formatDecimal }}</b>
             </td>
+            <td>
+              <b>{{ productionTotal.monthTotalMt | formatDecimal }}</b>
+            </td>
+            <td>
+              <b>{{ productionTotal.yearTotalSqm | formatDecimal }}</b>
+            </td>
+            <td>
+              <b>{{ productionTotal.yearTotalPcs | formatDecimal }}</b>
+            </td>
+            <td>
+              <b>{{ productionTotal.yearTotalMt | formatDecimal }}</b>
+            </td>
+
           </tr>
         </tbody>
       </table>
@@ -43,7 +79,7 @@
     <div class="col-1">
       <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
     </div>
-    <div class="col-2">
+    <div class="col-1">
       <Button type="button" class="p-button-primary w-100 mb-2" label="Mekmer"
         @click="$emit('products_status_selected', 1)" />
       <Button type="button" class="p-button-secondary w-100 mb-2" label="External Crates"
