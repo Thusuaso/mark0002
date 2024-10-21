@@ -63,6 +63,9 @@
               <li>
                 <nuxt-link to="/passwords" class="dropdown-item" tag="a">Passwords</nuxt-link>
               </li>
+              <li>
+                <nuxt-link to="/sales/important-links" class="dropdown-item" tag="a">Important Links</nuxt-link>
+              </li>
             </ul>
           </li>
 

@@ -16274,7 +16274,90 @@ app.put('/reports/ayo/mekmer/cost/update',(req,res)=>{
     });
 });
 
+
+
+
 /* */
+app.get('/important/link/list',(req,res)=>{
+    const sql = `
+        select 
+
+	im.ID,
+	im.Description,
+	im.Link,
+	im.SaveDate,
+	im.UpdatedUserID,
+	(select k.KullaniciAdi from KullaniciTB k where k.ID = im.UpdatedUserID) as Username
+
+from ImportantLinksTB im
+    `;
+
+    mssql.query(sql,(err,important)=>{
+        res.status(200).json({
+            'list':important.recordset
+        })
+    });
+});
+
+app.post('/important/link/save',(req,res)=>{
+    const insertSql = `
+        insert into ImportantLinksTB (Description,Link,SaveDate,UpdatedUserID)
+
+VALUES('${req.body.Description}','${req.body.Link}','${req.body.SaveDate}','${req.body.UpdatedUserID}')
+    `;
+    const getIdSql = `select top 1 ID from ImportantLinksTB order by ID desc`;
+    mssql.query(insertSql,(err,important)=>{
+        if(important.rowsAffected[0] == 1){
+            mssql.query(getIdSql,(err,id)=>{
+                res.status(200).json({
+                    'status':true,
+                    'id':id.recordset[0].ID
+                })
+            });
+
+        }else{
+            res.status(200).json({
+                'status':false
+            })
+        }
+    });
+});
+app.put('/important/link/update',(req,res)=>{
+    const updateSql = `
+                update ImportantLinksTB SET 
+Description='${req.body.Description}',Link='${req.body.Link}',SaveDate='${req.body.SaveDate}',UpdatedUserID='${req.body.UpdatedUserID}'
+where ID='${req.body.ID}'
+    `;
+    mssql.query(updateSql,(err,important)=>{
+        if(important.rowsAffected[0] == 1){
+            res.status(200).json({
+                'status':true
+            })
+        }else{
+            res.status(200).json({
+                'status':false
+            })
+        };
+    });
+});
+
+app.delete('/important/link/delete/:id',(req,res)=>{
+    const deleteSql = `
+delete ImportantLinksTB where ID='${req.params.id}'
+    `;
+    mssql.query(deleteSql,(err,important)=>{
+        if(important.rowsAffected[0] == 1){
+            res.status(200).json({
+                'status':true
+            })
+        }else{
+            res.status(200).json({
+                'status':false
+            })
+        }
+    });
+})
+
 
 
 

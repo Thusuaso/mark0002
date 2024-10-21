@@ -134,6 +134,14 @@ import formCurrency from '~/components/reports/mekmar/ayo/formcurrency';
 
 import profitGu from '~/components/reports/mekmar/gu/profit';
 
+import importantLinksForm from '~/components/sales/important-links/form';
+import importantLinksList from '~/components/sales/important-links/list';
+
+
+Vue.component('importantLinksForm',importantLinksForm);
+Vue.component('importantLinksList',importantLinksList);
+
+
 Vue.component('profitGu',profitGu);
 
 Vue.component('formCurrency',formCurrency);
@@ -451,6 +459,22 @@ Vue.filter('monthToString', (value) => {
     const months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
     return months[value - 1];
 });
+
+Vue.filter('dateToTime',(value)=>{
+    if(value == null || value == NaN-NaN-NaN || value == 'NaN-NaN-NaN' || value == undefined || value == ""){
+        return "";
+    } else{
+        let date = new Date(value);
+        let seconds = date.getSeconds();
+        let minutes = date.getMinutes();
+        let hours = date.getHours();
+
+
+        return hours + ":" + minutes + ":" + seconds;
+    }
+
+});
+
 
 
 

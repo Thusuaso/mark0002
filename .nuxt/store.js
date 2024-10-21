@@ -28,6 +28,7 @@ let store = {};
   resolveStoreModules(require('..\\store\\modules\\customer.js'), 'modules/customer.js')
   resolveStoreModules(require('..\\store\\modules\\finance.js'), 'modules/finance.js')
   resolveStoreModules(require('..\\store\\modules\\home.js'), 'modules/home.js')
+  resolveStoreModules(require('..\\store\\modules\\importantLink.js'), 'modules/importantLink.js')
   resolveStoreModules(require('..\\store\\modules\\loading.js'), 'modules/loading.js')
   resolveStoreModules(require('..\\store\\modules\\local.js'), 'modules/local.js')
   resolveStoreModules(require('..\\store\\modules\\logs.js'), 'modules/logs.js')
@@ -62,6 +63,7 @@ let store = {};
       '..\\store\\modules\\customer.js',
       '..\\store\\modules\\finance.js',
       '..\\store\\modules\\home.js',
+      '..\\store\\modules\\importantLink.js',
       '..\\store\\modules\\loading.js',
       '..\\store\\modules\\local.js',
       '..\\store\\modules\\logs.js',

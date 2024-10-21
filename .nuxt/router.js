@@ -32,6 +32,7 @@ const _2710d177 = () => interopDefault(import('..\\pages\\panel\\users\\index.vu
 const _26c582a6 = () => interopDefault(import('..\\pages\\sales\\bgp.vue' /* webpackChunkName: "pages/sales/bgp" */))
 const _36fa6cee = () => interopDefault(import('..\\pages\\sales\\consider.vue' /* webpackChunkName: "pages/sales/consider" */))
 const _7a18a226 = () => interopDefault(import('..\\pages\\sales\\follow.vue' /* webpackChunkName: "pages/sales/follow" */))
+const _2e56ea29 = () => interopDefault(import('..\\pages\\sales\\important-links.vue' /* webpackChunkName: "pages/sales/important-links" */))
 const _6f5615b4 = () => interopDefault(import('..\\pages\\sales\\maintodo.vue' /* webpackChunkName: "pages/sales/maintodo" */))
 const _b4e985dc = () => interopDefault(import('..\\pages\\sales\\representative.vue' /* webpackChunkName: "pages/sales/representative" */))
 const _d42a210a = () => interopDefault(import('..\\pages\\sales\\todo.vue' /* webpackChunkName: "pages/sales/todo" */))
@@ -186,6 +187,10 @@ export const routerOptions = {
     path: "/sales/follow",
     component: _7a18a226,
     name: "sales-follow"
+  }, {
+    path: "/sales/important-links",
+    component: _2e56ea29,
+    name: "sales-important-links"
   }, {
     path: "/sales/maintodo",
     component: _6f5615b4,
