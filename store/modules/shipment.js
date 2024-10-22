@@ -28,7 +28,8 @@ const actions = {
     },
 
     setShipmentAmount(vuexContext,product){
-        this.$axios.get(`/shipment/product/amount/${product.SiparisNo}/${product.ID}/${product.UrunKartId}`)
+        console.log(product);
+        this.$axios.get(`/shipment/product/amount/${product.SiparisNo}/${product.ID}/${product.UrunKartId}/${product.TedarikciID}`)
         .then(response=>{
             vuexContext.commit('setShipmentAmount',response.data);
             vuexContext.commit('setShipmentProductionList',response.data.productionList);

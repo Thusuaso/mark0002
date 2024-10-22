@@ -1691,13 +1691,13 @@ app.delete('/supplier/delete/:id',(req,res)=>{
 });
 
 /*Shipment */
-app.get(`/shipment/product/amount/:po/:orderId/:cardId`,(req,res)=>{
+app.get(`/shipment/product/amount/:po/:orderId/:cardId/:supplier`,(req,res)=>{
     const orderAmountSql = `select Miktar from SiparisUrunTB where ID='${req.params.orderId}'`;
     const productionAmountSql = `select sum(Miktar) as Miktar from UretimTB where SiparisAciklama='${req.params.po}' and UrunKartID=${req.params.cardId}`;
     const productionListSql = `
         select ur.ID,ur.KasaNo,ur.Miktar,uk.ID as UrunKartId,k.KategoriAdi,urun.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar,ub.BirimAdi,
-        (select su.SatisFiyati * ur.Miktar from SiparisUrunTB su where su.SiparisNo = ur.SiparisAciklama and su.UrunKartID = ur.UrunKartID) as TotalProduct,
-        (select su.SatisFiyati from SiparisUrunTB su where su.SiparisNo = ur.SiparisAciklama and su.UrunKartID = ur.UrunKartID) as SatisFiyati
+        (select su.SatisFiyati * ur.Miktar from SiparisUrunTB su where su.SiparisNo = ur.SiparisAciklama and su.UrunKartID = ur.UrunKartID and su.TedarikciID = ur.TedarikciID) as TotalProduct,
+        (select su.SatisFiyati from SiparisUrunTB su where su.SiparisNo = ur.SiparisAciklama and su.UrunKartID = ur.UrunKartID and su.TedarikciID=ur.TedarikciID) as SatisFiyati
 
         from 
             UretimTB ur
@@ -1708,9 +1708,10 @@ app.get(`/shipment/product/amount/:po/:orderId/:cardId`,(req,res)=>{
             inner join OlculerTB ol on ol.ID = uk.OlcuID
             inner join UrunBirimTB ub on ub.ID = ur.UrunBirimID
         where 
-        SiparisAciklama='${req.params.po}' 
-        and UrunKartID='${req.params.cardId}'
-    `
+        ur.SiparisAciklama='${req.params.po}' 
+        and ur.UrunKartID='${req.params.cardId}'
+        and ur.TedarikciID = '${req.params.supplier}'
+    `;
     mssql.query(orderAmountSql)
     .then(orderAmount=>{
         mssql.query(productionAmountSql)
@@ -8892,7 +8893,7 @@ s.SiparisKontrolEden,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+    dbo.Order_Total_Production_2(su.UrunKartID,su.SiparisNo,su.TedarikciID) as Uretim,
     dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf,
 	(select top 1 uretim.Disarda from UretimTB uretim where uretim.SiparisAciklama = su.SiparisNo and uretim.UrunKartID = su.UrunKartID and uretim.Disarda = 1) as Out
 
@@ -9049,7 +9050,7 @@ s.KonteynerNo,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+    dbo.Order_Total_Production_2(su.UrunKartID,su.SiparisNo,su.TedarikciID) as Uretim,
     dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
 
 
@@ -9172,7 +9173,7 @@ s.KonteynerNo,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+dbo.Order_Total_Production_2(su.UrunKartID,su.SiparisNo,su.TedarikciID) as Uretim,
     dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
 
 
@@ -9461,7 +9462,7 @@ s.KonteynerNo,
 	su.Adet,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
+dbo.Order_Total_Production_2(su.UrunKartID,su.SiparisNo,su.TedarikciID) as Uretim,
     dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
 
 

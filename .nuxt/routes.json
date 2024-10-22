@@ -294,13 +294,6 @@
     "_name": "_0b141e34"
   },
   {
-    "name": "reports-mekmar-ayo-compare",
-    "path": "/reports/mekmar/ayo-compare",
-    "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\ayo-compare.vue",
-    "chunkName": "pages/reports/mekmar/ayo-compare",
-    "_name": "_18a9d368"
-  },
-  {
     "name": "reports-mekmar-filter-finance",
     "path": "/reports/mekmar/filter-finance",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\filter-finance.vue",

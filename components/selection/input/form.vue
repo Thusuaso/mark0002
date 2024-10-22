@@ -654,7 +654,37 @@ export default {
       this.height = event.Boy;
     },
     saveKindSelected(event) {
-      if (event.value.id == 1) {
+      if(!this.buttonStatus){
+        if(this.selectedSupplier.ID == 1){
+          if (event.value.id == 1) {
+        this.disabledOrders = true;
+        this.selectedSupplier = { ID: 1, FirmaAdi: "Mekmer" };
+        if (this.buttonStatus) {
+          this.$store.dispatch("setSelectionProductionCrateNoIn");
+        }
+        this.description = "Stok";
+          } else {
+            if (this.buttonStatus) {
+              this.$store.dispatch("setSelectionProductionCrateNoIn");
+            }
+            this.disabledOrders = false;
+          }
+        }else{
+          if (event.value.id == 1) {
+                this.disabledOrders = true;
+                if (this.buttonStatus) {
+                  this.$store.dispatch("setSelectionProductionCrateNoIn");
+                }
+                this.description = "Stok";
+              } else {
+                if (this.buttonStatus) {
+                  this.$store.dispatch("setSelectionProductionCrateNoIn");
+                }
+                this.disabledOrders = false;
+              }
+        }
+      }else{
+        if (event.value.id == 1) {
         this.disabledOrders = true;
         this.selectedSupplier = { ID: 1, FirmaAdi: "Mekmer" };
         if (this.buttonStatus) {
@@ -667,6 +697,8 @@ export default {
         }
         this.disabledOrders = false;
       }
+      }
+
     },
     productsSelected(event) {
       this.selectedSupplier = this.suppliers.find((x) => x.ID == event.value.TedarikciID);

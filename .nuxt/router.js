@@ -46,7 +46,6 @@ const _73b2f4cc = () => interopDefault(import('..\\pages\\panel\\products\\notpu
 const _fda6c626 = () => interopDefault(import('..\\pages\\panel\\products\\published.vue' /* webpackChunkName: "pages/panel/products/published" */))
 const _a834d3e0 = () => interopDefault(import('..\\pages\\panel\\products\\queue.vue' /* webpackChunkName: "pages/panel/products/queue" */))
 const _0b141e34 = () => interopDefault(import('..\\pages\\reports\\mekmar\\ayo.vue' /* webpackChunkName: "pages/reports/mekmar/ayo" */))
-const _18a9d368 = () => interopDefault(import('..\\pages\\reports\\mekmar\\ayo-compare.vue' /* webpackChunkName: "pages/reports/mekmar/ayo-compare" */))
 const _bc78ccd0 = () => interopDefault(import('..\\pages\\reports\\mekmar\\filter-finance.vue' /* webpackChunkName: "pages/reports/mekmar/filter-finance" */))
 const _7d1e9f90 = () => interopDefault(import('..\\pages\\reports\\mekmar\\forwarding.vue' /* webpackChunkName: "pages/reports/mekmar/forwarding" */))
 const _0201a401 = () => interopDefault(import('..\\pages\\reports\\mekmar\\gu.vue' /* webpackChunkName: "pages/reports/mekmar/gu" */))
@@ -243,10 +242,6 @@ export const routerOptions = {
     path: "/reports/mekmar/ayo",
     component: _0b141e34,
     name: "reports-mekmar-ayo"
-  }, {
-    path: "/reports/mekmar/ayo-compare",
-    component: _18a9d368,
-    name: "reports-mekmar-ayo-compare"
   }, {
     path: "/reports/mekmar/filter-finance",
     component: _bc78ccd0,

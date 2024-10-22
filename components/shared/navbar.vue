@@ -191,9 +191,7 @@
               <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/ayo" class="dropdown-item" tag="a">AYO</nuxt-link>
               </li>
-              <li v-show="getAyoStatus">
-                <nuxt-link to="/reports/mekmar/ayo-compare" class="dropdown-item" tag="a">AYO Compare</nuxt-link>
-              </li>
+
               <li>
                 <nuxt-link to="/reports/mekmar/loading" class="dropdown-item" tag="a">List of Shipments</nuxt-link>
               </li>
