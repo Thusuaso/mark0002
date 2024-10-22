@@ -7,7 +7,11 @@
         >
             <Column field="ID" header="ID"></Column>
             <Column field="Description" header="Desc."></Column>
-            <Column field="Link" header="Link"></Column>
+            <Column field="Link" header="Link">
+                <template #body="slotProps">
+                    <a :href="slotProps.data.Link" target="_blank">Link</a>
+                </template>
+            </Column>
             <Column field="SaveDate" header="Date">
                 <template #body="slotProps">
                     {{ slotProps.data.SaveDate | dateToString }}
