@@ -47,6 +47,18 @@ export default {
       const container = event.KonteynerFirmaID;
       const document = event.EvrakAdi;
       const docName = event.DocName;
+      if(event.EvrakAdi == 'Other'){
+        this.document_link = `https://file-service.mekmar.com/file/download/77/${po}`;
+        this.document_form = true;
+      };
+      if(event.EvrakAdi == 'ATR'){
+        this.document_link = `https://file-service.mekmar.com/file/download/75/${po}`;
+        this.document_form = true;
+      };
+      if(event.EvrakAdi == 'Certificate of Origin'){
+        this.document_link = `https://file-service.mekmar.com/file/download/74/${po}`;
+        this.document_form = true;
+      };
       if(event.EvrakAdi == 'Proforma Invoice'){
         this.document_link = `https://file-service.mekmar.com/file/download/2/${po}`;
         this.document_form = true;
@@ -85,7 +97,7 @@ export default {
         this.document_link = `https://file-service.mekmar.com/file/download/10/${po}`;
         this.document_form = true;
       };
-      if(event.EvrakAdi == 'Dolaşım Belgeleri'){
+      if(event.EvrakAdi == 'Dolaşım Belgeleri (Eski)'){
         this.document_link = `https://file-service.mekmar.com/file/download/11/${po}`;
         this.document_form = true;
       };
@@ -138,6 +150,8 @@ export default {
                 this.document_form = true;
 
             };
+
+
 
 
 

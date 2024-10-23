@@ -11882,7 +11882,7 @@ from
 UretimTB u,UrunBirimTB b,TedarikciTB t    
 where u.SiparisAciklama='${req.params.po}'   
 and b.ID = u.UrunBirimID    
-and t.ID = u.TedarikciID    and t.ID in (1,123)
+and t.ID = u.TedarikciID   
 order by u.UrunKartID asc    
     `;
    await mssql.query(checkListSql, (err, check) => {
