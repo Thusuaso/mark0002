@@ -521,14 +521,15 @@ export default {
           label: "Adet",
           field: "Adet",
         },
-        {
-          label: "Ürün Birim",
-          field: "UrunBirimAdi",
-        },
+
         {
           label: "Miktar",
           field: "Miktar",
           dataFormat: this.formatDecimal,
+        },
+        {
+          label: "Ürün Birim",
+          field: "UrunBirimAdi",
         },
         {
           label: "Po",
@@ -555,8 +556,9 @@ export default {
         "Kutu Adet": "KutuAdet",
         "Kutu Ici Adet": "KutuIciAdet",
         Adet: "Adet",
-        "Ürün Birim": "UrunBirimAdi",
         Miktar: "Miktar",
+        "Ürün Birim": "UrunBirimAdi",
+
         Po: "SiparisAciklama",
         Açıklama: "Aciklama",
       },
