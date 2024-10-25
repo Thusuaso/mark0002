@@ -128,7 +128,7 @@
       <div class="col-9">
         <span class="p-float-label mb-4">
           <Textarea v-model="model.UretimAciklama" rows="5" class="w-100" />
-          <label>Production Explanation</label>
+          <label>AYO Explanation</label>
         </span>
         <span class="p-float-label mb-4">
           <Textarea v-model="model.SevkiyatAciklama" rows="5" class="w-100" />

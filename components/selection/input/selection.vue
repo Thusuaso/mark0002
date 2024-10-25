@@ -286,16 +286,6 @@ export default {
           link: "https://file-service.mekmar.com/file/download/etiket/1/SBS02.doc",
         },
         {
-          code: "ST-450",
-          urun: "MINA RUSTIC DÜZ KENAR (ST-450)",
-          link: "https://file-service.mekmar.com/file/download/etiket/1/ST-450.doc",
-        },
-        {
-          code: "ST-448",
-          urun: "SILVER RUSTIC DÜZ KENAR (ST-448)",
-          link: "https://file-service.mekmar.com/file/download/etiket/1/ST-448-1.doc",
-        },
-        {
           code: "VKGD-SNS",
           urun: "CLASSIC VEIN CUT DÜZ KENAR (VKGD-SNS)",
           link: "https://file-service.mekmar.com/file/download/etiket/1/SNS01.doc",
