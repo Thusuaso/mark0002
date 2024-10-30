@@ -25,7 +25,7 @@
     />
     <Dialog
       :visible.sync="panel_form_dialog"
-      :header="'Ürün Id ' + getPanelProductId"
+      :header="'Ürün Id ' + getPanelProductId + ' ' + getPanelProductName"
       modal
       maximizable
       :closeOnEscape="false"
@@ -73,6 +73,7 @@ export default {
   middleware: ["authority"],
   computed: {
     ...mapGetters([
+      'getPanelProductName',
       "getPanelPublishedList",
       "getPanelCategoryList",
       "getPanelProductModel",
@@ -120,6 +121,7 @@ export default {
   },
   methods: {
     panelPublishedListSelected(event) {
+      this.$store.dispatch('setPanelProductName',event.urunadi_en);
       this.$store.dispatch("setPanelProductId", event.urunid);
       this.$store.dispatch('setPanelId',event.Id);
 

@@ -11568,11 +11568,11 @@ app.get('/order/production/product/document/:po', async (req, res) => {
             };
             if((x.YuklemeEvrakID == 3) && (x.Evrak_Kontrol != 1)){
                 x.Link = `https://file-service.mekmar.com/file/download/3/${x.SiparisNo}`;
-                x.Evrak = 'ISF-' + x.EvrakAdi;
+                x.Evrak = 'ISF - ' + x.EvrakAdi;
             };
             if((x.YuklemeEvrakID == 3) && (x.Evrak_Kontrol == 1)){
                 x.Link = `https://file-service.mekmar.com/file/download/3/${x.EvrakAdi}`;
-                x.Evrak = 'ISF-' + x.EvrakAdi;
+                x.Evrak = 'ISF - ' + x.EvrakAdi;
             };
             if (x.YuklemeEvrakID == 4) {
                 x.Link = `https://file-service.mekmar.com/file/download/4/${x.SiparisNo}`;
@@ -11636,7 +11636,7 @@ app.get('/order/production/product/document/:po', async (req, res) => {
             };
             if (x.YuklemeEvrakID == 13) {
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.NakliyeFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = 'Transportation Invoices (Nakliye Faturaları) -' + x.NakliyeFirmaAdi
+                x.Evrak = 'Transportation Invoices (Nakliye Faturaları) - ' + x.NakliyeFirmaAdi
             };
             if (x.YuklemeEvrakID == 40) {
                 x.Link = `https://file-service.mekmar.com/file/download/40/${x.SiparisNo}`;
@@ -11644,28 +11644,28 @@ app.get('/order/production/product/document/:po', async (req, res) => {
             };
             if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID == 7){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/3/${x.EvrakAdi}`;
-                x.Evrak = 'Customs -' + x.KonteynerFirmaAdi;
+                x.Evrak = 'Customs - ' + x.KonteynerFirmaAdi;
             }
 
             if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID==9 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = 'Shipping Invoices (Denizcilik Faturaları) -' + x.KonteynerFirmaAdi;
+                x.Evrak = 'Shipping Invoices (Denizcilik Faturaları) - ' + x.KonteynerFirmaAdi;
             };
             if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID==13 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = 'Freight -' + x.KonteynerFirmaAdi;
+                x.Evrak = 'Freight - ' + x.KonteynerFirmaAdi;
             };
             if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID==13 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = 'Freight -' + x.KonteynerFirmaAdi;
+                x.Evrak = 'Freight - ' + x.KonteynerFirmaAdi;
             };
             if(x.YuklemeEvrakID == 70 && x.SiparisFaturaTurID==7 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = x.KonteynerFirmaAdi;
+                x.Evrak = 'Customs - '+ x.KonteynerFirmaAdi;
             };
             if(x.YuklemeEvrakID == 50 && x.SiparisFaturaTurID==73 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = x.KonteynerFirmaAdi;
+                x.Evrak = 'Fumigation - ' + x.KonteynerFirmaAdi;
             };
             if(x.YuklemeEvrakID == 71 ){
                 x.Link = `https://file-service.mekmar.com/file/download/71/${x.SiparisNo}`;
@@ -11704,19 +11704,21 @@ app.get('/order/production/product/document/:po', async (req, res) => {
             };
             if(x.SiparisFaturaTurID == 101 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = x.KonteynerFirmaAdi + ' Booking';
+                x.Evrak = ' Booking - ' + x.KonteynerFirmaAdi ;
             };
             if(x.SiparisFaturaTurID == 102 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = x.KonteynerFirmaAdi + ' Spanzet';
+                x.Evrak = 'Spanzet - ' + x.KonteynerFirmaAdi ;
             };
             if(x.SiparisFaturaTurID == 100 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
-                x.Evrak = x.KonteynerFirmaAdi + ' Lashing';
+                x.Evrak = 'Lashing - ' + x.KonteynerFirmaAdi;
             };
-
         });
-        res.status(200).json({ 'list': document.recordset });
+        const liste = document.recordset.filter(x=>{
+            return !(x.YuklemeEvrakID == 0 && x.SiparisFaturaTurID == 0)
+        });
+        res.status(200).json({ 'list': liste });
     });
 });
 

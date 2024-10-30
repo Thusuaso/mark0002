@@ -25,7 +25,8 @@ const state = {
     panelUsaStockList:[],
     panelUsaStockPhotosList:[],
     panelUsaStockButtonStatus:false,
-    panelId:0
+    panelId:0,
+    panelProductName:''
 };
 const actions = {
     setPanelProjectMainPhotoChange(vuexContext,photo){
@@ -145,6 +146,9 @@ const actions = {
     },
     setPanelProductId(vuexContext, id) {
         vuexContext.commit('setPanelProductId', id);
+    },
+    setPanelProductName(vuexContext,productName){
+        vuexContext.commit('setPanelProductName',productName);
     },
     setPanelId(vuexContext,id){
         vuexContext.commit('setPanelId',id);
@@ -714,6 +718,9 @@ const actions = {
 
 };
 const mutations = {
+    setPanelProductName(state,payload){
+        state.panelProductName = payload;
+    },
     setPanelId(state,payload){
         state.panelId = payload;
     },
@@ -873,6 +880,9 @@ const mutations = {
 
 };
 const getters = {
+    getPanelProductName(state){
+        return state.panelProductName;
+    },
     getProductId(state){
         return state.panelId;
     },

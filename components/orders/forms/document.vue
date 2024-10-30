@@ -1,6 +1,16 @@
 <template>
   <div>
     <DataTable :value="list">
+      <Column field="YuklemeEvrakID" header="Y.ID">
+        <template #body="slotProps">
+          {{ slotProps.data.YuklemeEvrakID  }}
+        </template>
+      </Column>
+      <Column field="SiparisFaturaTurID" header="S.ID">
+        <template #body="slotProps">
+          {{ slotProps.data.SiparisFaturaTurID  }}
+        </template>
+      </Column>
       <Column field="Tarih" header="Upload Date">
         <template #body="slotProps">
           {{ slotProps.data.Tarih | dateToString }}
