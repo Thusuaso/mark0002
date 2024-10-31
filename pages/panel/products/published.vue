@@ -163,6 +163,7 @@ export default {
       this.$store.dispatch("setPanelProductsSave", event);
     },
     update(event) {
+
       event.aciklama_fr2 = this.__stringCharacterChange(event.aciklama_fr);
       event.anahtarlar_fr2 = this.__stringCharacterChange(event.anahtarlar_fr);
       event.keywords_fr2 = this.__stringCharacterChange(event.keywords_fr);

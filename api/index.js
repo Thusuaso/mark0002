@@ -6924,9 +6924,73 @@ app.put('/panel/product/update', (req, res) => {
             where Id = '${req.body.Id}'
     `;
     if(!req.body.yayinla){
+        /*Un publish olan ürün ve suggestedlar eklenecektir. */
+        const unpublishSql = `
+            select 
+
+                (select p.urunadi_en from MekmarCom_Products p where p.urunid=oner.urunid) as ProductName,
+                (select p.urunid from MekmarCom_Products p where p.urunid=oner.urunid) as ProductId
+
+
+            from MekmarCom_OnerilenUrunler oner where oner.onerilenurunid=${req.body.urunid}
+        `;
+        let content = `
+            <h3>${req.body.urunadi_en} (${req.body.urunid}) ürünü yayından kaldırılmıştır. Aşağıdaki ürünlerin önerilenlerini kontrol ediniz...</h3>
+            <br/>
+            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+            <tr style="border: 1px solid;">
+                <th style="border: 1px solid;">Ürün Id</th>
+                <th style="border: 1px solid;">Ürün Adı</th>
+            </tr>
+        `;
+        mssql.query(unpublishSql,(err,unpublished)=>{
+            if(unpublished.recordset.length>0){
+                unpublished.recordset.forEach(x=>{
+                    content = content + `
+                    <tr style="border: 1px solid;">
+                        <td style="border: 1px solid;text-align:center;">${x.ProductId}</td>
+                        <td style="border: 1px solid;text-align:center;">${x.ProductName}</td>
+           
+        
+                    </tr>`
+                });
+                
+                content = content + '</table>';
+                transporter.sendMail({
+                    to: 'export1@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: 'Yayından Kaldırılan Ürün',
+                    html: content
+                });
+                transporter.sendMail({
+                    to: 'export2@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: 'Yayından Kaldırılan Ürün',
+                    html: content
+                });
+            }else{
+
+                content = content + '</table>';
+                transporter.sendMail({
+                    to: 'export1@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: 'Yayından Kaldırılan Ürün',
+                    html: content
+                });
+                transporter.sendMail({
+                    to: 'export2@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: 'Yayından Kaldırılan Ürün',
+                    html: content
+                });
+            }
+
+        });
+
         const suggestedSqlDelete = `delete MekmarCom_OnerilenUrunler where onerilenurunid='${req.body.urunid}'`;
         mssql.query(suggestedSqlDelete);
     };
+
     mssql.query(updateProductSql, (err, product) => {
         if(product.rowsAffected[0] == 1){
             res.status(200).json({'status':true});

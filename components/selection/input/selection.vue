@@ -176,10 +176,13 @@
           />
         </vue-excel-editor>
       </div> -->
-      <vue-excel-xlsx :data="getProductList" :columns="excelColumnsField" :file-name="'Seleksiyon'" :file-type="'xlsx'"
+
+      <Button class="p-button-secondary" type="button" label="Selection Excel" @click="selection_click_excel"
+      :disabled="selection_orders_disabled" />
+      <!-- <vue-excel-xlsx :data="getProductList" :columns="excelColumnsField" :file-name="'Seleksiyon'" :file-type="'xlsx'"
         :sheet-name="'sheetname'" style="border: none; background-color: white">
         <Button type="button" class="p-button-info w-100" icon="pi pi-file-excel" label="Excel" />
-      </vue-excel-xlsx>
+      </vue-excel-xlsx> -->
       <br />
 
       <Dropdown class="mt-1" v-model="selectedEfeTicket" :options="efeTickets" optionLabel="name"
@@ -587,6 +590,21 @@ export default {
           }
       });
     },
+    selection_click_excel(){
+      api
+        .post("/siparisler/dosyalar/seleksiyon/excel/output", this.getProductList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "siparisler/dosyalar/seleksiyon/excel/output";
+
+            link.setAttribute("download", "selection.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
+    },
+
     orders_click_excel(){
       api
         .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
