@@ -137,10 +137,41 @@ export default {
       this.model.UrunKartId = this.productId;
       this.model.SiparisNo = this.po;
       this.$store.dispatch("setProductionProductWorkermanDelete", this.model);
+            this.model.Tutar = 0;
+      this.model.Aciklama = '';
+
     },
     process() {
       if (this.deleted_button_disabled) {
-        this.save();
+        if(!this.workerman_date){
+          if(confirm('Tarih eksik yinede kaydedilsin mi ?')){
+            this.save();
+          };
+        }else{
+            if(!this.selectedSupplier){
+              if(confirm('Tedarikçi eksik yinede kaydedilsin mi ?')){
+              this.save();
+              }
+            
+              }else{
+                if(this.model.Tutar == 0){
+                  if(confirm('Tutar eksik yinede kaydedilsin mi ?')){
+                    this.save();
+                  } 
+                }else{
+                  if(this.model.Aciklama == ''){
+                    if(confirm('Açıklama eksik yinede kaydedilsin mi?')){
+                      this.save();
+                    }
+                  }else{
+                    this.save();
+                  }
+                }
+            }
+            
+
+          }
+        // this.save();
       } else {
         this.update();
       }
@@ -152,6 +183,9 @@ export default {
       this.$store.dispatch("setProductionProductWorkermanUpdate", this.model);
       this.selectedSupplier = null;
       this.workerman_date = null;
+      this.model.Tutar = 0;
+      this.model.Aciklama = '';
+
     },
     save() {
       this.model.SiparisEkstraGiderTurID = 1;
@@ -160,6 +194,9 @@ export default {
       this.$store.dispatch("setProductionProductWorkermanSave", this.model);
       this.selectedSupplier = null;
       this.workerman_date = null;
+      this.model.Tutar = 0;
+      this.model.Aciklama = '';
+
     },
     workermanDateSelected(event) {
       this.model.Tarih = date.dateToString(event);

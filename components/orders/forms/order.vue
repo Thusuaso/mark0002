@@ -120,9 +120,26 @@
         </div>
       </div>
     </div>
+    <div class="row m-auto text-center">
+      <div class="col-1" style="background-color:#4287f5;width:25px;height:25px;"></div>
+      <div class="col-1">İşçilik Var</div>
+      <div class="col-1" style="background-color:#81fca0;width:25px;height:25px;"></div>
+      <div class="col-1">Alış Fiyatı Eksik</div>
+
+    </div>
+
     <DataTable :value="products" :selection.sync="selectedOrderProducts" selectionMode="single"
-      @row-click="orderProductsSelected($event)" :sortField="'SiraNo'" :sortOrder="1">
-      <Column field="SiraNo" header="#"></Column>
+      @row-click="orderProductsSelected($event)" :sortField="'SiraNo'" :sortOrder="1"
+      
+      
+      >
+      <Column field="SiraNo" header="#">
+        <template #body="slotProps">
+          <div :style="{'backgroundColor':slotProps.data.Iscilik>0?'#4287f5':''}">
+            {{ slotProps.data.SiraNo }}
+          </div>
+        </template>
+      </Column>
       <Column field="FirmaAdi" header="Supplier">
         <template #body="slotProps">
           <div :style="{ 'backgroundColor': rowClass(slotProps.data.AlisFiyati) ? '#81fca0':'#fff'}">

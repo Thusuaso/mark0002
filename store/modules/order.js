@@ -515,11 +515,12 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 if (response.data.status) {
                     const data = {
                         productId: workerman.UrunKartId,
-                      po:workerman.SiparisNo  
+                        po:workerman.SiparisNo  
                     };
                     vuexContext.dispatch('setProductionProductWorkermanList', data);
                     vuexContext.dispatch('setOrderProductWorkermanModel');
-
+                    vuexContext.dispatch('setOrderProductionProductDetailList',workerman.SiparisNo);
+                    // vuexContext.commit('addWorkerman',{ ID:response.data.id,...workerman });
                     this.$toast.success('Başarıyla Kaydedildi.');
 
                 } else {
@@ -528,6 +529,7 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                 }
             });
     },
+
     setProductionProductWorkermanDelete(vuexContext, workerman) {
         this.$axios.delete(`/order/production/product/workerman/delete/${workerman.ID}`)
             .then(response => {
@@ -537,8 +539,10 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                       po:workerman.SiparisNo  
                     };
                     this.$toast.success('Başarıyla Silindi');
-                    vuexContext.dispatch('setProductionProductWorkermanList', data);
+                    vuexContext.dispatch('setOrderProductionProductDetailList',workerman.SiparisNo);
                     vuexContext.dispatch('setOrderProductWorkermanModel');
+                    vuexContext.dispatch('setProductionProductWorkermanList', data);
+
 
                 } else{
                     this.$toast.error('Silme Başarısız.');
@@ -554,6 +558,8 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
                       po:workerman.SiparisNo  
                     };
                     this.$toast.success('Başarıyla Güncellendi');
+                    vuexContext.dispatch('setOrderProductionProductDetailList',workerman.SiparisNo);
+
                     vuexContext.dispatch('setProductionProductWorkermanList', data);
                     vuexContext.dispatch('setOrderProductWorkermanModel');
 
@@ -608,6 +614,9 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
 
 };
 const mutations = {
+    addWorkerman(state,payload){
+        state.orderProductionProductDetailWorkermanList.push(payload);
+    },
     setProductionDivideOrderListUpdate(state, payload) {
         if (state.orderProductionDivideOrderList.length > 0) {
 

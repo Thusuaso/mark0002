@@ -471,6 +471,7 @@ export default {
     this.$store.dispatch("setOrderProductionList");
   },
   methods: {
+
     divideProduct() {
       this.getDivideProductionModel.id = this.productionModel.SiparisId;
       this.getDivideProductionModel.siparisno = this.productionModel.SiparisNo;

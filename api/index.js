@@ -11999,9 +11999,15 @@ VALUES('${req.body.Tarih}',
 
 )
     `;
+    const getIdSql = `
+        select top 1 ID from SiparisEkstraGiderlerTB order by ID desc
+    `;
     mssql.query(sql,(err,workerman)=>{
         if (workerman.rowsAffected[0] == 1) {
-            res.status(200).json({'status':true});
+            mssql.query(getIdSql,(err,workermanId)=>{
+                res.status(200).json({'status':true,'id':workermanId.recordset[0].ID});
+
+            });
         } else{
             res.status(200).json({'status':false});
             
