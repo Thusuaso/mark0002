@@ -53,7 +53,7 @@
     <Dialog :visible.sync="finance_po_list_form" header="" modal>
       <financePoList :poList="getFinancePoList" :paidList="getFinancePaidList" :poListTotal="getFinancePoListTotal"
         :paidListTotal="getFinancePaidListTotal" @po_list_selected_emit="poListSelected($event)"
-        @po_paid_detail_list_selected_emit="poPaidDetailListSelected($event)" :loading="getLoading" />
+        @po_paid_detail_list_selected_emit="poPaidDetailListSelected($event)" :loading="getLoading" :insurance="getFinanceDetailInsuranceList"/>
     </Dialog>
     <Dialog :visible.sync="finance_po_detail_form" header="" modal>
       <financePoForm :model="getFinancePoModel" :po="finance_po_list_detail"
@@ -73,6 +73,7 @@ export default {
   middleware: ["authority"],
   computed: {
     ...mapGetters([
+      "getFinanceDetailInsuranceList",
       "getfinanceList",
       "getFinanceListTotal",
       "getFinanceExpiryList",

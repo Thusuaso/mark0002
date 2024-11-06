@@ -1,6 +1,7 @@
 import api from "../../plugins/excel.server";
 
 const state = {
+    financeDetailInsuranceList:[],
     financeList: [],
     financeListAll: [],
     financeListTotal: {
@@ -643,6 +644,7 @@ const mutations = {
     setFinancePoList(state,payload){
         state.financePoList = payload.poList;
         state.financePaidList = payload.paidList;
+        state.financeDetailInsuranceList=payload.insuranceList;
     },
 
         setFinancePoListMekmer(state,payload){
@@ -708,6 +710,9 @@ const mutations = {
 
 };
 const getters = {
+    getFinanceDetailInsuranceList(state){
+        return state.financeDetailInsuranceList;
+    },
     getFinanceTotalListMekmer(state) {
         return state.financeTotalListMekmer;  
     },

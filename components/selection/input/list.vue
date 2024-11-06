@@ -38,7 +38,7 @@
                 style="width: 80px" />
             </template>
           </Column>
-          <Column field="UrunAdi" header="Product" :showFilterMenu="false" :showClearButton="false" sortable>
+          <Column field="UrunAdi" header="Product"  :showClearButton="false" sortable>
             <template #footer>
               {{ total.kasaadedi }}
             </template>

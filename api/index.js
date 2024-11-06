@@ -4083,7 +4083,7 @@ app.get('/reports/loading/list/:year/:month',(req,res)=>{
     m.FirmaAdi as MusteriAdi,  
     (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) as Fob,  
     (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+  
-    dbo.Get_SiparisNavlun(s.SiparisNo) as Dtp,  
+    dbo.Get_SiparisNavlun(s.SiparisNo) + s.sigorta_tutar_satis as Dtp,  
     'Konteyner' as Tur,m.Marketing  
     from  
     SiparislerTB s,MusterilerTB m  
@@ -4116,7 +4116,7 @@ app.get('/reports/loading/list/:year/:month',(req,res)=>{
     m.FirmaAdi as MusteriAdi,  
     (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) as Fob,  
     (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+  
-    dbo.Get_SiparisNavlun(s.SiparisNo) as Dtp,  
+    dbo.Get_SiparisNavlun(s.SiparisNo)+ s.sigorta_tutar_satis as Dtp,  
     'Konteyner' as Tur,m.Marketing  
     from  
     SiparislerTB s,MusterilerTB m  
@@ -4257,7 +4257,7 @@ app.get('/reports/loading/list/by/customer/:year/:month',(req,res)=>{
       and s.SiparisDurumID=3 and s.MusteriID=m.ID and Year(YuklemeTarihi)='${req.params.year}' and MONTH(YuklemeTarihi) ='${req.params.month}'  and s.SiparisDurumID=3
    )  +  
    (  
-       Select Sum(s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3 ) from SiparislerTB s  
+       Select Sum(s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3 + s.sigorta_tutar_satis) from SiparislerTB s  
        where s.MusteriID=m.ID and YEAR(s.YuklemeTarihi)='${req.params.year}' and MONTH(s.YuklemeTarihi) ='${req.params.month}'  and s.SiparisDurumID=3
    )  
        
@@ -7723,6 +7723,8 @@ app.get('/panel/project/detail/:id', (req, res) => {
 	mpd.ProductName_Fr,
 	mpd.ProductName_Es,
 	mpd.ProductName_Ru,
+	mpd.ProductName_Ar,
+
 	mpd.ImageLink,
 	mpd.ImageName,
 	mpd.ImageStatus,
@@ -7764,7 +7766,8 @@ where mp.ID not in (select mps.SuggestedId from MekmarCom_Projects_Suggested mps
             mpi.ProjectInformation,
             mpi.ProjectInformation_Fr,
             mpi.ProjectInformation_Es,
-            mpi.ProjectInformation_Ru
+            mpi.ProjectInformation_Ru,
+            mpi.ProjectInformation_Ar
 
         from MekmarCom_Projects_Information mpi
         where mpi.ProjectId = '${req.params.id}'
@@ -7813,10 +7816,11 @@ app.post('/panel/project/information/update',(req,res)=>{
     const informationUpdateSql = `
         update MekmarCom_Projects_Information
 SET
-	ProjectInformation='${req.body.ProjectInformation}',
-	ProjectInformation_Fr='${req.body.ProjectInformation_Fr}',
-	ProjectInformation_Es='${req.body.ProjectInformation_Es}',
-	ProjectInformation_Ru=N'${req.body.ProjectInformation_Ru}'
+	ProjectInformation='${__stringCharacterChange(req.body.ProjectInformation)}',
+	ProjectInformation_Fr='${__stringCharacterChange(req.body.ProjectInformation_Fr)}',
+	ProjectInformation_Es='${__stringCharacterChange(req.body.ProjectInformation_Es)}',
+	ProjectInformation_Ru=N'${__stringCharacterChange(req.body.ProjectInformation_Ru)}',
+    ProjectInformation_Ar=N'${__stringCharacterChange(req.body.ProjectInformation_Ar)}'
 
 WHERE
 	ID = '${req.body.ID}'
@@ -7863,7 +7867,9 @@ app.put('/panel/project/product/photo/name/update', (req, res) => {
             ProductName='${req.body.ProductName}',
             ProductName_Fr='${req.body.ProductName_Fr}',
             ProductName_Es='${req.body.ProductName_Es}',
-            ProductName_Ru=N'${req.body.ProductName_Ru}'
+            ProductName_Ru=N'${req.body.ProductName_Ru}',
+            ProductName_Ar=N'${req.body.ProductName_Ar}'
+
         WHERE 
             ID = '${req.body.ID}'
     `;
@@ -7915,17 +7921,30 @@ app.post('/panel/project/save', (req, res) => {
             ProjectName_Fr,
             ProjectName_Es,
             ProjectName_Ru,
+            ProjectName_Ar,
             CountryId,
             CountryName,
+            CountryName_Fr,
+            CountryName_Es,
+            CountryName_Ru,
+            CountryName_Ar,
+
             Queue
         )
         VALUES(
-            '${req.body.ProjectName}',
-            '${req.body.ProjectName_Fr}',
-            '${req.body.ProjectName_Es}',
-            N'${req.body.ProjectName_Ru}',
+            '${__stringCharacterChange(req.body.ProjectName)}',
+            '${__stringCharacterChange(req.body.ProjectName_Fr)}',
+            '${__stringCharacterChange(req.body.ProjectName_Es)}',
+            N'${__stringCharacterChange(req.body.ProjectName_Ru)}',
+            N'${__stringCharacterChange(req.body.ProjectName_Ar)}',
+
             '${req.body.CountryId}',
-            '${req.body.CountryName}',
+            '${__stringCharacterChange(req.body.CountryName)}',
+            '${__stringCharacterChange(req.body.CountryName_Fr)}',
+            '${__stringCharacterChange(req.body.CountryName_Es)}',
+            N'${__stringCharacterChange(req.body.CountryName_Ru)}',
+            N'${__stringCharacterChange(req.body.CountryName_Ar)}',
+
             '0'
         )
     `;
@@ -7961,14 +7980,17 @@ app.post('/panel/project/information/save', (req, res) => {
 	ProjectInformation,
 	ProjectInformation_Fr,
 	ProjectInformation_Es,
-	ProjectInformation_Ru
+	ProjectInformation_Ru,
+    ProjectInformation_Ar
 )
 VALUES(
 	'${req.body.ProjectId}',
-	'${req.body.ProjectInformation}',
-	'${req.body.ProjectInformation_Fr}',
-	'${req.body.ProjectInformation_Es}',
-	N'${req.body.ProjectInformation_Ru}'
+	'${__stringCharacterChange(req.body.ProjectInformation)}',
+	'${__stringCharacterChange(req.body.ProjectInformation_Fr)}',
+	'${__stringCharacterChange(req.body.ProjectInformation_Es)}',
+	N'${__stringCharacterChange(req.body.ProjectInformation_Ru)}',
+	N'${__stringCharacterChange(req.body.ProjectInformation_Ar)}'
+
 )
     `;
     mssql.query(informationInsertSql,(err,information)=>{
@@ -8609,7 +8631,7 @@ app.get('/finance/po/list/:customerId', (req, res) => {
 	s.SiparisNo,
 	m.FirmaAdi,
 	(
-		s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3 + dbo.Finance_Detail_Po_Order_Total(s.SiparisNo)
+		s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3 + dbo.Finance_Detail_Po_Order_Total(s.SiparisNo) + s.sigorta_tutar_satis
 	) as OrderTotal,
 	s.Pesinat,
 	dbo.Finance_Detail_Po_Advanced_Payment_Total(s.SiparisNo) as Paid,
@@ -8631,6 +8653,7 @@ order by s.YuklemeTarihi desc
         group by o.Tarih 
         order by o.Tarih desc
     `;
+    const insuranceListSql = `select sigorta_tutar_satis,SiparisNo from SiparislerTB where MusteriID='${req.params.customerId}' order by YuklemeTarihi desc`;
     mssql.query(poListSql, (err, poList) => {
         const poListData = [];
         poList.recordset.forEach(x => {
@@ -8661,7 +8684,10 @@ order by s.YuklemeTarihi desc
 
 
         mssql.query(paidListSql, (err, paidList) => {
-            res.status(200).json({ 'poList': finalDatas,'paidList':paidList.recordset });
+            mssql.query(insuranceListSql,(err,insurance)=>{
+                res.status(200).json({ 'poList': finalDatas,'paidList':paidList.recordset ,'insuranceList':insurance.recordset});
+
+            });
 
         });
     });
@@ -13943,7 +13969,7 @@ app.get('/orders/production/list',(req,res)=>{
     });
 });
 app.get('/country',(req,res)=>{
-    const sql = 'select ytu.Id,ytu.UlkeAdi,ytu.Kod,ytu.Icon_Flags,ytu.Png_Flags,ytu.dhl from YeniTeklif_UlkeTB ytu';
+    const sql = 'select ytu.Id,ytu.UlkeAdi,ytu.Kod,ytu.Icon_Flags,ytu.Png_Flags,ytu.dhl,ytu.UlkeAdi_Fr,ytu.UlkeAdi_Es,ytu.UlkeAdi_Ru,ytu.UlkeAdi_Ar from YeniTeklif_UlkeTB ytu';
     mssql.query(sql,(err,country)=>{
        res.status(200).json({
            'data':country.recordset,

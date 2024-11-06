@@ -224,39 +224,90 @@ export default {
     save() {
       if(this.getOrderProductionProductNormalList.length  == 0){
       this.save_button_disabled = true;
-      if (confirm("Sevk etmek istiyor musunuz?")) {
-        const data = this.getShipmentSendProductionList;
-        for (const item of data) {
-          item.KullaniciId = Cookies.get("userId");
-          item.Tarih = convertDate.dateToString(this.forwardingDate);
-          item.MusteriId = this.selectedOrder.MusteriID;
-          item.SiparisNo = this.selectedOrder.SiparisNo;
-        }
-        const datas = {
-          data: data,
-          MusteriID: this.selectedOrder.MusteriID,
-          SiparisNo: this.selectedOrder.SiparisNo,
-          FaturaNo: this.invoice,
-          YuklemeTarihi: convertDate.dateToString(this.forwardingDate),
-          SevkStatus: this.forwardingstatus,
-          Takip: this.follow,
-          KullaniciAdi: Cookies.get("username"),
-          mail: Cookies.get("mail"),
-        };
-        this.$store.dispatch("setShipmentSave", datas).then((res) => {
-          if (res) {
-            this.$toast.success("Başarıyla Sevk Edildi");
-            this.$store.dispatch("setOrderList");
+      if(!this.selectedOrder){
+        this.$toast.error("Sipariş seçilmemiş, tekrar deneyiniz...");
+        this.save_button_disabled = false;
+
+      }else{
+        if(!this.forwardingDate){
+          this.$toast.error("Sevkiyat tarihi girilmemiş, tekrar deneyiniz...");
+          this.save_button_disabled = false;
+
+        }else{
+          if(this.invoice == '' || this.invoice ==  ' ' || this.invoice == null || this.invoice == undefined){
+            this.$toast.error("Fatura no girilmemiş, tekrar deneyiniz...");
             this.save_button_disabled = false;
 
-            this.reset();
-          } else {
-            this.$toast.error("Sevk Edilemedi");
+          }else{
+            if(this.forwardingstatus == '' || this.forwardingstatus == ' ' || this.forwardingstatus ==null || this.forwardingstatus ==undefined){
+              if (confirm("Sevk türü seçilmemiş yine de sevk etmek istiyor musunuz?")) {
+                console.log('sevk türü seçilmemiş')
+                    const data = this.getShipmentSendProductionList;
+                    for (const item of data) {
+                      item.KullaniciId = Cookies.get("userId");
+                      item.Tarih = convertDate.dateToString(this.forwardingDate);
+                      item.MusteriId = this.selectedOrder.MusteriID;
+                      item.SiparisNo = this.selectedOrder.SiparisNo;
+                    }
+                    const datas = {
+                      data: data,
+                      MusteriID: this.selectedOrder.MusteriID,
+                      SiparisNo: this.selectedOrder.SiparisNo,
+                      FaturaNo: this.invoice,
+                      YuklemeTarihi: convertDate.dateToString(this.forwardingDate),
+                      SevkStatus: this.forwardingstatus,
+                      Takip: this.follow,
+                      KullaniciAdi: Cookies.get("username"),
+                      mail: Cookies.get("mail"),
+                    };
+                    this.$store.dispatch("setShipmentSave", datas).then((res) => {
+                      if (res) {
+                        this.$toast.success("Başarıyla Sevk Edildi");
+                        this.$store.dispatch("setOrderList");
+                        this.save_button_disabled = false;
+
+                        this.reset();
+                      } else {
+                        this.$toast.error("Sevk Edilemedi");
+                      }
+                    });
+                } else {
+                  const data = this.getShipmentSendProductionList;
+                    for (const item of data) {
+                      item.KullaniciId = Cookies.get("userId");
+                      item.Tarih = convertDate.dateToString(this.forwardingDate);
+                      item.MusteriId = this.selectedOrder.MusteriID;
+                      item.SiparisNo = this.selectedOrder.SiparisNo;
+                    }
+                    const datas = {
+                      data: data,
+                      MusteriID: this.selectedOrder.MusteriID,
+                      SiparisNo: this.selectedOrder.SiparisNo,
+                      FaturaNo: this.invoice,
+                      YuklemeTarihi: convertDate.dateToString(this.forwardingDate),
+                      SevkStatus: this.forwardingstatus,
+                      Takip: this.follow,
+                      KullaniciAdi: Cookies.get("username"),
+                      mail: Cookies.get("mail"),
+                    };
+                    this.$store.dispatch("setShipmentSave", datas).then((res) => {
+                      if (res) {
+                        this.$toast.success("Başarıyla Sevk Edildi");
+                        this.$store.dispatch("setOrderList");
+                        this.save_button_disabled = false;
+
+                        this.reset();
+                      } else {
+                        this.$toast.error("Sevk Edilemedi");
+                      }
+                    });
+                };
+            }
+
           }
-        });
-      } else {
-        this.save_button_disabled = false;
-      };
+        }
+      }
+
 
       }else{
         this.$toast.error("Gönderilmemiş Ürünler Mevcut. Kontrol edip tekrar dene...");

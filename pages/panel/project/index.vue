@@ -90,6 +90,14 @@
               <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
             </template>
           </Column>
+          <Column field="ProductName_Ar" header="Project Name (Ar)">
+            <template #body="slotProps">
+              {{ slotProps.data.ProductName_Ar }}
+            </template>
+            <template #editor="slotProps">
+              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+            </template>
+          </Column>
           <Column
             :rowEditor="true"
             :styles="{ width: '10%', 'min-width': '8rem' }"
@@ -162,6 +170,15 @@
               v-model="getPanelProductProjectModel.ProjectName_Ru"
             />
             <label for="project_name_ru">Project Name (Ru)</label>
+          </span>
+        </div>
+        <div class="col">
+          <span class="p-float-label">
+            <InputText
+              id="project_name_ru"
+              v-model="getPanelProductProjectModel.ProjectName_Ar"
+            />
+            <label for="project_name_ru">Project Name (Ar)</label>
           </span>
         </div>
         <div class="col">
@@ -248,6 +265,13 @@ export default {
     countrySelected(event) {
       this.getPanelProductProjectModel.CountryId = event.value.Id;
       this.getPanelProductProjectModel.CountryName = event.value.UlkeAdi;
+      this.getPanelProductProjectModel.CountryName_Fr = event.value.UlkeAdi_Fr;
+      this.getPanelProductProjectModel.CountryName_Es = event.value.UlkeAdi_Es;
+      this.getPanelProductProjectModel.CountryName_Ru = event.value.UlkeAdi_Ru;
+      this.getPanelProductProjectModel.CountryName_Ar = event.value.UlkeAdi_Ar;
+
+      
+
     },
     projectPhotoUpload(event) {
       const data = {

@@ -1,5 +1,6 @@
 <template>
-
+<div>
+  <h3 class="insurance_custom_css">Sigorta bedelleri detay alanına eklenmiştir fakat yukarıdaki bedeli aşağıdaki sigorta bedelleri ve diğer bedellerle kontrol ederek işleminizi gerçekleştiriniz. Ayrıca ana sayfadaki bedel ile karşılaştırınız.</h3>
   <div class="row">
     <Button v-if="userId == 10" class="p-button-warning" label="Excel" @click="excel_output_custom"/>
 
@@ -86,17 +87,42 @@
       </DataTable>
     </div>
   </div>
+  <DataTable :value="insurance" responsiveLayout="scroll" :filters.sync="filters1" filterDisplay="row">
+    <template #header>
+      Insurance Cost
+    </template>
+    <Column field="SiparisNo" header="Po" :showFilterMenu="false" :showClearButton="false">
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
+          style="width: 50px" />
+      </template>
+    </Column>
+    <Column field="sigorta_tutar_satis" header="Insurance">
+      <template #body="slotProps">
+        {{ slotProps.data.sigorta_tutar_satis | formatPriceUsd }}
+      </template>
+    </Column>
+
+</DataTable>
+</div>
+
+
 </template>
 <script>
 import Cookies from "js-cookie";
 import {mapGetters} from 'vuex';
 import api from "~/plugins/excel.server";
+import {FilterMatchMode,FilterOperator} from 'primevue/api/';
 
 export default {
   computed:{
     ...mapGetters(['getLocalUrl'])
   },
   props: {
+    insurance:{
+      type:Array,
+      required:true
+    },
     poList: {
       type: Array,
       required: false,
@@ -121,6 +147,9 @@ export default {
   },
   data() {
     return {
+      filters1:{
+        SiparisNo:{value:null,matchMode:FilterMatchMode.STARTS_WITH}
+      },
       filteredPoList:[],
       selectedPoList: null,
       selectedPoPaidDetailList: null,
@@ -238,5 +267,20 @@ export default {
 :deep(.red-row) {
   border: 1px solid yellow !important;
   color: black !important;
+}
+.insurance_custom_css{
+  font-size:16px;
+  color:black;
+  background-color: yellow;
+  font-weight: bold;
+  animation: insurance_animation 1s 0s infinite alternate-reverse;
+}
+@keyframes insurance_animation {
+  from{
+    color:blue;
+  }
+  to{
+    color:red;
+  }
 }
 </style>

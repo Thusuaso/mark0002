@@ -116,6 +116,10 @@
       <Textarea v-model="information.ProjectInformation_Ru" rows="8" class="w-100" />
       <label>Description (Ru)</label>
     </span>
+    <span class="p-float-label mt-3">
+      <Textarea v-model="information.ProjectInformation_Ar" rows="8" class="w-100" />
+      <label>Description (Ar)</label>
+    </span>
     <div class="row">
       <div class="col">
         <Button

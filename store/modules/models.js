@@ -267,8 +267,15 @@ const state = {
         ProjectName_Fr: '',
         ProjectName_Es: '',
         ProjectName_Ru: '',
+        ProjectName_Ar: '',
+
         CountryId: 0,
         CountryName: '',
+        CountryName_Fr: '',
+        CountryName_Es: '',
+        CountryName_Ru: '',
+        CountryName_Ar: '',
+
         Image: '',
         Queue:0
     },
@@ -278,7 +285,8 @@ const state = {
         ProjectInformation: '',
         ProjectInformation_Fr: '',
         ProjectInformation_Es: '',
-        ProjectInformation_Ru:''
+        ProjectInformation_Ru:'',
+        ProjectInformation_Ar:''
     },
     panelUsersModel: {
         id: 0,
@@ -879,8 +887,14 @@ const actions = {
             ProjectName_Fr: '',
             ProjectName_Es: '',
             ProjectName_Ru: '',
+            ProjectName_Ar: '',
+
             CountryId: 0,
             CountryName: '',
+            CountryName_Fr: '',
+            CountryName_Es: '',
+            CountryName_Ru: '',
+            CountryName_Ar: '',
             Image: '',
             Queue: 0
         };
@@ -893,7 +907,9 @@ const actions = {
             ProjectInformation: '',
             ProjectInformation_Fr: '',
             ProjectInformation_Es: '',
-            ProjectInformation_Ru: ''
+            ProjectInformation_Ru: '',
+            ProjectInformation_Ar: ''
+
         };
         vuexContext.commit('setPanelProjectInformationModel', panelProductProjectInformationModel);
     },
