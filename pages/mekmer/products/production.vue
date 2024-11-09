@@ -242,6 +242,7 @@ export default {
       this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
+      this.productionModel.SiparisKontrolEden = 0
       this.$store.dispatch("setOrderProductionUpdate", {
         ...this.productionModel,
         SiparisId: this.getOrderProductionId,
@@ -278,7 +279,7 @@ export default {
       this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
-
+      this.productionModel.SiparisKontrolEden = 0
       this.$store.dispatch("setOrderProductionSaveButtonStatus", true);
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");

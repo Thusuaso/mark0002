@@ -12270,10 +12270,6 @@ SET
 where
 ID='${req.body.SiparisId}'
     `;
-
-
-
-
     await mssql.query(sql,(err,production)=>{
         if(production.rowsAffected[0] == 1){
             res.status(200).json({'status':true});

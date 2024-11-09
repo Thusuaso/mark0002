@@ -624,10 +624,13 @@ export default {
       this.selectedInvoice = this.invoice.find(
         (x) => x.ID === this.model.FaturaKesimTurID
       );
-      if (this.model.Vade != null) {
-        this.maturityDate = date.stringToDate(this.model.Vade);
-      } else {
+      if (this.model.Vade == null || this.model.Vade == ' ' || this.model.Vade == undefined || this.model.Vade == '') {
         this.model.Vade = "";
+        this.maturityDate = '';
+
+      } else {
+        this.maturityDate = date.stringToDate(this.model.Vade);
+
       }
       this.model.Iade = this.__nullControl(this.model.Iade);
       this.model.depo_yukleme;
@@ -654,6 +657,9 @@ export default {
       this.model.TeslimTurID = event.value.ID;
     },
   },
+  beforeCreate(){
+
+  }
 };
 </script>
 <style scoped>

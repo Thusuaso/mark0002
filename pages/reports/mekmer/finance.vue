@@ -92,7 +92,7 @@
               </div>
             </template>
             <template #footer>
-              {{ mekmarListTotal.order | formatPriceUsd }}
+              {{ mekmarListTotal.balanced | formatPriceUsd }}
             </template>
 
           </Column>
@@ -445,7 +445,16 @@
       monthSelected(event) {
         api.get('/finance/po/list/mekmer/month/' + event.value.id)
           .then(res => {
+            this.mekmarListTotal.order = 0;
+            this.mekmarListTotal.labour = 0;
+            this.mekmarListTotal.balanced = 0;
             this.monthly_mekmar_finance_list = res.data.ayrinti_list;
+            res.data.ayrinti_list.forEach(x => {
+              this.mekmarListTotal.order += x.toplam;
+              this.mekmarListTotal.labour += x.iscilik;
+              this.mekmarListTotal.balanced += x.kalan;
+
+            });
           });
       },
       collectionClick() {
