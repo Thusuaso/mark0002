@@ -12329,14 +12329,14 @@ VALUES(
 function __getDocumentCost(country,kind){
     if(kind == 7 || kind == 8 || kind == 10 || kind == 12 || kind ==9){
         const sql = `
-select 
+            select 
 
-	dhl,
-	DhlFiyat
+                dhl,
+                DhlFiyat
 
-from YeniTeklif_UlkeTB ytu
-inner join DhlFiyatlari dhl on dhl.ID = ytu.dhl
-where ytu.Id='${country}'
+            from YeniTeklif_UlkeTB ytu
+            inner join DhlFiyatlari dhl on dhl.ID = ytu.dhl
+            where ytu.Id='${country}'
         `;
         return new Promise(async(resolve,reject)=>{
             await mssql.query(sql,(err,dhl)=>{
@@ -12349,7 +12349,7 @@ where ytu.Id='${country}'
 };
 
 app.put('/order/production/update', async (req, res) => {
-    const dhl = await __getDocumentCost(req.body.UlkeId,req.body.TeslimTurID);
+    // const dhl = await __getDocumentCost(req.body.UlkeId,req.body.TeslimTurID);
     const sql = `
         update SiparislerTB 
 SET
@@ -12381,7 +12381,7 @@ SET
 	DetayTutar_3='${req.body.DetayTutar_3}',
 	DetayAlis_3='${req.body.DetayAlis_3}',
 	SiparisSahibi='${req.body.SiparisSahibi}',
-	EvrakGideri='${dhl}',
+	EvrakGideri='${req.body.EvrakGideri}',
 	KonteynerAyrinti='${req.body.KonteynerAyrinti}',
 	UlkeId='${req.body.UlkeId}',
 	FaturaKesimTurID='${req.body.FaturaKesimTurID}',
