@@ -241,7 +241,6 @@ export default {
           }else{
             if(this.forwardingstatus == '' || this.forwardingstatus == ' ' || this.forwardingstatus ==null || this.forwardingstatus ==undefined){
               if (confirm("Sevk türü seçilmemiş yine de sevk etmek istiyor musunuz?")) {
-                console.log('sevk türü seçilmemiş')
                     const data = this.getShipmentSendProductionList;
                     for (const item of data) {
                       item.KullaniciId = Cookies.get("userId");
@@ -271,8 +270,9 @@ export default {
                         this.$toast.error("Sevk Edilemedi");
                       }
                     });
-                } else {
-                  const data = this.getShipmentSendProductionList;
+                } 
+            }else{
+              const data = this.getShipmentSendProductionList;
                     for (const item of data) {
                       item.KullaniciId = Cookies.get("userId");
                       item.Tarih = convertDate.dateToString(this.forwardingDate);
@@ -301,7 +301,6 @@ export default {
                         this.$toast.error("Sevk Edilemedi");
                       }
                     });
-                };
             }
 
           }
