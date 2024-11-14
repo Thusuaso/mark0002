@@ -17,12 +17,12 @@
                 <TabPanel header="Cost" v-if="!statusAlfa">
                     <orderDetailCostForm :cost="cost" :total="costTotal" />
                 </TabPanel>
-                <TabPanel header="Supplier" v-if="!statusAlfa">
+                <TabPanel header="Supplier" >
                     <orderDetailSupplierForm :modelProduction="modelProduction" :productSupplier="productSupplier"
                         :invoice="invoice" :supplierDelivery="supplierDelivery" :po="po"
                         :supplierProduct="supplierProduct" />
                 </TabPanel>
-                <TabPanel header="Document" v-if="!statusAlfa">
+                <TabPanel header="Document" >
                     <orderDetailDocumentForm :list="document"
                         @proforma_delete_emit="$emit('proforma_delete_emit', $event)"
                         @isf_delete_emit="$emit('isf_delete_emit', $event)" />

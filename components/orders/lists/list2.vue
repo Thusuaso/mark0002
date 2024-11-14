@@ -169,7 +169,7 @@
                 selectionMode="multiple" @row-click="$emit('production_selected_emit', $event.data)"
                 class="p-datatable-sm"  filterDisplay="row" :filters.sync="filtersOrders"
                 :rowClass="rowClass2" @filter="ordersFilter($event)" columnResizeMode="fit" showGridlines
-                responsiveLayout="scroll" v-else>
+                responsiveLayout="scroll" sortField="SiparisTarihi" :sortOrder="-1"  v-else>
 
 
                 <Column header="#" headerStyle="width:3rem" headerClass="tableHeader" bodyClass="tableBody">
@@ -260,10 +260,14 @@
                 </Column>
                 <Column field="UrunFirmaAdi" header="Supplier" :showFilterMenu="false" :showClearButton="false"
                     headerClass="tableHeader" bodyClass="tableBody">
+                    
                     <template #body="slotProps">
-                        <div :style="{ backgroundColor: slotProps.data.Isf ? '' : 'red' }">
-                            {{ slotProps.data.UrunFirmaAdi }}
-                        </div>
+                        <div v-if="slotProps.data.TedarikciID == 1 || slotProps.data.TedarikciID == 123" >
+              {{ slotProps.data.UrunFirmaAdi }}
+            </div>
+            <div v-else :style="{ color: slotProps.data.Isf ? '' : 'red' }">
+              {{ slotProps.data.UrunFirmaAdi }}
+            </div>
                     </template>
                     <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
