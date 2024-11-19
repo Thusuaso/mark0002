@@ -46,7 +46,6 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
   ],
-
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // Doc: https://www.primefaces.org/primevue/showcase-v2/#/setup
@@ -65,9 +64,6 @@ export default {
     'nuxt-socket-io'
 
   ],
-
-
-
   toast: {
     position: 'top-center',
     duration: 3000,
@@ -81,14 +77,11 @@ export default {
       }
     ]
   },
-
-
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: process.env.server
+    baseURL: process.env.client
   },
-
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     // https://github.com/primefaces/primevue/issues/844
@@ -112,8 +105,4 @@ export default {
       url: 'socket-io.mekmar.com'
     }]
   }
-
-
-
-
 }

@@ -50,9 +50,50 @@
         </span>
         <span style="padding-top: 25px"> Hepsi </span>
       </div>
-
       <div class="col">
-        <table class="table">
+        <table class="table caption-top">
+          <caption>Turnover (Cari)</caption>
+
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Profit ($)</th>
+              <th scope="col">Profit (₺)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Total</th>
+              <td>{{ (getReportsMekmarAyoListTotal.proforma) | formatPriceUsd }}</td>
+              <td>{{ (profitProformaTl) | formatPriceTl }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <table class="table caption-top">
+          <caption>Profit</caption>
+
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Profit ($)</th>
+              <th scope="col">Profit (₺)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Total</th>
+              <td>{{ (getReportsMekmarAyoListTotal.profitUsd) | formatPriceUsd }}</td>
+              <td>{{ (getReportsMekmarAyoListTotal.profitTl) | formatPriceTl }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <table class="table caption-top">
+          <caption>Real Profit</caption>
+
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -69,6 +110,7 @@
           </tbody>
         </table>
       </div>
+
       
     </div>
     <div class="container row">
@@ -238,6 +280,7 @@ export default {
   },
   data() {
     return {
+      profitProformaTl:0,
       detail_header:'',
       mekmar_ayo_detail_dialog:false,
       mekmer_cost_form_visible:false,
@@ -384,6 +427,7 @@ export default {
     //     this.__getMonthlyCostList(date.year,date.month);
     //     this.$store.dispatch("setEndLoadingAction");
     //   });
+
 
 
 
@@ -718,6 +762,11 @@ export default {
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
+              this.$axios.get(`/maliyet/proforma/currency/half/${this.selectedYear.Yil}/${1}/${6}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
             }
 
           });
@@ -735,6 +784,11 @@ export default {
               this.$store.commit("setReportsMekmarAyoList", data);
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
+              this.$axios.get(`/maliyet/proforma/currency/half/${this.selectedYear.Yil}/${7}/${12}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
             }
 
           });
@@ -750,6 +804,11 @@ export default {
             this.$store.dispatch("setEndLoadingAction");
             this.__getMonthlyCostList(this.selectedYear.Yil,this.getReportsMekmarAyoMonthList[0].Ay)
             this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+            this.$axios.get(`/maliyet/proforma/currency/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`)
+                .then(res=>{
+                  this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                  
+                });
           });
       }
     },
@@ -767,6 +826,11 @@ export default {
             this.$store.dispatch("setEndLoadingAction");
             this.__getMonthlyCostList(this.selectedYear.Yil,this.getReportsMekmarAyoMonthList[0].Ay)
             this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
+            this.$axios.get(`/maliyet/proforma/currency/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`)
+            .then(res=>{
+              this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+              
+            });
           });
       } else if (event.value.id == 1) {
         this.$store.dispatch("setBeginLoadingAction");
@@ -781,6 +845,11 @@ export default {
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.__getQuarterCostList(1,3,this.selectedYear.Yil);
               this.$store.dispatch("setEndLoadingAction");
+              this.$axios.get(`/maliyet/proforma/currency/quarter/${this.selectedYear.Yil}/${1}/${3}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
             }
 
           });
@@ -798,6 +867,11 @@ export default {
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
               this.__getQuarterCostList(4,6,this.selectedYear.Yil);
+              this.$axios.get(`/maliyet/proforma/currency/quarter/${this.selectedYear.Yil}/${4}/${6}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
 
             }
           });
@@ -815,6 +889,11 @@ export default {
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
               this.__getQuarterCostList(7,9,this.selectedYear.Yil);
+              this.$axios.get(`/maliyet/proforma/currency/quarter/${this.selectedYear.Yil}/${7}/${9}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
 
             }
           });
@@ -832,6 +911,11 @@ export default {
               this.$store.commit("setReportsMekmarAyoListTotal", data);
               this.$store.dispatch("setEndLoadingAction");
               this.__getQuarterCostList(10,12,this.selectedYear.Yil);
+              this.$axios.get(`/maliyet/proforma/currency/quarter/${this.selectedYear.Yil}/${10}/${12}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
 
             }
           });
@@ -853,6 +937,7 @@ export default {
     },
     allAyoList(event) {
       if (this.checked) {
+
         this.date_disabled = true;
         this.$store.dispatch("setBeginLoadingAction");
         api
@@ -863,6 +948,12 @@ export default {
             this.$store.dispatch("setEndLoadingAction");
             this.__getYearlyCostList(this.selectedYear.Yil);
             this.selectedQuarter = { 'quarter': 'All', id: 0 };
+            this.$axios.get(`/maliyet/proforma/all/currency/${this.selectedYear.Yil}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
+
           });
       } else {
         this.$store.dispatch("setReportsMekmarAyoMonthList", this.selectedYear.Yil);
@@ -879,6 +970,11 @@ export default {
             this.__getMonthlyCostList(this.selectedYear.Yil,this.getReportsMekmarAyoMonthList[0].Ay);
             this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
             this.selectedQuarter = { 'quarter': 'All', id: 0 };
+            this.$axios.get(`/maliyet/proforma/currency/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`)
+            .then(res=>{
+              this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+
+            });
 
           });
       }
@@ -902,6 +998,11 @@ export default {
           this.$store.dispatch("setEndLoadingAction");
           this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
           this.selectedQuarter = { 'quarter': 'All', id: 0 };
+          this.$axios.get(`/maliyet/proforma/currency/${event.value.Yil}/${12}`)
+          .then(res=>{
+            this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+            
+          });
 
         });
     },
@@ -920,6 +1021,11 @@ export default {
           this.__getMonthlyCostList(date.year,date.month);
           this.$store.dispatch("setEndLoadingAction");
           this.selectedQuarter = { 'quarter': 'All', id: 0 };
+          this.$axios.get(`/maliyet/proforma/currency/${date.year}/${date.month}`)
+          .then(res=>{
+            this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+            
+          });
 
         });
     },
@@ -937,6 +1043,12 @@ export default {
         this.$store.commit("setReportsMekmarAyoList", response.data);
         this.$store.commit("setReportsMekmarAyoListTotal", response.data);
         this.__getMonthlyCostList(new Date().getFullYear(),this.selectedMonth.Ay);
+        this.$axios.get(`/maliyet/proforma/currency/${new Date().getFullYear()}/${this.selectedMonth.Ay}`)
+        .then(res=>{
+          this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+          
+        });
+
         this.$store.dispatch("setEndLoadingAction");
       });
 

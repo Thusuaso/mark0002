@@ -16579,7 +16579,55 @@ delete ImportantLinksTB where ID='${req.params.id}'
             })
         }
     });
-})
+});
+
+app.get(`/maliyet/proforma/currency/:year/:month`,(req,res)=>{
+    const currencySql = `select top 1 CURRENCY from AyoCurrency where YEAR='${req.params.year}' and MONTH = '${req.params.month}'`;
+    mssql.query(currencySql,(err,currency)=>{
+        if(currency.recordset.length == 0){
+            res.status(200).json({'currency':0});
+        }else{
+            res.status(200).json({'currency':currency.recordset[0].CURRENCY});
+
+        }
+    });
+});
+
+app.get(`/maliyet/proforma/currency/quarter/:year/:q1/:q2`,(req,res)=>{
+    const currencySql = `select (sum(CURRENCY) / 3) as curr from AyoCurrency where YEAR='${req.params.year}' and MONTH between '${req.params.q1}' and '${req.params.q2}'`;
+    mssql.query(currencySql,(err,currency)=>{
+        if(currency.recordset.length == 0){
+            res.status(200).json({'currency':0});
+        }else{
+            res.status(200).json({'currency':currency.recordset[0].curr});
+
+        }
+    });
+});
+
+app.get(`/maliyet/proforma/currency/half/:year/:q1/:q2`,(req,res)=>{
+    const currencySql = `select (sum(CURRENCY) / 6) as curr from AyoCurrency where YEAR='${req.params.year}' and MONTH between '${req.params.q1}' and '${req.params.q2}'`;
+    mssql.query(currencySql,(err,currency)=>{
+        if(currency.recordset.length == 0){
+            res.status(200).json({'currency':0});
+        }else{
+            res.status(200).json({'currency':currency.recordset[0].curr});
+
+        }
+    });
+});
+
+app.get(`/maliyet/proforma/all/currency/:year`,(req,res)=>{
+    const currencySql = `select (sum(CURRENCY) / 12) as curr from AyoCurrency where YEAR='${req.params.year}'`;
+    mssql.query(currencySql,(err,currency)=>{
+        if(currency.recordset.length == 0){
+            res.status(200).json({'currency':0});
+        }else{
+            res.status(200).json({'currency':currency.recordset[0].curr});
+
+        }
+    });
+});
 
 
 

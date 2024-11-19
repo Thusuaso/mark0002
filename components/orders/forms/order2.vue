@@ -425,13 +425,13 @@ export default {
       } else {
         if (this.selectedUnit.ID == 1) {
           this.model.OzelMiktar = this.model.Miktar;
-          this.model.Adet = parseInt(((this.__typeFloatControl(event) / (this.__typeFloatControl(this.width) / 100)) / (this.__typeFloatControl(this.height) / 100)));
+          this.model.Adet = Math.round(((this.__typeFloatControl(event) / (this.__typeFloatControl(this.width) / 100)) / (this.__typeFloatControl(this.height) / 100)));
         } else if (this.selectedUnit.ID == 2) {
           this.model.OzelMiktar = (this.__typeFloatControl(this.width) * this.__typeFloatControl(this.height) * this.__typeFloatControl(event)) / 10000;
           this.model.Adet = this.model.Miktar;
         } else if (this.selectedUnit.ID == 3) {
           this.model.OzelMiktar = (this.__typeFloatControl(event) * this.__typeFloatControl(this.width)) / 100;
-          this.model.Adet = parseInt(((this.__typeFloatControl(this.model.OzelMiktar) / (this.__typeFloatControl(this.width) / 100)) / (this.__typeFloatControl(this.height) / 100)));
+          this.model.Adet = Math.round(((this.__typeFloatControl(this.model.OzelMiktar) / (this.__typeFloatControl(this.width) / 100)) / (this.__typeFloatControl(this.height) / 100)));
 
         }
       }
