@@ -6387,12 +6387,53 @@ inner join KullaniciTB k on k.ID = yt.KullaniciId
 where yt.TakipEt = 1 and yt.BList = 1
 order by yt.TeklifOncelik,yt.Sira
     `;
+
+
     mssql.query(sql,(err,results)=>{
         mssql.query(bListSql,(err,bList)=>{
             results.recordset.forEach(x=>{
                 x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;
             });
-            res.status(200).json({ 'list': results.recordset,'bList':bList.recordset });
+
+            const list = [];
+            const _h_a = results.recordset.filter(x=>(x.KullaniciId == 44 && (x.TeklifOncelik == 'A' || x.TeklifOncelik == 'B' ||  x.TeklifOncelik == 'C')));
+            const _h_t = results.recordset.filter(x=>(x.KullaniciId == 44 && x.TeklifOncelik == 'Toplantı'));
+            const _o_a = results.recordset.filter(x=>(x.KullaniciId == 19 && (x.TeklifOncelik == 'A' || x.TeklifOncelik == 'B' || x.TeklifOncelik == 'C')));
+            const _o_t = results.recordset.filter(x=>(x.KullaniciId == 19 && x.TeklifOncelik == 'Toplantı'));
+
+            const a_list = results.recordset.filter(x=>(x.TeklifOncelik == 'A' || x.TeklifOncelik == 'B' || x.TeklifOncelik == 'C'));
+
+            const t_list = results.recordset.filter(x=>(x.TeklifOncelik == 'Toplantı'));
+
+
+            if(a_list.length > 0){
+                let i = 0;
+                while (a_list.length  > i){
+                    if(_h_a.length >= (i+1)){
+                        list.push(_h_a[i]);
+                    }
+                    if(_o_a.length >= (i+1)){
+                        list.push(_o_a[i]);
+                    }
+                    i+=1;
+                }
+            }
+
+            if(t_list.length > 0){
+                let i = 0;
+                while (t_list.length  > i){
+                    if(_h_t.length >= (i+1)){
+                        list.push(_h_t[i]);
+                    }
+                    if(_o_t.length >= (i+1)){
+                        list.push(_o_t[i]);
+                    }
+                    i+=1;
+                }
+            }
+
+
+            res.status(200).json({ 'list': list,'bList':bList.recordset });
 
         });
     })

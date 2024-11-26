@@ -9,6 +9,8 @@
       @row-reorder="colReOrderProject"
       :filters.sync="filterProjects"
       filterDisplay="row"
+      sortField="Queue" :sortOrder="1"
+      
     >
       <Column
         :rowReorder="true"
