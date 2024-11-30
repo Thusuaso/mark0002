@@ -43,7 +43,7 @@
             label="Excel"
           />
         </JsonExcel> -->
-        <vue-excel-xlsx
+        <!-- <vue-excel-xlsx
           :data="getReportsMekmerProductionList"
           :columns="reportsMekmerProductionListExcelFields2"
           :file-name="'Production'"
@@ -57,7 +57,9 @@
             icon="pi pi-file-excel"
             label="Excel"
           />
-        </vue-excel-xlsx>
+        </vue-excel-xlsx> -->
+      
+        <Button type="button" class="p-button-primary" label="Excel" @click="excel_output"/>
       </div>
 
     </div>
@@ -69,11 +71,14 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import api from "~/plugins/excel.server.js";
+
 export default {
   computed: {
     ...mapGetters([
       "getReportsMekmerProductionList",
       "getReportsMekmerProductionListTotal",
+      "getLocalUrl"
     ]),
   },
   data() {
@@ -127,7 +132,18 @@ export default {
     this.$store.dispatch("setReportsMekmerProductionList");
   },
   methods: {
-    
+    excel_output(){
+      api.post("/reports/excel/production", this.getReportsMekmerProductionList).then((response) => {
+        if (response.status) {
+          const link = document.createElement("a");
+          link.href = this.getLocalUrl + "reports/excel/production";
+
+          link.setAttribute("download", "mekamer_production_excel.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+    },
     formatDecimal(value) {
       const data = value.toString().replace(".", ",");
       return data;

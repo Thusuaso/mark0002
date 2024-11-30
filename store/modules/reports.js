@@ -532,8 +532,12 @@ const actions = {
 
         this.$axios.get(`/reports/loading/list/by/customer/${date.year}/${date.month}`)
         .then(response=>{
-            vuexContext.commit('setLoadingCustomerList',response.data.list);
-            vuexContext.commit('setReportsMekmarLoadingListTotal',response.data.list);
+            const data = [];
+            response.data.list.forEach(x=>{
+                data.push({...x,'YuklemeTarihi':'','SiparisNo':''});
+            });
+            vuexContext.commit('setLoadingCustomerList',data);
+            vuexContext.commit('setReportsMekmarLoadingListTotal',data);
             vuexContext.dispatch('setEndLoadingAction');
 
         });

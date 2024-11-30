@@ -3020,7 +3020,7 @@ inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
 inner join OlculerTB ol on ol.ID = uk.OlcuID
 where u.UrunDurumID=1 and u.Bulunamadi != 1
 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
-order by ol.En,ol.Boy,ol.Kenar
+order by sum(u.Miktar) desc
               `;
 
   mssql.query(sql,(err,results)=>{
@@ -3050,7 +3050,7 @@ inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
 inner join OlculerTB ol on ol.ID = uk.OlcuID
 where u.UrunDurumID=1 and UretimTurID=1 and u.Disarda != 1 and u.Bulunamadi != 1
 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
-order by ol.En,ol.Boy,ol.Kenar
+order by sum(u.Miktar) desc
               `;
 
     mssql.query(sql, (err, results) => {
@@ -3080,7 +3080,7 @@ app.get('/reports/mekmer/stock/list/mekmer', (req, res) => {
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
                 where u.UrunDurumID=1 and u.Disarda != 1 and u.Bulunamadi != 1 and (u.TedarikciID) not in (1,123)
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
-                order by ol.En,ol.Boy,ol.Kenar
+                order by sum(u.Miktar) desc
               `;
 
     mssql.query(sql, (err, results) => {
@@ -3110,7 +3110,7 @@ app.get('/reports/mekmer/stock/list/mekmer/in', (req, res) => {
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
                 where u.UrunDurumID=1 and u.TedarikciID = 1 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
-                order by ol.En,ol.Boy,ol.Kenar
+                order by sum(u.Miktar) desc
               `;
 
     mssql.query(sql, (err, results) => {
@@ -3140,7 +3140,7 @@ app.get('/reports/mekmer/stock/list/mekmoz', (req, res) => {
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
                 where u.UrunDurumID=1 and u.TedarikciID = 123 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
-                order by ol.En,ol.Boy,ol.Kenar
+                order by sum(u.Miktar) desc
               `;
 
     mssql.query(sql, (err, results) => {
@@ -3171,7 +3171,7 @@ app.get('/reports/mekmer/stock/list/only/mekmer', (req, res) => {
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
                 where u.UrunDurumID=1 and u.TedarikciID in (1,123) and u.UretimTurID=1 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar 
-                order by ol.En,ol.Boy,ol.Kenar
+                order by sum(u.Miktar) desc
 
 
 
@@ -3209,7 +3209,7 @@ app.get('/reports/mekmer/stock/list/outer', (req, res) => {
                 inner join OlculerTB ol on ol.ID = uk.OlcuID
                 where u.UrunDurumID=1 and u.Disarda = 1 and u.Bulunamadi != 1
                 group by k.KategoriAdi,ur.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar
-                order by ol.En,ol.Boy,ol.Kenar
+                order by sum(u.Miktar) desc
               `;
 
     mssql.query(sql, (err, results) => {

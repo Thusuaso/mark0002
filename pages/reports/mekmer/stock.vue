@@ -82,6 +82,7 @@ export default {
       "getReportsStockListDetail",
       "getReportsStockListDetailTotal",
       "getLocalUrl",
+      'getLoading'
     ]),
   },
   data() {

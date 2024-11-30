@@ -11,21 +11,8 @@
                 <Dropdown v-model="selectedMonth" :options="getMonthList" optionLabel="Month"  class="w-100" @change="monthChange($event)"/>
             </div>
             <div class="col">
-                <vue-excel-xlsx
-          :data="getReportsMekmarLoadingList"
-          :columns="reportsMekmerLoadingListExcelFields2"
-          :file-name="'Loading'"
-          :file-type="'xlsx'"
-          :sheet-name="'sheetname'"
-          style="border: none; background-color: white; width: 100%"
-        >
-          <Button
-            type="button"
-            class="p-button-info w-100"
-            icon="pi pi-file-excel"
-            label="Excel"
-          />
-        </vue-excel-xlsx>
+                <Button type="button" class="p-button-secondary" label="Excel" @click="excel_output"/>
+
             </div>
         </div>
 
@@ -34,6 +21,8 @@
 </template>
 <script>
 import {mapGetters} from 'vuex';
+import api from "~/plugins/excel.server.js";
+
 export default {
     middleware: ["authority"],
     computed:{
@@ -44,6 +33,7 @@ export default {
         'getReportsMekmarLoadingListTotal',
         'getReportsMekmarLoadingListYear',
         'getReportsMekmarLoadingListYearTotal',
+        'getLocalUrl'
     ])},
     data(){
         return{
@@ -71,6 +61,18 @@ export default {
         this.$store.dispatch('setLoadingList',data)
     },
     methods:{
+        excel_output(){
+            api.post("/reports/excel/loading", this.getReportsMekmarLoadingList).then((response) => {
+                if (response.status) {
+                const link = document.createElement("a");
+                link.href = this.getLocalUrl + "reports/excel/loading";
+
+                link.setAttribute("download", "mekamer_loading_excel.xlsx");
+                document.body.appendChild(link);
+                link.click();
+                }
+            });
+        },
         byCustomerList(){
             const date = {
                 year:this.selectedYear.Year,

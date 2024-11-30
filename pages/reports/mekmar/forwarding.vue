@@ -40,21 +40,8 @@
             label="Excel"
           />
         </JsonExcel> -->
-        <vue-excel-xlsx
-          :data="getreportsMekmarForwardingList"
-          :columns="reportsMekmerForwardingListExcelFields2"
-          :file-name="'Forwarding'"
-          :file-type="'xlsx'"
-          :sheet-name="'sheetname'"
-          style="border: none; background-color: white; width: 100%"
-        >
-          <Button
-            type="button"
-            class="p-button-info w-100"
-            icon="pi pi-file-excel"
-            label="Excel"
-          />
-        </vue-excel-xlsx>
+        <Button type="button" class="p-button-secondary" label="Excel" @click="excel_output"/>
+
       </div>
     </div>
     <reportsMekmarForwardingList
@@ -66,11 +53,14 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import api from "~/plugins/excel.server.js";
+
 export default {
   computed: {
     ...mapGetters([
       "getreportsMekmarForwardingList",
       "getReportsMekmarForwardingListTotal",
+      "getLocalUrl"
     ]),
   },
   data() {
@@ -132,6 +122,18 @@ export default {
     this.$store.dispatch("setReportsMekmarForwardingList");
   },
   methods: {
+    excel_output(){
+      api.post("/reports/excel/forwarding", this.getreportsMekmarForwardingList).then((response) => {
+        if (response.status) {
+          const link = document.createElement("a");
+          link.href = this.getLocalUrl + "reports/excel/forwarding";
+
+          link.setAttribute("download", "mekamer_forwarding_excel.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+    },
     yearChange(event) {},
     formatDecimal(value) {
       if (value == null || value == undefined || value == "" || value == " ") {
