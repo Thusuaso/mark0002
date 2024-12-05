@@ -137,6 +137,9 @@ import profitGu from '~/components/reports/mekmar/gu/profit';
 import importantLinksForm from '~/components/sales/important-links/form';
 import importantLinksList from '~/components/sales/important-links/list';
 
+import guSupplierCost from '~/components/reports/mekmar/gu/supplier';
+
+Vue.component('guSupplierCost',guSupplierCost);
 
 Vue.component('importantLinksForm',importantLinksForm);
 Vue.component('importantLinksList',importantLinksList);

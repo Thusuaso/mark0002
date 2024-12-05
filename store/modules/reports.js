@@ -95,6 +95,7 @@ const state = {
     reportsMekmarGuMekusList: [],
     reportsMekmarGuLogsList: [],
     reportsMekmarGuForwList: [],
+    reportsMekmarGuOrderList:[],
     reportsMekmerAtlantaList:[],
     reportsMekmarMkList: [],
     reportsMekmarGuAyoList: [],
@@ -1125,6 +1126,7 @@ const mutations = {
         let index = 0;
         for (const x of Array(11).keys()) {
             state.reportsMekmarGuForwList.push({ 'year': date, 'data': [],'fob':0,'ddp':0 });
+            state.reportsMekmarGuOrderList.push({ 'year': date, 'data': [],'fob':0,'ddp':0 });
             for (const y of payload.forwList) {
                 if (y.Yil == date) {
                     state.reportsMekmarGuForwList[index].fob += y.Fob;
@@ -1133,10 +1135,23 @@ const mutations = {
                     
                 };
             }
+            for (const y of payload.orderSummaryList) {
+                if (y.Yil == date) {
+                    state.reportsMekmarGuOrderList[index].fob += y.Fob;
+                    state.reportsMekmarGuOrderList[index].ddp += y.Ddp
+                    state.reportsMekmarGuOrderList[index].data.push(y);
+                    
+                };
+            }
             index += 1;
             date = date - 1;
 
         };
+
+        
+
+        
+
         state.reportsMekmarGuAyoList = payload.ayoList;
 
 
@@ -1364,6 +1379,9 @@ const getters = {
 
     getReportsMekmerAtlantaList(state){
         return state.reportsMekmerAtlantaList;
+    },
+    getReportsMekmarGuOrderList(state){
+        return state.reportsMekmarGuOrderList;
     }
 
 };

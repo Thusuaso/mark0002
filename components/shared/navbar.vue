@@ -214,6 +214,9 @@
               <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/country-order" class="dropdown-item" tag="a">Country Order</nuxt-link>
               </li>
+              <li v-show="getAyoStatus">
+                <nuxt-link to="/reports/mekmar/supplier-cost" class="dropdown-item" tag="a">Supplier Cost</nuxt-link>
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown" v-show="!getAuthorityStatus">

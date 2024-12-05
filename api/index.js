@@ -4626,15 +4626,34 @@ app.get('/reports/mekmar/gu/list', (req, res) => {
                             mssql.query(forwSql, (err, forwList) => {
                                 const ayoSql = `select Yil,Usd,Tl from Ayo_Total_Custom`;
                                 mssql.query(ayoSql, (err, ayo) => {
-                                res.status(200).json({
-                                    'contByCust':contByCust.recordset,
-                                    'contList':contList.recordset,
-                                    'yearList': yearList.recordset,
-                                    'mekusList':mekusList.recordset,
-                                    'logsList': logsList.recordset,
-                                    'forwList': forwList.recordset,
-                                    'ayoList':ayo.recordset
-                                });
+                                    const orderSummarySql = `
+                                                                                    select 
+                                                    MONTH(s.SiparisTarihi) as Ay,
+                                                    (sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3)+sum(s.DetayTutar_4)+
+                                                    dbo.Gu_Order_Ozet_Sip_Urn_Turkey(YEAR(s.SiparisTarihi),MONTH(s.SiparisTarihi))
+                                                    ) as Ddp,
+                                                    dbo.Gu_Order_Ozet_Sip_Urn_Turkey(YEAR(s.SiparisTarihi),MONTH(s.SiparisTarihi)) as Fob,
+                                                    YEAR(s.SiparisTarihi) as Yil
+
+                                                from SiparislerTB s
+                                                inner join MusterilerTB m on m.ID = s.MusteriID
+                                                where MONTH(s.SiparisTarihi) is not null and m.Marketing = 'Mekmar'
+                                                group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
+                                                order by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
+                                    `;
+                                    mssql.query(orderSummarySql,(err,orderSummary)=>{
+                                        res.status(200).json({
+                                            'contByCust':contByCust.recordset,
+                                            'contList':contList.recordset,
+                                            'yearList': yearList.recordset,
+                                            'mekusList':mekusList.recordset,
+                                            'logsList': logsList.recordset,
+                                            'forwList': forwList.recordset,
+                                            'ayoList':ayo.recordset,
+                                            'orderSummaryList':orderSummary.recordset
+                                        });
+                                    });
+
                                 });
 
                             });
@@ -10883,7 +10902,11 @@ app.get('/order/shipped/list/filter/global/:filter',async (req,res)=>{
         ol.En Like '%'+'${req.params.filter}' + '%' or
         ol.Boy Like '%'+'${req.params.filter}' + '%' or
         ol.Kenar Like '%'+'${req.params.filter}' + '%' or 
-        t.FirmaAdi Like '%'+'${req.params.filter}' + '%' 
+        t.FirmaAdi Like '%'+'${req.params.filter}' + '%' or
+        su.UretimAciklama Like '%'+'${req.params.filter}' + '%' or
+        su.MusteriAciklama Like '%'+'${req.params.filter}' + '%' 
+
+
         order by s.SiparisTarihi desc
 
 
@@ -16360,13 +16383,14 @@ app.get('/reports/ayo/country/order/list',(req,res)=>{
 
 
         from SiparislerTB s 
-        inner join YeniTeklif_UlkeTB ytu on ytu.ID = s.UlkeID
         inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
         inner join MusterilerTB m on m.ID = s.MusteriID
+		inner join YeniTeklif_UlkeTB ytu on ytu.ID = m.UlkeID
+
 
         where YEAR(s.SiparisTarihi) >= 2019 and m.Marketing = 'Mekmar'
         group by YEAR(s.SiparisTarihi),ytu.UlkeAdi
-        order by YEAR(s.SiparisTarihi) desc
+        order by sum(su.SatisToplam) desc
     `;
     const orderCostSql = `
         select 
@@ -16379,8 +16403,9 @@ app.get('/reports/ayo/country/order/list',(req,res)=>{
 
 
 from SiparislerTB s 
-inner join YeniTeklif_UlkeTB ytu on ytu.ID = s.UlkeID
 inner join MusterilerTB m on m.ID = s.MusteriID
+inner join YeniTeklif_UlkeTB ytu on ytu.ID = m.UlkeId
+
 
 where YEAR(s.SiparisTarihi) >= 2019 and m.Marketing = 'Mekmar'
 group by YEAR(s.SiparisTarihi),ytu.UlkeAdi
@@ -16406,6 +16431,48 @@ order by YEAR(s.SiparisTarihi) desc
 
 });
 
+/*Supplier Cost */
+app.get('/reports/supplier/cost/list',(req,res)=>{
+    const sql = `
+        select 
+
+
+    su.TedarikciID,
+    sum(su.AlisFiyati * su.Miktar) as Total,
+    t.FirmaAdi,
+	YEAR(s.YuklemeTarihi) as Year
+
+
+from SiparislerTB s
+inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
+inner join TedarikciTB t on t.ID = su.TedarikciID
+where YEAR(s.YuklemeTarihi) >= 2019
+group by su.TedarikciID,t.FirmaAdi,YEAR(s.YuklemeTarihi)
+order by YEAR(s.YuklemeTarihi) desc,sum(su.AlisFiyati * su.Miktar) desc
+    `;
+
+    mssql.query(sql,(err,result)=>{
+        const data = [];
+        let date = new Date().getFullYear();
+        let index = 0;
+        for (const x of Array(6).keys()) {
+            data.push({ 'year': date, 'data': [],'total':0 });
+            for (const y of result.recordset) {
+                if (y.Year == date) {
+                    data[index].total += y.Total;
+                    data[index].data.push(y);
+                };
+            };
+            index += 1;
+            date = date - 1;
+
+        };
+        res.status(200).json({'list':data})
+
+    });
+
+
+});
 
 
 

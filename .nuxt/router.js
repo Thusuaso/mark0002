@@ -53,6 +53,7 @@ const _0201a401 = () => interopDefault(import('..\\pages\\reports\\mekmar\\gu.vu
 const _100f018e = () => interopDefault(import('..\\pages\\reports\\mekmar\\loading.vue' /* webpackChunkName: "pages/reports/mekmar/loading" */))
 const _0bb1ccb1 = () => interopDefault(import('..\\pages\\reports\\mekmar\\mk.vue' /* webpackChunkName: "pages/reports/mekmar/mk" */))
 const _829dfeba = () => interopDefault(import('..\\pages\\reports\\mekmar\\summary.vue' /* webpackChunkName: "pages/reports/mekmar/summary" */))
+const _1a170c6b = () => interopDefault(import('..\\pages\\reports\\mekmar\\supplier-cost.vue' /* webpackChunkName: "pages/reports/mekmar/supplier-cost" */))
 const _0e92c618 = () => interopDefault(import('..\\pages\\reports\\mekmer\\atlanta.vue' /* webpackChunkName: "pages/reports/mekmer/atlanta" */))
 const _6dc517db = () => interopDefault(import('..\\pages\\reports\\mekmer\\finance.vue' /* webpackChunkName: "pages/reports/mekmer/finance" */))
 const _079223a2 = () => interopDefault(import('..\\pages\\reports\\mekmer\\mine.vue' /* webpackChunkName: "pages/reports/mekmer/mine" */))
@@ -271,6 +272,10 @@ export const routerOptions = {
     path: "/reports/mekmar/summary",
     component: _829dfeba,
     name: "reports-mekmar-summary"
+  }, {
+    path: "/reports/mekmar/supplier-cost",
+    component: _1a170c6b,
+    name: "reports-mekmar-supplier-cost"
   }, {
     path: "/reports/mekmer/atlanta",
     component: _0e92c618,

@@ -343,6 +343,13 @@
     "_name": "_829dfeba"
   },
   {
+    "name": "reports-mekmar-supplier-cost",
+    "path": "/reports/mekmar/supplier-cost",
+    "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\supplier-cost.vue",
+    "chunkName": "pages/reports/mekmar/supplier-cost",
+    "_name": "_1a170c6b"
+  },
+  {
     "name": "reports-mekmer-atlanta",
     "path": "/reports/mekmer/atlanta",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\atlanta.vue",

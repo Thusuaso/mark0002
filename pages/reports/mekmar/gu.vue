@@ -17,9 +17,16 @@
       <TabPanel header="Logs">
         <reportsMekmarGuLogsList :list="getReportsMekmarGuLogsList" />
       </TabPanel>
-      <TabPanel header="Shipment Summary (Yıl)">
+      <TabPanel header="Shipment Summary (Yearly)">
+        <Button type="button" label="Excel" class="p-button-secondary" @click="forwarding_excel_output"/>
         <div class="row">
           <reportsMekmarGuForwardingList v-for="item of getReportsMekmarGuForwList" :key="item" :list="item" />
+        </div>
+      </TabPanel>
+      <TabPanel header="Order Summary (Yearly)">
+        <Button type="button" label="Excel" class="p-button-secondary" @click="forwarding_excel_output_2"/>
+        <div class="row">
+          <reportsMekmarGuForwardingList v-for="item of getReportsMekmarGuOrderList" :key="item" :list="item" />
         </div>
       </TabPanel>
       <TabPanel header="Ayo">
@@ -77,7 +84,9 @@ export default {
       "getReportsMekmarGuMekusList",
       "getReportsMekmarGuLogsList",
       "getReportsMekmarGuForwList",
-      "getReportsMekmarGuAyoList"
+      "getReportsMekmarGuAyoList",
+      'getLocalUrl',
+      'getReportsMekmarGuOrderList'
     ]),
   },
   data() {
@@ -111,6 +120,34 @@ export default {
   },
 
   methods: {
+    forwarding_excel_output(){
+      api
+                .post("/reports/gu/forwarding", this.getReportsMekmarGuForwList)
+                .then((response) => {
+                if (response.status) {
+                    const link = document.createElement("a");
+                    link.href = this.getLocalUrl + "/reports/gu/forwarding";
+
+                    link.setAttribute("download", "gu_excel.xlsx");
+                    document.body.appendChild(link);
+                    link.click();
+                }
+                });
+    },
+    forwarding_excel_output_2(){
+      api
+                .post("/reports/gu/forwarding", this.getReportsMekmarGuOrderList)
+                .then((response) => {
+                if (response.status) {
+                    const link = document.createElement("a");
+                    link.href = this.getLocalUrl + "/reports/gu/forwarding";
+
+                    link.setAttribute("download", "gu_excel.xlsx");
+                    document.body.appendChild(link);
+                    link.click();
+                }
+                });
+    },
     yearSelected(event) {
       this.$store.dispatch("setReportsMekmarGuListYear", event.value.Year);
     },
