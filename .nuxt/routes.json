@@ -294,6 +294,13 @@
     "_name": "_0b141e34"
   },
   {
+    "name": "reports-mekmar-country-order",
+    "path": "/reports/mekmar/country-order",
+    "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\country-order.vue",
+    "chunkName": "pages/reports/mekmar/country-order",
+    "_name": "_38f6a314"
+  },
+  {
     "name": "reports-mekmar-filter-finance",
     "path": "/reports/mekmar/filter-finance",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\filter-finance.vue",

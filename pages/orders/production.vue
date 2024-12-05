@@ -57,11 +57,16 @@
         :detailProductCost="getOrderProductionProductDetailCostTotal"
         :saveButtonStatus="getOrderProductionSaveButtonStatus"
         :proformaUploadButtonStatus="getOrderProductionUploadProformaButtonStatus" :statusAlfa="false"
+        :insuranceCalculation="getOrderProductionInsuranceTotal"
+        
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
         " @process="process" @workerman_selected_emit="workermanSelected($event)"
         @close_production_form_emit="closeProductionForm" @proforma_delete_emit="proformaDelete($event)"
-        @isf_delete_emit="isfDelete($event)" @divide="divide" />
+        @isf_delete_emit="isfDelete($event)" @divide="divide" 
+        
+        
+        />
     </Dialog>
 
     <Dialog :visible.sync="workerman_dialog_form" header="" modal>
@@ -423,6 +428,7 @@ export default {
       "getOrderProductionCheckList",
       "getOrderProductionCheckListTotal",
       "getOrderProductionProductTotal",
+      "getOrderProductionInsuranceTotal",
       "getOrderProductionFreightTotal",
       "getOrderProductionDetailTotal",
       "getOrderProductionProductDetailTotal",
@@ -1077,6 +1083,7 @@ export default {
       this.$store.dispatch("setOrderProductionDocumentList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionCheckList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
+      this.$store.dispatch("setOrderProductionInsuranceTotal", event.sigorta_tutar_satis);
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);

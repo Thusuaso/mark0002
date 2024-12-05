@@ -61,7 +61,8 @@ const state = {
         'price':0
     },
     orderProductionDivideList: [],
-    orderProductionDivideOrderList:[]
+    orderProductionDivideOrderList:[],
+    orderProductionInsuranceTotal:0
 
     
 
@@ -493,6 +494,15 @@ vuexContext.commit('setOrderProductionTotal',response.data.list);
     setOrderProductionFreightTotal(vuexContext, freight) {
         vuexContext.commit('setOrderProductionFreightTotal', freight);
     },
+    setOrderProductionInsuranceTotal(vuexContext, insurance) {
+        if(insurance == null || insurance == undefined || insurance == ' ' || insurance ==  ''){
+            vuexContext.commit('setOrderProductionInsuranceTotal', 0);
+
+        }else{
+            vuexContext.commit('setOrderProductionInsuranceTotal', insurance);
+
+        }
+    },
     setOrderProductionDetailTotal(vuexContext, detail) {
         vuexContext.commit('setOrderProductionDetailTotal', detail);
     },
@@ -891,6 +901,9 @@ const mutations = {
     setOrderProductionFreightTotal(state, payload) {
         state.orderProductionFreightTotal = payload;
     },
+    setOrderProductionInsuranceTotal(state,payload){
+        state.orderProductionInsuranceTotal = payload;
+    },
     setOrderProductionDetailTotal(state, payload) {
         state.orderProductionDetailTotal = (parseFloat(payload.DetayTutar_1) + parseFloat(payload.DetayTutar_2) + parseFloat(payload.DetayTutar_3));
     },
@@ -1026,6 +1039,9 @@ const getters = {
     },
     getOrderProductionFreightTotal(state) {
         return state.orderProductionFreightTotal;
+    },
+    getOrderProductionInsuranceTotal(state){
+        return state.orderProductionInsuranceTotal;
     },
     getOrderProductionDetailTotal(state) {
         return state.orderProductionDetailTotal;

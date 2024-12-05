@@ -213,11 +213,15 @@
 
             <div class="row mb-4">
               <div class="col">
-                <CustomInput
-                  :value="model.sigorta_tutar_satis"
-                  text="Insurance"
-                  @onInput="model.sigorta_tutar_satis = $event"
-                />
+                <span class="p-float-label">
+                  <InputText
+                    id="Insurance"
+                    v-model="model.sigorta_tutar_satis"
+                    @input="insuranceSelling($event)"
+                    style="width:100%;"
+                  />
+                  <label for="Insurance">Insurance</label>
+                </span>
               </div>
             </div>
           </template>
@@ -656,6 +660,28 @@ export default {
       this.model.TeslimTur = event.value.TeslimTur;
       this.model.TeslimTurID = event.value.ID;
     },
+    insuranceSelling(event){
+      console.log("insuranceSelling",event)
+      if (event) {
+        if (event[0] == 0) {
+          event = event.substr(1);
+        }
+        if (event == null || event == undefined) {
+          event = 0;
+        }
+        this.model.sigorta_tutar_satis = event.replace(",", ".");
+        this.$store.dispatch(
+          "setOrderProductionInsuranceTotal",
+          parseFloat(event.replace(",", "."))
+        );
+      } else {
+        this.model.sigorta_tutar_satis = 0;
+        this.$store.dispatch("setOrderProductionInsuranceTotal", 0);
+      }
+
+
+
+    }
   },
   beforeCreate(){
 

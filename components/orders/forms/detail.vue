@@ -98,6 +98,10 @@
             <td>{{ freightCalculation | formatPriceUsd }}</td>
           </tr>
           <tr>
+            <th scope="row">Insurance Cost</th>
+            <td>{{ insuranceCalculation | formatPriceUsd }}</td>
+          </tr>
+          <tr>
             <th scope="row">Total (Other)</th>
             <td>{{ detailCalculation | formatPriceUsd }}</td>
           </tr>
@@ -105,7 +109,7 @@
             <th scope="row">G.Total</th>
             <td>
               {{
-              (productCalculation + freightCalculation + detailCalculation)
+              ( productCalculation + freightCalculation + detailCalculation + insuranceCalculation )
               | formatPriceUsd
               }}
             </td>
@@ -319,6 +323,10 @@ export default {
       type: Boolean,
       required: false,
     },
+    insuranceCalculation:{
+      type:Number,
+      required:true
+    }
   },
   data() {
     return {

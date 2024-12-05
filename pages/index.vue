@@ -15,7 +15,9 @@ export default {
   },
   components: {},
   data() {
-    return {};
+    return {
+    
+    };
   },
   beforeMount() {},
   created() {

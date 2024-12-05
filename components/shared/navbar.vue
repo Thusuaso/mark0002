@@ -192,6 +192,7 @@
                 <nuxt-link to="/reports/mekmar/ayo" class="dropdown-item" tag="a">AYO</nuxt-link>
               </li>
 
+
               <li>
                 <nuxt-link to="/reports/mekmar/loading" class="dropdown-item" tag="a">List of Shipments</nuxt-link>
               </li>
@@ -209,6 +210,9 @@
               </li>
               <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/filter-finance" class="dropdown-item" tag="a">GU Finance</nuxt-link>
+              </li>
+              <li v-show="getAyoStatus">
+                <nuxt-link to="/reports/mekmar/country-order" class="dropdown-item" tag="a">Country Order</nuxt-link>
               </li>
             </ul>
           </li>

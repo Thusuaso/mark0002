@@ -28,6 +28,7 @@
         :freightCalculation="getOrderProductionFreightTotal" :detailCalculation="getOrderProductionDetailTotal"
         :detailProductTotal="getOrderProductionProductDetailTotal"
         :detailProductCost="getOrderProductionProductDetailCostTotal" :statusAlfa="false"
+        :insuranceCalculation="getOrderProductionInsuranceTotal"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
         " @process="process" @workerman_selected_emit="workermanSelected($event)"
@@ -73,6 +74,7 @@ export default {
       "getOrderProductionCheckListTotal",
       "getOrderProductionProductTotal",
       "getOrderProductionFreightTotal",
+      "getOrderProductionInsuranceTotal",
       "getOrderProductionDetailTotal",
       "getOrderProductionProductDetailTotal",
       "getOrderProductionProductDetailCostTotal",
@@ -460,6 +462,7 @@ export default {
       this.$store.dispatch("setOrderProductionDocumentList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionCheckList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
+      this.$store.dispatch("setOrderProductionInsuranceTotal", event.sigorta_tutar_satis);
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");

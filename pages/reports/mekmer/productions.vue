@@ -316,6 +316,7 @@ export default {
       this.$store.dispatch("setOrderProductionDocumentList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionCheckMekmerList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
+      this.$store.dispatch("setOrderProductionInsuranceTotal", event.sigorta_tutar_satis);
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);

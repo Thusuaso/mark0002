@@ -218,7 +218,7 @@
         getfinanceList(){
 
               this.filterFinanceList = this.getfinanceList.filter(x=>{
-                return (x.customer_id != 37) && (x.customer_id != 7653) && (x.customer_id != 6519) && (x.customer_id != 2385) && (x.customer_id !=2386) && (x.customer_id!= 162);
+                return (x.customer_id != 37) && (x.customer_id != 7653) && (x.customer_id != 6519) && (x.customer_id != 2385) && (x.customer_id !=2386) && (x.customer_id!= 162) && (x.customer_id != 7540) && (x.customer_id != 7687) && (x.customer_id != 7590);
               });
               this.$store.dispatch('setFinanceTotalList',this.filterFinanceList)
         }

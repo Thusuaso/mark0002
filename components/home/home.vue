@@ -203,6 +203,24 @@
       </div>
 
     </div>
+    <div class="row m-auto text">
+      <div class="col-sm-6">
+        
+<DataTable :value="home.supplierCostList" scrollable scrollHeight="500px">
+    <Column field="FirmaAdi" header="Supplier"></Column>
+    <Column field="Total" header="Total">
+      <template #body="slotProps">
+        {{ slotProps.data.Total | formatPriceUsd }}
+      </template>
+      <template #footer>  
+          {{ totalSupplier | formatPriceUsd }}
+        </template>
+    </Column>
+
+</DataTable>
+      </div>
+    </div>
+
 
   </div>
 </template>
@@ -216,6 +234,7 @@ export default {
   },
   data() {
     return {
+      totalSupplier:0,
       userId:null,
       chartOptions: {
         maintainAspectRatio: false,
@@ -327,6 +346,18 @@ export default {
   },
   created(){
     this.userId = Cookies.get('userId');
+
+
+  },
+  mounted(){
+    
+  },
+  watch: {
+    home(){
+      this.home.supplierCostList.forEach(x=>{
+          this.totalSupplier += x.Total;
+        });
+    }
   }
 };
 </script>

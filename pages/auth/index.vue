@@ -13,6 +13,7 @@ export default {
   methods: {
     onSubmit(user) {
       this.$store.dispatch("login", user).then((res) => {
+        
         const userId = Cookies.get('userId');
         this.$store.dispatch('setUserId',userId);
         if (res) {
@@ -30,6 +31,9 @@ export default {
             ":" +
             date.getSeconds();
           this.$store.dispatch("login_mailer", user);
+          this.$store.dispatch('setToDoListByUsername',user.username)
+
+
         }
       });
     },

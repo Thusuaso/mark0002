@@ -122,6 +122,25 @@ inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
 where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
     `;
 
+    let sqlSupplierCostList = `
+        select 
+
+
+            su.TedarikciID,
+            sum(su.AlisFiyati * su.Miktar) as Total,
+            t.FirmaAdi
+
+
+        from SiparislerTB s
+        inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
+        inner join TedarikciTB t on t.ID = su.TedarikciID
+        where YEAR(s.YuklemeTarihi) = YEAR(GETDATE())
+        group by su.TedarikciID,t.FirmaAdi
+        order by sum(su.AlisFiyati * su.Miktar) desc
+    `;
+
+
+
     function _forSum(data){
         let sum = 0;
         if(data.length == 0){
@@ -316,87 +335,97 @@ where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
                                             mssql.query(sqlChartProduct,(err,chartProducts)=>{
                                                 mssql.query(sqlChartOffers,(err,chartOffers)=>{
                                                     mssql.query(sqlChartProductSpecial,(err,chartProductsSpecial)=>{
-                                                        let _productsChartData = _chartProductsSum(chartProducts?.recordset,chartProductsSpecial.recordset);
-                                                        let _offeresChartData = _chartOffersSum(chartOffers?.recordset);
-                                                        res.status(200).json({
-                                                            'aylikSiparis':totalMonthOrder,
-                                                            'yillikSiparis':totalYearOrder,
-                                                            'ortalamaSiparis':totalYearOrder / (new Date().getMonth() + 1),
-                                                            'tahminiYillikSiparis':(totalYearOrder / (new Date().getMonth() + 1)) * 12,
-                                                            'aylikYukleme':totalMonthForwarding,
-                                                            'yillikYukleme':totalYearForwarding,
-                                                            'ortalamaYukleme':totalYearForwarding / (new Date().getMonth() + 1),
-                                                            'tahminiYillikYukleme':(totalYearForwarding / (new Date().getMonth() + 1)) * 12,
-                                                            'chartOne':{
-                                                                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                                                                datasets: [
-                                                                    {
-                                                                        label: new Date().getFullYear(),
-                                                                        backgroundColor: 'grey',
-                                                                        borderColor: 'black',
-                                                                        data: chartOne
-                                                                    },
-                                                                    {
-                                                                        label: new Date().getFullYear() - 1,
-                                                                        backgroundColor: 'black',
-                                                                        borderColor: 'grey',
-                                                                        data: chartTwo
-                                                                    }
-                                                                ]
-                                                            },
-                                                            'chartCustomerShipped':{
-                                                                labels: ['Mekmar', 'İç Piyasa', 'Imperial Homes', 'Mekmer'],
-                                                                datasets: [
-                                                                    {
-                                                                        data: _chartCustomerShippedSum(chartShippedCustomer?.recordset),
-                                                                        backgroundColor: ['#aba34f','#ab6e4f','#4fab9f','#ab4f86'],
-                                                                        hoverBackgroundColor: ['grey','grey','grey','grey']
-                                                                    }
-                                                                ]
-                                                            },
-                                                            'chartProducts':{
-                                                                labels: ['January', 'February', 'March','April','May','June','July','August','September','October','November','December'],
-                                                                datasets: [
-                                                                    {
-                                                                        type: 'bar',
-                                                                        label: 'SQM',
-                                                                        backgroundColor: '#f2bf33',
-                                                                        data: _productsChartData.sqm
-                                                                    },
-                                                                    {
-                                                                        type: 'bar',
-                                                                        label: 'PIECE',
-                                                                        backgroundColor: '#33f2e2',
-                                                                        data: _productsChartData.piece
-                                                                    },
-                                                                    {
-                                                                        type: 'bar',
-                                                                        label: 'MT',
-                                                                        backgroundColor: '#5333f2',
-                                                                        data: _productsChartData.mt
-                                                                    }
-                                                                ]
-                                                            },
-                                                            'chartOffers':{
+                                                        mssql.query(sqlSupplierCostList,(err,supplierCostList)=>{
+                                                            let _productsChartData = _chartProductsSum(chartProducts?.recordset,chartProductsSpecial.recordset);
+                                                            let _offeresChartData = _chartOffersSum(chartOffers?.recordset);
+                                                            res.status(200).json({
+                                                                'supplierCostList':supplierCostList.recordset,
+                                                                'aylikSiparis':totalMonthOrder,
+                                                                'yillikSiparis':totalYearOrder,
+                                                                'ortalamaSiparis':totalYearOrder / (new Date().getMonth() + 1),
+                                                                'tahminiYillikSiparis':(totalYearOrder / (new Date().getMonth() + 1)) * 12,
+                                                                'aylikYukleme':totalMonthForwarding,
+                                                                'yillikYukleme':totalYearForwarding,
+                                                                'ortalamaYukleme':totalYearForwarding / (new Date().getMonth() + 1),
+                                                                'tahminiYillikYukleme':(totalYearForwarding / (new Date().getMonth() + 1)) * 12,
+                                                                'chartOne':{
                                                                     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                                                                     datasets: [
                                                                         {
-                                                                            label: 'Özlem',
-                                                                            backgroundColor: '#e86db3',
-                                                                            borderColor: 'grey',
-                                                                            data: _offeresChartData.chart_o
+                                                                            label: new Date().getFullYear(),
+                                                                            backgroundColor: 'grey',
+                                                                            borderColor: 'black',
+                                                                            data: chartOne
                                                                         },
                                                                         {
-                                                                            label: 'Hakan',
-                                                                            backgroundColor: '#6d94e8',
+                                                                            label: new Date().getFullYear() - 1,
+                                                                            backgroundColor: 'black',
                                                                             borderColor: 'grey',
-                                                                            data: _offeresChartData.chart_h
+                                                                            data: chartTwo
                                                                         }
                                                                     ]
-                                                                }
+                                                                },
+                                                                'chartCustomerShipped':{
+                                                                    labels: ['Mekmar', 'İç Piyasa', 'Imperial Homes', 'Mekmer'],
+                                                                    datasets: [
+                                                                        {
+                                                                            data: _chartCustomerShippedSum(chartShippedCustomer?.recordset),
+                                                                            backgroundColor: ['#aba34f','#ab6e4f','#4fab9f','#ab4f86'],
+                                                                            hoverBackgroundColor: ['grey','grey','grey','grey']
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                'chartProducts':{
+                                                                    labels: ['January', 'February', 'March','April','May','June','July','August','September','October','November','December'],
+                                                                    datasets: [
+                                                                        {
+                                                                            type: 'bar',
+                                                                            label: 'SQM',
+                                                                            backgroundColor: '#f2bf33',
+                                                                            data: _productsChartData.sqm
+                                                                        },
+                                                                        {
+                                                                            type: 'bar',
+                                                                            label: 'PIECE',
+                                                                            backgroundColor: '#33f2e2',
+                                                                            data: _productsChartData.piece
+                                                                        },
+                                                                        {
+                                                                            type: 'bar',
+                                                                            label: 'MT',
+                                                                            backgroundColor: '#5333f2',
+                                                                            data: _productsChartData.mt
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                'chartOffers':{
+                                                                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                                                                        datasets: [
+                                                                            {
+                                                                                label: 'Özlem',
+                                                                                backgroundColor: '#e86db3',
+                                                                                borderColor: 'grey',
+                                                                                data: _offeresChartData.chart_o
+                                                                            },
+                                                                            {
+                                                                                label: 'Hakan',
+                                                                                backgroundColor: '#6d94e8',
+                                                                                borderColor: 'grey',
+                                                                                data: _offeresChartData.chart_h
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                            });
+                                                            });
                                                         });
+
+
+
+
                                                         });
-                                                    });
+
+                                                        
+                                                       
 
 
                                                     
@@ -16317,6 +16346,70 @@ app.put('/reports/ayo/other/cost/update',(req,res)=>{
     });
 });
 
+
+/*Country Order*/
+
+app.get('/reports/ayo/country/order/list',(req,res)=>{
+    const orderFobSql = `
+        select 
+            YEAR(s.SiparisTarihi) as Year,
+            sum(su.SatisToplam) as Fob,
+            ytu.UlkeAdi
+
+
+
+
+        from SiparislerTB s 
+        inner join YeniTeklif_UlkeTB ytu on ytu.ID = s.UlkeID
+        inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+        inner join MusterilerTB m on m.ID = s.MusteriID
+
+        where YEAR(s.SiparisTarihi) >= 2019 and m.Marketing = 'Mekmar'
+        group by YEAR(s.SiparisTarihi),ytu.UlkeAdi
+        order by YEAR(s.SiparisTarihi) desc
+    `;
+    const orderCostSql = `
+        select 
+	YEAR(s.SiparisTarihi) as Year,
+	ytu.UlkeAdi,
+	sum(s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3 + s.DetayTutar_4) as Cost
+
+
+
+
+
+from SiparislerTB s 
+inner join YeniTeklif_UlkeTB ytu on ytu.ID = s.UlkeID
+inner join MusterilerTB m on m.ID = s.MusteriID
+
+where YEAR(s.SiparisTarihi) >= 2019 and m.Marketing = 'Mekmar'
+group by YEAR(s.SiparisTarihi),ytu.UlkeAdi
+order by YEAR(s.SiparisTarihi) desc
+    `;
+
+    mssql.query(orderFobSql,(err,fob)=>{
+        mssql.query(orderCostSql,(err,cost)=>{
+            const data = [];
+            fob.recordset.forEach(x=>{
+                cost.recordset.forEach(y=>{
+                    if(x.Year === y.Year && x.UlkeAdi === y.UlkeAdi){
+                        data.push({...x,'ddp':x.Fob + y.Cost});
+                    }
+                });
+            });
+            res.status(200).json({'list':data});
+        });
+
+    });
+
+
+
+});
+
+
+
+
+
 /* */
 app.get('/reports/ayo/mekmer/cost/list/:year',(req,res)=>{
     const year = req.params.year;
@@ -16669,6 +16762,8 @@ app.get(`/maliyet/proforma/all/currency/:year`,(req,res)=>{
         }
     });
 });
+
+
 
 
 

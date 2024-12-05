@@ -918,7 +918,7 @@ const mutations = {
     state.reportsMekmarAyoList = payload;
     },
     setReportsMekmarAyoYearList(state, payload) {
-        state.reportsMekmarAyoYearList = payload;
+        state.reportsMekmarAyoYearList = payload.filter(x=>x.Yil >= 2019);
     },
     setReportsMekmarAyoMonthList(state, payload) {
         state.reportsMekmarAyoMonthList = payload;
