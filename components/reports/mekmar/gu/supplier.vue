@@ -6,7 +6,7 @@
                     {{ list.year }}
                 </div>
             </template>
-            <Column field="Year" header="Year"></Column>
+            <Column field="FirmaAdi" header="Supplier"></Column>
             <Column field="Total" header="Total">
                 <template #body="slotProps">
                     {{slotProps.data.Total | formatPriceUsd}}
