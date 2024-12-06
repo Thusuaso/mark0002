@@ -16446,7 +16446,8 @@ app.get('/reports/supplier/cost/list',(req,res)=>{
 from SiparislerTB s
 inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
 inner join TedarikciTB t on t.ID = su.TedarikciID
-where YEAR(s.YuklemeTarihi) >= 2019
+inner join MusterilerTB m on m.ID = s.MusteriID
+where YEAR(s.YuklemeTarihi) >= 2019 and m.Marketing='Mekmar'
 group by su.TedarikciID,t.FirmaAdi,YEAR(s.YuklemeTarihi)
 order by YEAR(s.YuklemeTarihi) desc,sum(su.AlisFiyati * su.Miktar) desc
     `;
