@@ -123,7 +123,7 @@ where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
     `;
 
     let sqlSupplierCostList = `
-        select 
+ select 
 
 
             su.TedarikciID,
@@ -134,6 +134,7 @@ where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
         from SiparislerTB s
         inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
         inner join TedarikciTB t on t.ID = su.TedarikciID
+		inner join MusterilerTB m on m.ID = s.MusteriID
         where YEAR(s.YuklemeTarihi) = YEAR(GETDATE())
         group by su.TedarikciID,t.FirmaAdi
         order by sum(su.AlisFiyati * su.Miktar) desc
@@ -16470,6 +16471,87 @@ order by YEAR(s.YuklemeTarihi) desc,sum(su.AlisFiyati * su.Miktar) desc
         };
         res.status(200).json({'list':data})
 
+    });
+
+
+});
+
+/*Continent */
+
+app.get('/reports/continent/order/list',(req,res)=>{
+    const costSql=  `
+        select 
+            sum(s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3 + s.DetayTutar_4) as Cost,
+            c.Continent,
+            YEAR(s.SiparisTarihi) as Year,
+            ytu.ContinentId
+        from SiparislerTB s
+        inner join MusterilerTB m on m.ID = s.MusteriID
+        inner join YeniTeklif_UlkeTB ytu on ytu.ID = m.UlkeId
+        inner join ContinentTB c on c.ID = ytu.ContinentId
+        where m.Marketing='Mekmar' and YEAR(s.SiparisTarihi) >= YEAR(GETDATE()) - 5
+        group by ytu.ContinentId,c.Continent,YEAR(s.SiparisTarihi)
+        order by ytu.ContinentId,YEAR(s.SiparisTarihi) desc
+    `;
+    const orderSql = `
+        select 
+	sum(su.SatisToplam) as Orders,
+	c.Continent,
+	YEAR(s.SiparisTarihi) as Year,
+	ytu.ContinentId
+from SiparislerTB s
+inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+inner join MusterilerTB m on m.ID = s.MusteriID
+inner join YeniTeklif_UlkeTB ytu on ytu.ID = m.UlkeId
+inner join ContinentTB c on c.ID = ytu.ContinentId
+where m.Marketing='Mekmar' and YEAR(s.SiparisTarihi) >= YEAR(GETDATE()) - 5
+group by ytu.ContinentId,c.Continent,YEAR(s.SiparisTarihi)
+order by ytu.ContinentId,YEAR(s.SiparisTarihi) desc
+    `;
+
+    mssql.query(orderSql,(err,orders)=>{
+        mssql.query(costSql,(err,cost)=>{
+            const data = [];
+            orders.recordset.forEach(x=>{
+                cost.recordset.forEach(y=>{
+                    if(x.Year == y.Year && x.ContinentId == y.ContinentId){
+                        data.push({...x,'Fob':x.Orders,'Ddp':(x.Orders + y.Cost)});
+                    }
+                });
+            });
+
+            const year = new Date().getFullYear();
+
+            const data2 = [
+                {'year':year,'data':[]},
+                {'year':year-1,'data':[]},
+                {'year':year-2,'data':[]},
+                {'year':year-3,'data':[]},
+                {'year':year-4,'data':[]},
+                {'year':year-5,'data':[]},
+
+            ];
+            data.forEach(x=>{
+                if(x.Year == year){
+                    data2[0].data.push(x);
+                }else if(x.Year == year - 1){
+                    data2[1].data.push(x);
+                }else if(x.Year == year - 2){
+                    data2[2].data.push(x);
+                }else if(x.Year == year - 3){
+                    data2[3].data.push(x);
+                }else if(x.Year == year - 4){
+                    data2[4].data.push(x);
+                }
+                else if(x.Year == year - 5){
+                    data2[5].data.push(x);
+                }
+            });
+
+
+
+            res.status(200).json({'list':data2});
+        });
     });
 
 

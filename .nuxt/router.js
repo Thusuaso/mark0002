@@ -46,6 +46,7 @@ const _73b2f4cc = () => interopDefault(import('..\\pages\\panel\\products\\notpu
 const _fda6c626 = () => interopDefault(import('..\\pages\\panel\\products\\published.vue' /* webpackChunkName: "pages/panel/products/published" */))
 const _a834d3e0 = () => interopDefault(import('..\\pages\\panel\\products\\queue.vue' /* webpackChunkName: "pages/panel/products/queue" */))
 const _0b141e34 = () => interopDefault(import('..\\pages\\reports\\mekmar\\ayo.vue' /* webpackChunkName: "pages/reports/mekmar/ayo" */))
+const _07911672 = () => interopDefault(import('..\\pages\\reports\\mekmar\\continent-order.vue' /* webpackChunkName: "pages/reports/mekmar/continent-order" */))
 const _38f6a314 = () => interopDefault(import('..\\pages\\reports\\mekmar\\country-order.vue' /* webpackChunkName: "pages/reports/mekmar/country-order" */))
 const _bc78ccd0 = () => interopDefault(import('..\\pages\\reports\\mekmar\\filter-finance.vue' /* webpackChunkName: "pages/reports/mekmar/filter-finance" */))
 const _7d1e9f90 = () => interopDefault(import('..\\pages\\reports\\mekmar\\forwarding.vue' /* webpackChunkName: "pages/reports/mekmar/forwarding" */))
@@ -244,6 +245,10 @@ export const routerOptions = {
     path: "/reports/mekmar/ayo",
     component: _0b141e34,
     name: "reports-mekmar-ayo"
+  }, {
+    path: "/reports/mekmar/continent-order",
+    component: _07911672,
+    name: "reports-mekmar-continent-order"
   }, {
     path: "/reports/mekmar/country-order",
     component: _38f6a314,

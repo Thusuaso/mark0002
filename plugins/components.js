@@ -139,6 +139,9 @@ import importantLinksList from '~/components/sales/important-links/list';
 
 import guSupplierCost from '~/components/reports/mekmar/gu/supplier';
 
+import guContinentOrders from '~/components/reports/mekmar/gu/continent';
+Vue.component('guContinentOrders',guContinentOrders);
+
 Vue.component('guSupplierCost',guSupplierCost);
 
 Vue.component('importantLinksForm',importantLinksForm);

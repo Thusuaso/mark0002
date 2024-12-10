@@ -212,10 +212,13 @@
                 <nuxt-link to="/reports/mekmar/filter-finance" class="dropdown-item" tag="a">GU Finance</nuxt-link>
               </li>
               <li v-show="getAyoStatus">
-                <nuxt-link to="/reports/mekmar/country-order" class="dropdown-item" tag="a">Country Order</nuxt-link>
+                <nuxt-link to="/reports/mekmar/country-order" class="dropdown-item" tag="a">Country Orders</nuxt-link>
               </li>
               <li v-show="getAyoStatus">
                 <nuxt-link to="/reports/mekmar/supplier-cost" class="dropdown-item" tag="a">Supplier Cost</nuxt-link>
+              </li>
+              <li v-show="getAyoStatus">
+                <nuxt-link to="/reports/mekmar/continent-order" class="dropdown-item" tag="a">Continent Orders</nuxt-link>
               </li>
             </ul>
           </li>
