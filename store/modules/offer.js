@@ -114,7 +114,7 @@ const actions = {
                    
                     vuexContext.dispatch('setOfferMainList');
                     vuexContext.dispatch('setOfferId', response.data.id);
-                    // this.$socket.socketIO.emit('offers_updated_emit');
+                    this.$socket.socketIO.emit('offers_updated_emit');
                     vuexContext.commit('setOfferButtonStatus', false);
                     vuexContext.dispatch('setOfferCustomerList');
                     this.$toast.success('Başarıyla Kaydedildi');
@@ -133,9 +133,9 @@ const actions = {
         this.$axios.put('/offer/update',payload)
             .then(response => {
                 if (response.data.status) {
-                     if (vuexContext.state.offerAllButtonStatus) {
-                        vuexContext.dispatch('setOfferDetailAllList');
-                    };
+                    //  if (vuexContext.state.offerAllButtonStatus) {
+                    //     vuexContext.dispatch('setOfferDetailAllList');
+                    // };
                     vuexContext.dispatch('setOfferMainList');
                     // this.$socket.socketIO.emit('offers_updated_emit',payload);
                     vuexContext.dispatch('setOfferCustomerList');
