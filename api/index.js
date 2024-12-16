@@ -123,7 +123,7 @@ where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
     `;
 
     let sqlSupplierCostList = `
- select 
+select 
 
 
             su.TedarikciID,
@@ -135,7 +135,7 @@ where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
         inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
         inner join TedarikciTB t on t.ID = su.TedarikciID
 		inner join MusterilerTB m on m.ID = s.MusteriID
-        where YEAR(s.YuklemeTarihi) = YEAR(GETDATE())
+        where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar'
         group by su.TedarikciID,t.FirmaAdi
         order by sum(su.AlisFiyati * su.Miktar) desc
     `;
@@ -2990,7 +2990,24 @@ order by u.Tarih desc
       res.status(200).json({'list':results.recordset})
     })
 });
+function dateToStringAbd(value){
+    if(value == null || value == NaN-NaN-NaN || value == 'NaN-NaN-NaN' || value == undefined || value == ""){
+        return "";
+    } else{
+        let date = new Date(value);
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+        if (month.toString().length == 1) {
+            month = '0' + month;
+        };
+        if (day.toString().length == 1) {
+            day = '0' + day;
+        }
 
+        return year + "-" + month + "-" + day;
+    }
+}
 app.post('/reports/mekmer/production/date', (req, res) => {
     const sql = `
                   select 
@@ -3023,7 +3040,7 @@ inner join OlculerTB o on o.ID = uk.OlcuID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.Tarih between '${req.body.date1}' and '${req.body.date2}'
+where u.Tarih between '${dateToStringAbd(req.body.date1)}' and '${dateToStringAbd(req.body.date2)}'
               `;
     mssql.query(sql, (err, results) => {
        res.status(200).json({'list':results.recordset})

@@ -203,23 +203,38 @@
       </div>
 
     </div>
-    <div class="row m-auto text">
+    <div class="row text-center m-auto">
       <div class="col-sm-6">
-        
-<DataTable :value="home.supplierCostList" scrollable scrollHeight="500px">
-    <Column field="FirmaAdi" header="Supplier"></Column>
-    <Column field="Total" header="Total">
-      <template #body="slotProps">
-        {{ slotProps.data.Total | formatPriceUsd }}
-      </template>
-      <template #footer>  
-          {{ totalSupplier | formatPriceUsd }}
-        </template>
-    </Column>
+        <Card>
+          <template #header>
+            <h3>{{ new Date().getFullYear() }} Supplier Cost</h3>
+            
+          </template>
+
+          <template #content>
+            <DataTable :value="home.supplierCostList" scrollable scrollHeight="500px">
+
+<Column field="FirmaAdi" header="Supplier"></Column>
+<Column field="Total" header="Total">
+  <template #body="slotProps">
+    {{ slotProps.data.Total | formatPriceUsd }}
+  </template>
+  <template #footer>  
+      {{ totalSupplier | formatPriceUsd }}
+    </template>
+</Column>
 
 </DataTable>
+          </template>
+
+      </Card>
+
       </div>
+      <div class="col-sm-6"></div>
+
     </div>
+
+
 
 
   </div>

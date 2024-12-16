@@ -155,6 +155,7 @@ export default {
         date1: date1,
         date2: date2,
       };
+      console.log("date",payload);
       this.$store.dispatch("setReportsMekmerProductionDate", payload);
     },
   },
