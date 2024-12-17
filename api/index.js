@@ -8769,7 +8769,7 @@ order by s.YuklemeTarihi desc
                 x.Pesinat = 0;
             };
         });
-        const uretimde = poList.recordset.filter(x=>x.Durum == 'Üretimde')
+        const uretimde = poList.recordset.filter(x=>x.Durum == 'Üretimde' || x.Durum == 'Beklemede')
         const sevkiyatta = poList.recordset.filter(x => x.Durum == 'Sevk Edilen');
         uretimde.forEach(x => {
             poListData.push(x); 

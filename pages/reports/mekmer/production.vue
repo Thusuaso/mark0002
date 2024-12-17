@@ -64,7 +64,7 @@
 
     </div>
     <reportsMekmerProductionList
-      :list="getReportsMekmerProductionList"
+      :list="productionList"
       :total="getReportsMekmerProductionListTotal"
     />
   </div>
@@ -83,6 +83,7 @@ export default {
   },
   data() {
     return {
+      productionList:[],
       quarters: [
         { id: 1, quarter: "Q1" },
         { id: 2, quarter: "Q2" },
@@ -129,11 +130,17 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("setReportsMekmerProductionList");
+    this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.productionList = response.data.list;
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
   },
   methods: {
     excel_output(){
-      api.post("/reports/excel/production", this.getReportsMekmerProductionList).then((response) => {
+      api.post("/reports/excel/production", this.productionList).then((response) => {
         if (response.status) {
           const link = document.createElement("a");
           link.href = this.getLocalUrl + "reports/excel/production";
@@ -155,8 +162,15 @@ export default {
         date1: date1,
         date2: date2,
       };
-      console.log("date",payload);
-      this.$store.dispatch("setReportsMekmerProductionDate", payload);
+      this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.post('/reports/mekmer/production/date', payload)
+            .then(response => {
+              this.productionList = response.data.list;
+                
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+
+            });
     },
   },
 };

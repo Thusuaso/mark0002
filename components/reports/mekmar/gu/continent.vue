@@ -1,11 +1,9 @@
 <template>
     <div class="col">
-        <DataTable :value="values.data" tableStyle="min-width: 50rem">
+        <DataTable :value="values.data">
             <template #header>
-                <div class="text-center m-auto">
+                <div class="text-center">
                     {{ values.year }}
-
-
                 </div>
             </template>
             <Column field="Continent" header="Continent"></Column>
