@@ -51,16 +51,8 @@
         <span style="padding-top: 25px"> Hepsi </span>
       </div>
       <div class="col">
-        <table class="table caption-top">
-          <caption>Turnover (Cari)</caption>
-
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Profit ($)</th>
-              <th scope="col">Profit (₺)</th>
-            </tr>
-          </thead>
+        <table class="table caption-top ">
+          <caption style="font-weight: bold;"><b>Turnover (Cari)</b></caption>
           <tbody>
             <tr>
               <th scope="row">Total</th>
@@ -72,15 +64,9 @@
       </div>
       <div class="col">
         <table class="table caption-top">
-          <caption>Profit</caption>
+          <caption style="font-weight: bold;"><b>Profit</b></caption>
 
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Profit ($)</th>
-              <th scope="col">Profit (₺)</th>
-            </tr>
-          </thead>
+
           <tbody>
             <tr>
               <th scope="row">Total</th>
@@ -92,15 +78,9 @@
       </div>
       <div class="col">
         <table class="table caption-top">
-          <caption>Real Profit</caption>
+          <caption style="font-weight: bold;"><b>Real Profit</b></caption>
 
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Profit ($)</th>
-              <th scope="col">Profit (₺)</th>
-            </tr>
-          </thead>
+
           <tbody>
             <tr>
               <th scope="row">Total</th>
