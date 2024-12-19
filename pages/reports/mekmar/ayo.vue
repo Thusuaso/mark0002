@@ -731,6 +731,8 @@ export default {
     halfMonthsSelected(event){
       if(event.value.id == 0){
         this.$store.dispatch("setBeginLoadingAction");
+
+
         api
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
@@ -750,6 +752,9 @@ export default {
             }
 
           });
+
+
+
       }else if (event.value.id == 1){
         this.$store.dispatch("setBeginLoadingAction");
         api
@@ -775,20 +780,19 @@ export default {
       } else if (event.value.id == 2){
         this.$store.dispatch("setBeginLoadingAction");
         api
-          .get(
-            `/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`
-          )
+          .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             this.$store.commit("setReportsMekmarAyoList", response.data);
             this.$store.commit("setReportsMekmarAyoListTotal", response.data);
             this.$store.dispatch("setEndLoadingAction");
-            this.__getMonthlyCostList(this.selectedYear.Yil,this.getReportsMekmarAyoMonthList[0].Ay)
-            this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
-            this.$axios.get(`/maliyet/proforma/currency/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`)
-                .then(res=>{
-                  this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
-                  
-                });
+            this.__getYearlyCostList(this.selectedYear.Yil);
+            this.selectedQuarter = { 'quarter': 'All', id: 0 };
+            this.$axios.get(`/maliyet/proforma/all/currency/${this.selectedYear.Yil}`)
+              .then(res=>{
+                this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
+                
+              });
+
           });
       }
     },

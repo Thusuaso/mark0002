@@ -3040,7 +3040,7 @@ inner join OlculerTB o on o.ID = uk.OlcuID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
-where u.Tarih between '${dateToStringAbd(req.body.date1)}' and '${dateToStringAbd(req.body.date2)}'
+where u.Tarih between '${req.body.date1}' and '${req.body.date2}'
               `;
     mssql.query(sql, (err, results) => {
        res.status(200).json({'list':results.recordset})

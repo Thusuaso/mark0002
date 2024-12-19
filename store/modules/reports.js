@@ -1,4 +1,5 @@
 const state = {
+    reportsMekmerProductionFilterList:[],
     reportsMekmerProductionList: [],
     reportsMekmerProductionListTotal: {
         'amount': 0,
@@ -281,14 +282,15 @@ const actions = {
     setReportsMekmarSummaryOrderListByRepresentativeTotal(vuexContext,payload){
         vuexContext.commit('setReportsMekmarSummaryOrderListByRepresentativeTotal',payload);
     },
-    setReportsMekmerProductionList(vuexContext) {
-        vuexContext.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
-                vuexContext.commit('setReportsMekmerProductionList', response.data.list);
-                vuexContext.dispatch('setReportsMekmerProductionTotal', response.data.list);
-                vuexContext.dispatch('setEndLoadingAction');
-            })
+    setReportsMekmerFilteredProductionList(vuexContext,payload){
+        vuexContext.commit('reportsMekmerProductionFilterList', payload);
+        vuexContext.dispatch('setReportsMekmerProductionTotal', payload);
+    },
+    setReportsMekmerProductionList(vuexContext,payload) {
+
+        vuexContext.commit('setReportsMekmerProductionList', payload);
+        vuexContext.dispatch('setReportsMekmerProductionTotal', payload);
+
     },
 
     setProductionFilterList(vuexContext,filter){
@@ -1177,6 +1179,9 @@ const mutations = {
 
 };
 const getters = {
+    getReportsMekmerProductionFilterList(state){
+        return state.reportsMekmerProductionFilterList;
+    },
     getMekmarGuSelectedUser(state) {
         return state.mekmarGuSelectedUser;  
     },

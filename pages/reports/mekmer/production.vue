@@ -64,12 +64,15 @@
 
     </div>
     <reportsMekmerProductionList
-      :list="productionList"
+      :list="getReportsMekmerProductionList"
       :total="getReportsMekmerProductionListTotal"
+      :dates="selectedDates"
+      @mekmer_filtered_production_list_emit="mekmerFilteredProductionList($event)"
     />
   </div>
 </template>
 <script>
+
 import { mapGetters } from "vuex";
 import api from "~/plugins/excel.server.js";
 
@@ -78,7 +81,8 @@ export default {
     ...mapGetters([
       "getReportsMekmerProductionList",
       "getReportsMekmerProductionListTotal",
-      "getLocalUrl"
+      "getLocalUrl",
+      "getReportsMekmerProductionFilterList"
     ]),
   },
   data() {
@@ -127,20 +131,27 @@ export default {
         { label: "Po", field: "SiparisAciklama" },
         { label: "Aciklama", field: "Aciklama" },
       ],
+      is_filtered:false,
+      mekmer_filtered_list:[]
     };
   },
   created() {
     this.$store.dispatch('setBeginLoadingAction');
         this.$axios.get('/reports/mekmer/production/list')
             .then(response => {
-              this.productionList = response.data.list;
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
               this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
               this.$store.dispatch('setEndLoadingAction');
             })
   },
   methods: {
+    mekmerFilteredProductionList(event){
+      this.is_filtered = true;
+      this.mekmer_filtered_list = event;
+    },
     excel_output(){
-      api.post("/reports/excel/production", this.productionList).then((response) => {
+      api.post("/reports/excel/production", this.is_filtered? this.mekmer_filtered_list:this.getReportsMekmerProductionList).then((response) => {
         if (response.status) {
           const link = document.createElement("a");
           link.href = this.getLocalUrl + "reports/excel/production";
@@ -156,16 +167,20 @@ export default {
       return data;
     },
     searchDateList() {
-      const date1 = this.selectedDates[0];
-      const date2 = this.selectedDates[1];
+      const _date1 = new Date(this.selectedDates[0]);
+      const _date2 = new Date(this.selectedDates[1]);
+      const _date_1_format = _date1.getFullYear() + '-' + (_date1.getMonth() + 1) + '-' + _date1.getDate();
+      const _date_2_format = _date2.getFullYear() + '-' + (_date2.getMonth() + 1) + '-' + _date2.getDate();
       const payload = {
-        date1: date1,
-        date2: date2,
+        date1: _date_1_format,
+        date2: _date_2_format,
       };
       this.$store.dispatch('setBeginLoadingAction');
         this.$axios.post('/reports/mekmer/production/date', payload)
             .then(response => {
-              this.productionList = response.data.list;
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+
                 
               this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
               this.$store.dispatch('setEndLoadingAction');

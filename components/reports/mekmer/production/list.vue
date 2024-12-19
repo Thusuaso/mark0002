@@ -8,6 +8,7 @@
       filterDisplay="row"
       @filter="mekmerProductionFilter($event)"
       class="p-datatable-sm"
+      v-if="!dates"
     >
       <Column
         field="Tarih"
@@ -281,6 +282,217 @@
         </template>
       </Column>
     </DataTable>
+    <DataTable
+      :value="list"
+      paginator
+      :rows="15"
+      :filters.sync="filters2"
+      filterDisplay="row"
+      @filter="mekmerProductionFilter($event)"
+      class="p-datatable-sm"
+      v-if="dates"
+    >
+      <Column
+        field="Tarih"
+        header="Date"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.Tarih | dateToString }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="FirmaAdi"
+        header="Supplier"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="KategoriAdi"
+        header="Category"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="KasaNo"
+        header="Crate No"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="UrunAdi"
+        header="Product"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+        <template #footer>
+          {{ total.crate | formatDecimal }}
+        </template>
+      </Column>
+      <Column
+        field="OcakAdi"
+        header="Mine"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="YuzeyIslemAdi"
+        header="Surface"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="En"
+        header="Width"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="Boy"
+        header="Height"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="Kenar"
+        header="Edge"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="Miktar"
+        header="Amount"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ slotProps.data.Miktar | formatDecimal }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+        <template #footer>
+          {{ total.amount | formatDecimal }}
+        </template>
+      </Column>
+      <Column field="Adet" header="Piece" headerClass="tableHeader" bodyClass="tableBody">
+        <template #body="slotProps">
+          {{ slotProps.data.Adet | formatDecimal }}
+        </template>
+        <template #footer>
+          {{ total.piece | formatDecimal }}
+        </template>
+      </Column>
+      <Column
+        field="BirimAdi"
+        header="Unit"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+      <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
+      <Column
+        field="SiparisAciklama"
+        header="Po"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @keyup.enter="filterPo(filterModel.value)"
+            @input="filterPoInput(filterModel.value)"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="Aciklama"
+        header="Description"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #filter="{ filterModel }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @keyup.enter="filterDescription(filterModel.value)"
+            @input="filterDescriptionInput(filterModel.value)"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+    </DataTable>
   </div>
 </template>
 <script>
@@ -295,6 +507,9 @@ export default {
       type: Object,
       required: false,
     },
+    dates:{
+      
+    }
 
   },
   data() {
@@ -316,6 +531,22 @@ export default {
         description: "",
       },
       filters1: {
+        Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KategoriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KasaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        OcakAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        YuzeyIslemAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SiparisAciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Aciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
+      filters2: {
         Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         KategoriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -367,6 +598,7 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
+          
           this.$store.dispatch("setReportsMekmerProductionList");
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
@@ -618,7 +850,10 @@ export default {
     },
 
     mekmerProductionFilter(event) {
+      console.log(event);
       this.$store.dispatch("setReportsMekmerProductionTotal", event.filteredValue);
+      this.$emit('mekmer_filtered_production_list_emit',event.filteredValue);
+
     },
   },
 };
