@@ -70,7 +70,9 @@
     <div class="row mb-4">
       <div class="col-4">
         <DataTable :value="getShipmentProductionList" dataKey="ID" :selection.sync="selectedProducts" :scrollable="true"
-          scrollHeight="400px">
+          scrollHeight="400px"
+            sortField="KasaNo" :sortOrder="1"
+          >
           <Column selectionMode="multiple" headerStyle="width: 2rem" header="All" headerClass="tableHeader"
             bodyClass="tableBody"></Column>
           <Column field="KasaNo" header="Crate No" headerClass="tableHeader" bodyClass="tableBody"></Column>

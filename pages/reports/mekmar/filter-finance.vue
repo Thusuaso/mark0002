@@ -1,6 +1,6 @@
 <template>
     <div>
-
+      <h3>FOB, CFR, DAP, DDP ve CIF yüklemelerinin evrak masrafı olması gerekiyor.(İstinai durumlarda el ile silinmesi gerekiyor.)</h3>
   
       <financeList :list="filterFinanceList" :total="getFinanceListTotal" :expiry="getFinanceExpiryList"
         :allStatus="buttonAllStatus" :allList="getFinanceListAll"

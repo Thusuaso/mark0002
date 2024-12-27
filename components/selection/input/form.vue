@@ -215,6 +215,12 @@
               <label for="notFind" class="ml-2"> Not Found </label>
             </div>
           </div>
+          <div class="col">
+            <div class="flex align-items-center">
+              <Checkbox v-model="fasonStatus" inputId="fason_status" :binary="true" />
+              <label for="fason_status" class="ml-2"> Fason </label>
+            </div>
+          </div>
         </div>
         <div class="row g-3">
           <Textarea v-model="description" rows="5" cols="25" />
@@ -312,6 +318,7 @@ export default {
   },
   data() {
     return {
+      fasonStatus:false,
       width: null,
       height: null,
       description: null,
@@ -490,6 +497,7 @@ export default {
         Bagli: this.stringStatus,
         Bulunamadi: this.notFindStatus,
         KasaKayıtAdedi: this.crateAmount,
+        Fason:this.fasonStatus
       };
       this.$store.dispatch("setSelectionProductionSave", data);
       this.$store.dispatch("setSelectionProductionTotal");
@@ -534,6 +542,7 @@ export default {
         Bagli: this.stringStatus,
         Bulunamadi: this.notFindStatus,
         KasaKayıtAdedi: this.crateAmount,
+        Fason:this.fasonStatus
       };
       this.$store.dispatch("setSelectionProductionUpdate", data);
       this.$emit("selection_production_dialog_form", false);
@@ -568,6 +577,7 @@ export default {
       this.selectedAmountStatus = "Sqm";
       this.selectedSaveKind = null;
       this.selectedSupplier = null;
+      this.fasonStatus = false;
       this.$store.commit("setSelectionProductionCrateNo", null);
     },
     createdProcess() {
@@ -613,7 +623,8 @@ export default {
         this.speacialAmount = 0;
       } else {
         this.speacialAmount = this.model.OzelMiktar;
-      }
+      };
+      this.fasonStatus = this.model.Fason;
       this.description = this.model.Aciklama;
       this.notFindStatus = this.__nullNoneTrueFalseControl(this.model.Bulunamadi);
       this.outStatus = this.__nullNoneTrueFalseControl(this.model.Disarda);

@@ -1,5 +1,6 @@
 <template>
-  <div class="row mt-3" style="padding:0px 50px;">
+    <div class="row mt-3" style="padding:0px 50px;">
+
     <div class="col-10">
       <TabView>
         <TabPanel header="Order">
@@ -204,7 +205,7 @@ import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 export default {
   computed: {
-    ...mapGetters(["getOrdersAllList"]),
+    ...mapGetters(["getOrdersAllList","getCostList"]),
   },
   props: {
     modelProduction: {
@@ -421,6 +422,8 @@ export default {
     },
     financemanSelected(event) {
       this.modelProduction.Finansman = event.value.ID;
+      this.modelProduction.FinansmanAdi = event.value.KullaniciAdi;
+
     },
     searchFinanceman(event) {
       let results;
@@ -436,6 +439,8 @@ export default {
     operationSelected(event) {
       this.modelProduction.Operasyon = event.value.ID;
       this.modelProduction.operationMail = event.value.MailAdres;
+      this.modelProduction.OperasyonAdi = event.value.KullaniciAdi;
+
     },
     searchOperation(event) {
       let results;
@@ -461,11 +466,12 @@ export default {
     },
     ordererSelected(event) {
       this.modelProduction.SiparisSahibi = event.value.ID;
-
+      this.modelProduction.SiparisSahibiAdi = event.value.KullaniciAdi;
       this.modelProduction.representativeMail = event.value.MailAdres;
     },
     customerSelected(event) {
       this.modelProduction.MusteriID = event.value.ID;
+      this.modelProduction.MusteriAdi = event.value.FirmaAdi;
     },
     searchCustomer(event) {
       let results;

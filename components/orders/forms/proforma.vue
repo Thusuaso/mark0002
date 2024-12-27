@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="row">
+      
       <div class="col-3">
+
         <Dropdown
           v-model="selectedDelivery"
           :options="delivery"
@@ -312,8 +314,11 @@
 import date from "../../../plugins/date";
 import upload from "../../../plugins/upload";
 import Cookies from "js-cookie";
-
+import {mapGetters} from 'vuex';
 export default {
+  computed:{
+    ...mapGetters(['getCostList'])
+  },
   props: {
     model: {
       type: Object,
@@ -602,6 +607,7 @@ export default {
     },
     invoiceChange(event) {
       this.model.FaturaKesimTurID = event.value.ID;
+      this.model.FaturaKesimTurAdi = event.value.FaturaAdi;
     },
     countrySelected(event) {
       this.model.Ulke = event.value.UlkeAdi;

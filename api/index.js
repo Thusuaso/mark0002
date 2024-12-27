@@ -894,6 +894,7 @@ app.put('/sales/representative/change',(req,res)=>{
 /*Selection*/
 app.get('/selection/production/list',(req,res)=>{
     const sql = `select u.OzelMiktar,
+    u.Fason,
     u.Duzenleyen,u.Kasalayan,u.UrunKartId,urb.ID as UrunBirimId,urb.BirimAdi as UrunBirimAdi,u.UretimTurID,u.ID,u.Tarih,u.KasaNo,k.KategoriAdi,k.ID as KategoriID,uo.OcakAdi,uo.ID as OcakId,ur.UrunAdi,ur.ID as UrunId,yk.YuzeyIslemAdi,yk.ID as YuzeyId,ol.ID as OlcuId,ol.En,ol.Boy,ol.Kenar,u.KutuAdet,u.KutuIciAdet,u.Miktar,u.Kutu,u.Bagli,u.SiparisAciklama,u.Aciklama,u.TedarikciID,t.FirmaAdi,u.Bulunamadi,u.Disarda,u.Adet from UretimTB u inner join TedarikciTB t on t.ID = u.TedarikciID inner join UrunBirimTB ub on ub.ID = u.UrunBirimID inner join UrunOcakTB uo on uo.ID = u.UrunOcakID inner join UretimTurTB ut on ut.ID = u.UretimTurID inner join UrunKartTB uk on uk.ID = u.UrunKartID inner join KategoriTB k on k.ID = uk.KategoriID inner join UrunlerTB ur on ur.ID = uk.UrunID inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID inner join OlculerTB ol on ol.ID = uk.OlcuID inner join UrunBirimTB urb on urb.ID = u.UrunBirimID where UrunDurumID=1 order by KasaNo desc`;
     
     mssql.query(sql,(err,productions)=>{
@@ -1182,7 +1183,9 @@ app.post('/selection/production/save',(req,res)=>{
                     KutuIciAdet,
                     SqmMiktar,
                     Bagli,
-                    Bulunamadi)
+                    Bulunamadi,
+                    Fason
+                    )
                 Values('${req.body.Tarih}','${crateNo}',
                 '${req.body.UrunKartID}','${req.body.TedarikciID}',
                 '${req.body.UrunBirimID}','${req.body.UrunOcakID}',
@@ -1192,7 +1195,7 @@ app.post('/selection/production/save',(req,res)=>{
                 '${req.body.SiparisAciklama}','${req.body.Kutu}',
                 '${req.body.Duzenleyen}','${req.body.Kasalayan}',
                 '${req.body.Disarda}','${req.body.KutuIciAdet}',
-                '${req.body.SqmMiktar}','${req.body.Bagli}','${req.body.Bulunamadi}')
+                '${req.body.SqmMiktar}','${req.body.Bagli}','${req.body.Bulunamadi}','${req.body.Fason}')
                 `;
             mssql.query(sql,(err,product)=>{
              
@@ -1225,7 +1228,8 @@ app.put('/selection/production/update',(req,res)=>{
     KutuIciAdet='${req.body.KutuIciAdet}',
     SqmMiktar='${req.body.SqmMiktar}',
     Bagli='${req.body.Bagli}',
-    Bulunamadi='${req.body.Bulunamadi}'
+    Bulunamadi='${req.body.Bulunamadi}',
+    Fason='${req.body.Fason}'
     where
     ID='${req.body.ID}'
     `;
@@ -12516,6 +12520,19 @@ ID='${req.body.SiparisId}'
             res.status(200).json({'status':false});
         };
     });
+});
+
+app.post('/production/add/cost/list',async(req,res)=>{
+    const body = req.body;
+    body.forEach(x=>{
+        const addCost = `
+            insert into MaliyetAnaliziDegisikliklerTB (DegisiklikTarihi,SiparisNo,IslemAdi,DegisiklikYapan)
+            values('${x.date}','${x.po}','${x.desc}','${x.user}')
+        `;
+        mssql.query(addCost);
+        res.status(200);
+    });
+
 });
 
 app.get('/production/proforma/delete/:id',async(req,res)=>{

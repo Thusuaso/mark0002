@@ -27,6 +27,7 @@ import local from './modules/local';
 import authority from './modules/authority';
 import accounts from './modules/accounts';
 import importantLinks from './modules/importantLink';
+import cost from './modules/cost';
 const createStore = ()=>{
     return new Vuex.Store({
        state:{
@@ -64,7 +65,8 @@ const createStore = ()=>{
             local,
             authority,
             accounts,
-            importantLinks
+            importantLinks,
+            cost
         ],
 
     });
