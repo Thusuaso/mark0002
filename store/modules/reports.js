@@ -517,6 +517,21 @@ const actions = {
             });
     },
 
+    setLoadingListNotYear(vuexContext){
+        vuexContext.dispatch('setBeginLoadingAction');
+
+        this.$axios.get('/reports/loading/not/year/list')
+        .then(res=>{
+            vuexContext.commit('setLoadingList',res.data);
+            vuexContext.commit('setReportsMekmarLoadingListTotal',res.data.list);
+            vuexContext.commit('setReportsMekmarLoadingListYear',res.data.yearly);
+            vuexContext.dispatch('setEndLoadingAction');
+            vuexContext.dispatch('setMonthList');
+            vuexContext.dispatch('setYearList');
+        });
+    },
+
+
     setLoadingList(vuexContext,date){
         vuexContext.dispatch('setBeginLoadingAction');
 

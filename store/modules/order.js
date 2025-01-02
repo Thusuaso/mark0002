@@ -202,8 +202,8 @@ const actions = {
             .then(response => {
                 if (response.data.list) {
                 vuexContext.commit('setOrderList', response.data.list);
-vuexContext.commit('setOrderProductionYearsList', response.data.years);
-vuexContext.commit('setOrderProductionTotal',response.data.list);
+                vuexContext.commit('setOrderProductionYearsList', response.data.years);
+                vuexContext.commit('setOrderProductionTotal',response.data.list);
 
                 vuexContext.dispatch('setEndLoadingAction');
                 };

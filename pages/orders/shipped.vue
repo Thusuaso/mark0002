@@ -957,7 +957,7 @@ export default {
   },
   watch: {
     getOrderProductionYearsList() {
-      this.selectedYear = { Yil: new Date().getFullYear() };
+      this.selectedYear = { Yil: this.getOrderProductionYearsList[0].Yil };
     },
   },
   mounted() {

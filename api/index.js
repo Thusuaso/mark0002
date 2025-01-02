@@ -1453,7 +1453,6 @@ app.post('/card/save',(req,res)=>{
 function sizeIdControl(width, height, thickness, id) {
     return new Promise((resolve, reject) => {
         const controlSql = `select top 1 * from OlculerTB where En='${width}' and Boy='${height}' and Kenar='${thickness}'`;
-        console.log(controlSql);
         mssql.query(controlSql, (err, control) => {
             if (control.recordset.length > 0) {
                 resolve(control.recordset[0].ID);
@@ -3934,12 +3933,13 @@ where m.Marketing = 'Mekmar' and s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) 
 app.get('/reports/mekmar/ayo/year/list', (req, res) => {
     const sql = `
                 select YEAR(s.YuklemeTarihi) as Yil from SiparislerTB s 
-where YEAR(s.YuklemeTarihi) is not null
-group by YEAR(s.YuklemeTarihi)
-order by YEAR(s.YuklemeTarihi) desc
+                where YEAR(s.YuklemeTarihi) is not null
+                group by YEAR(s.YuklemeTarihi)
+                order by YEAR(s.YuklemeTarihi) desc
                 `;
     mssql.query(sql, (err, results) => {
-        res.status(200).json({ 'list': results.recordset });
+
+    res.status(200).json({ 'list': results.recordset });
     });
 });
 app.get('/reports/mekmar/ayo/month/list/:year', (req, res) => {
@@ -4120,7 +4120,6 @@ order by s.Tarih desc
 
 
     `;
-    console.log(sql);
     mssql.query(sql, (err, results) => {
        res.status(200).json({'list':results.recordset}) 
     });
@@ -4200,6 +4199,109 @@ app.get('/reports/loading/list/:year/:month',(req,res)=>{
         
     });
 });
+
+
+app.get('/reports/loading/not/year/list',async (req,res)=>{
+    const yearSql = `
+        select Year(YuklemeTarihi) as Yil from SiparislerTB s
+
+        where SiparisDurumID = 3
+        group by YEAR(YuklemeTarihi)
+        order by YEAR(YuklemeTarihi) desc
+    `;
+    await mssql.query(yearSql,async (err,years)=>{
+        const monthSql = `
+            select MONTH(YuklemeTarihi) as Ay from SiparislerTB s
+
+where SiparisDurumID = 3 and YEAR(YuklemeTarihi) = '${years.recordset[0].Yil}'
+group by MONTH(YuklemeTarihi)
+order by MONTH(YuklemeTarihi) desc
+        `;
+        await mssql.query(monthSql,async(err,months)=>{
+            const sql = `
+            select  
+            s.YuklemeTarihi,  
+            s.SiparisNo,  
+            m.FirmaAdi as MusteriAdi,  
+            (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) as Fob,  
+            (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+  
+            dbo.Get_SiparisNavlun(s.SiparisNo) + s.sigorta_tutar_satis as Dtp,  
+            'Konteyner' as Tur,m.Marketing  
+            from  
+            SiparislerTB s,MusterilerTB m  
+            where Year(YuklemeTarihi)=${years.recordset[0].Yil}
+            and Month(YuklemeTarihi)=${months.recordset[0].Ay}
+            and m.ID=s.MusteriID  
+            and m.Marketing not in ('Mekmar Numune','Seleksiyon','Warehouse')  
+            and m.Marketing is not null  
+             
+            union  
+            select  
+            s.Tarih as YuklemeTarihi,  
+            s.CikisNo as SiparisNo,  
+            m.FirmaAdi as MusteriAdi,  
+            Sum(Toplam) as Fob  
+            ,Sum((s.BirimFiyat+7.5)*u.Miktar) as Dtp,  
+            'Depo' as Tur,m.Marketing  
+            from  
+            SevkiyatTB s,MusterilerTB m,UretimTB u  
+            where s.MusteriID=m.ID and u.KasaNo=s.KasaNo  
+            and Year(s.Tarih)=${years.recordset[0].Yil} and Month(s.Tarih)=${months.recordset[0].Ay}
+            and m.Mt_No=1  
+            group by  
+            s.Tarih,s.CikisNo,m.FirmaAdi,m.Marketing
+            `;
+            const yearlySql = `
+            select  
+            s.YuklemeTarihi,  
+            s.SiparisNo,  
+            m.FirmaAdi as MusteriAdi,  
+            (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) as Fob,  
+            (select Sum(SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+  
+            dbo.Get_SiparisNavlun(s.SiparisNo)+ s.sigorta_tutar_satis as Dtp,  
+            'Konteyner' as Tur,m.Marketing  
+            from  
+            SiparislerTB s,MusterilerTB m  
+            where Year(YuklemeTarihi)=${years.recordset[0].Yil}
+            and m.ID=s.MusteriID  
+            and m.Marketing not in ('Mekmar Numune','Seleksiyon','Warehouse')  
+            and m.Marketing is not null  
+             
+            union  
+            select  
+            s.Tarih as YuklemeTarihi,  
+            s.CikisNo as SiparisNo,  
+            m.FirmaAdi as MusteriAdi,  
+            Sum(Toplam) as Fob  
+            ,Sum((s.BirimFiyat+7.5)*u.Miktar) as Dtp,  
+            'Depo' as Tur,m.Marketing  
+            from  
+            SevkiyatTB s,MusterilerTB m,UretimTB u  
+            where s.MusteriID=m.ID and u.KasaNo=s.KasaNo  
+            and Year(s.Tarih)=${years.recordset[0].Yil}
+            and m.Mt_No=1  
+            group by  
+            s.Tarih,s.CikisNo,m.FirmaAdi,m.Marketing
+            `;
+            await mssql.query(sql,async (err,loading)=>{
+                await mssql.query(yearlySql,async (err,yearly)=>{
+                    res.status(200).json({'list':loading.recordset,'yearly':yearly.recordset});
+        
+                });
+                
+            });
+
+
+        });
+
+    });
+    
+
+
+
+
+});
+
 
 app.get('/reports/loading/list/:year',(req,res)=>{
     const sql = `
@@ -9971,6 +10073,18 @@ order by s.SiparisTarihi desc
 });
 
 app.get('/order/shipped/list', async (req, res) => {
+
+        const orderYearListSql = `
+        select YEAR(s.SiparisTarihi) as Yil from SiparislerTB s
+group by YEAR(s.SiparisTarihi) 
+order by YEAR(s.SiparisTarihi) desc
+    `;
+    await mssql.query(orderYearListSql, async(err, years) => {
+
+        let customYearList = [];
+        years.recordset.forEach(x => {
+            customYearList.push(x);
+        });
         const ordersListSql = `
         select 
 
@@ -10091,25 +10205,16 @@ s.SiparisKontrolEden,
     inner join MusterilerTB m on m.ID = s.MusteriID
     inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
     
-    where s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing= 'Mekmar'
+    where s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) = '${years.recordset[0].Yil}' and m.Marketing= 'Mekmar'
     order by s.YuklemeTarihi desc
     `;
-        const orderYearListSql = `
-        select YEAR(s.SiparisTarihi) as Yil from SiparislerTB s
-group by YEAR(s.SiparisTarihi) 
-order by YEAR(s.SiparisTarihi) desc
-    `;
-    await mssql.query(ordersListSql,async (err, orders) => {
-               await mssql.query(orderYearListSql, (err, years) => {
-
-            let customYearList = [];
-            years.recordset.forEach(x => {
-                customYearList.push(x);
-            });
-               res.status(200).json({'list':orders.recordset,'years':customYearList});
+        await mssql.query(ordersListSql,async (err, orders) => {
+            res.status(200).json({'list':orders.recordset,'years':customYearList});
 
         });
+
     });
+
 });
 
 app.get('/order/shipped/mekmer/list', async (req, res) => {
@@ -14627,16 +14732,34 @@ app.get('/year/list',(req,res)=>{
         res.status(200).json({'list':year.recordset});
     });
 });
-app.get('/month/list',(req,res)=>{
-    const sql = `
-    select MONTH(YuklemeTarihi) as Month from SiparislerTB 
-    where MONTH(YuklemeTarihi) is not null and YEAR(YuklemeTarihi) = YEAR(GETDATE())
-    group by MONTH(YuklemeTarihi) order by MONTH(YuklemeTarihi) desc
-    
+app.get('/month/list',async (req,res)=>{
+    const yearsListSql = `
+        select Year(YuklemeTarihi) as Yil from SiparislerTB s
+
+where SiparisDurumID = 3
+group by YEAR(YuklemeTarihi)
+order by YEAR(YuklemeTarihi) desc
     `;
-    mssql.query(sql,(err,year)=>{
-        res.status(200).json({'list':year.recordset});
+
+    await mssql.query(yearsListSql,async (err,years)=>{
+        
+            const sql = `
+            select MONTH(YuklemeTarihi) as Month from SiparislerTB s
+
+            where SiparisDurumID = 3 and YEAR(YuklemeTarihi) = '${years.recordset[0].Yil}'
+            group by MONTH(YuklemeTarihi)
+            order by MONTH(YuklemeTarihi) desc
+
+        `;
+
+        await mssql.query(sql,async (err,year)=>{
+            res.status(200).json({'list':year.recordset});
+        });
+
     });
+
+
+
 });
 
 app.get('/reports/ayo/currency/list/:year',(req,res)=>{
@@ -14756,7 +14879,6 @@ app.put('/reports/ayo/currency/update',(req,res)=>{
     const updateSql = `
         update AyoCurrency SET CURRENCY='${body.currency}' WHERE ID='${body.id}'
     `;
-    console.log(updateSql);
     mssql.query(updateSql,(err,currency)=>{
         if(currency.rowsAffected[0] == 1){
             res.status(200).json({'status':true});

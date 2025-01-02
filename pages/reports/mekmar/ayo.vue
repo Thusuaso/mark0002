@@ -393,7 +393,7 @@ export default {
   },
   created() {
     this.$store.dispatch("setReportsMekmarAyoYearList");
-    this.$store.dispatch("setReportsMekmarAyoMonthList", new Date().getFullYear());
+
     // const date = {
     //   year: new Date().getFullYear(),
     //   month: new Date().getMonth() + 1,
@@ -1017,12 +1017,14 @@ export default {
   watch: {
     getReportsMekmarAyoYearList() {
       this.selectedYear = this.getReportsMekmarAyoYearList[0];
+      this.$store.dispatch("setReportsMekmarAyoMonthList", this.selectedYear.Yil);
+
     },
     getReportsMekmarAyoMonthList() {
       this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
       this.$store.dispatch("setBeginLoadingAction");
       api
-      .get(`/maliyet/listeler/maliyetListesi/${new Date().getFullYear()}/${this.selectedMonth.Ay}`)
+      .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.selectedMonth.Ay}`)
       .then((response) => {
         this.$store.commit("setReportsMekmarAyoList", response.data);
         this.$store.commit("setReportsMekmarAyoListTotal", response.data);

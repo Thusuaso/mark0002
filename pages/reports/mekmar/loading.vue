@@ -27,6 +27,7 @@ export default {
     middleware: ["authority"],
     computed:{
         ...mapGetters([
+            'getLoading',
         'getYearList',
         'getMonthList',
         'getReportsMekmarLoadingList',
@@ -51,14 +52,8 @@ export default {
         }
     },
     created(){
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const data = {
-            year:year,
-            month:month
-        }
-        this.$store.dispatch('setLoadingList',data)
+
+        this.$store.dispatch('setLoadingListNotYear')
     },
     methods:{
         excel_output(){
