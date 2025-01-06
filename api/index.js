@@ -10075,12 +10075,14 @@ order by s.SiparisTarihi desc
 app.get('/order/shipped/list', async (req, res) => {
 
         const orderYearListSql = `
-        select YEAR(s.SiparisTarihi) as Yil from SiparislerTB s
-group by YEAR(s.SiparisTarihi) 
-order by YEAR(s.SiparisTarihi) desc
+        select YEAR(s.YuklemeTarihi) as Yil from SiparislerTB s
+		inner join MusterilerTB m on m.ID = s.MusteriID
+		where m.Marketing='Mekmar' and YEAR(s.YuklemeTarihi) is not null
+		group by YEAR(s.YuklemeTarihi)  
+		order by YEAR(s.YuklemeTarihi) desc
     `;
     await mssql.query(orderYearListSql, async(err, years) => {
-
+        console.log('years.recordset[0].Yil',years.recordset[0].Yil)
         let customYearList = [];
         years.recordset.forEach(x => {
             customYearList.push(x);
