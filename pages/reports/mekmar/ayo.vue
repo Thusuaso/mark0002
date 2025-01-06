@@ -1028,8 +1028,8 @@ export default {
       .then((response) => {
         this.$store.commit("setReportsMekmarAyoList", response.data);
         this.$store.commit("setReportsMekmarAyoListTotal", response.data);
-        this.__getMonthlyCostList(new Date().getFullYear(),this.selectedMonth.Ay);
-        this.$axios.get(`/maliyet/proforma/currency/${new Date().getFullYear()}/${this.selectedMonth.Ay}`)
+        this.__getMonthlyCostList(this.selectedYear.Yil,this.selectedMonth.Ay);
+        this.$axios.get(`/maliyet/proforma/currency/${this.selectedYear.Yil}/${this.selectedMonth.Ay}`)
         .then(res=>{
           this.profitProformaTl =  this.getReportsMekmarAyoListTotal.proforma * res.data.currency
           
