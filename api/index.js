@@ -3932,10 +3932,11 @@ where m.Marketing = 'Mekmar' and s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) 
 
 app.get('/reports/mekmar/ayo/year/list', (req, res) => {
     const sql = `
-                select YEAR(s.YuklemeTarihi) as Yil from SiparislerTB s 
-                where YEAR(s.YuklemeTarihi) is not null
-                group by YEAR(s.YuklemeTarihi)
-                order by YEAR(s.YuklemeTarihi) desc
+        select YEAR(s.YuklemeTarihi) as Yil from SiparislerTB s
+		inner join MusterilerTB m on m.ID = s.MusteriID
+		where m.Marketing='Mekmar' and YEAR(s.YuklemeTarihi) is not null
+		group by YEAR(s.YuklemeTarihi)  
+		order by YEAR(s.YuklemeTarihi) desc
                 `;
     mssql.query(sql, (err, results) => {
 
@@ -3943,6 +3944,7 @@ app.get('/reports/mekmar/ayo/year/list', (req, res) => {
     });
 });
 app.get('/reports/mekmar/ayo/month/list/:year', (req, res) => {
+    console.log(req.params.year);
     const sql = `
                    select MONTH(s.YuklemeTarihi) as Ay from SiparislerTB s 
 				   inner join MusterilerTB m on m.ID = s.MusteriID
