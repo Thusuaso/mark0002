@@ -359,6 +359,7 @@
                 @complete="searchSize($event)"
                 field="ebat"
                 @item-select="sizeSelected($event)"
+                @input="sizeInput($event)"
               />
               <label for="size">Sizes</label>
             </span>
@@ -1318,6 +1319,9 @@ export default {
     },
     sizeSelected(event) {
       this.sizeModel.ebat = event.value.ebat;
+    },
+    sizeInput(event){
+      this.sizeModel.ebat = event;
     },
     formatPoint(value) {
       if (value == null || value == " ") {

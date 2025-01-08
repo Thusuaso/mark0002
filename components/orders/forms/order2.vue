@@ -141,7 +141,7 @@
                         {{ slotProps.data.Miktar | formatDecimal }}
                     </div>
                     <div v-else :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }">
-                        {{ 0 | formatDecimal }}
+                        {{ slotProps.data.OzelMiktar | formatDecimal }}
                     </div>
                 </template>
                 <template #footer>

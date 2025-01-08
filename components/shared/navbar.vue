@@ -174,6 +174,9 @@
               <li>
                 <nuxt-link to="/reports/mekmer/finance" class="dropdown-item" tag="a">Finance</nuxt-link>
               </li>
+              <li v-show="getAuthorityStatus">
+                <nuxt-link to="/reports/mekmer/by-buying-production" class="dropdown-item" tag="a">Product Purchase</nuxt-link>
+              </li>
 
               <li v-show="getAuthorityStatus">
                 <nuxt-link to="/reports/mekmar/forwarding" class="dropdown-item" tag="a">Shipped Crates</nuxt-link>

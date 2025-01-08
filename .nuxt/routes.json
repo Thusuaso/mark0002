@@ -364,6 +364,13 @@
     "_name": "_0e92c618"
   },
   {
+    "name": "reports-mekmer-by-buying-production",
+    "path": "/reports/mekmer/by-buying-production",
+    "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\by-buying-production.vue",
+    "chunkName": "pages/reports/mekmer/by-buying-production",
+    "_name": "_47c42c63"
+  },
+  {
     "name": "reports-mekmer-finance",
     "path": "/reports/mekmer/finance",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\finance.vue",

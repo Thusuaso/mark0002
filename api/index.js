@@ -11511,6 +11511,8 @@ inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
 where su.SiparisNo='${req.params.po}'
     `;
     await mssql.query(sql,(err,detail)=>{
+        
+
         res.status(200).json({ 'list': detail.recordset }); 
     });
 });
@@ -17129,6 +17131,73 @@ app.get(`/maliyet/proforma/all/currency/:year`,(req,res)=>{
     });
 });
 
+
+app.get('/production/buying/price/list',(req,res)=>{
+    const sql = `
+        select 
+	u.UrunOcakID,
+	uc.OcakAdi,
+	u.KasaNo,
+	m.FirmaAdi,
+	u.SiparisAciklama,
+	u.Miktar,
+	birim.BirimAdi,
+	urun.UrunAdi,
+	((select su.AlisFiyati from SiparisUrunTB su where su.SiparisNo = u.SiparisAciklama and su.UrunKartID = u.UrunKartID and su.TedarikciID = u.TedarikciID) * u.Miktar) as AlisToplam,
+	(select su.AlisFiyati from SiparisUrunTB su where su.SiparisNo = u.SiparisAciklama and su.UrunKartID = u.UrunKartID and su.TedarikciID = u.TedarikciID) as AlisFiyati,
+	MONTH(s.YuklemeTarihi) as Month
+from UretimTB u
+inner join SiparislerTB s on s.SiparisNo = u.SiparisAciklama
+inner join UrunOcakTb ub on ub.ID = u.UrunOcakID
+inner join MusterilerTB m on m.ID = s.MusteriID
+inner join UrunOcakTB uc on uc.ID = u.UrunOcakID
+inner join UrunBirimTB birim on birim.ID = u.UrunBirimID
+inner join UrunKartTB uk on uk.ID = u.UrunKartID
+inner join UrunlerTB urun on urun.ID = uk.UrunID
+
+where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and u.TedarikciID in (1,123)
+and s.SiparisDurumID=3
+
+
+    `;
+    mssql.query(sql,(err,buying)=>{
+        res.status(200).json({'list':buying.recordset});
+    });
+});
+
+app.get('/production/buying/price/list/yearly/:year',(req,res)=>{
+    const year = req.params.year;
+    const sql = `
+        select 
+	u.UrunOcakID,
+	uc.OcakAdi,
+	u.KasaNo,
+	m.FirmaAdi,
+	u.SiparisAciklama,
+	u.Miktar,
+	birim.BirimAdi,
+	urun.UrunAdi,
+	((select su.AlisFiyati from SiparisUrunTB su where su.SiparisNo = u.SiparisAciklama and su.UrunKartID = u.UrunKartID and su.TedarikciID = u.TedarikciID) * u.Miktar) as AlisToplam,
+	(select su.AlisFiyati from SiparisUrunTB su where su.SiparisNo = u.SiparisAciklama and su.UrunKartID = u.UrunKartID and su.TedarikciID = u.TedarikciID) as AlisFiyati,
+	MONTH(s.YuklemeTarihi) as Month
+from UretimTB u
+inner join SiparislerTB s on s.SiparisNo = u.SiparisAciklama
+inner join UrunOcakTb ub on ub.ID = u.UrunOcakID
+inner join MusterilerTB m on m.ID = s.MusteriID
+inner join UrunOcakTB uc on uc.ID = u.UrunOcakID
+inner join UrunBirimTB birim on birim.ID = u.UrunBirimID
+inner join UrunKartTB uk on uk.ID = u.UrunKartID
+inner join UrunlerTB urun on urun.ID = uk.UrunID
+
+where YEAR(s.YuklemeTarihi) = ${year} and u.TedarikciID in (1,123)
+and s.SiparisDurumID=3
+
+
+    `;
+    mssql.query(sql,(err,buying)=>{
+        res.status(200).json({'list':buying.recordset});
+    });
+});
 
 
 

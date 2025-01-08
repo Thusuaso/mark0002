@@ -56,6 +56,7 @@ const _0bb1ccb1 = () => interopDefault(import('..\\pages\\reports\\mekmar\\mk.vu
 const _829dfeba = () => interopDefault(import('..\\pages\\reports\\mekmar\\summary.vue' /* webpackChunkName: "pages/reports/mekmar/summary" */))
 const _1a170c6b = () => interopDefault(import('..\\pages\\reports\\mekmar\\supplier-cost.vue' /* webpackChunkName: "pages/reports/mekmar/supplier-cost" */))
 const _0e92c618 = () => interopDefault(import('..\\pages\\reports\\mekmer\\atlanta.vue' /* webpackChunkName: "pages/reports/mekmer/atlanta" */))
+const _47c42c63 = () => interopDefault(import('..\\pages\\reports\\mekmer\\by-buying-production.vue' /* webpackChunkName: "pages/reports/mekmer/by-buying-production" */))
 const _6dc517db = () => interopDefault(import('..\\pages\\reports\\mekmer\\finance.vue' /* webpackChunkName: "pages/reports/mekmer/finance" */))
 const _079223a2 = () => interopDefault(import('..\\pages\\reports\\mekmer\\mine.vue' /* webpackChunkName: "pages/reports/mekmer/mine" */))
 const _43e6eb2d = () => interopDefault(import('..\\pages\\reports\\mekmer\\onhold.vue' /* webpackChunkName: "pages/reports/mekmer/onhold" */))
@@ -285,6 +286,10 @@ export const routerOptions = {
     path: "/reports/mekmer/atlanta",
     component: _0e92c618,
     name: "reports-mekmer-atlanta"
+  }, {
+    path: "/reports/mekmer/by-buying-production",
+    component: _47c42c63,
+    name: "reports-mekmer-by-buying-production"
   }, {
     path: "/reports/mekmer/finance",
     component: _6dc517db,
