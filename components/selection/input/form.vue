@@ -499,6 +499,26 @@ export default {
         KasaKayıtAdedi: this.crateAmount,
         Fason:this.fasonStatus
       };
+      // if(data.UrunOcakID == ' ' || data.UrunOcakID == '' || data.UrunOcakID == 0 || data.UrunOcakID == undefined || data.UrunOcakID == null){
+      //   this.$toast.error('Ürün Ocağını Giriniz!')
+      //   return;
+      // }
+      // if(data.UrunKartID == ' ' || data.UrunKartID == '' || data.UrunKartID == 0 || data.UrunKartID == undefined || data.UrunKartID == null){
+      //   this.$toast.error('Ürün Kartını Seçiniz!')
+      //   return;
+      // }
+      // if(data.TedarikciID == ' ' || data.TedarikciID == '' || data.TedarikciID == 0 || data.TedarikciID == undefined || data.TedarikciID == null){
+      //   this.$toast.error('Tedarikçiyi Giriniz!')
+      //   return;
+      // }
+      // if(data.Miktar == ' ' || data.Miktar == '' || data.Miktar == 0 || data.Miktar == undefined || data.Miktar == null){
+      //   this.$toast.error('Miktar Giriniz!')
+      //   return;
+      // }
+      // if(data.Tarih == ' ' || data.Tarih == '' || data.Tarih == 0 || data.Tarih == undefined || data.Tarih == null){
+      //   this.$toast.error('Tarih Giriniz!')
+      //   return;
+      // }
       this.$store.dispatch("setSelectionProductionSave", data);
       this.$store.dispatch("setSelectionProductionTotal");
       this.reset();
