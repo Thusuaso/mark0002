@@ -8,6 +8,9 @@
       filterDisplay="row"
       @filter="mekmerProductionFilter($event)"
       class="p-datatable-sm"
+sortField="Tarih" :sortOrder="-1"
+
+
       v-if="!dates"
     >
       <Column
@@ -578,7 +581,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -599,7 +609,14 @@ export default {
       } else {
         if (this.resetFilter()) {
           
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -619,7 +636,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -639,7 +663,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -659,7 +690,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -679,7 +717,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -699,7 +744,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -719,7 +771,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -739,7 +798,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -759,7 +825,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -779,7 +852,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -799,7 +879,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -819,7 +906,14 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch("setReportsMekmerProductionList");
+          this.$store.dispatch('setBeginLoadingAction');
+        this.$axios.get('/reports/mekmer/production/list')
+            .then(response => {
+              this.is_filtered = false;
+              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
+              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
+              this.$store.dispatch('setEndLoadingAction');
+            })
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }

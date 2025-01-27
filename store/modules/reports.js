@@ -287,7 +287,7 @@ const actions = {
         vuexContext.dispatch('setReportsMekmerProductionTotal', payload);
     },
     setReportsMekmerProductionList(vuexContext,payload) {
-
+        
         vuexContext.commit('setReportsMekmerProductionList', payload);
         vuexContext.dispatch('setReportsMekmerProductionTotal', payload);
 

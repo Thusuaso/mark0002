@@ -2926,7 +2926,7 @@ inner join OlculerTB o on o.ID = uk.OlcuID
 inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 where YEAR(u.Tarih) = YEAR(GETDATE())
-order by u.Tarih desc
+order by u.Tarih desc, u.KasaNo desc
                 `;
     mssql.query(sql, (err, results) => {
       res.status(200).json({'list':results.recordset})
@@ -2987,7 +2987,7 @@ u.Aciklama like '${req.body.description}' + '%'
 
 
 
-order by u.Tarih desc
+order by u.Tarih desc, u.KasaNo desc
                 `;
     mssql.query(sql, (err, results) => {
       res.status(200).json({'list':results.recordset})
@@ -3044,6 +3044,7 @@ inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
 inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
 
 where u.Tarih between '${req.body.date1}' and '${req.body.date2}'
+order by u.Tarih desc, u.KasaNo desc
               `;
     mssql.query(sql, (err, results) => {
        res.status(200).json({'list':results.recordset})
