@@ -52,6 +52,7 @@
           :detailCalculation="getOrderProductionDetailTotal"
           :detailProductTotal="getOrderProductionProductDetailTotal"
           :detailProductCost="getOrderProductionProductDetailCostTotal"
+          :insuranceCalculation="0"
           :statusAlfa="false"
           @order_production_product_reset_model_emit="
             orderProductionProductResetModel($event)

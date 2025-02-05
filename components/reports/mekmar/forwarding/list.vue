@@ -5,6 +5,17 @@
       v-if="!dates"
       
       >
+      <Column field="UretimTarihi" header="Product Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+        bodyClass="tableBody">
+        <template #body="slotProps">
+          {{ slotProps.data.UretimTarihi | dateToString }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" @keyup.enter="filterDateProduct(filterModel.value)"
+             @input="filterDateProductInput(filterModel.value)"
+            class="p-column-filter" />
+        </template>
+      </Column>
       <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
         <template #body="slotProps">
@@ -184,6 +195,15 @@
       v-if="dates"
       
       >
+      <Column field="UretimTarihi" header="Product Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
+        bodyClass="tableBody">
+        <template #body="slotProps">
+          {{ slotProps.data.UretimTarihi | dateToString }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        </template>
+      </Column>
       <Column field="Tarih" header="Date" :showFilterMenu="false" :showClearButton="false" headerClass="tableHeader"
         bodyClass="tableBody">
         <template #body="slotProps">
@@ -354,6 +374,7 @@ export default {
   data() {
     return {
       filterModel: {
+        product_date:"",
         date: "",
         to: "",
         fromWho: "",
@@ -374,6 +395,8 @@ export default {
       },
 
       filters1: {
+        UretimTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
         Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         TedarikciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -393,6 +416,8 @@ export default {
         BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       filters2:{
+        UretimTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
         Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         TedarikciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -414,6 +439,25 @@ export default {
     };
   },
   methods: {
+    filterDateProduct(event){
+      if (event) {
+        this.filterModel.product_date = event;
+        this.$store.dispatch("setForwardingFilterList", this.filterModel);
+      } else {
+        if (this.resetFilter()) {
+          this.$store.dispatch("setReportsMekmarForwardingList");
+        } else {
+          this.$store.dispatch("setForwardingFilterList", this.filterModel);
+        }
+      }
+    },
+    filterDateProductInput(event){
+      if (event) {
+        this.filterModel.product_date = event;
+      } else {
+        this.filterModel.product_date = "";
+      }
+    },
     filterPoInput(event) {
       if (event) {
         this.filterModel.po = event;
@@ -755,6 +799,7 @@ export default {
 
     resetFilter() {
       if (
+        this.filterModel.product_date == "" &&
         this.filterModel.date == "" &&
         this.filterModel.to == "" &&
         this.filterModel.fromWho == "" &&

@@ -122,6 +122,19 @@
           <img :src="slotProps.data.Image" width="150" height="150" lazyload />
         </template>
       </Column>
+      <Column 
+              field="VideoStatus"
+        header="Video Status"
+      >
+        <template #body="slotProps">
+          <div v-if="slotProps.data.VideoStatus">
+            Yes
+          </div>
+          <div v-else>
+            No
+          </div>
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>

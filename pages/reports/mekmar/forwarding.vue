@@ -146,8 +146,11 @@ export default {
     searchDateList() {
       // const date1 = this.selectedDates[0];
       // const date2 = this.selectedDates[1];
+      if(this.selectedDates == null || this.selectedDates == '' || this.selectedDates == ' ' || this.selectedDates == undefined){
+        this.$store.dispatch("setReportsMekmarForwardingList");
 
-      const _date1 = new Date(this.selectedDates[0]);
+      }else{
+        const _date1 = new Date(this.selectedDates[0]);
       const _date2 = new Date(this.selectedDates[1]);
       const _date_1_format = _date1.getFullYear() + '-' + (_date1.getMonth() + 1) + '-' + _date1.getDate();
       const _date_2_format = _date2.getFullYear() + '-' + (_date2.getMonth() + 1) + '-' + _date2.getDate();
@@ -157,6 +160,8 @@ export default {
         date2: _date_2_format,
       };
       this.$store.dispatch("setReportsMekmarForwardingDate", payload);
+      }
+      
     },
   },
 };

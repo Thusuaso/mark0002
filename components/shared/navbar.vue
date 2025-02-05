@@ -36,6 +36,17 @@
               </li>
             </ul>
           </li>
+          <li class="nav-item dropdown" v-show="getAuthorityStatus">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              ORDERS
+            </a>
+            <ul class="dropdown-menu">
+
+              <li>
+                <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a">On Hold</nuxt-link>
+              </li>
+            </ul>
+          </li>
           <li class="nav-item dropdown" v-show="!getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               SALES

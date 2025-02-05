@@ -3986,7 +3986,8 @@ app.get('/reports/mekmar/forwarding/list', (req, res) => {
     uoc.OcakAdi,
     ub.BirimAdi,
     t.FirmaAdi as TedarikciAdi,
-    u.Aciklama
+    u.Aciklama,
+	u.Tarih as UretimTarihi
     
     from SevkiyatTB s 
     inner join UretimTB u on u.KasaNo = s.KasaNo
@@ -4013,7 +4014,15 @@ app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
     const supplier = req.body.fromWho.charAt(0).toUpperCase()
     + req.body.fromWho.slice(1);
     const po = req.body.po.toUpperCase();
+    const product_date = req.body.product_date.split('-');
+    const product_year = product_date[2];
+    const product_month = product_date[1];
+    const product_day = product_date[0];
+    const new_product_date = product_year + '-' + product_month + '-' + product_day;
+    
+    
 
+    
     const sql = `
     
     select 
@@ -4038,7 +4047,8 @@ app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
     uoc.OcakAdi,
     ub.BirimAdi,
     t.FirmaAdi as TedarikciAdi,
-    u.Aciklama
+    u.Aciklama,
+    u.Tarih as UretimTarihi
     
     from SevkiyatTB s 
     inner join UretimTB u on u.KasaNo = s.KasaNo
@@ -4068,7 +4078,8 @@ app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
     u.Adet Like  '${req.body.piece}' + '%' and
     u.Miktar Like  '${req.body.amount}' + '%' and
     ub.BirimAdi Like  '${req.body.unit}' + '%' and
-    u.SiparisAciklama Like  '${po}' + '%' 
+    u.SiparisAciklama Like  '${po}' + '%' and
+    u.Tarih Like  '${new_product_date}' + '%'
 
     order by s.Tarih desc
     `;
@@ -4105,7 +4116,8 @@ ol.Kenar,
 uoc.OcakAdi,
 ub.BirimAdi,
 t.FirmaAdi as TedarikciAdi,
-u.Aciklama
+u.Aciklama,
+u.Tarih as UretimTarihi
 
 from SevkiyatTB s 
 inner join UretimTB u on u.KasaNo = s.KasaNo
@@ -7184,6 +7196,18 @@ app.put('/panel/product/update', (req, res) => {
                     subject: 'Yayından Kaldırılan Ürün',
                     html: content
                 });
+                transporter.sendMail({
+                    to: 'info@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: 'Yayından Kaldırılan Ürün',
+                    html: content
+                });
+                transporter.sendMail({
+                    to: 'bilgiislem@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: 'Yayından Kaldırılan Ürün',
+                    html: content
+                });
             }else{
 
                 content = content + '</table>';
@@ -7919,7 +7943,8 @@ app.get('/panel/project/list', (req, res) => {
             mp.Queue,
             mp.ProjectName_Fr,
             mp.ProjectName_Es,
-            mp.ProjectName_Ru
+            mp.ProjectName_Ru,
+			(select mpd.VideosStatus from MekmarCom_Project_Detail mpd where mpd.VideosStatus=1 and mpd.ProjectId = mp.ID) as VideoStatus
 
 
         from MekmarCom_Projects mp

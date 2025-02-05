@@ -167,13 +167,13 @@
             <th scope="row">G. Total</th>
             <td>
               {{
-              (detailProductCost.supplier +
-              detailProductCost.workerman +
-              detailProductCost.freight +
-              detailProductCost.detail +
-              detailProductCost.brokerage +
-              detailProductCost.fob)
-              | formatPriceUsd
+                (detailProductCost.supplier +
+                detailProductCost.workerman +
+                detailProductCost.freight +
+                detailProductCost.detail +
+                detailProductCost.brokerage +
+                detailProductCost.fob)
+                | formatPriceUsd
               }}
             </td>
           </tr>
