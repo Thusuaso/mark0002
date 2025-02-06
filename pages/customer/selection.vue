@@ -39,7 +39,10 @@ export default {
       model: null,
     };
   },
-  created() {},
+  mounted() {
+    this.$store.dispatch('setSelectionCustomerList',Cookies.get('userId'));
+
+  },
   methods: {
     deleteForm(id) {
       this.$store.dispatch("setSelectionCustomerDelete", id);

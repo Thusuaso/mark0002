@@ -2811,6 +2811,7 @@ app.post('/customer/selection/save', (req, res) => {
                         '${req.body.SurfaceId}',
                         '${req.body.UserId}')
                 `;
+    console.log(sql);
     mssql.query(sql, (err, results) => {
         if (results.rowsAffected[0] == 1) {
             res.status(200).json({
