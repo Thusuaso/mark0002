@@ -4012,14 +4012,22 @@ app.get('/reports/mekmar/forwarding/list', (req, res) => {
 });
 
 app.post('/reports/mekmar/forwarding/filter',(req,res)=>{
+    console.log("req.body.product_date",req.body.product_date);
     const supplier = req.body.fromWho.charAt(0).toUpperCase()
     + req.body.fromWho.slice(1);
     const po = req.body.po.toUpperCase();
-    const product_date = req.body.product_date.split('-');
-    const product_year = product_date[2];
-    const product_month = product_date[1];
-    const product_day = product_date[0];
-    const new_product_date = product_year + '-' + product_month + '-' + product_day;
+    
+    let new_product_date = '';
+    if(req.body.product_date == '' || req.body.product_date == ' ' || req.body.product_date == undefined || req.body.product_date == null){
+        new_product_date = '';
+    }else{
+        const product_date = req.body.product_date.split('-');
+        const product_year = product_date[2];
+        const product_month = product_date[1];
+        const product_day = product_date[0];
+        new_product_date = product_year + '-' + product_month + '-' + product_day;
+    }
+
     
     
 
