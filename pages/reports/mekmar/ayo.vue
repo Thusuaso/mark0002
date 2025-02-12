@@ -164,9 +164,9 @@
         </Dialog>
       </div>
       <div class="col">
-        <Button type="button" class="p-button-success w-100" label="Other Cost" @click="otherCost"/>
+        <Button type="button" class="p-button-success w-100" label="Fuil Cost" @click="otherCost"/>
 
-        <Dialog :visible.sync="other_cost_form_visible" header="Other Cost" modal >
+        <Dialog :visible.sync="other_cost_form_visible" header="Fuil Cost" modal >
           <creditCardForm style="margin-bottom:5px;" v-for="item in otherCostList" :key="item" :month="item.month" :value="item.value"
           :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
           @credit_card_cost_list_updated_emit="otherCostListUpdated"
@@ -178,9 +178,9 @@
       </div>
 
       <div class="col">
-        <Button type="button" class="p-button w-100" label="Mekmer Cost" @click="mekmerCost" style="background-color:blueviolet;color:white;"/>
+        <Button type="button" class="p-button w-100" label="Meal Cost" @click="mekmerCost" style="background-color:blueviolet;color:white;"/>
 
-        <Dialog :visible.sync="mekmer_cost_form_visible" header="Mekmer Cost" modal >
+        <Dialog :visible.sync="mekmer_cost_form_visible" header="Meal Cost" modal >
           <creditCardForm style="margin-bottom:5px;" v-for="item in mekmerCostList" :key="item" :month="item.month" :value="item.value"
           :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
           @credit_card_cost_list_updated_emit="mekmerCostListUpdated"
