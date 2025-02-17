@@ -709,10 +709,15 @@ const mutations = {
 
             if (x.UrunBirimID == 1) {
                 state.orderProductionProductDetailTotal.m2 += parseFloat(x.Miktar);
+                state.orderProductionProductDetailTotal.piece += x.Adet;
             } else if (x.UrunBirimID == 2) {
                 state.orderProductionProductDetailTotal.piece += parseFloat(x.Miktar);
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
+            
             } else if (x.UrunBirimID == 3) {
                 state.orderProductionProductDetailTotal.mt += parseFloat(x.Miktar);
+                state.orderProductionProductDetailTotal.piece += x.Adet;
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
             };
             state.orderProductionProductDetailTotal.ton += parseFloat(x.Ton);
             state.orderProductionProductDetailTotal.total += (x.Miktar * x.SatisFiyati);
@@ -749,10 +754,17 @@ const mutations = {
         state.orderProductionProductDetailList.forEach(x => {
             if (x.UrunBirimID == 1) {
                 state.orderProductionProductDetailTotal.m2 += x.Miktar;
+                state.orderProductionProductDetailTotal.piece += x.Adet;
+
             } else if (x.UrunBirimID == 2) {
                 state.orderProductionProductDetailTotal.piece += x.Miktar;
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
+
             } else if (x.UrunBirimID == 3) {
                 state.orderProductionProductDetailTotal.mt += x.Miktar;
+                state.orderProductionProductDetailTotal.piece += x.Adet;
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
+
             };
 
             state.orderProductionProductDetailTotal.ton += x.Ton;
@@ -791,10 +803,18 @@ const mutations = {
         state.orderProductionProductDetailList.forEach(x => {
             if (x.UrunBirimID == 1) {
                 state.orderProductionProductDetailTotal.m2 += parseFloat(x.Miktar);
+                state.orderProductionProductDetailTotal.piece += x.Adet;
+
             } else if (x.UrunBirimID == 2) {
                 state.orderProductionProductDetailTotal.piece += parseFloat(x.Miktar);
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
+
             } else if (x.UrunBirimID == 3) {
                 state.orderProductionProductDetailTotal.mt += parseFloat(x.Miktar);
+                state.orderProductionProductDetailTotal.piece += x.Adet;
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
+
+
             };
             state.orderProductionProductDetailTotal.ton += parseFloat(x.Ton);
             state.orderProductionProductDetailTotal.total += (x.Miktar * x.SatisFiyati);
@@ -921,10 +941,18 @@ const mutations = {
         payload.forEach(x => {
             if (x.UrunBirimID == 1) {
                 state.orderProductionProductDetailTotal.m2 += x.Miktar;
+                state.orderProductionProductDetailTotal.piece += x.Adet;
+
             } else if (x.UrunBirimID == 2) {
                 state.orderProductionProductDetailTotal.piece += x.Miktar;
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
+
             } else if (x.UrunBirimID == 3) {
                 state.orderProductionProductDetailTotal.mt += x.Miktar;
+                state.orderProductionProductDetailTotal.piece += x.Adet;
+                state.orderProductionProductDetailTotal.m2 += x.OzelMiktar;
+
+
             };
             state.orderProductionProductDetailTotal.ton += x.Ton;
             state.orderProductionProductDetailTotal.total += (x.Miktar * x.SatisFiyati);

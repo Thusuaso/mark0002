@@ -158,6 +158,7 @@
             :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }">
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
+
           <div v-else :style="{ backgroundColor: slotProps.data.UrunBirimID == 1 ? 'red' : '' }">
             {{ slotProps.data.OzelMiktar | formatDecimal }}
           </div>
@@ -173,8 +174,9 @@
             {{ slotProps.data.Miktar | formatDecimal }}
           </div>
           <div v-else :style="{ backgroundColor: slotProps.data.UrunBirimID == 2 ? 'red' : '' }">
-            {{ 0 | formatDecimal }}
+            {{ slotProps.data.Adet | formatDecimal }}
           </div>
+
         </template>
         <template #footer>
           {{ detailProductTotal.piece | formatDecimal }}

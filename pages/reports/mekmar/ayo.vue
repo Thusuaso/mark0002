@@ -182,10 +182,10 @@
 
         <Dialog :visible.sync="mekmer_cost_form_visible" header="Meal Cost" modal >
           <creditCardForm style="margin-bottom:5px;" v-for="item in mekmerCostList" :key="item" :month="item.month" :value="item.value"
-          :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
-          @credit_card_cost_list_updated_emit="mekmerCostListUpdated"
-          @cost_save_emit="mekmerCostSave($event)"
-          @cost_update_emit="mekmerCostUpdate($event)"
+            :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
+            @credit_card_cost_list_updated_emit="mekmerCostListUpdated"
+            @cost_save_emit="mekmerCostSave($event)"
+            @cost_update_emit="mekmerCostUpdate($event)"
           />
 
         </Dialog>

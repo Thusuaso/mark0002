@@ -7232,6 +7232,12 @@ app.put('/panel/product/update', (req, res) => {
                     subject: 'Yayından Kaldırılan Ürün',
                     html: content
                 });
+                transporter.sendMail({
+                    to: 'bilgiislem@mekmar.com',
+                    from: 'goz@mekmar.com',
+                    subject: 'Yayından Kaldırılan Ürün',
+                    html: content
+                });
             }
 
         });
@@ -16405,6 +16411,7 @@ app.get('/reports/ayo/costs/half/:month_1/:month_2/:year',async(req,res)=>{
 
 app.get('/reports/ayo/other/cost/list/:year',(req,res)=>{
     const year = req.params.year;
+    console.log(year)
     const sql = `
         select * from AyoOtherCostTB where YEAR='${year}'
     `;
