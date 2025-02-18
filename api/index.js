@@ -2526,6 +2526,7 @@ app.get('/customer/offer/list',(req,res)=>{
                     from YeniTeklif_MusterilerTB ytm
                     inner join YeniTeklif_UlkeTB ytu on ytu.Id = ytm.UlkeId
                     inner join KullaniciTB k on k.ID = ytm.Kullanici
+                    order by ytm.Id desc
                 `;
     mssql.query(sql,(err,results)=>{
         results.recordset?.forEach(x=>{
