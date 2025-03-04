@@ -57,7 +57,7 @@
           </div>
           <div class="col">
             <CustomInput :value="model.Miktar" text="Amount" @onInput="model.Miktar = $event"
-              :disabled="(product_form_disabled || amount_disabled)" @change="tonajChange($event)" />
+              :disabled="(product_form_disabled || amount_disabled)" @change="tonajChange($event)" style="border:1px solid red;"/>
           </div>
           <div class="col">
             <CustomInput :value="model.Adet" text="Piece" @onInput="model.Adet = $event"
