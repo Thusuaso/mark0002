@@ -7834,7 +7834,8 @@ app.get('/panel/usa/stock/list',(req,res)=>{
                 dbo.MekmarUsaYeni_StockSqft(duk.SkuNo) as StokSqft,
                 dbo.MekmarUsaYeni_StockBox(duk.SkuNo) as StokBox,
                 duk.Kategori,
-                duk.ID as ProductId
+                duk.ID as ProductId,
+                dpm.hashtags
 
 
 
@@ -7904,7 +7905,8 @@ app.put('/panel/usa/stock/update',(req,res)=>{
         kutudetay_es='${__stringCharacterChange(req.body.kutudetay_es)}',
         kasadetay_es='${__stringCharacterChange(req.body.kasadetay_es)}',
         surface_es='${__stringCharacterChange(req.body.surface_es)}',
-        edge_es='${__stringCharacterChange(req.body.edge_es)}'
+        edge_es='${__stringCharacterChange(req.body.edge_es)}',
+        hashtags='${__stringCharacterChange(req.body.hashtags)}'
     where Id='${req.body.Id}'
 
     `;

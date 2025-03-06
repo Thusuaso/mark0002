@@ -67,6 +67,19 @@
               <label for="keywords_en">Keywords</label>
             </span>
           </div>
+          <div class="col">
+            <span class="p-float-label">
+              <Textarea
+                id="hashtags"
+                v-model="model.hashtags"
+                rows="5"
+                class="w-100"
+                @input="hashtagsInput($event)"
+              />
+
+              <label for="hashtags">Hashtags</label>
+            </span>
+          </div>
         </div>
         <div class="row mb-3">
           <div class="col">
@@ -422,6 +435,9 @@ export default {
     },
   },
   methods: {
+    hashtagsInput(event){
+      this.model.hashtags = event.trim();
+    },
     usaReOrder(event) {
       let index = 1;
       let data = [];
