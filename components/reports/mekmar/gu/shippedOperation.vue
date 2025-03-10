@@ -196,11 +196,11 @@
 
         <div class="row">
             <div class="col">
-                <DataTable :value="getReportsMekmarGuOrdererThisYearForw" class="p-datatable-sm"
+                <DataTable :value="getReportsMekmarGuOrdererThisYearForw.filter(x=>x.Month <= 6)" class="p-datatable-sm"
                     :selection="selectedForw" selectionMode="single" @row-select="thisYearOrdererSelectedForw($event)"
                     :loading="loading">
                     <template #header>
-                        {{ new Date().getFullYear() }} Seller Shipped
+                        {{ new Date().getFullYear() }} Seller Shipped (First 6 Months)
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -212,7 +212,7 @@
                             {{ slotProps.data.FOB | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOrdererThisYearTotalForw.fob | formatPriceUsd }}
+                            {{ total_1_half_one.fob | formatPriceUsd }}
                         </template>
                     </Column>
                     <Column field="DDP" header="DDP">
@@ -220,18 +220,46 @@
                             {{ slotProps.data.DDP | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOrdererThisYearTotalForw.ddp | formatPriceUsd }}
+                            {{ total_1_half_one.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+                <DataTable :value="getReportsMekmarGuOrdererThisYearForw.filter(x=>x.Month >6)" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single" @row-select="thisYearOrdererSelectedForw($event)"
+                    :loading="loading">
+                    <template #header>
+                        {{ new Date().getFullYear() }} Seller Shipped (Second 6 Months)
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_1_half_two.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_1_half_two.ddp | formatPriceUsd }}
                         </template>
                     </Column>
                 </DataTable>
             </div>
             <div class="col">
-                <DataTable :value="getReportsMekmarGuOrdererPreviousYearForw" class="p-datatable-sm"
+                <DataTable :value="getReportsMekmarGuOrdererPreviousYearForw.filter(x=>x.Month <=6)" class="p-datatable-sm"
                     :selection="selectedForw" selectionMode="single"
                     @row-select="previousYearOrdererSelectedForw($event)" :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 1 }} Seller Shipped
+                        {{ new Date().getFullYear() - 1 }} Seller Shipped (First 6 Months)
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -243,7 +271,7 @@
                             {{ slotProps.data.FOB | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOrdererPreviousYearTotalForw.fob | formatPriceUsd }}
+                            {{ total_2_half_one.fob | formatPriceUsd }}
                         </template>
                     </Column>
                     <Column field="DDP" header="DDP">
@@ -251,18 +279,47 @@
                             {{ slotProps.data.DDP | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOrdererPreviousYearTotalForw.ddp | formatPriceUsd }}
+                            {{ total_2_half_one.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+                <DataTable :value="getReportsMekmarGuOrdererPreviousYearForw.filter(x=>x.Month >6)" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single"
+                    @row-select="previousYearOrdererSelectedForw($event)" :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 1 }} Seller Shipped (Second Six Months)
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_2_half_two.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_2_half_two.ddp | formatPriceUsd }}
                         </template>
                     </Column>
                 </DataTable>
             </div>
             <div class="col">
-                <DataTable :value="getReportsMekmarGuOrdererTwoYearAgoForw" class="p-datatable-sm"
+                <DataTable :value="getReportsMekmarGuOrdererTwoYearAgoForw.filter(x=>x.Month <=6)" class="p-datatable-sm"
                     :selection="selectedForw" selectionMode="single" @row-select="twoYearAgoOrdererSelectedForw($event)"
                     :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 2 }} Seller Shipped
+                        {{ new Date().getFullYear() - 2 }} Seller Shipped (First 6 Months)
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -274,7 +331,7 @@
                             {{ slotProps.data.FOB | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOrdererTwoYearAgoTotalForw.fob | formatPriceUsd }}
+                            {{ total_3_half_one.fob | formatPriceUsd }}
                         </template>
                     </Column>
                     <Column field="DDP" header="DDP">
@@ -282,7 +339,36 @@
                             {{ slotProps.data.DDP | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOrdererTwoYearAgoTotalForw.ddp | formatPriceUsd }}
+                            {{ total_3_half_one.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+                <DataTable :value="getReportsMekmarGuOrdererTwoYearAgoForw.filter(x=>x.Month >6)" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single" @row-select="twoYearAgoOrdererSelectedForw($event)"
+                    :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 2 }} Seller Shipped (Second 6 Months)
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_3_half_two.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_3_half_two.ddp | formatPriceUsd }}
                         </template>
                     </Column>
                 </DataTable>
@@ -292,11 +378,11 @@
 
         <div class="row">
             <div class="col">
-                <DataTable :value="getreportsMekmarGuOperationThisYearForw" class="p-datatable-sm"
+                <DataTable :value="getreportsMekmarGuOperationThisYearForw.filter(x=>x.Month <=6)" class="p-datatable-sm"
                     :selection="selectedForw" selectionMode="single" @row-select="thisYearOperationSelectedForw($event)"
                     :loading="loading">
                     <template #header>
-                        {{ new Date().getFullYear() }} Operation Shipped
+                        {{ new Date().getFullYear() }} Operation Shipped (First 6 Months)
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -308,7 +394,7 @@
                             {{ slotProps.data.FOB | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOperationThisYearTotalForw.fob | formatPriceUsd }}
+                            {{ total_4_half_one.fob | formatPriceUsd }}
                         </template>
                     </Column>
                     <Column field="DDP" header="DDP">
@@ -316,18 +402,46 @@
                             {{ slotProps.data.DDP | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOperationThisYearTotalForw.ddp | formatPriceUsd }}
+                            {{ total_4_half_one.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+                <DataTable :value="getreportsMekmarGuOperationThisYearForw.filter(x=>x.Month >6)" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single" @row-select="thisYearOperationSelectedForw($event)"
+                    :loading="loading">
+                    <template #header>
+                        {{ new Date().getFullYear() }} Operation Shipped (Second 6 Months)
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_4_half_two.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_4_half_two.ddp | formatPriceUsd }}
                         </template>
                     </Column>
                 </DataTable>
             </div>
             <div class="col">
-                <DataTable :value="getReportsMekmarGuOperationPreviousYearForw" class="p-datatable-sm"
+                <DataTable :value="getReportsMekmarGuOperationPreviousYearForw.filter(x=>x.Month <=6)" class="p-datatable-sm"
                     :selection="selectedForw" selectionMode="single"
                     @row-select="previousYearOperationSelectedForw($event)" :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 1 }} Operation Shipped
+                        {{ new Date().getFullYear() - 1 }} Operation Shipped (First 6 Months)
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -339,7 +453,7 @@
                             {{ slotProps.data.FOB | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOperationPreviousYearTotalForw.fob | formatPriceUsd }}
+                            {{ total_5_half_one.fob | formatPriceUsd }}
                         </template>
                     </Column>
                     <Column field="DDP" header="DDP">
@@ -347,18 +461,47 @@
                             {{ slotProps.data.DDP | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOperationPreviousYearTotalForw.ddp | formatPriceUsd }}
+                            {{ total_5_half_one.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+                <DataTable :value="getReportsMekmarGuOperationPreviousYearForw.filter(x=>x.Month >6)" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single"
+                    @row-select="previousYearOperationSelectedForw($event)" :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 1 }} Operation Shipped (Second 6 Months)
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_5_half_two.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_5_half_two.ddp | formatPriceUsd }}
                         </template>
                     </Column>
                 </DataTable>
             </div>
             <div class="col">
-                <DataTable :value="getReportsMekmarGuOperationTwoYearAgoForw" class="p-datatable-sm"
+                <DataTable :value="getReportsMekmarGuOperationTwoYearAgoForw.filter(x=>x.Month <=6)" class="p-datatable-sm"
                     :selection="selectedForw" selectionMode="single"
                     @row-select="twoYearAgoOperationSelectedForw($event)" :loading="loading">
 
                     <template #header>
-                        {{ new Date().getFullYear() - 2 }} Seller Shipped
+                        {{ new Date().getFullYear() - 2 }} Seller Shipped (First 6 Months)
                     </template>
                     <Column field="Month" header="MONTH">
                         <template #body="slotProps">
@@ -370,7 +513,7 @@
                             {{ slotProps.data.FOB | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOperationTwoYearAgoTotalForw.fob | formatPriceUsd }}
+                            {{ total_6_half_one.fob | formatPriceUsd }}
                         </template>
                     </Column>
                     <Column field="DDP" header="DDP">
@@ -378,7 +521,36 @@
                             {{ slotProps.data.DDP | formatPriceUsd }}
                         </template>
                         <template #footer>
-                            {{ getReportsMekmarGuOperationTwoYearAgoTotalForw.ddp | formatPriceUsd }}
+                            {{ total_6_half_one.ddp | formatPriceUsd }}
+                        </template>
+                    </Column>
+                </DataTable>
+                <DataTable :value="getReportsMekmarGuOperationTwoYearAgoForw.filter(x=>x.Month >6)" class="p-datatable-sm"
+                    :selection="selectedForw" selectionMode="single"
+                    @row-select="twoYearAgoOperationSelectedForw($event)" :loading="loading">
+
+                    <template #header>
+                        {{ new Date().getFullYear() - 2 }} Seller Shipped (Second 6 Months)
+                    </template>
+                    <Column field="Month" header="MONTH">
+                        <template #body="slotProps">
+                            {{ getMonthName(slotProps.data.Month) }}
+                        </template>
+                    </Column>
+                    <Column field="FOB" header="FOB">
+                        <template #body="slotProps">
+                            {{ slotProps.data.FOB | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_6_half_two.fob | formatPriceUsd }}
+                        </template>
+                    </Column>
+                    <Column field="DDP" header="DDP">
+                        <template #body="slotProps">
+                            {{ slotProps.data.DDP | formatPriceUsd }}
+                        </template>
+                        <template #footer>
+                            {{ total_6_half_two.ddp | formatPriceUsd }}
                         </template>
                     </Column>
                 </DataTable>
@@ -509,6 +681,55 @@ export default {
             detail_dialog_form: false,
             loading: false,
             selectedForw: null,
+            total_1_half_one:{
+                fob:0,
+                ddp:0
+            },
+            total_1_half_two:{
+                fob:0,
+                ddp:0
+            },
+            total_2_half_one:{
+                fob:0,
+                ddp:0
+            },
+            total_2_half_two:{
+                fob:0,
+                ddp:0
+            },
+            total_3_half_one:{
+                fob:0,
+                ddp:0
+            },
+            total_3_half_two:{
+                fob:0,
+                ddp:0
+            },
+            total_4_half_one:{
+                fob:0,
+                ddp:0
+            },
+            total_4_half_two:{
+                fob:0,
+                ddp:0
+            },
+            total_5_half_one:{
+                fob:0,
+                ddp:0
+            },
+            total_5_half_two:{
+                fob:0,
+                ddp:0
+            },
+            total_6_half_one:{
+                fob:0,
+                ddp:0
+            },
+            total_6_half_two:{
+                fob:0,
+                ddp:0
+            }
+
         }
     },
     methods: {
@@ -722,6 +943,120 @@ export default {
                 { id: 12, name: 'December' },
             ];
             return data.find(item => item.id === value).name;
+        }
+    },
+    watch:{
+        getReportsMekmarGuOrdererThisYearForw(){
+            this.total_1_half_one = {
+                fob:0,
+                ddp:0
+            };
+            this.total_1_half_two = {
+                fob:0,
+                ddp:0
+            };
+
+            this.getReportsMekmarGuOrdererThisYearForw.filter(x=>x.Month <= 6).forEach(x=>{
+                this.total_1_half_one.fob += x.FOB;
+                this.total_1_half_one.ddp += x.DDP; 
+            });
+            
+            this.getReportsMekmarGuOrdererThisYearForw.filter(x=>x.Month > 6).forEach(x=>{
+                this.total_1_half_two.fob += x.FOB;
+                this.total_1_half_two.ddp += x.DDP; 
+            })
+
+        },
+        getReportsMekmarGuOrdererPreviousYearForw(){
+            this.total_2_half_one = {
+                fob:0,
+                ddp:0
+            };
+            this.total_2_half_two = {
+                fob:0,
+                ddp:0
+            };
+            this.getReportsMekmarGuOrdererPreviousYearForw.filter(x=>x.Month <= 6).forEach(x=>{
+                this.total_2_half_one.fob += x.FOB;
+                this.total_2_half_one.ddp += x.DDP; 
+            });
+            this.getReportsMekmarGuOrdererPreviousYearForw.filter(x=>x.Month > 6).forEach(x=>{
+                this.total_2_half_two.fob += x.FOB;
+                this.total_2_half_two.ddp += x.DDP; 
+            })
+        },
+        getReportsMekmarGuOrdererTwoYearAgoForw(){
+            this.total_3_half_one = {
+                fob:0,
+                ddp:0
+            };
+            this.total_3_half_two = {
+                fob:0,
+                ddp:0
+            };
+            this.getReportsMekmarGuOrdererTwoYearAgoForw.filter(x=>x.Month <= 6).forEach(x=>{
+                this.total_3_half_one.fob += x.FOB;
+                this.total_3_half_one.ddp += x.DDP; 
+            });
+            this.getReportsMekmarGuOrdererTwoYearAgoForw.filter(x=>x.Month > 6).forEach(x=>{
+                this.total_3_half_two.fob += x.FOB;
+                this.total_3_half_two.ddp += x.DDP; 
+            })
+        },
+        getreportsMekmarGuOperationThisYearForw(){
+            this.total_4_half_one = {
+                fob:0,
+                ddp:0
+            };
+            this.total_4_half_two = {
+                fob:0,
+                ddp:0
+            };
+            this.getreportsMekmarGuOperationThisYearForw.filter(x=>x.Month <= 6).forEach(x=>{
+                this.total_4_half_one.fob += x.FOB;
+                this.total_4_half_one.ddp += x.DDP; 
+            });
+            this.getreportsMekmarGuOperationThisYearForw.filter(x=>x.Month > 6).forEach(x=>{
+                this.total_4_half_two.fob += x.FOB;
+                this.total_4_half_two.ddp += x.DDP; 
+            })
+        },
+        getReportsMekmarGuOperationPreviousYearForw(){
+            this.total_5_half_one = {
+                fob:0,
+                ddp:0
+            };
+            this.total_5_half_two = {
+                fob:0,
+                ddp:0
+            };
+            this.getReportsMekmarGuOperationPreviousYearForw.filter(x=>x.Month <= 6).forEach(x=>{
+                this.total_5_half_one.fob += x.FOB;
+                this.total_5_half_one.ddp += x.DDP; 
+            });
+            this.getReportsMekmarGuOperationPreviousYearForw.filter(x=>x.Month > 6).forEach(x=>{
+                this.total_5_half_two.fob += x.FOB;
+                this.total_5_half_two.ddp += x.DDP; 
+            })
+
+        },
+        getReportsMekmarGuOperationTwoYearAgoForw(){
+            this.total_6_half_one = {
+                fob:0,
+                ddp:0
+            };
+            this.total_6_half_two = {
+                fob:0,
+                ddp:0
+            };
+            this.getReportsMekmarGuOperationTwoYearAgoForw.filter(x=>x.Month <= 6).forEach(x=>{
+                this.total_6_half_one.fob += x.FOB;
+                this.total_6_half_one.ddp += x.DDP; 
+            });
+            this.getReportsMekmarGuOperationTwoYearAgoForw.filter(x=>x.Month > 6).forEach(x=>{
+                this.total_6_half_two.fob += x.FOB;
+                this.total_6_half_two.ddp += x.DDP; 
+            })
         }
     }
 
