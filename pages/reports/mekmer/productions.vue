@@ -126,8 +126,15 @@ export default {
       this.$store.dispatch("setOrderProductionProformaDelete", id);
     },
     excel_output() {
+      const new_data = this.getOrderList.sort(function(a,b) {
+          const new_date_a = new Date(a.SiparisTarihi).getTime();
+          const new_date_b = new Date(b.SiparisTarihi).getTime();
+
+
+          return new_date_b-new_date_a;
+      });
       api
-        .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
+        .post("/siparisler/dosyalar/uretimExcelCikti", new_data)
         .then((response) => {
           if (response.status) {
             const link = document.createElement("a");

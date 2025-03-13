@@ -151,6 +151,7 @@ export default {
       this.mekmer_filtered_list = event;
     },
     excel_output(){
+
       api.post("/reports/excel/production", this.is_filtered? this.mekmer_filtered_list:this.getReportsMekmerProductionList).then((response) => {
         if (response.status) {
           const link = document.createElement("a");
