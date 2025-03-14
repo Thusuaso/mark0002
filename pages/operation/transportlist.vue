@@ -57,7 +57,7 @@ import date from '../../plugins/date';
 import server from "@/plugins/excel.server";
 
 export default {
-  // middleware: ["authority"],
+  middleware: ["authority"],
   computed: {
     ...mapGetters(["getTransportList","getOrdersAllList"]),
   },

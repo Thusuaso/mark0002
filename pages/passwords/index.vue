@@ -37,7 +37,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
-  // middleware: ["authority"],
+  middleware: ["authority"],
   data() {
     return {
       accounts_new_form: false,

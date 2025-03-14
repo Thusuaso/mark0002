@@ -45,7 +45,7 @@
 import { mapGetters } from "vuex";
 import api from "../../../plugins/excel.server";
 export default {
-  // middleware: ["authority"],
+  middleware: ["authority"],
   data() {
     return {
       selectedYear: { Year: 2024 },

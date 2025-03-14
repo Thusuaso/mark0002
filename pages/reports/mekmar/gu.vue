@@ -74,7 +74,7 @@
 import { mapGetters } from "vuex";
 import api from '~/plugins/excel.server.js';
 export default {
-  // middleware: ["authority"],
+  middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getReportsMekmarGuYearList",
