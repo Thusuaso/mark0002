@@ -20,7 +20,6 @@ import nuxt_plugin_axios_90a01432 from 'nuxt_plugin_axios_90a01432' // Source: .
 import nuxt_plugin_configpluginripple15dc8de9_218c26ea from 'nuxt_plugin_configpluginripple15dc8de9_218c26ea' // Source: .\\config.plugin-ripple.15dc8de9.js (mode: 'all')
 import nuxt_plugin_components_50cb0b6b from 'nuxt_plugin_components_50cb0b6b' // Source: ..\\plugins\\components.js (mode: 'all')
 import nuxt_plugin_excel_698a9d56 from 'nuxt_plugin_excel_698a9d56' // Source: ..\\plugins\\excel.js (mode: 'client')
-import nuxt_plugin_socketio_2006d74c from 'nuxt_plugin_socketio_2006d74c' // Source: ..\\plugins\\socket.io.js (mode: 'all')
 import nuxt_plugin_logs_098ad49c from 'nuxt_plugin_logs_098ad49c' // Source: ..\\plugins\\logs.js (mode: 'all')
 import nuxt_plugin_cookies_1f907659 from 'nuxt_plugin_cookies_1f907659' // Source: ..\\plugins\\cookies (mode: 'all')
 
@@ -246,10 +245,6 @@ async function createApp(ssrContext, config = {}) {
 
   if (process.client && typeof nuxt_plugin_excel_698a9d56 === 'function') {
     await nuxt_plugin_excel_698a9d56(app.context, inject)
-  }
-
-  if (typeof nuxt_plugin_socketio_2006d74c === 'function') {
-    await nuxt_plugin_socketio_2006d74c(app.context, inject)
   }
 
   if (typeof nuxt_plugin_logs_098ad49c === 'function') {

@@ -20,7 +20,7 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 export default {
-  middleware: ["authority"],
+  // middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getFairCustomerList",

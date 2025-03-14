@@ -224,7 +224,7 @@
 import { mapGetters } from "vuex";
 import oceanservice from "../../../plugins/digitalocean";
 export default {
-  middleware: ["authority"],
+  // middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getPanelProjectList",

@@ -247,7 +247,7 @@ import { mapGetters } from "vuex";
 import api from "../../../plugins/excel.server";
 import currency from "../../../plugins/currency";
 export default {
-  middleware: ["authority"],
+  // middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getReportsMekmarAyoList",

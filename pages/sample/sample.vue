@@ -50,7 +50,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
-  middleware: ["authority"],
+  // middleware: ["authority"],
   computed: {
     ...mapGetters([
       "getSampleList",

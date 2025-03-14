@@ -12,7 +12,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
-  middleware: ["authority"],
+  // middleware: ["authority"],
   data() {
     return {
       unfollow_dialog_form: false,
