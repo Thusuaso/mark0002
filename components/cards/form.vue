@@ -131,7 +131,7 @@
 </template>
 <script>
 import Cookies from "js-cookie";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 export default {
   props: {
     status: {

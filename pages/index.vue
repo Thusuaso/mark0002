@@ -7,7 +7,7 @@
 <script>
 import api from '@/plugins/excel.server';
 
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 export default {
   computed: {
     home() {

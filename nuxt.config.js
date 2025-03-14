@@ -98,11 +98,11 @@ export default {
     bodyParser.json(),
     '~/api'
   ],
-  io: {
-    // module options
-    sockets: [{
-      name: 'main',
-      url: 'socket-io.mekmar.com'
-    }]
-  }
+  // io: {
+  //   // module options
+  //   sockets: [{
+  //     name: 'main',
+  //     url: 'socket-io.mekmar.com'
+  //   }]
+  // }
 }

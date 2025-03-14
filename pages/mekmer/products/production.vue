@@ -187,7 +187,7 @@ export default {
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
-        this.$socket.socketIO.emit('production_update_emit');
+        // this.$socket.socketIO.emit('production_update_emit');
         this.production_detail_form = false;
       }
     },
@@ -331,9 +331,9 @@ export default {
   },
   mounted() {
 
-    this.$socket.socketIO.on("cards_update_on", () => {
-      this.$store.dispatch("setCardList");
-    });
+    // this.$socket.socketIO.on("cards_update_on", () => {
+    //   this.$store.dispatch("setCardList");
+    // });
   },
 
   watch: {

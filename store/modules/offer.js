@@ -114,7 +114,7 @@ const actions = {
                    
                     vuexContext.dispatch('setOfferMainList');
                     vuexContext.dispatch('setOfferId', response.data.id);
-                    this.$socket.socketIO.emit('offers_updated_emit');
+                    // this.$socket.socketIO.emit('offers_updated_emit');
                     vuexContext.commit('setOfferButtonStatus', false);
                     vuexContext.dispatch('setOfferCustomerList');
                     this.$toast.success('Başarıyla Kaydedildi');
@@ -154,7 +154,7 @@ const actions = {
                 if (response.data.status) {
                     vuexContext.dispatch('setOfferMainList');
                     vuexContext.commit('setOfferDelete', id);
-                    this.$socket.socketIO.emit('offers_deleted_emit',id);
+                    // this.$socket.socketIO.emit('offers_deleted_emit',id);
                     this.$toast.success('Başarıyla Silindi');
 
 
