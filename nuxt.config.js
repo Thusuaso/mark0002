@@ -104,5 +104,12 @@ export default {
       name: 'main',
       url: 'socket-io.mekmar.com'
     }]
+  },
+  vite: {
+    server: {
+      hmr: {
+        protocol: 'ws'
+      }
+    }
   }
 }
