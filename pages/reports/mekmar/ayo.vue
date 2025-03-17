@@ -392,7 +392,7 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("setReportsMekmarAyoYearList");
+    // this.$store.dispatch("setReportsMekmarAyoYearList");
 
     // const date = {
     //   year: new Date().getFullYear(),
