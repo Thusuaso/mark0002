@@ -1075,6 +1075,7 @@ export default {
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
       this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", false);
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setCardList");
 
       this.$store.dispatch("setOrderProductionId", event.SiparisId);
       this.productionModel = event;

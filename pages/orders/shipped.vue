@@ -946,6 +946,7 @@ export default {
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setCardList");
 
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);

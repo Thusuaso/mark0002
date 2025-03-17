@@ -35,7 +35,7 @@ export default {
   plugins: [
     '~/plugins/components.js',
     { src: '~/plugins/excel.js', mode: 'client' },
-    '~/plugins/socket.io.js',
+    // '~/plugins/socket.io.js',
     '~/plugins/logs.js',
     '~/plugins/cookies'
   ],
@@ -98,13 +98,13 @@ export default {
     bodyParser.json(),
     '~/api'
   ],
-  io: {
-    // module options
-    sockets: [{
-      name: 'main',
-      url: 'socket-io.mekmar.com'
-    }]
-  },
+  // io: {
+  //   // module options
+  //   sockets: [{
+  //     name: 'main',
+  //     url: 'socket-io.mekmar.com'
+  //   }]
+  // },
   vite: {
     server: {
       hmr: {

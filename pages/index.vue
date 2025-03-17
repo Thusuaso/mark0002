@@ -23,7 +23,7 @@ export default {
   beforeMount() {},
   created() {
     if(process.client){
-      api.get('/reports/production/send/mail');
+      // api.get('/reports/production/send/mail');
       this.$store.dispatch("getHome");
 
     }
