@@ -392,21 +392,21 @@ export default {
     };
   },
   created() {
-    // this.$store.dispatch("setReportsMekmarAyoYearList");
+    this.$store.dispatch("setReportsMekmarAyoYearList");
 
-    // const date = {
-    //   year: new Date().getFullYear(),
-    //   month: new Date().getMonth() + 1,
-    // };
+    const date = {
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+    };
 
-    // api
-    //   .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
-    //   .then((response) => {
-    //     this.$store.commit("setReportsMekmarAyoList", response.data);
-    //     this.$store.commit("setReportsMekmarAyoListTotal", response.data);
-    //     this.__getMonthlyCostList(date.year,date.month);
-    //     this.$store.dispatch("setEndLoadingAction");
-    //   });
+    api
+      .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
+      .then((response) => {
+        this.$store.commit("setReportsMekmarAyoList", response.data);
+        this.$store.commit("setReportsMekmarAyoListTotal", response.data);
+        this.__getMonthlyCostList(date.year,date.month);
+        this.$store.dispatch("setEndLoadingAction");
+      });
 
 
 

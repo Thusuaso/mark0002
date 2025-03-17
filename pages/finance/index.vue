@@ -124,7 +124,7 @@ export default {
     };
   },
   created() {
-    // this.$store.dispatch("setFinanceList");
+    this.$store.dispatch("setFinanceList");
   },
   methods: {
 
