@@ -41,7 +41,6 @@ export default {
     this.$store.dispatch("setSelectionProductionTotal");
     this.$store.dispatch("setSelectionProductsList");
     this.$store.dispatch("setSelectionProductionMekmerButtonStatus");
-    this.$store.dispatch("setCardList");
 
 
   },
@@ -63,6 +62,8 @@ export default {
       }
     },
     productSelectedEmit(event) {
+      this.$store.dispatch("setCardList");
+
       this.selection_production_dialog_form = true;
       this.model = event.data;
       this.$store.dispatch("setSelectionProductionButtonStatus", false);

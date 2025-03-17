@@ -10,7 +10,7 @@
             </span>
           </div>
           <div class="col">
-            <Button type="button" class="p-button-secondary" label="@" @click="product_cards_form_dialog = true"
+            <Button type="button" class="p-button-secondary" label="@" @click="card_selected_list"
               :disabled="product_form_disabled" />
           </div>
         </div>
@@ -730,6 +730,11 @@ export default {
         });
       }
       this.filteredSupplier = results;
+    },
+    card_selected_list(){
+      this.$store.dispatch("setCardList");
+
+      this.product_cards_form_dialog = true;
     },
     productCardsSelected(event) {
       this.product_cards_form_dialog = false;
