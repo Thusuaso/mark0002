@@ -236,6 +236,19 @@
               <label for="keywords_en">Keywords</label>
             </span>
           </div>
+          <div class="col">
+            <span class="p-float-label">
+              <Textarea
+                id="hashtags"
+                v-model="model.hashtags_fr"
+                rows="5"
+                class="w-100"
+                @input="hashtagsInputFr($event)"
+              />
+
+              <label for="hashtags">Hashtags Fr</label>
+            </span>
+          </div>
         </div>
         <div class="row mb-3">
           <div class="col">
@@ -315,6 +328,19 @@
               />
 
               <label for="keywords_en">Keywords</label>
+            </span>
+          </div>
+          <div class="col">
+            <span class="p-float-label">
+              <Textarea
+                id="hashtags"
+                v-model="model.hashtags_es"
+                rows="5"
+                class="w-100"
+                @input="hashtagsInputEs($event)"
+              />
+
+              <label for="hashtags">Hashtags Es</label>
             </span>
           </div>
         </div>
@@ -437,6 +463,15 @@ export default {
   methods: {
     hashtagsInput(event){
       this.model.hashtags = event.trim();
+      
+    },
+    hashtagsInputFr(event){
+      this.model.hashtags_fr = event.trim();
+      
+    },
+    hashtagsInputEs(event){
+      this.model.hashtags_es = event.trim();
+      
     },
     usaReOrder(event) {
       let index = 1;

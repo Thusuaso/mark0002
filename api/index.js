@@ -7835,7 +7835,9 @@ app.get('/panel/usa/stock/list',(req,res)=>{
                 dbo.MekmarUsaYeni_StockBox(duk.SkuNo) as StokBox,
                 duk.Kategori,
                 duk.ID as ProductId,
-                dpm.hashtags
+                dpm.hashtags,
+                dpm.hashtags_fr,
+                dpm.hashtags_es
 
 
 
@@ -7866,12 +7868,11 @@ app.put('/panel/usa/stock/update',(req,res)=>{
         SkuNo='${req.body.SkuNo}'
     `;
     const updateDetail = `
-    select * from DepoUrunKart_MekmarSiteTB
 
     update DepoUrunKart_MekmarSiteTB
     SET
         UrunAdi='${__stringCharacterChange(req.body.UrunAdi)}',
-        Aciklama='${__stringCharacterChange(req.body.Aciklama)}',
+        Aciklama='${__stringCharacterChange(req.body.aciklama_en)}',
         Anahtarlar='${__stringCharacterChange(req.body.Anahtarlar)}',
         Size='${__stringCharacterChange(req.body.Size)}',
         Renk='${__stringCharacterChange(req.body.Renk)}',
@@ -7883,7 +7884,7 @@ app.put('/panel/usa/stock/update',(req,res)=>{
         Edge='${__stringCharacterChange(req.body.Edge)}',
         Yayinla='${req.body.Yayinla}',
         urunadi_en='${__stringCharacterChange(req.body.UrunAdi)}',
-        aciklama_en='${__stringCharacterChange(req.body.Aciklama)}',
+        aciklama_en='${__stringCharacterChange(req.body.aciklama_en)}',
         anahtarlar_en='${__stringCharacterChange(req.body.Anahtarlar)}',
         renk_en='${__stringCharacterChange(req.body.Renk)}',
         kutudetay_en='${__stringCharacterChange(req.body.KutuDetay)}',
@@ -7906,7 +7907,10 @@ app.put('/panel/usa/stock/update',(req,res)=>{
         kasadetay_es='${__stringCharacterChange(req.body.kasadetay_es)}',
         surface_es='${__stringCharacterChange(req.body.surface_es)}',
         edge_es='${__stringCharacterChange(req.body.edge_es)}',
-        hashtags='${__stringCharacterChange(req.body.hashtags)}'
+        hashtags='${__stringCharacterChange(req.body.hashtags)}',
+        hashtags_fr='${__stringCharacterChange(req.body.hashtags_fr)}',
+        hashtags_es='${__stringCharacterChange(req.body.hashtags_es)}'
+
     where Id='${req.body.Id}'
 
     `;
@@ -17243,6 +17247,21 @@ and s.SiparisDurumID=3
         res.status(200).json({'list':buying.recordset});
     });
 });
+
+app.get('/gu/reports/finance/purchase-prices',(req,res)=>{
+    const sql = `
+        select s.SiparisTarihi,m.FirmaAdi,s.SiparisNo,(su.AlisFiyati * su.Miktar) as Purchase,t.FirmaAdi as Tedarikci from SiparisUrunTB su
+        inner join SiparislerTB s on s.SiparisNo = su.SiparisNo
+        inner join MusterilerTB m on m.ID = s.MusteriID
+        inner join TedarikciTB t on t.ID = su.TedarikciID
+        where s.SiparisDurumID= 2 and su.TedarikciID not in (1,123,32)
+        and m.Marketing = 'Mekmar'
+    `;
+    mssql.query(sql,(err,data)=>{
+        res.status(200).json({'list':data.recordset});
+    });
+
+})
 
 
 

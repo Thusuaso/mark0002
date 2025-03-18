@@ -1,6 +1,14 @@
 <template>
     <div>
-      <h3>FOB, CFR, DAP, DDP ve CIF yüklemelerinin evrak masrafı olması gerekiyor.(İstinai durumlarda el ile silinmesi gerekiyor.)</h3>
+      <div class="row">
+        <div class="col-9">
+          <h3>FOB, CFR, DAP, DDP ve CIF yüklemelerinin evrak masrafı olması gerekiyor.(İstinai durumlarda el ile silinmesi gerekiyor.)</h3>
+
+        </div>
+        <div class="col-3">
+          <Button class="w-100" label="Purchase Price" @click="purchasePrices"/>
+        </div>
+      </div>
   
       <financeList :list="filterFinanceList" :total="getFinanceListTotal" :expiry="getFinanceExpiryList"
         :allStatus="buttonAllStatus" :allList="getFinanceListAll"
@@ -27,12 +35,104 @@
       <Dialog :visible.sync="finance_po_paid_detail_form" header="" modal>
         <FinancePaidList :list="getFinancePoPaidDetailList" />
       </Dialog>
+      <Dialog :visible.sync="purchase_price_dialog_form" header="" modal>
+        <DataTable :value="purchasePriceList" class="p-datatable-sm"
+        :filters.sync="filters"
+        filterDisplay="row"
+        @filter="filterSelected($event)"
+        >
+          <Column field="SiparisTarihi" header="Order Date"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.SiparisTarihi | dateToString }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+          </Column>
+          <Column field="FirmaAdi" header="Customer"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+          >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+          <Column field="SiparisNo" header="Po"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+          >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+          <Column field="Tedarikci" header="Supplier"
+          :showFilterMenu="false"
+          :showFilterOperator="false"
+          :showClearButton="false"
+          :showApplyButton="false"
+          :showFilterMatchModes="false"
+          :showAddButton="false"
+          >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+          <Column field="Purchase" header="Purchase Total"
+
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.Purchase | formatPriceUsd }}
+            </template>
+            <template #footer>
+              {{ purchase_price_total | formatPriceUsd }}
+            </template>
+
+          </Column>
+      </DataTable>
+      </Dialog>
     </div>
   </template>
   <script>
   import { mapGetters } from "vuex";
   import date from "../../../plugins/date";
   import api from "../../../plugins/excel.server.js";
+  import { FilterMatchMode } from "primevue/api";
+
   export default {
     middleware: ["authority"],
     computed: {
@@ -64,6 +164,17 @@
     },
     data() {
       return {
+        filters: {
+          SiparisTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+          SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+          Tedarikci: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+          FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
+      },
+        purchase_price_total:0,
+        purchase_price_button_loading:false,
+        purchasePriceList:[],
+        purchase_price_dialog_form:false,
         filterFinanceList:[],
         checked:'Mekmer',
         mekmarMekmerList:false,
@@ -92,7 +203,29 @@
 
     },
     methods: {
-  
+      filterSelected(event){
+        this.purchase_price_total = 0;
+        event.filteredValue.forEach(x=>{
+          this.purchase_price_total += x.Purchase;
+
+        });
+      },
+      purchasePrices(){
+        this.purchase_price_button_loading = true;
+        this.purchase_price_total = 0;
+        this.$axios.get('/gu/reports/finance/purchase-prices').then(res=>{
+          if(res.data.list){
+            this.purchase_price_button_loading = false;
+            this.purchasePriceList = res.data.list;
+            res.data.list.forEach(x=>{
+              this.purchase_price_total += x.Purchase;
+            });
+            this.purchase_price_dialog_form = true;
+
+          }
+        });
+
+      },
       checkedMekmarMekmer(event){
         if(this.mekmarMekmerList){
           this.checked = 'Mekmar';
