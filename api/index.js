@@ -7916,8 +7916,6 @@ app.put('/panel/usa/stock/update',(req,res)=>{
     `;
 
 
-    mssql.query(updateDetail);
-
     mssql.query(updateStock,(err,stock)=>{
         if(stock.rowsAffected[0]==1){
             res.status(200).json({'status':true});
@@ -7948,7 +7946,23 @@ app.post('/panel/usa/stock/photo/upload',(req,res)=>{
     });
 });
 
+app.get('/api/usa/photo/delete/:id',(req,res)=>{
+    const sql = `delete DepoUrunKart_MekmarFotolarTB where Id=${req.params.id}`;
+    mssql.query(sql,(err,result)=>{
+        if(result.rowsAffected == 1){
+            res.status(200).json({'status':true});
+        }
+    });
+});
 
+app.post('/panel/usa/stock/photos/change/queue',async (req,res)=>{
+    await req.body.forEach(x=>{
+        const sql = `update DepoUrunKart_MekmarFotolarTB SET Sira='${x.Sira}' where Id='${x.Id}'`;
+        mssql.query(sql);
+    });
+    res.status(200).json({'status':true});
+
+});
 
 
 
@@ -17261,7 +17275,9 @@ app.get('/gu/reports/finance/purchase-prices',(req,res)=>{
         res.status(200).json({'list':data.recordset});
     });
 
-})
+});
+
+
 
 
 

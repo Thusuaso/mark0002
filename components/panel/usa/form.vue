@@ -429,6 +429,11 @@
             </template>
           </Column>
           <Column field="Sira" header="Queue"> </Column>
+          <Column header="#">
+            <template #body="slotProps">
+                <Button label="Delete" class="p-button-danger" @click="deletePhotos(slotProps.data)" />
+            </template>
+          </Column>
         </DataTable>
       </TabPanel>
     </TabView>
@@ -483,6 +488,19 @@ export default {
       });
       this.$store.commit("setpanelUsaStockPhotosList", data);
     },
+    deletePhotos(event){
+      this.$axios.get(`/api/usa/photo/delete/${event.Id}`)
+      .then(res=>{
+        if(res.data.status){
+          this.$toast.success('Resim Başarıyla Silindi.');
+          this.$store.dispatch('setpanelUsaStockPhotosList',this.model.UrunId);
+        }else{
+          this.$toast.success('Resim silme işlemi başarısız.');
+
+        }
+      });
+
+    }
   },
 };
 </script>

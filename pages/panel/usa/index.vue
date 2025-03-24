@@ -38,9 +38,11 @@ export default {
   },
   methods: {
     photosChangeQueue(event) {
-      event.forEach((x) => {
-        this.$store.dispatch("setUsaStockPhotosChangeQueue", x);
-      });
+      this.$store.dispatch("setUsaStockPhotosChangeQueue", event);
+
+      // event.forEach((x) => {
+      //   this.$store.dispatch("setUsaStockPhotosChangeQueue", x);
+      // });
     },
     uploadPhotos(event) {
       event.files.forEach((x) => {

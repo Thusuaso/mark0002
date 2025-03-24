@@ -684,7 +684,7 @@ const actions = {
         });
     },
     setUsaStockPhotosChangeQueue(vuexContext,image){
-        this.$axios.post('/panel/usa/stock/photos/change/queue')
+        this.$axios.post('/panel/usa/stock/photos/change/queue',image)
         .then(response=>{
             if(response.data.status){
                 this.$toast.success('Fotoğraf Sırası Başarıyla Değiştirildi.');    
