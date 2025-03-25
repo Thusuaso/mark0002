@@ -404,6 +404,8 @@
           @uploader="$emit('usa_stock_upload_photos', $event)"
           chooseLabel="Upload Photos"
           :multiple="true"
+          @select="$emit('usa_stock_select_photos',$event)"
+
         />
         <Button
           type="button"

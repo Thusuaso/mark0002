@@ -7926,24 +7926,21 @@ app.put('/panel/usa/stock/update',(req,res)=>{
     });
 
 });
-app.post('/panel/usa/stock/photo/upload',(req,res)=>{
-    const sql = `
-        INSERT INTO DepoUrunKart_MekmarFotolarTB(UrunId,Image,Webp,Sira)
-        VALUES(
-            '${req.body.UrunId}',
-            '${req.body.Image}',
-            '${req.body.Webp}',
-            '${req.body.Sira}'
-        )
-    `;
-    mssql.query(sql,(err,image)=>{
-        if(image.rowsAffected[0]==1){
-            res.status(200).json({'status':true});
-        } else{
-            res.status(200).json({'status':false});
-            
-        }
+app.post('/panel/usa/stock/photo/upload',async(req,res)=>{
+    await req.body.forEach(x=>{
+        const sql = `
+                INSERT INTO DepoUrunKart_MekmarFotolarTB(UrunId,Image,Webp,Sira)
+                VALUES(
+                    '${x.UrunId}',
+                    '${x.Image}',
+                    '${x.Webp}',
+                    '${x.Sira}'
+                )
+            `;
+    mssql.query(sql);
     });
+    res.status(200).json({'status':true});
+
 });
 
 app.get('/api/usa/photo/delete/:id',(req,res)=>{

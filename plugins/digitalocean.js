@@ -14,7 +14,7 @@ const oceanservice = {
             Key: "usa-products/" + filename,
             Body: file,
             ACL: "public-read",
-            ContentType: "image/" + filename.split(".")[1],
+            ContentType: "image/" + filename.split(".")[2],
             CacheControl: "public,max-age=1,s-max-age=500,must-revalidate",
         };
         return new Promise((resolve, reject) => {

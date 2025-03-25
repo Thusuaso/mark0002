@@ -11,6 +11,7 @@
         @panel_usa_process_emit="process($event)"
         @usa_stock_upload_photos="uploadPhotos($event)"
         @usa_stock_photos_change_queue="photosChangeQueue($event)"
+        @usa_stock_select_photos="selectedPhotos($event)"
       />
     </Dialog>
   </div>
@@ -31,12 +32,24 @@ export default {
     return {
       model: {},
       panel_usa_stock_dialog: false,
+      photoFiles:[]
     };
   },
   created() {
     this.$store.dispatch("setPanelUsaStockList");
   },
   methods: {
+    selectedPhotos(event){
+      let index = 1;
+      event.files.forEach(x=>{
+            index++;
+            this.photoFiles.push({...x,'UrunId':this.model.UrunId,'Image':x.name,'Webp':x.name,'Sira': index});
+      });
+      
+
+
+
+    },
     photosChangeQueue(event) {
       this.$store.dispatch("setUsaStockPhotosChangeQueue", event);
 
@@ -46,20 +59,11 @@ export default {
     },
     uploadPhotos(event) {
       event.files.forEach((x) => {
-        oceanservice.panelUsaProductUploadPhoto(x).then((res) => {
-          if (res) {
-            const data = {
-              UrunId: this.model.UrunId,
-              Image: x.name,
-              Webp: x.name,
-              Sira: this.getPanelUsaStockPhotosList.length + 1,
-            };
-            this.$store.dispatch("setPanelUsaStockPhotoUpload", data);
-          } else {
-            this.$toast.success("Fotoğraf Ekleme Hatası.");
-          }
-        });
+        oceanservice.panelUsaProductUploadPhoto(x);
       });
+      this.$store.dispatch("setPanelUsaStockPhotoUpload", this.photoFiles);
+      this.photoFiles = [];
+
     },
     update(event) {
       this.$store.dispatch("setPanelUsaStockUpdate", event);

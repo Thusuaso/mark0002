@@ -677,7 +677,7 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 this.$toast.success('Resim Başarıyla Yüklendi.');
-                vuexContext.dispatch('setpanelUsaStockPhotosList',image.UrunId);
+                vuexContext.dispatch('setpanelUsaStockPhotosList',image[0].UrunId);
             } else{
                 this.$toast.error('Resim Yükleme Başarısız.');
             }
