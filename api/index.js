@@ -7914,8 +7914,7 @@ app.put('/panel/usa/stock/update',(req,res)=>{
     where Id='${req.body.Id}'
 
     `;
-
-
+    mssql.query(updateDetail);
     mssql.query(updateStock,(err,stock)=>{
         if(stock.rowsAffected[0]==1){
             res.status(200).json({'status':true});

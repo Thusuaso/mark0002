@@ -417,6 +417,8 @@
           :value="photos"
           :reorderableColumns="true"
           @row-reorder="usaReOrder($event)"
+          sortField="Sira"
+          sortOrder="1"
         >
           <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
           <Column field="Id" header="Id"> </Column>
