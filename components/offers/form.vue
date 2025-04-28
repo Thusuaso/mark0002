@@ -2,7 +2,7 @@
   <div class="row" style="padding:0px 100px;">
     <div class="col-9">
       <div class="row">
-        <div class="col">
+        <div class="col mt-3">
           <div class="p-float-label mb-4">
             <Dropdown v-model="selectedSource" inputId="source" :options="sources" optionLabel="source" class="w-100"
               @change="sourceSelected($event)" />
@@ -18,6 +18,12 @@
               class="w-100" @change="prioritySelected($event)" />
             <label for="priority">Priority</label>
           </div>
+          <div class="p-float-label mb-4">
+            <Dropdown v-model="selectedShippedType" inputId="type" :options="shippedType" optionLabel="type"
+              class="w-100"  />
+            <label for="type">Type</label>
+          </div>
+          <Button class="p-button-secondary w-100" label="Proforma Excel" @click="proforma_excel_output"/>
         </div>
         <div class="col">
           <TabView>
@@ -189,7 +195,16 @@
         <div class="row mt-3">
           <div class="col">
             <DataTable :value="productsList" :selection.sync="selectedProductsList" selectionMode="single"
-              @row-click="productsListSelected($event)">
+              @row-click="productsListSelected($event)"
+              dataKey="Id"
+              >
+              <template #empty> No products found. </template>
+              <Column selectionMode="multiple" headerStyle="width: 3rem">
+                <template #body="slotProps">
+                  <Checkbox v-model="slotProps.data.selected" inputId="cb1" binary @change="productsCheckbox(slotProps.data)"/>
+                </template>
+              </Column>
+
               <Column field="Tarih" header="Date">
                 <template #body="slotProps">
                   {{ slotProps.data.Tarih | dateToString }}
@@ -292,9 +307,14 @@
 <script>
 import date from "../../plugins/date";
 import Cookies from "js-cookie";
+import api from '@/plugins/excel.server';
 
 import fileService from "~/plugins/upload.js";
+import {mapGetters} from 'vuex';
 export default {
+  computed: {
+    ...mapGetters([ "getLocalUrl"]),
+  },
   props: {
     model: {
       type: Object,
@@ -359,6 +379,15 @@ export default {
   },
   data() {
     return {
+      selectedCheckedProductList:[],
+      selectedShippedType:null,
+      shippedType:[
+        {'id':1,'type':'FOB'},
+        {'id':2,'type':'FCA'},
+        {'id':3,'type':'C'},
+        {'id':4,'type':'D'},
+      ],
+      selectedOrderProducts:[],
       width: null,
       height: null,
       offer_customer_disabled: false,
@@ -423,6 +452,48 @@ export default {
     }
   },
   methods: {
+    productsCheckbox(event){
+      if(event.selected){
+        this.selectedCheckedProductList.push(event);
+      }else{
+        const index = this.selectedCheckedProductList.findIndex(x => x.Id == event.Id);
+        if(index != -1){
+          this.selectedCheckedProductList.splice(index,1);
+        }
+      };
+    },
+    proforma_excel_output(){
+      if(this.selectedShippedType == null ){
+        this.$toast.error("Please select a shipped type.");
+      }else{
+        if(this.selectedCheckedProductList.length === 0 ){
+          this.$toast.error("Please select a product.");
+        }else{
+          const data = {
+            'data':this.selectedCheckedProductList,
+            'shipped':this.selectedShippedType,
+            'model':this.model,
+            'customer':this.customerModel
+          };
+          
+          api.post('/offer/proforma/output',data)
+          .then(res=>{
+            if (res.status) {
+                const link = document.createElement("a");
+                link.href = this.getLocalUrl + "offer/proforma/output";
+
+                link.setAttribute("download", "proforma_invoice.xlsx");
+                document.body.appendChild(link);
+                link.click();
+              }
+          });
+
+
+        }
+
+      }
+
+    },
     inputSurface(event) {
       this.modelProduct.IslemAdi = event;
     },
@@ -656,6 +727,7 @@ export default {
       this.selectedProductsList = null;
     },
     productsListSelected(event) {
+      this.selectedProductsList = null;
       this.offerProductDate = date.stringToDate(event.data.Tarih);
       this.selectedCategory = this.category.find((x) => x.Id == event.data.KategoriId);
       this.selectedProduct = this.product.find((x) => x.Id == event.data.UrunId);

@@ -680,7 +680,7 @@ export default {
       this.width = event.data.En;
       this.height = event.data.Boy;
       this.thickness = event.data.Kenar;
-
+      this.amount_disabled = false;
       const data = {
         SiparisNo: event.data.SiparisNo,
         FirmaAdi: event.data.FirmaAdi,

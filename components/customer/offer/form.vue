@@ -73,6 +73,13 @@
         />
       </div>
     </div>
+    <hr/>
+    <h3 class="text-center m-auto">Offer ID</h3>
+    <div class="row">
+      <div class="col-1" v-for="offer in offerData">{{ offer.Sira }}</div>
+    </div>
+    <hr/>
+
   </div>
 </template>
 <script>
@@ -92,6 +99,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    offerData:{
+      type:Array,
+      required:true
+    }
   },
   data() {
     return {

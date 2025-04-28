@@ -732,7 +732,10 @@ export default {
 
     },
     productsSelected(event) {
-      this.selectedSupplier = this.suppliers.find((x) => x.ID == event.value.TedarikciID);
+      if(!this.buttonStatus){
+        if(this.model.UrunKartId != event.value.UrunKartId){
+          if(confirm('Ürün kartı değiştirilecek. Devam etmek istiyor musunuz?')){
+            this.selectedSupplier = this.suppliers.find((x) => x.ID == event.value.TedarikciID);
       this.selectedAmountStatus = this.amountStatus.find(
         (x) => x.id == event.value.UrunBirimID
       ).status;
@@ -753,6 +756,37 @@ export default {
           this.$store.dispatch("setSelectionProductionCrateNoOut");
         }
       }
+          } else{
+            this.$emit("selection_production_dialog_form", false);
+
+          }
+        }
+      } else{
+        this.selectedSupplier = this.suppliers.find((x) => x.ID == event.value.TedarikciID);
+      this.selectedAmountStatus = this.amountStatus.find(
+        (x) => x.id == event.value.UrunBirimID
+      ).status;
+      this.orderProductCardDesc = event.value.Aciklama;
+      this.productCardId = event.value.UrunKartId;
+      this.categoryName = event.value.KategoriAdi;
+      this.productName = event.value.UrunAdi;
+      this.surfaceName = event.value.YuzeyIslemAdi;
+      this.sizeName = event.value.En + "x" + event.value.Boy + "x" + event.value.Kenar;
+      this.width = event.value.En;
+      this.height = event.value.Boy;
+      if (event.value.TedarikciID == 1 || event.value.TedarikciID == 123) {
+        if (this.buttonStatus) {
+          this.$store.dispatch("setSelectionProductionCrateNoIn");
+        }
+      } else {
+        if (this.buttonStatus) {
+          this.$store.dispatch("setSelectionProductionCrateNoOut");
+        }
+      }
+      }
+
+
+      
     },
     poSelected(event) {
       this.$store.dispatch("setSelectionProductionProductsList", event.value.SiparisNo);

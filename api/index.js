@@ -2538,6 +2538,7 @@ app.get('/customer/offer/list',(req,res)=>{
             x.Adress = __noneNullControl(x.Adress);
 
 
+
         });
 
         res.status(200).json({
@@ -6049,6 +6050,17 @@ where ytuk.TeklifId='${req.params.id}'
     mssql.query(sql,(err,results)=>{
         res.status(200).json({ 'list': results.recordset }); 
     });
+});
+
+app.get('/offer/customer/data/:id',(req,res)=>{
+    
+    const sql = `
+        select Sira from YeniTeklifTB where MusteriId='${req.params.id}'
+    `;
+    mssql.query(sql,(err,results)=>{
+        res.status(200).json({'list':results.recordset});
+    });
+    
 });
 
 function __offerCategoryId(payload){
@@ -14594,14 +14606,16 @@ order by YEAR(s.SiparisTarihi) desc`;
 });
 app.get('/customer/offer/list/all', (req, res) => {
     const sql = `
-                    select 
+ select 
 
 	ytm.Id,
 	ytm.UlkeId,
 	ytm.MusteriAdi,
-	ytm.Adress
+	ytm.Adress,
+	yu.UlkeAdi
 
 from YeniTeklif_MusterilerTB ytm
+inner join YeniTeklif_UlkeTB yu on yu.Id = ytm.UlkeId
     `;
     mssql.query(sql, (err, results) => {
         res.status(200).json({ 'list': results.recordset }); 

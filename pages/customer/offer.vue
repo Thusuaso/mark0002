@@ -12,6 +12,7 @@
         :country="getCountryList"
         :button="getOfferCustomerButtonStatus"
         @offer_customer_dialog_close="offer_form_dialog = false"
+        :offerData="customer_offer_data"
       />
     </Dialog>
   </div>
@@ -32,6 +33,7 @@ export default {
     return {
       offer_form_dialog: false,
       model: null,
+      customer_offer_data:[],
     };
   },
   created() {
@@ -47,6 +49,11 @@ export default {
     offerCustomerSelected(offer) {
       this.offer_form_dialog = true;
       this.model = offer.data;
+      const id = offer.data.Id;
+      this.$axios.get('/offer/customer/data/'+id)
+      .then(res=>{
+        this.customer_offer_data = res.data.list;
+      });
       this.$store.dispatch("setOfferCustomerButtonStatus", false);
     },
   },

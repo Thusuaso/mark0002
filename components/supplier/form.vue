@@ -48,20 +48,20 @@ export default {
       this.model.FirmaAdi = this.supplier;
       this.$store.dispatch("setSupplierSave", this.model);
       this.$emit("supplier_dialog_close_emit");
-      // this.$socket.socketIO.emit('supplier_list_emit');
+      this.$socket.socketIO.emit('supplier_list_emit');
       
     },
     update() {
       this.model.FirmaAdi = this.supplier;
       this.$store.dispatch("setSupplierUpdate", this.model);
       this.$emit("supplier_dialog_close_emit");
-      // this.$socket.socketIO.emit('supplier_list_emit');
+      this.$socket.socketIO.emit('supplier_list_emit');
 
     },
     deleteForm() {
       this.$store.dispatch("setSupplierDelete", this.model.ID);
       this.$emit("supplier_dialog_close_emit");
-      // this.$socket.socketIO.emit('supplier_list_emit');
+      this.$socket.socketIO.emit('supplier_list_emit');
 
     },
   },
