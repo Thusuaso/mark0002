@@ -38,6 +38,10 @@ export default {
   },
   created() {
     this.$store.dispatch("setOfferCustomerList");
+    this.$store.dispatch("setOfferMainList");
+    this.$store.dispatch("setOfferSharedList");
+    this.$store.dispatch("setOfferCustomerList");
+    this.$store.dispatch("setCountryList");
   },
   methods: {
     newForm() {

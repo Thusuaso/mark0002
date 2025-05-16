@@ -6046,7 +6046,10 @@ inner join YeniTeklif_YuzeyIslemTB yty on yty.Id = ytuk.YuzeyIslemId
 inner join YeniTeklif_Olcu_KalinlikTB ytok on ytok.id = ytuk.KalinlikId
 
 where ytuk.TeklifId='${req.params.id}'
+
     `;
+    console.log("TeklifId",sql);
+
     mssql.query(sql,(err,results)=>{
         res.status(200).json({ 'list': results.recordset }); 
     });
@@ -6055,12 +6058,75 @@ where ytuk.TeklifId='${req.params.id}'
 app.get('/offer/customer/data/:id',(req,res)=>{
     
     const sql = `
-        select Sira from YeniTeklifTB where MusteriId='${req.params.id}'
+        select Sira,Id from YeniTeklifTB where MusteriId='${req.params.id}'
     `;
     mssql.query(sql,(err,results)=>{
         res.status(200).json({'list':results.recordset});
     });
     
+});
+
+app.get('/offer/customer/get/offer/:id',(req,res)=>{
+    const sql = `
+                 select 
+
+
+	yt.Id,
+	yt.Tarih,
+	yt.HatirlatmaTarihi,
+	yt.HatirlatmaSonTarih,
+	yt.MusteriId,
+	yt.Aciklama,
+	yt.Cfr,
+	yt.Fob,
+	yt.Dtp,
+	yt.Fca,
+	yt.KullaniciId,
+	yt.TakipEt,
+	yt.KaynakYeri,
+	yt.TeklifYeri,
+	yt.HatirlatmaAciklama,
+	yt.HatirlatmaId,
+	yt.DosyaAdi,
+	yt.Numune_Giris_Tarihi,
+	yt.Numune_Hatirlatma_Tarihi,
+	yt.Numune_Hatirlatma_SonTarih,
+	yt.Numune_Tracking_No,
+	yt.Numune_Odenen_Tutar,
+	yt.Numune_Musteriden_Alinan,
+	yt.Proforma_Po_No,
+	yt.Proforma_Tarih,
+	yt.Proforma_Tutar,
+	yt.ProformaNot,
+	yt.Teklif_Cloud,
+	yt.Teklif_Cloud_Dosya,
+	yt.Proforma_Cloud,
+	yt.Proforma_Cloud_Dosya,
+	yt.Numune_Cloud,
+	yt.Numune_Cloud_Dosya,
+	yt.NumuneNot,
+	yt.TeklifOncelik,
+	yt.Sira,
+	yt.BList,
+	yt.SonGorulme_Cloud,
+	yt.SonGorulme_Cloud_Dosya,
+	yt.HatirlatilmaDurumu,
+	yt.Company,
+	yt.Email,
+	yt.Phone,
+	k.KullaniciAdi,
+    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
+	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi
+    
+
+from YeniTeklifTB yt
+inner join KullaniciTB k on k.ID = yt.KullaniciId
+
+where yt.Id='${req.params.id}'
+    `;
+    mssql.query(sql,(err,results)=>{
+        res.status(200).json({'list':results.recordset});
+    })
 });
 
 function __offerCategoryId(payload){

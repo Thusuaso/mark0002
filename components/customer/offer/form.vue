@@ -76,16 +76,49 @@
     <hr/>
     <h3 class="text-center m-auto">Offer ID</h3>
     <div class="row">
-      <div class="col-1" v-for="offer in offerData">{{ offer.Sira }}</div>
+      <div class="col-1" v-for="offer in offerData">
+        <Button :label="offer.Sira" class="p-button-primary" @click="open_offer(offer)"/>
+      </div>
     </div>
     <hr/>
-
+    <Dialog :visible.sync="offer_list_detail_form" :header="offer_id" modal :closeOnEscape="false">
+      <offerForm :model="offerModel" :category="getOfferCategoryList" :product="getOfferProductList" :size="getOfferSizeList"
+        :thickness="getOfferThicknessList" :surface="getOfferSurfaceList" :unit="getOfferUnitList"
+        :productsList="getOfferDetailProductsList" :modelProduct="getOfferProductModel" :status="getOfferButtonStatus"
+        :customer="getOfferCustomerList" :country="getCountryList" :customerModel="getOfferCustomerModel"
+        @offer_process_emit="offerProcess($event)" :id="getOfferId" @offer_delete_emit="offerDelete($event)"
+        :disabled_button_status="disabled_offer_button_status" />
+    </Dialog>
   </div>
+
 </template>
 <script>
 import Cookies from "js-cookie";
+import {mapGetters} from 'vuex';
 export default {
-  computed: {},
+  computed: {
+    ...mapGetters([
+    "getOfferCountryList",
+      "getOfferDetailList",
+      "getOfferCategoryList",
+      "getOfferProductList",
+      "getOfferSizeList",
+      "getOfferThicknessList",
+      "getOfferSurfaceList",
+      "getOfferUnitList",
+      "getOfferDetailProductsList",
+      "getOfferProductModel",
+      "getOfferButtonStatus",
+      "getOfferCustomerList",
+      "getCountryList",
+      "getOfferCustomerModel",
+      "getOfferModel",
+      "getOfferId",
+      "getOfferAllButtonStatus",
+
+    ])
+
+  },
   props: {
     model: {
       type: Object,
@@ -108,12 +141,40 @@ export default {
     return {
       selectedCountry: null,
       filteredCountry: null,
+      offer_list_detail_form: false,
+      offer_id:null,
+      offerModel:{},
+      disabled_offer_button_status:false,
+
+
     };
   },
   created() {
     this.selectedCountry = this.country.find((x) => x.Id == this.model.UlkeId);
   },
   methods: {
+    offerDelete(event){
+      alert("Bu bölümde çalışmaz");
+    },
+    offerProcess(event){
+      alert("Bu bölümde çalışmaz");
+
+    },    
+    open_offer(event){
+      this.$axios.get(`/offer/customer/get/offer/${event.Id}`)
+      .then(res=>{
+        this.offerModel = res.data.list[0];
+        this.$store.dispatch("setOfferButtonStatus", false);
+        this.$store.dispatch("setOfferId", event.Id);
+        this.$store.dispatch("setOfferDetailProductsList", event.Id);
+        this.offer_id = event.Sira;
+        this.offer_list_detail_form = true;
+
+      });
+
+
+
+    },
     deleteForm() {
       this.$store.dispatch("setOfferCustomerDelete", this.model.Id);
       this.$emit("offer_customer_dialog_close");

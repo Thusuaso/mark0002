@@ -3,434 +3,372 @@
     "name": "auth",
     "path": "/auth",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\auth\\\\index.vue",
-    "chunkName": "pages/auth/index",
-    "_name": "_2e17fb5a"
+    "chunkName": "pages/auth/index"
   },
   {
     "name": "finance",
     "path": "/finance",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\finance\\\\index.vue",
-    "chunkName": "pages/finance/index",
-    "_name": "_5fff99c2"
+    "chunkName": "pages/finance/index"
   },
   {
     "name": "offers",
     "path": "/offers",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\offers\\\\index.vue",
-    "chunkName": "pages/offers/index",
-    "_name": "_59adf2c4"
+    "chunkName": "pages/offers/index"
   },
   {
     "name": "passwords",
     "path": "/passwords",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\passwords\\\\index.vue",
-    "chunkName": "pages/passwords/index",
-    "_name": "_80cda97e"
+    "chunkName": "pages/passwords/index"
   },
   {
     "name": "customer-bgp",
     "path": "/customer/bgp",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\customer\\\\bgp.vue",
-    "chunkName": "pages/customer/bgp",
-    "_name": "_cc28fbd4"
+    "chunkName": "pages/customer/bgp"
   },
   {
     "name": "customer-fair",
     "path": "/customer/fair",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\customer\\\\fair.vue",
-    "chunkName": "pages/customer/fair",
-    "_name": "_0560a42e"
+    "chunkName": "pages/customer/fair"
   },
   {
     "name": "customer-mekmar",
     "path": "/customer/mekmar",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\customer\\\\mekmar.vue",
-    "chunkName": "pages/customer/mekmar",
-    "_name": "_0521aeb0"
+    "chunkName": "pages/customer/mekmar"
   },
   {
     "name": "customer-offer",
     "path": "/customer/offer",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\customer\\\\offer.vue",
-    "chunkName": "pages/customer/offer",
-    "_name": "_392fae67"
+    "chunkName": "pages/customer/offer"
   },
   {
     "name": "customer-selection",
     "path": "/customer/selection",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\customer\\\\selection.vue",
-    "chunkName": "pages/customer/selection",
-    "_name": "_5d7c07d2"
+    "chunkName": "pages/customer/selection"
   },
   {
     "name": "operation-cards",
     "path": "/operation/cards",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\cards.vue",
-    "chunkName": "pages/operation/cards",
-    "_name": "_7dfdd9c3"
+    "chunkName": "pages/operation/cards"
   },
   {
     "name": "operation-container",
     "path": "/operation/container",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\container.vue",
-    "chunkName": "pages/operation/container",
-    "_name": "_53449be1"
+    "chunkName": "pages/operation/container"
   },
   {
     "name": "operation-containerlist",
     "path": "/operation/containerlist",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\containerlist.vue",
-    "chunkName": "pages/operation/containerlist",
-    "_name": "_1c3a00ff"
+    "chunkName": "pages/operation/containerlist"
   },
   {
     "name": "operation-follow",
     "path": "/operation/follow",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\follow.vue",
-    "chunkName": "pages/operation/follow",
-    "_name": "_6f532d81"
+    "chunkName": "pages/operation/follow"
   },
   {
     "name": "operation-shipment",
     "path": "/operation/shipment",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\shipment.vue",
-    "chunkName": "pages/operation/shipment",
-    "_name": "_db818e2c"
+    "chunkName": "pages/operation/shipment"
   },
   {
     "name": "operation-supplier",
     "path": "/operation/supplier",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\supplier.vue",
-    "chunkName": "pages/operation/supplier",
-    "_name": "_2c1e581c"
+    "chunkName": "pages/operation/supplier"
   },
   {
     "name": "operation-transport",
     "path": "/operation/transport",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\transport.vue",
-    "chunkName": "pages/operation/transport",
-    "_name": "_f23e9aee"
+    "chunkName": "pages/operation/transport"
   },
   {
     "name": "operation-transportlist",
     "path": "/operation/transportlist",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\transportlist.vue",
-    "chunkName": "pages/operation/transportlist",
-    "_name": "_611a83a7"
+    "chunkName": "pages/operation/transportlist"
   },
   {
     "name": "operation-unfollow",
     "path": "/operation/unfollow",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\unfollow.vue",
-    "chunkName": "pages/operation/unfollow",
-    "_name": "_8bb0fa4c"
+    "chunkName": "pages/operation/unfollow"
   },
   {
     "name": "operation-uploadform",
     "path": "/operation/uploadform",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\operation\\\\uploadform.vue",
-    "chunkName": "pages/operation/uploadform",
-    "_name": "_44f5c3d6"
+    "chunkName": "pages/operation/uploadform"
   },
   {
     "name": "orders-production",
     "path": "/orders/production",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\orders\\\\production.vue",
-    "chunkName": "pages/orders/production",
-    "_name": "_033067f6"
+    "chunkName": "pages/orders/production"
   },
   {
     "name": "orders-shipped",
     "path": "/orders/shipped",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\orders\\\\shipped.vue",
-    "chunkName": "pages/orders/shipped",
-    "_name": "_6443adb7"
+    "chunkName": "pages/orders/shipped"
   },
   {
     "name": "orders-waiting",
     "path": "/orders/waiting",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\orders\\\\waiting.vue",
-    "chunkName": "pages/orders/waiting",
-    "_name": "_469359b1"
+    "chunkName": "pages/orders/waiting"
   },
   {
     "name": "panel-project",
     "path": "/panel/project",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\panel\\\\project\\\\index.vue",
-    "chunkName": "pages/panel/project/index",
-    "_name": "_6ee5de86"
+    "chunkName": "pages/panel/project/index"
   },
   {
     "name": "panel-usa",
     "path": "/panel/usa",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\panel\\\\usa\\\\index.vue",
-    "chunkName": "pages/panel/usa/index",
-    "_name": "_17d0105c"
+    "chunkName": "pages/panel/usa/index"
   },
   {
     "name": "panel-users",
     "path": "/panel/users",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\panel\\\\users\\\\index.vue",
-    "chunkName": "pages/panel/users/index",
-    "_name": "_2710d177"
+    "chunkName": "pages/panel/users/index"
   },
   {
     "name": "sales-bgp",
     "path": "/sales/bgp",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sales\\\\bgp.vue",
-    "chunkName": "pages/sales/bgp",
-    "_name": "_26c582a6"
+    "chunkName": "pages/sales/bgp"
   },
   {
     "name": "sales-consider",
     "path": "/sales/consider",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sales\\\\consider.vue",
-    "chunkName": "pages/sales/consider",
-    "_name": "_36fa6cee"
+    "chunkName": "pages/sales/consider"
   },
   {
     "name": "sales-follow",
     "path": "/sales/follow",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sales\\\\follow.vue",
-    "chunkName": "pages/sales/follow",
-    "_name": "_7a18a226"
+    "chunkName": "pages/sales/follow"
   },
   {
     "name": "sales-important-links",
     "path": "/sales/important-links",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sales\\\\important-links.vue",
-    "chunkName": "pages/sales/important-links",
-    "_name": "_2e56ea29"
+    "chunkName": "pages/sales/important-links"
   },
   {
     "name": "sales-maintodo",
     "path": "/sales/maintodo",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sales\\\\maintodo.vue",
-    "chunkName": "pages/sales/maintodo",
-    "_name": "_6f5615b4"
+    "chunkName": "pages/sales/maintodo"
   },
   {
     "name": "sales-representative",
     "path": "/sales/representative",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sales\\\\representative.vue",
-    "chunkName": "pages/sales/representative",
-    "_name": "_b4e985dc"
+    "chunkName": "pages/sales/representative"
   },
   {
     "name": "sales-todo",
     "path": "/sales/todo",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sales\\\\todo.vue",
-    "chunkName": "pages/sales/todo",
-    "_name": "_d42a210a"
+    "chunkName": "pages/sales/todo"
   },
   {
     "name": "sample-finance",
     "path": "/sample/finance",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sample\\\\finance.vue",
-    "chunkName": "pages/sample/finance",
-    "_name": "_65ddda19"
+    "chunkName": "pages/sample/finance"
   },
   {
     "name": "sample-sample",
     "path": "/sample/sample",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\sample\\\\sample.vue",
-    "chunkName": "pages/sample/sample",
-    "_name": "_2a97848a"
+    "chunkName": "pages/sample/sample"
   },
   {
     "name": "selection-input",
     "path": "/selection/input",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\selection\\\\input.vue",
-    "chunkName": "pages/selection/input",
-    "_name": "_77fced36"
+    "chunkName": "pages/selection/input"
   },
   {
     "name": "selection-size",
     "path": "/selection/size",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\selection\\\\size.vue",
-    "chunkName": "pages/selection/size",
-    "_name": "_778629b6"
+    "chunkName": "pages/selection/size"
   },
   {
     "name": "mekmer-products-production",
     "path": "/mekmer/products/production",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\mekmer\\\\products\\\\production.vue",
-    "chunkName": "pages/mekmer/products/production",
-    "_name": "_b5adecaa"
+    "chunkName": "pages/mekmer/products/production"
   },
   {
     "name": "mekmer-products-shipped",
     "path": "/mekmer/products/shipped",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\mekmer\\\\products\\\\shipped.vue",
-    "chunkName": "pages/mekmer/products/shipped",
-    "_name": "_49347c5e"
+    "chunkName": "pages/mekmer/products/shipped"
   },
   {
     "name": "panel-products-notpublished",
     "path": "/panel/products/notpublished",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\panel\\\\products\\\\notpublished.vue",
-    "chunkName": "pages/panel/products/notpublished",
-    "_name": "_73b2f4cc"
+    "chunkName": "pages/panel/products/notpublished"
   },
   {
     "name": "panel-products-published",
     "path": "/panel/products/published",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\panel\\\\products\\\\published.vue",
-    "chunkName": "pages/panel/products/published",
-    "_name": "_fda6c626"
+    "chunkName": "pages/panel/products/published"
   },
   {
     "name": "panel-products-queue",
     "path": "/panel/products/queue",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\panel\\\\products\\\\queue.vue",
-    "chunkName": "pages/panel/products/queue",
-    "_name": "_a834d3e0"
+    "chunkName": "pages/panel/products/queue"
   },
   {
     "name": "reports-mekmar-ayo",
     "path": "/reports/mekmar/ayo",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\ayo.vue",
-    "chunkName": "pages/reports/mekmar/ayo",
-    "_name": "_0b141e34"
+    "chunkName": "pages/reports/mekmar/ayo"
   },
   {
     "name": "reports-mekmar-continent-order",
     "path": "/reports/mekmar/continent-order",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\continent-order.vue",
-    "chunkName": "pages/reports/mekmar/continent-order",
-    "_name": "_07911672"
+    "chunkName": "pages/reports/mekmar/continent-order"
   },
   {
     "name": "reports-mekmar-country-order",
     "path": "/reports/mekmar/country-order",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\country-order.vue",
-    "chunkName": "pages/reports/mekmar/country-order",
-    "_name": "_38f6a314"
+    "chunkName": "pages/reports/mekmar/country-order"
   },
   {
     "name": "reports-mekmar-filter-finance",
     "path": "/reports/mekmar/filter-finance",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\filter-finance.vue",
-    "chunkName": "pages/reports/mekmar/filter-finance",
-    "_name": "_bc78ccd0"
+    "chunkName": "pages/reports/mekmar/filter-finance"
   },
   {
     "name": "reports-mekmar-forwarding",
     "path": "/reports/mekmar/forwarding",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\forwarding.vue",
-    "chunkName": "pages/reports/mekmar/forwarding",
-    "_name": "_7d1e9f90"
+    "chunkName": "pages/reports/mekmar/forwarding"
   },
   {
     "name": "reports-mekmar-gu",
     "path": "/reports/mekmar/gu",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\gu.vue",
-    "chunkName": "pages/reports/mekmar/gu",
-    "_name": "_0201a401"
+    "chunkName": "pages/reports/mekmar/gu"
   },
   {
     "name": "reports-mekmar-loading",
     "path": "/reports/mekmar/loading",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\loading.vue",
-    "chunkName": "pages/reports/mekmar/loading",
-    "_name": "_100f018e"
+    "chunkName": "pages/reports/mekmar/loading"
   },
   {
     "name": "reports-mekmar-mk",
     "path": "/reports/mekmar/mk",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\mk.vue",
-    "chunkName": "pages/reports/mekmar/mk",
-    "_name": "_0bb1ccb1"
+    "chunkName": "pages/reports/mekmar/mk"
   },
   {
     "name": "reports-mekmar-summary",
     "path": "/reports/mekmar/summary",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\summary.vue",
-    "chunkName": "pages/reports/mekmar/summary",
-    "_name": "_829dfeba"
+    "chunkName": "pages/reports/mekmar/summary"
   },
   {
     "name": "reports-mekmar-supplier-cost",
     "path": "/reports/mekmar/supplier-cost",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmar\\\\supplier-cost.vue",
-    "chunkName": "pages/reports/mekmar/supplier-cost",
-    "_name": "_1a170c6b"
+    "chunkName": "pages/reports/mekmar/supplier-cost"
   },
   {
     "name": "reports-mekmer-atlanta",
     "path": "/reports/mekmer/atlanta",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\atlanta.vue",
-    "chunkName": "pages/reports/mekmer/atlanta",
-    "_name": "_0e92c618"
+    "chunkName": "pages/reports/mekmer/atlanta"
   },
   {
     "name": "reports-mekmer-by-buying-production",
     "path": "/reports/mekmer/by-buying-production",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\by-buying-production.vue",
-    "chunkName": "pages/reports/mekmer/by-buying-production",
-    "_name": "_47c42c63"
+    "chunkName": "pages/reports/mekmer/by-buying-production"
   },
   {
     "name": "reports-mekmer-finance",
     "path": "/reports/mekmer/finance",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\finance.vue",
-    "chunkName": "pages/reports/mekmer/finance",
-    "_name": "_6dc517db"
+    "chunkName": "pages/reports/mekmer/finance"
   },
   {
     "name": "reports-mekmer-mine",
     "path": "/reports/mekmer/mine",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\mine.vue",
-    "chunkName": "pages/reports/mekmer/mine",
-    "_name": "_079223a2"
+    "chunkName": "pages/reports/mekmer/mine"
   },
   {
     "name": "reports-mekmer-onhold",
     "path": "/reports/mekmer/onhold",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\onhold.vue",
-    "chunkName": "pages/reports/mekmer/onhold",
-    "_name": "_43e6eb2d"
+    "chunkName": "pages/reports/mekmer/onhold"
   },
   {
     "name": "reports-mekmer-production",
     "path": "/reports/mekmer/production",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\production.vue",
-    "chunkName": "pages/reports/mekmer/production",
-    "_name": "_2120f070"
+    "chunkName": "pages/reports/mekmer/production"
   },
   {
     "name": "reports-mekmer-productions",
     "path": "/reports/mekmer/productions",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\productions.vue",
-    "chunkName": "pages/reports/mekmer/productions",
-    "_name": "_022d125b"
+    "chunkName": "pages/reports/mekmer/productions"
   },
   {
     "name": "reports-mekmer-shipped",
     "path": "/reports/mekmer/shipped",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\shipped.vue",
-    "chunkName": "pages/reports/mekmer/shipped",
-    "_name": "_b1c77e58"
+    "chunkName": "pages/reports/mekmer/shipped"
   },
   {
     "name": "reports-mekmer-stock",
     "path": "/reports/mekmer/stock",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\stock.vue",
-    "chunkName": "pages/reports/mekmer/stock",
-    "_name": "_0fb14757"
+    "chunkName": "pages/reports/mekmer/stock"
   },
   {
     "name": "reports-mekmer-strips",
     "path": "/reports/mekmer/strips",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\reports\\\\mekmer\\\\strips.vue",
-    "chunkName": "pages/reports/mekmer/strips",
-    "_name": "_67b469ea"
+    "chunkName": "pages/reports/mekmer/strips"
   },
   {
     "name": "index",
     "path": "/",
     "component": "D:\\\\Projects\\\\mark0002\\\\pages\\\\index.vue",
-    "chunkName": "pages/index",
-    "_name": "_3113b53b"
+    "chunkName": "pages/index"
   }
 ]

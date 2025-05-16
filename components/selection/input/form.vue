@@ -398,7 +398,10 @@ export default {
         this.width == "SLAB" ||
         this.width == "Slab" ||
         this.width == "Mini" ||
-        this.width == "MINI"
+        this.width == "MINI" ||
+        this.width == "Other" ||
+
+        this.width == "OTHER"
       ) {
         return 0;
       } else {
