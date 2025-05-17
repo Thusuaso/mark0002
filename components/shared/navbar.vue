@@ -257,9 +257,9 @@
               W. PANEL
             </a>
             <ul class="dropdown-menu">
-              <!-- <li>
+              <li>
                 <nuxt-link to="/panel/products/published" class="dropdown-item" tag="a">Products (Published)</nuxt-link>
-              </li> -->
+              </li>
               <li>
                 <nuxt-link to="/panel/products/notpublished" class="dropdown-item" tag="a">Products
                   (Unpublished)</nuxt-link>
