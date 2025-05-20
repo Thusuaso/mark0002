@@ -35,7 +35,7 @@ export default {
   plugins: [
     '~/plugins/components.js',
     { src: '~/plugins/excel.js', mode: 'client' },
-    // '~/plugins/socket.io.js',
+    '~/plugins/socket.io.js',
     '~/plugins/logs.js',
     '~/plugins/cookies'
   ],

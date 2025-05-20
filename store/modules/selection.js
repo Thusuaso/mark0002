@@ -94,7 +94,7 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.dispatch('setSelectionProductionUpdateList');
-                // this.$socket.socketIO.emit('production_update_emit');
+                this.$socket.socketIO.emit('production_update_emit');
                 this.$toast.success('Başarıyla Kaydedildi.')
                 
             }
@@ -117,7 +117,7 @@ const actions = {
         .then(response=>{
            if(response.data.status){
                  vuexContext.dispatch('setSelectionProductionUpdateList');
-                //  this.$socket.socketIO.emit('production_update_emit');
+                 this.$socket.socketIO.emit('production_update_emit');
 
                  this.$toast.success('Başarıyla Silindi.');
             } else{
@@ -145,7 +145,7 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.dispatch('setSelectionProductionUpdateList');
-                // this.$socket.socketIO.emit('production_update_emit');
+                this.$socket.socketIO.emit('production_update_emit');
 
                 this.$toast.success('Başarıyla Güncellendi.');
             }else{
