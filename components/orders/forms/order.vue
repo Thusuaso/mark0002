@@ -79,6 +79,12 @@
             <CustomInput :value="model.Ton" text="Ton" @onInput="model.Ton = $event"
               :disabled="product_form_disabled" />
           </div>
+          <div class="col">
+                <span class="p-float-label">
+                  <InputText class="w-100" id="crate_size" v-model="model.KasaOlcusu" :disabled="product_form_disabled" />
+                  <label for="crate_size">C.Size</label>
+                </span>
+          </div>
         </div>
         <div class="row mb-4">
           <div class="col">
@@ -596,6 +602,7 @@ export default {
       this.model.Adet = this.__nullControl(this.model.Adet);
 
       this.$store.dispatch("setOrderProductAdded", this.model);
+
     },
     update() {
       const log = {
@@ -630,6 +637,7 @@ export default {
       this.workerman_button_disabled = true;
       this.model.Adet = this.__nullControl(this.model.Adet);
       this.$store.dispatch("setOrderProductUpdated", this.model);
+
     },
     cancelForm() {
       this.new_button_disabled = false;

@@ -420,7 +420,8 @@ const state = {
         SiraNo: 0,
         Ton: 0,
         musteriID: 0,
-        Adet:0
+        Adet:0,
+        KasaOlcusu:''
     },
     orderProductWorkermanModel: {
         ID: 0,

@@ -137,6 +137,7 @@
             <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" />
           </template>
         </Column>
+        <Column field="KasaOlcusu" header="C.Size"></Column>
       </DataTable>
     </div>
   </div>

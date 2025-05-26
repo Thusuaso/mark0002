@@ -344,6 +344,7 @@ const actions = {
                 if (response.data.status) {
                     this.$toast.success('Başarıyla Eklendi.');
                     vuexContext.commit('setOrderProductAdded', { ...payload, 'ID': response.data.id });
+                    vuexContext.dispatch("setOrderProductionCheckList", payload.SiparisNo);
                     vuexContext.dispatch("setOrderProductionSupplierList",payload.SiparisNo);
                     vuexContext.dispatch('setOrderProductModel');
                     
@@ -359,6 +360,8 @@ const actions = {
                     this.$toast.success('Başarıyla Güncellendi.');
                     vuexContext.commit('setOrderProductUpdated', payload);
                     vuexContext.dispatch('setOrderProductModel');
+                    vuexContext.dispatch("setOrderProductionCheckList", payload.SiparisNo);
+
                     vuexContext.dispatch("setOrderProductionSupplierList",payload.SiparisNo);
                 } else {
                     this.$toast.error('Güncelleme Başarısız.');

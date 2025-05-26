@@ -175,6 +175,8 @@ export default {
       event.keywords_es2 = this.__stringCharacterChange(event.keywords_es);
       event.urunadi_fr2 = this.__stringCharacterChange(event.urunadi_fr);
       this.$store.dispatch("setPanelProductsUpdate", {...event,'Id':this.getProductId});
+      
+
     },
     process(event) {
       if (this.getPanelProductId == 0) {

@@ -12,7 +12,7 @@ const sql = {
     server:'94.73.151.2',
     options: {
         encrypt: false, // for azure
-        trustServerCertificate: false // change to true for local dev / self-signed certs
+        trustServerCertificate: true // change to true for local dev / self-signed certs
       }
 };
 mssql.connect(sql);
@@ -9332,6 +9332,7 @@ s.SiparisKontrolEden,
 	su.SiraNo,
 	su.Ton,
 	su.Adet,
+    su.KasaOlcusu,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
     dbo.Order_Total_Production_2(su.UrunKartID,su.SiparisNo,su.TedarikciID) as Uretim,
@@ -10329,6 +10330,7 @@ s.SiparisKontrolEden,
         su.SiraNo,
         su.Ton,
         su.Adet,
+        su.KasaOlcusu,
         ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
         dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum
     
@@ -11005,6 +11007,7 @@ s.KonteynerNo,
     su.SiraNo,
     su.Ton,
     su.Adet,
+    su.KasaOlcusu,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum
 
@@ -11570,6 +11573,7 @@ s.SiparisKontrolEden,
 	su.SiraNo,
 	su.Ton,
 	su.Adet,
+    su.KasaOlcusu,
     ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
     dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
     dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
@@ -11632,7 +11636,8 @@ app.get('/order/production/product/detail/list/:po', async (req, res) => {
 	su.musteriID,
 	su.Adet,
     su.UrunBirimID,
-    dbo.Product_Workerman_Cost(su.SiparisNo,su.UrunKartID) as Iscilik
+    dbo.Product_Workerman_Cost(su.SiparisNo,su.UrunKartID) as Iscilik,
+    su.KasaOlcusu
 
 
 from SiparisUrunTB su
@@ -11780,7 +11785,8 @@ app.post('/order/production/product/add', (req, res) => {
 	AlisFiyati,
 	SiraNo,
 	Ton,
-	Adet
+	Adet,
+    KasaOlcusu
 ) VALUES(
 	'${req.body.SiparisNo}',
 	'${__floatNullControl(req.body.TedarikciID)}',
@@ -11795,7 +11801,8 @@ app.post('/order/production/product/add', (req, res) => {
 	'${__floatNullControl(buyingPrice)}',
 	'${__floatNullControl(req.body.SiraNo)}',
 	'${__floatNullControl(req.body.Ton)}',
-	'${__floatNullControl(req.body.Adet)}'
+	'${__floatNullControl(req.body.Adet)}',
+    '${req.body.KasaOlcusu}'
 
 )
     `;
@@ -11864,7 +11871,8 @@ app.put('/order/production/product/update', (req, res) => {
         AlisFiyati = ${__floatNullControl(buyingPrice)},
         SiraNo = '${__floatNullControl(req.body.SiraNo)}',
         Ton = '${__floatNullControl(req.body.Ton)}',
-        Adet = '${__floatNullControl(req.body.Adet)}'
+        Adet = '${__floatNullControl(req.body.Adet)}',
+        KasaOlcusu='${req.body.KasaOlcusu}'
         where ID = '${req.body.ID}'
     `;
     mssql.query(sql,(err,product)=>{
@@ -12422,14 +12430,16 @@ u.Miktar,
 b.BirimAdi,    
 u.KutuAdet,    
 u.ID  ,  
-u.UrunKartID  
+u.UrunKartID,
+su.KasaOlcusu
 from    
-UretimTB u,UrunBirimTB b,TedarikciTB t    
+UretimTB u,UrunBirimTB b,TedarikciTB t,SiparisUrunTB su  
 where u.SiparisAciklama='${req.params.po}'   
 and b.ID = u.UrunBirimID    
 and t.ID = u.TedarikciID
 and u.TedarikciID in (select surun.TedarikciID from SiparisUrunTB surun where surun.SiparisNo = u.SiparisAciklama)
-
+and su.SiparisNo = u.SiparisAciklama
+and su.UrunKartID = u.UrunKartID
 order by u.UrunKartID,KasaNo asc      
     `;
    await mssql.query(checkListSql, (err, check) => {
