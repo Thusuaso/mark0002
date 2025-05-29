@@ -17,7 +17,7 @@ const actions = {
 
 
                 vuexContext.dispatch('setCardList');
-                this.$socket.socketIO.emit('cards_update_emit');
+                // this.$socket.socketIO.emit('cards_update_emit');
                 this.$toast.success('Başarıyla Kaydedildi.');
             }else{
                 this.$toast.error('Kaydetme Başarısız.');
@@ -29,7 +29,7 @@ const actions = {
         .then(response=>{
             if(response.data.status){
                 vuexContext.dispatch('setCardList');
-                this.$socket.socketIO.emit('cards_update_emit');
+                // this.$socket.socketIO.emit('cards_update_emit');
 
                 this.$toast.success('Başarıyla Silindi.');
             } else{
@@ -43,7 +43,7 @@ const actions = {
             if(response.data.status){
                 vuexContext.dispatch('setCardSizesList');
                 vuexContext.dispatch('setCardList');
-                this.$socket.socketIO.emit('cards_update_emit');
+                // this.$socket.socketIO.emit('cards_update_emit');
 
                 this.$toast.success('Başarıyla Güncellendi.');
             } else{

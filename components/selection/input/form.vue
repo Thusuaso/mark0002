@@ -376,7 +376,12 @@ export default {
   methods: {
   amountInput(event){
     this.amount = event.replace(',', '.');
-    this.speacialAmount = this.amount;
+    if(this.selectedAmountStatus =='Sqm'){
+      this.speacialAmount = this.amount;
+
+    }else{
+      this.speacialAmount = 0;
+    }
 
   },
     __nullNoneTrueFalseControl(value) {

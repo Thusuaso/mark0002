@@ -140,7 +140,9 @@
           <Textarea v-model="model.FinansAciklama" rows="5" class="w-100" />
           <label>Finance Explanation</label>
         </span>
-        <FileUpload
+        <div class="row">
+          <div class="col">
+                    <FileUpload
           mode="basic"
           accept=".pdf"
           customUpload
@@ -148,6 +150,20 @@
           chooseLabel="Upload Proforma"
           :disabled="proformaUploadButtonStatus"
         />
+          </div>
+          <div class="col">
+          <FileUpload
+              accept=".pdf"
+              @select="selectedDrawingDocument($event)"
+              auto
+              chooseLabel="Upload Drawing"
+              :disabled="proformaUploadButtonStatus"
+              :multiple="true"
+        />
+          </div>
+        </div>
+
+
       </div>
     </div>
     <div class="row">
@@ -317,7 +333,7 @@ import Cookies from "js-cookie";
 import {mapGetters} from 'vuex';
 export default {
   computed:{
-    ...mapGetters(['getCostList'])
+    ...mapGetters(['getCostList','getLocalUrl','getOrderProductionDocumentList'])
   },
   props: {
     model: {
@@ -605,6 +621,42 @@ export default {
         this.$toast.success("Dosya boyutu 1MB den büyük olamaz!");
       }
     },
+    selectedDrawingDocument(event){
+        let lengthDocuments = this.getOrderProductionDocumentList.filter(x=>{
+          return x.YuklemeEvrakID === 200;
+        }).length;
+        console.log('lengthDocuments',lengthDocuments);
+        let index = lengthDocuments + 1;
+        event.files.forEach((item)=>{
+          if(item.size > "1000000"){
+            this.$toast.success("Dosya boyutu 1MB den büyük olamaz!");
+            return;
+          }else{
+            const name = this.po + '-drawing-' + index + ".pdf";
+            upload.sendDrawing(item, this.po,200 ,name);
+            const data = {
+                id: 200,
+                po: this.po,
+                userId: Cookies.get("userId"),
+                date: date.dateToString(new Date()),
+                document: name,
+            };
+            this.$store.dispatch("setOrderProformaUpload", data);
+            index++;
+
+
+          }
+
+        });
+
+     
+
+
+    },
+    uploadDrawingDocument(event){
+      console.log('uploadDrawingDocument',event);
+    },
+
     invoiceChange(event) {
       this.model.FaturaKesimTurID = event.value.ID;
       this.model.FaturaKesimTurAdi = event.value.FaturaAdi;

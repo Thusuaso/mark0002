@@ -12,7 +12,7 @@ const sql = {
     server:'94.73.151.2',
     options: {
         encrypt: false, // for azure
-        trustServerCertificate: true // change to true for local dev / self-signed certs
+        trustServerCertificate: false // change to true for local dev / self-signed certs
       }
 };
 mssql.connect(sql);
@@ -12034,7 +12034,7 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID='${req.params.supplier}
 });
 function supplierIsfDocId(value){
     return new Promise((resolve, reject) => {
-            const h = ["A", "B", "C", "Ç" ,"D" ,"E", "F", "G", "Ğ", "H", "İ", "I", "J" ,"K" ,"L", "M", "N", "O", "Ö", "P", "R", "S", "Ş", "T" ,"U", "Ü", "V", "Y", "Z"]
+        const h = ["A", "B", "C", "Ç" ,"D" ,"E", "F", "G", "Ğ", "H", "İ", "I", "J" ,"K" ,"L", "M", "N", "O", "Ö", "P", "R", "S", "Ş", "T" ,"U", "Ü", "V", "Y", "Z"]
         const controlSql = `Select count(*) as durum from YeniIcSiparisFaturaTB where SiparisNo='${value.po}'`;
         let docId = '';
         mssql.query(controlSql, (err, control) => {
@@ -12301,6 +12301,10 @@ app.get('/order/production/product/document/:po', async (req, res) => {
             if(x.SiparisFaturaTurID == 100 ){
                 x.Link = `https://file-service.mekmar.com/file/download/customer/${x.KonteynerFirmaID}/${x.EvrakAdi}`;
                 x.Evrak = 'Lashing - ' + x.KonteynerFirmaAdi;
+            };
+            if(x.YuklemeEvrakID == 200 ){
+                x.Link = `https://file-service.mekmar.com/file/download/drawing/${x.SiparisNo}/200/${x.EvrakAdi}`;
+                x.Evrak = 'Drawing - ' + x.EvrakAdi;
             };
         });
         const liste = document.recordset.filter(x=>{
@@ -17362,6 +17366,8 @@ app.get('/gu/reports/finance/purchase-prices',(req,res)=>{
     });
 
 });
+
+
 
 
 

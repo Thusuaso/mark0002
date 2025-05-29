@@ -212,6 +212,27 @@ const fileService = {
     return api.post(url, formData).then((res) => {
       return { ...res.data, dosyaAdi: dosya };
     });
+  },
+  sendDrawing(file,po,id,name){
+
+    const kontrol = file.name.split(".").length;
+    if (kontrol > 2) {
+      alert(
+        "Lütfen Dosya İsmini Düzeltiniz.Dosya İsminde '.' karakteri olamaz."
+      );
+      return;
+    }
+
+    const dosya = name;
+    // /file/download/drawing/<string:siparisNo>/<int:id>/<string:fileName>
+    const url = "/file/upload/drawing/" + po + "/" + id + '/' + name;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api.post(url, formData).then((res) => {
+      return { ...res.data, dosyaAdi: dosya };
+    });
   }
 }
 

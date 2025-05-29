@@ -195,6 +195,7 @@
       <div class="col">
         <Button label="Currency" class="p-button-danger" @click="currency" />
         <Dialog :visible.sync="currency_form_visible" modal >
+
           <formCurrency v-for="cur in currency_list" :key="cur" 
             :month="cur.month" :id="cur.id" :month_id="cur.month_id" :currency="cur.currency"
             @cost_save_emit="saveCurrency($event)"
@@ -414,6 +415,9 @@ export default {
 
   },
   methods: {
+    reloadCurrency(){
+      
+    },
     mekmarAyoSelected(event){
       this.$store.dispatch('setOrderProductionDocumentList',event.siparis_no);
       this.detail_header = event.siparis_no;

@@ -329,9 +329,9 @@ export default {
     },
     mounted() {
 
-        this.$socket.socketIO.on("cards_update_on", () => {
-            this.$store.dispatch("setCardList");
-        });
+        // this.$socket.socketIO.on("cards_update_on", () => {
+        //     this.$store.dispatch("setCardList");
+        // });
     },
 
     watch: {
