@@ -11034,6 +11034,7 @@ ol.Boy Like '${req.body.height}' + '%' and
 ol.Kenar Like '${req.body.edge}' + '%' and 
 t.FirmaAdi Like '${req.body.supplier}' + '%' and
 su.Miktar Like '${req.body.amount}' + '%' 
+and ub.BirimAdi Like '${req.body.unit}' + '%'
 
 order by s.YuklemeTarihi desc 
 `;

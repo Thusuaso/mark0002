@@ -265,6 +265,13 @@
                         <div v-if="slotProps.data.TedarikciID == 1 || slotProps.data.TedarikciID == 123" >
               {{ slotProps.data.UrunFirmaAdi }}
             </div>
+            <div
+              v-else-if="slotProps.data.TedarikciID == 32"
+              style="background-color: #459bf7"
+              :style="{ color: slotProps.data.Isf ? '' : 'red' }"
+            >
+              {{ slotProps.data.UrunFirmaAdi }}
+            </div>
             <div v-else :style="{ color: slotProps.data.Isf ? '' : 'red' }">
               {{ slotProps.data.UrunFirmaAdi }}
             </div>
@@ -510,7 +517,7 @@
                     {{ slotProps.data.SatisFiyati * slotProps.data.Miktar | formatPriceUsd }}
                 </template>
                 <template #footer>
-                    {{ totals | formatDecimal }}
+                    {{ totals | formatPriceUsd }}
                 </template>
             </Column>
             <Column field="AlisFiyati" header="Price (Puchase)" headerClass="tableHeader" bodyClass="tableBody">
@@ -523,7 +530,7 @@
                     {{ slotProps.data.AlisFiyati * slotProps.data.Miktar | formatPriceUsd }}
                 </template>
                 <template #footer>
-                    {{ totals | formatDecimal }}
+                    {{ totals | formatPriceUsd }}
                 </template>
             </Column>
         </DataTable>

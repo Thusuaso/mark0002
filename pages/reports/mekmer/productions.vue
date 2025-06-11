@@ -2,42 +2,90 @@
   <div class="">
     <div class="row m-auto text-center">
       <div class="col-6">
-        <Button type="button" class="p-button-success w-100" label="New Order" @click="newForm" />
+        <Button
+          type="button"
+          class="p-button-success w-100"
+          label="New Order"
+          @click="newForm"
+        />
       </div>
 
       <div class="col-6">
-        <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
+        <Button
+          class="p-button-warning w-100"
+          label="Excel"
+          @click="excel_output"
+        />
       </div>
     </div>
-    <orderList2 :list="getOrderList" @production_selected_emit="productionSelected($event)"
-      :loading="getLoadingDatatable" :status="'Production'" :total="getOrderProductionTotal" />
-    <Dialog :visible.sync="production_detail_form" header="" modal :style="{ width: '100%' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false" :maximizable="true">
-      <orderDetailForm2 :modelProduction="productionModel" :modelProduct="getOrderProductModel"
-        :status="getOrderProductionButtonStatus" :customer="getCustomersList" :user="getUserList"
-        :productsList="getOrderProductionProductDetailList" :supplier="getSupplierList" :unit="getUnitList"
-        :po="getOrderProductionPo" :delivery="getOrderKindOfDeliveryList" :payment="getOrderKindOfPaymentList"
-        :country="getCountryList" :invoice="getOrderKindOfInvoiceList" :cost="getOrderProductionCostList"
-        :costTotal="getOrderProductionCostTotal" :supplierDelivery="getOrderKindOfDeliverySupplierList"
-        :productSupplier="getOrderProductionSupplierList" :supplierProduct="getOrderSupplierProductList"
-        :document="getOrderProductionDocumentList" :check="getOrderProductionCheckList"
-        :checkTotal="getOrderProductionCheckListTotal" :productCalculation="getOrderProductionProductTotal"
-        :freightCalculation="getOrderProductionFreightTotal" :detailCalculation="getOrderProductionDetailTotal"
+    <orderList2
+      :list="getOrderList"
+      @production_selected_emit="productionSelected($event)"
+      :loading="getLoadingDatatable"
+      :status="'Production'"
+      :total="getOrderProductionTotal"
+    />
+    <Dialog
+      :visible.sync="production_detail_form"
+      header=""
+      modal
+      :style="{ width: '100%' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+      :closeOnEscape="false"
+      :closable="false"
+      :maximizable="true"
+    >
+      <orderDetailForm2
+        :modelProduction="productionModel"
+        :modelProduct="getOrderProductModel"
+        :status="getOrderProductionButtonStatus"
+        :customer="getCustomersList"
+        :user="getUserList"
+        :productsList="getOrderProductionProductDetailList"
+        :supplier="getSupplierList"
+        :unit="getUnitList"
+        :po="getOrderProductionPo"
+        :delivery="getOrderKindOfDeliveryList"
+        :payment="getOrderKindOfPaymentList"
+        :country="getCountryList"
+        :invoice="getOrderKindOfInvoiceList"
+        :cost="getOrderProductionCostList"
+        :costTotal="getOrderProductionCostTotal"
+        :supplierDelivery="getOrderKindOfDeliverySupplierList"
+        :productSupplier="getOrderProductionSupplierList"
+        :supplierProduct="getOrderSupplierProductList"
+        :document="getOrderProductionDocumentList"
+        :check="getOrderProductionCheckList"
+        :checkTotal="getOrderProductionCheckListTotal"
+        :productCalculation="getOrderProductionProductTotal"
+        :freightCalculation="getOrderProductionFreightTotal"
+        :detailCalculation="getOrderProductionDetailTotal"
         :detailProductTotal="getOrderProductionProductDetailTotal"
         :detailProductCost="getOrderProductionProductDetailCostTotal"
         :saveButtonStatus="getOrderProductionSaveButtonStatus"
-        :proformaUploadButtonStatus="getOrderProductionUploadProformaButtonStatus" :statusAlfa="true"
+        :proformaUploadButtonStatus="
+          getOrderProductionUploadProformaButtonStatus
+        "
+        :statusAlfa="true"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
-          " @process="process" @workerman_selected_emit="workermanSelected($event)"
-        @close_production_form_emit="closeProductionForm" @proforma_delete_emit="proformaDelete($event)"
-        @isf_delete_emit="isfDelete($event)" />
+        "
+        @process="process"
+        @workerman_selected_emit="workermanSelected($event)"
+        @close_production_form_emit="closeProductionForm"
+        @proforma_delete_emit="proformaDelete($event)"
+        @isf_delete_emit="isfDelete($event)"
+      />
     </Dialog>
 
     <Dialog :visible.sync="workerman_dialog_form" header="" modal>
-      <orderDetailWorkermanForm :list="getOrderProductionProductDetailWorkermanList"
-        :model="getOrderProductWorkermanModel" :supplier="getSupplierList" :productId="productId"
-        :po="getOrderProductionPo" />
+      <orderDetailWorkermanForm
+        :list="getOrderProductionProductDetailWorkermanList"
+        :model="getOrderProductWorkermanModel"
+        :supplier="getSupplierList"
+        :productId="productId"
+        :po="getOrderProductionPo"
+      />
     </Dialog>
   </div>
 </template>
@@ -116,7 +164,7 @@ export default {
   },
 
   created() {
-    this.$store.dispatch("setOrderProductionMekmerList")
+    this.$store.dispatch("setOrderProductionMekmerList");
   },
   methods: {
     isfDelete(event) {
@@ -126,19 +174,19 @@ export default {
       this.$store.dispatch("setOrderProductionProformaDelete", id);
     },
     excel_output() {
-      const new_data = this.getOrderList.sort(function(a,b) {
-          const new_date_a = new Date(a.SiparisTarihi).getTime();
-          const new_date_b = new Date(b.SiparisTarihi).getTime();
+      const new_data = this.getOrderList.sort(function (a, b) {
+        const new_date_a = new Date(a.SiparisTarihi).getTime();
+        const new_date_b = new Date(b.SiparisTarihi).getTime();
 
-
-          return new_date_b-new_date_a;
+        return new_date_b - new_date_a;
       });
       api
         .post("/siparisler/dosyalar/uretimExcelCikti", new_data)
         .then((response) => {
           if (response.status) {
             const link = document.createElement("a");
-            link.href = this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
+            link.href =
+              this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
 
             link.setAttribute("download", "Uretim_list.xlsx");
             document.body.appendChild(link);
@@ -150,7 +198,9 @@ export default {
       if (this.selectedMarketing == "All") {
         this.$store.commit("setOrderList", this.getOrderListAll);
       } else {
-        const datas = this.getOrderListAll.filter((x) => x.FaturaKesimTurID == 1);
+        const datas = this.getOrderListAll.filter(
+          (x) => x.FaturaKesimTurID == 1
+        );
         this.$store.commit("setOrderList", datas);
       }
     },
@@ -249,7 +299,7 @@ export default {
       this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
-      this.productionModel.SiparisKontrolEden = 0
+      this.productionModel.SiparisKontrolEden = 0;
 
       this.$store.dispatch("setOrderProductionUpdate", {
         ...this.productionModel,
@@ -287,13 +337,16 @@ export default {
       this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
-      this.productionModel.SiparisKontrolEden = 0
+      this.productionModel.SiparisKontrolEden = 0;
 
       this.$store.dispatch("setOrderProductionSaveButtonStatus", true);
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");
       this.$store.dispatch("setOrderProductionSave", this.productionModel);
-      this.$store.dispatch("setOrderProductionPo", this.productionModel.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionPo",
+        this.productionModel.SiparisNo
+      );
     },
     process() {
       if (this.getOrderProductionButtonStatus) {
@@ -308,7 +361,10 @@ export default {
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch("setOrderProductionDetailListReset");
       this.$store.dispatch("setOrderProductionPo", null);
-      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", true);
+      this.$store.dispatch(
+        "setOrderProductionUploadProformaButtonStatus",
+        true
+      );
       this.$store.commit("setOrderSupplierProductList", []);
       this.$store.dispatch("setOrderAllList");
       this.productionModel = this.getOrderProductionModel;
@@ -317,18 +373,30 @@ export default {
     productionSelected(event) {
       this.$store.dispatch("setOrderProductionButtonStatus", false);
       this.$store.dispatch("setOrderProductModel");
-      this.$store.dispatch("setOrderProductionProductDetailMekmerList", event.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionProductDetailMekmerList",
+        event.SiparisNo
+      );
       this.$store.dispatch("setOrderProductionCostList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionSupplierList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionDocumentList", event.SiparisNo);
-      this.$store.dispatch("setOrderProductionCheckMekmerList", event.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionCheckMekmerList",
+        event.SiparisNo
+      );
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
-      this.$store.dispatch("setOrderProductionInsuranceTotal", event.sigorta_tutar_satis);
+      this.$store.dispatch(
+        "setOrderProductionInsuranceTotal",
+        event.sigorta_tutar_satis
+      );
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
-      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", false);
+      this.$store.dispatch(
+        "setOrderProductionUploadProformaButtonStatus",
+        false
+      );
       this.$store.commit("setOrderSupplierProductList", []);
 
       this.$store.dispatch("setOrderProductionId", event.SiparisId);
@@ -338,9 +406,9 @@ export default {
     },
   },
   mounted() {
-    this.$socket.socketIO.on("cards_update_on", () => {
-      this.$store.dispatch("setCardList");
-    });
+    // this.$socket.socketIO.on("cards_update_on", () => {
+    //   this.$store.dispatch("setCardList");
+    // });
   },
 
   watch: {
