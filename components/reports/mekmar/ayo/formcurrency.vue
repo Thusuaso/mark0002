@@ -10,7 +10,7 @@
         :disabled="false"
       />
     </div>
-    <div class="col">
+    <!-- <div class="col">
       <Button
         class="p-button-success w-100"
         label="Save"
@@ -25,7 +25,7 @@
         @click="update"
         :disabled="update_button_disabled"
       />
-    </div>
+    </div> -->
     <div class="col">
       <Button
         class="p-button-secondary w-100"

@@ -788,7 +788,7 @@
             </div>
             <div
               v-else-if="slotProps.data.TedarikciID == 32"
-              style="background-color: #459bf7"
+              style="background-color: #ffff05"
               :style="{ color: slotProps.data.Isf ? '' : 'red' }"
             >
               {{ slotProps.data.UrunFirmaAdi }}
