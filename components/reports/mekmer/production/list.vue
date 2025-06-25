@@ -8,9 +8,8 @@
       filterDisplay="row"
       @filter="mekmerProductionFilter($event)"
       class="p-datatable-sm"
-sortField="Tarih" :sortOrder="-1"
-
-
+      sortField="Tarih"
+      :sortOrder="-1"
       v-if="!dates"
     >
       <Column
@@ -222,7 +221,12 @@ sortField="Tarih" :sortOrder="-1"
           {{ total.amount | formatDecimal }}
         </template>
       </Column>
-      <Column field="Adet" header="Piece" headerClass="tableHeader" bodyClass="tableBody">
+      <Column
+        field="Adet"
+        header="Piece"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
@@ -284,6 +288,12 @@ sortField="Tarih" :sortOrder="-1"
           />
         </template>
       </Column>
+      <Column field="Fason" header="Fason">
+        <template #body="slotProps">
+          <div v-if="slotProps.data.Fason == true">Fason</div>
+          <div v-if="slotProps.data.Fason == false">Fason Değil</div>
+        </template>
+      </Column>
     </DataTable>
     <DataTable
       :value="list"
@@ -307,7 +317,12 @@ sortField="Tarih" :sortOrder="-1"
           {{ slotProps.data.Tarih | dateToString }}
         </template>
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -318,8 +333,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -330,8 +350,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -342,8 +367,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -354,8 +384,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
         <template #footer>
           {{ total.crate | formatDecimal }}
@@ -369,8 +404,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -381,8 +421,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -393,8 +438,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -405,8 +455,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -417,8 +472,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -433,13 +493,23 @@ sortField="Tarih" :sortOrder="-1"
           {{ slotProps.data.Miktar | formatDecimal }}
         </template>
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
         <template #footer>
           {{ total.amount | formatDecimal }}
         </template>
       </Column>
-      <Column field="Adet" header="Piece" headerClass="tableHeader" bodyClass="tableBody">
+      <Column
+        field="Adet"
+        header="Piece"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Adet | formatDecimal }}
         </template>
@@ -455,8 +525,13 @@ sortField="Tarih" :sortOrder="-1"
         headerClass="tableHeader"
         bodyClass="tableBody"
       >
-      <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" />
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
         </template>
       </Column>
       <Column
@@ -495,6 +570,12 @@ sortField="Tarih" :sortOrder="-1"
           />
         </template>
       </Column>
+      <Column field="Fason" header="Fason">
+        <template #body="slotProps">
+          <div v-if="slotProps.data.Fason == true">Fason</div>
+          <div v-if="slotProps.data.Fason == false">Fason Değil</div>
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
@@ -510,10 +591,7 @@ export default {
       type: Object,
       required: false,
     },
-    dates:{
-      
-    }
-
+    dates: {},
   },
   data() {
     return {
@@ -545,7 +623,10 @@ export default {
         Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        SiparisAciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SiparisAciklama: {
+          value: null,
+          matchMode: FilterMatchMode.STARTS_WITH,
+        },
         Aciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
@@ -561,7 +642,10 @@ export default {
         Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        SiparisAciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SiparisAciklama: {
+          value: null,
+          matchMode: FilterMatchMode.STARTS_WITH,
+        },
         Aciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
@@ -581,14 +665,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -608,15 +699,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -636,14 +733,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -663,14 +767,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -690,14 +801,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -717,14 +835,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -744,14 +869,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -771,14 +903,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -798,14 +937,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -825,14 +971,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -852,14 +1005,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -879,14 +1039,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -906,14 +1073,21 @@ export default {
         this.$store.dispatch("setProductionFilterList", this.filterModel);
       } else {
         if (this.resetFilter()) {
-          this.$store.dispatch('setBeginLoadingAction');
-        this.$axios.get('/reports/mekmer/production/list')
-            .then(response => {
+          this.$store.dispatch("setBeginLoadingAction");
+          this.$axios
+            .get("/reports/mekmer/production/list")
+            .then((response) => {
               this.is_filtered = false;
-              this.$store.dispatch('setReportsMekmerProductionList',response.data.list);
-              this.$store.dispatch('setReportsMekmerProductionTotal', response.data.list);
-              this.$store.dispatch('setEndLoadingAction');
-            })
+              this.$store.dispatch(
+                "setReportsMekmerProductionList",
+                response.data.list
+              );
+              this.$store.dispatch(
+                "setReportsMekmerProductionTotal",
+                response.data.list
+              );
+              this.$store.dispatch("setEndLoadingAction");
+            });
         } else {
           this.$store.dispatch("setProductionFilterList", this.filterModel);
         }
@@ -945,9 +1119,11 @@ export default {
 
     mekmerProductionFilter(event) {
       console.log(event);
-      this.$store.dispatch("setReportsMekmerProductionTotal", event.filteredValue);
-      this.$emit('mekmer_filtered_production_list_emit',event.filteredValue);
-
+      this.$store.dispatch(
+        "setReportsMekmerProductionTotal",
+        event.filteredValue
+      );
+      this.$emit("mekmer_filtered_production_list_emit", event.filteredValue);
     },
   },
 };

@@ -44,7 +44,12 @@
         />
         <div class="row mb-4">
           <div class="col-9">
-            <InputText type="text" class="w-100" v-model="productCardId" disabled />
+            <InputText
+              type="text"
+              class="w-100"
+              v-model="productCardId"
+              disabled
+            />
           </div>
           <div class="col">
             <Button
@@ -59,7 +64,11 @@
         <div class="row mb-4">
           <div class="col-6">
             <span class="p-float-label">
-              <InputText id="create" type="text" v-model="getProductionCrateNo" />
+              <InputText
+                id="create"
+                type="text"
+                v-model="getProductionCrateNo"
+              />
               <label for="create">Crate No</label>
             </span>
           </div>
@@ -103,9 +112,17 @@
           />
           <label for="ac">Supplier</label>
         </span>
-        <Calendar v-model="selectedDate" dateFormat="dd/mm/yy" class="w-100 mb-3" />
+        <Calendar
+          v-model="selectedDate"
+          dateFormat="dd/mm/yy"
+          class="w-100 mb-3"
+        />
         <div class="row mb-3">
-          <div v-for="(item, index) of amountStatus" :key="item.id" class="col-3">
+          <div
+            v-for="(item, index) of amountStatus"
+            :key="item.id"
+            class="col-3"
+          >
             <RadioButton
               v-model="selectedAmountStatus"
               :inputId="index"
@@ -199,7 +216,11 @@
           </div>
           <div class="col">
             <div class="flex align-items-center">
-              <Checkbox v-model="stringStatus" inputId="string" :binary="true" />
+              <Checkbox
+                v-model="stringStatus"
+                inputId="string"
+                :binary="true"
+              />
               <label for="string" class="ml-2"> Binded </label>
             </div>
           </div>
@@ -211,13 +232,21 @@
           </div>
           <div class="col">
             <div class="flex align-items-center">
-              <Checkbox v-model="notFindStatus" inputId="notFind" :binary="true" />
+              <Checkbox
+                v-model="notFindStatus"
+                inputId="notFind"
+                :binary="true"
+              />
               <label for="notFind" class="ml-2"> Not Found </label>
             </div>
           </div>
           <div class="col">
             <div class="flex align-items-center">
-              <Checkbox v-model="fasonStatus" inputId="fason_status" :binary="true" />
+              <Checkbox
+                v-model="fasonStatus"
+                inputId="fason_status"
+                :binary="true"
+              />
               <label for="fason_status" class="ml-2"> Fason </label>
             </div>
           </div>
@@ -230,13 +259,23 @@
         <div class="row">
           <div class="col-6 mb-2">
             <span class="p-float-label">
-              <InputText id="category" type="text" v-model="categoryName" disabled />
+              <InputText
+                id="category"
+                type="text"
+                v-model="categoryName"
+                disabled
+              />
               <label for="category">Category</label>
             </span>
           </div>
           <div class="col-6">
             <span class="p-float-label">
-              <InputText id="product" type="text" v-model="productName" disabled />
+              <InputText
+                id="product"
+                type="text"
+                v-model="productName"
+                disabled
+              />
               <label for="product">Product</label>
             </span>
           </div>
@@ -244,7 +283,12 @@
         <div class="row">
           <div class="col-6">
             <span class="p-float-label">
-              <InputText id="surface" type="text" v-model="surfaceName" disabled />
+              <InputText
+                id="surface"
+                type="text"
+                v-model="surfaceName"
+                disabled
+              />
               <label for="surface">Surface</label>
             </span>
           </div>
@@ -278,7 +322,11 @@
       </div>
     </div>
 
-    <Dialog :visible.sync="product_cards_form_dialog" header="Ürün Kartları" modal>
+    <Dialog
+      :visible.sync="product_cards_form_dialog"
+      header="Ürün Kartları"
+      modal
+    >
       <productCards @cards_selected_emit="productCardsSelected($event)" />
     </Dialog>
   </div>
@@ -318,7 +366,7 @@ export default {
   },
   data() {
     return {
-      fasonStatus:false,
+      fasonStatus: false,
       width: null,
       height: null,
       description: null,
@@ -374,16 +422,14 @@ export default {
     }
   },
   methods: {
-  amountInput(event){
-    this.amount = event.replace(',', '.');
-    if(this.selectedAmountStatus =='Sqm'){
-      this.speacialAmount = this.amount;
-
-    }else{
-      this.speacialAmount = 0;
-    }
-
-  },
+    amountInput(event) {
+      this.amount = event.replace(",", ".");
+      if (this.selectedAmountStatus == "Sqm") {
+        this.speacialAmount = this.amount;
+      } else {
+        this.speacialAmount = 0;
+      }
+    },
     __nullNoneTrueFalseControl(value) {
       if (value == null || value == undefined || value == "" || value == " ") {
         return false;
@@ -398,17 +444,19 @@ export default {
         this.height == "Free" ||
         this.width == "Ant" ||
         this.height == "FREE" ||
-        this.width == "VAR" ||
-        this.width == "Various" ||
-        this.width == "SLAB" ||
-        this.width == "Slab" ||
         this.width == "Mini" ||
         this.width == "MINI" ||
         this.width == "Other" ||
-
         this.width == "OTHER"
       ) {
         return 0;
+      } else if (
+        this.width === "VAR" ||
+        this.width === "Various" ||
+        this.width === "Slab" ||
+        this.width === "SLAB"
+      ) {
+        this.amount = event;
       } else {
         if (this.selectedAmountStatus == "Sqm") {
           const width = parseFloat(this.width.replace(",", "."));
@@ -439,7 +487,10 @@ export default {
       let setM2 = 0.494875;
 
       if (event) {
-        if ((this.height == "Set" || this.height == "SET") && this.width == "20,3") {
+        if (
+          (this.height == "Set" || this.height == "SET") &&
+          this.width == "20,3"
+        ) {
           this.amount = (setM2 * event).toFixed(2);
           this.speacialAmount = this.amount;
         } else {
@@ -505,7 +556,7 @@ export default {
         Bagli: this.stringStatus,
         Bulunamadi: this.notFindStatus,
         KasaKayıtAdedi: this.crateAmount,
-        Fason:this.fasonStatus
+        Fason: this.fasonStatus,
       };
       // if(data.UrunOcakID == ' ' || data.UrunOcakID == '' || data.UrunOcakID == 0 || data.UrunOcakID == undefined || data.UrunOcakID == null){
       //   this.$toast.error('Ürün Ocağını Giriniz!')
@@ -570,7 +621,7 @@ export default {
         Bagli: this.stringStatus,
         Bulunamadi: this.notFindStatus,
         KasaKayıtAdedi: this.crateAmount,
-        Fason:this.fasonStatus
+        Fason: this.fasonStatus,
       };
       this.$store.dispatch("setSelectionProductionUpdate", data);
       this.$emit("selection_production_dialog_form", false);
@@ -609,7 +660,9 @@ export default {
       this.$store.commit("setSelectionProductionCrateNo", null);
     },
     createdProcess() {
-      this.selectedSaveKind = this.kinds.find((x) => x.id == this.model.UretimTurID);
+      this.selectedSaveKind = this.kinds.find(
+        (x) => x.id == this.model.UretimTurID
+      );
       this.selectedPo = this.orders.find(
         (x) => x.SiparisNo == this.model.SiparisAciklama
       );
@@ -622,7 +675,8 @@ export default {
       this.categoryName = this.model.KategoriAdi;
       this.productName = this.model.UrunAdi;
       this.surfaceName = this.model.YuzeyIslemAdi;
-      this.sizeName = this.model.En + "x" + this.model.Boy + "x" + this.model.Kenar;
+      this.sizeName =
+        this.model.En + "x" + this.model.Boy + "x" + this.model.Kenar;
       this.orderProductCardDesc =
         this.model.FirmaAdi +
         "/" +
@@ -651,10 +705,12 @@ export default {
         this.speacialAmount = 0;
       } else {
         this.speacialAmount = this.model.OzelMiktar;
-      };
+      }
       this.fasonStatus = this.model.Fason;
       this.description = this.model.Aciklama;
-      this.notFindStatus = this.__nullNoneTrueFalseControl(this.model.Bulunamadi);
+      this.notFindStatus = this.__nullNoneTrueFalseControl(
+        this.model.Bulunamadi
+      );
       this.outStatus = this.__nullNoneTrueFalseControl(this.model.Disarda);
       this.stringStatus = this.__nullNoneTrueFalseControl(this.model.Bagli);
       this.boxStatus = this.__nullNoneTrueFalseControl(this.model.Kutu);
@@ -693,111 +749,132 @@ export default {
       this.height = event.Boy;
     },
     saveKindSelected(event) {
-      if(!this.buttonStatus){
-        if(this.selectedSupplier.ID == 1){
+      if (!this.buttonStatus) {
+        if (this.selectedSupplier.ID == 1) {
           if (event.value.id == 1) {
-        this.disabledOrders = true;
-        this.selectedSupplier = { ID: 1, FirmaAdi: "Mekmer" };
-        if (this.buttonStatus) {
-          this.$store.dispatch("setSelectionProductionCrateNoIn");
-        }
-        this.description = "Stok";
+            this.disabledOrders = true;
+            this.selectedSupplier = { ID: 1, FirmaAdi: "Mekmer" };
+            if (this.buttonStatus) {
+              this.$store.dispatch("setSelectionProductionCrateNoIn");
+            }
+            this.description = "Stok";
           } else {
             if (this.buttonStatus) {
               this.$store.dispatch("setSelectionProductionCrateNoIn");
             }
             this.disabledOrders = false;
           }
-        }else{
+        } else {
           if (event.value.id == 1) {
-                this.disabledOrders = true;
-                if (this.buttonStatus) {
-                  this.$store.dispatch("setSelectionProductionCrateNoIn");
-                }
-                this.description = "Stok";
-              } else {
-                if (this.buttonStatus) {
-                  this.$store.dispatch("setSelectionProductionCrateNoIn");
-                }
-                this.disabledOrders = false;
-              }
-        }
-      }else{
-        if (event.value.id == 1) {
-        this.disabledOrders = true;
-        this.selectedSupplier = { ID: 1, FirmaAdi: "Mekmer" };
-        if (this.buttonStatus) {
-          this.$store.dispatch("setSelectionProductionCrateNoIn");
-        }
-        this.description = "Stok";
-      } else {
-        if (this.buttonStatus) {
-          this.$store.dispatch("setSelectionProductionCrateNoIn");
-        }
-        this.disabledOrders = false;
-      }
-      }
-
-    },
-    productsSelected(event) {
-      if(!this.buttonStatus){
-        if(this.model.UrunKartId != event.value.UrunKartId){
-          if(confirm('Ürün kartı değiştirilecek. Devam etmek istiyor musunuz?')){
-            this.selectedSupplier = this.suppliers.find((x) => x.ID == event.value.TedarikciID);
-      this.selectedAmountStatus = this.amountStatus.find(
-        (x) => x.id == event.value.UrunBirimID
-      ).status;
-      this.orderProductCardDesc = event.value.Aciklama;
-      this.productCardId = event.value.UrunKartId;
-      this.categoryName = event.value.KategoriAdi;
-      this.productName = event.value.UrunAdi;
-      this.surfaceName = event.value.YuzeyIslemAdi;
-      this.sizeName = event.value.En + "x" + event.value.Boy + "x" + event.value.Kenar;
-      this.width = event.value.En;
-      this.height = event.value.Boy;
-      if (event.value.TedarikciID == 1 || event.value.TedarikciID == 123) {
-        if (this.buttonStatus) {
-          this.$store.dispatch("setSelectionProductionCrateNoIn");
-        }
-      } else {
-        if (this.buttonStatus) {
-          this.$store.dispatch("setSelectionProductionCrateNoOut");
-        }
-      }
-          } else{
-            this.$emit("selection_production_dialog_form", false);
-
+            this.disabledOrders = true;
+            if (this.buttonStatus) {
+              this.$store.dispatch("setSelectionProductionCrateNoIn");
+            }
+            this.description = "Stok";
+          } else {
+            if (this.buttonStatus) {
+              this.$store.dispatch("setSelectionProductionCrateNoIn");
+            }
+            this.disabledOrders = false;
           }
         }
-      } else{
-        this.selectedSupplier = this.suppliers.find((x) => x.ID == event.value.TedarikciID);
-      this.selectedAmountStatus = this.amountStatus.find(
-        (x) => x.id == event.value.UrunBirimID
-      ).status;
-      this.orderProductCardDesc = event.value.Aciklama;
-      this.productCardId = event.value.UrunKartId;
-      this.categoryName = event.value.KategoriAdi;
-      this.productName = event.value.UrunAdi;
-      this.surfaceName = event.value.YuzeyIslemAdi;
-      this.sizeName = event.value.En + "x" + event.value.Boy + "x" + event.value.Kenar;
-      this.width = event.value.En;
-      this.height = event.value.Boy;
-      if (event.value.TedarikciID == 1 || event.value.TedarikciID == 123) {
-        if (this.buttonStatus) {
-          this.$store.dispatch("setSelectionProductionCrateNoIn");
+      } else {
+        if (event.value.id == 1) {
+          this.disabledOrders = true;
+          this.selectedSupplier = { ID: 1, FirmaAdi: "Mekmer" };
+          if (this.buttonStatus) {
+            this.$store.dispatch("setSelectionProductionCrateNoIn");
+          }
+          this.description = "Stok";
+        } else {
+          if (this.buttonStatus) {
+            this.$store.dispatch("setSelectionProductionCrateNoIn");
+          }
+          this.disabledOrders = false;
+        }
+      }
+    },
+    productsSelected(event) {
+      if (!this.buttonStatus) {
+        if (this.model.UrunKartId != event.value.UrunKartId) {
+          if (
+            confirm("Ürün kartı değiştirilecek. Devam etmek istiyor musunuz?")
+          ) {
+            this.selectedSupplier = this.suppliers.find(
+              (x) => x.ID == event.value.TedarikciID
+            );
+            this.selectedAmountStatus = this.amountStatus.find(
+              (x) => x.id == event.value.UrunBirimID
+            ).status;
+            this.orderProductCardDesc = event.value.Aciklama;
+            this.productCardId = event.value.UrunKartId;
+            this.categoryName = event.value.KategoriAdi;
+            this.productName = event.value.UrunAdi;
+            this.surfaceName = event.value.YuzeyIslemAdi;
+            this.sizeName =
+              event.value.En + "x" + event.value.Boy + "x" + event.value.Kenar;
+            this.width = event.value.En;
+            this.height = event.value.Boy;
+            if (
+              event.value.TedarikciID == 1 ||
+              event.value.TedarikciID == 123
+            ) {
+              if (this.buttonStatus) {
+                this.$store.dispatch("setSelectionProductionCrateNoIn");
+              }
+              this.selectedMine = null;
+              this.organizer = null;
+              this.crateman = null;
+            } else {
+              if (this.buttonStatus) {
+                this.$store.dispatch("setSelectionProductionCrateNoOut");
+              }
+              this.selectedMine = this.mines.find((x) => x.ID === 28);
+              this.organizer = this.$cookie.get("username");
+              this.crateman = this.$cookie.get("username");
+            }
+          } else {
+            this.$emit("selection_production_dialog_form", false);
+          }
         }
       } else {
-        if (this.buttonStatus) {
-          this.$store.dispatch("setSelectionProductionCrateNoOut");
+        this.selectedSupplier = this.suppliers.find(
+          (x) => x.ID == event.value.TedarikciID
+        );
+        this.selectedAmountStatus = this.amountStatus.find(
+          (x) => x.id == event.value.UrunBirimID
+        ).status;
+        this.orderProductCardDesc = event.value.Aciklama;
+        this.productCardId = event.value.UrunKartId;
+        this.categoryName = event.value.KategoriAdi;
+        this.productName = event.value.UrunAdi;
+        this.surfaceName = event.value.YuzeyIslemAdi;
+        this.sizeName =
+          event.value.En + "x" + event.value.Boy + "x" + event.value.Kenar;
+        this.width = event.value.En;
+        this.height = event.value.Boy;
+        if (event.value.TedarikciID == 1 || event.value.TedarikciID == 123) {
+          if (this.buttonStatus) {
+            this.$store.dispatch("setSelectionProductionCrateNoIn");
+          }
+          this.selectedMine = null;
+          this.organizer = null;
+          this.crateman = null;
+        } else {
+          if (this.buttonStatus) {
+            this.$store.dispatch("setSelectionProductionCrateNoOut");
+          }
+          this.selectedMine = this.mines.find((x) => x.ID === 28);
+          this.organizer = this.$cookie.get("username");
+          this.crateman = this.$cookie.get("username");
         }
       }
-      }
-
-
-      
     },
     poSelected(event) {
-      this.$store.dispatch("setSelectionProductionProductsList", event.value.SiparisNo);
+      this.$store.dispatch(
+        "setSelectionProductionProductsList",
+        event.value.SiparisNo
+      );
       this.description = event.value.SiparisNo;
     },
     searchPo(event) {
@@ -806,7 +883,9 @@ export default {
         results = this.orders;
       } else {
         results = this.orders.filter((x) => {
-          return x.SiparisNo.toLowerCase().startsWith(event.query.toLowerCase());
+          return x.SiparisNo.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredPo = results;

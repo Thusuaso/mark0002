@@ -2935,7 +2935,8 @@ app.get("/reports/mekmer/production/list", (req, res) => {
 	u.Adet,
 	ub.BirimAdi,
 	u.SiparisAciklama,
-	u.Aciklama
+	u.Aciklama,
+  	u.Fason
 
 
 
@@ -2976,7 +2977,8 @@ app.post("/reports/mekmer/production/filter", (req, res) => {
 	u.Adet,
 	ub.BirimAdi,
 	u.SiparisAciklama,
-	u.Aciklama
+	u.Aciklama,
+  	u.Fason
 
 
 
@@ -3058,7 +3060,8 @@ app.post("/reports/mekmer/production/date", (req, res) => {
 	u.Adet,
 	ub.BirimAdi,
 	u.SiparisAciklama,
-	u.Aciklama
+	u.Aciklama,
+  	u.Fason
 
 
 
@@ -8966,7 +8969,39 @@ app.get("/finance/advanced/payment/list", (req, res) => {
             where
             s.SiparisDurumID in (1,2)
             and s.Pesinat >0
-            and m.ID = s.MusteriID
+            and m.ID = s.MusteriID and m.Marketing != 'İç Piyasa'
+            group by s.SiparisNo,s.MusteriID,m.FirmaAdi,m.Marketing,s.siparisSahibi,s.SiparisTarihi
+            order by s.SiparisTarihi desc
+
+    `;
+  mssql.query(advancedPaymentSql, (err, advancedPayment) => {
+    const list = [];
+    advancedPayment.recordset.forEach((x) => {
+      if (x.Pesinat - noneControl(x.Odenen) > 0) {
+        list.push(x);
+      }
+    });
+    res.status(200).json({ list: list });
+  });
+});
+app.get("/finance/advanced/payment/list/mekmer", (req, res) => {
+  const advancedPaymentSql = `
+         select
+            s.SiparisNo,
+            m.FirmaAdi,
+            s.MusteriID,
+            Sum(s.Pesinat) as Pesinat,
+            dbo.Finance_Paid_List_Po(s.SiparisNo) as Odenen,
+            (select k.MailAdres from KullaniciTB k where s.SiparisSahibi = k.ID) as Mail,
+			 m.Marketing,
+             (sum(s.Pesinat)) - dbo.Finance_Paid_List_Po(s.SiparisNo) as Kalan
+
+            from
+            SiparislerTB s,MusterilerTB m
+            where
+            s.SiparisDurumID in (1,2)
+            and s.Pesinat >0
+            and m.ID = s.MusteriID and m.Marketing = 'İç Piyasa'
             group by s.SiparisNo,s.MusteriID,m.FirmaAdi,m.Marketing,s.siparisSahibi,s.SiparisTarihi
             order by s.SiparisTarihi desc
 
@@ -8984,6 +9019,48 @@ app.get("/finance/advanced/payment/list", (req, res) => {
 app.post("/finance/advanced/payment/save", (req, res) => {
   const advancedPaymentInsertSql = `
         insert into OdemelerTB(
+	        Tarih,
+            MusteriID,
+            SiparisNo,
+            FinansOdemeTurID,
+            Aciklama,
+            Tutar,
+            Masraf,
+            KullaniciID,
+            Kur
+        )
+        VALUES(
+            '${req.body.Tarih}',
+            '${req.body.MusteriID}',
+            '${req.body.SiparisNo}',
+            '${req.body.FinansOdemeTurID}',
+            '${req.body.Aciklama}',
+            '${req.body.Tutar}',
+            '${req.body.Masraf}',
+            '${req.body.KullaniciID}',
+            '${req.body.Kur}'
+
+        )
+    `;
+  const changePoStatusSql = `update SiparislerTB SET SiparisDurumID=2 where SiparisNo='${req.body.SiparisNo}'`;
+
+  mssql.query(advancedPaymentInsertSql, (err, advancedPayment) => {
+    if (advancedPayment.rowsAffected[0] == 1) {
+      mssql.query(changePoStatusSql, (err, poStatus) => {
+        if (poStatus.rowsAffected[0] == 1) {
+          res.status(200).json({ status: true });
+        } else {
+          res.status(200).json({ status: false });
+        }
+      });
+    } else {
+      res.status(200).json({ status: false });
+    }
+  });
+});
+app.post("/finance/advanced/payment/save/mekmer", (req, res) => {
+  const advancedPaymentInsertSql = `
+        insert into Odemeler_MekmerTB(
 	        Tarih,
             MusteriID,
             SiparisNo,
