@@ -858,8 +858,8 @@ export default {
             this.$store.dispatch("setSelectionProductionCrateNoIn");
           }
           this.selectedMine = null;
-          this.organizer = null;
-          this.crateman = null;
+          this.organizer = "Muhsin";
+          this.crateman = "Muhsin";
         } else {
           if (this.buttonStatus) {
             this.$store.dispatch("setSelectionProductionCrateNoOut");

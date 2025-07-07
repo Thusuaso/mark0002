@@ -17713,6 +17713,47 @@ app.get("/gu/reports/finance/purchase-prices", (req, res) => {
   });
 });
 
+app.post("/panel/project/queue/changing", (req, res) => {
+  const newBody = req.body.body.newData;
+  const oldBody = req.body.body.data;
+  const getOldProjectId = `
+    select ID,Queue from MekmarCom_Projects
+
+  where Queue='${newBody.Queue}'
+`;
+  const newUpdateSql = `
+      update MekmarCom_Projects SET Queue='${newBody.Queue}' where ID='${newBody.ID}'
+
+    `;
+
+  const getOldProjectQueue = `
+    select top 1 (Queue + 1) as Queue from MekmarCom_Projects order by Queue desc
+    `;
+
+  mssql.query(getOldProjectId, (err, res2) => {
+    if (res2.recordset.length > 0) {
+      mssql.query(getOldProjectQueue, (err, res3) => {
+        const sql_update = `update MekmarCom_Projects SET Queue='${res3.recordset[0].Queue}' where ID='${res2.recordset[0].ID}'`;
+        mssql.query(sql_update, (err, res4) => {
+          mssql.query(newUpdateSql, (err, result) => {
+            if (result.rowsAffected[0] === 1) {
+              res.status(200).json({ status: true });
+            }
+          });
+        });
+      });
+    } else {
+      mssql.query(getOldProjectQueue, (err, res3) => {
+        mssql.query(newUpdateSql, (err, result) => {
+          if (result.rowsAffected[0] === 1) {
+            res.status(200).json({ status: true });
+          }
+        });
+      });
+    }
+  });
+});
+
 module.exports = {
   path: "/api",
   handler: app,

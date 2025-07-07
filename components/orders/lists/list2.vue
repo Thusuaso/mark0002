@@ -710,7 +710,7 @@
             }}
           </template>
           <template #footer>
-            {{ totals | formatDecimal }}
+            {{ totals | formatPriceUsd }}
           </template>
         </Column>
         <Column
@@ -735,7 +735,7 @@
             }}
           </template>
           <template #footer>
-            {{ totals | formatDecimal }}
+            {{ totals | formatPriceUsd }}
           </template>
         </Column>
       </DataTable>

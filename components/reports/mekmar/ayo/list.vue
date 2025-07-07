@@ -1,6 +1,5 @@
 <template>
   <div class="row">
-
     <div class="col">
       <DataTable
         :value="list"
@@ -14,7 +13,10 @@
         @row-click="mekmarAyoSelected($event)"
         scrollable
         scrollHeight="500px"
-:resizableColumns="true" columnResizeMode="fit" showGridlines responsiveLayout="scroll"
+        :resizableColumns="true"
+        columnResizeMode="fit"
+        showGridlines
+        responsiveLayout="scroll"
       >
         <Column
           field="siparisci"
@@ -25,7 +27,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -45,7 +46,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -65,7 +65,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -85,10 +84,14 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #body="slotProps">
-            <div :style="{ 'backgroundColor': slotProps.data.dosya_kapanma_date == '-' ? '#fae8b3':'' }">
+            <div
+              :style="{
+                backgroundColor:
+                  slotProps.data.dosya_kapanma_date == '-' ? '#fae8b3' : '',
+              }"
+            >
               {{ slotProps.data.siparis_no }}
             </div>
           </template>
@@ -111,7 +114,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -131,7 +133,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -151,7 +152,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -171,7 +171,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -191,7 +190,6 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
-
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -202,11 +200,7 @@
             />
           </template>
         </Column>
-        <Column
-          field="toplam_bedel"
-          header="Proforma"
-
-        >
+        <Column field="toplam_bedel" header="Proforma">
           <template #body="slotProps">
             {{ slotProps.data.toplam_bedel | formatPriceUsd }}
           </template>
@@ -214,18 +208,12 @@
             {{ total.proforma | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="mekmar_alim"
-          header="Production (Mekmer)"
-
-        >
+        <Column field="mekmar_alim" header="Production (Mekmer)">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.mekmer_alim_alis_kontrol > 0 
-                    ? '#F1948A'
-                    : '',
+                  slotProps.data.mekmer_alim_alis_kontrol > 0 ? '#F1948A' : '',
               }"
             >
               {{ slotProps.data.mekmar_alim | formatPriceUsd }}
@@ -235,7 +223,7 @@
             {{ total.mekmerProduction | formatPriceUsd }}
           </template>
         </Column>
-        <Column
+        <!-- <Column
           field="mekmoz_alim"
           header="Production (Mek-Moz)"
 
@@ -255,20 +243,13 @@
           <template #footer>
             {{ total.mekmozProduction | formatPriceUsd }}
           </template>
-        </Column>
-        <Column
-          field="dis_alim"
-          header="External Purchase"
-
-        >
+        </Column> -->
+        <Column field="dis_alim" header="External Purchase">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.dis_alim_alis_kontrol > 0 
-
-                    ? '#F1948A'
-                    : '',
+                  slotProps.data.dis_alim_alis_kontrol > 0 ? '#F1948A' : '',
               }"
             >
               {{ slotProps.data.dis_alim | formatPriceUsd }}
@@ -279,16 +260,13 @@
           </template>
         </Column>
 
-        <Column
-          field="nakliye"
-          header="Logistics"
-
-        >
+        <Column field="nakliye" header="Logistics">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.nakliye_evrak.length == 0 && slotProps.data.nakliye > 0
+                  slotProps.data.nakliye_evrak.length == 0 &&
+                  slotProps.data.nakliye > 0
                     ? '#F1948A'
                     : '',
               }"
@@ -300,16 +278,13 @@
             {{ total.transport | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="gumruk"
-          header="Custom"
-
-        >
+        <Column field="gumruk" header="Custom">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.gumruk_evrak.length == 0 && slotProps.data.gumruk > 0
+                  slotProps.data.gumruk_evrak.length == 0 &&
+                  slotProps.data.gumruk > 0
                     ? '#F1948A'
                     : '',
               }"
@@ -321,16 +296,13 @@
             {{ total.duty | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="ilaclama"
-          header="Fumigation"
-
-        >
+        <Column field="ilaclama" header="Fumigation">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.ilaclama_evrak.length == 0 && slotProps.data.ilaclama > 0
+                  slotProps.data.ilaclama_evrak.length == 0 &&
+                  slotProps.data.ilaclama > 0
                     ? '#F1948A'
                     : '',
               }"
@@ -342,16 +314,13 @@
             {{ total.spraying | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="liman"
-          header="Port"
-
-        >
+        <Column field="liman" header="Port">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.liman_evrak.length == 0 && slotProps.data.liman > 0
+                  slotProps.data.liman_evrak.length == 0 &&
+                  slotProps.data.liman > 0
                     ? '#F1948A'
                     : '',
               }"
@@ -363,11 +332,7 @@
             {{ total.port | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="sigorta"
-          header="Insurance"
-
-        >
+        <Column field="sigorta" header="Insurance">
           <template #body="slotProps">
             <div
               :style="{
@@ -384,16 +349,13 @@
             {{ total.insuranceBuyes | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="navlun"
-          header="Freight"
-
-        >
+        <Column field="navlun" header="Freight">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.navlun > 0 && slotProps.data.navlun_evrak.length <= 0
+                  slotProps.data.navlun > 0 &&
+                  slotProps.data.navlun_evrak.length <= 0
                     ? '#F1948A'
                     : '',
               }"
@@ -405,16 +367,13 @@
             {{ total.freightBuyes | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="lashing"
-          header="Lashing"
-
-        >
+        <Column field="lashing" header="Lashing">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.lashing > 0 && slotProps.data.lashing_evrak.length <= 0
+                  slotProps.data.lashing > 0 &&
+                  slotProps.data.lashing_evrak.length <= 0
                     ? '#F1948A'
                     : '',
               }"
@@ -426,16 +385,13 @@
             {{ total.lashing | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="booking"
-          header="Booking"
-
-        >
+        <Column field="booking" header="Booking">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.booking > 0 && slotProps.data.booking_evrak.length <= 0
+                  slotProps.data.booking > 0 &&
+                  slotProps.data.booking_evrak.length <= 0
                     ? '#F1948A'
                     : '',
               }"
@@ -447,16 +403,13 @@
             {{ total.booking | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="spazlet"
-          header="Spanzlet"
-
-        >
+        <Column field="spazlet" header="Spanzlet">
           <template #body="slotProps">
             <div
               :style="{
                 'background-color':
-                  slotProps.data.spazlet > 0 && slotProps.data.spazlet_evrak.length <= 0
+                  slotProps.data.spazlet > 0 &&
+                  slotProps.data.spazlet_evrak.length <= 0
                     ? '#F1948A'
                     : '',
               }"
@@ -468,11 +421,7 @@
             {{ total.spanzlet | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="detay_1"
-          header="Detail 1"
-
-        >
+        <Column field="detay_1" header="Detail 1">
           <template #body="slotProps">
             {{ slotProps.data.detay_1 | formatPriceUsd }}
           </template>
@@ -480,11 +429,7 @@
             {{ total.detailBuyes1 | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="detay_2"
-          header="Detail 2"
-
-        >
+        <Column field="detay_2" header="Detail 2">
           <template #body="slotProps">
             {{ slotProps.data.detay_2 | formatPriceUsd }}
           </template>
@@ -493,12 +438,7 @@
           </template>
         </Column>
 
-
-        <Column
-          field="pazarlama"
-          header="Marketing Cost"
-
-        >
+        <Column field="pazarlama" header="Marketing Cost">
           <template #body="slotProps">
             {{ slotProps.data.pazarlama | formatPriceUsd }}
           </template>
@@ -506,11 +446,7 @@
             {{ total.commision | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="ozel_iscilik"
-          header="Manual Labour Cost"
-
-        >
+        <Column field="ozel_iscilik" header="Manual Labour Cost">
           <template #body="slotProps">
             <div
               :style="{
@@ -528,11 +464,7 @@
             {{ total.specialwork | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="banka_masrafi"
-          header="Bank"
-
-        >
+        <Column field="banka_masrafi" header="Bank">
           <template #body="slotProps">
             {{ slotProps.data.banka_masrafi | formatPriceUsd }}
           </template>
@@ -540,11 +472,7 @@
             {{ total.bankCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="kurye_masrafi"
-          header="Courier"
-
-        >
+        <Column field="kurye_masrafi" header="Courier">
           <template #body="slotProps">
             {{ slotProps.data.kurye_masrafi | formatPriceUsd }}
           </template>
@@ -552,11 +480,7 @@
             {{ total.fregileCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="masraf_toplam"
-          header="Total"
-
-        >
+        <Column field="masraf_toplam" header="Total">
           <template #body="slotProps">
             {{ slotProps.data.masraf_toplam | formatPriceUsd }}
           </template>
@@ -564,11 +488,7 @@
             {{ total.costTotal | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="kar_zarar"
-          header="Profit / USD"
-
-        >
+        <Column field="kar_zarar" header="Profit / USD">
           <template #body="slotProps">
             {{ slotProps.data.kar_zarar | formatPriceUsd }}
           </template>
@@ -576,11 +496,7 @@
             {{ total.profitUsd | formatPriceUsd }}
           </template>
         </Column>
-        <Column
-          field="kar_zarar_tl"
-          header="Profit / TRY"
-
-        >
+        <Column field="kar_zarar_tl" header="Profit / TRY">
           <template #body="slotProps">
             {{ slotProps.data.kar_zarar_tl | formatPriceTl }}
           </template>
@@ -588,20 +504,12 @@
             {{ total.profitTl | formatPriceTl }}
           </template>
         </Column>
-        <Column
-          field="kar_zarar_tl_yuzdesi"
-          header="Profit (%)"
-
-        >
+        <Column field="kar_zarar_tl_yuzdesi" header="Profit (%)">
           <template #body="slotProps">
             % {{ slotProps.data.kar_zarar_tl_yuzdesi }}
           </template>
         </Column>
-        <Column
-          field="dosya_kapanma_date"
-          header="Date of Closure"
-
-        ></Column>
+        <Column field="dosya_kapanma_date" header="Date of Closure"></Column>
       </DataTable>
     </div>
   </div>
@@ -641,13 +549,10 @@ export default {
       this.$store.dispatch("setReportsMekmarAyoListTotal", event.filteredValue);
     },
     mekmarAyoSelected(event) {
-      this.$emit('mekmar_ayo_selected_emit',event.data);
-
+      this.$emit("mekmar_ayo_selected_emit", event.data);
     },
   },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
