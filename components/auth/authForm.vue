@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="onSubmit">
+  <!-- <form @submit.prevent="onSubmit">
     <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">Username</label>
       <input
@@ -23,7 +23,41 @@
       />
     </div>
     <button type="submit" class="btn btn-primary w-100">Login</button>
-  </form>
+  </form> -->
+
+  <Card style="width: 25rem; margin: 0px auto;">
+    <template #title>
+      <div class="text-center">Login</div>
+    </template>
+    <template #content>
+      <form @submit.prevent="onSubmit">
+        <div class="flex flex-column gap-3">
+          <div class="field">
+            <label for="email">Username</label>
+            <InputText
+              id="email"
+              v-model="user.username"
+              @change="validateUsername($event)"
+              class="w-full"
+            />
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <InputText
+              v-model="user.password"
+              @change="validatePassword($event)"
+              class="w-full"
+              type="password"
+              inputClass="w-full"
+            />
+          </div>
+
+          <Button type="submit" label="Login" class="mt-3" />
+        </div>
+      </form>
+    </template>
+  </Card>
 </template>
 <script>
 export default {
@@ -68,7 +102,8 @@ export default {
     validateUsername(event) {
       this.usernameInfoStatus = true;
       const index = this.users.filter(
-        (x) => x.KullaniciAdi.toLowerCase() === event.target._value.toLowerCase()
+        (x) =>
+          x.KullaniciAdi.toLowerCase() === event.target._value.toLowerCase()
       );
       if (index.length > 0) {
         this.usernameStatus = true;

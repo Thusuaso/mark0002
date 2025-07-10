@@ -1,5 +1,5 @@
 <template>
-  <div class="container m-auto w-50 mt-5">
+  <div class="container" style="padding-top: 230px">
     <authForm @onSubmit="onSubmit($event)" :users="getUserList" />
   </div>
 </template>
@@ -13,9 +13,8 @@ export default {
   methods: {
     onSubmit(user) {
       this.$store.dispatch("login", user).then((res) => {
-        
-        const userId = Cookies.get('userId');
-        this.$store.dispatch('setUserId',userId);
+        const userId = Cookies.get("userId");
+        this.$store.dispatch("setUserId", userId);
         if (res) {
           const date = new Date();
           user.innerDate =
@@ -31,9 +30,7 @@ export default {
             ":" +
             date.getSeconds();
           this.$store.dispatch("login_mailer", user);
-          this.$store.dispatch('setToDoListByUsername',user.username)
-
-
+          this.$store.dispatch("setToDoListByUsername", user.username);
         }
       });
     },

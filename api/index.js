@@ -36,7 +36,8 @@ function __noneNullControl(value) {
     value == undefined ||
     value == "null" ||
     value == "NULL" ||
-    value == "Null"
+    value == "Null" ||
+    value == "undefined"
   ) {
     return "";
   } else {
@@ -11866,6 +11867,14 @@ function __floatNullControl(value) {
   }
 }
 
+function __undefinedControl(event) {
+  if (event === undefined || event === null || event === "null") {
+    return "";
+  } else {
+    return value;
+  }
+}
+
 app.post("/order/production/product/add", (req, res) => {
   let buyingPrice = 0;
 
@@ -11913,7 +11922,7 @@ app.post("/order/production/product/add", (req, res) => {
 	'${__floatNullControl(req.body.SiraNo)}',
 	'${__floatNullControl(req.body.Ton)}',
 	'${__floatNullControl(req.body.Adet)}',
-    '${req.body.KasaOlcusu}'
+    '${__noneNullControl(req.body.KasaOlcusu)}'
 
 )
     `;
@@ -11983,7 +11992,7 @@ app.put("/order/production/product/update", (req, res) => {
         SiraNo = '${__floatNullControl(req.body.SiraNo)}',
         Ton = '${__floatNullControl(req.body.Ton)}',
         Adet = '${__floatNullControl(req.body.Adet)}',
-        KasaOlcusu='${req.body.KasaOlcusu}'
+        KasaOlcusu='${__noneNullControl(req.body.KasaOlcusu)}'
         where ID = '${req.body.ID}'
     `;
   mssql.query(sql, (err, product) => {
