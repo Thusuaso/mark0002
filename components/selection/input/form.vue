@@ -439,41 +439,81 @@ export default {
     },
 
     calculateTotalAmountM2(event) {
-      if (
-        this.width == "ANT" ||
-        this.height == "Free" ||
-        this.width == "Ant" ||
-        this.height == "FREE" ||
-        this.width == "Mini" ||
-        this.width == "MINI" ||
-        this.width == "Other" ||
-        this.width == "OTHER"
-      ) {
-        return 0;
-      } else if (
-        this.width === "VAR" ||
-        this.width === "Various" ||
-        this.width === "Slab" ||
-        this.width === "SLAB"
-      ) {
-        this.amount = event;
-      } else {
-        if (this.selectedAmountStatus == "Sqm") {
-          const width = parseFloat(this.width.replace(",", "."));
-          const height = parseFloat(this.height.replace(",", "."));
-          this.amount = (
-            (width * height * parseInt(event.replace(",", "."))) /
-            10000
-          ).toFixed(2);
-          this.speacialAmount = this.amount;
+      if (this.selectedAmountStatus === "Sqm") {
+        if (
+          this.width == "ANT" ||
+          this.height == "Free" ||
+          this.width == "Ant" ||
+          this.height == "FREE" ||
+          this.width == "Mini" ||
+          this.width == "MINI" ||
+          this.width == "Other" ||
+          this.width == "OTHER"
+        ) {
+          return 0;
+        } else if (
+          this.width === "VAR" ||
+          this.width === "Various" ||
+          this.width === "Slab" ||
+          this.width === "SLAB"
+        ) {
+          this.amount = 0;
         } else {
-          const width = parseFloat(this.width.replace(",", "."));
-          const height = parseFloat(this.height.replace(",", "."));
-          this.speacialAmount = (
-            (width * height * parseInt(event.replace(",", "."))) /
-            10000
-          ).toFixed(2);
+          if (this.selectedAmountStatus == "Sqm") {
+            const width = parseFloat(this.width.replace(",", "."));
+            const height = parseFloat(this.height.replace(",", "."));
+            this.amount = (
+              (width * height * parseInt(event.replace(",", "."))) /
+              10000
+            ).toFixed(2);
+            this.speacialAmount = this.amount;
+          } else {
+            const width = parseFloat(this.width.replace(",", "."));
+            const height = parseFloat(this.height.replace(",", "."));
+            this.speacialAmount = (
+              (width * height * parseInt(event.replace(",", "."))) /
+              10000
+            ).toFixed(2);
+            this.amount = event;
+          }
+        }
+      } else if (this.selectedAmountStatus === "Pcs") {
+        if (
+          this.width == "ANT" ||
+          this.height == "Free" ||
+          this.width == "Ant" ||
+          this.height == "FREE" ||
+          this.width == "Mini" ||
+          this.width == "MINI" ||
+          this.width == "Other" ||
+          this.width == "OTHER"
+        ) {
+          return 0;
+        } else if (
+          this.width === "VAR" ||
+          this.width === "Various" ||
+          this.width === "Slab" ||
+          this.width === "SLAB"
+        ) {
           this.amount = event;
+        } else {
+          if (this.selectedAmountStatus == "Sqm") {
+            const width = parseFloat(this.width.replace(",", "."));
+            const height = parseFloat(this.height.replace(",", "."));
+            this.amount = (
+              (width * height * parseInt(event.replace(",", "."))) /
+              10000
+            ).toFixed(2);
+            this.speacialAmount = this.amount;
+          } else {
+            const width = parseFloat(this.width.replace(",", "."));
+            const height = parseFloat(this.height.replace(",", "."));
+            this.speacialAmount = (
+              (width * height * parseInt(event.replace(",", "."))) /
+              10000
+            ).toFixed(2);
+            this.amount = event;
+          }
         }
       }
     },
@@ -532,6 +572,8 @@ export default {
         birimId = 2;
       } else if (this.selectedAmountStatus == "Mt") {
         birimId = 3;
+      } else if (this.selectedAmountStatus == "Ton") {
+        birimId = 4;
       }
       const data = {
         Tarih: date.dateToString(this.selectedDate),
@@ -596,6 +638,8 @@ export default {
         birimId = 2;
       } else if (this.selectedAmountStatus == "Mt") {
         birimId = 3;
+      } else if (this.selectedAmountStatus == "Ton") {
+        birimId = 4;
       }
       const data = {
         ID: this.model.ID,

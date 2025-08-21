@@ -1,61 +1,119 @@
 <template>
-  <div class="row" style="padding:0px 100px;">
+  <div class="row" style="padding: 0px 100px">
     <div class="col-9">
       <div class="row">
         <div class="col mt-3">
           <div class="p-float-label mb-4">
-            <Dropdown v-model="selectedSource" inputId="source" :options="sources" optionLabel="source" class="w-100"
-              @change="sourceSelected($event)" />
+            <Dropdown
+              v-model="selectedSource"
+              inputId="source"
+              :options="sources"
+              optionLabel="source"
+              class="w-100"
+              @change="sourceSelected($event)"
+            />
             <label for="source">Source</label>
           </div>
           <div class="p-float-label mb-4">
-            <Dropdown v-model="selectedOfferType" inputId="type" :options="offerTypes" optionLabel="type" class="w-100"
-              @change="offerTypeSelected($event)" />
+            <Dropdown
+              v-model="selectedOfferType"
+              inputId="type"
+              :options="offerTypes"
+              optionLabel="type"
+              class="w-100"
+              @change="offerTypeSelected($event)"
+            />
             <label for="type">Quote Type</label>
           </div>
           <div class="p-float-label mb-4">
-            <Dropdown v-model="selectedPriority" inputId="priority" :options="priorities" optionLabel="priority"
-              class="w-100" @change="prioritySelected($event)" />
+            <Dropdown
+              v-model="selectedPriority"
+              inputId="priority"
+              :options="priorities"
+              optionLabel="priority"
+              class="w-100"
+              @change="prioritySelected($event)"
+            />
             <label for="priority">Priority</label>
           </div>
           <div class="p-float-label mb-4">
-            <Dropdown v-model="selectedShippedType" inputId="type" :options="shippedType" optionLabel="type"
-              class="w-100"  />
+            <Dropdown
+              v-model="selectedShippedType"
+              inputId="type"
+              :options="shippedType"
+              optionLabel="type"
+              class="w-100"
+            />
             <label for="type">Type</label>
           </div>
-          <Button class="p-button-secondary w-100" label="Proforma Excel" @click="proforma_excel_output"/>
+          <Button
+            class="p-button-secondary w-100"
+            label="Proforma Excel"
+            @click="proforma_excel_output"
+          />
         </div>
         <div class="col">
           <TabView>
             <TabPanel header="Description">
-              <Textarea v-model="model.Aciklama" autoResize rows="5" cols="30" class="w-100" />
+              <Textarea
+                v-model="model.Aciklama"
+                autoResize
+                rows="5"
+                cols="30"
+                class="w-100"
+              />
             </TabPanel>
             <TabPanel header="Reminder">
               <div class="row">
                 <div class="col">
-                  <Calendar v-model="reminder_date" @date-select="reminderDateSelected($event)" placeholder="Date" dateFormat="dd/mm/yy"/>
+                  <Calendar
+                    v-model="reminder_date"
+                    @date-select="reminderDateSelected($event)"
+                    placeholder="Date"
+                    dateFormat="dd/mm/yy"
+                  />
                 </div>
                 <div class="col">
                   <FileUpload mode="basic" @select="uploadReminder($event)" />
                 </div>
                 <div class="col">
                   <a :href="offerFileLink" ref="cloudReminder"> </a>
-                  <Button @click="$refs.cloudReminder.click()" :disabled="!model.Teklif_Cloud"
-                    class="btn btn-success h-100"><i class="pi pi-download"></i></Button>
+                  <Button
+                    @click="$refs.cloudReminder.click()"
+                    :disabled="!model.Teklif_Cloud"
+                    class="btn btn-success h-100"
+                    ><i class="pi pi-download"></i
+                  ></Button>
                 </div>
               </div>
             </TabPanel>
             <TabPanel header="Sample Invoice">
               <div class="row">
                 <div class="col">
-                  <Button class="p-button-primary" label="Proforma" @click="proforma_dialog_form = true" />
-                  <Dialog :visible.sync="proforma_dialog_form" header="Proforma" modal>
+                  <Button
+                    class="p-button-primary"
+                    label="Proforma"
+                    @click="proforma_dialog_form = true"
+                  />
+                  <Dialog
+                    :visible.sync="proforma_dialog_form"
+                    header="Proforma"
+                    modal
+                  >
                     <offerProforma :id="id" :model="model" />
                   </Dialog>
                 </div>
                 <div class="col">
-                  <Button class="p-button-secondary" label="Sample" @click="sample_dialog_form = true" />
-                  <Dialog :visible.sync="sample_dialog_form" header="Sample" modal>
+                  <Button
+                    class="p-button-secondary"
+                    label="Sample"
+                    @click="sample_dialog_form = true"
+                  />
+                  <Dialog
+                    :visible.sync="sample_dialog_form"
+                    header="Sample"
+                    modal
+                  >
                     <offerSample :id="id" :model="model" />
                   </Dialog>
                 </div>
@@ -68,32 +126,59 @@
         <div class="row">
           <div class="col">
             <span class="p-float-label">
-              <Calendar v-model="offerProductDate" inputId="offer_product_date"
-                @date-select="offerProductDateSelected($event)" :disabled="id == 0" style="z-index: 99" dateFormat="dd/mm/yy"/>
+              <Calendar
+                v-model="offerProductDate"
+                inputId="offer_product_date"
+                @date-select="offerProductDateSelected($event)"
+                :disabled="id == 0"
+                style="z-index: 99"
+                dateFormat="dd/mm/yy"
+              />
               <label for="offer_product_date">Date of Quote</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
-              <AutoComplete v-model="selectedCategory" inputId="category" :suggestions="filteredCategoryList"
-                @complete="searchCategory($event)" field="KategoriAdi" @item-select="categoryListSelected($event)"
-                :disabled="id == 0" @input="inputCategory($event)" />
+              <AutoComplete
+                v-model="selectedCategory"
+                inputId="category"
+                :suggestions="filteredCategoryList"
+                @complete="searchCategory($event)"
+                field="KategoriAdi"
+                @item-select="categoryListSelected($event)"
+                :disabled="id == 0"
+                @input="inputCategory($event)"
+              />
               <label for="category">Category</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
-              <AutoComplete v-model="selectedProduct" inputId="product" :suggestions="filteredProductList"
-                @complete="searchProduct($event)" field="UrunAdi" @item-select="productListSelected($event)"
-                :disabled="id == 0" @input="inputProduct($event)" />
+              <AutoComplete
+                v-model="selectedProduct"
+                inputId="product"
+                :suggestions="filteredProductList"
+                @complete="searchProduct($event)"
+                field="UrunAdi"
+                @item-select="productListSelected($event)"
+                :disabled="id == 0"
+                @input="inputProduct($event)"
+              />
               <label for="product">Product</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
-              <AutoComplete v-model="selectedSize" inputId="size" :suggestions="filteredSizeList"
-                @complete="searchSize($event)" field="EnBoy" @item-select="sizeListSelected($event)" :disabled="id == 0"
-                @input="inputSize($event)" />
+              <AutoComplete
+                v-model="selectedSize"
+                inputId="size"
+                :suggestions="filteredSizeList"
+                @complete="searchSize($event)"
+                field="EnBoy"
+                @item-select="sizeListSelected($event)"
+                :disabled="id == 0"
+                @input="inputSize($event)"
+              />
               <label for="size">Width x Lenght</label>
             </span>
           </div>
@@ -101,32 +186,56 @@
         <div class="row mt-4">
           <div class="col">
             <span class="p-float-label">
-              <AutoComplete v-model="selectedThickness" inputId="thickness" :suggestions="filteredThicknessList"
-                @complete="searchThickness($event)" field="Kalinlik" @item-select="thicknessListSelected($event)"
-                :disabled="id == 0" @input="inputThickness($event)" />
+              <AutoComplete
+                v-model="selectedThickness"
+                inputId="thickness"
+                :suggestions="filteredThicknessList"
+                @complete="searchThickness($event)"
+                field="Kalinlik"
+                @item-select="thicknessListSelected($event)"
+                :disabled="id == 0"
+                @input="inputThickness($event)"
+              />
               <label for="thickness">Thickness</label>
             </span>
           </div>
           <div class="col">
             <span class="p-float-label">
-              <AutoComplete v-model="selectedSurface" inputId="surface" :suggestions="filteredSurfaceList"
-                @complete="searchSurface($event)" field="IslemAdi" @item-select="surfaceListSelected($event)"
-                :disabled="id == 0" @input="inputSurface($event)" />
+              <AutoComplete
+                v-model="selectedSurface"
+                inputId="surface"
+                :suggestions="filteredSurfaceList"
+                @complete="searchSurface($event)"
+                field="IslemAdi"
+                @item-select="surfaceListSelected($event)"
+                :disabled="id == 0"
+                @input="inputSurface($event)"
+              />
               <label for="surface">Surface</label>
             </span>
           </div>
           <div class="col">
             <div class="p-float-label">
-              <Dropdown v-model="selectedUnit" inputId="unit" :options="unit" optionLabel="Birim"
-                @change="unitSelected($event)" :disabled="id == 0" />
+              <Dropdown
+                v-model="selectedUnit"
+                inputId="unit"
+                :options="unit"
+                optionLabel="Birim"
+                @change="unitSelected($event)"
+                :disabled="id == 0"
+              />
               <label for="unit">Select a Unit</label>
             </div>
           </div>
         </div>
         <div class="row mt-4">
           <div class="col">
-            <CustomInput :value="modelProduct.FobFiyat" text="Fob" @onInput="modelProduct.FobFiyat = $event"
-              :disabled="id == 0" />
+            <CustomInput
+              :value="modelProduct.FobFiyat"
+              text="Fob"
+              @onInput="modelProduct.FobFiyat = $event"
+              :disabled="id == 0"
+            />
             <!-- <span class="p-float-label">
               <InputText
                 id="fob"
@@ -138,8 +247,12 @@
             </span> -->
           </div>
           <div class="col">
-            <CustomInput :value="modelProduct.FcaFiyat" text="Fca" @onInput="modelProduct.FcaFiyat = $event"
-              :disabled="id == 0" />
+            <CustomInput
+              :value="modelProduct.FcaFiyat"
+              text="Fca"
+              @onInput="modelProduct.FcaFiyat = $event"
+              :disabled="id == 0"
+            />
             <!-- <span class="p-float-label">
               
 
@@ -153,8 +266,12 @@
             </span> -->
           </div>
           <div class="col">
-            <CustomInput :value="modelProduct.CFiyat" text="C" @onInput="modelProduct.CFiyat = $event"
-              :disabled="id == 0" />
+            <CustomInput
+              :value="modelProduct.CFiyat"
+              text="C"
+              @onInput="modelProduct.CFiyat = $event"
+              :disabled="id == 0"
+            />
             <!-- <span class="p-float-label">
               <InputText
                 id="c"
@@ -166,8 +283,12 @@
             </span> -->
           </div>
           <div class="col">
-            <CustomInput :value="modelProduct.DFiyat" text="D" @onInput="modelProduct.DFiyat = $event"
-              :disabled="id == 0" />
+            <CustomInput
+              :value="modelProduct.DFiyat"
+              text="D"
+              @onInput="modelProduct.DFiyat = $event"
+              :disabled="id == 0"
+            />
             <!-- <span class="p-float-label">
               <InputText
                 id="d"
@@ -181,27 +302,51 @@
         </div>
         <div class="row mt-3">
           <div class="col">
-            <Button type="button" class="p-button-success w-100" label="Add" @click="addProduct" :disabled="id == 0" />
+            <Button
+              type="button"
+              class="p-button-success w-100"
+              label="Add"
+              @click="addProduct"
+              :disabled="id == 0"
+            />
           </div>
           <div class="col">
-            <Button type="button" class="p-button-warning w-100" label="Update" @click="updateProduct"
-              :disabled="id == 0" />
+            <Button
+              type="button"
+              class="p-button-warning w-100"
+              label="Update"
+              @click="updateProduct"
+              :disabled="id == 0"
+            />
           </div>
           <div class="col">
-            <Button type="button" class="p-button-danger w-100" label="Delete" @click="deleteProduct"
-              :disabled="id == 0" />
+            <Button
+              type="button"
+              class="p-button-danger w-100"
+              label="Delete"
+              @click="deleteProduct"
+              :disabled="id == 0"
+            />
           </div>
         </div>
         <div class="row mt-3">
           <div class="col">
-            <DataTable :value="productsList" :selection.sync="selectedProductsList" selectionMode="single"
+            <DataTable
+              :value="productsList"
+              :selection.sync="selectedProductsList"
+              selectionMode="single"
               @row-click="productsListSelected($event)"
               dataKey="Id"
-              >
+            >
               <template #empty> No products found. </template>
               <Column selectionMode="multiple" headerStyle="width: 3rem">
                 <template #body="slotProps">
-                  <Checkbox v-model="slotProps.data.selected" inputId="cb1" binary @change="productsCheckbox(slotProps.data)"/>
+                  <Checkbox
+                    v-model="slotProps.data.selected"
+                    inputId="cb1"
+                    binary
+                    @change="productsCheckbox(slotProps.data)"
+                  />
                 </template>
               </Column>
 
@@ -246,11 +391,21 @@
       <div class="">
         <div class="row">
           <div class="col">
-            <Button type="button" class="p-button-success w-100 mb-4" label="Save" @click="process"
-              :disabled="disabled_button_status" />
+            <Button
+              type="button"
+              class="p-button-success w-100 mb-4"
+              label="Save"
+              @click="process"
+              :disabled="disabled_button_status"
+            />
           </div>
           <div class="col" v-if="!status">
-            <Button type="button" class="p-button-danger w-100" label="Delete" @click="deleteProcess" />
+            <Button
+              type="button"
+              class="p-button-danger w-100"
+              label="Delete"
+              @click="deleteProcess"
+            />
           </div>
         </div>
         <div class="flex flex-wrap justify-content-center gap-3 mb-4">
@@ -264,20 +419,38 @@
           </div>
         </div>
         <span class="p-float-label mb-4">
-          <Calendar v-model="offerDate" inputId="offer_date" style="width: 100%"
-            @date-select="offerDateSelected($event)" dateFormat="dd/mm/yy"/>
+          <Calendar
+            v-model="offerDate"
+            inputId="offer_date"
+            style="width: 100%"
+            @date-select="offerDateSelected($event)"
+            dateFormat="dd/mm/yy"
+          />
           <label for="offer_date">Date</label>
         </span>
         <span class="p-float-label mb-4">
-          <AutoComplete v-model="selectedCustomer" inputId="customer" :suggestions="filteredCustomer"
-            @complete="searchCustomer($event)" field="MusteriAdi" @item-select="customerSelected($event)"
-            @input="customerInput($event)" :disabled="offer_customer_disabled" />
+          <AutoComplete
+            v-model="selectedCustomer"
+            inputId="customer"
+            :suggestions="filteredCustomer"
+            @complete="searchCustomer($event)"
+            field="MusteriAdi"
+            @item-select="customerSelected($event)"
+            @input="customerInput($event)"
+            :disabled="offer_customer_disabled"
+          />
           <label for="customer">Customer</label>
         </span>
         <span class="p-float-label mb-4">
-          <AutoComplete v-model="selectedCountry" inputId="country" :suggestions="filteredCountry"
-            @complete="searchCountry($event)" field="UlkeAdi" @item-select="countrySelected($event)"
-            :disabled="offer_customer_disabled" />
+          <AutoComplete
+            v-model="selectedCountry"
+            inputId="country"
+            :suggestions="filteredCountry"
+            @complete="searchCountry($event)"
+            field="UlkeAdi"
+            @item-select="countrySelected($event)"
+            :disabled="offer_customer_disabled"
+          />
           <label for="country">Country</label>
         </span>
         <span class="p-float-label mb-4">
@@ -297,7 +470,11 @@
           <label for="adress">Address</label>
         </span>
         <span class="p-float-label mb-4">
-          <Textarea v-model="customerModel.Description" rows="5" class="w-100" />
+          <Textarea
+            v-model="customerModel.Description"
+            rows="5"
+            class="w-100"
+          />
           <label>Description</label>
         </span>
       </div>
@@ -307,13 +484,13 @@
 <script>
 import date from "../../plugins/date";
 import Cookies from "js-cookie";
-import api from '@/plugins/excel.server';
+import api from "@/plugins/excel.server";
 
 import fileService from "~/plugins/upload.js";
-import {mapGetters} from 'vuex';
+import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters([ "getLocalUrl"]),
+    ...mapGetters(["getLocalUrl"]),
   },
   props: {
     model: {
@@ -372,22 +549,22 @@ export default {
       type: Number,
       required: false,
     },
-    disabled_button_status:{
-      type:Boolean,
-      required:true
-    }
+    disabled_button_status: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
-      selectedCheckedProductList:[],
-      selectedShippedType:null,
-      shippedType:[
-        {'id':1,'type':'FOB'},
-        {'id':2,'type':'FCA'},
-        {'id':3,'type':'C'},
-        {'id':4,'type':'D'},
+      selectedCheckedProductList: [],
+      selectedShippedType: null,
+      shippedType: [
+        { id: 1, type: "FOB" },
+        { id: 2, type: "FCA" },
+        { id: 3, type: "C" },
+        { id: 4, type: "D" },
       ],
-      selectedOrderProducts:[],
+      selectedOrderProducts: [],
       width: null,
       height: null,
       offer_customer_disabled: false,
@@ -410,6 +587,7 @@ export default {
         { id: 6, source: "BGP Network" },
         { id: 7, source: "Ziyaret" },
         { id: 8, source: "Stone Add" },
+        { id: 9, source: "Shopify" },
       ],
       selectedOfferType: null,
       offerTypes: [
@@ -452,47 +630,44 @@ export default {
     }
   },
   methods: {
-    productsCheckbox(event){
-      if(event.selected){
+    productsCheckbox(event) {
+      if (event.selected) {
         this.selectedCheckedProductList.push(event);
-      }else{
-        const index = this.selectedCheckedProductList.findIndex(x => x.Id == event.Id);
-        if(index != -1){
-          this.selectedCheckedProductList.splice(index,1);
+      } else {
+        const index = this.selectedCheckedProductList.findIndex(
+          (x) => x.Id == event.Id
+        );
+        if (index != -1) {
+          this.selectedCheckedProductList.splice(index, 1);
         }
-      };
-    },
-    proforma_excel_output(){
-      if(this.selectedShippedType == null ){
-        this.$toast.error("Please select a shipped type.");
-      }else{
-        if(this.selectedCheckedProductList.length === 0 ){
-          this.$toast.error("Please select a product.");
-        }else{
-          const data = {
-            'data':this.selectedCheckedProductList,
-            'shipped':this.selectedShippedType,
-            'model':this.model,
-            'customer':this.customerModel
-          };
-          
-          api.post('/offer/proforma/output',data)
-          .then(res=>{
-            if (res.status) {
-                const link = document.createElement("a");
-                link.href = this.getLocalUrl + "offer/proforma/output";
-
-                link.setAttribute("download", "proforma_invoice.xlsx");
-                document.body.appendChild(link);
-                link.click();
-              }
-          });
-
-
-        }
-
       }
+    },
+    proforma_excel_output() {
+      if (this.selectedShippedType == null) {
+        this.$toast.error("Please select a shipped type.");
+      } else {
+        if (this.selectedCheckedProductList.length === 0) {
+          this.$toast.error("Please select a product.");
+        } else {
+          const data = {
+            data: this.selectedCheckedProductList,
+            shipped: this.selectedShippedType,
+            model: this.model,
+            customer: this.customerModel,
+          };
 
+          api.post("/offer/proforma/output", data).then((res) => {
+            if (res.status) {
+              const link = document.createElement("a");
+              link.href = this.getLocalUrl + "offer/proforma/output";
+
+              link.setAttribute("download", "proforma_invoice.xlsx");
+              document.body.appendChild(link);
+              link.click();
+            }
+          });
+        }
+      }
     },
     inputSurface(event) {
       this.modelProduct.IslemAdi = event;
@@ -543,14 +718,16 @@ export default {
             date: date.dateToString(this.reminder_date),
             id: this.id,
           };
-          this.$store.dispatch("setOfferReminderCloudUpload", data).then((response) => {
-            this.offerFileLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${this.id}/${event.files[0].name}`;
-            if (response) {
-              this.$toast.success("Başarıyla Kaydedildi.");
-            } else {
-              this.$toast.error("Kaydetme Başarısız.");
-            }
-          });
+          this.$store
+            .dispatch("setOfferReminderCloudUpload", data)
+            .then((response) => {
+              this.offerFileLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${this.id}/${event.files[0].name}`;
+              if (response) {
+                this.$toast.success("Başarıyla Kaydedildi.");
+              } else {
+                this.$toast.error("Kaydetme Başarısız.");
+              }
+            });
         }
       });
     },
@@ -570,7 +747,11 @@ export default {
     },
     deleteProcess() {
       if (confirm("Are you sure you want to delete?")) {
-        const data = { offer: this.model, customer: this.customerModel,'id':this.model.Id };
+        const data = {
+          offer: this.model,
+          customer: this.customerModel,
+          id: this.model.Id,
+        };
         this.$emit("offer_delete_emit", data);
       }
     },
@@ -602,13 +783,17 @@ export default {
         alert("Hatalı Giriş");
         this.offer_disabled_button = false;
       } else {
-          this.customerModel.Kullanici = Cookies.get("userId");
-          this.customerModel.Company = this.__nullControl(this.customerModel.Company);
-          this.customerModel.Mail = this.__nullControl(this.customerModel.Mail);
-          this.customerModel.Phone = this.__nullControl(this.customerModel.Phone);
-          this.customerModel.Adress = this.__nullControl(this.customerModel.Adress);
-          this.customerModel.Description = this.__nullControl(
-            this.customerModel.Description
+        this.customerModel.Kullanici = Cookies.get("userId");
+        this.customerModel.Company = this.__nullControl(
+          this.customerModel.Company
+        );
+        this.customerModel.Mail = this.__nullControl(this.customerModel.Mail);
+        this.customerModel.Phone = this.__nullControl(this.customerModel.Phone);
+        this.customerModel.Adress = this.__nullControl(
+          this.customerModel.Adress
+        );
+        this.customerModel.Description = this.__nullControl(
+          this.customerModel.Description
         );
 
         if (this.status) {
@@ -619,8 +804,24 @@ export default {
         this.model.Tarih = date.dateToString(this.offerDate);
         const data = { offer: this.model, customer: this.customerModel };
 
-
         this.$emit("offer_process_emit", data);
+        if (this.status) {
+          this.modelProduct.Tarih = date.dateToString(this.offerDate);
+          this.modelProduct.TeklifId = this.id;
+          this.modelProduct.KategoriId = 1;
+          this.modelProduct.UrunId = 1;
+          this.modelProduct.EnBoyId = 1;
+          this.modelProduct.KalinlikId = 1;
+          this.modelProduct.YuzeyIslemId = 1;
+          this.modelProduct.FobFiyat = 0;
+          this.modelProduct.Birim = "Sqm";
+          this.modelProduct.FcaFiyat = 0;
+          this.modelProduct.CFiyat = 0;
+          this.modelProduct.DFiyat = 0;
+          this.$store.dispatch("setOfferDetailProductsAdd", this.modelProduct);
+          this.productReset();
+        }
+
         this.offer_disabled_button = false;
       }
     },
@@ -628,7 +829,9 @@ export default {
       this.customerModel.UlkeId = event.value.Id;
     },
     customerSelected(event) {
-      this.selectedCountry = this.country.find((x) => x.Id == event.value.UlkeId);
+      this.selectedCountry = this.country.find(
+        (x) => x.Id == event.value.UlkeId
+      );
       this.model.MusteriId = event.value.Id;
       this.customerModel.Id = event.value.Id;
       this.customerModel.UlkeId = event.value.UlkeId;
@@ -657,7 +860,9 @@ export default {
         results = this.customer;
       } else {
         results = this.customer.filter((x) => {
-          return x.MusteriAdi.toLowerCase().startsWith(event.query.toLowerCase());
+          return x.MusteriAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredCustomer = results;
@@ -687,7 +892,9 @@ export default {
     createdProcess() {
       this.offer_customer_disabled = true;
       this.offerFileLink = this.model.cloudLink;
-      this.selectedSource = this.sources.find((x) => x.source == this.model.KaynakYeri);
+      this.selectedSource = this.sources.find(
+        (x) => x.source == this.model.KaynakYeri
+      );
       this.selectedOfferType = this.offerTypes.find(
         (x) => x.type == this.model.TeklifYeri
       );
@@ -696,7 +903,9 @@ export default {
       );
       this.offerDate = date.stringToDate(this.model.Tarih);
       if (this.__undefinedControl(this.model.MusteriId)) {
-        this.selectedCustomer = this.customer.find((x) => x.Id == this.model.MusteriId);
+        this.selectedCustomer = this.customer.find(
+          (x) => x.Id == this.model.MusteriId
+        );
         if (this.__undefinedControl(this.selectedCustomer.UlkeId)) {
           this.selectedCountry = this.country.find(
             (x) => x.Id == this.selectedCustomer.UlkeId
@@ -708,10 +917,16 @@ export default {
       this.customerModel.Id = this.selectedCustomer.Id;
       this.customerModel.MusteriAdi = this.selectedCustomer.MusteriAdi;
 
-      this.customerModel.Company = this.__nullControl(this.selectedCustomer.Company);
+      this.customerModel.Company = this.__nullControl(
+        this.selectedCustomer.Company
+      );
       this.customerModel.Mail = this.__nullControl(this.selectedCustomer.Mail);
-      this.customerModel.Phone = this.__nullControl(this.selectedCustomer.Phone);
-      this.customerModel.Adress = this.__nullControl(this.selectedCustomer.Adress);
+      this.customerModel.Phone = this.__nullControl(
+        this.selectedCustomer.Phone
+      );
+      this.customerModel.Adress = this.__nullControl(
+        this.selectedCustomer.Adress
+      );
       this.customerModel.Description = this.__nullControl(
         this.selectedCustomer.Description
       );
@@ -729,11 +944,19 @@ export default {
     productsListSelected(event) {
       this.selectedProductsList = null;
       this.offerProductDate = date.stringToDate(event.data.Tarih);
-      this.selectedCategory = this.category.find((x) => x.Id == event.data.KategoriId);
-      this.selectedProduct = this.product.find((x) => x.Id == event.data.UrunId);
+      this.selectedCategory = this.category.find(
+        (x) => x.Id == event.data.KategoriId
+      );
+      this.selectedProduct = this.product.find(
+        (x) => x.Id == event.data.UrunId
+      );
       this.selectedSize = this.size.find((x) => x.id == event.data.EnBoyId);
-      this.selectedThickness = this.thickness.find((x) => x.id == event.data.KalinlikId);
-      this.selectedSurface = this.surface.find((x) => x.Id == event.data.YuzeyIslemId);
+      this.selectedThickness = this.thickness.find(
+        (x) => x.id == event.data.KalinlikId
+      );
+      this.selectedSurface = this.surface.find(
+        (x) => x.Id == event.data.YuzeyIslemId
+      );
       this.selectedUnit = this.unit.find((x) => x.Birim == event.data.Birim);
       this.modelProduct = event.data;
       if (event.data.FobFiyat == null || event.data.FobFiyat == 0) {
@@ -762,69 +985,84 @@ export default {
     },
     deleteProduct() {
       const date = new Date();
-       const year = date.getFullYear();
-       const month = this.__zeroControl(date.getMonth() + 1);
-       const day = this.__zeroControl(date.getDate());
-       const hour = this.__zeroControl(date.getHours());
-       const minute = this.__zeroControl(date.getMinutes());
-       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+      const year = date.getFullYear();
+      const month = this.__zeroControl(date.getMonth() + 1);
+      const day = this.__zeroControl(date.getDate());
+      const hour = this.__zeroControl(date.getHours());
+      const minute = this.__zeroControl(date.getMinutes());
+      const now = day + "-" + month + "-" + year + " " + hour + ":" + minute;
       const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
-      const desc = `${Cookies.get('username')}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü sildi.`;
+      const desc = `${Cookies.get(
+        "username"
+      )}  adlı kullanıcı  ${now}  tarihinde  ${
+        this.customerModel.MusteriAdi
+      }  teklif müşterisinin  ${size} cm ürününü sildi.`;
 
       const log = {
-        description:desc,
-        po:'',
-        color:''
+        description: desc,
+        po: "",
+        color: "",
       };
       this.$logs.save(log);
       if (confirm("Are you sure you want to delete?")) {
-        this.$store.dispatch("setOfferDetailProductsDelete", this.modelProduct.Id);
+        this.$store.dispatch(
+          "setOfferDetailProductsDelete",
+          this.modelProduct.Id
+        );
         this.productReset();
       }
     },
     updateProduct() {
       const date = new Date();
-       const year = date.getFullYear();
-       const month = this.__zeroControl(date.getMonth() + 1);
-       const day = this.__zeroControl(date.getDate());
-       const hour = this.__zeroControl(date.getHours());
-       const minute = this.__zeroControl(date.getMinutes());
-       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
+      const year = date.getFullYear();
+      const month = this.__zeroControl(date.getMonth() + 1);
+      const day = this.__zeroControl(date.getDate());
+      const hour = this.__zeroControl(date.getHours());
+      const minute = this.__zeroControl(date.getMinutes());
+      const now = day + "-" + month + "-" + year + " " + hour + ":" + minute;
       const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
-      const desc = `${Cookies.get('username')}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisinin  ${size} cm ürününü güncelledi.`;
+      const desc = `${Cookies.get(
+        "username"
+      )}  adlı kullanıcı  ${now}  tarihinde  ${
+        this.customerModel.MusteriAdi
+      }  teklif müşterisinin  ${size} cm ürününü güncelledi.`;
 
       const log = {
-        description:desc,
-        po:'',
-        color:''
+        description: desc,
+        po: "",
+        color: "",
       };
       this.$logs.save(log);
       this.$store.dispatch("setOfferDetailProductsUpdate", this.modelProduct);
 
       this.productReset();
     },
-    __zeroControl(event){
-      if(event.toString().length == 1){
+    __zeroControl(event) {
+      if (event.toString().length == 1) {
         return "0" + event.toString();
-      }else{
+      } else {
         return event.toString();
       }
     },
     addProduct() {
       const date = new Date();
-       const year = date.getFullYear();
-       const month = this.__zeroControl(date.getMonth() + 1);
-       const day = this.__zeroControl(date.getDate());
-       const hour = this.__zeroControl(date.getHours());
-       const minute = this.__zeroControl(date.getMinutes());
-       const now = day + '-' + month + '-' + year + ' ' + hour + ':' + minute; 
-       const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
-      const desc = `${Cookies.get('username')}  adlı kullanıcı  ${now}  tarihinde  ${this.customerModel.MusteriAdi}  teklif müşterisine  ${size} cm ürününü girdi.`;
+      const year = date.getFullYear();
+      const month = this.__zeroControl(date.getMonth() + 1);
+      const day = this.__zeroControl(date.getDate());
+      const hour = this.__zeroControl(date.getHours());
+      const minute = this.__zeroControl(date.getMinutes());
+      const now = day + "-" + month + "-" + year + " " + hour + ":" + minute;
+      const size = `${this.modelProduct.KategoriAdi}  /  ${this.modelProduct.UrunAdi}  /  ${this.modelProduct.IslemAdi} /  ${this.modelProduct.EnBoy}  /  ${this.modelProduct.Kalinlik}`;
+      const desc = `${Cookies.get(
+        "username"
+      )}  adlı kullanıcı  ${now}  tarihinde  ${
+        this.customerModel.MusteriAdi
+      }  teklif müşterisine  ${size} cm ürününü girdi.`;
 
       const log = {
-        description:desc,
-        po:'',
-        color:''
+        description: desc,
+        po: "",
+        color: "",
       };
       this.$logs.save(log);
       this.modelProduct.TeklifId = this.id;
@@ -911,7 +1149,9 @@ export default {
         results = this.category;
       } else {
         results = this.category.filter((x) => {
-          return x.KategoriAdi.toLowerCase().startsWith(event.query.toLowerCase());
+          return x.KategoriAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredCategoryList = results;
@@ -920,26 +1160,26 @@ export default {
 };
 </script>
 <style scoped>
- @media screen and (max-width:576px) {
-  .row{
-  clear:both;
-  display:block;
-  width:100%;
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-3 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-9 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
 }
-.col{
-  clear:both;
-  display:block;
-  width:100%;
-}
-.col-3{
-  clear:both;
-  display:block;
-  width:100%;
-}
-.col-9{
-  clear:both;
-  display:block;
-  width:100%;
-}
- }
 </style>

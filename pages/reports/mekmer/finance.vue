@@ -84,7 +84,6 @@
               {{ slotProps.data.siparisno }}
             </template>
           </Column>
-
           <Column
             field="yuklemetarihi"
             header="Shipment Date"
@@ -108,7 +107,6 @@
               {{ mekmarListTotal.order | formatPriceUsd }}
             </template>
           </Column>
-
           <Column
             field="iscilik"
             header="Labour"

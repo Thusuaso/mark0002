@@ -1,5 +1,5 @@
 <template>
-  <div class="row mb-6" style="padding:50px 0px;">
+  <div class="row mb-6" style="padding: 50px 0px">
     <div class="col-9">
       <div class="row mt-3">
         <div class="col">
@@ -165,22 +165,20 @@ export default {
       this.model.BugunTarih = date.dateToString(new Date());
     },
     process() {
-      if(this.model.Kur == 0){
-        this.$toast.error('Kur girilmesi zorunludur.');
-      }else{
-              this.model.MusteriID = this.po.MusteriID;
-              this.model.Tarih = date.dateToString(this.paid_date);
-              this.model.FirmaAdi = this.po.FirmaAdi;
-              this.model.SiparisNo = this.po.SiparisNo;
-              this.model.FinansOdemeTurID = 2;
-              this.model.KullaniciID = Cookies.get("userId");
-              this.model.KullaniciAdi = Cookies.get("username");
-              this.model.BugunTarih = date.dateToString(new Date());
-              this.$emit("po_paid_process_emit", this.model);
-              this.paid_date = null;
-
+      if (this.model.Kur == 0) {
+        this.$toast.error("Kur girilmesi zorunludur.");
+      } else {
+        this.model.MusteriID = this.po.MusteriID;
+        this.model.Tarih = date.dateToString(this.paid_date);
+        this.model.FirmaAdi = this.po.FirmaAdi;
+        this.model.SiparisNo = this.po.SiparisNo;
+        this.model.FinansOdemeTurID = 2;
+        this.model.KullaniciID = Cookies.get("userId");
+        this.model.KullaniciAdi = Cookies.get("username");
+        this.model.BugunTarih = date.dateToString(new Date());
+        this.$emit("po_paid_process_emit", this.model);
+        this.paid_date = null;
       }
-
     },
     paidDateSelected(event) {
       this.model.Tarih = date.dateToString(event);
@@ -197,26 +195,26 @@ export default {
 };
 </script>
 <style scoped>
- @media screen and (max-width:576px) {
-    .row{
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col-9{
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col-3{
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col{
-      clear:both;
-      display:block;
-      width:100%;
-    }
- }
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-9 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-3 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+}
 </style>

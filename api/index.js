@@ -6761,6 +6761,8 @@ order by yt.TeklifOncelik,yt.Sira
       });
 
       const list = [];
+      const list_b = [];
+
       const _h_a = results.recordset.filter(
         (x) =>
           x.KullaniciId == 44 &&
@@ -6788,6 +6790,30 @@ order by yt.TeklifOncelik,yt.Sira
           x.TeklifOncelik == "Toplantı"
       );
 
+      const h_b = bList.recordset.filter(
+        (x) =>
+          x.KullaniciId == 44 &&
+          (x.TeklifOncelik == "A" ||
+            x.TeklifOncelik == "B" ||
+            x.TeklifOncelik == "C" ||
+            x.TeklifOncelik == "Toplantı")
+      );
+      const o_b = bList.recordset.filter(
+        (x) =>
+          x.KullaniciId == 19 &&
+          (x.TeklifOncelik == "A" ||
+            x.TeklifOncelik == "B" ||
+            x.TeklifOncelik == "C" ||
+            x.TeklifOncelik == "Toplantı")
+      );
+      const b_list = bList.recordset.filter(
+        (x) =>
+          x.TeklifOncelik == "A" ||
+          x.TeklifOncelik == "B" ||
+          x.TeklifOncelik == "C" ||
+          x.TeklifOncelik == "Toplantı"
+      );
+
       // const t_list = results.recordset.filter(x=>(x.TeklifOncelik == 'Toplantı'));
 
       if (a_list.length > 0) {
@@ -6800,6 +6826,18 @@ order by yt.TeklifOncelik,yt.Sira
             list.push(_o_a[i]);
           }
           i += 1;
+        }
+      }
+      if (b_list.length > 0) {
+        let a = 0;
+        while (b_list.length > a) {
+          if (h_b.length >= a + 1) {
+            list_b.push(h_b[a]);
+          }
+          if (o_b.length >= a + 1) {
+            list_b.push(o_b[a]);
+          }
+          a += 1;
         }
       }
 
@@ -6816,7 +6854,7 @@ order by yt.TeklifOncelik,yt.Sira
       //     }
       // }
 
-      res.status(200).json({ list: list, bList: bList.recordset });
+      res.status(200).json({ list: list, bList: list_b });
     });
   });
 });
