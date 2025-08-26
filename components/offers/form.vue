@@ -410,7 +410,12 @@
         </div>
         <div class="flex flex-wrap justify-content-center gap-3 mb-4">
           <div class="flex align-items-center">
-            <Checkbox v-model="model.TakipEt" inputId="follow" binary />
+            <Checkbox
+              v-model="follow_it"
+              inputId="follow"
+              binary
+              @update:modelValue="followChange($event)"
+            />
             <label for="follow" class="ml-2"> Track </label>
           </div>
           <div class="flex align-items-center">
@@ -556,6 +561,7 @@ export default {
   },
   data() {
     return {
+      follow_it: false,
       selectedCheckedProductList: [],
       selectedShippedType: null,
       shippedType: [
@@ -630,6 +636,9 @@ export default {
     }
   },
   methods: {
+    followChange(event) {
+      this.follow_it = !this.follow_it;
+    },
     productsCheckbox(event) {
       if (event.selected) {
         this.selectedCheckedProductList.push(event);
@@ -795,6 +804,7 @@ export default {
         this.customerModel.Description = this.__nullControl(
           this.customerModel.Description
         );
+        this.model.TakipEt = this.follow_it;
 
         if (this.status) {
           this.model.TakipEt = true;
@@ -805,22 +815,22 @@ export default {
         const data = { offer: this.model, customer: this.customerModel };
 
         this.$emit("offer_process_emit", data);
-        if (this.status) {
-          this.modelProduct.Tarih = date.dateToString(this.offerDate);
-          this.modelProduct.TeklifId = this.id;
-          this.modelProduct.KategoriId = 1;
-          this.modelProduct.UrunId = 1;
-          this.modelProduct.EnBoyId = 1;
-          this.modelProduct.KalinlikId = 1;
-          this.modelProduct.YuzeyIslemId = 1;
-          this.modelProduct.FobFiyat = 0;
-          this.modelProduct.Birim = "Sqm";
-          this.modelProduct.FcaFiyat = 0;
-          this.modelProduct.CFiyat = 0;
-          this.modelProduct.DFiyat = 0;
-          this.$store.dispatch("setOfferDetailProductsAdd", this.modelProduct);
-          this.productReset();
-        }
+        // if (this.status) {
+        //   this.modelProduct.Tarih = date.dateToString(this.offerDate);
+        //   this.modelProduct.TeklifId = this.id;
+        //   this.modelProduct.KategoriId = 1;
+        //   this.modelProduct.UrunId = 1;
+        //   this.modelProduct.EnBoyId = 1;
+        //   this.modelProduct.KalinlikId = 1;
+        //   this.modelProduct.YuzeyIslemId = 1;
+        //   this.modelProduct.FobFiyat = 0;
+        //   this.modelProduct.Birim = "Sqm";
+        //   this.modelProduct.FcaFiyat = 0;
+        //   this.modelProduct.CFiyat = 0;
+        //   this.modelProduct.DFiyat = 0;
+        //   this.$store.dispatch("setOfferDetailProductsAdd", this.modelProduct);
+        //   this.productReset();
+        // }
 
         this.offer_disabled_button = false;
       }
@@ -930,6 +940,11 @@ export default {
       this.customerModel.Description = this.__nullControl(
         this.selectedCustomer.Description
       );
+      if (this.model.TakipEt) {
+        this.follow_it = true;
+      } else {
+        this.follow_it = false;
+      }
     },
     productReset() {
       this.offerProductDate = null;

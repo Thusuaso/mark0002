@@ -2,14 +2,20 @@
   <div>
     <div class="row container">
       <div class="col">
-        <Dropdown v-model="selectedYear" :options="getReportsMekmarGuYearList" optionLabel="Year"
-          @change="yearSelected($event)" />
+        <Dropdown
+          v-model="selectedYear"
+          :options="getReportsMekmarGuYearList"
+          optionLabel="Year"
+          @change="yearSelected($event)"
+        />
       </div>
     </div>
     <TabView>
       <TabPanel header="Container (Mekmar)">
-        <reportsMekmarGuContList :contCountList="getReportsMekmarGuContList"
-          :contCustList="getReportsMekmarGuContByCustList" />
+        <reportsMekmarGuContList
+          :contCountList="getReportsMekmarGuContList"
+          :contCustList="getReportsMekmarGuContByCustList"
+        />
       </TabPanel>
       <TabPanel header="Mekus">
         <reportsMekmarGuMekusList :list="getReportsMekmarGuMekusList" />
@@ -18,18 +24,36 @@
         <reportsMekmarGuLogsList :list="getReportsMekmarGuLogsList" />
       </TabPanel>
       <TabPanel header="Shipment Summary (Yearly)">
-        <Button type="button" label="Excel" class="p-button-secondary" @click="forwarding_excel_output"/>
+        <Button
+          type="button"
+          label="Excel"
+          class="p-button-secondary"
+          @click="forwarding_excel_output"
+        />
         <div class="row">
-          <reportsMekmarGuForwardingList v-for="item of getReportsMekmarGuForwList" :key="item" :list="item" />
+          <reportsMekmarGuForwardingList
+            v-for="item of getReportsMekmarGuForwList"
+            :key="item"
+            :list="item"
+          />
         </div>
       </TabPanel>
       <TabPanel header="Order Summary (Yearly)">
-        <Button type="button" label="Excel" class="p-button-secondary" @click="forwarding_excel_output_2"/>
+        <Button
+          type="button"
+          label="Excel"
+          class="p-button-secondary"
+          @click="forwarding_excel_output_2"
+        />
         <div class="row">
-          <reportsMekmarGuForwardingList v-for="item of getReportsMekmarGuOrderList" :key="item" :list="item" />
+          <reportsMekmarGuForwardingList
+            v-for="item of getReportsMekmarGuOrderList"
+            :key="item"
+            :list="item"
+          />
         </div>
       </TabPanel>
-      <TabPanel header="Ayo">
+      <!-- <TabPanel header="Ayo">
         <DataTable :value="getReportsMekmarGuAyoList">
           <Column field="Yil" header="Year"></Column>
           <Column field="Usd" header="Usd">
@@ -52,7 +76,7 @@
 
 
 
-      </TabPanel>
+      </TabPanel> -->
       <TabPanel header="Seller and Operation Orders">
         <ordererOperation />
       </TabPanel>
@@ -60,19 +84,18 @@
         <shippedOperation />
       </TabPanel>
       <TabPanel header="Seller and Operation Shipped Profit">
-        <profitGu :thisyear="ayoListThisYear" :oneyear="ayoListOneYearAgo"
+        <profitGu
+          :thisyear="ayoListThisYear"
+          :oneyear="ayoListOneYearAgo"
           :twoyear="ayoListTwoYearAgo"
         />
-
-
       </TabPanel>
-
     </TabView>
   </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from '~/plugins/excel.server.js';
+import api from "~/plugins/excel.server.js";
 export default {
   middleware: ["authority"],
   computed: {
@@ -85,18 +108,18 @@ export default {
       "getReportsMekmarGuLogsList",
       "getReportsMekmarGuForwList",
       "getReportsMekmarGuAyoList",
-      'getLocalUrl',
-      'getReportsMekmarGuOrderList'
+      "getLocalUrl",
+      "getReportsMekmarGuOrderList",
     ]),
   },
   data() {
     return {
       selectedYear: null,
-      ayoUsdTotal:0,
-      ayoTlTotal:0,
-      ayoListThisYear:[],
-      ayoListOneYearAgo:[],
-      ayoListTwoYearAgo:[]
+      ayoUsdTotal: 0,
+      ayoTlTotal: 0,
+      ayoListThisYear: [],
+      ayoListOneYearAgo: [],
+      ayoListTwoYearAgo: [],
     };
   },
   beforeCreate() {
@@ -104,49 +127,52 @@ export default {
   },
   created() {
     this.selectedYear = { Year: 2025 };
-    api.get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year}`)
-      .then(res=>{
+    api
+      .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year}`)
+      .then((res) => {
         this.ayoListThisYear = res.data;
       });
 
-    api.get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 1}`)
-      .then(res=>{
+    api
+      .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 1}`)
+      .then((res) => {
         this.ayoListOneYearAgo = res.data;
       });
-      api.get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 2}`)
-      .then(res=>{
+    api
+      .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 2}`)
+      .then((res) => {
         this.ayoListTwoYearAgo = res.data;
       });
   },
 
   methods: {
-    forwarding_excel_output(){
+    forwarding_excel_output() {
       api
-                .post("/reports/gu/forwarding", this.getReportsMekmarGuForwList)
-                .then((response) => {
-                if (response.status) {
-                    const link = document.createElement("a");
-                    link.href = this.getLocalUrl + "/reports/gu/forwarding";
+        .post("/reports/gu/forwarding", this.getReportsMekmarGuForwList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "/reports/gu/forwarding";
 
-                    link.setAttribute("download", "gu_excel.xlsx");
-                    document.body.appendChild(link);
-                    link.click();
-                }
-                });
+            link.setAttribute("download", "gu_excel.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
     },
-    forwarding_excel_output_2(){
+    forwarding_excel_output_2() {
       api
-                .post("/reports/gu/forwarding", this.getReportsMekmarGuOrderList)
-                .then((response) => {
-                if (response.status) {
-                    const link = document.createElement("a");
-                    link.href = this.getLocalUrl + "/reports/gu/forwarding";
+        .post("/reports/gu/forwarding", this.getReportsMekmarGuOrderList)
+        .then((response) => {
+          if (response.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "/reports/gu/forwarding";
 
-                    link.setAttribute("download", "gu_excel.xlsx");
-                    document.body.appendChild(link);
-                    link.click();
-                }
-                });
+            link.setAttribute("download", "gu_excel.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
     },
     yearSelected(event) {
       this.$store.dispatch("setReportsMekmarGuListYear", event.value.Year);
@@ -156,11 +182,11 @@ export default {
     getReportsMekmarGuAyoList() {
       this.ayoUsdTotal = 0;
       this.ayoTlTotal = 0;
-      this.getReportsMekmarGuAyoList.forEach(x => {
+      this.getReportsMekmarGuAyoList.forEach((x) => {
         this.ayoUsdTotal += x.Usd;
         this.ayoTlTotal += x.Tl;
       });
-    }
-  }
+    },
+  },
 };
 </script>
