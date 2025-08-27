@@ -2824,7 +2824,36 @@ app.get("/customer/selection/list/:userId", (req, res) => {
     });
   });
 });
-app.post("/customer/selection/save", (req, res) => {
+
+function ___addSurface(event) {
+  return new Promise((resolve, reject) => {
+    const surfaceCheckSql = `select count(*) as durum from CustomersSurfaceTB where Surface='${event}'`;
+    const insertSql = `
+      insert into CustomersSurfaceTB(Surface,UserId)
+
+      values('${event}','44')
+    `;
+    const getIdSql = `select top 1 ID from CustomersSurfaceTB order by ID desc`;
+    const getIdSqlBySurface = `select top 1 ID from CustomersSurfaceTB where Surface='${event}'`;
+    mssql.query(surfaceCheckSql, (err, status) => {
+      if (status.recordset[0].durum == 0) {
+        mssql.query(insertSql, (err, insert) => {
+          if (insert.rowsAffected[0] === 1) {
+            mssql.query(getIdSql, (err, getId) => {
+              resolve({ id: getId.recordset[0].ID });
+            });
+          }
+        });
+      } else {
+        mssql.query(getIdSqlBySurface, (err, getIdBySurface) => {
+          resolve({ id: getIdBySurface.recordset[0].ID });
+        });
+      }
+    });
+  });
+}
+app.post("/customer/selection/save", async (req, res) => {
+  const surface_id = await ___addSurface(req.body.Surface);
   const sql = `
                     insert into SurfaceCustomersTB(FirstName,Adress,City,Email,Phone,SurfaceId,UserId)
                 VALUES('${req.body.FirstName}',
@@ -2832,10 +2861,9 @@ app.post("/customer/selection/save", (req, res) => {
                         '${req.body.City}',
                         '${req.body.Email}',
                         '${req.body.Phone}',
-                        '${req.body.SurfaceId}',
+                        '${surface_id["id"]}',
                         '${req.body.UserId}')
                 `;
-  console.log(sql);
   mssql.query(sql, (err, results) => {
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({
@@ -7365,7 +7393,7 @@ app.put("/panel/product/update", (req, res) => {
 
             where Id = '${req.body.Id}'
     `;
-  if (!req.body.yayinla) {
+  if (req.body.unpublished) {
     /*Un publish olan ürün ve suggestedlar eklenecektir. */
     const unpublishSql = `
             select 
@@ -7394,8 +7422,6 @@ app.put("/panel/product/update", (req, res) => {
                     <tr style="border: 1px solid;">
                         <td style="border: 1px solid;text-align:center;">${x.ProductId}</td>
                         <td style="border: 1px solid;text-align:center;">${x.ProductName}</td>
-           
-        
                     </tr>`;
         });
 

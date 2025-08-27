@@ -5,7 +5,11 @@
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
-              <InputText id="productname" v-model="model.urunadi_en" class="w-100" />
+              <InputText
+                id="productname"
+                v-model="model.urunadi_en"
+                class="w-100"
+              />
               <label for="productname">Product Name</label>
             </span>
           </div>
@@ -18,7 +22,12 @@
           <div class="col">
             <div class="flex flex-wrap justify-content-center gap-3">
               <div class="flex align-items-center">
-                <Checkbox v-model="model.yayinla" inputId="published" binary />
+                <Checkbox
+                  v-model="model.yayinla"
+                  inputId="published"
+                  binary
+                  @input="publishChange($event)"
+                />
                 <label for="published" class="ml-2"> Publish </label>
               </div>
             </div>
@@ -43,7 +52,11 @@
           </div> -->
           <div class="col-6">
             <span class="p-float-label mb-4">
-              <InputText type="text" v-model="model.anahtarlar_en" class="w-100" />
+              <InputText
+                type="text"
+                v-model="model.anahtarlar_en"
+                class="w-100"
+              />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -115,7 +128,11 @@
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
-              <InputText id="productname" v-model="model.urunadi_fr" class="w-100" />
+              <InputText
+                id="productname"
+                v-model="model.urunadi_fr"
+                class="w-100"
+              />
               <label for="productname">Product Name</label>
             </span>
           </div>
@@ -136,7 +153,11 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <InputText type="text" v-model="model.anahtarlar_fr" class="w-100" />
+              <InputText
+                type="text"
+                v-model="model.anahtarlar_fr"
+                class="w-100"
+              />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -174,7 +195,11 @@
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
-              <InputText id="productname" v-model="model.urunadi_es" class="w-100" />
+              <InputText
+                id="productname"
+                v-model="model.urunadi_es"
+                class="w-100"
+              />
               <label for="productname">Product Name</label>
             </span>
           </div>
@@ -195,7 +220,11 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <InputText type="text" v-model="model.anahtarlar_es" class="w-100" />
+              <InputText
+                type="text"
+                v-model="model.anahtarlar_es"
+                class="w-100"
+              />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -233,7 +262,11 @@
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
-              <InputText id="productname" v-model="model.urunadi_ru" class="w-100" />
+              <InputText
+                id="productname"
+                v-model="model.urunadi_ru"
+                class="w-100"
+              />
               <label for="productname">Product Name</label>
             </span>
           </div>
@@ -254,7 +287,11 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <InputText type="text" v-model="model.anahtarlar_ru" class="w-100" />
+              <InputText
+                type="text"
+                v-model="model.anahtarlar_ru"
+                class="w-100"
+              />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -292,7 +329,11 @@
         <div class="row mt-3 mb-3">
           <div class="col">
             <span class="p-float-label">
-              <InputText id="productname" v-model="model.urunadi_ar" class="w-100" />
+              <InputText
+                id="productname"
+                v-model="model.urunadi_ar"
+                class="w-100"
+              />
               <label for="productname">Product Name</label>
             </span>
           </div>
@@ -313,7 +354,11 @@
 
           <div class="col">
             <span class="p-float-label mb-4">
-              <InputText type="text" v-model="model.anahtarlar_ar" class="w-100" />
+              <InputText
+                type="text"
+                v-model="model.anahtarlar_ar"
+                class="w-100"
+              />
               <label>Keywords</label>
             </span>
             <span class="p-float-label">
@@ -375,7 +420,12 @@
             </span>
           </div>
           <div class="col">
-            <Button type="button" class="p-button-success" label="Add" @click="addSize" />
+            <Button
+              type="button"
+              class="p-button-success"
+              label="Add"
+              @click="addSize"
+            />
           </div>
           <div class="col">
             <Button
@@ -404,7 +454,10 @@
 
           <Column field="ebat" header="Size">
             <template #editor="slotProps">
-              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+              <InputText
+                v-model="slotProps.data[slotProps.column.field]"
+                autofocus
+              />
             </template>
           </Column>
           <Column field="fiyat" header="Price">
@@ -412,7 +465,10 @@
               {{ slotProps.data.fiyat | formatPriceUsd }}
             </template>
             <template #editor="slotProps">
-              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+              <InputText
+                v-model="slotProps.data[slotProps.column.field]"
+                autofocus
+              />
             </template>
           </Column>
           <Column
@@ -810,7 +866,12 @@
           <template #item="slotProps">
             <div class="row">
               <div class="col">
-                <img :src="slotProps.item.macPath" width="100" height="100" lazyload />
+                <img
+                  :src="slotProps.item.macPath"
+                  width="100"
+                  height="100"
+                  lazyload
+                />
               </div>
               <div class="col">
                 <h5 class="mb-2">{{ slotProps.item.name }}</h5>
@@ -835,7 +896,12 @@
           <template #item="slotProps">
             <div class="row">
               <div class="col">
-                <img :src="slotProps.item.Image" width="100" height="100" lazyload />
+                <img
+                  :src="slotProps.item.Image"
+                  width="100"
+                  height="100"
+                  lazyload
+                />
               </div>
               <div class="col">
                 <h5 class="mb-2">{{ slotProps.item.urunadi_en }}</h5>
@@ -1025,8 +1091,18 @@ export default {
     }
   },
   methods: {
+    publishChange(event) {
+      if (event == false) {
+        this.model.unpublished = true;
+      }
+    },
     __noneNullControl(value) {
-      if (value == null || value == " " || value == undefined || value == "null") {
+      if (
+        value == null ||
+        value == " " ||
+        value == undefined ||
+        value == "null"
+      ) {
         return "";
       } else {
         return value;
@@ -1070,19 +1146,21 @@ export default {
     },
 
     panelProductTestReportUpload(event) {
-      oceanservice.panelProductSendTestReport(event.files[0]).then((response) => {
-        if (response) {
-          this.model.testrapor =
-            "https://cdn.mekmarimage.com/test-reports/" + event.files[0].name;
-          const data = {
-            urunid: this.model.urunid,
-            testrapor: this.model.testrapor,
-          };
-          this.$store.dispatch("setPanelProductTestReport", data);
-        } else {
-          this.$toast.error("Test Raporu Yüklenemedi.");
-        }
-      });
+      oceanservice
+        .panelProductSendTestReport(event.files[0])
+        .then((response) => {
+          if (response) {
+            this.model.testrapor =
+              "https://cdn.mekmarimage.com/test-reports/" + event.files[0].name;
+            const data = {
+              urunid: this.model.urunid,
+              testrapor: this.model.testrapor,
+            };
+            this.$store.dispatch("setPanelProductTestReport", data);
+          } else {
+            this.$toast.error("Test Raporu Yüklenemedi.");
+          }
+        });
     },
     reOrderSuggested(event) {
       let queue = 1;
@@ -1103,7 +1181,10 @@ export default {
     },
     moveToSourceSuggested(event) {
       if (confirm("Are you sure you want to delete?")) {
-        this.$store.dispatch("setPanelProductSuggestedDelete", event.items[0].Id);
+        this.$store.dispatch(
+          "setPanelProductSuggestedDelete",
+          event.items[0].Id
+        );
       }
     },
     moveToTargetSuggested(event) {
@@ -1148,7 +1229,10 @@ export default {
       });
     },
     reOrderPhotoChangeButton(event) {
-      this.$store.dispatch("setPanelProductPhotoQueueChange", this.reOrderPhotoList);
+      this.$store.dispatch(
+        "setPanelProductPhotoQueueChange",
+        this.reOrderPhotoList
+      );
       this.queueChangeButtonDisabled = true;
     },
     reOrderPhoto(event) {
@@ -1176,11 +1260,16 @@ export default {
         return;
       } else {
         if (confirm("Are you sure you want to delete?")) {
-          oceanservice.panelProductPhotoDelete(event.items[0].name).then((response) => {
-            if (response) {
-              this.$store.dispatch("setPanelProductPhotoOneDelete", event.items[0].Id);
-            }
-          });
+          oceanservice
+            .panelProductPhotoDelete(event.items[0].name)
+            .then((response) => {
+              if (response) {
+                this.$store.dispatch(
+                  "setPanelProductPhotoOneDelete",
+                  event.items[0].Id
+                );
+              }
+            });
         }
       }
     },
@@ -1320,7 +1409,7 @@ export default {
     sizeSelected(event) {
       this.sizeModel.ebat = event.value.ebat;
     },
-    sizeInput(event){
+    sizeInput(event) {
       this.sizeModel.ebat = event;
     },
     formatPoint(value) {
@@ -1342,32 +1431,46 @@ export default {
       this.filteredSize = results;
     },
     createdProcess() {
-      this.selectedCategory = this.category.find((x) => x.Id == this.model.kategori_id);
-      this.selectedStoneType = this.category.find((x) => x.Id == this.model.stonetype);
+      this.selectedCategory = this.category.find(
+        (x) => x.Id == this.model.kategori_id
+      );
+      this.selectedStoneType = this.category.find(
+        (x) => x.Id == this.model.stonetype
+      );
       this.model.urunadi_en = this.__noneNullControl(this.model.urunadi_en);
       this.model.aciklama_en = this.__noneNullControl(this.model.aciklama_en);
-      this.model.anahtarlar_en = this.__noneNullControl(this.model.anahtarlar_en);
+      this.model.anahtarlar_en = this.__noneNullControl(
+        this.model.anahtarlar_en
+      );
       this.model.keywords_en = this.__noneNullControl(this.model.keywords_en);
 
       this.model.birim = this.__noneNullControl(this.model.birim);
       this.model.urunadi_fr = this.__noneNullControl(this.model.urunadi_fr);
       this.model.aciklama_fr = this.__noneNullControl(this.model.aciklama_fr);
-      this.model.anahtarlar_fr = this.__noneNullControl(this.model.anahtarlar_fr);
+      this.model.anahtarlar_fr = this.__noneNullControl(
+        this.model.anahtarlar_fr
+      );
       this.model.keywords_fr = this.__noneNullControl(this.model.keywords_fr);
 
       this.model.urunadi_es = this.__noneNullControl(this.model.urunadi_es);
       this.model.aciklama_es = this.__noneNullControl(this.model.aciklama_es);
-      this.model.anahtarlar_es = this.__noneNullControl(this.model.anahtarlar_es);
+      this.model.anahtarlar_es = this.__noneNullControl(
+        this.model.anahtarlar_es
+      );
       this.model.keywords_es = this.__noneNullControl(this.model.keywords_es);
 
       this.model.urunadi_ru = this.__noneNullControl(this.model.urunadi_ru);
       this.model.aciklama_ru = this.__noneNullControl(this.model.aciklama_ru);
-      this.model.anahtarlar_ru = this.__noneNullControl(this.model.anahtarlar_ru);
+      this.model.anahtarlar_ru = this.__noneNullControl(
+        this.model.anahtarlar_ru
+      );
       this.model.keywords_ru = this.__noneNullControl(this.model.keywords_ru);
 
       this.model.urunadi_ar = this.__noneNullControl(this.model.urunadi_ar);
       this.model.aciklama_ar = this.__noneNullControl(this.model.aciklama_ar);
-      this.model.anahtarlar_ar = this.__noneNullControl(this.model.anahtarlar_ar);
+      this.model.anahtarlar_ar = this.__noneNullControl(
+        this.model.anahtarlar_ar
+      );
       this.model.keywords_ar = this.__noneNullControl(this.model.keywords_ar);
     },
     deleteForm() {
@@ -1395,26 +1498,26 @@ export default {
   font-size: 18px;
   text-align: center;
 }
-@media screen and (max-width:576px){
-  .row{
-    clear:both;
-    display:block;
-    width:100%;
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-  .col{
-    clear:both;
-    display:block;
-    width:100%;
+  .col {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-  .col-6{
-    clear:both;
-    display:block;
-    width:100%;
+  .col-6 {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-  .test{
-    clear:both;
-    display:block;
-    width:90vw;
+  .test {
+    clear: both;
+    display: block;
+    width: 90vw;
   }
 }
 </style>

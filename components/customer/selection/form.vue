@@ -45,6 +45,7 @@
             @complete="searchSurface($event)"
             class="w-100"
             @item-select="surfaceSelected($event)"
+            @input="inputSurface($event)"
           />
           <label for="surface">Products</label>
         </span>
@@ -108,14 +109,20 @@ export default {
   },
   created() {
     if (!this.button) {
-
       this.selectedCountry = this.country.find(
-        (x) => x.UlkeAdi.toLowerCase().trim() == this.model.City.toLowerCase().trim()
+        (x) =>
+          x.UlkeAdi.toLowerCase().trim() == this.model.City.toLowerCase().trim()
       );
-      this.selectedSurface = this.surface.find((x) => x.ID == this.model.SurfaceId);
+      this.selectedSurface = this.surface.find(
+        (x) => x.ID == this.model.SurfaceId
+      );
     }
   },
   methods: {
+    inputSurface(event) {
+      this.model.Surface = event;
+      this.model.SurfaceId = 0;
+    },
     surfaceSelected(event) {
       this.model.Surface = event.value.Surface;
       this.model.SurfaceId = event.value.ID;
