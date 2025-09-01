@@ -12698,7 +12698,9 @@ u.Miktar,
 b.BirimAdi,    
 u.KutuAdet,    
 u.ID  ,  
-u.UrunKartID  
+u.UrunKartID,
+(select su.KasaOlcusu from SiparisUrunTB su where su.SiparisNo = u.SiparisAciklama and su.UrunKartID = u.UrunKartID) as KasaOlcusu
+
 from    
 UretimTB u,UrunBirimTB b,TedarikciTB t    
 where u.SiparisAciklama='${req.params.po}'   
@@ -17159,7 +17161,7 @@ app.get("/reports/ayo/country/order/list", (req, res) => {
 		inner join YeniTeklif_UlkeTB ytu on ytu.ID = m.UlkeID
 
 
-        where YEAR(s.SiparisTarihi) >= 2019 and m.Marketing = 'Mekmar'
+        where YEAR(s.SiparisTarihi) >= 2020 and m.Marketing = 'Mekmar'
         group by YEAR(s.SiparisTarihi),ytu.UlkeAdi
         order by sum(su.SatisToplam) desc
     `;
@@ -17178,7 +17180,7 @@ inner join MusterilerTB m on m.ID = s.MusteriID
 inner join YeniTeklif_UlkeTB ytu on ytu.ID = m.UlkeId
 
 
-where YEAR(s.SiparisTarihi) >= 2019 and m.Marketing = 'Mekmar'
+where YEAR(s.SiparisTarihi) >= 2020 and m.Marketing = 'Mekmar'
 group by YEAR(s.SiparisTarihi),ytu.UlkeAdi
 order by YEAR(s.SiparisTarihi) desc
     `;

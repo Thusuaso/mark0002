@@ -48,11 +48,16 @@ export default {
   middleware: ["authority"],
   data() {
     return {
-      selectedYear: { Year: 2024 },
+      selectedYear: { Year: 2025 },
     };
   },
   computed: {
-    ...mapGetters(["getReportsMekmarMkList", "getLocalUrl", "getLoading", "getYearList"]),
+    ...mapGetters([
+      "getReportsMekmarMkList",
+      "getLocalUrl",
+      "getLoading",
+      "getYearList",
+    ]),
   },
   created() {
     const year = new Date().getFullYear();
@@ -66,11 +71,15 @@ export default {
     excel_output() {
       this.$store.dispatch("setBeginLoadingAction");
       api
-        .post("/raporlar/listeler/mkraporlari/excel", this.getReportsMekmarMkList)
+        .post(
+          "/raporlar/listeler/mkraporlari/excel",
+          this.getReportsMekmarMkList
+        )
         .then((response) => {
           if (response.status) {
             const link = document.createElement("a");
-            link.href = this.getLocalUrl + "raporlar/listeler/mkraporlari/excel";
+            link.href =
+              this.getLocalUrl + "raporlar/listeler/mkraporlari/excel";
             link.setAttribute("download", "mkRaporlari.xlsx");
             document.body.appendChild(link);
             link.click();
@@ -80,10 +89,12 @@ export default {
     },
     yearSelected(event) {
       this.$store.dispatch("setBeginLoadingAction");
-      api.get(`/raporlar/listeler/mkraporlari/${event.value.Year}`).then((response) => {
-        this.$store.dispatch("setReportsMekmarMkList", response.data);
-        this.$store.dispatch("setEndLoadingAction");
-      });
+      api
+        .get(`/raporlar/listeler/mkraporlari/${event.value.Year}`)
+        .then((response) => {
+          this.$store.dispatch("setReportsMekmarMkList", response.data);
+          this.$store.dispatch("setEndLoadingAction");
+        });
     },
   },
 };
