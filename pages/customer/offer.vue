@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
+    <Button
+      type="button"
+      class="p-button-success w-100"
+      label="New"
+      @click="newForm"
+    />
 
     <customerOfferList
       :offer="getOfferCustomerList"
@@ -33,7 +38,7 @@ export default {
     return {
       offer_form_dialog: false,
       model: null,
-      customer_offer_data:[],
+      customer_offer_data: [],
     };
   },
   created() {
@@ -48,14 +53,14 @@ export default {
       this.$store.dispatch("setOfferCustomerModel");
       this.model = this.getOfferCustomerModel;
       this.offer_form_dialog = true;
+      this.customer_offer_data = [];
       this.$store.dispatch("setOfferCustomerButtonStatus", true);
     },
     offerCustomerSelected(offer) {
       this.offer_form_dialog = true;
       this.model = offer.data;
       const id = offer.data.Id;
-      this.$axios.get('/offer/customer/data/'+id)
-      .then(res=>{
+      this.$axios.get("/offer/customer/data/" + id).then((res) => {
         this.customer_offer_data = res.data.list;
       });
       this.$store.dispatch("setOfferCustomerButtonStatus", false);

@@ -6512,7 +6512,7 @@ app.post("/offer/save", (req, res) => {
                                       req.body.offer.Aciklama
                                     )}',
                                     '${req.body.offer.KullaniciId}',
-                                    '${req.body.offer.TakipEt}',
+                                    '${1}',
                                     '${req.body.offer.KaynakYeri}',
                                     '${req.body.offer.TeklifYeri}',
                                     '${req.body.offer.TeklifOncelik}',
@@ -6582,7 +6582,7 @@ app.post("/offer/save", (req, res) => {
                                       req.body.offer.Aciklama
                                     )}',
                                     '${req.body.offer.KullaniciId}',
-                                    '${req.body.offer.TakipEt}',
+                                    '${1}',
                                     '${req.body.offer.KaynakYeri}',
                                     '${req.body.offer.TeklifYeri}',
                                     '${req.body.offer.TeklifOncelik}',
