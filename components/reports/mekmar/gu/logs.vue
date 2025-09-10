@@ -5,6 +5,8 @@
       filterDisplay="row"
       :filters.sync="logsFilter"
       :rowClass="logsRowClass"
+      paginator
+      rows="25"
     >
       <Column
         field="DegisiklikTarihi"
@@ -85,16 +87,21 @@ export default {
       type: Array,
       required: false,
     },
-
   },
   data() {
     return {
       logsFilter: {
-        DegisiklikTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        DegisiklikTarihi: {
+          value: null,
+          matchMode: FilterMatchMode.STARTS_WITH,
+        },
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         IslemAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        DegisiklikYapan: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        DegisiklikYapan: {
+          value: null,
+          matchMode: FilterMatchMode.STARTS_WITH,
+        },
       },
     };
   },

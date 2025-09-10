@@ -4882,6 +4882,22 @@ app.get("/reports/mekmar/gu/list", (req, res) => {
   });
 });
 
+app.get("/reports/mekmar/gu/list/container", (req, res) => {
+  const year = new Date().getFullYear();
+  const sql = `
+                                select m.UlkeId,ytu.UlkeAdi,sum(s.KonteynirSayisi) as KontSayisi,COUNT(s.ID) as SipSayisi from MusterilerTB m
+                            inner join SiparislerTB s on s.MusteriID = m.ID
+                            inner join YeniTeklif_UlkeTB ytu on ytu.Id = m.UlkeId
+                            where YEAR(s.YuklemeTarihi) = '${year}' and m.Marketing='Mekmar'
+                            group by 
+                            m.UlkeId,ytu.UlkeAdi
+  `;
+
+  mssql.query(sql, (err, result) => {
+    res.status(200).json({ list: result.recordset });
+  });
+});
+
 app.get("/reports/mekmar/gu/list/:year", (req, res) => {
   const yearListSql = `
         select YEAR(s.YuklemeTarihi) as Year from SiparislerTB s 
