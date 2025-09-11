@@ -552,15 +552,40 @@ export default {
             10000;
           this.model.Adet = this.model.Miktar;
         } else if (this.selectedUnit.ID == 3) {
-          this.model.OzelMiktar =
-            (this.__typeFloatControl(event) *
-              this.__typeFloatControl(this.width)) /
-            100;
-          this.model.Adet = Math.round(
-            this.__typeFloatControl(this.model.OzelMiktar) /
-              (this.__typeFloatControl(this.width) / 100) /
-              (this.__typeFloatControl(this.height) / 100)
-          );
+          if (
+            this.height == "Free" ||
+            this.height == "FREE" ||
+            this.height == "VAR" ||
+            this.height == "Var" ||
+            this.heiht == "Various" ||
+            this.height == "SLAB" ||
+            this.height == "Slab" ||
+            this.height == "PAT" ||
+            this.height == "Pat" ||
+            this.height == "SET" ||
+            this.height == "SINK" ||
+            this.width == "Ant" ||
+            this.width == "ANT" ||
+            this.width == "FRENCH" ||
+            this.width == "MINI" ||
+            this.thickness == "Other" ||
+            this.width == "özel" ||
+            this.width == "1 LT"
+          ) {
+            this.model.OzelMiktar = 0;
+            this.model.Adet = 0;
+            this.model.Ton = 0;
+          } else {
+            this.model.OzelMiktar =
+              (this.__typeFloatControl(event) *
+                this.__typeFloatControl(this.width)) /
+              100;
+            this.model.Adet = Math.round(
+              this.__typeFloatControl(this.model.OzelMiktar) /
+                (this.__typeFloatControl(this.width) / 100) /
+                (this.__typeFloatControl(this.height) / 100)
+            );
+          }
         }
       }
       let coefficient = this.productCoefficient(
