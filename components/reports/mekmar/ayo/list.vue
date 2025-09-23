@@ -205,7 +205,7 @@
             {{ slotProps.data.toplam_bedel | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.proforma | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.proforma | formatPriceUsd }}
           </template>
         </Column>
         <Column field="mekmar_alim" header="Production (Mekmer)">
@@ -220,7 +220,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.mekmerProduction | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.mekmerProduction | formatPriceUsd }}
           </template>
         </Column>
         <!-- <Column
@@ -256,7 +256,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.outerProduction | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.outerProduction | formatPriceUsd }}
           </template>
         </Column>
 
@@ -275,7 +275,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.transport | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.transport | formatPriceUsd }}
           </template>
         </Column>
         <Column field="gumruk" header="Custom">
@@ -293,7 +293,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.duty | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.duty | formatPriceUsd }}
           </template>
         </Column>
         <Column field="ilaclama" header="Fumigation">
@@ -311,7 +311,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.spraying | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.spraying | formatPriceUsd }}
           </template>
         </Column>
         <Column field="liman" header="Port">
@@ -329,7 +329,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.port | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.port | formatPriceUsd }}
           </template>
         </Column>
         <Column field="sigorta" header="Insurance">
@@ -346,7 +346,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.insuranceBuyes | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.insuranceBuyes | formatPriceUsd }}
           </template>
         </Column>
         <Column field="navlun" header="Freight">
@@ -364,7 +364,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.freightBuyes | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.freightBuyes | formatPriceUsd }}
           </template>
         </Column>
         <Column field="lashing" header="Lashing">
@@ -382,7 +382,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.lashing | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.lashing | formatPriceUsd }}
           </template>
         </Column>
         <Column field="booking" header="Booking">
@@ -400,7 +400,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.booking | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.booking | formatPriceUsd }}
           </template>
         </Column>
         <Column field="spazlet" header="Spanzlet">
@@ -418,7 +418,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.spanzlet | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.spanzlet | formatPriceUsd }}
           </template>
         </Column>
         <Column field="detay_1" header="Detail 1">
@@ -426,7 +426,7 @@
             {{ slotProps.data.detay_1 | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.detailBuyes1 | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.detailBuyes1 | formatPriceUsd }}
           </template>
         </Column>
         <Column field="detay_2" header="Detail 2">
@@ -434,7 +434,7 @@
             {{ slotProps.data.detay_2 | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.detailBuyes2 | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.detailBuyes2 | formatPriceUsd }}
           </template>
         </Column>
 
@@ -443,7 +443,7 @@
             {{ slotProps.data.pazarlama | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.commision | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.commision | formatPriceUsd }}
           </template>
         </Column>
         <Column field="ozel_iscilik" header="Manual Labour Cost">
@@ -461,7 +461,7 @@
             </div>
           </template>
           <template #footer>
-            {{ total.specialwork | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.specialwork | formatPriceUsd }}
           </template>
         </Column>
         <Column field="banka_masrafi" header="Bank">
@@ -469,7 +469,7 @@
             {{ slotProps.data.banka_masrafi | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.bankCost | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.bankCost | formatPriceUsd }}
           </template>
         </Column>
         <Column field="kurye_masrafi" header="Courier">
@@ -477,7 +477,7 @@
             {{ slotProps.data.kurye_masrafi | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.fregileCost | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.fregileCost | formatPriceUsd }}
           </template>
         </Column>
         <Column field="masraf_toplam" header="Total">
@@ -485,7 +485,7 @@
             {{ slotProps.data.masraf_toplam | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.costTotal | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.costTotal | formatPriceUsd }}
           </template>
         </Column>
         <Column field="kar_zarar" header="Profit / USD">
@@ -493,7 +493,7 @@
             {{ slotProps.data.kar_zarar | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ total.profitUsd | formatPriceUsd }}
+            {{ getReportsMekmarAyoListTotal.profitUsd | formatPriceUsd }}
           </template>
         </Column>
         <Column field="kar_zarar_tl" header="Profit / TRY">
@@ -501,7 +501,7 @@
             {{ slotProps.data.kar_zarar_tl | formatPriceTl }}
           </template>
           <template #footer>
-            {{ total.profitTl | formatPriceTl }}
+            {{ getReportsMekmarAyoListTotal.profitTl | formatPriceTl }}
           </template>
         </Column>
         <Column field="kar_zarar_tl_yuzdesi" header="Profit (%)">
@@ -516,7 +516,11 @@
 </template>
 <script>
 import { FilterMatchMode } from "primevue/api";
+import { mapGetters } from "vuex";
 export default {
+  computed: {
+    ...mapGetters(["getReportsMekmarAyoListTotal"]),
+  },
   props: {
     list: {
       type: Array,
