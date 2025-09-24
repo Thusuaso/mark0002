@@ -90,12 +90,19 @@
           :twoyear="ayoListTwoYearAgo"
         />
       </TabPanel>
+      <TabPanel header="Offer Source">
+        <guOfferSource />
+      </TabPanel>
+      <TabPanel header="Offer Country">
+        <guOfferCountry />
+      </TabPanel>
     </TabView>
   </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
 import api from "~/plugins/excel.server.js";
+import OfferCountry from "../../../components/reports/mekmar/gu/offerCountry.vue";
 export default {
   middleware: ["authority"],
   computed: {

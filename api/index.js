@@ -17847,6 +17847,161 @@ app.post("/panel/project/queue/changing", (req, res) => {
   });
 });
 
+app.get("/mekmar/reports/offer/source", (req, res) => {
+  const date = new Date().getFullYear();
+  const sql = `
+      select 
+
+        KaynakYeri,
+        Count(Id) as Num,
+        Year(Tarih) as Tarih
+
+      from YeniTeklifTB where YEAR(Tarih) > YEAR(GETDATE()) - 4
+      group by KaynakYeri,Year(Tarih)
+      order by Year(Tarih) desc,count(Id) desc
+  `;
+  mssql.query(sql, (err, data) => {
+    const data_this_year = [];
+    const data_one_year_ago = [];
+    const data_two_year_ago = [];
+    const data_three_year_ago = [];
+    data.recordset.forEach((x) => {
+      if (x.Tarih == date) {
+        data_this_year.push(x);
+      } else if (x.Tarih == date - 1) {
+        data_one_year_ago.push(x);
+      } else if (x.Tarih == date - 2) {
+        data_two_year_ago.push(x);
+      } else if (x.Tarih == date - 3) {
+        data_three_year_ago.push(x);
+      }
+    });
+    res.status(200).json({
+      data_1: data_this_year,
+      data_2: data_one_year_ago,
+      data_3: data_two_year_ago,
+      data_4: data_three_year_ago,
+    });
+  });
+});
+
+app.get("/mekmar/reports/offer/country", (req, res) => {
+  const date = new Date().getFullYear();
+
+  const sql = `
+    select 
+	YEAR(yt.Tarih) as Tarih,
+	Count(yt.Id) as Count,
+	yu.UlkeAdi
+
+from YeniTeklifTB yt
+inner join YeniTeklif_MusterilerTB ym on ym.Id = yt.MusteriId
+inner join YeniTeklif_UlkeTB yu on yu.Id = ym.UlkeId
+where YEAR(yt.Tarih) > YEAR(GETDATE()) - 4
+group by ym.UlkeId,yu.UlkeAdi,YEAR(yt.Tarih)
+order by YEAR(yt.Tarih) desc, count(yt.Id) desc
+  
+  `;
+  mssql.query(sql, async (err, data) => {
+    const data_this_year = [];
+    const data_one_year_ago = [];
+    const data_two_year_ago = [];
+    const data_three_year_ago = [];
+    await data.recordset.forEach((x) => {
+      if (x.Tarih == date) {
+        data_this_year.push(x);
+      } else if (x.Tarih == date - 1) {
+        data_one_year_ago.push(x);
+      } else if (x.Tarih == date - 2) {
+        data_two_year_ago.push(x);
+      } else if (x.Tarih == date - 3) {
+        data_three_year_ago.push(x);
+      }
+    });
+    /* 1*/
+    const data_this_year_1 = [];
+    let data_this_year_1_other_total = 0;
+    let x = 0;
+    data_this_year.forEach((item) => {
+      if (x <= 20) {
+        data_this_year_1.push(item);
+      } else {
+        data_this_year_1_other_total += item.Count;
+      }
+      x++;
+    });
+    data_this_year_1.push({
+      UlkeAdi: "Other",
+      Count: data_this_year_1_other_total,
+      Tarih: date,
+    });
+    /* 1*/
+    /*2 */
+    const data_this_year_2 = [];
+    let data_this_year_2_other_total = 0;
+    let x_2 = 0;
+    data_one_year_ago.forEach((item) => {
+      if (x_2 <= 20) {
+        data_this_year_2.push(item);
+      } else {
+        data_this_year_2_other_total += item.Count;
+      }
+      x_2++;
+    });
+    data_this_year_2.push({
+      UlkeAdi: "Other",
+      Count: data_this_year_2_other_total,
+      Tarih: date,
+    });
+    /*2 */
+
+    /*3 */
+    const data_this_year_3 = [];
+    let data_this_year_3_other_total = 0;
+    let x_3 = 0;
+    data_two_year_ago.forEach((item) => {
+      if (x_3 <= 20) {
+        data_this_year_3.push(item);
+      } else {
+        data_this_year_3_other_total += item.Count;
+      }
+      x_3++;
+    });
+    data_this_year_3.push({
+      UlkeAdi: "Other",
+      Count: data_this_year_3_other_total,
+      Tarih: date,
+    });
+    /*3 */
+
+    /*4 */
+    const data_this_year_4 = [];
+    let data_this_year_4_other_total = 0;
+    let x_4 = 0;
+    data_three_year_ago.forEach((item) => {
+      if (x_4 <= 20) {
+        data_this_year_4.push(item);
+      } else {
+        data_this_year_4_other_total += item.Count;
+      }
+      x_4++;
+    });
+    data_this_year_4.push({
+      UlkeAdi: "Other",
+      Count: data_this_year_4_other_total,
+      Tarih: date,
+    });
+    /*4 */
+
+    res.status(200).json({
+      data_1: data_this_year_1,
+      data_2: data_this_year_2,
+      data_3: data_this_year_3,
+      data_4: data_this_year_4,
+    });
+  });
+});
+
 module.exports = {
   path: "/api",
   handler: app,
