@@ -9559,7 +9559,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 2 and m.Marketing= 'Mekmar'
-order by s.SiparisTarihi desc,su.SiraNo asc
+order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -9726,7 +9726,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 2 and su.TedarikciID in (1,123) and m.Marketing='Mekmar'
-order by s.SiparisTarihi desc,su.SiraNo asc
+order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -10123,8 +10123,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 1 and su.TedarikciID in (1,123)
-order by s.SiparisTarihi desc,su.SiraNo asc
-
+order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
     `;
@@ -10263,8 +10262,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 2 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
-order by s.SiparisTarihi desc,su.SiraNo asc
-
+order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
     `;
@@ -10405,8 +10403,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 2 and YEAR(s.SiparisTarihi) = '${req.params.year}' and m.Marketing= 'Mekmar'
-order by s.SiparisTarihi desc,su.SiraNo asc
-
+order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
     `;
   await mssql.query(productionListYearSql, (err, production) => {
     res.status(200).json({ list: production.recordset });
@@ -10549,7 +10546,7 @@ s.SiparisKontrolEden,
     inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
     
     where s.SiparisDurumID = 3 and YEAR(s.YuklemeTarihi) = '${years.recordset[0].Yil}' and m.Marketing= 'Mekmar'
-    order by s.YuklemeTarihi desc,su.SiraNo asc
+    order by s.YuklemeTarihi desc,s.SiparisNo desc,su.SiraNo asc
     `;
     await mssql.query(ordersListSql, async (err, orders) => {
       res.status(200).json({ list: orders.recordset, years: customYearList });
@@ -10676,7 +10673,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 3 and su.TedarikciID in (1,123) and m.Marketing='Mekmar'
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -10799,7 +10796,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 3 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -10944,7 +10941,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 3 and su.TedarikciID in (1,123) and m.Marketing='Mekmar'
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -11067,7 +11064,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 3 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -11231,7 +11228,7 @@ su.Miktar Like '${req.body.amount}' + '%'
 and ub.BirimAdi Like '${req.body.unit}' + '%'
 
 
-    order by s.YuklemeTarihi desc,su.SiraNo asc
+    order by s.YuklemeTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 `;
 
@@ -11372,7 +11369,7 @@ app.get("/order/shipped/list/filter/global/:filter", async (req, res) => {
         su.MusteriAciklama Like '%'+'${req.params.filter}' + '%' 
 
 
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -11503,7 +11500,7 @@ inner join MusterilerTB m on m.ID = s.MusteriID
 inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
 
 where s.SiparisDurumID = 3 and YEAR(s.SiparisTarihi) = '${req.params.year}' and m.Marketing= 'Mekmar'
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -11639,7 +11636,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 1 and m.Marketing= 'Mekmar'
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
 
 
@@ -11782,7 +11779,7 @@ inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
 inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
 
 where s.SiparisDurumID = 1 and YEAR(s.SiparisTarihi) = '${req.params.year}' and m.Marketing= 'Mekmar'
-    order by s.SiparisTarihi desc,su.SiraNo asc
+    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
 
     `;
   await mssql.query(waitingListYearSql, (err, waiting) => {

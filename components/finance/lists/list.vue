@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div :class="status ? 'col-9':'col'">
+    <div :class="status ? 'col-9' : 'col'">
       <DataTable
         :value="allStatus ? allList : list"
         sortField="balanced"
@@ -142,7 +142,7 @@
       </DataTable>
     </div>
     <div class="col-3" v-if="status">
-      <DataTable :value="expiry" >
+      <DataTable :value="expiry" sortField="vade_tarih" :sortOrder="1">
         <Column
           field="firmaAdi"
           header="Customer"
@@ -174,10 +174,13 @@
           <template #body="slotProps">
             {{ slotProps.data.tutar | formatPriceUsd }}
           </template>
+          <template #footer>
+            {{ maturity_total | formatPriceUsd }}
+          </template>
         </Column>
       </DataTable>
     </div>
-    <DataTable :value="maya"  v-if="status">
+    <DataTable :value="maya" v-if="status">
       <Column
         field="order_date"
         header="Order Date"
@@ -272,13 +275,14 @@ export default {
       type: Array,
       required: false,
     },
-    status:{
-      type:Boolean,
-      required:false
-    }
+    status: {
+      type: Boolean,
+      required: false,
+    },
   },
   data() {
     return {
+      maturity_total: 0,
       filteredFinance: {
         customer_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
@@ -290,24 +294,30 @@ export default {
       this.$store.dispatch("setFinanceTotalList", event.filteredValue);
     },
   },
+  created() {
+    this.maturity_total = 0;
+    this.expiry.forEach((item) => {
+      this.maturity_total += item.tutar;
+    });
+  },
 };
 </script>
 <style scoped>
-@media screen and (max-width:575px) {
-  .row{
-clear:both;
-display:block;
-width:90vw;
-}
-.col-3{
-  clear:both;
-  display:block;
-  width:90vw;
-}
-.col-9{
-  clear:both;
-  display:block;
-  width:90vw;
-}
+@media screen and (max-width: 575px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 90vw;
+  }
+  .col-3 {
+    clear: both;
+    display: block;
+    width: 90vw;
+  }
+  .col-9 {
+    clear: both;
+    display: block;
+    width: 90vw;
+  }
 }
 </style>

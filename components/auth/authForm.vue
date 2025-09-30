@@ -25,7 +25,7 @@
     <button type="submit" class="btn btn-primary w-100">Login</button>
   </form> -->
 
-  <Card style="width: 25rem; margin: 0px auto;">
+  <Card style="width: 25rem; margin: 0px auto">
     <template #title>
       <div class="text-center">Login</div>
     </template>

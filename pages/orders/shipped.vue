@@ -2,44 +2,91 @@
   <div>
     <div class="row m-auto text-center">
       <div class="col">
-        <Button type="button" class="p-button-success w-100" label="New Product" @click="newForm" />
+        <Button
+          type="button"
+          class="p-button-success w-100"
+          label="New Product"
+          @click="newForm"
+        />
       </div>
       <div class="col">
         <div class="p-float-label">
-          <Dropdown v-model="selectedYear" inputId="years" :options="getOrderProductionYearsList" optionLabel="Yil"
-            class="w-100" @change="yearChange($event)" />
+          <Dropdown
+            v-model="selectedYear"
+            inputId="years"
+            :options="getOrderProductionYearsList"
+            optionLabel="Yil"
+            class="w-100"
+            @change="yearChange($event)"
+          />
           <label for="years">Year</label>
         </div>
       </div>
     </div>
-    <orderList :list="getOrderList" @production_selected_emit="productionSelected($event)" :status="'Shipped'"
-      :total="getOrderProductionTotal" :loading="getLoadingDatatable" />
-    <Dialog :visible.sync="production_detail_form" header="" modal :style="{ width: '100%' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false">
-      <orderDetailForm :modelProduction="productionModel" :modelProduct="getOrderProductModel"
-        :status="getOrderProductionButtonStatus" :customer="getCustomersList" :user="getUserList"
-        :productsList="getOrderProductionProductDetailList" :supplier="getSupplierList" :unit="getUnitList"
-        :po="getOrderProductionPo" :delivery="getOrderKindOfDeliveryList" :payment="getOrderKindOfPaymentList"
-        :country="getCountryList" :invoice="getOrderKindOfInvoiceList" :cost="getOrderProductionCostList"
-        :costTotal="getOrderProductionCostTotal" :supplierDelivery="getOrderKindOfDeliverySupplierList"
-        :productSupplier="getOrderProductionSupplierList" :supplierProduct="getOrderSupplierProductList"
-        :document="getOrderProductionDocumentList" :check="getOrderProductionCheckList"
-        :checkTotal="getOrderProductionCheckListTotal" :productCalculation="getOrderProductionProductTotal"
-        :freightCalculation="getOrderProductionFreightTotal" :detailCalculation="getOrderProductionDetailTotal"
+    <orderList
+      :list="getOrderList"
+      @production_selected_emit="productionSelected($event)"
+      :status="'Shipped'"
+      :total="getOrderProductionTotal"
+      :loading="getLoadingDatatable"
+    />
+    <Dialog
+      :visible.sync="production_detail_form"
+      header=""
+      modal
+      :style="{ width: '100%' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+      :closeOnEscape="false"
+      :closable="false"
+    >
+      <orderDetailForm
+        :modelProduction="productionModel"
+        :modelProduct="getOrderProductModel"
+        :status="getOrderProductionButtonStatus"
+        :customer="getCustomersList"
+        :user="getUserList"
+        :productsList="getOrderProductionProductDetailList"
+        :supplier="getSupplierList"
+        :unit="getUnitList"
+        :po="getOrderProductionPo"
+        :delivery="getOrderKindOfDeliveryList"
+        :payment="getOrderKindOfPaymentList"
+        :country="getCountryList"
+        :invoice="getOrderKindOfInvoiceList"
+        :cost="getOrderProductionCostList"
+        :costTotal="getOrderProductionCostTotal"
+        :supplierDelivery="getOrderKindOfDeliverySupplierList"
+        :productSupplier="getOrderProductionSupplierList"
+        :supplierProduct="getOrderSupplierProductList"
+        :document="getOrderProductionDocumentList"
+        :check="getOrderProductionCheckList"
+        :checkTotal="getOrderProductionCheckListTotal"
+        :productCalculation="getOrderProductionProductTotal"
+        :freightCalculation="getOrderProductionFreightTotal"
+        :detailCalculation="getOrderProductionDetailTotal"
         :detailProductTotal="getOrderProductionProductDetailTotal"
-        :detailProductCost="getOrderProductionProductDetailCostTotal" :statusAlfa="false"
+        :detailProductCost="getOrderProductionProductDetailCostTotal"
+        :statusAlfa="false"
         :insuranceCalculation="getOrderProductionInsuranceTotal"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
-        " @process="process" @workerman_selected_emit="workermanSelected($event)"
-        @close_production_form_emit="closeProductionForm" @proforma_delete_emit="proformaDelete($event)"
-        @isf_delete_emit="isfDelete($event)" />
+        "
+        @process="process"
+        @workerman_selected_emit="workermanSelected($event)"
+        @close_production_form_emit="closeProductionForm"
+        @proforma_delete_emit="proformaDelete($event)"
+        @isf_delete_emit="isfDelete($event)"
+      />
     </Dialog>
 
     <Dialog :visible.sync="workerman_dialog_form" header="" modal>
-      <orderDetailWorkermanForm :list="getOrderProductionProductDetailWorkermanList"
-        :model="getOrderProductWorkermanModel" :supplier="getSupplierList" :productId="productId"
-        :po="getOrderProductionPo" />
+      <orderDetailWorkermanForm
+        :list="getOrderProductionProductDetailWorkermanList"
+        :model="getOrderProductWorkermanModel"
+        :supplier="getSupplierList"
+        :productId="productId"
+        :po="getOrderProductionPo"
+      />
     </Dialog>
   </div>
 </template>
@@ -86,12 +133,13 @@ export default {
       "getOrderProductDeleted",
       "getOrderProductionYearsList",
       "getOrderProductionTotal",
-      "getLoadingDatatable"
+      "getLoadingDatatable",
+      "getOrderProductionProductDetailNotChangeList",
     ]),
   },
   data() {
     return {
-      productionCostOldList:{},
+      productionCostOldList: {},
       production_detail_form: false,
       productionModel: {},
       productModel: {},
@@ -105,16 +153,14 @@ export default {
     this.$store.dispatch("setOrderShippedList");
   },
   methods: {
-    costControlUpdate(newList,oldList){
-
-
+    costControlUpdate(newList, oldList) {
       const user = Cookies.get("username");
       const po = newList.SiparisNo;
       const date = new Date();
 
       const newCustomer = newList.MusteriAdi;
       const newSeller = newList.SiparisSahibiAdi;
-      const newOperation =newList.OperasyonAdi;
+      const newOperation = newList.OperasyonAdi;
       const newFinansman = newList.FinansmanAdi;
       const newPrePayment = newList.Pesinat;
       const newMaturity = newList.Vade;
@@ -144,11 +190,9 @@ export default {
       const newShippedKind = newList.TeslimTur;
       const newInvoiceKind = newList.FaturaKesimTurAdi;
 
-
-
       const oldCustomer = oldList.MusteriAdi;
       const oldSeller = oldList.SiparisSahibiAdi;
-      const oldOperation =oldList.OperasyonAdi;
+      const oldOperation = oldList.OperasyonAdi;
       const oldFinansman = oldList.FinansmanAdi;
       const oldPrePayment = oldList.Pesinat;
       const oldMaturity = oldList.Vade;
@@ -178,154 +222,485 @@ export default {
       const oldShippedKind = oldList.TeslimTur;
       const oldInvoiceKind = oldList.FaturaKesimTurAdi;
 
-      if(newCustomer != oldCustomer){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin müşteri bilgisi ' + oldCustomer + ' dan => ' + newCustomer + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
-
+      if (newCustomer != oldCustomer) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin müşteri bilgisi " +
+            oldCustomer +
+            " dan => " +
+            newCustomer +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newSeller != oldSeller){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin siparişçi bilgisi ' + oldSeller + ' dan => ' + newSeller + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newSeller != oldSeller) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin siparişçi bilgisi " +
+            oldSeller +
+            " dan => " +
+            newSeller +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newOperation != oldOperation){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin operasyon bilgisi ' + oldOperation + ' dan => ' + newOperation + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newOperation != oldOperation) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin operasyon bilgisi " +
+            oldOperation +
+            " dan => " +
+            newOperation +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newFinansman != oldFinansman){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin finansman bilgisi ' + oldFinansman + ' dan => ' + newFinansman + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newFinansman != oldFinansman) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin finansman bilgisi " +
+            oldFinansman +
+            " dan => " +
+            newFinansman +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newPrePayment != oldPrePayment){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin pesinat bilgisi $' + oldPrePayment + ' dan => $' + newPrePayment + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newPrePayment != oldPrePayment) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin pesinat bilgisi $" +
+            oldPrePayment +
+            " dan => $" +
+            newPrePayment +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newMaturity != oldMaturity){
-        if(newMaturity == null || oldMaturity == null){
-          console.log('');
-        }else{
-          const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin vade tarihi '+ oldMaturity + ' dan => '+ newMaturity +' olarak güncellenmiştir.' };
-          this.$store.dispatch('addCost',data);
+      if (newMaturity != oldMaturity) {
+        if (newMaturity == null || oldMaturity == null) {
+          console.log("");
+        } else {
+          const data = {
+            date: date,
+            user: user,
+            po: po,
+            desc:
+              po +
+              " po sahip siparişinin vade tarihi " +
+              oldMaturity +
+              " dan => " +
+              newMaturity +
+              " olarak güncellenmiştir.",
+          };
+          this.$store.dispatch("addCost", data);
         }
-
       }
-      if(newCountry != oldCountry){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin ülke bilgisi '+ oldCountry + ' dan => '+ newCountry +' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newCountry != oldCountry) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin ülke bilgisi " +
+            oldCountry +
+            " dan => " +
+            newCountry +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newPaymetDesc != oldPaymetDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin ödeme bilgisi ~'+ oldPaymetDesc + '~ dan => ~'+ newPaymetDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newPaymetDesc != oldPaymetDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin ödeme bilgisi ~" +
+            oldPaymetDesc +
+            "~ dan => ~" +
+            newPaymetDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newContainerDesc != oldContainerDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin konteyner bilgisi ~'+ oldContainerDesc + '~ dan => ~'+ newContainerDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newContainerDesc != oldContainerDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin konteyner bilgisi ~" +
+            oldContainerDesc +
+            "~ dan => ~" +
+            newContainerDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newCommission != oldCommission){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin komisyon bilgisi $' + oldCommission + ' dan => $' + newCommission + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newCommission != oldCommission) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin komisyon bilgisi $" +
+            oldCommission +
+            " dan => $" +
+            newCommission +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newRefund != oldRefund){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin iade bilgisi $' + oldRefund + ' dan => $' + newRefund + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newRefund != oldRefund) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin iade bilgisi $" +
+            oldRefund +
+            " dan => $" +
+            newRefund +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newProductionDesc != oldProductionDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin ürün üretimi bilgisi ~'+ oldProductionDesc + '~ dan => ~'+ newProductionDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newProductionDesc != oldProductionDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin ürün üretimi bilgisi ~" +
+            oldProductionDesc +
+            "~ dan => ~" +
+            newProductionDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newShippedDesc != oldShippedDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin teslim bilgisi ~'+ oldShippedDesc + '~ dan => ~'+ newShippedDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newShippedDesc != oldShippedDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin teslim bilgisi ~" +
+            oldShippedDesc +
+            "~ dan => ~" +
+            newShippedDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newFinanceDesc != oldFinanceDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin finans açıklama bilgisi ~'+ oldFinanceDesc + '~ dan => ~'+ newFinanceDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newFinanceDesc != oldFinanceDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin finans açıklama bilgisi ~" +
+            oldFinanceDesc +
+            "~ dan => ~" +
+            newFinanceDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newFreightSelling != oldFreightSelling){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin navlun satış bilgisi $' + oldFreightSelling + ' dan => $' + newFreightSelling + ' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newFreightSelling != oldFreightSelling) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin navlun satış bilgisi $" +
+            oldFreightSelling +
+            " dan => $" +
+            newFreightSelling +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newFreightSellingCompany != oldFreightSellingCompany){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin navlun satış şirketi ~'+ oldFreightSellingCompany + '~ dan => ~'+ newFreightSellingCompany +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newFreightSellingCompany != oldFreightSellingCompany) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin navlun satış şirketi ~" +
+            oldFreightSellingCompany +
+            "~ dan => ~" +
+            newFreightSellingCompany +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail1!=oldDetail1){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 1 satış $'+ oldDetail1 + '~ dan => $'+ newDetail1 +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail1 != oldDetail1) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 1 satış $" +
+            oldDetail1 +
+            "~ dan => $" +
+            newDetail1 +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail1Desc !=oldDetail1Desc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 1 satış açıklama ~'+ oldDetail1Desc + '~ dan => ~'+ newDetail1Desc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail1Desc != oldDetail1Desc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 1 satış açıklama ~" +
+            oldDetail1Desc +
+            "~ dan => ~" +
+            newDetail1Desc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail2 != oldDetail2){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 2 satış $'+ oldDetail2 + ' dan => $'+ newDetail2 +' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail2 != oldDetail2) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 2 satış $" +
+            oldDetail2 +
+            " dan => $" +
+            newDetail2 +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail2Desc !=oldDetail2Desc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 2 satış açıklama ~'+ oldDetail2Desc + '~ dan => ~'+ newDetail2Desc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail2Desc != oldDetail2Desc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 2 satış açıklama ~" +
+            oldDetail2Desc +
+            "~ dan => ~" +
+            newDetail2Desc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newInsuranceSelling != oldInsuranceSelling){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin sigorta satış $'+ oldInsuranceSelling + ' dan => $'+ newInsuranceSelling +' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newInsuranceSelling != oldInsuranceSelling) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin sigorta satış $" +
+            oldInsuranceSelling +
+            " dan => $" +
+            newInsuranceSelling +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newFreightBuying != oldFreightBuying){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin navlun alış $'+ oldFreightBuying + ' dan => $'+ newFreightBuying +' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newFreightBuying != oldFreightBuying) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin navlun alış $" +
+            oldFreightBuying +
+            " dan => $" +
+            newFreightBuying +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newFreightBuyingDesc != oldFreightBuyingDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin navlun alış açıklama ~'+ oldFreightBuyingDesc + '~ dan => ~'+ newFreightBuyingDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newFreightBuyingDesc != oldFreightBuyingDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin navlun alış açıklama ~" +
+            oldFreightBuyingDesc +
+            "~ dan => ~" +
+            newFreightBuyingDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail1Buying != oldDetail1Buying){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 1 alış $'+ oldDetail1Buying + ' dan => $'+ newDetail1Buying +' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail1Buying != oldDetail1Buying) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 1 alış $" +
+            oldDetail1Buying +
+            " dan => $" +
+            newDetail1Buying +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail1BuyingDesc != oldDetail1BuyingDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 1 alış açıklama ~'+ oldDetail1BuyingDesc + '~ dan => ~'+ newDetail1BuyingDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail1BuyingDesc != oldDetail1BuyingDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 1 alış açıklama ~" +
+            oldDetail1BuyingDesc +
+            "~ dan => ~" +
+            newDetail1BuyingDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail2Buying != oldDetail2Buying){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 2 alış $'+ oldDetail2Buying + ' dan => $'+ newDetail2Buying +' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail2Buying != oldDetail2Buying) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 2 alış $" +
+            oldDetail2Buying +
+            " dan => $" +
+            newDetail2Buying +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newDetail2BuyingDesc !=oldDetail2BuyingDesc){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin detay 2 alış açıklama ~'+ oldDetail2BuyingDesc + '~ dan => ~'+ newDetail2BuyingDesc +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newDetail2BuyingDesc != oldDetail2BuyingDesc) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin detay 2 alış açıklama ~" +
+            oldDetail2BuyingDesc +
+            "~ dan => ~" +
+            newDetail2BuyingDesc +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newInsuranceBuying !=oldInsuranceBuying){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin sigorta alış $'+ oldInsuranceBuying + ' dan => $'+ newInsuranceBuying +' olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newInsuranceBuying != oldInsuranceBuying) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin sigorta alış $" +
+            oldInsuranceBuying +
+            " dan => $" +
+            newInsuranceBuying +
+            " olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newPaymentKind != oldPaymentKind){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin ödeme türü ~'+ oldPaymentKind + '~ dan => ~'+ newPaymentKind +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newPaymentKind != oldPaymentKind) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin ödeme türü ~" +
+            oldPaymentKind +
+            "~ dan => ~" +
+            newPaymentKind +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newShippedKind != oldShippedKind){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin gönderim türü ~'+ oldShippedKind + '~ dan => ~'+ newShippedKind +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newShippedKind != oldShippedKind) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin gönderim türü ~" +
+            oldShippedKind +
+            "~ dan => ~" +
+            newShippedKind +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(newInvoiceKind != oldInvoiceKind){
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişinin fatura türü ~'+ oldInvoiceKind + '~ dan => ~'+ newInvoiceKind +'~ olarak güncellenmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (newInvoiceKind != oldInvoiceKind) {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişinin fatura türü ~" +
+            oldInvoiceKind +
+            "~ dan => ~" +
+            newInvoiceKind +
+            "~ olarak güncellenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      this.$axios.post('/production/add/cost/list',this.getCostList);
-      this.$store.dispatch('resetCostList');
-
-
-
-
-
-
-
-
+      this.$axios.post("/production/add/cost/list", this.getCostList);
+      this.$store.dispatch("resetCostList");
     },
-    costControlAdd(payload){
+    costControlAdd(payload) {
       const user = Cookies.get("username");
       const po = payload.SiparisNo;
       const date = new Date();
       const customer = payload.MusteriAdi;
       const seller = payload.SiparisSahibiAdi;
-      const operation =payload.OperasyonAdi;
+      const operation = payload.OperasyonAdi;
       const finansman = payload.FinansmanAdi;
       const prePayment = payload.Pesinat;
       const maturity = payload.Vade;
@@ -355,229 +730,666 @@ export default {
       const shippedKind = payload.TeslimTur;
       const invoiceKind = payload.FaturaKesimTurAdi;
 
-      if(po == null || po == '' || po == ' ' || po == undefined || po == 0){
-        console.log('');
-      }else{
-        const data = {'date':date,'user':user,'po':po,'desc':po + ' po su sipariş olarak eklenmiştir.'};
-        this.$store.dispatch('addCost',data);
+      if (po == null || po == "" || po == " " || po == undefined || po == 0) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc: po + " po su sipariş olarak eklenmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(customer == null || customer == '' || customer == ' ' || customer == undefined || customer == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ' + customer + ' müşteri olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        customer == null ||
+        customer == "" ||
+        customer == " " ||
+        customer == undefined ||
+        customer == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe " +
+            customer +
+            " müşteri olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(seller == null || seller == '' || seller == ' ' || seller == undefined || seller == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ' +seller + ' satış temsilci olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        seller == null ||
+        seller == "" ||
+        seller == " " ||
+        seller == undefined ||
+        seller == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe " +
+            seller +
+            " satış temsilci olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(operation == null || operation == '' || operation == ' ' || operation == undefined || operation == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe '+ operation +' operasyoncu olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        operation == null ||
+        operation == "" ||
+        operation == " " ||
+        operation == undefined ||
+        operation == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe " +
+            operation +
+            " operasyoncu olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(finansman == null || finansman == '' || finansman == ' ' || finansman == undefined || finansman == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe '+ finansman +' finansman olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        finansman == null ||
+        finansman == "" ||
+        finansman == " " ||
+        finansman == undefined ||
+        finansman == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe " +
+            finansman +
+            " finansman olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(prePayment == null || prePayment == '' || prePayment == ' ' || prePayment == undefined || prePayment == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ prePayment +' pesinat olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        prePayment == null ||
+        prePayment == "" ||
+        prePayment == " " ||
+        prePayment == undefined ||
+        prePayment == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            prePayment +
+            " pesinat olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(maturity == null || maturity == '' || maturity == ' ' || maturity == undefined || maturity == 0){
-
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe '+ maturity +' vade olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        maturity == null ||
+        maturity == "" ||
+        maturity == " " ||
+        maturity == undefined ||
+        maturity == 0
+      ) {
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po + " po sahip siparişe " + maturity + " vade olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(country == null || country == '' || country == ' ' || country == undefined || country == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe '+ country +' ülke olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        country == null ||
+        country == "" ||
+        country == " " ||
+        country == undefined ||
+        country == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po + " po sahip siparişe " + country + " ülke olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(paymetDesc == null || paymetDesc == '' || paymetDesc == ' ' || paymetDesc == undefined || paymetDesc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ paymetDesc +'~ ödeme açıklaması olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        paymetDesc == null ||
+        paymetDesc == "" ||
+        paymetDesc == " " ||
+        paymetDesc == undefined ||
+        paymetDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            paymetDesc +
+            "~ ödeme açıklaması olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(containerDesc == null || containerDesc == '' || containerDesc == ' ' || containerDesc == undefined || containerDesc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ containerDesc +'~ konteyner ayrıntı olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        containerDesc == null ||
+        containerDesc == "" ||
+        containerDesc == " " ||
+        containerDesc == undefined ||
+        containerDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            containerDesc +
+            "~ konteyner ayrıntı olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(commission == null || commission == '' || commission == ' ' || commission == undefined || commission == 0){
-        console.log('');
-      }else {
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ commission +' komisyon olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        commission == null ||
+        commission == "" ||
+        commission == " " ||
+        commission == undefined ||
+        commission == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            commission +
+            " komisyon olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(refund == null || refund == '' || refund == ' ' || refund == undefined || refund == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ refund +' iade olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        refund == null ||
+        refund == "" ||
+        refund == " " ||
+        refund == undefined ||
+        refund == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po + " po sahip siparişe $" + refund + " iade olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(productionDesc == null || productionDesc == '' || productionDesc == ' ' || productionDesc == undefined || productionDesc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ productionDesc +'~ üretim açıklaması olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        productionDesc == null ||
+        productionDesc == "" ||
+        productionDesc == " " ||
+        productionDesc == undefined ||
+        productionDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            productionDesc +
+            "~ üretim açıklaması olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(shippedDesc == null || shippedDesc == '' || shippedDesc == ' ' || shippedDesc == undefined || shippedDesc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ shippedDesc +'~ sevkiyat açıklaması olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        shippedDesc == null ||
+        shippedDesc == "" ||
+        shippedDesc == " " ||
+        shippedDesc == undefined ||
+        shippedDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            shippedDesc +
+            "~ sevkiyat açıklaması olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(financeDesc == null || financeDesc == '' || financeDesc == ' ' || financeDesc == undefined || financeDesc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ financeDesc +'~ finans açıklaması olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        financeDesc == null ||
+        financeDesc == "" ||
+        financeDesc == " " ||
+        financeDesc == undefined ||
+        financeDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            financeDesc +
+            "~ finans açıklaması olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(freightSelling == null || freightSelling == '' || freightSelling == ' ' || freightSelling == undefined || freightSelling == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ freightSelling +' navlun satış fiyatı olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        freightSelling == null ||
+        freightSelling == "" ||
+        freightSelling == " " ||
+        freightSelling == undefined ||
+        freightSelling == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            freightSelling +
+            " navlun satış fiyatı olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(freightSellingCompany == null || freightSellingCompany == '' || freightSellingCompany == ' ' || freightSellingCompany == undefined || freightSellingCompany == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ freightSellingCompany +'~ navlun satış açıklama olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        freightSellingCompany == null ||
+        freightSellingCompany == "" ||
+        freightSellingCompany == " " ||
+        freightSellingCompany == undefined ||
+        freightSellingCompany == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            freightSellingCompany +
+            "~ navlun satış açıklama olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(detail1 == null || detail1 == '' || detail1 == ' ' || detail1 == undefined || detail1 == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ detail1 +' detay 1 satış fiyatı olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        detail1 == null ||
+        detail1 == "" ||
+        detail1 == " " ||
+        detail1 == undefined ||
+        detail1 == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            detail1 +
+            " detay 1 satış fiyatı olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(detail2 == null || detail2 == '' || detail2 == ' ' || detail2 == undefined || detail2 == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ detail2 +' detay 2 satış fiyatı olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        detail2 == null ||
+        detail2 == "" ||
+        detail2 == " " ||
+        detail2 == undefined ||
+        detail2 == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            detail2 +
+            " detay 2 satış fiyatı olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(detail1Desc == null || detail1Desc == '' || detail1Desc == ' ' || detail1Desc == undefined || detail1Desc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ detail1Desc +'~ detay 1 satış açıklama olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        detail1Desc == null ||
+        detail1Desc == "" ||
+        detail1Desc == " " ||
+        detail1Desc == undefined ||
+        detail1Desc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            detail1Desc +
+            "~ detay 1 satış açıklama olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(detail2Desc == null || detail2Desc == '' || detail2Desc == ' ' || detail2Desc == undefined || detail2Desc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ detail2Desc +'~ detay 2 satış açıklama olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        detail2Desc == null ||
+        detail2Desc == "" ||
+        detail2Desc == " " ||
+        detail2Desc == undefined ||
+        detail2Desc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            detail2Desc +
+            "~ detay 2 satış açıklama olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(insuranceSelling == null || insuranceSelling == '' || insuranceSelling == ' ' || insuranceSelling == undefined || insuranceSelling == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ insuranceSelling +' sigorta satış olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        insuranceSelling == null ||
+        insuranceSelling == "" ||
+        insuranceSelling == " " ||
+        insuranceSelling == undefined ||
+        insuranceSelling == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            insuranceSelling +
+            " sigorta satış olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(freightBuying == null || freightBuying == '' || freightBuying == ' ' || freightBuying == undefined || freightBuying == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ freightBuying +' navlun alış fiyatı olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        freightBuying == null ||
+        freightBuying == "" ||
+        freightBuying == " " ||
+        freightBuying == undefined ||
+        freightBuying == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            freightBuying +
+            " navlun alış fiyatı olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(freightBuyingDesc == null || freightBuyingDesc == '' || freightBuyingDesc == ' ' || freightBuyingDesc == undefined || freightBuyingDesc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ freightBuyingDesc +'~ navlun alış açıklama olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        freightBuyingDesc == null ||
+        freightBuyingDesc == "" ||
+        freightBuyingDesc == " " ||
+        freightBuyingDesc == undefined ||
+        freightBuyingDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            freightBuyingDesc +
+            "~ navlun alış açıklama olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
 
-      if(detail1Buying == null || detail1Buying == '' || detail1Buying == ' ' || detail1Buying == undefined || detail1Buying == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ detail1Buying +' detay 1 alış fiyatı olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        detail1Buying == null ||
+        detail1Buying == "" ||
+        detail1Buying == " " ||
+        detail1Buying == undefined ||
+        detail1Buying == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            detail1Buying +
+            " detay 1 alış fiyatı olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(detail2Buying == null || detail2Buying == '' || detail2Buying == ' ' || detail2Buying == undefined || detail2Buying == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ detail2Buying +' detay 2 alış fiyatı olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        detail2Buying == null ||
+        detail2Buying == "" ||
+        detail2Buying == " " ||
+        detail2Buying == undefined ||
+        detail2Buying == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            detail2Buying +
+            " detay 2 alış fiyatı olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
 
-      if(detail1BuyingDesc == null || detail1BuyingDesc == '' || detail1BuyingDesc == ' ' || detail1BuyingDesc == undefined || detail1BuyingDesc == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ detail1BuyingDesc +'~ detay 1 alış açıklama olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+      if (
+        detail1BuyingDesc == null ||
+        detail1BuyingDesc == "" ||
+        detail1BuyingDesc == " " ||
+        detail1BuyingDesc == undefined ||
+        detail1BuyingDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            detail1BuyingDesc +
+            "~ detay 1 alış açıklama olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      
-      if(detail2BuyingDesc == null || detail2BuyingDesc == '' || detail2BuyingDesc == ' ' || detail2BuyingDesc == undefined || detail2BuyingDesc == 0){
-      console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ detail2BuyingDesc +'~ detay 1 alış açıklama olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
+
+      if (
+        detail2BuyingDesc == null ||
+        detail2BuyingDesc == "" ||
+        detail2BuyingDesc == " " ||
+        detail2BuyingDesc == undefined ||
+        detail2BuyingDesc == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            detail2BuyingDesc +
+            "~ detay 1 alış açıklama olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
       }
-      if(insuranceBuying == null || insuranceBuying == '' || insuranceBuying == ' ' || insuranceBuying == undefined || insuranceBuying == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe $'+ insuranceBuying +' sigorta alış olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
-      };
+      if (
+        insuranceBuying == null ||
+        insuranceBuying == "" ||
+        insuranceBuying == " " ||
+        insuranceBuying == undefined ||
+        insuranceBuying == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe $" +
+            insuranceBuying +
+            " sigorta alış olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
+      }
 
-      if(paymentKind == null || paymentKind == '' || paymentKind == ' ' || paymentKind == undefined || paymentKind == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ paymentKind +'~ ödeme tür olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
-      };
+      if (
+        paymentKind == null ||
+        paymentKind == "" ||
+        paymentKind == " " ||
+        paymentKind == undefined ||
+        paymentKind == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            paymentKind +
+            "~ ödeme tür olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
+      }
 
-      if(shippedKind == null || shippedKind == '' || shippedKind == ' ' || shippedKind == undefined || shippedKind == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ shippedKind +'~ yükleme tür olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
-      };
+      if (
+        shippedKind == null ||
+        shippedKind == "" ||
+        shippedKind == " " ||
+        shippedKind == undefined ||
+        shippedKind == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            shippedKind +
+            "~ yükleme tür olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
+      }
 
-      if(invoiceKind == null || invoiceKind == '' || invoiceKind == ' ' || invoiceKind == undefined || invoiceKind == 0){
-        console.log('');
-      }else{
-        const data = { 'date':date,'user':user,'po':po,'desc':po +' po sahip siparişe ~'+ invoiceKind +'~ fatura tür olarak girilmiştir.' };
-        this.$store.dispatch('addCost',data);
-      };
+      if (
+        invoiceKind == null ||
+        invoiceKind == "" ||
+        invoiceKind == " " ||
+        invoiceKind == undefined ||
+        invoiceKind == 0
+      ) {
+        console.log("");
+      } else {
+        const data = {
+          date: date,
+          user: user,
+          po: po,
+          desc:
+            po +
+            " po sahip siparişe ~" +
+            invoiceKind +
+            "~ fatura tür olarak girilmiştir.",
+        };
+        this.$store.dispatch("addCost", data);
+      }
 
-      this.$axios.post('/production/add/cost/list',this.getCostList);
-
-
-
-
-
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-      
-
-
-
+      this.$axios.post("/production/add/cost/list", this.getCostList);
     },
     __stringCharacterChange(event) {
       if (event != null || event != undefined) {
@@ -617,6 +1429,8 @@ export default {
         operation: this.productionModel.operationMail,
         representative: this.productionModel.representativeMail,
         status: 3,
+        notchange: this.getOrderProductionProductDetailNotChangeList,
+        new: this.getOrderProductionButtonStatus,
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
@@ -766,7 +1580,7 @@ export default {
         this.productionModel.DetayMekmarNot_3
       );
       this.$store.dispatch("setOrderProductionUpdate", this.productionModel);
-      this.costControlUpdate(this.productionModel,this.productionCostOldList);
+      this.costControlUpdate(this.productionModel, this.productionCostOldList);
     },
     save() {
       if (
@@ -911,9 +1725,11 @@ export default {
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");
       this.$store.dispatch("setOrderProductionSave", this.productionModel);
-      this.$store.dispatch("setOrderProductionPo", this.productionModel.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionPo",
+        this.productionModel.SiparisNo
+      );
       this.costControlAdd(this.productionModel);
-
     },
     process() {
       if (this.getOrderProductionButtonStatus) {
@@ -935,13 +1751,19 @@ export default {
     productionSelected(event) {
       this.$store.dispatch("setOrderProductionButtonStatus", false);
       this.$store.dispatch("setOrderProductModel");
-      this.$store.dispatch("setOrderProductionProductDetailList", event.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionProductDetailList",
+        event.SiparisNo
+      );
       this.$store.dispatch("setOrderProductionCostList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionSupplierList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionDocumentList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionCheckList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
-      this.$store.dispatch("setOrderProductionInsuranceTotal", event.sigorta_tutar_satis);
+      this.$store.dispatch(
+        "setOrderProductionInsuranceTotal",
+        event.sigorta_tutar_satis
+      );
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
@@ -950,9 +1772,8 @@ export default {
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
       this.production_detail_form = true;
-      this.productionCostOldList =  {...event};
-      this.$store.dispatch('resetCostList');
-
+      this.productionCostOldList = { ...event };
+      this.$store.dispatch("resetCostList");
     },
   },
   watch: {
