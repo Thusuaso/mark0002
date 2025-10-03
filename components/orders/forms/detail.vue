@@ -1,28 +1,53 @@
 <template>
-    <div class="row mt-3" style="padding:0px 50px;">
-
+  <div class="row mt-3" style="padding: 0px 50px">
     <div class="col-10">
       <TabView>
         <TabPanel header="Order">
-          <orderDetailOrderForm :model="modelProduct" :products="productsList" :supplier="supplier" :unit="unit"
-            :po="po" :detailProductTotal="detailProductTotal" :status="status" :saveButtonStatus="saveButtonStatus"
-            @workerman_selected_emit="$emit('workerman_selected_emit', $event)" />
+          <orderDetailOrderForm
+            :model="modelProduct"
+            :products="productsList"
+            :supplier="supplier"
+            :unit="unit"
+            :po="po"
+            :detailProductTotal="detailProductTotal"
+            :status="status"
+            :saveButtonStatus="saveButtonStatus"
+            @workerman_selected_emit="$emit('workerman_selected_emit', $event)"
+          />
         </TabPanel>
         <TabPanel header="Proforma">
-          <orderDetailProformaForm :model="modelProduction" :delivery="delivery" :payment="payment" :status="status"
-            :country="country" :invoice="invoice" :po="po" :proformaUploadButtonStatus="proformaUploadButtonStatus"
-            @prepayment_is_activated_emit="prePaymentIsActivated($event)" />
+          <orderDetailProformaForm
+            :model="modelProduction"
+            :delivery="delivery"
+            :payment="payment"
+            :status="status"
+            :country="country"
+            :invoice="invoice"
+            :po="po"
+            :proformaUploadButtonStatus="proformaUploadButtonStatus"
+            @prepayment_is_activated_emit="prePaymentIsActivated($event)"
+            :source="source"
+          />
         </TabPanel>
         <TabPanel header="Cost" v-if="!statusAlfa">
           <orderDetailCostForm :cost="cost" :total="costTotal" />
         </TabPanel>
         <TabPanel header="Supplier" v-if="!statusAlfa">
-          <orderDetailSupplierForm :modelProduction="modelProduction" :productSupplier="productSupplier"
-            :invoice="invoice" :supplierDelivery="supplierDelivery" :po="po" :supplierProduct="supplierProduct" />
+          <orderDetailSupplierForm
+            :modelProduction="modelProduction"
+            :productSupplier="productSupplier"
+            :invoice="invoice"
+            :supplierDelivery="supplierDelivery"
+            :po="po"
+            :supplierProduct="supplierProduct"
+          />
         </TabPanel>
         <TabPanel header="Document" v-if="!statusAlfa">
-          <orderDetailDocumentForm :list="document" @proforma_delete_emit="$emit('proforma_delete_emit', $event)"
-            @isf_delete_emit="$emit('isf_delete_emit', $event)" />
+          <orderDetailDocumentForm
+            :list="document"
+            @proforma_delete_emit="$emit('proforma_delete_emit', $event)"
+            @isf_delete_emit="$emit('isf_delete_emit', $event)"
+          />
         </TabPanel>
         <TabPanel header="Check">
           <orderDetailCheckForm :list="check" :total="checkTotal" />
@@ -30,59 +55,120 @@
       </TabView>
     </div>
     <div class="col-2">
-      <Button type="button" class="p-button-success w-100 mb-3" label="Save" @click="$emit('process')"
-        :disabled="saveButtonStatus" />
-      <Button type="button" class="p-button-danger w-100 mb-4" label="Exit"
-        @click="$emit('close_production_form_emit')" />
-      <Button type="button" class="p-button-secondary w-100 mb-4" label="Divide" @click="$emit('divide')" />
+      <Button
+        type="button"
+        class="p-button-success w-100 mb-3"
+        label="Save"
+        @click="$emit('process')"
+        :disabled="saveButtonStatus"
+      />
+      <Button
+        type="button"
+        class="p-button-danger w-100 mb-4"
+        label="Exit"
+        @click="$emit('close_production_form_emit')"
+      />
+      <Button
+        type="button"
+        class="p-button-secondary w-100 mb-4"
+        label="Divide"
+        @click="$emit('divide')"
+      />
       <div class="flex flex-wrap justify-content-center gap-3 mb-4">
         <div class="flex align-items-center">
-          <Checkbox v-model="selectedControlBoolean" inputId="ingredient1" binary
-            @change="controlBooleanSelected($event)" />
+          <Checkbox
+            v-model="selectedControlBoolean"
+            inputId="ingredient1"
+            binary
+            @change="controlBooleanSelected($event)"
+          />
           <label for="ingredient1" class="ml-2"> Control </label>
         </div>
       </div>
 
-
-
-
       <span class="p-float-label mb-4">
-        <InputText id="po" v-model="modelProduction.SiparisNo" class="w-100" :disabled="!status"
-          @input="inputPo($event)" />
+        <InputText
+          id="po"
+          v-model="modelProduction.SiparisNo"
+          class="w-100"
+          :disabled="!status"
+          @input="inputPo($event)"
+        />
         <label for="po">Po</label>
       </span>
       <span class="p-float-label mb-4">
-        <Calendar v-model="order_date" inputId="order_date" class="w-100" @date-select="orderDateSelected($event)"
-          :disabled="!status" dateFormat="dd/mm/yy"/>
+        <Calendar
+          v-model="order_date"
+          inputId="order_date"
+          class="w-100"
+          @date-select="orderDateSelected($event)"
+          :disabled="!status"
+          dateFormat="dd/mm/yy"
+        />
         <label for="order_date">Date</label>
       </span>
       <span class="p-float-label mb-4">
-        <Calendar v-model="guess_loading_date" inputId="guess_loading_date" class="w-100"
-          @date-select="guessLoadingDateSelected($event)" :disabled="!status" dateFormat="dd/mm/yy" />
+        <Calendar
+          v-model="guess_loading_date"
+          inputId="guess_loading_date"
+          class="w-100"
+          @date-select="guessLoadingDateSelected($event)"
+          :disabled="!status"
+          dateFormat="dd/mm/yy"
+        />
         <label for="guess_loading_date">Estimated Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
-        <AutoComplete v-model="selectedCustomer" inputId="customer" :suggestions="filteredCustomer"
-          @complete="searchCustomer($event)" field="FirmaAdi" @item-select="customerSelected($event)" />
+        <AutoComplete
+          v-model="selectedCustomer"
+          inputId="customer"
+          :suggestions="filteredCustomer"
+          @complete="searchCustomer($event)"
+          field="FirmaAdi"
+          @item-select="customerSelected($event)"
+        />
         <label for="customer">Customer</label>
       </span>
       <span class="p-float-label mb-4">
-        <AutoComplete v-model="selectedOrderer" inputId="user" :suggestions="filteredOrderer"
-          @complete="searchOrderer($event)" field="KullaniciAdi" @item-select="ordererSelected($event)" />
+        <AutoComplete
+          v-model="selectedOrderer"
+          inputId="user"
+          :suggestions="filteredOrderer"
+          @complete="searchOrderer($event)"
+          field="KullaniciAdi"
+          @item-select="ordererSelected($event)"
+        />
         <label for="user">Seller</label>
       </span>
       <span class="p-float-label mb-4">
-        <AutoComplete v-model="selectedOperation" inputId="operation" :suggestions="filteredOperation"
-          @complete="searchOperation($event)" field="KullaniciAdi" @item-select="operationSelected($event)" />
+        <AutoComplete
+          v-model="selectedOperation"
+          inputId="operation"
+          :suggestions="filteredOperation"
+          @complete="searchOperation($event)"
+          field="KullaniciAdi"
+          @item-select="operationSelected($event)"
+        />
         <label for="operation">Operation</label>
       </span>
       <span class="p-float-label mb-4">
-        <AutoComplete v-model="selectedFinanceman" inputId="financeman" :suggestions="filteredFinanceman"
-          @complete="searchFinanceman($event)" field="KullaniciAdi" @item-select="financemanSelected($event)" />
+        <AutoComplete
+          v-model="selectedFinanceman"
+          inputId="financeman"
+          :suggestions="filteredFinanceman"
+          @complete="searchFinanceman($event)"
+          field="KullaniciAdi"
+          @item-select="financemanSelected($event)"
+        />
         <label for="financeman">Finance</label>
       </span>
-      <CustomInput :value="modelProduction.Pesinat" text="Prepayment" @onInput="modelProduction.Pesinat = $event"
-        :disabled="prepaymentDisabledForm" v-if="!statusAlfa" />
+      <CustomInput
+        :value="modelProduction.Pesinat"
+        text="Prepayment"
+        @onInput="modelProduction.Pesinat = $event"
+        :disabled="prepaymentDisabledForm"
+        v-if="!statusAlfa"
+      />
       <table class="table mb-4">
         <thead>
           <tr>
@@ -110,8 +196,11 @@
             <th scope="row">G.Total</th>
             <td>
               {{
-              ( productCalculation + freightCalculation + detailCalculation + insuranceCalculation )
-              | formatPriceUsd
+                (productCalculation +
+                  freightCalculation +
+                  detailCalculation +
+                  insuranceCalculation)
+                  | formatPriceUsd
               }}
             </td>
           </tr>
@@ -119,15 +208,32 @@
       </table>
 
       <span class="p-float-label mb-4">
-        <Calendar v-model="load_date" inputId="load_date" class="w-100" disabled dateFormat="dd/mm/yy" />
+        <Calendar
+          v-model="load_date"
+          inputId="load_date"
+          class="w-100"
+          disabled
+          dateFormat="dd/mm/yy"
+        />
         <label for="load_date">Shipment Date</label>
       </span>
       <span class="p-float-label mb-4">
-        <Calendar v-model="eta_date" inputId="eta_date" class="w-100" disabled dateFormat="dd/mm/yy" />
+        <Calendar
+          v-model="eta_date"
+          inputId="eta_date"
+          class="w-100"
+          disabled
+          dateFormat="dd/mm/yy"
+        />
         <label for="eta_date">ETA</label>
       </span>
       <span class="p-float-label mb-4">
-        <InputText id="container" v-model="modelProduction.KonteynerNo" class="w-100" disabled />
+        <InputText
+          id="container"
+          v-model="modelProduction.KonteynerNo"
+          class="w-100"
+          disabled
+        />
         <label for="container">Container No</label>
       </span>
       <table class="table mb-4">
@@ -168,12 +274,12 @@
             <td>
               {{
                 (detailProductCost.supplier +
-                detailProductCost.workerman +
-                detailProductCost.freight +
-                detailProductCost.detail +
-                detailProductCost.brokerage +
-                detailProductCost.fob)
-                | formatPriceUsd
+                  detailProductCost.workerman +
+                  detailProductCost.freight +
+                  detailProductCost.detail +
+                  detailProductCost.brokerage +
+                  detailProductCost.fob)
+                  | formatPriceUsd
               }}
             </td>
           </tr>
@@ -181,16 +287,16 @@
             <th scope="row">Profit</th>
             <td>
               {{
-              (productCalculation +
-              freightCalculation +
-              detailCalculation -
-              (detailProductCost.supplier +
-              detailProductCost.workerman +
-              detailProductCost.freight +
-              detailProductCost.detail +
-              detailProductCost.brokerage +
-              detailProductCost.fob))
-              | formatPriceUsd
+                (productCalculation +
+                  freightCalculation +
+                  detailCalculation -
+                  (detailProductCost.supplier +
+                    detailProductCost.workerman +
+                    detailProductCost.freight +
+                    detailProductCost.detail +
+                    detailProductCost.brokerage +
+                    detailProductCost.fob))
+                  | formatPriceUsd
               }}
             </td>
           </tr>
@@ -205,7 +311,7 @@ import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 export default {
   computed: {
-    ...mapGetters(["getOrdersAllList","getCostList"]),
+    ...mapGetters(["getOrdersAllList", "getCostList"]),
   },
   props: {
     modelProduction: {
@@ -324,14 +430,18 @@ export default {
       type: Boolean,
       required: false,
     },
-    insuranceCalculation:{
-      type:Number,
-      required:true
-    }
+    insuranceCalculation: {
+      type: Number,
+      required: true,
+    },
+    source: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
-      selectedControlBoolean:false,
+      selectedControlBoolean: false,
       prepaymentDisabledForm: true,
       guess_loading_date: null,
       order_date: null,
@@ -355,7 +465,7 @@ export default {
   methods: {
     controlBooleanSelected(event) {
       this.modelProduction.SiparisKontrol = this.selectedControlBoolean;
-      if(this.selectedControlBoolean){
+      if (this.selectedControlBoolean) {
         const date = new Date();
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
@@ -364,19 +474,20 @@ export default {
         const minutes = date.getMinutes();
 
         const payload = {
-          'po':this.modelProduction.SiparisNo,
-          'kontrol_eden':Cookies.get('username'),
-          'date':year + '/' + month + '/' + day + '/' + ' ' + hour + ':' + minutes
-
-        }
-        this.$axios.post('/mail/product/control/send',payload)
-            .then(response => {
-                if (response.data.status) {
-                  this.$toast.success('Mail gönderildi. Kaydetmeyi unutmayınız.');
-                } else {
-                this.$toast.error('Mail gönderilemedi.');
-                }
-            })
+          po: this.modelProduction.SiparisNo,
+          kontrol_eden: Cookies.get("username"),
+          date:
+            year + "/" + month + "/" + day + "/" + " " + hour + ":" + minutes,
+        };
+        this.$axios
+          .post("/mail/product/control/send", payload)
+          .then((response) => {
+            if (response.data.status) {
+              this.$toast.success("Mail gönderildi. Kaydetmeyi unutmayınız.");
+            } else {
+              this.$toast.error("Mail gönderilemedi.");
+            }
+          });
       }
     },
     inputPo(event) {
@@ -385,8 +496,13 @@ export default {
         this.$toast.success("Bu po ya ait sipariş bulunmakta.");
       }
     },
-    __nullControl(value){
-      if (value == null || value == 'null' || value == undefined || value == "") {
+    __nullControl(value) {
+      if (
+        value == null ||
+        value == "null" ||
+        value == undefined ||
+        value == ""
+      ) {
         return 0;
       } else {
         return parseFloat(value);
@@ -401,7 +517,6 @@ export default {
       prepayment += this.__nullControl(this.modelProduction.DetayTutar_1);
       prepayment += this.__nullControl(this.modelProduction.DetayTutar_2);
       prepayment += this.__nullControl(this.modelProduction.DetayTutar_3);
-
 
       if (event == 1) {
         this.prepaymentDisabledForm = true;
@@ -423,7 +538,6 @@ export default {
     financemanSelected(event) {
       this.modelProduction.Finansman = event.value.ID;
       this.modelProduction.FinansmanAdi = event.value.KullaniciAdi;
-
     },
     searchFinanceman(event) {
       let results;
@@ -431,7 +545,9 @@ export default {
         results = this.user;
       } else {
         results = this.user.filter((x) => {
-          return x.KullaniciAdi.toLowerCase().startsWith(event.query.toLowerCase());
+          return x.KullaniciAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredFinanceman = results;
@@ -440,7 +556,6 @@ export default {
       this.modelProduction.Operasyon = event.value.ID;
       this.modelProduction.operationMail = event.value.MailAdres;
       this.modelProduction.OperasyonAdi = event.value.KullaniciAdi;
-
     },
     searchOperation(event) {
       let results;
@@ -448,7 +563,9 @@ export default {
         results = this.user;
       } else {
         results = this.user.filter((x) => {
-          return x.KullaniciAdi.toLowerCase().startsWith(event.query.toLowerCase());
+          return x.KullaniciAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredOperation = results;
@@ -459,7 +576,9 @@ export default {
         results = this.user;
       } else {
         results = this.user.filter((x) => {
-          return x.KullaniciAdi.toLowerCase().startsWith(event.query.toLowerCase());
+          return x.KullaniciAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredOrderer = results;
@@ -503,40 +622,43 @@ export default {
       );
       this.load_date = date.stringToDate(this.modelProduction.YuklemeTarihi);
       this.eta_date = date.stringToDate(this.modelProduction.Eta);
-      this.modelProduction.SiparisKontrolEden = Cookies.get('userId');
-      if (this.modelProduction.SiparisKontrol == null || this.modelProduction.SiparisKontrol == '' || this.modelProduction.SiparisKontrol == 'null' || this.modelProduction.SiparisKontrol == undefined || this.modelProduction.SiparisKontrol == false) {
+      this.modelProduction.SiparisKontrolEden = Cookies.get("userId");
+      if (
+        this.modelProduction.SiparisKontrol == null ||
+        this.modelProduction.SiparisKontrol == "" ||
+        this.modelProduction.SiparisKontrol == "null" ||
+        this.modelProduction.SiparisKontrol == undefined ||
+        this.modelProduction.SiparisKontrol == false
+      ) {
         this.selectedControlBoolean = false;
         this.modelProduction.SiparisKontrol = false;
       } else {
         this.selectedControlBoolean = true;
         this.modelProduction.SiparisKontrol = true;
-      };
+      }
     },
   },
   watch: {},
-  mounted(){
-
-  }
+  mounted() {},
 };
 </script>
 
 <style scoped>
-  @media screen and (max-width:576px) {
-    .row{
-      clear:both;
-      display:block;
-      width:100%;
-
-    }
-    .col-10{
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col-2{
-      clear:both;
-      display: block;
-      width:100%;
-    }
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
   }
+  .col-10 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-2 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+}
 </style>

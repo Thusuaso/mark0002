@@ -76,6 +76,7 @@
         @close_production_form_emit="closeProductionForm"
         @proforma_delete_emit="proformaDelete($event)"
         @isf_delete_emit="isfDelete($event)"
+        :source="getOrderProductionSourceTypes"
       />
     </Dialog>
 
@@ -97,6 +98,7 @@ import Cookies from "js-cookie";
 export default {
   computed: {
     ...mapGetters([
+      "getOrderProductionSourceTypes",
       "getCostList",
       "getOrderList",
       "getOrderProductionModel",
@@ -151,6 +153,8 @@ export default {
 
   created() {
     this.$store.dispatch("setOrderShippedList");
+        this.$store.dispatch("setOrderProductionSourceTypes");
+
   },
   methods: {
     costControlUpdate(newList, oldList) {
@@ -1583,6 +1587,16 @@ export default {
       this.costControlUpdate(this.productionModel, this.productionCostOldList);
     },
     save() {
+                  if (
+        this.productionModel.KaynakTuruID == null ||
+        this.productionModel.KaynakTuruID == "" ||
+        this.productionModel.KaynakTuruID == " " ||
+        this.productionModel.KaynakTuruID == undefined ||
+        this.productionModel.KaynakTuruID == 0
+      ) {
+        alert("Source Type is missing");
+        return;
+      }
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||
@@ -1744,6 +1758,7 @@ export default {
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch("setOrderProductionDetailListReset");
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setOrderProductionSourceTypes");
 
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
@@ -1768,6 +1783,7 @@ export default {
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setOrderProductionSourceTypes");
 
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);

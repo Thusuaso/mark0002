@@ -1,9 +1,7 @@
 <template>
   <div>
     <div class="row">
-      
       <div class="col-3">
-
         <Dropdown
           v-model="selectedDelivery"
           :options="delivery"
@@ -73,15 +71,26 @@
           <label for="country">Country</label>
         </span>
         <span class="p-float-label mb-4">
-          <InputText id="paidDescription" v-model="model.OdemeAciklama" class="w-100" />
+          <InputText
+            id="paidDescription"
+            v-model="model.OdemeAciklama"
+            class="w-100"
+          />
           <label for="paidDescription">Payment Details</label>
         </span>
         <span class="p-float-label mb-4">
-          <InputText id="container" v-model="model.KonteynerAyrinti" class="w-100" />
+          <InputText
+            id="container"
+            v-model="model.KonteynerAyrinti"
+            class="w-100"
+          />
           <label for="container">Container Detail</label>
         </span>
         <span class="p-float-label mb-4">
-          <InputText id="document" v-model="model.EvrakGideri" class="w-100" 
+          <InputText
+            id="document"
+            v-model="model.EvrakGideri"
+            class="w-100"
             @input="evrakGideri($event)"
           />
           <label for="document">Document Cost</label>
@@ -96,12 +105,15 @@
           <label for="commission">Commission</label>
         </span>
         <span class="p-float-label mb-4">
-          <InputText id="return" v-model="model.Iade" class="w-100" 
+          <InputText
+            id="return"
+            v-model="model.Iade"
+            class="w-100"
             @input="refund($event)"
           />
           <label for="return">Refund</label>
         </span>
-        <div class="p-float-label">
+        <div class="p-float-label mb-4">
           <Dropdown
             v-model="selectedInvoice"
             inputId="invoice"
@@ -112,7 +124,18 @@
           />
           <label for="invoice">Invoice Type</label>
         </div>
-        <div class="row">
+        <div class="p-float-label">
+          <Dropdown
+            v-model="selectedSourceType"
+            inputId="source_type"
+            :options="source"
+            optionLabel="KaynakTuru"
+            class="w-100"
+            @change="sourceTypeChange($event)"
+          />
+          <label for="source_type">Source Type</label>
+        </div>
+        <!-- <div class="row">
           <div class="col">
             <div class="flex align-items-center">
               <Checkbox v-model="model.depo_yukleme" :binary="true" />
@@ -125,7 +148,7 @@
               <label for="ingredient2" class="ml-2"> Maya Payment</label>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="col-9">
         <span class="p-float-label mb-4">
@@ -142,33 +165,31 @@
         </span>
         <div class="row">
           <div class="col">
-                    <FileUpload
-          mode="basic"
-          accept=".pdf"
-          customUpload
-          @select="uploadInvoiceDocument($event)"
-          chooseLabel="Upload Proforma"
-          :disabled="proformaUploadButtonStatus"
-        />
+            <FileUpload
+              mode="basic"
+              accept=".pdf"
+              customUpload
+              @select="uploadInvoiceDocument($event)"
+              chooseLabel="Upload Proforma"
+              :disabled="proformaUploadButtonStatus"
+            />
           </div>
           <div class="col">
-          <FileUpload
+            <FileUpload
               accept=".pdf"
               @select="selectedDrawingDocument($event)"
               auto
               chooseLabel="Upload Drawing"
               :disabled="proformaUploadButtonStatus"
               :multiple="true"
-        />
+            />
           </div>
         </div>
-
-
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <Card class="cardClass" >
+        <Card class="cardClass">
           <template #title>Selling</template>
           <template #content>
             <div class="row mb-4">
@@ -178,14 +199,18 @@
                     id="freight"
                     v-model="model.NavlunSatis"
                     @input="freightInput($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="freight">Freight</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="freightComp" v-model="model.NavlunFirma" style="width:100%;"/>
+                  <InputText
+                    id="freightComp"
+                    v-model="model.NavlunFirma"
+                    style="width: 100%"
+                  />
                   <label for="freightComp">Freight Company</label>
                 </span>
               </div>
@@ -197,14 +222,18 @@
                     id="detail1"
                     v-model="model.DetayTutar_1"
                     @input="detail1Input($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="detail1">Detail 1</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detailDesc" v-model="model.DetayAciklama_1" style="width:100%;"/>
+                  <InputText
+                    id="detailDesc"
+                    v-model="model.DetayAciklama_1"
+                    style="width: 100%"
+                  />
                   <label for="detailDesc">Detail 1 Description</label>
                 </span>
               </div>
@@ -216,14 +245,18 @@
                     id="detail2"
                     v-model="model.DetayTutar_2"
                     @input="detail2Input($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="detail2">Detail 2</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayAciklama_2" style="width:100%;" />
+                  <InputText
+                    id="detail2Desc"
+                    v-model="model.DetayAciklama_2"
+                    style="width: 100%"
+                  />
                   <label for="detail2Desc">Detail 2 Description</label>
                 </span>
               </div>
@@ -236,7 +269,7 @@
                     id="Insurance"
                     v-model="model.sigorta_tutar_satis"
                     @input="insuranceSelling($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="Insurance">Insurance</label>
                 </span>
@@ -256,14 +289,18 @@
                     id="freight"
                     v-model="model.NavlunAlis"
                     @input="getFreightInput($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="freight">Freight</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="freightComp" v-model="model.DetayMekmarNot_1" style="width:100%;"/>
+                  <InputText
+                    id="freightComp"
+                    v-model="model.DetayMekmarNot_1"
+                    style="width: 100%"
+                  />
                   <label for="freightComp">Freight Description</label>
                 </span>
               </div>
@@ -275,14 +312,18 @@
                     id="detail1"
                     v-model="model.DetayAlis_1"
                     @input="getDetail1Input($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="detail1">Detail 1</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detailDesc" v-model="model.DetayMekmarNot_2" style="width:100%;"/>
+                  <InputText
+                    id="detailDesc"
+                    v-model="model.DetayMekmarNot_2"
+                    style="width: 100%"
+                  />
                   <label for="detailDesc">Detail 1 Description</label>
                 </span>
               </div>
@@ -294,14 +335,18 @@
                     id="detail2"
                     v-model="model.DetayAlis_2"
                     @input="getDetail2Input($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="detail2">Detail 2</label>
                 </span>
               </div>
               <div class="col">
                 <span class="p-float-label">
-                  <InputText id="detail2Desc" v-model="model.DetayMekmarNot_3" style="width:100%;"/>
+                  <InputText
+                    id="detail2Desc"
+                    v-model="model.DetayMekmarNot_3"
+                    style="width: 100%"
+                  />
                   <label for="detail2Desc">Detail 2 Description</label>
                 </span>
               </div>
@@ -314,7 +359,7 @@
                     id="insurance"
                     v-model="model.sigorta_Tutar"
                     @input="insuranceInput($event)"
-                    style="width:100%;"
+                    style="width: 100%"
                   />
                   <label for="insurance">Insurance</label>
                 </span>
@@ -330,10 +375,15 @@
 import date from "../../../plugins/date";
 import upload from "../../../plugins/upload";
 import Cookies from "js-cookie";
-import {mapGetters} from 'vuex';
+import { mapGetters } from "vuex";
 export default {
-  computed:{
-    ...mapGetters(['getCostList','getLocalUrl','getOrderProductionDocumentList'])
+  computed: {
+    ...mapGetters([
+      "getCostList",
+      "getLocalUrl",
+      "getOrderProductionDocumentList",
+      "getOrderProductionSourceTypes",
+    ]),
   },
   props: {
     model: {
@@ -369,9 +419,14 @@ export default {
       type: Boolean,
       required: false,
     },
+    source: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
+      selectedSourceType: null,
       selectedDelivery: null,
       selectedPayment: null,
       maturityDate: null,
@@ -382,12 +437,20 @@ export default {
     };
   },
   created() {
+    console.log(
+      "getOrderProductionSourceTypes",
+      this.getOrderProductionSourceTypes
+    );
     if (!this.status) {
       this.createdProcess();
     }
   },
   methods: {
-    refund(event){
+    sourceTypeChange(event) {
+      this.model.KaynakTuruID = event.value.ID;
+      this.model.KaynakTuru = event.value.KaynakTuru;
+    },
+    refund(event) {
       if (event) {
         if (event[0] == 0) {
           event = event.substr(1);
@@ -400,7 +463,7 @@ export default {
         this.model.Iade = 0;
       }
     },
-    evrakGideri(event){
+    evrakGideri(event) {
       if (event) {
         if (event[0] == 0) {
           event = event.substr(1);
@@ -409,14 +472,20 @@ export default {
           event = 0;
         }
         this.model.EvrakGideri = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.EvrakGideri = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
-    maturityDateChange(event){
-      this.model.Vade = '';
+    maturityDateChange(event) {
+      this.model.Vade = "";
     },
     __nullControl(value) {
       if (value == null || value == undefined) {
@@ -444,10 +513,16 @@ export default {
           event = 0;
         }
         this.model.Komisyon = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.Komisyon = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
     insuranceInput(event) {
@@ -459,10 +534,16 @@ export default {
           event = 0;
         }
         this.model.sigorta_Tutar = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.sigorta_Tutar = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
     getDetail3Input(event) {
@@ -474,10 +555,16 @@ export default {
           event = 0;
         }
         this.model.DetayAlis_3 = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.DetayAlis_3 = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
     getDetail2Input(event) {
@@ -489,10 +576,16 @@ export default {
           event = 0;
         }
         this.model.DetayAlis_2 = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.DetayAlis_2 = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
     getDetail1Input(event) {
@@ -504,10 +597,16 @@ export default {
           event = 0;
         }
         this.model.DetayAlis_1 = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.DetayAlis_1 = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
     getFreightInput(event) {
@@ -519,10 +618,16 @@ export default {
           event = 0;
         }
         this.model.NavlunAlis = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.NavlunAlis = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
     detail4Input(event) {
@@ -534,10 +639,16 @@ export default {
           event = 0;
         }
         this.model.DetayTutar_4 = event.replace(",", ".");
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       } else {
         this.model.DetayTutar_4 = 0;
-        this.$store.dispatch("setOrderProductionProductDetailCostTotal", this.model);
+        this.$store.dispatch(
+          "setOrderProductionProductDetailCostTotal",
+          this.model
+        );
       }
     },
     detail1Input(event) {
@@ -621,40 +732,33 @@ export default {
         this.$toast.success("Dosya boyutu 1MB den büyük olamaz!");
       }
     },
-    selectedDrawingDocument(event){
-        let lengthDocuments = this.getOrderProductionDocumentList.filter(x=>{
-          return x.YuklemeEvrakID === 200;
-        }).length;
-        console.log('lengthDocuments',lengthDocuments);
-        let index = lengthDocuments + 1;
-        event.files.forEach((item)=>{
-          if(item.size > "1000000"){
-            this.$toast.success("Dosya boyutu 1MB den büyük olamaz!");
-            return;
-          }else{
-            const name = this.po + '-drawing-' + index + ".pdf";
-            upload.sendDrawing(item, this.po,200 ,name);
-            const data = {
-                id: 200,
-                po: this.po,
-                userId: Cookies.get("userId"),
-                date: date.dateToString(new Date()),
-                document: name,
-            };
-            this.$store.dispatch("setOrderProformaUpload", data);
-            index++;
-
-
-          }
-
-        });
-
-     
-
-
+    selectedDrawingDocument(event) {
+      let lengthDocuments = this.getOrderProductionDocumentList.filter((x) => {
+        return x.YuklemeEvrakID === 200;
+      }).length;
+      console.log("lengthDocuments", lengthDocuments);
+      let index = lengthDocuments + 1;
+      event.files.forEach((item) => {
+        if (item.size > "1000000") {
+          this.$toast.success("Dosya boyutu 1MB den büyük olamaz!");
+          return;
+        } else {
+          const name = this.po + "-drawing-" + index + ".pdf";
+          upload.sendDrawing(item, this.po, 200, name);
+          const data = {
+            id: 200,
+            po: this.po,
+            userId: Cookies.get("userId"),
+            date: date.dateToString(new Date()),
+            document: name,
+          };
+          this.$store.dispatch("setOrderProformaUpload", data);
+          index++;
+        }
+      });
     },
-    uploadDrawingDocument(event){
-      console.log('uploadDrawingDocument',event);
+    uploadDrawingDocument(event) {
+      console.log("uploadDrawingDocument", event);
     },
 
     invoiceChange(event) {
@@ -680,23 +784,38 @@ export default {
       this.model.Vade = date.dateToString(event);
     },
     createdProcess() {
-      this.selectedDelivery = this.delivery.find((x) => x.ID === this.model.TeslimTurID);
-      this.selectedPayment = this.payment.find((x) => x.ID === this.model.OdemeTurID);
-      this.selectedCountry = this.country.find((x) => x.Id == this.model.UlkeId);
+      this.selectedSourceType = this.getOrderProductionSourceTypes.find(
+        (x) => x.ID === this.model.KaynakTuruID
+      );
+      this.selectedDelivery = this.delivery.find(
+        (x) => x.ID === this.model.TeslimTurID
+      );
+      this.selectedPayment = this.payment.find(
+        (x) => x.ID === this.model.OdemeTurID
+      );
+      this.selectedCountry = this.country.find(
+        (x) => x.Id == this.model.UlkeId
+      );
       this.selectedInvoice = this.invoice.find(
         (x) => x.ID === this.model.FaturaKesimTurID
       );
-      if (this.model.Vade == null || this.model.Vade == ' ' || this.model.Vade == undefined || this.model.Vade == '') {
+      if (
+        this.model.Vade == null ||
+        this.model.Vade == " " ||
+        this.model.Vade == undefined ||
+        this.model.Vade == ""
+      ) {
         this.model.Vade = "";
-        this.maturityDate = '';
-
+        this.maturityDate = "";
       } else {
         this.maturityDate = date.stringToDate(this.model.Vade);
-
       }
       this.model.Iade = this.__nullControl(this.model.Iade);
       this.model.depo_yukleme;
-      if (this.model.depo_yukleme == null || this.model.depo_yukleme == undefined) {
+      if (
+        this.model.depo_yukleme == null ||
+        this.model.depo_yukleme == undefined
+      ) {
         this.model.depo_yukleme = 0;
       }
     },
@@ -718,8 +837,8 @@ export default {
       this.model.TeslimTur = event.value.TeslimTur;
       this.model.TeslimTurID = event.value.ID;
     },
-    insuranceSelling(event){
-      console.log("insuranceSelling",event)
+    insuranceSelling(event) {
+      console.log("insuranceSelling", event);
       if (event) {
         if (event[0] == 0) {
           event = event.substr(1);
@@ -736,43 +855,38 @@ export default {
         this.model.sigorta_tutar_satis = 0;
         this.$store.dispatch("setOrderProductionInsuranceTotal", 0);
       }
-
-
-
-    }
+    },
   },
-  beforeCreate(){
-
-  }
+  beforeCreate() {},
 };
 </script>
 <style scoped>
-.cardClass{
-  height:350px;
+.cardClass {
+  height: 350px;
 }
-@media screen and (max-width:576px){
-  .row{
-    clear:both;
-    display:block;
-    width:100%;
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-  .col-3{
-    clear:both;
-    display:block;
-    width:100%;
+  .col-3 {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-  .col-9{
-    clear:both;
-    display:block;
-    width:100%;
+  .col-9 {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-  .col{
-    clear:both;
-    display:block;
-    width:100%;
+  .col {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-  .cardClass{
-    height:auto;
+  .cardClass {
+    height: auto;
   }
 }
 </style>

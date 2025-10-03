@@ -9508,6 +9508,7 @@ s.FaturaKesimTurID,
 s.KonteynerNo,
 s.SiparisKontrol,
 s.SiparisKontrolEden,
+s.KaynakTuru as KaynakTuruID,
 
 
 	su.ID as UrunId,
@@ -9677,6 +9678,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
+s.KaynakTuru as KaynakTuruID,
 
 
 	su.ID as UrunId,
@@ -9800,7 +9802,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -9929,7 +9931,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -10074,7 +10076,7 @@ s.FaturaKesimTurID,
 s.KonteynerNo,
 s.SiparisKontrol,
 s.SiparisKontrolEden,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -10213,7 +10215,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -10354,7 +10356,7 @@ s.FaturaKesimTurID,
 s.KonteynerNo,
 s.SiparisKontrol,
 s.SiparisKontrolEden,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -10502,7 +10504,7 @@ app.get("/order/shipped/list", async (req, res) => {
     s.KonteynerNo,
     s.SiparisKontrol,
 s.SiparisKontrolEden,
-    
+    s.KaynakTuru as KaynakTuruID,
     
         su.ID as UrunId,
         su.SiparisNo as UrunSiparisNo,
@@ -10624,7 +10626,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -10747,7 +10749,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -10892,7 +10894,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -11015,7 +11017,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -11172,7 +11174,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
     su.ID as UrunId,
     su.SiparisNo as UrunSiparisNo,
@@ -11314,7 +11316,7 @@ app.get("/order/shipped/list/filter/global/:filter", async (req, res) => {
         s.MayaControl,
         s.FaturaKesimTurID,
         s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
         su.ID as UrunId,
         su.SiparisNo as UrunSiparisNo,
@@ -11457,7 +11459,7 @@ s.KonteynerAyrinti,
 s.MayaControl,
 s.FaturaKesimTurID,
 s.KonteynerNo,
-
+s.KaynakTuru as KaynakTuruID,
 
 su.ID as UrunId,
 su.SiparisNo as UrunSiparisNo,
@@ -11586,7 +11588,7 @@ s.FaturaKesimTurID,
 s.KonteynerNo,
 s.SiparisKontrol,
 s.SiparisKontrolEden,
-
+s.KaynakTuru as KaynakTuruID,
 
 
 	su.ID as UrunId,
@@ -11729,7 +11731,7 @@ s.FaturaKesimTurID,
 s.KonteynerNo,
 s.SiparisKontrol,
 s.SiparisKontrolEden,
-
+s.KaynakTuru as KaynakTuruID,
 
 	su.ID as UrunId,
 	su.SiparisNo as UrunSiparisNo,
@@ -12873,7 +12875,8 @@ Finansman,
 Iade,
 MalBedeli,
 sigorta_tutar_satis,
-FaturaKesimTurID
+FaturaKesimTurID,
+KaynakTuru
 
 )
 VALUES(
@@ -12923,7 +12926,9 @@ VALUES(
 	'${req.body.Iade}',
 	'${req.body.MalBedeli}',
 	'${req.body.sigorta_tutar_satis}',
-	'${req.body.FaturaKesimTurID}'
+	'${req.body.FaturaKesimTurID}',
+	'${req.body.KaynakTuruID}'
+
 
 
 )
@@ -13013,7 +13018,8 @@ SET
 	Iade='${req.body.Iade}',
     SiparisKontrol='${req.body.SiparisKontrol}',
     SiparisKontrolEden='${req.body.SiparisKontrolEden}',
-	sigorta_tutar_satis='${req.body.sigorta_tutar_satis}'
+	sigorta_tutar_satis='${req.body.sigorta_tutar_satis}',
+	KaynakTuru='${req.body.KaynakTuruID}'
 where
 ID='${req.body.SiparisId}'
     `;
@@ -17996,6 +18002,13 @@ order by YEAR(yt.Tarih) desc, count(yt.Id) desc
       data_3: data_this_year_3,
       data_4: data_this_year_4,
     });
+  });
+});
+
+app.get("/order/production/source/types", (req, res) => {
+  const sql = ` select ID,KaynakTuru from KaynakTuruTB`;
+  mssql.query(sql, (err, data) => {
+    res.status(200).json({ list: data.recordset });
   });
 });
 

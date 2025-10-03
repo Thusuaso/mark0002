@@ -60,6 +60,7 @@
         @close_production_form_emit="closeProductionForm"
         @proforma_delete_emit="proformaDelete($event)"
         @isf_delete_emit="isfDelete($event)"
+        :source="getOrderProductionSourceTypes"
       />
     </Dialog>
 
@@ -81,6 +82,7 @@ import Cookies from "js-cookie";
 export default {
   computed: {
     ...mapGetters([
+      "getOrderProductionSourceTypes",
       "getOrderList",
       "getOrderProductionModel",
       "getOrderProductModel",
@@ -217,7 +219,7 @@ export default {
       this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
-      this.productionModel.SiparisKontrolEden = 0
+      this.productionModel.SiparisKontrolEden = 0;
 
       this.$store.dispatch("setOrderProductionUpdate", this.productionModel);
     },
@@ -254,10 +256,13 @@ export default {
       );
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");
-      this.productionModel.SiparisKontrolEden = 0
+      this.productionModel.SiparisKontrolEden = 0;
 
       this.$store.dispatch("setOrderProductionSave", this.productionModel);
-      this.$store.dispatch("setOrderProductionPo", this.productionModel.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionPo",
+        this.productionModel.SiparisNo
+      );
     },
     process() {
       if (this.getOrderProductionButtonStatus) {
@@ -272,6 +277,7 @@ export default {
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch("setOrderProductionDetailListReset");
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setOrderProductionSourceTypes");
 
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
@@ -279,17 +285,27 @@ export default {
     productionSelected(event) {
       this.$store.dispatch("setOrderProductionButtonStatus", false);
       this.$store.dispatch("setOrderProductModel");
-      this.$store.dispatch("setOrderProductionProductDetailMekmerList", event.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionProductDetailMekmerList",
+        event.SiparisNo
+      );
       this.$store.dispatch("setOrderProductionCostList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionSupplierList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionDocumentList", event.SiparisNo);
-      this.$store.dispatch("setOrderProductionCheckMekmerList", event.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionCheckMekmerList",
+        event.SiparisNo
+      );
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
-      this.$store.dispatch("setOrderProductionInsuranceTotal", event.sigorta_tutar_satis);
+      this.$store.dispatch(
+        "setOrderProductionInsuranceTotal",
+        event.sigorta_tutar_satis
+      );
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setOrderProductionSourceTypes");
 
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);

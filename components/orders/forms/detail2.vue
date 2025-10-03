@@ -12,7 +12,9 @@
                     <orderDetailProformaForm :model="modelProduction" :delivery="delivery" :payment="payment"
                         :status="status" :country="country" :invoice="invoice" :po="po"
                         :proformaUploadButtonStatus="proformaUploadButtonStatus"
-                        @prepayment_is_activated_emit="prePaymentIsActivated($event)" />
+                        @prepayment_is_activated_emit="prePaymentIsActivated($event)" 
+                        :source="source"
+                        />
                 </TabPanel>
                 <TabPanel header="Cost" v-if="!statusAlfa">
                     <orderDetailCostForm :cost="cost" :total="costTotal" />
@@ -311,6 +313,10 @@ export default {
             type: Boolean,
             required: false,
         },
+        source: {
+            type: Array,
+            required:true
+        }
     },
     data() {
         return {

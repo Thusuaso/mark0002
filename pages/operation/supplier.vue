@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
+    <Button
+      type="button"
+      class="p-button-success w-100"
+      label="New"
+      @click="newForm"
+    />
     <supplierList
       :list="getSupplierList"
       @supplier_model_emit="supplierModelEmit($event)"
@@ -10,6 +15,7 @@
         :status="getSupplierButtonStatus"
         :model="model"
         @supplier_dialog_close_emit="supplier_form_dialog = false"
+        :suppliers="getSupplierList"
       />
     </Dialog>
   </div>

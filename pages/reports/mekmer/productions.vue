@@ -75,6 +75,7 @@
         @close_production_form_emit="closeProductionForm"
         @proforma_delete_emit="proformaDelete($event)"
         @isf_delete_emit="isfDelete($event)"
+        :source="getOrderProductionSourceTypes"
       />
     </Dialog>
 
@@ -97,6 +98,7 @@ import api from "@/plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
+      "getOrderProductionSourceTypes",
       "getLoadingDatatable",
       "getOrderList",
       "getOrderListAll",
@@ -165,6 +167,8 @@ export default {
 
   created() {
     this.$store.dispatch("setOrderProductionMekmerList");
+        this.$store.dispatch("setOrderProductionSourceTypes");
+
   },
   methods: {
     isfDelete(event) {
@@ -356,6 +360,8 @@ export default {
       }
     },
     newForm() {
+      this.$store.dispatch("setOrderProductionSourceTypes");
+
       this.$store.dispatch("setOrderProductionButtonStatus", true);
       this.$store.dispatch("setOrderProductionModel");
       this.$store.dispatch("setOrderProductModel");
@@ -371,6 +377,8 @@ export default {
       this.production_detail_form = true;
     },
     productionSelected(event) {
+      this.$store.dispatch("setOrderProductionSourceTypes");
+
       this.$store.dispatch("setOrderProductionButtonStatus", false);
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch(

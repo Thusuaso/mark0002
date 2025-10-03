@@ -2,7 +2,12 @@
   <div class="">
     <div class="row m-auto text-center">
       <div class="col-4">
-        <Button type="button" class="p-button-success w-100" label="New Order" @click="newForm" />
+        <Button
+          type="button"
+          class="p-button-success w-100"
+          label="New Order"
+          @click="newForm"
+        />
       </div>
       <div class="col-4 m-auto text-center">
         <div class="m-auto text-center" style="width: 400px">
@@ -11,10 +16,21 @@
               <div class="col-2">Supplier</div>
               <div class="col">
                 <div class="flex flex-wrap gap-3">
-                  <div class="flex align-items-center" v-for="supplier in suppliers" :key="supplier.key">
-                    <RadioButton v-model="selectedSupplier" :inputId="supplier.key" name="dynamic"
-                      :value="supplier.name" @change="supplierChange($event)" />
-                    <label :for="supplier.key" class="ml-2">{{ supplier.name }}</label>
+                  <div
+                    class="flex align-items-center"
+                    v-for="supplier in suppliers"
+                    :key="supplier.key"
+                  >
+                    <RadioButton
+                      v-model="selectedSupplier"
+                      :inputId="supplier.key"
+                      name="dynamic"
+                      :value="supplier.name"
+                      @change="supplierChange($event)"
+                    />
+                    <label :for="supplier.key" class="ml-2">{{
+                      supplier.name
+                    }}</label>
                   </div>
                 </div>
               </div>
@@ -23,10 +39,21 @@
               <div class="col-2">Seller</div>
               <div class="col">
                 <div class="flex flex-wrap gap-3">
-                  <div class="flex align-items-center" v-for="marketing in marketings" :key="marketing.key">
-                    <RadioButton v-model="selectedMarketing" :inputId="marketing.key" name="dynamic"
-                      :value="marketing.name" @change="marketingChange($event)" />
-                    <label :for="marketing.key" class="ml-2">{{ marketing.name }}</label>
+                  <div
+                    class="flex align-items-center"
+                    v-for="marketing in marketings"
+                    :key="marketing.key"
+                  >
+                    <RadioButton
+                      v-model="selectedMarketing"
+                      :inputId="marketing.key"
+                      name="dynamic"
+                      :value="marketing.name"
+                      @change="marketingChange($event)"
+                    />
+                    <label :for="marketing.key" class="ml-2">{{
+                      marketing.name
+                    }}</label>
                   </div>
                 </div>
               </div>
@@ -36,48 +63,96 @@
       </div>
 
       <div class="col-4">
-        <Button class="p-button-warning w-100" label="Excel" @click="excel_output" />
+        <Button
+          class="p-button-warning w-100"
+          label="Excel"
+          @click="excel_output"
+        />
       </div>
     </div>
-    <orderList :list="getOrderList" @production_selected_emit="productionSelected($event)" :status="'Production'"
-      :total="getOrderProductionTotal" :loading="getLoadingDatatable" />
-    <Dialog :visible.sync="production_detail_form" header="" modal :style="{ width: '100%' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false" :maximizable="true">
-      <orderDetailForm :modelProduction="productionModel" :modelProduct="getOrderProductModel"
-        :status="getOrderProductionButtonStatus" :customer="getCustomersList" :user="getUserList"
-        :productsList="getOrderProductionProductDetailList" :supplier="getSupplierList" :unit="getUnitList"
-        :po="getOrderProductionPo" :delivery="getOrderKindOfDeliveryList" :payment="getOrderKindOfPaymentList"
-        :country="getCountryList" :invoice="getOrderKindOfInvoiceList" :cost="getOrderProductionCostList"
-        :costTotal="getOrderProductionCostTotal" :supplierDelivery="getOrderKindOfDeliverySupplierList"
-        :productSupplier="getOrderProductionSupplierList" :supplierProduct="getOrderSupplierProductList"
-        :document="getOrderProductionDocumentList" :check="getOrderProductionCheckList"
-        :checkTotal="getOrderProductionCheckListTotal" :productCalculation="getOrderProductionProductTotal"
-        :freightCalculation="getOrderProductionFreightTotal" :detailCalculation="getOrderProductionDetailTotal"
+    <orderList
+      :list="getOrderList"
+      @production_selected_emit="productionSelected($event)"
+      :status="'Production'"
+      :total="getOrderProductionTotal"
+      :loading="getLoadingDatatable"
+    />
+    <Dialog
+      :visible.sync="production_detail_form"
+      header=""
+      modal
+      :style="{ width: '100%' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+      :closeOnEscape="false"
+      :closable="false"
+      :maximizable="true"
+    >
+      <orderDetailForm
+        :modelProduction="productionModel"
+        :modelProduct="getOrderProductModel"
+        :status="getOrderProductionButtonStatus"
+        :customer="getCustomersList"
+        :user="getUserList"
+        :productsList="getOrderProductionProductDetailList"
+        :supplier="getSupplierList"
+        :unit="getUnitList"
+        :po="getOrderProductionPo"
+        :delivery="getOrderKindOfDeliveryList"
+        :payment="getOrderKindOfPaymentList"
+        :country="getCountryList"
+        :invoice="getOrderKindOfInvoiceList"
+        :cost="getOrderProductionCostList"
+        :costTotal="getOrderProductionCostTotal"
+        :supplierDelivery="getOrderKindOfDeliverySupplierList"
+        :productSupplier="getOrderProductionSupplierList"
+        :supplierProduct="getOrderSupplierProductList"
+        :document="getOrderProductionDocumentList"
+        :check="getOrderProductionCheckList"
+        :checkTotal="getOrderProductionCheckListTotal"
+        :productCalculation="getOrderProductionProductTotal"
+        :freightCalculation="getOrderProductionFreightTotal"
+        :detailCalculation="getOrderProductionDetailTotal"
         :detailProductTotal="getOrderProductionProductDetailTotal"
         :detailProductCost="getOrderProductionProductDetailCostTotal"
         :saveButtonStatus="getOrderProductionSaveButtonStatus"
-        :proformaUploadButtonStatus="getOrderProductionUploadProformaButtonStatus" :statusAlfa="false"
+        :proformaUploadButtonStatus="
+          getOrderProductionUploadProformaButtonStatus
+        "
+        :statusAlfa="false"
         :insuranceCalculation="getOrderProductionInsuranceTotal"
         @order_production_product_reset_model_emit="
           orderProductionProductResetModel($event)
-          " @process="process" @workerman_selected_emit="workermanSelected($event)"
-        @close_production_form_emit="closeProductionForm" @proforma_delete_emit="proformaDelete($event)"
-        @isf_delete_emit="isfDelete($event)" @divide="divide" />
+        "
+        @process="process"
+        @workerman_selected_emit="workermanSelected($event)"
+        @close_production_form_emit="closeProductionForm"
+        @proforma_delete_emit="proformaDelete($event)"
+        @isf_delete_emit="isfDelete($event)"
+        @divide="divide"
+        :source="getOrderProductionSourceTypes"
+      />
     </Dialog>
 
     <Dialog :visible.sync="workerman_dialog_form" header="" modal>
-      <orderDetailWorkermanForm :list="getOrderProductionProductDetailWorkermanList"
-        :model="getOrderProductWorkermanModel" :supplier="getSupplierList" :productId="productId"
-        :po="getOrderProductionPo" />
+      <orderDetailWorkermanForm
+        :list="getOrderProductionProductDetailWorkermanList"
+        :model="getOrderProductWorkermanModel"
+        :supplier="getSupplierList"
+        :productId="productId"
+        :po="getOrderProductionPo"
+      />
     </Dialog>
     <Dialog :visible.sync="divide_dialog_form" header="Divide" modal>
       <h3 class="text-center m-auto">Products</h3>
       <div class="row mb-3">
         <div class="col">
-          <Dropdown v-model="selectedProduct" :options="getOrderProductionDivideList" optionLabel="Urun"
-            placeholder="Select a Product" @change="changeSelectedProduct($event)" />
-
-
+          <Dropdown
+            v-model="selectedProduct"
+            :options="getOrderProductionDivideList"
+            optionLabel="Urun"
+            placeholder="Select a Product"
+            @change="changeSelectedProduct($event)"
+          />
         </div>
       </div>
 
@@ -108,51 +183,61 @@
                 <td>{{ selectedProduct.Kenar }}</td>
                 <td>{{ selectedProduct.BirimAdi }}</td>
                 <td>{{ selectedProduct.Miktar | formatDecimal }}</td>
-
-
-
               </tr>
             </tbody>
           </table>
-
-
         </div>
       </div>
 
       <div class="row">
         <div class="col">
-          <CustomInput :value="getDivideProductionProductModel.kalan" text="Remainder"
-            @onInput="getDivideProductionProductModel.kalan = $event" />
+          <CustomInput
+            :value="getDivideProductionProductModel.kalan"
+            text="Remainder"
+            @onInput="getDivideProductionProductModel.kalan = $event"
+          />
         </div>
         <div class="col">
-          <CustomInput :value="getDivideProductionProductModel.gonderilen" text="Outgoing"
-            @onInput="getDivideProductionProductModel.gonderilen = $event" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <Button type="button" class="p-button-success w-100" label="Add" @click="addDivideProductionProduct" />
-        </div>
-        <div class="col">
-          <Button type="button" class="p-button-warning w-100" label="Update" @click="updateDivideProductionProduct" />
+          <CustomInput
+            :value="getDivideProductionProductModel.gonderilen"
+            text="Outgoing"
+            @onInput="getDivideProductionProductModel.gonderilen = $event"
+          />
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <DataTable :value="getOrderProductionDivideOrderList" responsiveLayout="scroll"
-            :selection="selectedDivideOrder" selectionMode="single" @row-click="divideOrderSelected($event)">
+          <Button
+            type="button"
+            class="p-button-success w-100"
+            label="Add"
+            @click="addDivideProductionProduct"
+          />
+        </div>
+        <div class="col">
+          <Button
+            type="button"
+            class="p-button-warning w-100"
+            label="Update"
+            @click="updateDivideProductionProduct"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <DataTable
+            :value="getOrderProductionDivideOrderList"
+            responsiveLayout="scroll"
+            :selection="selectedDivideOrder"
+            selectionMode="single"
+            @row-click="divideOrderSelected($event)"
+          >
             <Column field="musteriAciklama" header="Desc."></Column>
             <Column field="urunBirimId" header="Unit">
               <template #body="slotProps">
-                <div v-if="slotProps.data.urunBirimId == 1">
-                  sqm
-                </div>
-                <div v-else-if="slotProps.data.urunBirimId == 2">
-                  pcs
-                </div>
-                <div v-else-if="slotProps.data.urunBirimId == 3">
-                  mt
-                </div>
+                <div v-if="slotProps.data.urunBirimId == 1">sqm</div>
+                <div v-else-if="slotProps.data.urunBirimId == 2">pcs</div>
+                <div v-else-if="slotProps.data.urunBirimId == 3">mt</div>
               </template>
             </Column>
 
@@ -167,7 +252,6 @@
               </template>
             </Column>
           </DataTable>
-
         </div>
       </div>
       <hr />
@@ -201,106 +285,158 @@
                 <td>{{ productionModel.DetayAlis_1 | formatPriceUsd }}</td>
                 <td>{{ productionModel.DetayAlis_2 | formatPriceUsd }}</td>
                 <td>{{ productionModel.DetayAlis_3 | formatPriceUsd }}</td>
-
               </tr>
-
             </tbody>
           </table>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <CustomInput :value="getDivideProductionModel.kalanPesinat" text="Remainder Prepayment"
-            @onInput="getDivideProductionModel.kalanPesinat = $event" />
+          <CustomInput
+            :value="getDivideProductionModel.kalanPesinat"
+            text="Remainder Prepayment"
+            @onInput="getDivideProductionModel.kalanPesinat = $event"
+          />
         </div>
         <div class="col">
-          <CustomInput :value="getDivideProductionModel.gidenPesinat" text="Outgoing Prepayment"
-            @onInput="getDivideProductionModel.gidenPesinat = $event" />
+          <CustomInput
+            :value="getDivideProductionModel.gidenPesinat"
+            text="Outgoing Prepayment"
+            @onInput="getDivideProductionModel.gidenPesinat = $event"
+          />
         </div>
       </div>
       <div class="row">
         <div class="col">
           <div class="row mb-3">
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanNavlunSatis" text="Remainder Freight Selling"
-                @onInput="getDivideProductionModel.kalanNavlunSatis = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.kalanNavlunSatis"
+                text="Remainder Freight Selling"
+                @onInput="getDivideProductionModel.kalanNavlunSatis = $event"
+              />
             </div>
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenNavlunSatis" text="Outgoing Freight Selling"
-                @onInput="getDivideProductionModel.gidenNavlunSatis = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.gidenNavlunSatis"
+                text="Outgoing Freight Selling"
+                @onInput="getDivideProductionModel.gidenNavlunSatis = $event"
+              />
             </div>
           </div>
 
           <div class="row mb-3">
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanDetaySatis_1" text="Remainder Detail 1 Selling"
-                @onInput="getDivideProductionModel.kalanDetaySatis_1 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.kalanDetaySatis_1"
+                text="Remainder Detail 1 Selling"
+                @onInput="getDivideProductionModel.kalanDetaySatis_1 = $event"
+              />
             </div>
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenDetaySatis_1" text="Outgoing Detail 1 Selling"
-                @onInput="getDivideProductionModel.gidenDetaySatis_1 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.gidenDetaySatis_1"
+                text="Outgoing Detail 1 Selling"
+                @onInput="getDivideProductionModel.gidenDetaySatis_1 = $event"
+              />
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanDetaySatis_2" text="Remainder Detail 2 Selling"
-                @onInput="getDivideProductionModel.kalanDetaySatis_2 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.kalanDetaySatis_2"
+                text="Remainder Detail 2 Selling"
+                @onInput="getDivideProductionModel.kalanDetaySatis_2 = $event"
+              />
             </div>
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenDetaySatis_2" text="Outgoing Detail 2 Selling"
-                @onInput="getDivideProductionModel.gidenDetaySatis_2 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.gidenDetaySatis_2"
+                text="Outgoing Detail 2 Selling"
+                @onInput="getDivideProductionModel.gidenDetaySatis_2 = $event"
+              />
             </div>
           </div>
           <div class="row">
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanDetaySatis_3" text="Remainder Detail 3 Selling"
-                @onInput="getDivideProductionModel.kalanDetaySatis_3 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.kalanDetaySatis_3"
+                text="Remainder Detail 3 Selling"
+                @onInput="getDivideProductionModel.kalanDetaySatis_3 = $event"
+              />
             </div>
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenDetaySatis_3" text="Outgoing Detail 3 Selling"
-                @onInput="getDivideProductionModel.gidenDetaySatis_3 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.gidenDetaySatis_3"
+                text="Outgoing Detail 3 Selling"
+                @onInput="getDivideProductionModel.gidenDetaySatis_3 = $event"
+              />
             </div>
           </div>
         </div>
         <div class="col">
           <div class="row mb-3">
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanNavlunAlis" text="Remainder Freight Buying"
-                @onInput="getDivideProductionModel.kalanNavlunAlis = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.kalanNavlunAlis"
+                text="Remainder Freight Buying"
+                @onInput="getDivideProductionModel.kalanNavlunAlis = $event"
+              />
             </div>
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenNavlunAlis" text="Outgoing Freight Buying"
-                @onInput="getDivideProductionModel.gidenNavlunAlis = $event" />
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanDetayAlis_1" text="Remainder Detail 1 Buying"
-                @onInput="getDivideProductionModel.kalanDetayAlis_1 = $event" />
-            </div>
-            <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenDetayAlis_1" text="Outgoing Detail 1 Buying"
-                @onInput="getDivideProductionModel.gidenDetayAlis_1 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.gidenNavlunAlis"
+                text="Outgoing Freight Buying"
+                @onInput="getDivideProductionModel.gidenNavlunAlis = $event"
+              />
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanDetayAlis_2" text="Remainder Detail 2 Buying"
-                @onInput="getDivideProductionModel.kalanDetayAlis_2 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.kalanDetayAlis_1"
+                text="Remainder Detail 1 Buying"
+                @onInput="getDivideProductionModel.kalanDetayAlis_1 = $event"
+              />
             </div>
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenDetayAlis_2" text="Outgoing Detail 2 Buying"
-                @onInput="getDivideProductionModel.gidenDetayAlis_2 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.gidenDetayAlis_1"
+                text="Outgoing Detail 1 Buying"
+                @onInput="getDivideProductionModel.gidenDetayAlis_1 = $event"
+              />
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.kalanDetayAlis_3" text="Remainder Detail 3 Buying"
-                @onInput="getDivideProductionModel.kalanDetayAlis_3 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.kalanDetayAlis_2"
+                text="Remainder Detail 2 Buying"
+                @onInput="getDivideProductionModel.kalanDetayAlis_2 = $event"
+              />
             </div>
             <div class="col">
-              <CustomInput :value="getDivideProductionModel.gidenDetayAlis_3" text="Outgoing Detail 3 Buying"
-                @onInput="getDivideProductionModel.gidenDetayAlis_3 = $event" />
+              <CustomInput
+                :value="getDivideProductionModel.gidenDetayAlis_2"
+                text="Outgoing Detail 2 Buying"
+                @onInput="getDivideProductionModel.gidenDetayAlis_2 = $event"
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <CustomInput
+                :value="getDivideProductionModel.kalanDetayAlis_3"
+                text="Remainder Detail 3 Buying"
+                @onInput="getDivideProductionModel.kalanDetayAlis_3 = $event"
+              />
+            </div>
+            <div class="col">
+              <CustomInput
+                :value="getDivideProductionModel.gidenDetayAlis_3"
+                text="Outgoing Detail 3 Buying"
+                @onInput="getDivideProductionModel.gidenDetayAlis_3 = $event"
+              />
             </div>
           </div>
         </div>
@@ -323,7 +459,6 @@
                 <th scope="col">Remainder Detail 2 Selling</th>
                 <th scope="col">Outgoing Detail 2 Selling</th>
 
-
                 <th scope="col">Remainder Detail 3 Selling</th>
                 <th scope="col">Outgoing Detail 3 Selling</th>
 
@@ -338,11 +473,6 @@
 
                 <th scope="col">Remainder Detail 3 Buying</th>
                 <th scope="col">Outgoing Detail 3 Buying</th>
-
-
-
-
-
               </tr>
             </thead>
             <tbody>
@@ -369,10 +499,7 @@
                 <td>{{ getDivideProductionModel.gidenDetayAlis_2 }}</td>
                 <td>{{ getDivideProductionModel.kalanDetayAlis_3 }}</td>
                 <td>{{ getDivideProductionModel.gidenDetayAlis_3 }}</td>
-
-
               </tr>
-
             </tbody>
           </table>
         </div>
@@ -380,10 +507,14 @@
       <br />
       <div class="row">
         <div class="col">
-          <Button type="button" class="p-button-success w-100" label="Divide" @click="divideProduct" />
+          <Button
+            type="button"
+            class="p-button-success w-100"
+            label="Divide"
+            @click="divideProduct"
+          />
         </div>
       </div>
-
     </Dialog>
   </div>
 </template>
@@ -395,6 +526,7 @@ import api from "../../plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
+      "getOrderProductionSourceTypes",
       "getOrderProductionDivideOrderList",
       "getDivideProductionProductModel",
       "getDivideProductionModel",
@@ -440,7 +572,7 @@ export default {
       "getOrderProductionId",
       "getOrderProductionUploadProformaButtonStatus",
       "getOrderProductionTotal",
-      "getOrderProductionDivideList"
+      "getOrderProductionDivideList",
     ]),
   },
   data() {
@@ -470,93 +602,120 @@ export default {
   },
 
   created() {
-    this.$store.dispatch("setOrderWaitingList");  },
+    this.$store.dispatch("setOrderWaitingList");
+    this.$store.dispatch("setOrderProductionSourceTypes");
+  },
   methods: {
     divideProduct() {
       this.getDivideProductionModel.id = this.productionModel.SiparisId;
       this.getDivideProductionModel.siparisno = this.productionModel.SiparisNo;
-      this.getDivideProductionModel.siparisTarihi = date.dateToString(this.productionModel.SiparisTarihi);
-      this.getDivideProductionModel.odemeTurId = this.productionModel.OdemeTurID;
-      this.getDivideProductionModel.teslimTurId = this.productionModel.TeslimTurID;
+      this.getDivideProductionModel.siparisTarihi = date.dateToString(
+        this.productionModel.SiparisTarihi
+      );
+      this.getDivideProductionModel.odemeTurId =
+        this.productionModel.OdemeTurID;
+      this.getDivideProductionModel.teslimTurId =
+        this.productionModel.TeslimTurID;
       this.getDivideProductionModel.musteriId = this.productionModel.MusteriID;
       this.getDivideProductionModel.pesinat = this.productionModel.Pesinat;
-      this.getDivideProductionModel.navlunFirma = this.productionModel.NavlunFirma;
+      this.getDivideProductionModel.navlunFirma =
+        this.productionModel.NavlunFirma;
       this.getDivideProductionModel.kayitTarihi = new Date();
       this.getDivideProductionModel.kullaniciId = Cookies.get("userId");
-      this.getDivideProductionModel.siparisDurumId = this.productionModel.SiparisDurumID;
-      this.getDivideProductionModel.uretimAciklama = this.productionModel.UretimAciklama;
-      this.getDivideProductionModel.sevkiyatAciklama = this.productionModel.SevkiyatAciklama;
-      this.getDivideProductionModel.finansAciklama = this.productionModel.FinansAciklama;
-      this.getDivideProductionModel.odemeAciklama = this.productionModel.OdemeAciklama;
-      this.getDivideProductionModel.TahminiYuklemeTarihi = date.dateToString(this.productionModel.TahminiYuklemeTarihi);
+      this.getDivideProductionModel.siparisDurumId =
+        this.productionModel.SiparisDurumID;
+      this.getDivideProductionModel.uretimAciklama =
+        this.productionModel.UretimAciklama;
+      this.getDivideProductionModel.sevkiyatAciklama =
+        this.productionModel.SevkiyatAciklama;
+      this.getDivideProductionModel.finansAciklama =
+        this.productionModel.FinansAciklama;
+      this.getDivideProductionModel.odemeAciklama =
+        this.productionModel.OdemeAciklama;
+      this.getDivideProductionModel.TahminiYuklemeTarihi = date.dateToString(
+        this.productionModel.TahminiYuklemeTarihi
+      );
       this.getDivideProductionModel.vade = this.productionModel.Vade;
       this.getDivideProductionModel.ulke = this.productionModel.UlkeAdi;
       this.getDivideProductionModel.komisyon = this.productionModel.Komisyon;
-      this.getDivideProductionModel.detayAciklama_1 = this.productionModel.DetayAciklama_1;
-      this.getDivideProductionModel.detayMekmarNot_1 = this.productionModel.DetayMekmarNot_1;
+      this.getDivideProductionModel.detayAciklama_1 =
+        this.productionModel.DetayAciklama_1;
+      this.getDivideProductionModel.detayMekmarNot_1 =
+        this.productionModel.DetayMekmarNot_1;
 
-      this.getDivideProductionModel.detayAciklama_2 = this.productionModel.DetayAciklama_2;
-      this.getDivideProductionModel.detayMekmarNot_2 = this.productionModel.DetayMekmarNot_2;
+      this.getDivideProductionModel.detayAciklama_2 =
+        this.productionModel.DetayAciklama_2;
+      this.getDivideProductionModel.detayMekmarNot_2 =
+        this.productionModel.DetayMekmarNot_2;
 
-      this.getDivideProductionModel.detayAciklama_3 = this.productionModel.DetayAciklama_3;
-      this.getDivideProductionModel.detayMekmarNot_3 = this.productionModel.DetayMekmarNot_3;
+      this.getDivideProductionModel.detayAciklama_3 =
+        this.productionModel.DetayAciklama_3;
+      this.getDivideProductionModel.detayMekmarNot_3 =
+        this.productionModel.DetayMekmarNot_3;
 
-
-      this.getDivideProductionModel.siparisSahibi = this.productionModel.SiparisSahibi;
-      this.getDivideProductionModel.evrakGideri = this.productionModel.EvrakGideri;
-      this.getDivideProductionModel.konteynerAyrinti = this.productionModel.KonteynerAyrinti;
+      this.getDivideProductionModel.siparisSahibi =
+        this.productionModel.SiparisSahibi;
+      this.getDivideProductionModel.evrakGideri =
+        this.productionModel.EvrakGideri;
+      this.getDivideProductionModel.konteynerAyrinti =
+        this.productionModel.KonteynerAyrinti;
       this.getDivideProductionModel.ulkeId = this.productionModel.UlkeId;
-      this.getDivideProductionModel.faturaKesimTurId = this.productionModel.FaturaKesimTurID;
+      this.getDivideProductionModel.faturaKesimTurId =
+        this.productionModel.FaturaKesimTurID;
       this.getDivideProductionModel.operasyon = this.productionModel.Operasyon;
       this.getDivideProductionModel.finansman = this.productionModel.Finansman;
       this.getDivideProductionModel.iade = this.productionModel.Iade;
       this.getDivideProductionModel.malBedeli = this.productionModel.SiparisId;
-      this.getDivideProductionModel.sigortaTutarSatis = this.productionModel.sigorta_tutar_satis;
-      this.getDivideProductionModel.sigortaTutar = this.productionModel.sigorta_Tutar;
-      const index = this.getDivideProductionModel.siparisno.split('-').length;
+      this.getDivideProductionModel.sigortaTutarSatis =
+        this.productionModel.sigorta_tutar_satis;
+      this.getDivideProductionModel.sigortaTutar =
+        this.productionModel.sigorta_Tutar;
+      const index = this.getDivideProductionModel.siparisno.split("-").length;
       if (index == 1) {
-        this.getDivideProductionModel.siparisno_giden = this.getDivideProductionModel.siparisno + '-1';
-        this.getDivideProductionModel.siparisno_kalan = this.getDivideProductionModel.siparisno + '-2';
-
+        this.getDivideProductionModel.siparisno_giden =
+          this.getDivideProductionModel.siparisno + "-1";
+        this.getDivideProductionModel.siparisno_kalan =
+          this.getDivideProductionModel.siparisno + "-2";
       } else {
-        const po2 = this.getDivideProductionModel.siparisno.split('-')[0];
-        const index2 = this.getDivideProductionModel.siparisno.split('-')[1];
-        this.getDivideProductionModel.siparisno_giden = this.getDivideProductionModel.siparisno;
-        this.getDivideProductionModel.siparisno_kalan = po2 + '-' + (parseInt(index2) + 1).toString();
+        const po2 = this.getDivideProductionModel.siparisno.split("-")[0];
+        const index2 = this.getDivideProductionModel.siparisno.split("-")[1];
+        this.getDivideProductionModel.siparisno_giden =
+          this.getDivideProductionModel.siparisno;
+        this.getDivideProductionModel.siparisno_kalan =
+          po2 + "-" + (parseInt(index2) + 1).toString();
       }
 
       const data = {
-        'order': this.getDivideProductionModel,
-        'product': this.getOrderProductionDivideOrderList
-      }
-      this.$store.dispatch('setDivide', data)
-        .then(response => {
-          if (response) {
-            this.$toast.success('Successfully');
-            // this.$socket.socketIO.emit("production_update_emit");
-
-          } else {
-            this.$toast.success('Error');
-          };
-        });
-
-
-
-
-
+        order: this.getDivideProductionModel,
+        product: this.getOrderProductionDivideOrderList,
+      };
+      this.$store.dispatch("setDivide", data).then((response) => {
+        if (response) {
+          this.$toast.success("Successfully");
+          // this.$socket.socketIO.emit("production_update_emit");
+        } else {
+          this.$toast.success("Error");
+        }
+      });
     },
-    addDivideProductionOrder() {
-
-    },
+    addDivideProductionOrder() {},
     updateDivideProductionProduct() {
-      if ((this.getDivideProductionProductModel.kalan + this.getDivideProductionProductModel.gonderilen) > this.getDivideProductionProductModel.miktar) {
-        alert('cannot be more than the remaining and sent amount');
+      if (
+        this.getDivideProductionProductModel.kalan +
+          this.getDivideProductionProductModel.gonderilen >
+        this.getDivideProductionProductModel.miktar
+      ) {
+        alert("cannot be more than the remaining and sent amount");
         return;
       } else {
-        this.$store.dispatch('setProductionDivideOrderListUpdate', this.getDivideProductionProductModel)
-          .then(response => {
+        this.$store
+          .dispatch(
+            "setProductionDivideOrderListUpdate",
+            this.getDivideProductionProductModel
+          )
+          .then((response) => {
             if (response) {
-              this.$store.dispatch('setDivideProductionsProductModel');
+              this.$store.dispatch("setDivideProductionsProductModel");
             }
           });
       }
@@ -574,78 +733,93 @@ export default {
       this.getDivideProductionProductModel.satisFiyat = event.data.satisFiyat;
       this.getDivideProductionProductModel.kalanToplam = event.data.kalanToplam;
       this.getDivideProductionProductModel.gidenToplam = event.data.gidenToplam;
-      this.getDivideProductionProductModel.uretimAciklama = event.data.uretimAciklama;
-      this.getDivideProductionProductModel.musteriAciklama = event.data.musteriAciklama;
+      this.getDivideProductionProductModel.uretimAciklama =
+        event.data.uretimAciklama;
+      this.getDivideProductionProductModel.musteriAciklama =
+        event.data.musteriAciklama;
       this.getDivideProductionProductModel.kullaniciId = event.data.kullaniciId;
       this.getDivideProductionProductModel.alisFiyati = event.data.alisFiyati;
       this.getDivideProductionProductModel.siraNo = event.data.siraNo;
       this.getDivideProductionProductModel.ton = event.data.ton;
       this.getDivideProductionProductModel.adet = event.data.adet;
-
-
     },
     addDivideProductionProduct() {
-      if ((this.getDivideProductionProductModel.kalan + this.getDivideProductionProductModel.gonderilen) > this.getDivideProductionProductModel.miktar) {
-        alert('cannot be more than the remaining and sent amount');
+      if (
+        this.getDivideProductionProductModel.kalan +
+          this.getDivideProductionProductModel.gonderilen >
+        this.getDivideProductionProductModel.miktar
+      ) {
+        alert("cannot be more than the remaining and sent amount");
         return;
       } else {
-        this.$store.dispatch('setProductionDivideOrderList', this.getDivideProductionProductModel)
-          .then(response => {
+        this.$store
+          .dispatch(
+            "setProductionDivideOrderList",
+            this.getDivideProductionProductModel
+          )
+          .then((response) => {
             if (response) {
-              this.$store.dispatch('setDivideProductionsProductModel');
+              this.$store.dispatch("setDivideProductionsProductModel");
             }
           });
       }
-
     },
     changeSelectedProduct(event) {
       this.getDivideProductionProductModel.id = event.value.UrunId;
       this.getDivideProductionProductModel.siparisno = event.value.SiparisNo;
-      this.getDivideProductionProductModel.tedarikciId = event.value.TedarikciID;
+      this.getDivideProductionProductModel.tedarikciId =
+        event.value.TedarikciID;
       this.getDivideProductionProductModel.urunKartId = event.value.UrunKartID;
-      this.getDivideProductionProductModel.urunBirimId = event.value.UrunBirimID;
+      this.getDivideProductionProductModel.urunBirimId =
+        event.value.UrunBirimID;
       this.getDivideProductionProductModel.miktar = event.value.Miktar;
       this.getDivideProductionProductModel.ozelMiktar = event.value.Miktar;
       this.getDivideProductionProductModel.satisFiyat = event.value.SatisFiyati;
-      this.getDivideProductionProductModel.kalanToplam = (parseFloat(this.getDivideProductionProductModel.kalan) * parseFloat(event.value.SatisFiyati));
-      this.getDivideProductionProductModel.gidenToplam = (parseFloat(this.getDivideProductionProductModel.gonderilen) * parseFloat(event.value.SatisFiyati));
-      this.getDivideProductionProductModel.uretimAciklama = event.value.UretimAciklama;
-      this.getDivideProductionProductModel.musteriAciklama = event.value.MusteriAciklama;
-      this.getDivideProductionProductModel.kullaniciId = event.value.MusteriAciklama;
+      this.getDivideProductionProductModel.kalanToplam =
+        parseFloat(this.getDivideProductionProductModel.kalan) *
+        parseFloat(event.value.SatisFiyati);
+      this.getDivideProductionProductModel.gidenToplam =
+        parseFloat(this.getDivideProductionProductModel.gonderilen) *
+        parseFloat(event.value.SatisFiyati);
+      this.getDivideProductionProductModel.uretimAciklama =
+        event.value.UretimAciklama;
+      this.getDivideProductionProductModel.musteriAciklama =
+        event.value.MusteriAciklama;
+      this.getDivideProductionProductModel.kullaniciId =
+        event.value.MusteriAciklama;
       this.getDivideProductionProductModel.alisFiyati = event.value.AlisFiyati;
       this.getDivideProductionProductModel.siraNo = event.value.SiraNo;
       this.getDivideProductionProductModel.ton = event.value.Ton;
       this.getDivideProductionProductModel.adet = event.value.Adet;
-      const index = event.value.SiparisNo.split('-').length;
+      const index = event.value.SiparisNo.split("-").length;
       if (index == 1) {
-        this.getDivideProductionProductModel.giden_po = event.value.SiparisNo + '-1';
-        this.getDivideProductionProductModel.kalan_po = event.value.SiparisNo + '-2';
-
+        this.getDivideProductionProductModel.giden_po =
+          event.value.SiparisNo + "-1";
+        this.getDivideProductionProductModel.kalan_po =
+          event.value.SiparisNo + "-2";
       } else {
-        const po2 = event.value.SiparisNo.split('-')[0];
-        const index2 = event.value.SiparisNo.split('-')[1];
+        const po2 = event.value.SiparisNo.split("-")[0];
+        const index2 = event.value.SiparisNo.split("-")[1];
         this.getDivideProductionProductModel.giden_po = event.value.SiparisNo;
-        this.getDivideProductionProductModel.kalan_po = po2 + '-' + (parseInt(index2) + 1).toString();
-      };
+        this.getDivideProductionProductModel.kalan_po =
+          po2 + "-" + (parseInt(index2) + 1).toString();
+      }
     },
     divide() {
-      this.$store.dispatch('setDivideProductionsProductModel');
-      this.$store.dispatch('setDivideProductionsModel');
+      this.$store.dispatch("setDivideProductionsProductModel");
+      this.$store.dispatch("setDivideProductionsModel");
 
-      this.$store.dispatch('setOrdersProductsDivideList', this.productionModel.SiparisNo)
-        .then(response => {
+      this.$store
+        .dispatch("setOrdersProductsDivideList", this.productionModel.SiparisNo)
+        .then((response) => {
           if (response) {
             this.divide_dialog_form = true;
-            this.$store.commit('setProductionDivideOrderListReset');
+            this.$store.commit("setProductionDivideOrderListReset");
             this.selectedProduct = null;
-
-
           } else {
             this.divide_dialog_form = false;
-
           }
-        })
-
+        });
     },
     isfDelete(event) {
       this.$store.dispatch("setOrderProductionIsfDelete", event);
@@ -659,7 +833,8 @@ export default {
         .then((response) => {
           if (response.status) {
             const link = document.createElement("a");
-            link.href = this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
+            link.href =
+              this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
 
             link.setAttribute("download", "Uretim_list.xlsx");
             document.body.appendChild(link);
@@ -671,7 +846,9 @@ export default {
       if (this.selectedMarketing == "All") {
         this.$store.commit("setOrderList", this.getOrderListAll);
       } else {
-        const datas = this.getOrderListAll.filter((x) => x.FaturaKesimTurID == 1);
+        const datas = this.getOrderListAll.filter(
+          (x) => x.FaturaKesimTurID == 1
+        );
         this.$store.commit("setOrderList", datas);
       }
     },
@@ -716,13 +893,12 @@ export default {
       };
       if (confirm("Çıkmak istediğinize emin misiniz?")) {
         this.$store.dispatch("setProductionProductSaveMail", data);
-        if (this.$route.path == '/orders/production') {
+        if (this.$route.path == "/orders/production") {
           this.$store.dispatch("setOrderProductionList");
-        } else if (this.$route.path == '/orders/waiting'){
-          this.$store.dispatch("setOrderWaitingList")
+        } else if (this.$route.path == "/orders/waiting") {
+          this.$store.dispatch("setOrderWaitingList");
         }
         this.production_detail_form = false;
-
       }
     },
     workermanSelected(event) {
@@ -885,13 +1061,23 @@ export default {
       this.productionModel.DetayMekmarNot_3_2 = this.__stringCharacterChange(
         this.productionModel.DetayMekmarNot_3
       );
-      this.productionModel.SiparisKontrolEden = Cookies.get('userId');
+      this.productionModel.SiparisKontrolEden = Cookies.get("userId");
       this.$store.dispatch("setOrderProductionUpdate", {
         ...this.productionModel,
         SiparisId: this.getOrderProductionId,
       });
     },
     save() {
+      if (
+        this.productionModel.KaynakTuruID == null ||
+        this.productionModel.KaynakTuruID == "" ||
+        this.productionModel.KaynakTuruID == " " ||
+        this.productionModel.KaynakTuruID == undefined ||
+        this.productionModel.KaynakTuruID == 0
+      ) {
+        alert("Source Type is missing");
+        return;
+      }
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||
@@ -1034,10 +1220,12 @@ export default {
       this.productionModel.KayitTarihi = date.dateToString(new Date());
       this.productionModel.KullaniciID = Cookies.get("userId");
 
-
       this.$store.dispatch("setOrderProductionSaveButtonStatus", true);
       this.$store.dispatch("setOrderProductionSave", this.productionModel);
-      this.$store.dispatch("setOrderProductionPo", this.productionModel.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionPo",
+        this.productionModel.SiparisNo
+      );
     },
 
     process() {
@@ -1053,8 +1241,13 @@ export default {
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch("setOrderProductionDetailListReset");
       this.$store.dispatch("setOrderProductionPo", null);
-      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", true);
+      this.$store.dispatch(
+        "setOrderProductionUploadProformaButtonStatus",
+        true
+      );
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setOrderProductionSourceTypes");
+
       this.$store.dispatch("setOrderAllList");
       this.productionModel = this.getOrderProductionModel;
       this.production_detail_form = true;
@@ -1062,19 +1255,29 @@ export default {
     productionSelected(event) {
       this.$store.dispatch("setOrderProductionButtonStatus", false);
       this.$store.dispatch("setOrderProductModel");
-      this.$store.dispatch("setOrderProductionProductDetailList", event.SiparisNo);
+      this.$store.dispatch(
+        "setOrderProductionProductDetailList",
+        event.SiparisNo
+      );
       this.$store.dispatch("setOrderProductionCostList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionSupplierList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionDocumentList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionCheckList", event.SiparisNo);
       this.$store.dispatch("setOrderProductionFreightTotal", event.NavlunSatis);
-      this.$store.dispatch("setOrderProductionInsuranceTotal", event.sigorta_tutar_satis);
+      this.$store.dispatch(
+        "setOrderProductionInsuranceTotal",
+        event.sigorta_tutar_satis
+      );
       this.$store.dispatch("setOrderProductionDetailTotal", event);
       this.$store.dispatch("setOrderProductionProductDetailCostTotal", event);
       this.$store.dispatch("setOrderProductionSaveButtonStatus", false);
       this.$store.dispatch("setOrderProductionProductDetailNotChangeListReset");
-      this.$store.dispatch("setOrderProductionUploadProformaButtonStatus", false);
+      this.$store.dispatch(
+        "setOrderProductionUploadProformaButtonStatus",
+        false
+      );
       this.$store.commit("setOrderSupplierProductList", []);
+      this.$store.dispatch("setOrderProductionSourceTypes");
 
       this.$store.dispatch("setOrderProductionId", event.SiparisId);
       this.productionModel = event;
@@ -1110,7 +1313,7 @@ export default {
   visibility: hidden;
 }
 
-@media screen and (max-width:576px) {
+@media screen and (max-width: 576px) {
   .row {
     clear: both;
     display: block;
