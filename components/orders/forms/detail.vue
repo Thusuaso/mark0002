@@ -491,6 +491,7 @@ export default {
       }
     },
     inputPo(event) {
+      this.modelProduction.SiparisNo = event.toUpperCase();
       const index = this.getOrdersAllList.find((x) => x.SiparisNo == event);
       if (index) {
         this.$toast.success("Bu po ya ait sipariş bulunmakta.");

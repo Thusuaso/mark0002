@@ -177,18 +177,21 @@ export default {
       filteredHeight: null,
       selectedEdge: null,
       filteredEdge: null,
-      socket:null
+      socket: null,
     };
   },
   created() {
     if (!this.status) {
       this.createdProcess();
-    };
+    }
     // this.socket = io("http://localhost:3001",{
     //   reconnectionDelayMax: 10000,
     // })
   },
   methods: {
+    capitalizeFirstLetter(val) {
+      return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+    },
     reset() {
       this.selectedCategory = null;
       this.selectedProduct = null;
@@ -207,12 +210,15 @@ export default {
       this.model.date = new Date();
       this.$store.dispatch("setCardsUpdate", this.model);
       this.$emit("card_dialog_form_emit", false);
+      this.$emit("card_dialog_update_values_emit");
+
       this.reset();
     },
     save() {
       this.model.userId = Cookies.get("userId");
       this.model.date = new Date();
       this.$store.dispatch("setCardsSave", this.model);
+      this.$emit("card_dialog_update_values_emit");
       this.reset();
     },
     saveProcess() {
@@ -223,50 +229,59 @@ export default {
       }
     },
     createdProcess() {
-      this.selectedCategory = this.categories.find((x) => x.ID == this.model.KategoriId);
-      this.selectedProduct = this.products.find((x) => x.ID == this.model.UrunId);
-      this.selectedSurface = this.surfaces.find((x) => x.ID == this.model.YuzeyId);
+      this.selectedCategory = this.categories.find(
+        (x) => x.ID == this.model.KategoriId
+      );
+      this.selectedProduct = this.products.find(
+        (x) => x.ID == this.model.UrunId
+      );
+      this.selectedSurface = this.surfaces.find(
+        (x) => x.ID == this.model.YuzeyId
+      );
       this.selectedWidth = this.sizes.find((x) => x.ID == this.model.OlcuId);
       this.selectedHeight = this.sizes.find((x) => x.ID == this.model.OlcuId);
       this.selectedEdge = this.sizes.find((x) => x.ID == this.model.OlcuId);
     },
     edgeChange(event) {
-      if(typeof (event) == 'string'){
+      if (typeof event == "string") {
         this.model.OlcuId = null;
-      this.model.Kenar = event.replace('.',',');
-      this.selectedEdge = event.replace('.',',');
+        this.model.Kenar = this.capitalizeFirstLetter(event).replace(".", ",");
+        this.selectedEdge = this.capitalizeFirstLetter(event).replace(".", ",");
       }
-
-
     },
     heightChange(event) {
-      if(typeof (event) == 'string'){
+      if (typeof event == "string") {
         this.model.OlcuId = null;
-      this.model.Boy = event.replace('.',',');
-      this.selectedHeight = event.replace('.',',');
+        this.model.Boy = this.capitalizeFirstLetter(event).replace(".", ",");
+        this.selectedHeight = this.capitalizeFirstLetter(event).replace(
+          ".",
+          ","
+        );
       }
-
-
     },
     widthSurface(event) {
-      if(typeof (event) == 'string'){
-      this.model.OlcuId = null;
-      this.model.En = event.replace('.',',');
-      this.selectedWidth = event.replace('.',',');
+      if (typeof event == "string") {
+        this.model.OlcuId = null;
+        this.model.En = this.capitalizeFirstLetter(event).replace(".", ",");
+        this.selectedWidth = this.capitalizeFirstLetter(event).replace(
+          ".",
+          ","
+        );
       }
-
-
     },
     surfaceChange(event) {
       this.model.YuzeyId = null;
-      this.model.YuzeyIslemAdi = event;
+      this.model.YuzeyIslemAdi = this.capitalizeFirstLetter(event);
+      this.selectedSurface = this.capitalizeFirstLetter(event);
     },
     productChange(event) {
+      this.selectedProduct = this.capitalizeFirstLetter(event);
       this.model.UrunId = null;
-      this.model.UrunAdi = event;
+      this.model.UrunAdi = this.capitalizeFirstLetter(event);
     },
     categoryChange(event) {
-      this.model.KategoriAdi = event;
+      this.selectedCategory = this.capitalizeFirstLetter(event);
+      this.model.KategoriAdi = this.capitalizeFirstLetter(event);
       this.model.KategoriId = null;
     },
     edgeSelected(event) {
@@ -332,7 +347,9 @@ export default {
         results = this.surfaces;
       } else {
         results = this.surfaces.filter((surface) =>
-          surface.YuzeyIslemAdi.toLowerCase().startsWith(event.query.toLowerCase())
+          surface.YuzeyIslemAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          )
         );
       }
       this.filteredSurface = results;
@@ -354,7 +371,9 @@ export default {
         results = this.categories;
       } else {
         results = this.categories.filter((category) =>
-          category.KategoriAdi.toLowerCase().startsWith(event.query.toLowerCase())
+          category.KategoriAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          )
         );
       }
       this.filteredCategory = results;
@@ -363,16 +382,16 @@ export default {
 };
 </script>
 <style scoped>
-@media screen and (max-width:575px) {
-  .row{
-  clear:both;
-  display:block;
-  width:100%;
-}
-.col{
-  clear:both;
-  display:block;
-  width:100%;
-}
+@media screen and (max-width: 575px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
 }
 </style>

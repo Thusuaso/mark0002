@@ -1,6 +1,7 @@
 import api from "../../plugins/excel.server";
 
 const state = {
+  financeExpiryListTotal: 0,
   financeDetailInsuranceList: [],
   financeList: [],
   financeListAll: [],
@@ -697,6 +698,10 @@ const mutations = {
       state.financeListAll.push(item);
     }
     state.financeExpiryList = payload.vadeList;
+    state.financeExpiryListTotal = 0;
+    payload.vadeList.forEach((x) => {
+      state.financeExpiryListTotal += x.tutar;
+    });
     state.financeListMaya = payload.mayaList;
   },
   setFinanceCollectionList(state, payload) {
@@ -794,6 +799,9 @@ const mutations = {
   },
 };
 const getters = {
+  getFinanceExpiryListTotal(state) {
+    return state.financeExpiryListTotal;
+  },
   getFinanceDetailInsuranceList(state) {
     return state.financeDetailInsuranceList;
   },

@@ -175,7 +175,7 @@
             {{ slotProps.data.tutar | formatPriceUsd }}
           </template>
           <template #footer>
-            {{ maturity_total | formatPriceUsd }}
+            {{ expiryTotal | formatPriceUsd }}
           </template>
         </Column>
       </DataTable>
@@ -248,7 +248,11 @@
 </template>
 <script>
 import { FilterMatchMode } from "primevue/api";
+import { mapGetters } from "vuex";
 export default {
+  computed: {
+    ...mapGetters(["getFinanceExpiryList"]),
+  },
   props: {
     list: {
       type: Array,
@@ -279,10 +283,13 @@ export default {
       type: Boolean,
       required: false,
     },
+    expiryTotal: {
+      type: Number,
+      required: false,
+    },
   },
   data() {
     return {
-      maturity_total: 0,
       filteredFinance: {
         customer_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
@@ -294,12 +301,7 @@ export default {
       this.$store.dispatch("setFinanceTotalList", event.filteredValue);
     },
   },
-  created() {
-    this.maturity_total = 0;
-    this.expiry.forEach((item) => {
-      this.maturity_total += item.tutar;
-    });
-  },
+  created() {},
 };
 </script>
 <style scoped>

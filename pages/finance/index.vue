@@ -70,6 +70,7 @@
       @finance_list_selected_emit="financeListSelected($event)"
       :maya="getFinanceListMaya"
       :status="true"
+      :expiryTotal="getFinanceExpiryListTotal"
     />
     <Dialog
       :visible.sync="finance_collection_list_form"
@@ -151,6 +152,7 @@ export default {
       "getFinanceCollectionSampleTotal",
       "getLocalUrl",
       "getLoading",
+      "getFinanceExpiryListTotal",
     ]),
   },
   data() {
@@ -180,6 +182,7 @@ export default {
   created() {
     this.$store.dispatch("setFinanceList");
   },
+
   methods: {
     checkedMekmarMekmer(event) {
       if (this.mekmarMekmerList) {

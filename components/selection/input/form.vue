@@ -237,7 +237,7 @@
                 inputId="notFind"
                 :binary="true"
               />
-              <label for="notFind" class="ml-2"> Not Found </label>
+              <label for="notFind" class="ml-2"> N.Found </label>
             </div>
           </div>
           <div class="col">
@@ -248,6 +248,16 @@
                 :binary="true"
               />
               <label for="fason_status" class="ml-2"> Fason </label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="flex align-items-center">
+              <Checkbox
+                v-model="kutulamaStatus"
+                inputId="kutulama_status"
+                :binary="true"
+              />
+              <label for="kutulama_status" class="ml-2"> Kutulama </label>
             </div>
           </div>
         </div>
@@ -366,6 +376,7 @@ export default {
   },
   data() {
     return {
+      kutulamaStatus: false,
       fasonStatus: false,
       width: null,
       height: null,
@@ -599,6 +610,7 @@ export default {
         Bulunamadi: this.notFindStatus,
         KasaKayıtAdedi: this.crateAmount,
         Fason: this.fasonStatus,
+        Kutulama: this.kutulamaStatus,
       };
       // if(data.UrunOcakID == ' ' || data.UrunOcakID == '' || data.UrunOcakID == 0 || data.UrunOcakID == undefined || data.UrunOcakID == null){
       //   this.$toast.error('Ürün Ocağını Giriniz!')
@@ -666,6 +678,7 @@ export default {
         Bulunamadi: this.notFindStatus,
         KasaKayıtAdedi: this.crateAmount,
         Fason: this.fasonStatus,
+        Kutulama: this.kutulamaStatus,
       };
       this.$store.dispatch("setSelectionProductionUpdate", data);
       this.$emit("selection_production_dialog_form", false);
@@ -701,6 +714,8 @@ export default {
       this.selectedSaveKind = null;
       this.selectedSupplier = null;
       this.fasonStatus = false;
+      this.kutulamaStatus = false;
+
       this.$store.commit("setSelectionProductionCrateNo", null);
     },
     createdProcess() {
@@ -745,12 +760,13 @@ export default {
       this.amount = this.model.Miktar;
       this.width = this.model.En;
       this.height = this.model.Boy;
-      if (this.model.OzelMiktar == null) {
+      if (this.model.SqmMiktar == null) {
         this.speacialAmount = 0;
       } else {
-        this.speacialAmount = this.model.OzelMiktar;
+        this.speacialAmount = this.model.SqmMiktar;
       }
       this.fasonStatus = this.model.Fason;
+      this.kutulamaStatus = this.model.Kutulama;
       this.description = this.model.Aciklama;
       this.notFindStatus = this.__nullNoneTrueFalseControl(
         this.model.Bulunamadi

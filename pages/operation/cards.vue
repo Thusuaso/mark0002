@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <Button type="button" class="p-button-success w-100" @click="newForm" label="New" />
+    <Button
+      type="button"
+      class="p-button-success w-100"
+      @click="newForm"
+      label="New"
+    />
     <productCards @cards_selected_emit="cardsSelected($event)" />
     <Dialog :visible.sync="cards_form_dialog" header="" modal>
       <cardsForm
@@ -12,6 +17,7 @@
         :surfaces="getCardSurfacesList"
         :sizes="getCardSizesList"
         :orders="getCardsOrderList"
+        @card_dialog_update_values_emit="card_dialog_update_values_emit"
       />
     </Dialog>
   </div>
@@ -36,9 +42,17 @@ export default {
     ]),
   },
   methods: {
+    card_dialog_update_values_emit() {
+      this.$store.dispatch("setCardCategoryList");
+      this.$store.dispatch("setCardProductsList");
+      this.$store.dispatch("setCardSurfacesList");
+      this.$store.dispatch("setCardSizesList");
+      this.$store.dispatch("setOrderAllList");
+      this.$store.dispatch("setSelectionSurfaces");
+    },
     newForm() {
       this.$store.dispatch("setCardsButtonStatus", true);
-      this.$store.commit('setCardsOrderList', []);
+      this.$store.commit("setCardsOrderList", []);
       this.model = {};
       this.cards_form_dialog = true;
     },

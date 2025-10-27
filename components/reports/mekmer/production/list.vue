@@ -294,6 +294,12 @@
           <div v-if="slotProps.data.Fason == false">Fason Değil</div>
         </template>
       </Column>
+      <Column field="Kutulama" header="Kutulama">
+        <template #body="slotProps">
+          <div v-if="slotProps.data.Kutulama == true">Kutulama</div>
+          <div v-if="slotProps.data.Kutulama == false">Kutulama Değil</div>
+        </template>
+      </Column>
     </DataTable>
     <DataTable
       :value="list"
@@ -574,6 +580,12 @@
         <template #body="slotProps">
           <div v-if="slotProps.data.Fason == true">Fason</div>
           <div v-if="slotProps.data.Fason == false">Fason Değil</div>
+        </template>
+      </Column>
+      <Column field="Kutulama" header="Kutulama">
+        <template #body="slotProps">
+          <div v-if="slotProps.data.Kutulama == true">Kutulama</div>
+          <div v-if="slotProps.data.Kutulama == false">Kutulama Değil</div>
         </template>
       </Column>
     </DataTable>

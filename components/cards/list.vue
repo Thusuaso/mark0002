@@ -137,9 +137,7 @@
 import { mapGetters } from "vuex";
 import { FilterMatchMode } from "primevue/api";
 export default {
-  props: {
-
-  },
+  props: {},
   computed: {
     ...mapGetters(["getCardList"]),
   },
@@ -148,7 +146,10 @@ export default {
       selectedCards: null,
       filters: {
         ID: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        KategoriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KategoriAdi: {
+          value: null,
+          matchMode: FilterMatchMode.STARTS_WITH,
+        },
         UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         YuzeyIslemAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -158,6 +159,9 @@ export default {
     };
   },
   methods: {
+    test(event) {
+      console.log(event);
+    },
     cardsSelected(event) {
       this.$emit("cards_selected_emit", event.data);
     },

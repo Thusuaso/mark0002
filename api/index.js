@@ -910,7 +910,8 @@ app.put("/sales/representative/change", (req, res) => {
 
 /*Selection*/
 app.get("/selection/production/list", (req, res) => {
-  const sql = `select u.OzelMiktar,
+  const sql = `select u.SqmMiktar,
+  u.Kutulama,
     u.Fason,
     u.Duzenleyen,u.Kasalayan,u.UrunKartId,urb.ID as UrunBirimId,urb.BirimAdi as UrunBirimAdi,u.UretimTurID,u.ID,u.Tarih,u.KasaNo,k.KategoriAdi,k.ID as KategoriID,uo.OcakAdi,uo.ID as OcakId,ur.UrunAdi,ur.ID as UrunId,yk.YuzeyIslemAdi,yk.ID as YuzeyId,ol.ID as OlcuId,ol.En,ol.Boy,ol.Kenar,u.KutuAdet,u.KutuIciAdet,u.Miktar,u.Kutu,u.Bagli,u.SiparisAciklama,u.Aciklama,u.TedarikciID,t.FirmaAdi,u.Bulunamadi,u.Disarda,u.Adet from UretimTB u inner join TedarikciTB t on t.ID = u.TedarikciID inner join UrunBirimTB ub on ub.ID = u.UrunBirimID inner join UrunOcakTB uo on uo.ID = u.UrunOcakID inner join UretimTurTB ut on ut.ID = u.UretimTurID inner join UrunKartTB uk on uk.ID = u.UrunKartID inner join KategoriTB k on k.ID = uk.KategoriID inner join UrunlerTB ur on ur.ID = uk.UrunID inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID inner join OlculerTB ol on ol.ID = uk.OlcuID inner join UrunBirimTB urb on urb.ID = u.UrunBirimID where UrunDurumID=1 order by KasaNo desc`;
 
@@ -1201,7 +1202,8 @@ app.post("/selection/production/save", (req, res) => {
                     SqmMiktar,
                     Bagli,
                     Bulunamadi,
-                    Fason
+                    Fason,
+                    Kutulama
                     )
                 Values('${req.body.Tarih}','${crateNo}',
                 '${req.body.UrunKartID}','${req.body.TedarikciID}',
@@ -1216,7 +1218,7 @@ app.post("/selection/production/save", (req, res) => {
                 '${req.body.Disarda}','${req.body.KutuIciAdet}',
                 '${req.body.SqmMiktar}','${req.body.Bagli}','${
       req.body.Bulunamadi
-    }','${req.body.Fason}')
+    }','${req.body.Fason}','${req.body.Kutulama}'))
                 `;
     mssql.query(sql, (err, product) => {});
     crateNo = parseInt(crateNo) + 1;
@@ -1247,7 +1249,9 @@ app.put("/selection/production/update", (req, res) => {
     SqmMiktar='${req.body.SqmMiktar}',
     Bagli='${req.body.Bagli}',
     Bulunamadi='${req.body.Bulunamadi}',
-    Fason='${req.body.Fason}'
+    Fason='${req.body.Fason}',
+    Kutulama='${req.body.Kutulama}'
+
     where
     ID='${req.body.ID}'
     `;
@@ -2965,7 +2969,8 @@ app.get("/reports/mekmer/production/list", (req, res) => {
 	ub.BirimAdi,
 	u.SiparisAciklama,
 	u.Aciklama,
-  	u.Fason
+  	u.Fason,
+    u.Kutulama
 
 
 
@@ -3007,7 +3012,8 @@ app.post("/reports/mekmer/production/filter", (req, res) => {
 	ub.BirimAdi,
 	u.SiparisAciklama,
 	u.Aciklama,
-  	u.Fason
+  	u.Fason,
+    u.Kutulama
 
 
 
@@ -3090,7 +3096,8 @@ app.post("/reports/mekmer/production/date", (req, res) => {
 	ub.BirimAdi,
 	u.SiparisAciklama,
 	u.Aciklama,
-  	u.Fason
+  	u.Fason,
+    u.Kutulama
 
 
 
@@ -4067,7 +4074,9 @@ app.get("/reports/mekmar/forwarding/list", (req, res) => {
     ub.BirimAdi,
     t.FirmaAdi as TedarikciAdi,
     u.Aciklama,
-	u.Tarih as UretimTarihi
+	u.Tarih as UretimTarihi,
+  u.Fason,
+  u.Kutulama
     
     from SevkiyatTB s 
     inner join UretimTB u on u.KasaNo = s.KasaNo
@@ -4091,7 +4100,6 @@ app.get("/reports/mekmar/forwarding/list", (req, res) => {
 });
 
 app.post("/reports/mekmar/forwarding/filter", (req, res) => {
-  console.log("req.body.product_date", req.body.product_date);
   const supplier =
     req.body.fromWho.charAt(0).toUpperCase() + req.body.fromWho.slice(1);
   const po = req.body.po.toUpperCase();
@@ -4137,7 +4145,9 @@ app.post("/reports/mekmar/forwarding/filter", (req, res) => {
     ub.BirimAdi,
     t.FirmaAdi as TedarikciAdi,
     u.Aciklama,
-    u.Tarih as UretimTarihi
+    u.Tarih as UretimTarihi,
+    u.Fason,
+    u.Kutulama
     
     from SevkiyatTB s 
     inner join UretimTB u on u.KasaNo = s.KasaNo
@@ -4202,7 +4212,9 @@ uoc.OcakAdi,
 ub.BirimAdi,
 t.FirmaAdi as TedarikciAdi,
 u.Aciklama,
-u.Tarih as UretimTarihi
+u.Tarih as UretimTarihi,
+    u.Fason,
+    u.Kutulama
 
 from SevkiyatTB s 
 inner join UretimTB u on u.KasaNo = s.KasaNo
