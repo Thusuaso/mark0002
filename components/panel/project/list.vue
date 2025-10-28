@@ -52,6 +52,9 @@
         :showFilterMenu="false"
         :showClearButton="false"
       >
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -67,6 +70,9 @@
         :showFilterMenu="false"
         :showClearButton="false"
       >
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -82,6 +88,9 @@
         :showFilterMenu="false"
         :showClearButton="false"
       >
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -97,6 +106,27 @@
         :showFilterMenu="false"
         :showClearButton="false"
       >
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column
+        field="ProjectName_Ar"
+        header="Project (Ar)"
+        :showFilterMenu="false"
+        :showClearButton="false"
+      >
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -295,6 +325,7 @@ export default {
         ProjectName_Fr: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         ProjectName_Es: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         ProjectName_Ru: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        ProjectName_Ar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         CountryName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
     };

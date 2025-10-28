@@ -1218,8 +1218,10 @@ app.post("/selection/production/save", (req, res) => {
                 '${req.body.Disarda}','${req.body.KutuIciAdet}',
                 '${req.body.SqmMiktar}','${req.body.Bagli}','${
       req.body.Bulunamadi
-    }','${req.body.Fason}','${req.body.Kutulama}'))
+    }','${req.body.Fason}','${req.body.Kutulama}')
                 `;
+
+    console.log("/selection/production/save", sql);
     mssql.query(sql, (err, product) => {});
     crateNo = parseInt(crateNo) + 1;
   }
@@ -8204,6 +8206,7 @@ app.get("/panel/project/list", (req, res) => {
             mp.ProjectName_Fr,
             mp.ProjectName_Es,
             mp.ProjectName_Ru,
+            mp.ProjectName_Ar,
 			(select mpd.VideosStatus from MekmarCom_Project_Detail mpd where mpd.VideosStatus=1 and mpd.ProjectId = mp.ID) as VideoStatus
 
 
@@ -17825,18 +17828,18 @@ app.post("/panel/project/queue/changing", (req, res) => {
   const newBody = req.body.body.newData;
   const oldBody = req.body.body.data;
   const getOldProjectId = `
-    select ID,Queue from MekmarCom_Projects
+      select ID,Queue from MekmarCom_Projects
 
-  where Queue='${newBody.Queue}'
-`;
+    where Queue='${newBody.Queue}'
+  `;
   const newUpdateSql = `
-      update MekmarCom_Projects SET Queue='${newBody.Queue}' where ID='${newBody.ID}'
+        update MekmarCom_Projects SET Queue='${newBody.Queue}',ProjectName='${newBody.ProjectName}',ProjectName_Fr='${newBody.ProjectName_Fr}',ProjectName_Es='${newBody.ProjectName_Es}',ProjectName_Ru=N'${newBody.ProjectName_Ru}',ProjectName_Ar=N'${newBody.ProjectName_Ar}' where ID='${newBody.ID}'
 
-    `;
+      `;
 
   const getOldProjectQueue = `
-    select top 1 (Queue + 1) as Queue from MekmarCom_Projects order by Queue desc
-    `;
+      select top 1 (Queue + 1) as Queue from MekmarCom_Projects order by Queue desc
+      `;
 
   mssql.query(getOldProjectId, (err, res2) => {
     if (res2.recordset.length > 0) {
