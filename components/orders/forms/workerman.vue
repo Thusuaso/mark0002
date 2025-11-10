@@ -38,7 +38,12 @@
     <div class="row mt-4 mb-4">
       <div class="col">
         <span class="p-float-label">
-          <Textarea id="description" v-model="model.Aciklama" rows="5" class="w-100" />
+          <Textarea
+            id="description"
+            v-model="model.Aciklama"
+            rows="5"
+            class="w-100"
+          />
           <label for="description">Explanation</label>
         </span>
       </div>
@@ -125,7 +130,9 @@ export default {
     workermanSelected(event) {
       this.deleted_button_disabled = false;
       this.model = event.data;
-      this.selectedSupplier = this.supplier.find((x) => x.ID == event.data.TedarikciID);
+      this.selectedSupplier = this.supplier.find(
+        (x) => x.ID == event.data.TedarikciID
+      );
       this.workerman_date = date.stringToDate(event.data.Tarih);
       this.model.SiparisNo = this.po;
       this.model.UrunKartId = this.productId;
@@ -137,46 +144,44 @@ export default {
       this.model.UrunKartId = this.productId;
       this.model.SiparisNo = this.po;
       this.$store.dispatch("setProductionProductWorkermanDelete", this.model);
-            this.model.Tutar = 0;
-      this.model.Aciklama = '';
-
+      this.model.Tutar = 0;
+      this.model.Aciklama = "";
     },
     process() {
       if (this.deleted_button_disabled) {
-        if(!this.workerman_date){
-          if(confirm('Tarih eksik yinede kaydedilsin mi ?')){
+        if (!this.workerman_date) {
+          if (confirm("Tarih eksik yinede kaydedilsin mi ?")) {
             this.save();
-          };
-        }else{
-            if(!this.selectedSupplier){
-              if(confirm('Tedarikçi eksik yinede kaydedilsin mi ?')){
-              this.save();
-              }
-            
-              }else{
-                if(this.model.Tutar == 0){
-                  if(confirm('Tutar eksik yinede kaydedilsin mi ?')){
-                    this.save();
-                  } 
-                }else{
-                  if(this.model.Aciklama == ''){
-                    if(confirm('Açıklama eksik yinede kaydedilsin mi?')){
-                      this.save();
-                    }
-                  }else{
-                    this.save();
-                  }
-                }
-            }
-            
-
           }
+        } else {
+          if (!this.selectedSupplier) {
+            if (confirm("Tedarikçi eksik yinede kaydedilsin mi ?")) {
+              this.save();
+            }
+          } else {
+            if (this.model.Tutar == 0) {
+              if (confirm("Tutar eksik yinede kaydedilsin mi ?")) {
+                this.save();
+              }
+            } else {
+              if (this.model.Aciklama == "") {
+                if (confirm("Açıklama eksik yinede kaydedilsin mi?")) {
+                  this.save();
+                }
+              } else {
+                this.save();
+              }
+            }
+          }
+        }
         // this.save();
       } else {
         this.update();
       }
     },
     update() {
+      this.model.Aciklama = this.__stringCharacterChange(this.model.Aciklama);
+
       this.model.SiparisEkstraGiderTurID = 1;
       this.model.UrunKartId = this.productId;
       this.model.SiparisNo = this.po;
@@ -184,10 +189,20 @@ export default {
       this.selectedSupplier = null;
       this.workerman_date = null;
       this.model.Tutar = 0;
-      this.model.Aciklama = '';
+      this.model.Aciklama = "";
+    },
+    __stringCharacterChange(event) {
+      const data = event.split("'");
+      let value = "";
 
+      data.forEach((x) => {
+        value += x + "''";
+      });
+      const value2 = value.substring(0, value.length - 2);
+      return value2;
     },
     save() {
+      this.model.Aciklama = this.__stringCharacterChange(this.model.Aciklama);
       this.model.SiparisEkstraGiderTurID = 1;
       this.model.UrunKartId = this.productId;
       this.model.SiparisNo = this.po;
@@ -195,8 +210,7 @@ export default {
       this.selectedSupplier = null;
       this.workerman_date = null;
       this.model.Tutar = 0;
-      this.model.Aciklama = '';
-
+      this.model.Aciklama = "";
     },
     workermanDateSelected(event) {
       this.model.Tarih = date.dateToString(event);
@@ -211,7 +225,9 @@ export default {
         results = this.supplier;
       } else {
         results = this.supplier.filter((supplier) => {
-          return supplier.FirmaAdi.toLowerCase().startsWith(event.query.toLowerCase());
+          return supplier.FirmaAdi.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredSupplier = results;

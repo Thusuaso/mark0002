@@ -1478,10 +1478,12 @@ export default {
         this.$emit("delete_emit", this.model.urunid);
       }
     },
+
     process() {
       if (this.status) {
         this.productSaveButtonDisabled = false;
       }
+
       this.$emit("process_emit", this.model);
     },
     stoneTypeSelected(event) {

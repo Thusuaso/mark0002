@@ -1060,6 +1060,54 @@ export default {
       }
     },
     addProduct() {
+      if (
+        this.selectedUnit == null ||
+        this.selectedUnit == undefined ||
+        this.selectedUnit == ""
+      ) {
+        this.$toast.error("Please select a unit.");
+        return;
+      };
+            if (
+        this.selectedSurface == null ||
+        this.selectedSurface == undefined ||
+        this.selectedSurface == ""
+      ) {
+        this.$toast.error("Please select a surface.");
+        return;
+      };
+                  if (
+        this.selectedThickness == null ||
+        this.selectedThickness == undefined ||
+        this.selectedThickness == ""
+      ) {
+        this.$toast.error("Please select a thickness.");
+        return;
+      };
+                        if (
+        this.selectedSize == null ||
+        this.selectedSize == undefined ||
+        this.selectedSize == ""
+      ) {
+        this.$toast.error("Please select a size.");
+        return;
+      };
+                              if (
+        this.selectedProduct == null ||
+        this.selectedProduct == undefined ||
+        this.selectedProduct == ""
+      ) {
+        this.$toast.error("Please select a product.");
+        return;
+      };
+                                    if (
+        this.selectedCategory == null ||
+        this.selectedCategory == undefined ||
+        this.selectedCategory == ""
+      ) {
+        this.$toast.error("Please select a category.");
+        return;
+      };
       const date = new Date();
       const year = date.getFullYear();
       const month = this.__zeroControl(date.getMonth() + 1);

@@ -3,7 +3,7 @@
     <div class="col">
       <DataTable
         :value="list"
-        tableStyle="font-size:70%"
+        tableStyle="font-size:90%"
         class="p-datatable-sm"
         :filters.sync="filters"
         filterDisplay="row"
@@ -14,7 +14,6 @@
         scrollable
         scrollHeight="500px"
         :resizableColumns="true"
-        columnResizeMode="fit"
         showGridlines
         responsiveLayout="scroll"
       >
@@ -27,6 +26,7 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          :headerStyle="{ width: '1200px' }"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -37,25 +37,7 @@
             />
           </template>
         </Column>
-        <Column
-          field="operasyon"
-          header="Operation"
-          :showFilterMenu="false"
-          :showFilterOperator="false"
-          :showClearButton="false"
-          :showApplyButton="false"
-          :showFilterMatchModes="false"
-          :showAddButton="false"
-        >
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
-          </template>
-        </Column>
+
         <Column
           field="musteri_adi"
           header="Customer"
@@ -65,6 +47,7 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          :headerStyle="{ width: '600px' }"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -84,6 +67,7 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          style="width: 100%"
         >
           <template #body="slotProps">
             <div
@@ -104,7 +88,7 @@
             />
           </template>
         </Column>
-
+        <!-- 
         <Column
           field="faturatur"
           header="Invoice"
@@ -123,7 +107,7 @@
               class="p-column-filter"
             />
           </template>
-        </Column>
+        </Column> -->
         <Column
           field="siparis_tarihi"
           header="O. Date"
@@ -133,6 +117,7 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          style="width: 100%"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -152,6 +137,7 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          style="width: 100%"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -171,6 +157,7 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          style="width: 100%"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -190,6 +177,7 @@
           :showApplyButton="false"
           :showFilterMatchModes="false"
           :showAddButton="false"
+          :headerStyle="{ width: '50px', 'overflow-wrap': 'break-word' }"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -206,6 +194,27 @@
           </template>
           <template #footer>
             {{ getReportsMekmarAyoListTotal.proforma | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column field="kar_zarar" header="Profit / USD">
+          <template #body="slotProps">
+            {{ slotProps.data.kar_zarar | formatPriceUsd }}
+          </template>
+          <template #footer>
+            {{ getReportsMekmarAyoListTotal.profitUsd | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column field="kar_zarar_tl" header="Profit / TRY">
+          <template #body="slotProps">
+            {{ slotProps.data.kar_zarar_tl | formatPriceTl }}
+          </template>
+          <template #footer>
+            {{ getReportsMekmarAyoListTotal.profitTl | formatPriceTl }}
+          </template>
+        </Column>
+        <Column field="kar_zarar_tl_yuzdesi" header="Profit (%)">
+          <template #body="slotProps">
+            % {{ slotProps.data.kar_zarar_tl_yuzdesi }}
           </template>
         </Column>
         <Column field="mekmar_alim" header="Production (Mekmer)">
@@ -244,7 +253,7 @@
             {{ total.mekmozProduction | formatPriceUsd }}
           </template>
         </Column> -->
-        <Column field="dis_alim" header="External Purchase">
+        <Column field="dis_alim" header="Production (Others)">
           <template #body="slotProps">
             <div
               :style="{
@@ -385,7 +394,7 @@
             {{ getReportsMekmarAyoListTotal.lashing | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="booking" header="Booking">
+        <!-- <Column field="booking" header="Booking">
           <template #body="slotProps">
             <div
               :style="{
@@ -402,7 +411,7 @@
           <template #footer>
             {{ getReportsMekmarAyoListTotal.booking | formatPriceUsd }}
           </template>
-        </Column>
+        </Column> -->
         <Column field="spazlet" header="Spanzlet">
           <template #body="slotProps">
             <div
@@ -421,31 +430,33 @@
             {{ getReportsMekmarAyoListTotal.spanzlet | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_1" header="Detail 1">
+        <Column field="detay_1" header="Detail(Sum)">
           <template #body="slotProps">
-            {{ slotProps.data.detay_1 | formatPriceUsd }}
+            {{
+              (slotProps.data.detay_1 + slotProps.data.detay_2) | formatPriceUsd
+            }}
           </template>
           <template #footer>
             {{ getReportsMekmarAyoListTotal.detailBuyes1 | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="detay_2" header="Detail 2">
+        <!-- <Column field="detay_2" header="Detail 2">
           <template #body="slotProps">
             {{ slotProps.data.detay_2 | formatPriceUsd }}
           </template>
           <template #footer>
             {{ getReportsMekmarAyoListTotal.detailBuyes2 | formatPriceUsd }}
           </template>
-        </Column>
+        </Column> -->
 
-        <Column field="pazarlama" header="Marketing Cost">
+        <!-- <Column field="pazarlama" header="Marketing Cost">
           <template #body="slotProps">
             {{ slotProps.data.pazarlama | formatPriceUsd }}
           </template>
           <template #footer>
             {{ getReportsMekmarAyoListTotal.commision | formatPriceUsd }}
           </template>
-        </Column>
+        </Column> -->
         <Column field="ozel_iscilik" header="Manual Labour Cost">
           <template #body="slotProps">
             <div
@@ -464,22 +475,25 @@
             {{ getReportsMekmarAyoListTotal.specialwork | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="banka_masrafi" header="Bank">
+        <Column field="banka_masrafi" header="Office Cost">
           <template #body="slotProps">
-            {{ slotProps.data.banka_masrafi | formatPriceUsd }}
+            {{
+              (slotProps.data.banka_masrafi + slotProps.data.kurye_masrafi)
+                | formatPriceUsd
+            }}
           </template>
           <template #footer>
             {{ getReportsMekmarAyoListTotal.bankCost | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="kurye_masrafi" header="Courier">
+        <!-- <Column field="kurye_masrafi" header="Courier">
           <template #body="slotProps">
             {{ slotProps.data.kurye_masrafi | formatPriceUsd }}
           </template>
           <template #footer>
             {{ getReportsMekmarAyoListTotal.fregileCost | formatPriceUsd }}
           </template>
-        </Column>
+        </Column> -->
         <Column field="masraf_toplam" header="Total">
           <template #body="slotProps">
             {{ slotProps.data.masraf_toplam | formatPriceUsd }}
@@ -488,27 +502,7 @@
             {{ getReportsMekmarAyoListTotal.costTotal | formatPriceUsd }}
           </template>
         </Column>
-        <Column field="kar_zarar" header="Profit / USD">
-          <template #body="slotProps">
-            {{ slotProps.data.kar_zarar | formatPriceUsd }}
-          </template>
-          <template #footer>
-            {{ getReportsMekmarAyoListTotal.profitUsd | formatPriceUsd }}
-          </template>
-        </Column>
-        <Column field="kar_zarar_tl" header="Profit / TRY">
-          <template #body="slotProps">
-            {{ slotProps.data.kar_zarar_tl | formatPriceTl }}
-          </template>
-          <template #footer>
-            {{ getReportsMekmarAyoListTotal.profitTl | formatPriceTl }}
-          </template>
-        </Column>
-        <Column field="kar_zarar_tl_yuzdesi" header="Profit (%)">
-          <template #body="slotProps">
-            % {{ slotProps.data.kar_zarar_tl_yuzdesi }}
-          </template>
-        </Column>
+
         <Column field="dosya_kapanma_date" header="Date of Closure"></Column>
       </DataTable>
     </div>
