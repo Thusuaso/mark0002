@@ -1,7 +1,11 @@
 <template>
   <div class="row">
     <div class="col">
-      <DataTable
+      <ayoListForm
+        :list="list"
+        @mekmar_ayo_selected_emit="mekmarAyoSelected($event)"
+      />
+      <!-- <DataTable
         :value="list"
         tableStyle="font-size:90%"
         class="p-datatable-sm"
@@ -88,26 +92,7 @@
             />
           </template>
         </Column>
-        <!-- 
-        <Column
-          field="faturatur"
-          header="Invoice"
-          :showFilterMenu="false"
-          :showFilterOperator="false"
-          :showClearButton="false"
-          :showApplyButton="false"
-          :showFilterMatchModes="false"
-          :showAddButton="false"
-        >
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
-          </template>
-        </Column> -->
+
         <Column
           field="siparis_tarihi"
           header="O. Date"
@@ -232,27 +217,7 @@
             {{ getReportsMekmarAyoListTotal.mekmerProduction | formatPriceUsd }}
           </template>
         </Column>
-        <!-- <Column
-          field="mekmoz_alim"
-          header="Production (Mek-Moz)"
 
-        >
-          <template #body="slotProps">
-            <div
-              :style="{
-                'background-color':
-                  slotProps.data.mekmoz_alim_alis_kontrol > 0 
-                    ? '#F1948A'
-                    : '',
-              }"
-            >
-              {{ slotProps.data.mekmoz_alim | formatPriceUsd }}
-            </div>
-          </template>
-          <template #footer>
-            {{ total.mekmozProduction | formatPriceUsd }}
-          </template>
-        </Column> -->
         <Column field="dis_alim" header="Production (Others)">
           <template #body="slotProps">
             <div
@@ -394,24 +359,7 @@
             {{ getReportsMekmarAyoListTotal.lashing | formatPriceUsd }}
           </template>
         </Column>
-        <!-- <Column field="booking" header="Booking">
-          <template #body="slotProps">
-            <div
-              :style="{
-                'background-color':
-                  slotProps.data.booking > 0 &&
-                  slotProps.data.booking_evrak.length <= 0
-                    ? '#F1948A'
-                    : '',
-              }"
-            >
-              {{ slotProps.data.booking | formatPriceUsd }}
-            </div>
-          </template>
-          <template #footer>
-            {{ getReportsMekmarAyoListTotal.booking | formatPriceUsd }}
-          </template>
-        </Column> -->
+
         <Column field="spazlet" header="Spanzlet">
           <template #body="slotProps">
             <div
@@ -440,23 +388,6 @@
             {{ getReportsMekmarAyoListTotal.detailBuyes1 | formatPriceUsd }}
           </template>
         </Column>
-        <!-- <Column field="detay_2" header="Detail 2">
-          <template #body="slotProps">
-            {{ slotProps.data.detay_2 | formatPriceUsd }}
-          </template>
-          <template #footer>
-            {{ getReportsMekmarAyoListTotal.detailBuyes2 | formatPriceUsd }}
-          </template>
-        </Column> -->
-
-        <!-- <Column field="pazarlama" header="Marketing Cost">
-          <template #body="slotProps">
-            {{ slotProps.data.pazarlama | formatPriceUsd }}
-          </template>
-          <template #footer>
-            {{ getReportsMekmarAyoListTotal.commision | formatPriceUsd }}
-          </template>
-        </Column> -->
         <Column field="ozel_iscilik" header="Manual Labour Cost">
           <template #body="slotProps">
             <div
@@ -486,14 +417,7 @@
             {{ getReportsMekmarAyoListTotal.bankCost | formatPriceUsd }}
           </template>
         </Column>
-        <!-- <Column field="kurye_masrafi" header="Courier">
-          <template #body="slotProps">
-            {{ slotProps.data.kurye_masrafi | formatPriceUsd }}
-          </template>
-          <template #footer>
-            {{ getReportsMekmarAyoListTotal.fregileCost | formatPriceUsd }}
-          </template>
-        </Column> -->
+
         <Column field="masraf_toplam" header="Total">
           <template #body="slotProps">
             {{ slotProps.data.masraf_toplam | formatPriceUsd }}
@@ -504,7 +428,7 @@
         </Column>
 
         <Column field="dosya_kapanma_date" header="Date of Closure"></Column>
-      </DataTable>
+      </DataTable> -->
     </div>
   </div>
 </template>
@@ -547,7 +471,7 @@ export default {
       this.$store.dispatch("setReportsMekmarAyoListTotal", event.filteredValue);
     },
     mekmarAyoSelected(event) {
-      this.$emit("mekmar_ayo_selected_emit", event.data);
+      this.$emit("mekmar_ayo_selected_emit", event);
     },
   },
 };

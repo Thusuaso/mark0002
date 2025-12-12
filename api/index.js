@@ -12091,6 +12091,7 @@ app.put("/order/production/product/update", (req, res) => {
         KasaOlcusu='${__noneNullControl(req.body.KasaOlcusu)}'
         where ID = '${req.body.ID}'
     `;
+  console.log("sql", sql);
   mssql.query(sql, (err, product) => {
     if (product.rowsAffected[0] == 1) {
       res.status(200).json({ status: true });

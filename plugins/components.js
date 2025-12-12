@@ -141,6 +141,9 @@ import guContinentOrders from "~/components/reports/mekmar/gu/continent";
 import guOfferSource from "~/components/reports/mekmar/gu/offerSource";
 import guOfferCountry from "~/components/reports/mekmar/gu/offerCountry";
 
+import ayoListForm from "~/components/reports/mekmar/ayo/listForm";
+Vue.component("ayoListForm", ayoListForm);
+
 Vue.component("guOfferSource", guOfferSource);
 Vue.component("guOfferCountry", guOfferCountry);
 
