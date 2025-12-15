@@ -343,6 +343,10 @@ import PickList from "primevue/picklist";
 import OverlayPanel from "primevue/overlaypanel";
 import Sidebar from "primevue/sidebar";
 import Chips from "primevue/chips";
+import InputSwitch from "primevue/inputswitch";
+import SelectButton from "primevue/selectbutton";
+Vue.component("InputSwitch", InputSwitch);
+Vue.component("SelectButton", SelectButton);
 
 Vue.component("Button", Button);
 Vue.component("Chart", Chart);

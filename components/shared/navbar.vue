@@ -154,6 +154,11 @@
                   >Crate Size</nuxt-link
                 >
               </li>
+              <li>
+                <nuxt-link to="/container" class="dropdown-item" tag="a"
+                  >Container Calculator</nuxt-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item" v-show="!getAuthorityStatus">

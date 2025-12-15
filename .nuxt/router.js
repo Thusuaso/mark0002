@@ -4,68 +4,69 @@ import { normalizeURL, decode } from 'ufo'
 import { interopDefault } from './utils'
 import scrollBehavior from './router.scrollBehavior.js'
 
-const _2e17fb5a = () => interopDefault(import('..\\pages\\auth\\index.vue' /* webpackChunkName: "pages/auth/index" */))
-const _5fff99c2 = () => interopDefault(import('..\\pages\\finance\\index.vue' /* webpackChunkName: "pages/finance/index" */))
-const _59adf2c4 = () => interopDefault(import('..\\pages\\offers\\index.vue' /* webpackChunkName: "pages/offers/index" */))
-const _80cda97e = () => interopDefault(import('..\\pages\\passwords\\index.vue' /* webpackChunkName: "pages/passwords/index" */))
-const _cc28fbd4 = () => interopDefault(import('..\\pages\\customer\\bgp.vue' /* webpackChunkName: "pages/customer/bgp" */))
-const _0560a42e = () => interopDefault(import('..\\pages\\customer\\fair.vue' /* webpackChunkName: "pages/customer/fair" */))
-const _0521aeb0 = () => interopDefault(import('..\\pages\\customer\\mekmar.vue' /* webpackChunkName: "pages/customer/mekmar" */))
-const _392fae67 = () => interopDefault(import('..\\pages\\customer\\offer.vue' /* webpackChunkName: "pages/customer/offer" */))
-const _5d7c07d2 = () => interopDefault(import('..\\pages\\customer\\selection.vue' /* webpackChunkName: "pages/customer/selection" */))
-const _7dfdd9c3 = () => interopDefault(import('..\\pages\\operation\\cards.vue' /* webpackChunkName: "pages/operation/cards" */))
-const _53449be1 = () => interopDefault(import('..\\pages\\operation\\container.vue' /* webpackChunkName: "pages/operation/container" */))
-const _1c3a00ff = () => interopDefault(import('..\\pages\\operation\\containerlist.vue' /* webpackChunkName: "pages/operation/containerlist" */))
-const _6f532d81 = () => interopDefault(import('..\\pages\\operation\\follow.vue' /* webpackChunkName: "pages/operation/follow" */))
-const _db818e2c = () => interopDefault(import('..\\pages\\operation\\shipment.vue' /* webpackChunkName: "pages/operation/shipment" */))
-const _2c1e581c = () => interopDefault(import('..\\pages\\operation\\supplier.vue' /* webpackChunkName: "pages/operation/supplier" */))
-const _f23e9aee = () => interopDefault(import('..\\pages\\operation\\transport.vue' /* webpackChunkName: "pages/operation/transport" */))
-const _611a83a7 = () => interopDefault(import('..\\pages\\operation\\transportlist.vue' /* webpackChunkName: "pages/operation/transportlist" */))
-const _8bb0fa4c = () => interopDefault(import('..\\pages\\operation\\unfollow.vue' /* webpackChunkName: "pages/operation/unfollow" */))
-const _44f5c3d6 = () => interopDefault(import('..\\pages\\operation\\uploadform.vue' /* webpackChunkName: "pages/operation/uploadform" */))
-const _033067f6 = () => interopDefault(import('..\\pages\\orders\\production.vue' /* webpackChunkName: "pages/orders/production" */))
-const _6443adb7 = () => interopDefault(import('..\\pages\\orders\\shipped.vue' /* webpackChunkName: "pages/orders/shipped" */))
-const _469359b1 = () => interopDefault(import('..\\pages\\orders\\waiting.vue' /* webpackChunkName: "pages/orders/waiting" */))
-const _6ee5de86 = () => interopDefault(import('..\\pages\\panel\\project\\index.vue' /* webpackChunkName: "pages/panel/project/index" */))
-const _17d0105c = () => interopDefault(import('..\\pages\\panel\\usa\\index.vue' /* webpackChunkName: "pages/panel/usa/index" */))
-const _2710d177 = () => interopDefault(import('..\\pages\\panel\\users\\index.vue' /* webpackChunkName: "pages/panel/users/index" */))
-const _26c582a6 = () => interopDefault(import('..\\pages\\sales\\bgp.vue' /* webpackChunkName: "pages/sales/bgp" */))
-const _36fa6cee = () => interopDefault(import('..\\pages\\sales\\consider.vue' /* webpackChunkName: "pages/sales/consider" */))
-const _7a18a226 = () => interopDefault(import('..\\pages\\sales\\follow.vue' /* webpackChunkName: "pages/sales/follow" */))
-const _2e56ea29 = () => interopDefault(import('..\\pages\\sales\\important-links.vue' /* webpackChunkName: "pages/sales/important-links" */))
-const _6f5615b4 = () => interopDefault(import('..\\pages\\sales\\maintodo.vue' /* webpackChunkName: "pages/sales/maintodo" */))
-const _b4e985dc = () => interopDefault(import('..\\pages\\sales\\representative.vue' /* webpackChunkName: "pages/sales/representative" */))
-const _d42a210a = () => interopDefault(import('..\\pages\\sales\\todo.vue' /* webpackChunkName: "pages/sales/todo" */))
-const _65ddda19 = () => interopDefault(import('..\\pages\\sample\\finance.vue' /* webpackChunkName: "pages/sample/finance" */))
-const _2a97848a = () => interopDefault(import('..\\pages\\sample\\sample.vue' /* webpackChunkName: "pages/sample/sample" */))
-const _77fced36 = () => interopDefault(import('..\\pages\\selection\\input.vue' /* webpackChunkName: "pages/selection/input" */))
-const _778629b6 = () => interopDefault(import('..\\pages\\selection\\size.vue' /* webpackChunkName: "pages/selection/size" */))
-const _b5adecaa = () => interopDefault(import('..\\pages\\mekmer\\products\\production.vue' /* webpackChunkName: "pages/mekmer/products/production" */))
-const _49347c5e = () => interopDefault(import('..\\pages\\mekmer\\products\\shipped.vue' /* webpackChunkName: "pages/mekmer/products/shipped" */))
-const _73b2f4cc = () => interopDefault(import('..\\pages\\panel\\products\\notpublished.vue' /* webpackChunkName: "pages/panel/products/notpublished" */))
-const _fda6c626 = () => interopDefault(import('..\\pages\\panel\\products\\published.vue' /* webpackChunkName: "pages/panel/products/published" */))
-const _a834d3e0 = () => interopDefault(import('..\\pages\\panel\\products\\queue.vue' /* webpackChunkName: "pages/panel/products/queue" */))
-const _0b141e34 = () => interopDefault(import('..\\pages\\reports\\mekmar\\ayo.vue' /* webpackChunkName: "pages/reports/mekmar/ayo" */))
-const _07911672 = () => interopDefault(import('..\\pages\\reports\\mekmar\\continent-order.vue' /* webpackChunkName: "pages/reports/mekmar/continent-order" */))
-const _38f6a314 = () => interopDefault(import('..\\pages\\reports\\mekmar\\country-order.vue' /* webpackChunkName: "pages/reports/mekmar/country-order" */))
-const _bc78ccd0 = () => interopDefault(import('..\\pages\\reports\\mekmar\\filter-finance.vue' /* webpackChunkName: "pages/reports/mekmar/filter-finance" */))
-const _7d1e9f90 = () => interopDefault(import('..\\pages\\reports\\mekmar\\forwarding.vue' /* webpackChunkName: "pages/reports/mekmar/forwarding" */))
-const _0201a401 = () => interopDefault(import('..\\pages\\reports\\mekmar\\gu.vue' /* webpackChunkName: "pages/reports/mekmar/gu" */))
-const _100f018e = () => interopDefault(import('..\\pages\\reports\\mekmar\\loading.vue' /* webpackChunkName: "pages/reports/mekmar/loading" */))
-const _0bb1ccb1 = () => interopDefault(import('..\\pages\\reports\\mekmar\\mk.vue' /* webpackChunkName: "pages/reports/mekmar/mk" */))
-const _829dfeba = () => interopDefault(import('..\\pages\\reports\\mekmar\\summary.vue' /* webpackChunkName: "pages/reports/mekmar/summary" */))
-const _1a170c6b = () => interopDefault(import('..\\pages\\reports\\mekmar\\supplier-cost.vue' /* webpackChunkName: "pages/reports/mekmar/supplier-cost" */))
-const _0e92c618 = () => interopDefault(import('..\\pages\\reports\\mekmer\\atlanta.vue' /* webpackChunkName: "pages/reports/mekmer/atlanta" */))
-const _47c42c63 = () => interopDefault(import('..\\pages\\reports\\mekmer\\by-buying-production.vue' /* webpackChunkName: "pages/reports/mekmer/by-buying-production" */))
-const _6dc517db = () => interopDefault(import('..\\pages\\reports\\mekmer\\finance.vue' /* webpackChunkName: "pages/reports/mekmer/finance" */))
-const _079223a2 = () => interopDefault(import('..\\pages\\reports\\mekmer\\mine.vue' /* webpackChunkName: "pages/reports/mekmer/mine" */))
-const _43e6eb2d = () => interopDefault(import('..\\pages\\reports\\mekmer\\onhold.vue' /* webpackChunkName: "pages/reports/mekmer/onhold" */))
-const _2120f070 = () => interopDefault(import('..\\pages\\reports\\mekmer\\production.vue' /* webpackChunkName: "pages/reports/mekmer/production" */))
-const _022d125b = () => interopDefault(import('..\\pages\\reports\\mekmer\\productions.vue' /* webpackChunkName: "pages/reports/mekmer/productions" */))
-const _b1c77e58 = () => interopDefault(import('..\\pages\\reports\\mekmer\\shipped.vue' /* webpackChunkName: "pages/reports/mekmer/shipped" */))
-const _0fb14757 = () => interopDefault(import('..\\pages\\reports\\mekmer\\stock.vue' /* webpackChunkName: "pages/reports/mekmer/stock" */))
-const _67b469ea = () => interopDefault(import('..\\pages\\reports\\mekmer\\strips.vue' /* webpackChunkName: "pages/reports/mekmer/strips" */))
-const _3113b53b = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages/index" */))
+const _4193e1b2 = () => interopDefault(import('..\\pages\\auth\\index.vue' /* webpackChunkName: "pages/auth/index" */))
+const _f8bc6a84 = () => interopDefault(import('..\\pages\\container.vue' /* webpackChunkName: "pages/container" */))
+const _205305cb = () => interopDefault(import('..\\pages\\finance\\index.vue' /* webpackChunkName: "pages/finance/index" */))
+const _70bfcad0 = () => interopDefault(import('..\\pages\\offers\\index.vue' /* webpackChunkName: "pages/offers/index" */))
+const _468202ed = () => interopDefault(import('..\\pages\\passwords\\index.vue' /* webpackChunkName: "pages/passwords/index" */))
+const _07dda9ea = () => interopDefault(import('..\\pages\\customer\\bgp.vue' /* webpackChunkName: "pages/customer/bgp" */))
+const _4da28095 = () => interopDefault(import('..\\pages\\customer\\fair.vue' /* webpackChunkName: "pages/customer/fair" */))
+const _e7eaf348 = () => interopDefault(import('..\\pages\\customer\\mekmar.vue' /* webpackChunkName: "pages/customer/mekmar" */))
+const _19919d8a = () => interopDefault(import('..\\pages\\customer\\offer.vue' /* webpackChunkName: "pages/customer/offer" */))
+const _6363f4eb = () => interopDefault(import('..\\pages\\customer\\selection.vue' /* webpackChunkName: "pages/customer/selection" */))
+const _04e6b16f = () => interopDefault(import('..\\pages\\operation\\cards.vue' /* webpackChunkName: "pages/operation/cards" */))
+const _0561bd8d = () => interopDefault(import('..\\pages\\operation\\container.vue' /* webpackChunkName: "pages/operation/container" */))
+const _52566cab = () => interopDefault(import('..\\pages\\operation\\containerlist.vue' /* webpackChunkName: "pages/operation/containerlist" */))
+const _74f56956 = () => interopDefault(import('..\\pages\\operation\\follow.vue' /* webpackChunkName: "pages/operation/follow" */))
+const _246131be = () => interopDefault(import('..\\pages\\operation\\shipment.vue' /* webpackChunkName: "pages/operation/shipment" */))
+const _837f5e20 = () => interopDefault(import('..\\pages\\operation\\supplier.vue' /* webpackChunkName: "pages/operation/supplier" */))
+const _38fdd435 = () => interopDefault(import('..\\pages\\operation\\transport.vue' /* webpackChunkName: "pages/operation/transport" */))
+const _d192215a = () => interopDefault(import('..\\pages\\operation\\transportlist.vue' /* webpackChunkName: "pages/operation/transportlist" */))
+const _4c497bae = () => interopDefault(import('..\\pages\\operation\\unfollow.vue' /* webpackChunkName: "pages/operation/unfollow" */))
+const _6f0c31e9 = () => interopDefault(import('..\\pages\\operation\\uploadform.vue' /* webpackChunkName: "pages/operation/uploadform" */))
+const _6e7968b1 = () => interopDefault(import('..\\pages\\orders\\production.vue' /* webpackChunkName: "pages/orders/production" */))
+const _1e4b308b = () => interopDefault(import('..\\pages\\orders\\shipped.vue' /* webpackChunkName: "pages/orders/shipped" */))
+const _009adc85 = () => interopDefault(import('..\\pages\\orders\\waiting.vue' /* webpackChunkName: "pages/orders/waiting" */))
+const _006cf25a = () => interopDefault(import('..\\pages\\panel\\project\\index.vue' /* webpackChunkName: "pages/panel/project/index" */))
+const _6e022e30 = () => interopDefault(import('..\\pages\\panel\\usa\\index.vue' /* webpackChunkName: "pages/panel/usa/index" */))
+const _8d9a6b6a = () => interopDefault(import('..\\pages\\panel\\users\\index.vue' /* webpackChunkName: "pages/panel/users/index" */))
+const _3736e95c = () => interopDefault(import('..\\pages\\sales\\bgp.vue' /* webpackChunkName: "pages/sales/bgp" */))
+const _1dfc207c = () => interopDefault(import('..\\pages\\sales\\consider.vue' /* webpackChunkName: "pages/sales/consider" */))
+const _2fea6c0c = () => interopDefault(import('..\\pages\\sales\\follow.vue' /* webpackChunkName: "pages/sales/follow" */))
+const _649b5e56 = () => interopDefault(import('..\\pages\\sales\\important-links.vue' /* webpackChunkName: "pages/sales/important-links" */))
+const _295d9888 = () => interopDefault(import('..\\pages\\sales\\maintodo.vue' /* webpackChunkName: "pages/sales/maintodo" */))
+const _371250e6 = () => interopDefault(import('..\\pages\\sales\\representative.vue' /* webpackChunkName: "pages/sales/representative" */))
+const _e7a60762 = () => interopDefault(import('..\\pages\\sales\\todo.vue' /* webpackChunkName: "pages/sales/todo" */))
+const _1fe55ced = () => interopDefault(import('..\\pages\\sample\\finance.vue' /* webpackChunkName: "pages/sample/finance" */))
+const _3b071067 = () => interopDefault(import('..\\pages\\sample\\sample.vue' /* webpackChunkName: "pages/sample/sample" */))
+const _4aea6111 = () => interopDefault(import('..\\pages\\selection\\input.vue' /* webpackChunkName: "pages/selection/input" */))
+const _318dac8a = () => interopDefault(import('..\\pages\\selection\\size.vue' /* webpackChunkName: "pages/selection/size" */))
+const _5a8fbf57 = () => interopDefault(import('..\\pages\\mekmer\\products\\production.vue' /* webpackChunkName: "pages/mekmer/products/production" */))
+const _68d6cba5 = () => interopDefault(import('..\\pages\\mekmer\\products\\shipped.vue' /* webpackChunkName: "pages/mekmer/products/shipped" */))
+const _6b22f4a0 = () => interopDefault(import('..\\pages\\panel\\products\\notpublished.vue' /* webpackChunkName: "pages/panel/products/notpublished" */))
+const _bc4664ce = () => interopDefault(import('..\\pages\\panel\\products\\published.vue' /* webpackChunkName: "pages/panel/products/published" */))
+const _4b40fcbc = () => interopDefault(import('..\\pages\\panel\\products\\queue.vue' /* webpackChunkName: "pages/panel/products/queue" */))
+const _859d8040 = () => interopDefault(import('..\\pages\\reports\\mekmar\\ayo.vue' /* webpackChunkName: "pages/reports/mekmar/ayo" */))
+const _cbe5d3c4 = () => interopDefault(import('..\\pages\\reports\\mekmar\\continent-order.vue' /* webpackChunkName: "pages/reports/mekmar/continent-order" */))
+const _2f869dc0 = () => interopDefault(import('..\\pages\\reports\\mekmar\\country-order.vue' /* webpackChunkName: "pages/reports/mekmar/country-order" */))
+const _7d32f46c = () => interopDefault(import('..\\pages\\reports\\mekmar\\filter-finance.vue' /* webpackChunkName: "pages/reports/mekmar/filter-finance" */))
+const _72748464 = () => interopDefault(import('..\\pages\\reports\\mekmar\\forwarding.vue' /* webpackChunkName: "pages/reports/mekmar/forwarding" */))
+const _d7b8c656 = () => interopDefault(import('..\\pages\\reports\\mekmar\\gu.vue' /* webpackChunkName: "pages/reports/mekmar/gu" */))
+const _2e14eae5 = () => interopDefault(import('..\\pages\\reports\\mekmar\\loading.vue' /* webpackChunkName: "pages/reports/mekmar/loading" */))
+const _c45874f6 = () => interopDefault(import('..\\pages\\reports\\mekmar\\mk.vue' /* webpackChunkName: "pages/reports/mekmar/mk" */))
+const _16652762 = () => interopDefault(import('..\\pages\\reports\\mekmar\\summary.vue' /* webpackChunkName: "pages/reports/mekmar/summary" */))
+const _10a70717 = () => interopDefault(import('..\\pages\\reports\\mekmar\\supplier-cost.vue' /* webpackChunkName: "pages/reports/mekmar/supplier-cost" */))
+const _2ed308a0 = () => interopDefault(import('..\\pages\\reports\\mekmer\\atlanta.vue' /* webpackChunkName: "pages/reports/mekmer/atlanta" */))
+const _53711837 = () => interopDefault(import('..\\pages\\reports\\mekmer\\by-buying-production.vue' /* webpackChunkName: "pages/reports/mekmer/by-buying-production" */))
+const _b83cf8f2 = () => interopDefault(import('..\\pages\\reports\\mekmer\\finance.vue' /* webpackChunkName: "pages/reports/mekmer/finance" */))
+const _cdcd9114 = () => interopDefault(import('..\\pages\\reports\\mekmer\\mine.vue' /* webpackChunkName: "pages/reports/mekmer/mine" */))
+const _e00f4bfe = () => interopDefault(import('..\\pages\\reports\\mekmer\\onhold.vue' /* webpackChunkName: "pages/reports/mekmer/onhold" */))
+const _367526c8 = () => interopDefault(import('..\\pages\\reports\\mekmer\\production.vue' /* webpackChunkName: "pages/reports/mekmer/production" */))
+const _90d86ff2 = () => interopDefault(import('..\\pages\\reports\\mekmer\\productions.vue' /* webpackChunkName: "pages/reports/mekmer/productions" */))
+const _458ea700 = () => interopDefault(import('..\\pages\\reports\\mekmer\\shipped.vue' /* webpackChunkName: "pages/reports/mekmer/shipped" */))
+const _a1e6a3fa = () => interopDefault(import('..\\pages\\reports\\mekmer\\stock.vue' /* webpackChunkName: "pages/reports/mekmer/stock" */))
+const _98744e84 = () => interopDefault(import('..\\pages\\reports\\mekmer\\strips.vue' /* webpackChunkName: "pages/reports/mekmer/strips" */))
+const _51c4f10f = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages/index" */))
 
 const emptyFn = () => {}
 
@@ -80,251 +81,255 @@ export const routerOptions = {
 
   routes: [{
     path: "/auth",
-    component: _2e17fb5a,
+    component: _4193e1b2,
     name: "auth"
   }, {
+    path: "/container",
+    component: _f8bc6a84,
+    name: "container"
+  }, {
     path: "/finance",
-    component: _5fff99c2,
+    component: _205305cb,
     name: "finance"
   }, {
     path: "/offers",
-    component: _59adf2c4,
+    component: _70bfcad0,
     name: "offers"
   }, {
     path: "/passwords",
-    component: _80cda97e,
+    component: _468202ed,
     name: "passwords"
   }, {
     path: "/customer/bgp",
-    component: _cc28fbd4,
+    component: _07dda9ea,
     name: "customer-bgp"
   }, {
     path: "/customer/fair",
-    component: _0560a42e,
+    component: _4da28095,
     name: "customer-fair"
   }, {
     path: "/customer/mekmar",
-    component: _0521aeb0,
+    component: _e7eaf348,
     name: "customer-mekmar"
   }, {
     path: "/customer/offer",
-    component: _392fae67,
+    component: _19919d8a,
     name: "customer-offer"
   }, {
     path: "/customer/selection",
-    component: _5d7c07d2,
+    component: _6363f4eb,
     name: "customer-selection"
   }, {
     path: "/operation/cards",
-    component: _7dfdd9c3,
+    component: _04e6b16f,
     name: "operation-cards"
   }, {
     path: "/operation/container",
-    component: _53449be1,
+    component: _0561bd8d,
     name: "operation-container"
   }, {
     path: "/operation/containerlist",
-    component: _1c3a00ff,
+    component: _52566cab,
     name: "operation-containerlist"
   }, {
     path: "/operation/follow",
-    component: _6f532d81,
+    component: _74f56956,
     name: "operation-follow"
   }, {
     path: "/operation/shipment",
-    component: _db818e2c,
+    component: _246131be,
     name: "operation-shipment"
   }, {
     path: "/operation/supplier",
-    component: _2c1e581c,
+    component: _837f5e20,
     name: "operation-supplier"
   }, {
     path: "/operation/transport",
-    component: _f23e9aee,
+    component: _38fdd435,
     name: "operation-transport"
   }, {
     path: "/operation/transportlist",
-    component: _611a83a7,
+    component: _d192215a,
     name: "operation-transportlist"
   }, {
     path: "/operation/unfollow",
-    component: _8bb0fa4c,
+    component: _4c497bae,
     name: "operation-unfollow"
   }, {
     path: "/operation/uploadform",
-    component: _44f5c3d6,
+    component: _6f0c31e9,
     name: "operation-uploadform"
   }, {
     path: "/orders/production",
-    component: _033067f6,
+    component: _6e7968b1,
     name: "orders-production"
   }, {
     path: "/orders/shipped",
-    component: _6443adb7,
+    component: _1e4b308b,
     name: "orders-shipped"
   }, {
     path: "/orders/waiting",
-    component: _469359b1,
+    component: _009adc85,
     name: "orders-waiting"
   }, {
     path: "/panel/project",
-    component: _6ee5de86,
+    component: _006cf25a,
     name: "panel-project"
   }, {
     path: "/panel/usa",
-    component: _17d0105c,
+    component: _6e022e30,
     name: "panel-usa"
   }, {
     path: "/panel/users",
-    component: _2710d177,
+    component: _8d9a6b6a,
     name: "panel-users"
   }, {
     path: "/sales/bgp",
-    component: _26c582a6,
+    component: _3736e95c,
     name: "sales-bgp"
   }, {
     path: "/sales/consider",
-    component: _36fa6cee,
+    component: _1dfc207c,
     name: "sales-consider"
   }, {
     path: "/sales/follow",
-    component: _7a18a226,
+    component: _2fea6c0c,
     name: "sales-follow"
   }, {
     path: "/sales/important-links",
-    component: _2e56ea29,
+    component: _649b5e56,
     name: "sales-important-links"
   }, {
     path: "/sales/maintodo",
-    component: _6f5615b4,
+    component: _295d9888,
     name: "sales-maintodo"
   }, {
     path: "/sales/representative",
-    component: _b4e985dc,
+    component: _371250e6,
     name: "sales-representative"
   }, {
     path: "/sales/todo",
-    component: _d42a210a,
+    component: _e7a60762,
     name: "sales-todo"
   }, {
     path: "/sample/finance",
-    component: _65ddda19,
+    component: _1fe55ced,
     name: "sample-finance"
   }, {
     path: "/sample/sample",
-    component: _2a97848a,
+    component: _3b071067,
     name: "sample-sample"
   }, {
     path: "/selection/input",
-    component: _77fced36,
+    component: _4aea6111,
     name: "selection-input"
   }, {
     path: "/selection/size",
-    component: _778629b6,
+    component: _318dac8a,
     name: "selection-size"
   }, {
     path: "/mekmer/products/production",
-    component: _b5adecaa,
+    component: _5a8fbf57,
     name: "mekmer-products-production"
   }, {
     path: "/mekmer/products/shipped",
-    component: _49347c5e,
+    component: _68d6cba5,
     name: "mekmer-products-shipped"
   }, {
     path: "/panel/products/notpublished",
-    component: _73b2f4cc,
+    component: _6b22f4a0,
     name: "panel-products-notpublished"
   }, {
     path: "/panel/products/published",
-    component: _fda6c626,
+    component: _bc4664ce,
     name: "panel-products-published"
   }, {
     path: "/panel/products/queue",
-    component: _a834d3e0,
+    component: _4b40fcbc,
     name: "panel-products-queue"
   }, {
     path: "/reports/mekmar/ayo",
-    component: _0b141e34,
+    component: _859d8040,
     name: "reports-mekmar-ayo"
   }, {
     path: "/reports/mekmar/continent-order",
-    component: _07911672,
+    component: _cbe5d3c4,
     name: "reports-mekmar-continent-order"
   }, {
     path: "/reports/mekmar/country-order",
-    component: _38f6a314,
+    component: _2f869dc0,
     name: "reports-mekmar-country-order"
   }, {
     path: "/reports/mekmar/filter-finance",
-    component: _bc78ccd0,
+    component: _7d32f46c,
     name: "reports-mekmar-filter-finance"
   }, {
     path: "/reports/mekmar/forwarding",
-    component: _7d1e9f90,
+    component: _72748464,
     name: "reports-mekmar-forwarding"
   }, {
     path: "/reports/mekmar/gu",
-    component: _0201a401,
+    component: _d7b8c656,
     name: "reports-mekmar-gu"
   }, {
     path: "/reports/mekmar/loading",
-    component: _100f018e,
+    component: _2e14eae5,
     name: "reports-mekmar-loading"
   }, {
     path: "/reports/mekmar/mk",
-    component: _0bb1ccb1,
+    component: _c45874f6,
     name: "reports-mekmar-mk"
   }, {
     path: "/reports/mekmar/summary",
-    component: _829dfeba,
+    component: _16652762,
     name: "reports-mekmar-summary"
   }, {
     path: "/reports/mekmar/supplier-cost",
-    component: _1a170c6b,
+    component: _10a70717,
     name: "reports-mekmar-supplier-cost"
   }, {
     path: "/reports/mekmer/atlanta",
-    component: _0e92c618,
+    component: _2ed308a0,
     name: "reports-mekmer-atlanta"
   }, {
     path: "/reports/mekmer/by-buying-production",
-    component: _47c42c63,
+    component: _53711837,
     name: "reports-mekmer-by-buying-production"
   }, {
     path: "/reports/mekmer/finance",
-    component: _6dc517db,
+    component: _b83cf8f2,
     name: "reports-mekmer-finance"
   }, {
     path: "/reports/mekmer/mine",
-    component: _079223a2,
+    component: _cdcd9114,
     name: "reports-mekmer-mine"
   }, {
     path: "/reports/mekmer/onhold",
-    component: _43e6eb2d,
+    component: _e00f4bfe,
     name: "reports-mekmer-onhold"
   }, {
     path: "/reports/mekmer/production",
-    component: _2120f070,
+    component: _367526c8,
     name: "reports-mekmer-production"
   }, {
     path: "/reports/mekmer/productions",
-    component: _022d125b,
+    component: _90d86ff2,
     name: "reports-mekmer-productions"
   }, {
     path: "/reports/mekmer/shipped",
-    component: _b1c77e58,
+    component: _458ea700,
     name: "reports-mekmer-shipped"
   }, {
     path: "/reports/mekmer/stock",
-    component: _0fb14757,
+    component: _a1e6a3fa,
     name: "reports-mekmer-stock"
   }, {
     path: "/reports/mekmer/strips",
-    component: _67b469ea,
+    component: _98744e84,
     name: "reports-mekmer-strips"
   }, {
     path: "/",
-    component: _3113b53b,
+    component: _51c4f10f,
     name: "index"
   }],
 
