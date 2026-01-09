@@ -2,16 +2,10 @@
   <div>
     <div class="row mt-3">
       <div class="col">
-        <span class="p-float-label">
-          <Calendar
-            v-model="payment_date"
-            inputId="payment_date"
-            @date-select="paymentDateSelected($event)"
-            :disabled="advanced_payment_disabled"
-            dateFormat="dd/mm/yy"
-          />
-          <label for="payment_date">Date</label>
-        </span>
+        <currencyApi
+          @dateSelectedEmit="dateSelected($event)"
+          @rateFetchedEmit="rateFetched($event)"
+        />
       </div>
       <div class="col">
         <span class="p-float-label">
@@ -24,23 +18,16 @@
           :value="model.Tutar"
           text="Price"
           @onInput="model.Tutar = $event"
-          :disabled="advanced_payment_disabled"
+          :disabled="!model.Kur"
         />
       </div>
-      <div class="col">
-        <CustomInput
-          :value="model.Kur"
-          text="Currency"
-          @onInput="model.Kur = $event"
-          :disabled="advanced_payment_disabled"
-        />
-      </div>
+
       <div class="col">
         <CustomInput
           :value="model.Masraf"
           text="Cost"
           @onInput="model.Masraf = $event"
-          :disabled="advanced_payment_disabled"
+          :disabled="!model.Kur"
         />
       </div>
     </div>
@@ -51,7 +38,7 @@
             v-model="model.Aciklama"
             rows="5"
             class="w-100"
-            :disabled="advanced_payment_disabled"
+            :disabled="!model.Kur"
           />
           <label>Description</label>
         </span>
@@ -63,7 +50,7 @@
           type="button"
           class="p-button-success w-100"
           label="Save"
-          :disabled="advanced_payment_disabled"
+          :disabled="!model.Kur"
           @click="save"
         />
       </div>
@@ -72,7 +59,7 @@
           type="button"
           class="p-button-warning w-100"
           label="Cancel"
-          :disabled="advanced_payment_disabled"
+          :disabled="!model.Kur"
           @click="cancel"
         />
       </div>
@@ -117,6 +104,12 @@ export default {
     };
   },
   methods: {
+    rateFetched(event) {
+      this.model.Kur = event.rate;
+    },
+    dateSelected(event) {
+      this.model.Tarih = date.dateToString(event);
+    },
     formatPoint(value) {
       if (value == null || value == " ") {
         return 0;
@@ -131,19 +124,18 @@ export default {
       this.$store.dispatch("setFinancePaymentModel");
     },
     save() {
-      if(this.model.Kur == 0){
-        this.$toast.error('Kur girilmesi zorunludur.')
-        }else{
-          this.model.BugunTarih = date.dateToString(new Date());
-          this.model.KullaniciID = Cookies.get("userId");
-          this.model.KullaniciAdi = Cookies.get("username");
-          this.$emit("advanced_payment_save_emit", this.model);
-          this.advanced_payment_disabled = true;
-          this.payment_date = null;
-          this.selectedAdvancedPayment = null;
-          this.$store.dispatch("setFinancePaymentModel");
+      if (this.model.Kur == 0) {
+        this.$toast.error("Kur girilmesi zorunludur.");
+      } else {
+        this.model.BugunTarih = date.dateToString(new Date());
+        this.model.KullaniciID = Cookies.get("userId");
+        this.model.KullaniciAdi = Cookies.get("username");
+        this.$emit("advanced_payment_save_emit", this.model);
+        this.advanced_payment_disabled = true;
+        this.payment_date = null;
+        this.selectedAdvancedPayment = null;
+        this.$store.dispatch("setFinancePaymentModel");
       }
-
     },
     advancedPaymentSelected(event) {
       this.model.MusteriID = event.data.MusteriID;
@@ -169,16 +161,16 @@ export default {
 };
 </script>
 <style scoped>
- @media screen and (max-width:576px) {
-    .row{
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col{
-      clear:both;
-      display:block;
-      width:100%;
-    }
- }
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+}
 </style>

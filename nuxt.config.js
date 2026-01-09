@@ -40,6 +40,7 @@ export default {
     // '~/plugins/socket.io.js',
     "~/plugins/logs.js",
     "~/plugins/cookies",
+    { src: "~/plugins/tcmb-service.js", mode: "client" },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -82,6 +83,21 @@ export default {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
     baseURL: process.env.server,
   },
+
+  proxy: {
+    "/tcmb-api/": {
+      target: "https://www.tcmb.gov.tr/kurlar/",
+      pathRewrite: { "^/tcmb-api/": "" },
+      changeOrigin: true,
+      secure: false, // SSL sertifika hatalarını yoksay (bazen gerekir)
+      // Kendimizi tarayıcı gibi gösterelim
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        Accept: "application/xml, text/xml, */*; q=0.01",
+      },
+    },
+  },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     // https://github.com/primefaces/primevue/issues/844
@@ -93,7 +109,11 @@ export default {
       },
     },
   },
-  serverMiddleware: [bodyParser.json(), "~/api"],
+  serverMiddleware: [
+    bodyParser.json(),
+    "~/api",
+    { path: "/tcmb-api", handler: "~/api/tcmb.js" },
+  ],
   io: {
     // module options
     sockets: [

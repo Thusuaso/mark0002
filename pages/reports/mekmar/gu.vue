@@ -133,7 +133,7 @@ export default {
     this.$store.dispatch("setReportsMekmarGuList");
   },
   created() {
-    this.selectedYear = { Year: 2025 };
+    this.selectedYear = { Year: 2026 };
     api
       .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year}`)
       .then((res) => {

@@ -191,12 +191,12 @@ export default {
   created() {
     this.year = new Date().getFullYear();
     this.$axios.get("/reports/ayo/country/order/list").then((res) => {
-      this.list_this_year = res.data.list.filter((x) => x.Year === 2025);
-      this.list_one_year_ago = res.data.list.filter((x) => x.Year === 2024);
-      this.list_two_year_ago = res.data.list.filter((x) => x.Year === 2023);
-      this.list_three_year_ago = res.data.list.filter((x) => x.Year === 2022);
-      this.list_four_year_ago = res.data.list.filter((x) => x.Year === 2021);
-      this.list_five_year_ago = res.data.list.filter((x) => x.Year === 2020);
+      this.list_this_year = res.data.list.filter((x) => x.Year === 2026);
+      this.list_one_year_ago = res.data.list.filter((x) => x.Year === 2025);
+      this.list_two_year_ago = res.data.list.filter((x) => x.Year === 2024);
+      this.list_three_year_ago = res.data.list.filter((x) => x.Year === 2023);
+      this.list_four_year_ago = res.data.list.filter((x) => x.Year === 2022);
+      this.list_five_year_ago = res.data.list.filter((x) => x.Year === 2021);
 
       this.list_this_year_total = {
         fob: 0,

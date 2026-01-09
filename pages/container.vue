@@ -1,24 +1,17 @@
 <template>
   <div class="calculator-wrapper">
     <transition name="fade">
-      <div v-if="alertState.type === 'error'" class="alert-box error">
+      <div v-if="alertState.type" :class="['alert-box', alertState.type]">
         <div class="alert-content">
-          <i class="pi pi-times-circle"></i>
+          <i
+            :class="
+              alertState.type === 'error'
+                ? 'pi pi-times-circle'
+                : 'pi pi-exclamation-triangle'
+            "
+          ></i>
           <div>
-            <h4>Başarısız</h4>
-            <p>{{ alertState.message }}</p>
-          </div>
-        </div>
-        <button @click="clearAlert" class="close-btn">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-
-      <div v-else-if="alertState.type === 'warning'" class="alert-box warning">
-        <div class="alert-content">
-          <i class="pi pi-exclamation-triangle"></i>
-          <div>
-            <h4>Kısmi Yükleme</h4>
+            <h4>{{ alertState.type === "error" ? "Sığmadı" : "Bilgi" }}</h4>
             <p>{{ alertState.message }}</p>
           </div>
         </div>
@@ -77,40 +70,24 @@
       </Card>
 
       <div class="stats-wrapper">
-        <div class="stat-card">
-          <span class="stat-title">ZEMİN DOLULUĞU</span>
-          <div class="stat-value">%{{ areaPercentage }}</div>
-          <ProgressBar
-            :value="parseFloat(areaPercentage)"
-            :showValue="false"
-            style="height: 10px; margin-top: 10px"
-          />
-        </div>
-
         <div class="stat-card highlight-card">
           <span class="stat-title">KALAN BOŞ UZUNLUK</span>
           <div class="stat-value" style="color: #d946ef">
             {{ remainingLength }} cm
           </div>
-          <div class="stat-desc">
-            Kullanılan: {{ usedLength }} cm / Toplam: {{ container.length }} cm
-          </div>
           <div class="visual-bar">
             <div
               class="bar-fill"
-              :style="{ width: (usedLength / container.length) * 100 + '%' }"
+              :style="{ width: (usedLength / containerL) * 100 + '%' }"
             ></div>
           </div>
         </div>
-
         <div class="stat-card">
-          <span class="stat-title">HACİM DOLULUĞU</span>
-          <div class="stat-value" style="color: #3b82f6">
-            %{{ volumePercentage }}
-          </div>
+          <span class="stat-title">ZEMİN DOLULUĞU</span>
+          <div class="stat-value">%{{ areaPercentage }}</div>
           <small class="stat-desc"
-            >{{ totalVolume.toFixed(2) }} m³ /
-            {{ containerVolume.toFixed(2) }} m³</small
+            >{{ totalAreaUsed.toFixed(1) }} m² /
+            {{ containerArea.toFixed(1) }} m²</small
           >
         </div>
       </div>
@@ -128,7 +105,7 @@
                 <label>Kasa Tanımı</label>
                 <InputText
                   v-model="newCrate.name"
-                  placeholder="Örn: 2cm Traverten"
+                  placeholder="Örn: Mermer Sandığı"
                 />
               </div>
 
@@ -162,6 +139,9 @@
                     optionLabel="label"
                     optionValue="value"
                   />
+                  <small style="color: #999; font-size: 9px"
+                    >(Sistem otomatik çevirebilir)</small
+                  >
                 </div>
                 <div class="option-box switch-box">
                   <div class="switch-row">
@@ -184,7 +164,7 @@
               >
                 <label
                   style="font-weight: bold; display: block; text-align: center"
-                  >Toplam Adet</label
+                  >Adet</label
                 >
                 <InputNumber
                   v-model="newCrate.quantity"
@@ -196,8 +176,8 @@
               </div>
 
               <Button
-                label="Ekle"
-                icon="pi pi-plus"
+                label="Optimal Yerleştir"
+                icon="pi pi-bolt"
                 class="p-button-success"
                 @click="tryAddCrate"
                 style="width: 100%"
@@ -208,15 +188,15 @@
 
         <div class="simulation-container">
           <div class="sim-header">
-            <h4>AKILLI ZEMİN PLANI</h4>
-            <span class="badge">Kalan Mesafe Ölçülüyor</span>
+            <h4>OTOMATİK YERLEŞİM PLANI</h4>
+            <span class="badge" v-if="items.length > 0"
+              >Boşluk: {{ remainingLength }} cm</span
+            >
           </div>
 
           <div
             class="container-frame"
-            :style="{
-              paddingBottom: (container.width / container.length) * 100 + '%',
-            }"
+            :style="{ paddingBottom: (containerW / containerL) * 100 + '%' }"
           >
             <div class="container-inner">
               <div class="door-label">KAPI</div>
@@ -224,10 +204,10 @@
               <div
                 v-if="items.length > 0"
                 class="measure-line"
-                :style="{ left: (usedLength / container.length) * 100 + '%' }"
+                :style="{ left: (usedLength / containerL) * 100 + '%' }"
               >
                 <div class="measure-arrow">
-                  <span>&larr; {{ remainingLength }} cm Boş &rarr;</span>
+                  <span>&larr; {{ remainingLength }} cm &rarr;</span>
                 </div>
               </div>
 
@@ -236,27 +216,30 @@
                 :key="index"
                 class="crate-box"
                 :style="{
-                  left: (box.x / container.length) * 100 + '%',
-                  top: (box.y / container.width) * 100 + '%',
-                  width: (box.l / container.length) * 100 + '%',
-                  height: (box.w / container.width) * 100 + '%',
+                  left: (box.x / containerL) * 100 + '%',
+                  top: (box.y / containerW) * 100 + '%',
+                  width: (box.l / containerL) * 100 + '%',
+                  height: (box.w / containerW) * 100 + '%',
                   backgroundColor: box.color,
                 }"
-                :title="box.name"
+                :title="
+                  box.name +
+                  ' (Çevrildi: ' +
+                  (box.isRotated ? 'Evet' : 'Hayır') +
+                  ')'
+                "
               >
-                <div class="box-content">
-                  <span v-if="box.stackCount > 1" class="stack-badge"
-                    >x{{ box.stackCount }}</span
-                  >
-                  <div
-                    v-if="box.forkliftSide === 'width'"
-                    class="forklift-lines vertical"
-                  >
-                    <span></span><span></span>
-                  </div>
-                  <div v-else class="forklift-lines horizontal">
-                    <span></span><span></span>
-                  </div>
+                <div
+                  v-if="
+                    (box.forkliftSide === 'width' && !box.isRotated) ||
+                    (box.forkliftSide === 'length' && box.isRotated)
+                  "
+                  class="forklift-overlay from-width"
+                ></div>
+                <div v-else class="forklift-overlay from-length"></div>
+
+                <div class="box-badge" v-if="box.stackCount > 1">
+                  x{{ box.stackCount }}
                 </div>
               </div>
             </div>
@@ -270,7 +253,7 @@
             <h3>Yükleme Listesi</h3>
             <Button
               v-if="items.length > 0"
-              label="Sıfırla"
+              label="Temizle"
               icon="pi pi-trash"
               class="p-button-danger p-button-text p-button-sm"
               @click="clearAll"
@@ -284,15 +267,13 @@
             scrollHeight="600px"
             v-if="items.length > 0"
           >
-            <Column header="" headerStyle="width: 2rem">
-              <template #body="slotProps">
-                <div
+            <Column header="" headerStyle="width: 2rem"
+              ><template #body="slotProps"
+                ><div
                   class="color-dot"
                   :style="{ backgroundColor: slotProps.data.color }"
-                ></div>
-              </template>
-            </Column>
-
+                ></div></template
+            ></Column>
             <Column field="name" header="Malzeme">
               <template #body="slotProps">
                 <div style="font-weight: bold">{{ slotProps.data.name }}</div>
@@ -303,37 +284,28 @@
                 </div>
               </template>
             </Column>
-
             <Column
               header="Kat"
               headerStyle="width: 3rem; text-align:center"
               bodyStyle="text-align: center;"
             >
-              <template #body="slotProps">
-                <div
-                  v-if="slotProps.data.isStackable"
-                  style="font-size: 0.8rem; font-weight: bold"
-                >
-                  {{ slotProps.data.calculatedMaxStack }}
-                </div>
-                <div v-else style="color: #ccc; font-size: 0.8rem">1</div>
-              </template>
+              <template #body="slotProps">{{
+                slotProps.data.calculatedMaxStack
+              }}</template>
             </Column>
-
             <Column
-              header="Yerleşen"
+              header="Sığan"
               headerStyle="width: 5rem; text-align:center"
               bodyStyle="text-align: center; font-weight: bold; color: #10B981; font-size: 1.1rem;"
             >
-              <template #body="slotProps">
-                {{ slotProps.data.quantity }}
+              <template #body="slotProps"
+                >{{ slotProps.data.quantity }}
                 <span
                   style="font-size: 0.7rem; color: #666; font-weight: normal"
                   >/ {{ slotProps.data.requestedQty }}</span
-                >
-              </template>
+                ></template
+              >
             </Column>
-
             <Column
               header="Kalan"
               headerStyle="width: 4rem; text-align:center"
@@ -350,21 +322,33 @@
                 ></span>
               </template>
             </Column>
-
-            <Column headerStyle="width: 3rem">
+            <Column
+              header="İşlem"
+              headerStyle="width: 6rem; text-align: center"
+              bodyStyle="text-align: center"
+            >
               <template #body="slotProps">
-                <Button
-                  icon="pi pi-times"
-                  class="p-button-rounded p-button-danger p-button-text"
-                  @click="removeItem(slotProps.index)"
-                />
+                <div style="display: flex; justify-content: center; gap: 5px">
+                  <Button
+                    icon="pi pi-minus"
+                    class="p-button-rounded p-button-secondary p-button-text p-button-sm"
+                    @click="decreaseItem(slotProps.index)"
+                    v-tooltip.top="'1 Adet Azalt'"
+                  />
+
+                  <Button
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger p-button-text p-button-sm"
+                    @click="removeItem(slotProps.index)"
+                    v-tooltip.top="'Tamamını Sil'"
+                  />
+                </div>
               </template>
             </Column>
           </DataTable>
-
           <div v-else class="empty-state">
             <i class="pi pi-box"></i>
-            <p>Henüz kasa eklenmedi.</p>
+            <p>Liste boş.</p>
           </div>
         </div>
       </div>
@@ -392,9 +376,10 @@ export default {
           length: 1203,
         },
       ],
+      // Value değerlerini 'standard' ve 'rotated' olarak güncelledik ki mantık netleşsin
       forkliftOptions: [
-        { label: "Kısa (En)", value: "width" },
-        { label: "Uzun (Boy)", value: "length" },
+        { label: "Kısa (En)", value: "standard" },
+        { label: "Uzun (Boy)", value: "rotated" },
       ],
       selectedPreset: null,
       alertState: { type: null, message: null },
@@ -407,31 +392,39 @@ export default {
         length: 120,
         quantity: 10,
         isStackable: true,
-        forkliftSide: "width",
+        forkliftSide: "standard",
         color: "#3B82F6",
+        isEuroMode: false,
       },
       items: [],
       placedBoxes: [],
     };
   },
   computed: {
+    containerW() {
+      return Number(this.container.width);
+    },
+    containerH() {
+      return Number(this.container.height);
+    },
+    containerL() {
+      return Number(this.container.length);
+    },
     containerVolume() {
-      return (
-        (Number(this.container.width) *
-          Number(this.container.height) *
-          Number(this.container.length)) /
-        1000000
-      );
+      return (this.containerW * this.containerH * this.containerL) / 1000000;
     },
     containerArea() {
-      return Number(this.container.width) * Number(this.container.length);
+      return (this.containerW * this.containerL) / 10000;
     },
     totalVolume() {
-      // Sığan (quantity) üzerinden hesapla
       return this.items.reduce(
         (acc, item) =>
           acc +
-          (item.width * item.height * item.length * item.quantity) / 1000000,
+          (Number(item.width) *
+            Number(item.height) *
+            Number(item.length) *
+            item.quantity) /
+            1000000,
         0
       );
     },
@@ -439,26 +432,26 @@ export default {
       const val = (this.totalVolume / this.containerVolume) * 100;
       return isNaN(val) ? "0.0" : Math.min(val, 100).toFixed(1);
     },
-    areaPercentage() {
-      const usedArea = this.placedBoxes.reduce(
-        (acc, box) => acc + box.w * box.l,
-        0
+    totalAreaUsed() {
+      return (
+        this.placedBoxes.reduce((acc, box) => acc + box.w * box.l, 0) / 10000
       );
-      const val = (usedArea / this.containerArea) * 100;
+    },
+    areaPercentage() {
+      const val = (this.totalAreaUsed / this.containerArea) * 100;
       return isNaN(val) ? "0.0" : Math.min(val, 100).toFixed(1);
     },
     calculatePreviewStack() {
-      const cH = Number(this.container.height);
       const bH = Number(this.newCrate.height);
       if (!bH || bH <= 0) return 1;
-      return Math.floor(cH / bH);
+      return Math.floor(this.containerH / bH);
     },
     usedLength() {
       if (this.placedBoxes.length === 0) return 0;
       return Math.max(...this.placedBoxes.map((b) => b.x + b.l));
     },
     remainingLength() {
-      const rem = Number(this.container.length) - this.usedLength;
+      const rem = this.containerL - this.usedLength;
       return Math.max(0, rem).toFixed(1);
     },
   },
@@ -471,6 +464,17 @@ export default {
         this.recalculateAll();
       }
     },
+    toggleEuroMode() {
+      if (this.newCrate.isEuroMode) {
+        // Sadece ölçüleri ayarlar, yerleşime karışmaz
+        this.newCrate.width = 80;
+        this.newCrate.length = 120;
+        this.newCrate.height = 14.4;
+        this.newCrate.name = "Euro Palet (EPAL)";
+        this.newCrate.isStackable = true;
+        this.newCrate.forkliftSide = "standard"; // Varsayılan: 80'lik taraf En'e gelir
+      }
+    },
     generateColor() {
       const h = Math.floor(Math.random() * 360);
       return `hsl(${h}, 70%, 60%)`;
@@ -480,15 +484,13 @@ export default {
       this.alertState.message = null;
     },
 
-    // Listeyi "En Büyük Taban Alanı"na göre sıralar
     getSortedList(list) {
       const sorted = JSON.parse(JSON.stringify(list));
+      // Sıralama yine Büyükten Küçüğe (En iyi dolum için)
       return sorted.sort((a, b) => {
         const areaA = Number(a.width) * Number(a.length);
         const areaB = Number(b.width) * Number(b.length);
-        // 1. Alan (Büyük olan başa)
         if (Math.abs(areaB - areaA) > 1) return areaB - areaA;
-        // 2. Yükseklik (Yüksek olan başa)
         return Number(b.height) - Number(a.height);
       });
     },
@@ -496,42 +498,51 @@ export default {
     tryAddCrate() {
       this.clearAlert();
       const requestedQty = Number(this.newCrate.quantity);
-
-      // Veri Güvenliği: Ölçüler sayı olmalı
       const boxW = Number(this.newCrate.width);
       const boxL = Number(this.newCrate.length);
       const boxH = Number(this.newCrate.height);
-      const contW = Number(this.container.width);
-      const contL = Number(this.container.length);
-      const contH = Number(this.container.height);
 
-      // Temel Sığma Kontrolü (Daha algoritmayı çalıştırmadan)
-      if (boxW > contW || boxL > contL || boxH > contH) {
+      // Temel sığma kontrolü (Seçili yöne göre)
+      let fits = false;
+      if (this.newCrate.forkliftSide === "standard") {
+        // Standart: En -> Konteynır Eni (W), Boy -> Konteynır Boyu (L)
+        if (boxW <= this.containerW && boxL <= this.containerL) fits = true;
+      } else {
+        // Çevrilmiş: En -> Boy, Boy -> En
+        if (boxL <= this.containerW && boxW <= this.containerL) fits = true;
+      }
+
+      if (!fits) {
         this.alertState = {
           type: "error",
-          message: "Kasa ölçüleri konteynır ölçülerinden büyük!",
+          message: "Kasa seçilen yönde konteynıra sığmıyor!",
+        };
+        return;
+      }
+      if (boxH > this.containerH) {
+        this.alertState = {
+          type: "error",
+          message: "Kasa yüksekliği konteynırdan büyük!",
         };
         return;
       }
 
-      // Max stack hesabı
       let calcMaxStack = 1;
       if (this.newCrate.isStackable && boxH > 0) {
-        calcMaxStack = Math.floor(contH / boxH);
+        calcMaxStack = Math.floor(this.containerH / boxH);
         if (calcMaxStack < 1) calcMaxStack = 1;
       }
 
-      // --- AYNISI VAR MI KONTROLÜ ---
+      // Aynısı var mı?
       const existingIndex = this.items.findIndex(
         (item) =>
           Math.abs(Number(item.width) - boxW) < 0.1 &&
           Math.abs(Number(item.height) - boxH) < 0.1 &&
           Math.abs(Number(item.length) - boxL) < 0.1 &&
           item.isStackable === this.newCrate.isStackable &&
-          item.forkliftSide === this.newCrate.forkliftSide
+          item.forkliftSide === this.newCrate.forkliftSide // Yönü de aynı olmalı
       );
 
-      // Simülasyon listesi
       let candidateList = JSON.parse(JSON.stringify(this.items));
       let currentItemRef = null;
 
@@ -552,33 +563,24 @@ export default {
         currentItemRef = newItem;
       }
 
-      // Sıralı hesaplama yap
-      const sortedCandidates = this.getSortedList(candidateList);
-      const result = this.packItems(sortedCandidates);
+      const result = this.packItems(this.getSortedList(candidateList));
 
-      // Sığanları Say
       let totalFittedForThisItem = 0;
       result.placed.forEach((box) => {
-        if (box.groupId === currentItemRef.id) {
+        if (box.groupId === currentItemRef.id)
           totalFittedForThisItem += box.stackCount;
-        }
       });
 
       const totalRequested = currentItemRef.requestedQty;
-      const oldFitted =
-        existingIndex !== -1 ? this.items[existingIndex].quantity : 0;
       const failed = totalRequested - totalFittedForThisItem;
-      const newlyFitted = totalFittedForThisItem - oldFitted;
 
-      // Hata Yönetimi
-      if (newlyFitted === 0 && requestedQty > 0) {
+      if (totalFittedForThisItem === 0 && requestedQty > 0) {
         this.alertState = {
           type: "error",
-          message: `Eklenen ${requestedQty} kasanın hiçbiri sığmadı!`,
+          message: `Hiçbir kasa boşluğa sığmadı!`,
         };
         return;
       }
-
       if (failed > 0) {
         this.alertState = {
           type: "warning",
@@ -586,7 +588,6 @@ export default {
         };
       }
 
-      // Listeyi Güncelle
       candidateList.forEach((item) => {
         let fitCount = 0;
         result.placed.forEach((box) => {
@@ -598,28 +599,32 @@ export default {
 
       this.items = candidateList;
       this.placedBoxes = result.placed;
-
-      // Formu temizle
       this.newCrate.quantity = 1;
       this.newCrate.name = "";
+    },
+
+    decreaseItem(index) {
+      const item = this.items[index];
+      if (item.requestedQty > 1) {
+        item.requestedQty--;
+        this.recalculateAll();
+      } else {
+        this.removeItem(index);
+      }
     },
 
     removeItem(index) {
       this.items.splice(index, 1);
       this.recalculateAll();
     },
-
     clearAll() {
       this.items = [];
       this.placedBoxes = [];
       this.clearAlert();
     },
-
     recalculateAll() {
       let candidateList = JSON.parse(JSON.stringify(this.items));
-      const sortedList = this.getSortedList(candidateList);
-      const result = this.packItems(sortedList);
-
+      const result = this.packItems(this.getSortedList(candidateList));
       this.items.forEach((item) => {
         let fitCount = 0;
         result.placed.forEach((box) => {
@@ -628,28 +633,23 @@ export default {
         item.quantity = fitCount;
         item.failedQty = item.requestedQty - fitCount;
       });
-
       this.placedBoxes = result.placed;
     },
 
-    // --- SAĞLAMLAŞTIRILMIŞ ALGORİTMA ---
+    // --- KESİN YÖNLENDİRMELİ ALGORİTMA ---
     packItems(itemList) {
-      // Ölçüleri garantiye al
-      const cLength = Number(this.container.length);
-      const cWidth = Number(this.container.width); // Konteynır Eni (Y ekseni)
-      const cHeight = Number(this.container.height);
+      const cLength = this.containerL;
+      const cWidth = this.containerW; // Y ekseni
+      const cHeight = this.containerH;
 
-      // Başlangıç boşluğu
       let spaces = [{ x: 0, y: 0, w: cLength, h: cWidth }];
       let placed = [];
 
       itemList.forEach((group) => {
-        // Hesaplama yaparken 'requestedQty' (istenen) baz alınır
         let remainingQty =
           group.requestedQty !== undefined
             ? group.requestedQty
             : group.quantity;
-
         let stackCap = 1;
         const gHeight = Number(group.height);
         if (group.isStackable && gHeight > 0) {
@@ -657,27 +657,46 @@ export default {
           if (stackCap < 1) stackCap = 1;
         }
 
-        const boxL = Number(group.length); // X ekseninde kaplayacağı yer
-        const boxW = Number(group.width); // Y ekseninde kaplayacağı yer
+        const rawDim1 = Number(group.length);
+        const rawDim2 = Number(group.width);
+
+        // Kullanıcının seçimine göre hedef ölçüleri belirle
+        let targetL, targetW; // L -> X (Boy), W -> Y (En)
+        let isRotated = false;
+
+        if (group.forkliftSide === "standard") {
+          // Kısa (En): Giriş genişliği Y eksenine paralel.
+          // Yani: Kasa Genişliği -> Konteynır Genişliği (Y)
+          // Kasa Uzunluğu -> Konteynır Uzunluğu (X)
+          targetL = rawDim1; // X
+          targetW = rawDim2; // Y
+          isRotated = false;
+        } else {
+          // Uzun (Boy): Giriş uzunluğu Y eksenine paralel.
+          // Yani: Kasa Uzunluğu -> Konteynır Genişliği (Y)
+          // Kasa Genişliği -> Konteynır Uzunluğu (X)
+          targetL = rawDim2; // X
+          targetW = rawDim1; // Y
+          isRotated = true;
+        }
 
         while (remainingQty > 0) {
           let currentStack = Math.min(remainingQty, stackCap);
 
-          // BOŞLUKLARI SIRALA:
-          // 1. X koordinatı küçük olan (Sol taraf) öncelikli.
-          // 2. X aynıysa Y koordinatı küçük olan (Üst/Bitişik) öncelikli.
+          // Boşlukları sırala: Önce En Arkadakiler (X küçük), Sonra En Soldakiler (Y küçük)
           spaces.sort((a, b) => {
             if (Math.abs(a.x - b.x) > 0.1) return a.x - b.x;
             return a.y - b.y;
           });
 
           let bestSpaceIndex = -1;
-          // İlk sığan boşluğu bul (First Fit)
+
+          // Sadece belirlenen hedef ölçüye göre yer ara
           for (let i = 0; i < spaces.length; i++) {
-            // Kayan nokta hatalarını önlemek için küçük tolerans payı
-            if (spaces[i].w >= boxL - 0.01 && spaces[i].h >= boxW - 0.01) {
+            const sp = spaces[i];
+            if (sp.w >= targetL - 0.01 && sp.h >= targetW - 0.01) {
               bestSpaceIndex = i;
-              break;
+              break; // İlk uygun yere koy
             }
           }
 
@@ -687,44 +706,41 @@ export default {
             placed.push({
               x: space.x,
               y: space.y,
-              l: boxL,
-              w: boxW,
+              l: targetL,
+              w: targetW,
               color: group.color,
               name: group.name,
               stackCount: currentStack,
-              forkliftSide: group.forkliftSide,
+              forkliftSide: isRotated ? "length" : "width", // Görsel için
               groupId: group.id,
+              isRotated: isRotated,
             });
 
-            // --- DİKEY BÖLME (Sütun Oluşturma) ---
-            // 1. ALTAKİ BOŞLUK (Down): Sadece kutunun genişliği kadar aşağı iner.
+            // Alanı Böl: Önce Yan (Sütun), Sonra Arka
             let splitDown = {
+              // Yanındaki (Altındaki) boşluk
               x: space.x,
-              y: space.y + boxW,
-              w: boxL, // Kutunun boyu kadar genişlikte
-              h: space.h - boxW,
+              y: space.y + targetW,
+              w: targetL,
+              h: space.h - targetW,
             };
 
-            // 2. SAĞDAKİ BOŞLUK (Right): Konteynırın geri kalan yüksekliğini kaplar.
             let splitRight = {
-              x: space.x + boxL,
+              // Arkasındaki (Sağındaki) boşluk
+              x: space.x + targetL,
               y: space.y,
-              w: space.w - boxL,
-              h: space.h, // Tam yükseklik
+              w: space.w - targetL,
+              h: space.h,
             };
 
-            // Kullanılan boşluğu sil
             spaces.splice(bestSpaceIndex, 1);
-
-            // Yeni boşlukları ekle (Geçerli boyutlardaysa)
             if (splitDown.w > 0.1 && splitDown.h > 0.1) spaces.push(splitDown);
             if (splitRight.w > 0.1 && splitRight.h > 0.1)
               spaces.push(splitRight);
 
             remainingQty -= currentStack;
           } else {
-            // Sığmadıysa bu grubu geç
-            break;
+            break; // Sığmadı
           }
         }
       });
@@ -744,7 +760,7 @@ export default {
   padding: 20px;
 }
 
-/* ALERT */
+/* ALERT KUTULARI */
 .alert-box {
   position: fixed;
   top: 20px;
@@ -791,7 +807,7 @@ export default {
   opacity: 0.8;
 }
 
-/* ROZETLER */
+/* ROZETLER VE LİSTE */
 .failed-badge {
   background: #fef2f2;
   color: #dc2626;
@@ -852,8 +868,6 @@ export default {
   color: #9ca3af;
   margin-top: 5px;
 }
-
-/* HIGHLIGHT CARD (PEMBE) */
 .highlight-card {
   border-color: #f5d0fe;
   background: #fdf4ff;
@@ -889,28 +903,31 @@ export default {
   min-width: 400px;
 }
 
-/* --- FORM DÜZELTMELERİ (BAŞLANGIÇ) --- */
+/* --- FORM DÜZELTMELERİ (KRİTİK GÜNCELLEME) --- */
 .form-column {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* dimensions-row: Sığmazsa alt satıra geçsin (wrap) */
+/* Satır yapısı: Sığmazsa aşağı kaysın */
 .dimensions-row {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  width: 100%; /* Taasmayı engellemek için */
 }
 
-/* input-group: Esnek olsun ama çok küçülmesin */
+/* Her bir input grubu */
 .input-group {
-  flex: 1 1 30%; /* Büyü, küçül, ideal olarak %30 yer kapla */
-  min-width: 80px; /* En az bu kadar genişlikte olsun */
+  flex: 1 1 30%; /* Büyüyüp küçülebilir, taban %30 */
+  min-width: 80px; /* Çok küçülmesin */
   display: flex;
   flex-direction: column;
   gap: 5px;
+  max-width: 100%; /* Asla kapsayıcıdan büyük olamaz */
 }
+
 .input-group label,
 .input-group small {
   font-size: 0.8rem;
@@ -921,12 +938,21 @@ export default {
   width: 100%;
 }
 
-/* PrimeVue InputNumber bileşeninin kendisinin ve içindeki inputun %100 genişlikte olmasını zorla */
-:deep(.p-inputnumber),
+/* PRIME VUE INPUTLARINI ZORLA KUTUYA SIĞDIR */
+:deep(.p-inputnumber) {
+  width: 100%;
+  max-width: 100%; /* Taşmayı engeller */
+}
 :deep(.p-inputnumber-input) {
   width: 100% !important;
+  text-align: center;
+  box-sizing: border-box !important; /* Padding yüzünden taşmayı engeller */
 }
-/* --- FORM DÜZELTMELERİ (BİTİŞ) --- */
+:deep(.p-dropdown) {
+  width: 100%;
+  max-width: 100%;
+}
+/* --- FORM DÜZELTMELERİ BİTİŞ --- */
 
 .options-row {
   display: flex;
@@ -948,6 +974,19 @@ export default {
   gap: 10px;
   font-size: 0.8rem;
   font-weight: bold;
+}
+
+/* EURO MODE KUTUSU */
+.euro-mode-box {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px;
+  transition: all 0.3s;
+}
+.euro-mode-box.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
 }
 
 /* SİMÜLASYON */
@@ -1001,53 +1040,58 @@ export default {
 }
 .crate-box {
   position: absolute;
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s;
   cursor: pointer;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .crate-box:hover {
-  filter: brightness(1.1);
   z-index: 10;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 0 2px #fff, 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: scale(1.02);
 }
-.box-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.forklift-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.25;
   pointer-events: none;
 }
-.stack-badge {
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 1px 4px;
+.from-width {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 10px,
+    #000 10px,
+    #000 12px
+  );
+}
+.from-length {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 10px,
+    #000 10px,
+    #000 12px
+  );
+}
+.box-badge {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  font-weight: bold;
+  font-size: 10px;
+  padding: 1px 5px;
   border-radius: 4px;
-  font-size: 9px;
-  margin-bottom: 2px;
-}
-.forklift-lines {
-  display: flex;
-  gap: 2px;
-  opacity: 0.6;
-}
-.forklift-lines span {
-  background: black;
-}
-.forklift-lines.vertical {
-  flex-direction: column;
-}
-.forklift-lines.vertical span {
-  width: 10px;
-  height: 1px;
-}
-.forklift-lines.horizontal {
-  flex-direction: row;
-}
-.forklift-lines.horizontal span {
-  width: 1px;
-  height: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* LİSTE */
@@ -1096,13 +1140,6 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
-
-/* Metni ortalama ve genişlik zorlama */
-:deep(.p-inputnumber-input) {
-  text-align: center;
-}
-
-/* YENİ: ÖLÇÜM ÇİZGİSİ */
 .measure-line {
   position: absolute;
   top: 0;

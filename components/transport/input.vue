@@ -1,5 +1,9 @@
 <template>
   <div class="container">
+    <currencyApi
+      @dateSelectedEmit="dateSelected($event)"
+      @rateFetchedEmit="rateFetched($event)"
+    />
     <div class="row mb-3">
       <div class="col">
         <Button
@@ -19,12 +23,12 @@
             :suggestions="filteredCompany"
             field="FirmaAdi"
             @complete="searchCompany($event)"
-            :disabled="disabled"
+            :disabled="!this.currency"
           />
           <label for="company">Company</label>
         </span>
       </div>
-      <div class="col-3">
+      <!-- <div class="col-3">
         <span class="p-float-label">
           <Calendar
             v-model="transportdate"
@@ -35,10 +39,14 @@
           />
           <label for="date">Date</label>
         </span>
-      </div>
+      </div> -->
       <div class="col-3">
         <span class="p-float-label">
-          <InputText id="invoiceno" v-model="invoiceno" :disabled="disabled" />
+          <InputText
+            id="invoiceno"
+            v-model="invoiceno"
+            :disabled="!this.currency"
+          />
           <label for="invoiceno">Invoice No</label>
         </span>
       </div>
@@ -52,7 +60,7 @@
             :suggestions="filteredPo"
             field="SiparisNo"
             @complete="searchPo($event)"
-            :disabled="disabled_input"
+            :disabled="!this.currency"
           />
           <label for="po">Order No</label>
         </span>
@@ -62,23 +70,23 @@
           :value="tl"
           text="₺"
           @onInput="inputTl($event)"
-          :disabled="disabled_input"
+          :disabled="!this.currency"
         />
       </div>
-      <div class="col">
+      <!-- <div class="col">
         <CustomInput
           :value="currency"
           text="Currency ($)"
           @onInput="currency = $event"
           :disabled="disabled_input"
         />
-      </div>
+      </div> -->
       <div class="col">
         <CustomInput
           :value="usd"
           text="$"
           @onInput="inputUsd($event)"
-          :disabled="disabled"
+          :disabled="!this.currency"
         />
       </div>
     </div>
@@ -204,7 +212,7 @@ export default {
       selectedPo: null,
       filteredPo: null,
       tl: 0.0,
-      currency: 0.0,
+      currency: 0,
       usd: 0.0,
       disabled: true,
       newButtonDisabled: false,
@@ -216,6 +224,12 @@ export default {
     };
   },
   methods: {
+    rateFetched(event) {
+      this.currency = event.rate;
+    },
+    dateSelected(event) {
+      this.transportdate = date.dateToString(event);
+    },
     inputUsd(event) {
       this.usd = event;
       this.tl = event * this.currency;
@@ -225,7 +239,11 @@ export default {
       this.usd = event / this.currency;
     },
     onUpload(event) {
-      upload.sendTransport(event.files[0], this.selectedCompany.ID, this.invoiceno);
+      upload.sendTransport(
+        event.files[0],
+        this.selectedCompany.ID,
+        this.invoiceno
+      );
       this.$store.dispatch("setTransportFileSave", this.transportList);
     },
     transportSelected(event) {
@@ -234,7 +252,9 @@ export default {
       this.updateButtonDisabled = false;
       this.deleteButtonDisabled = false;
       this.newButtonDisabled = true;
-      this.selectedCompany = this.company.find((x) => (x.ID = event.data.companyId));
+      this.selectedCompany = this.company.find(
+        (x) => (x.ID = event.data.companyId)
+      );
       this.transportdate = date.stringToDate(event.data.date);
       this.invoiceno = event.data.invoiceno;
       this.selectedPo = this.orders.find((x) => (x.SiparisNo = event.data.po));
@@ -257,6 +277,8 @@ export default {
       this.currency = 0.0;
       this.usd = 0.0;
       this.selectedTransport = {};
+      this.selectedCompany = null;
+      this.invoiceno = null;
     },
     newForm() {
       this.disabled = false;
@@ -345,7 +367,9 @@ export default {
         result = this.orders;
       } else {
         result = this.orders.filter((x) => {
-          return x.SiparisNo.toLowerCase().startsWith(event.query.toLowerCase());
+          return x.SiparisNo.toLowerCase().startsWith(
+            event.query.toLowerCase()
+          );
         });
       }
       this.filteredPo = result;
@@ -368,21 +392,21 @@ export default {
 };
 </script>
 <style scoped>
-@media screen and (max-width:576px) {
-  .row{
-  clear:both;
-  display:block;
-  width:100%;
-}
-.col{
-  clear:both;
-  display: block;
-  width:100%;
-}
-.col-3{
-  clear:both;
-  display:block;
-  width:100%;
-}
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-3 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
 }
 </style>

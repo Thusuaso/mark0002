@@ -1,5 +1,9 @@
 <template>
-  <div class="row mb-6" style="padding: 50px 0px">
+  <div class="row mb-2" style="padding: 20px 0px">
+    <currencyApi
+      @dateSelectedEmit="dateSelected($event)"
+      @rateFetchedEmit="rateFetched($event)"
+    />
     <div class="col-9">
       <div class="row mt-3">
         <div class="col">
@@ -25,7 +29,7 @@
       </div>
       <div class="row mt-3">
         <div class="col">
-          <span class="p-float-label">
+          <!-- <span class="p-float-label">
             <Calendar
               v-model="paid_date"
               inputId="date"
@@ -33,14 +37,14 @@
               dateFormat="dd/mm/yy"
             />
             <label for="date">Date</label>
-          </span>
+          </span> -->
         </div>
         <div class="col">
           <CustomInput
             :value="model.Tutar"
             text="Paid Amount"
             @onInput="model.Tutar = $event"
-            :disabled="false"
+            :disabled="!model.Kur"
           />
         </div>
         <div class="col">
@@ -48,22 +52,27 @@
             :value="model.Masraf"
             text="Cost"
             @onInput="model.Masraf = $event"
-            :disabled="false"
+            :disabled="!model.Kur"
           />
         </div>
-        <div class="col">
+        <!-- <div class="col">
           <CustomInput
             :value="model.Kur"
             text="Rate"
             @onInput="model.Kur = $event"
             :disabled="false"
           />
-        </div>
+        </div> -->
       </div>
       <div class="row mt-3">
         <div class="col">
           <span class="p-float-label">
-            <Textarea v-model="model.Aciklama" rows="5" class="w-100" />
+            <Textarea
+              v-model="model.Aciklama"
+              rows="5"
+              class="w-100"
+              :disabled="!model.Kur"
+            />
             <label>Description</label>
           </span>
         </div>
@@ -141,6 +150,12 @@ export default {
     };
   },
   methods: {
+    rateFetched(event) {
+      this.model.Kur = event.rate;
+    },
+    dateSelected(event) {
+      this.model.Tarih = date.dateToString(event);
+    },
     deleteForm() {
       this.$emit("po_paid_delete_emit", {
         ...this.model,

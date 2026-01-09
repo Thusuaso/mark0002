@@ -3,6 +3,7 @@
     class="navbar navbar-expand-lg bg-body-tertiary"
     style="font-size: 100%"
     data-bs-theme="blue"
+    v-if="!getAuthorityStatus"
   >
     <div class="container-fluid">
       <a class="navbar-brand" href="/">GOZ</a>
@@ -603,6 +604,123 @@
             @deleteProcess="deleteProcess($event)"
           />
         </Dialog>
+      </div>
+    </div>
+  </nav>
+
+  <nav
+    class="navbar navbar-expand-lg bg-body-tertiary"
+    style="font-size: 100%"
+    data-bs-theme="blue"
+    v-else
+  >
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">GOZ</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <nuxt-link to="/reports/mekmer/productions" tag="a" class="nav-link"
+              >Siparişler</nuxt-link
+            >
+          </li>
+          <li class="nav-item">
+            <nuxt-link to="/reports/mekmer/production" tag="a" class="nav-link"
+              >Üretim Raporu</nuxt-link
+            >
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Seleksiyon
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <nuxt-link to="/selection/input" class="dropdown-item" tag="a"
+                  >Stok</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link
+                  to="/reports/mekmer/stock"
+                  class="dropdown-item"
+                  tag="a"
+                  >Stok Raporu</nuxt-link
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Yükleme
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <nuxt-link
+                  to="/reports/mekmer/shipped"
+                  class="dropdown-item"
+                  tag="a"
+                  >Yüklenen</nuxt-link
+                >
+              </li>
+              <li>
+                <nuxt-link
+                  to="/reports/mekmar/forwarding"
+                  class="dropdown-item"
+                  tag="a"
+                  >Yükleme Raporu</nuxt-link
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <nuxt-link to="/reports/mekmer/finance" tag="a" class="nav-link"
+              >Cari (Finans)</nuxt-link
+            >
+          </li>
+          <li class="nav-item">
+            <nuxt-link
+              to="/reports/mekmer/by-buying-production"
+              tag="a"
+              class="nav-link"
+              >Kasa Satış Fiyatı</nuxt-link
+            >
+          </li>
+          <li class="nav-item">
+            <nuxt-link
+              to="/reports/mekmer/calculating-cost"
+              tag="a"
+              class="nav-link"
+              >Muhasebe</nuxt-link
+            >
+          </li>
+          <li class="nav-item">
+            <nuxt-link to="/reports/mekmer/strips" tag="a" class="nav-link"
+              >Strip & Moloz</nuxt-link
+            >
+          </li>
+        </ul>
       </div>
     </div>
   </nav>

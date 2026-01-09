@@ -3,28 +3,48 @@
     <div class="row">
       <div class="col">
         <div class="p-float-label w-full md:w-14rem">
-          <Dropdown v-model="selectedSupplier" inputId="supplier" :options="productSupplier" optionLabel="FirmaAdi"
-            class="w-100" @change="supplierSelected($event)" />
+          <Dropdown
+            v-model="selectedSupplier"
+            inputId="supplier"
+            :options="productSupplier"
+            optionLabel="FirmaAdi"
+            class="w-100"
+            @change="supplierSelected($event)"
+          />
           <label for="supplier">Supplier</label>
         </div>
       </div>
       <div class="col">
         <div class="p-float-label w-full md:w-14rem">
-          <Dropdown v-model="selectedInvoice" inputId="supplier" :options="invoice" optionLabel="FaturaAdi"
-            class="w-100" />
+          <Dropdown
+            v-model="selectedInvoice"
+            inputId="supplier"
+            :options="invoice"
+            optionLabel="FaturaAdi"
+            class="w-100"
+          />
           <label for="supplier">Kind of Invoice</label>
         </div>
       </div>
       <div class="col">
         <div class="p-float-label w-full md:w-14rem">
-          <Dropdown v-model="selectedDelivery" inputId="delivery" :options="supplierDelivery" optionLabel="TeslimAdi"
-            class="w-100" />
+          <Dropdown
+            v-model="selectedDelivery"
+            inputId="delivery"
+            :options="supplierDelivery"
+            optionLabel="TeslimAdi"
+            class="w-100"
+          />
           <label for="delivery">Kind of Delivery</label>
         </div>
       </div>
       <div class="col">
         <span class="p-float-label">
-          <Calendar v-model="supplier_date" inputId="date" dateFormat="dd/mm/yy"/>
+          <Calendar
+            v-model="supplier_date"
+            inputId="date"
+            dateFormat="dd/mm/yy"
+          />
           <label for="date">Date</label>
         </span>
       </div>
@@ -66,7 +86,9 @@
       </Column>
       <Column header="Buying Total">
         <template #body="slotProps">
-          {{ (slotProps.data.AlisFiyati * slotProps.data.Miktar) | formatPriceUsd }}
+          {{
+            (slotProps.data.AlisFiyati * slotProps.data.Miktar) | formatPriceUsd
+          }}
         </template>
         <template #footer>
           {{ total.sum | formatPriceUsd }}
@@ -75,10 +97,21 @@
     </DataTable>
     <div class="row">
       <div class="col">
-        <Button type="button" class="p-button-danger" @click="download" label="Download Pdf" />
+        <Button
+          type="button"
+          class="p-button-danger"
+          @click="download"
+          label="Download Pdf"
+        />
       </div>
       <div class="col">
-        <FileUpload mode="basic" accept=".pdf" customUpload @select="isfUpload($event)" chooseLabel="Upload Isf" />
+        <FileUpload
+          mode="basic"
+          accept=".pdf"
+          customUpload
+          @select="isfUpload($event)"
+          chooseLabel="Upload Isf"
+        />
       </div>
     </div>
   </div>
@@ -88,7 +121,7 @@ import date from "../../../plugins/date";
 import jsPDF from "jspdf";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "../../../node_modules/pdfmake/build/vfs_fonts";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts.vfs;
 import upload from "../../../plugins/upload";
 import Cookies from "js-cookie";
 
@@ -138,7 +171,10 @@ export default {
       const file = event.files[0];
       if (file.size < "1000000") {
         const doc =
-          this.selectedSupplier.FirmaAdi + "-" + this.modelProduction.SiparisNo + ".pdf";
+          this.selectedSupplier.FirmaAdi +
+          "-" +
+          this.modelProduction.SiparisNo +
+          ".pdf";
         const id = 3;
         upload.sendIsf(file, id, doc).then((response) => {
           if (response) {
@@ -156,20 +192,20 @@ export default {
               deliveryDate: date.dateToString(this.supplier_date),
               m4: this.m4,
               m5: this.m5,
-              productionDate: date.dateToString(this.modelProduction.SiparisTarihi),
-              supplierName: this.selectedSupplier.FirmaAdi
+              productionDate: date.dateToString(
+                this.modelProduction.SiparisTarihi
+              ),
+              supplierName: this.selectedSupplier.FirmaAdi,
             };
-            this.$store.dispatch("setProductionProductSupplierIsfSave", value).then(res=>{
-              if (res) {
-                this.$store.dispatch('setOrderProductionIsfSendMail', value);
-              } else {
-                this.$toast.error("İşlem gerçekleştirilemedi!");
-              }
-            })
-
-
-
-
+            this.$store
+              .dispatch("setProductionProductSupplierIsfSave", value)
+              .then((res) => {
+                if (res) {
+                  this.$store.dispatch("setOrderProductionIsfSendMail", value);
+                } else {
+                  this.$toast.error("İşlem gerçekleştirilemedi!");
+                }
+              });
           }
         });
       } else {
@@ -244,16 +280,21 @@ export default {
           },
           { text: "", style: "header", fontSize: 7 },
           {
-            text: "Kasa üzerine yazılacak : " + this.supplierProduct[0].SiparisNo,
+            text:
+              "Kasa üzerine yazılacak : " + this.supplierProduct[0].SiparisNo,
             fontSize: 7,
           },
           {
             text:
-              "Sipariş Tarihi : " + date.dateToString(this.modelProduction.SiparisTarihi),
+              "Sipariş Tarihi : " +
+              date.dateToString(this.modelProduction.SiparisTarihi),
             fontSize: 7,
           },
           { text: "Firma : " + this.selectedSupplier.FirmaAdi, fontSize: 7 },
-          { text: "Teslimat : " + this.selectedDelivery.TeslimAdi, fontSize: 7 },
+          {
+            text: "Teslimat : " + this.selectedDelivery.TeslimAdi,
+            fontSize: 7,
+          },
           {
             text: "Teslim Tarihi : " + date.dateToString(this.supplier_date),
             fontSize: 7,
@@ -280,21 +321,18 @@ export default {
           },
           { text: "Şartlar ", fontSize: 7 },
           {
-            text:
-              "1.Malzeme aynen yukarıda gibi tüm detaylara uygun olarak hazırlanmalıdır. ",
+            text: "1.Malzeme aynen yukarıda gibi tüm detaylara uygun olarak hazırlanmalıdır. ",
             fontSize: 7,
           },
           { text: "2.Kasalar ısıl işlemli ve bağlı olacak .  ", fontSize: 7 },
           { text: "3." + this.m4, fontSize: 7, color: "red" },
           { text: "4." + this.m5, fontSize: 7, color: "red" },
           {
-            text:
-              "5.Belirtilen şartlara uymayan malzemelerin tüm sorumluluğu üreticiye aittir",
+            text: "5.Belirtilen şartlara uymayan malzemelerin tüm sorumluluğu üreticiye aittir",
             fontSize: 7,
           },
           {
-            text:
-              "SAYGILARIMIZLA ; Sipariş durumu yukarıda belirtilen şahıs ya da firma adına düzenlenmiştir ve onun tarafından kullanıbilir . Herhangi bir sorunuz olması durumunda yukarıda verilen numaralardan bize ulaşabilirsiniz.",
+            text: "SAYGILARIMIZLA ; Sipariş durumu yukarıda belirtilen şahıs ya da firma adına düzenlenmiştir ve onun tarafından kullanıbilir . Herhangi bir sorunuz olması durumunda yukarıda verilen numaralardan bize ulaşabilirsiniz.",
             style: "header",
             fontSize: 7,
           },
@@ -333,13 +371,13 @@ export default {
       const doc = new jsPDF();
       /** WITH CSS */
       var canvasElement = document.createElement("canvas");
-      VueHtml2Canvas(this.$refs.content, { canvas: canvasElement }).then(function (
-        canvas
-      ) {
-        const img = canvas.toDataURL("image/jpeg", 0.8);
-        doc.addImage(img, "JPEG", 20, 20);
-        doc.save("sample.pdf");
-      });
+      VueHtml2Canvas(this.$refs.content, { canvas: canvasElement }).then(
+        function (canvas) {
+          const img = canvas.toDataURL("image/jpeg", 0.8);
+          doc.addImage(img, "JPEG", 20, 20);
+          doc.save("sample.pdf");
+        }
+      );
     },
     supplierSelected(event) {
       const data = {

@@ -142,6 +142,16 @@ import guOfferSource from "~/components/reports/mekmar/gu/offerSource";
 import guOfferCountry from "~/components/reports/mekmar/gu/offerCountry";
 
 import ayoListForm from "~/components/reports/mekmar/ayo/listForm";
+
+import currency from "~/components/tcmb/currency";
+import calculatingCostForm from "~/components/reports/mekmer/calculatingCost/form";
+import calculatingCost from "~/components/reports/mekmer/calculatingCost/cost";
+
+Vue.component("calculatingCost", calculatingCost);
+
+Vue.component("calculatingCostForm", calculatingCostForm);
+Vue.component("currencyApi", currency);
+
 Vue.component("ayoListForm", ayoListForm);
 
 Vue.component("guOfferSource", guOfferSource);
@@ -345,6 +355,7 @@ import Sidebar from "primevue/sidebar";
 import Chips from "primevue/chips";
 import InputSwitch from "primevue/inputswitch";
 import SelectButton from "primevue/selectbutton";
+
 Vue.component("InputSwitch", InputSwitch);
 Vue.component("SelectButton", SelectButton);
 
@@ -404,7 +415,14 @@ Vue.filter("formatPriceTl", (value) => {
 });
 
 Vue.filter("formatDecimal", (value) => {
-  if (value == "null" || value == null || value == " ") {
+  if (
+    value == "null" ||
+    value == null ||
+    value == " " ||
+    value == undefined ||
+    value == NaN ||
+    value == "NaN"
+  ) {
     return 0.0;
   } else {
     const val = (value / 1).toFixed(2).replace(".", ",");

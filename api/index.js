@@ -13,9 +13,47 @@ const sql = {
   options: {
     encrypt: false, // for azure
     trustServerCertificate: false, // change to true for local dev / self-signed certs
+    connectTimeout: 60000, // Bağlanmak için 60 saniye bekle (Varsayılan 15000)
+    requestTimeout: 60000, // Sorgu cevabı için 60 saniye bekle
+  },
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000,
   },
 };
-mssql.connect(sql);
+// mssql.connect(sql);
+const connectDB = async (retries = 5) => {
+  try {
+    // Bağlanmayı dene
+    await mssql.connect(sql);
+    console.log("✅ Veritabanı bağlantısı başarılı!");
+  } catch (err) {
+    // Hata olursa buraya düşer
+    console.error("❌ Bağlantı hatası:", err.message);
+
+    if (retries === 0) {
+      console.error(
+        "Artık denemiyorum, sunucu kapalı olabilir. Proje kapatılıyor."
+      );
+      process.exit(1); // Umut yoksa kapat
+    }
+
+    console.log(
+      `⏳ 5 saniye sonra tekrar denenecek... (Kalan Hak: ${retries})`
+    );
+
+    // 5 Saniye bekle
+    await new Promise((res) => setTimeout(res, 30000));
+
+    // Fonksiyonu tekrar çağır (Recursive)
+    return connectDB(retries - 1);
+  }
+};
+
+// Uygulama başlarken bu fonksiyonu çağır
+connectDB();
+
 let transporter = nodemailer.createTransport({
   host: "mail.kurumsaleposta.com",
   port: 465,
@@ -2277,7 +2315,7 @@ app.get("/transport/list", (req, res) => {
 					s.ID as SiparisFaturaID
                     
                     from SiparisFaturaKayitTB s ,NakliyeFaturaKayitTB n where 
-                    s.YuklemeEvrakID=13 and s.SiparisFaturaTurID=11  and Year(s.Tarih) in (2025,2024,2023,2022,2021)  and n.FaturaNo+'.pdf' = s.EvrakAdi and n.ID = s.FaturaKayitID
+                    s.YuklemeEvrakID=13 and s.SiparisFaturaTurID=11  and Year(s.Tarih) in (2026,2025,2024,2023,2022,2021)  and n.FaturaNo+'.pdf' = s.EvrakAdi and n.ID = s.FaturaKayitID
                 
                     group by s.ID ,s.SiparisNo , n.FaturaNo , n.FirmaID ,s.Tutar,n.Kur,s.Tarih,n.ID
 
@@ -5738,107 +5776,107 @@ function __getUsdToTlorUsd(date, value) {
 }
 
 app.put("/sample/update", async (req, res) => {
-  if (
-    req.body.DhlTarihi == null ||
-    req.body.DhlTarihi == "" ||
-    req.body.DhlTarihi == undefined ||
-    req.body.DhlTarihi == "1900-01-01" ||
-    req.body.DhlTarihi == "1900-01-01T00:00:00.000Z"
-  ) {
-    console.log("");
-  } else {
-    if (
-      req.body.KuryeAlis == null ||
-      req.body.KuryeAlis == 0 ||
-      req.body.KuryeAlis == " " ||
-      req.body.KuryeAlis == undefined
-    ) {
-      console.log();
-    } else {
-      await __getUsdToTlorEuro(req.body.DhlTarihi, req.body.KuryeAlis).then(
-        (res) => {
-          req.body.Euro_Alis = parseFloat(res.euro);
-          req.body.TL_Alis = parseFloat(res.tl);
-        }
-      );
-    }
-    if (
-      req.body.Euro_Alis == null ||
-      req.body.Euro_Alis == 0 ||
-      req.body.Euro_Alis == " " ||
-      req.body.Euro_Alis == undefined
-    ) {
-      console.log();
-    } else {
-      await __getUsdToTlorUsd(req.body.DhlTarihi, req.body.Euro_Alis).then(
-        (res) => {
-          req.body.KuryeAlis = res.usd;
-          req.body.TL_Alis = res.tl;
-        }
-      );
-    }
-    if (
-      req.body.TL_Alis == null ||
-      req.body.TL_Alis == 0 ||
-      req.body.TL_Alis == " " ||
-      req.body.TL_Alis == undefined
-    ) {
-      console.log();
-    } else {
-      await __getTlToUsdorEuro(req.body.DhlTarihi, req.body.TL_Alis).then(
-        (res) => {
-          req.body.KuryeAlis = res.usd;
-          req.body.Euro_Alis = res.euro;
-        }
-      );
-    }
+  // if (
+  //   req.body.DhlTarihi == null ||
+  //   req.body.DhlTarihi == "" ||
+  //   req.body.DhlTarihi == undefined ||
+  //   req.body.DhlTarihi == "1900-01-01" ||
+  //   req.body.DhlTarihi == "1900-01-01T00:00:00.000Z"
+  // ) {
+  //   console.log("");
+  // } else {
+  //   if (
+  //     req.body.KuryeAlis == null ||
+  //     req.body.KuryeAlis == 0 ||
+  //     req.body.KuryeAlis == " " ||
+  //     req.body.KuryeAlis == undefined
+  //   ) {
+  //     console.log();
+  //   } else {
+  //     await __getUsdToTlorEuro(req.body.DhlTarihi, req.body.KuryeAlis).then(
+  //       (res) => {
+  //         req.body.Euro_Alis = parseFloat(res.euro);
+  //         req.body.TL_Alis = parseFloat(res.tl);
+  //       }
+  //     );
+  //   }
+  //   if (
+  //     req.body.Euro_Alis == null ||
+  //     req.body.Euro_Alis == 0 ||
+  //     req.body.Euro_Alis == " " ||
+  //     req.body.Euro_Alis == undefined
+  //   ) {
+  //     console.log();
+  //   } else {
+  //     await __getUsdToTlorUsd(req.body.DhlTarihi, req.body.Euro_Alis).then(
+  //       (res) => {
+  //         req.body.KuryeAlis = res.usd;
+  //         req.body.TL_Alis = res.tl;
+  //       }
+  //     );
+  //   }
+  //   if (
+  //     req.body.TL_Alis == null ||
+  //     req.body.TL_Alis == 0 ||
+  //     req.body.TL_Alis == " " ||
+  //     req.body.TL_Alis == undefined
+  //   ) {
+  //     console.log();
+  //   } else {
+  //     await __getTlToUsdorEuro(req.body.DhlTarihi, req.body.TL_Alis).then(
+  //       (res) => {
+  //         req.body.KuryeAlis = res.usd;
+  //         req.body.Euro_Alis = res.euro;
+  //       }
+  //     );
+  //   }
 
-    if (
-      req.body.KuryeSatis == null ||
-      req.body.KuryeSatis == 0 ||
-      req.body.KuryeSatis == " " ||
-      req.body.KuryeSatis == undefined
-    ) {
-      console.log();
-    } else {
-      await __getUsdToTlorEuro(req.body.DhlTarihi, req.body.KuryeSatis).then(
-        (res) => {
-          req.body.Euro_Satis = parseFloat(res.euro);
-          req.body.TL_Satis = parseFloat(res.tl);
-        }
-      );
-    }
-    if (
-      req.body.Euro_Satis == null ||
-      req.body.Euro_Satis == 0 ||
-      req.body.Euro_Satis == " " ||
-      req.body.Euro_Satis == undefined
-    ) {
-      console.log();
-    } else {
-      await __getUsdToTlorUsd(req.body.DhlTarihi, req.body.Euro_Satis).then(
-        (res) => {
-          req.body.KuryeSatis = res.usd;
-          req.body.TL_Satis = res.tl;
-        }
-      );
-    }
-    if (
-      req.body.TL_Satis == null ||
-      req.body.TL_Satis == 0 ||
-      req.body.TL_Satis == " " ||
-      req.body.TL_Satis == undefined
-    ) {
-      console.log();
-    } else {
-      await __getTlToUsdorEuro(req.body.DhlTarihi, req.body.TL_Satis).then(
-        (res) => {
-          req.body.KuryeSatis = res.usd;
-          req.body.Euro_Satis = res.euro;
-        }
-      );
-    }
-  }
+  //   if (
+  //     req.body.KuryeSatis == null ||
+  //     req.body.KuryeSatis == 0 ||
+  //     req.body.KuryeSatis == " " ||
+  //     req.body.KuryeSatis == undefined
+  //   ) {
+  //     console.log();
+  //   } else {
+  //     await __getUsdToTlorEuro(req.body.DhlTarihi, req.body.KuryeSatis).then(
+  //       (res) => {
+  //         req.body.Euro_Satis = parseFloat(res.euro);
+  //         req.body.TL_Satis = parseFloat(res.tl);
+  //       }
+  //     );
+  //   }
+  //   if (
+  //     req.body.Euro_Satis == null ||
+  //     req.body.Euro_Satis == 0 ||
+  //     req.body.Euro_Satis == " " ||
+  //     req.body.Euro_Satis == undefined
+  //   ) {
+  //     console.log();
+  //   } else {
+  //     await __getUsdToTlorUsd(req.body.DhlTarihi, req.body.Euro_Satis).then(
+  //       (res) => {
+  //         req.body.KuryeSatis = res.usd;
+  //         req.body.TL_Satis = res.tl;
+  //       }
+  //     );
+  //   }
+  //   if (
+  //     req.body.TL_Satis == null ||
+  //     req.body.TL_Satis == 0 ||
+  //     req.body.TL_Satis == " " ||
+  //     req.body.TL_Satis == undefined
+  //   ) {
+  //     console.log();
+  //   } else {
+  //     await __getTlToUsdorEuro(req.body.DhlTarihi, req.body.TL_Satis).then(
+  //       (res) => {
+  //         req.body.KuryeSatis = res.usd;
+  //         req.body.Euro_Satis = res.euro;
+  //       }
+  //     );
+  //   }
+  // }
 
   if (req.body.MusteriID) {
     const sql = `
@@ -14539,7 +14577,7 @@ app.delete("/accounts/delete/:id", (req, res) => {
 /*Quarries Supplier Cost */
 app.get("/reports/mekmer/quarries/supplier/:year/:month", (req, res) => {
   const sqlList = `
- select qs.ID,qs.Date,qs.Supplier,qs.Quarry,qs.StripCost,qs.Strip,qs.StripPrice,qs.StripM2,qs.StripPiece,qs.StripWidth,qs.StripHeight,
+ select qs.ID,qs.Date,qs.Supplier,qs.Quarry,qs.StripCost,qs.Strip,qs.StripPrice,qs.StripM2,qs.StripPiece,qs.StripWidth,qs.StripHeight,qs.StripCostUsd,qs.StripThickness, qs.Currency,
 
 
 	t.FirmaAdi as SupplierName,
@@ -14647,9 +14685,10 @@ app.post("/reports/mekmer/quarries/supplier/strips/save", async (req, res) => {
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
 
   const insertSql = `
-        insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight,Invoice)
-VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}','${req.body.invoice}')
+        insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight,Invoice,StripCostUsd,StripThickness,Currency)
+VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}','${req.body.invoice}','${req.body.stripCostUsd}','${req.body.stripThickness}','${req.body.currency}')
     `;
+  console.log(insertSql);
   mssql.query(insertSql, (err, insert) => {
     if (insert.rowsAffected[0] == 1) {
       res.status(200).json({ status: true });
@@ -14679,7 +14718,10 @@ SET
 	StripPiece='${req.body.stripPiece}',
 	StripWidth='${req.body.stripWidth}',
 	StripHeight='${req.body.stripHeight}',
-    Invoice='${req.body.invoice}'
+    Invoice='${req.body.invoice}',
+    StripCostUsd='${req.body.stripCostUsd}',
+    StripThickness='${req.body.stripThickness}',
+    Currency='${req.body.currency}'
 WHERE
 	ID = '${req.body.Id}'
 
@@ -14715,8 +14757,8 @@ app.post("/reports/mekmer/moloz/save", async (req, res) => {
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
   const insertSql = `
-        insert into QuarriesSupplierMolozTB(Date,Supplier,Quarry,Strip,Ton,PriceTl,PriceUsd,Currency,Total)
-        VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${__stripId}','${req.body.ton}','${req.body.price_tl}','${req.body.price_usd}','${req.body.currency}','${req.body.total}')
+        insert into QuarriesSupplierMolozTB(Date,Supplier,Quarry,Strip,Ton,PriceTl,PriceUsd,Currency,Total,TotalUsd,FaturaNo,İrsaliyeNo)
+        VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${__stripId}','${req.body.ton}','${req.body.price_tl}','${req.body.price_usd}','${req.body.currency}','${req.body.total}','${req.body.total_usd}','${req.body.fatura_no}','${req.body.irsaliye_no}')
     `;
   mssql.query(insertSql, (err, insert) => {
     if (insert.rowsAffected[0] == 1) {
@@ -14730,6 +14772,7 @@ app.get("/reports/mekmer/moloz/list/:year/:month", async (req, res) => {
   const sql = `
 
         select qsm.ID,qsm.Date,qsm.Supplier,qsm.Quarry,qsm.Strip,qsm.Ton,qsm.PriceTl,qsm.PriceUsd,qsm.Currency,qsm.Total,
+        qsm.TotalUsd,qsm.FaturaNo,qsm.İrsaliyeNo,
         t.FirmaAdi as SupplierName,
         uo.OcakAdi as QuarryName,
         s.Strips as StripName
@@ -14775,7 +14818,10 @@ app.put("/reports/mekmer/moloz/update", async (req, res) => {
         PriceTl='${req.body.price_tl}',
         PriceUsd='${req.body.price_usd}',
         Currency='${req.body.currency}',
-        Total = '${req.body.total}'
+        Total = '${req.body.total}',
+        TotalUsd='${req.body.total_usd}',
+        FaturaNo='${req.body.fatura_no}',
+        İrsaliyeNo='${req.body.irsaliye_no}'
 
         where ID = '${req.body.id}'
 
@@ -14798,6 +14844,257 @@ app.delete("/reports/mekmer/moloz/delete/:id", async (req, res) => {
     }
   });
 });
+/*Calculating Cost */
+
+app.get("/reports/mekmer/calculating/cost/:year/:month", async (req, res) => {
+  try {
+    const { year, month } = req.params;
+
+    // 1. SQL Sorgularını Hazırla
+    const sqlCost = `
+            SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat , mb.MaliyetTuru,mf.MaliyetFirma
+      FROM MekmerMaliyetTB m
+	  inner join MekmerMaliyetTurTB mb on mb.ID = m.MaliyetTurId
+	  inner join MekmerMaliyetFirmaTB mf on mf.ID = m.FaturaFirmaId
+      WHERE YEAR(Tarih) = @year AND MONTH(Tarih) = @month
+    `;
+
+    const sqlProductionSqm = `
+      SELECT u.UrunBirimID, u.Miktar, ol.En, ol.Boy 
+      FROM UretimTB u 
+      INNER JOIN UrunKartTB uk ON uk.ID = u.UrunKartID
+      INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
+      WHERE YEAR(u.Tarih) = @year AND MONTH(u.Tarih) = @month AND u.TedarikciID = 1
+    `;
+
+    const sqlCompany = `SELECT * FROM MekmerMaliyetFirmaTB`;
+    const sqlCostType = `SELECT * FROM MekmerMaliyetTurTB`;
+
+    // 2. Request Nesnesini Hazırla (SQL Injection Önlemi)
+    const request = new mssql.Request();
+    request.input("year", mssql.Int, year);
+    request.input("month", mssql.Int, month);
+
+    // 3. Tüm Sorguları AYNI ANDA (Paralel) Çalıştır
+    // Promise.all sayesinde birbirini beklemek zorunda kalmazlar.
+    const [listResult, productionResult, companiesResult, costTypesResult] =
+      await Promise.all([
+        request.query(sqlCost),
+        request.query(sqlProductionSqm),
+        new mssql.Request().query(sqlCompany), // Parametre gerektirmeyenler için yeni request
+        new mssql.Request().query(sqlCostType), // Parametre gerektirmeyenler için yeni request
+      ]);
+
+    // 4. Sonucu Döndür
+    res.status(200).json({
+      list: listResult.recordset,
+      production: productionResult.recordset,
+      companies: companiesResult.recordset,
+      costTypes: costTypesResult.recordset,
+    });
+  } catch (err) {
+    console.error("SQL Hatası:", err);
+    res.status(500).send("Veritabanı işlemi sırasında bir hata oluştu.");
+  }
+});
+app.get("/reports/mekmer/calculating/cost/:year", async (req, res) => {
+  try {
+    const { year, month } = req.params;
+
+    // 1. SQL Sorgularını Hazırla
+    const sqlCost = `
+      SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat , mb.MaliyetTuru,mf.MaliyetFirma
+      FROM MekmerMaliyetTB m
+	  inner join MekmerMaliyetTurTB mb on mb.ID = m.MaliyetTurId
+	  inner join MekmerMaliyetFirmaTB mf on mf.ID = m.FaturaFirmaId
+      WHERE YEAR(m.Tarih) = @year
+    `;
+
+    const sqlProductionSqm = `
+      SELECT u.UrunBirimID, u.Miktar, ol.En, ol.Boy 
+      FROM UretimTB u 
+      INNER JOIN UrunKartTB uk ON uk.ID = u.UrunKartID
+      INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
+      WHERE YEAR(u.Tarih) = @year AND u.TedarikciID = 1
+    `;
+
+    const sqlCompany = `SELECT * FROM MekmerMaliyetFirmaTB`;
+    const sqlCostType = `SELECT * FROM MekmerMaliyetTurTB`;
+
+    // 2. Request Nesnesini Hazırla (SQL Injection Önlemi)
+    const request = new mssql.Request();
+    request.input("year", mssql.Int, year);
+    request.input("month", mssql.Int, month);
+
+    // 3. Tüm Sorguları AYNI ANDA (Paralel) Çalıştır
+    // Promise.all sayesinde birbirini beklemek zorunda kalmazlar.
+    const [listResult, productionResult, companiesResult, costTypesResult] =
+      await Promise.all([
+        request.query(sqlCost),
+        request.query(sqlProductionSqm),
+        new mssql.Request().query(sqlCompany), // Parametre gerektirmeyenler için yeni request
+        new mssql.Request().query(sqlCostType), // Parametre gerektirmeyenler için yeni request
+      ]);
+
+    // 4. Sonucu Döndür
+    res.status(200).json({
+      list: listResult.recordset,
+      production: productionResult.recordset,
+      companies: companiesResult.recordset,
+      costTypes: costTypesResult.recordset,
+    });
+  } catch (err) {
+    console.error("SQL Hatası:", err);
+    res.status(500).send("Veritabanı işlemi sırasında bir hata oluştu.");
+  }
+});
+
+app.post("/reports/mekmer/calculating/cost/save", async (req, res) => {
+  //   const body = req.body;
+  //   const insertCostTypeSql = `
+  //     insert into MekmerMaliyetTurTB(MaliyetTuru) VALUES('${body.costType}')
+
+  //   `;
+  //   const getCostTypeIdSql = `select top 1 ID from MekmerMaliyetTurTB order by ID desc`;
+  //   const insertCompanySql = `
+  //     insert into MekmerMaliyetFirmaTB(MaliyetFirma) VALUES('${body.company}')
+
+  //   `;
+  //   const getCompanyIdSql = `
+  //   select top 1 ID from MekmerMaliyetFirmaTB order by ID desc
+
+  //   `;
+  //   const insertCostSql = `
+  //     insert into MekmerMaliyetTB(Tarih,MaliyetTurId,FaturaNo,FaturaFirmaId,Kur,Fiyat)
+  // VALUES('${body.date}','${body.costTypeId}','${body.invoiceNo}','${body.companyId}','${body.rate}','${body.price}')
+  //   `;
+
+  try {
+    const body = req.body;
+
+    // 1. Değişkenleri body'den gelenle başlatıyoruz.
+    // Eğer body.costTypeId null veya undefined ise, aşağıda yenisini oluşturacağız.
+    let activeCostTypeId = body.MaliyetTurId;
+    let activeCompanyId = body.FaturaFirmaId;
+
+    // --- ADIM 1: Maliyet Türü Kontrolü ---
+    if (!activeCostTypeId) {
+      // ID yoksa önce yeni türü kaydet
+      const insertCostTypeSql = `insert into MekmerMaliyetTurTB(MaliyetTuru) VALUES('${body.MaliyetFirma}')`;
+      await new mssql.Request().query(insertCostTypeSql);
+
+      // Sonra oluşan ID'yi çek (SCOPE_IDENTITY kullanımı daha güvenlidir ama senin sorguna sadık kaldım)
+      const getCostTypeIdSql = `select top 1 ID from MekmerMaliyetTurTB order by ID desc`;
+      const typeResult = await new mssql.Request().query(getCostTypeIdSql);
+
+      // Yeni ID'yi değişkene ata
+      activeCostTypeId = typeResult.recordset[0].ID;
+    }
+
+    // --- ADIM 2: Firma Kontrolü ---
+    if (!activeCompanyId) {
+      // ID yoksa önce firmayı kaydet
+      const insertCompanySql = `insert into MekmerMaliyetFirmaTB(MaliyetFirma) VALUES('${body.FaturaFirma}')`;
+      await new mssql.Request().query(insertCompanySql);
+
+      // Sonra oluşan ID'yi çek
+      const getCompanyIdSql = `select top 1 ID from MekmerMaliyetFirmaTB order by ID desc`;
+      const companyResult = await new mssql.Request().query(getCompanyIdSql);
+
+      // Yeni ID'yi değişkene ata
+      activeCompanyId = companyResult.recordset[0].ID;
+    }
+
+    // --- ADIM 3: Ana Kayıt İşlemi ---
+    // Artık elimizde kesinlikle hem activeCostTypeId hem de activeCompanyId var.
+
+    const insertCostSql = `
+      INSERT INTO MekmerMaliyetTB (Tarih, MaliyetTurId, FaturaNo, FaturaFirmaId, Kur, Fiyat)
+      VALUES ('${body.Tarih}', '${activeCostTypeId}', '${body.FaturaNo}', '${activeCompanyId}', '${body.Kur}', '${body.Fiyat}')
+    `;
+
+    await new mssql.Request().query(insertCostSql);
+
+    res.status(200).send("Kayıt başarıyla tamamlandı.");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Bir hata oluştu: " + error.message);
+  }
+});
+app.put("/reports/mekmer/calculating/cost/update", async (req, res) => {
+  try {
+    const body = req.body;
+    console.log(body);
+
+    // 1. Değişkenleri body'den gelenle başlatıyoruz.
+    // Eğer body.costTypeId null veya undefined ise, aşağıda yenisini oluşturacağız.
+    let activeCostTypeId = body.MaliyetTurId;
+    let activeCompanyId = body.FaturaFirmaId;
+
+    // --- ADIM 1: Maliyet Türü Kontrolü ---
+    if (!activeCostTypeId) {
+      // ID yoksa önce yeni türü kaydet
+      const insertCostTypeSql = `insert into MekmerMaliyetTurTB(MaliyetTuru) VALUES('${body.MaliyetFirma}')`;
+      await new mssql.Request().query(insertCostTypeSql);
+
+      // Sonra oluşan ID'yi çek (SCOPE_IDENTITY kullanımı daha güvenlidir ama senin sorguna sadık kaldım)
+      const getCostTypeIdSql = `select top 1 ID from MekmerMaliyetTurTB order by ID desc`;
+      const typeResult = await new mssql.Request().query(getCostTypeIdSql);
+
+      // Yeni ID'yi değişkene ata
+      activeCostTypeId = typeResult.recordset[0].ID;
+    }
+
+    // --- ADIM 2: Firma Kontrolü ---
+    if (!activeCompanyId) {
+      // ID yoksa önce firmayı kaydet
+      const insertCompanySql = `insert into MekmerMaliyetFirmaTB(MaliyetFirma) VALUES('${body.FaturaFirma}')`;
+      await new mssql.Request().query(insertCompanySql);
+
+      // Sonra oluşan ID'yi çek
+      const getCompanyIdSql = `select top 1 ID from MekmerMaliyetFirmaTB order by ID desc`;
+      const companyResult = await new mssql.Request().query(getCompanyIdSql);
+
+      // Yeni ID'yi değişkene ata
+      activeCompanyId = companyResult.recordset[0].ID;
+    }
+
+    // --- ADIM 3: Ana Kayıt İşlemi ---
+    // Artık elimizde kesinlikle hem activeCostTypeId hem de activeCompanyId var.
+
+    const insertCostSql = `
+      UPDATE MekmerMaliyetTB SET Tarih='${body.Tarih}', MaliyetTurId='${activeCostTypeId}',FaturaNo='${body.FaturaNo}',
+      FaturaFirmaId='${activeCompanyId}',Kur='${body.Kur}',Fiyat='${body.Fiyat}' where ID='${body.ID}'
+    `;
+    console.log(insertCostSql);
+
+    await new mssql.Request().query(insertCostSql);
+
+    res.status(200).send("Güncelleme başarıyla tamamlandı.");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Bir hata oluştu: " + error.message);
+  }
+});
+
+app.delete("/reports/mekmer/calculating/cost/delete/:_id", async (req, res) => {
+  try {
+    const _id = await req.params._id;
+
+    const insertCostSql = `
+      delete MekmerMaliyetTB where ID='${_id}'
+    `;
+
+    await new mssql.Request().query(insertCostSql);
+
+    res.status(200).send("Silme başarıyla tamamlandı.");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Bir hata oluştu: " + error.message);
+  }
+});
+
+/*Calculating Cost */
 
 /*Shared*/
 app.get("/orders/production/list", (req, res) => {

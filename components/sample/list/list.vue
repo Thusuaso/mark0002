@@ -16,6 +16,7 @@
         :showClearButton="false"
         headerClass="tableHeader"
         bodyClass="tableBody"
+        sortable
       >
         <template #body="slotProps">
           {{ slotProps.data.NumuneTarihi | dateToString }}
@@ -69,7 +70,11 @@
         headerClass="tableHeader"
         bodyClass="tableBody"
       ></Column>
-      <Column header="Miktar/Birim" headerClass="tableHeader" bodyClass="tableBody">
+      <Column
+        header="Miktar/Birim"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Miktar }} / {{ slotProps.data.NumuneUrunBirim }}
         </template>
@@ -97,13 +102,15 @@ export default {
       type: Array,
       required: false,
     },
-
   },
   data() {
     return {
       sampleFilters: {
         NumuneTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        NumuneTemsilciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        NumuneTemsilciAdi: {
+          value: null,
+          matchMode: FilterMatchMode.STARTS_WITH,
+        },
         NumuneNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       selectedSample: null,
