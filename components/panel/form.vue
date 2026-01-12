@@ -9,7 +9,6 @@
                 id="productname"
                 v-model="model.urunadi_en"
                 class="w-100"
-                @change="translateProductName($event)"
               />
               <label for="productname">Product Name</label>
             </span>
