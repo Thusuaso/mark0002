@@ -9,6 +9,7 @@
                 id="productname"
                 v-model="model.urunadi_en"
                 class="w-100"
+                @change="translateProductName($event)"
               />
               <label for="productname">Product Name</label>
             </span>
@@ -941,6 +942,7 @@
 </template>
 <script>
 import oceanservice from "../../plugins/digitalocean";
+import debounce from "lodash/debounce";
 export default {
   props: {
     model: {
@@ -1091,6 +1093,40 @@ export default {
     }
   },
   methods: {
+    async translateProductName(event) {
+      console.log("translateProductName", event.target._value);
+      const product_fr = debounce(
+        await this.translateIt(event.target._value, "fr"),
+        500
+      );
+      console.log("product_fr", product_fr);
+    },
+    async translateIt(value, lang) {
+      if (!value) {
+        this.model.urunadi_en = "";
+        this.model.urunadi_fr = "";
+        this.model.urunadi_es = "";
+        this.model.urunadi_ru = "";
+        this.model.urunadi_ar = "";
+        return;
+      }
+
+      try {
+        // Ücretsiz hızlı bir API endpoint (Örnek amaçlıdır)
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURI(
+          value
+        )}`;
+
+        const response = await this.$axios.$get(url);
+
+        // Google Translate bu formatta [["çeviri", "orijinal"...]] bir array döndürür
+        const ceviri = response[0].map((item) => item[0]).join("");
+        return ceviri;
+      } catch (error) {
+        console.error("Çeviri hatası:", error);
+      } finally {
+      }
+    },
     publishChange(event) {
       if (event == false) {
         this.model.unpublished = true;

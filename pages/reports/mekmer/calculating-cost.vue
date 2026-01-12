@@ -130,6 +130,12 @@
               {{ slotProps.data.MaliyetTuru }}
             </template>
           </Column>
+          <Column field="Total" header="Toplam">
+            <template #body="slotProps">
+              {{ slotProps.data.Total | formatPriceUsd }}
+              %
+            </template>
+          </Column>
 
           <Column field="Oran" header="Oran (%)">
             <template #body="slotProps">
@@ -214,6 +220,7 @@ export default {
         MaliyetTurId: null,
         MaliyetFirma: null,
         Tarih: null,
+        FiyatUsd: 0,
       },
     };
   },
@@ -391,7 +398,13 @@ export default {
       this.wageAndInsuranceTotal = 0;
       this.productionSqm = 0;
       this.productionPiece = 0;
-      costs.forEach((x) => {
+      const customCosts = costs.filter((x) => {
+        return (
+          x.MaliyetTurId in
+          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+        );
+      });
+      customCosts.forEach((x) => {
         this.costTypeTotal += x.Fiyat / x.Kur;
         if (x.MaliyetTurId == 1 || x.MaliyetTurId == 2) {
           this.wageAndInsuranceTotal += x.Fiyat / x.Kur;
@@ -419,16 +432,34 @@ export default {
       this.costWork = this.wageAndInsuranceTotal / this.productionSqm;
       this.costMain = (this.cost - this.costWork) / 1.2 + this.costWork;
     },
-    getCalculateRatio(_costs, _types) {
+    async getCalculateRatio(_costs, _types) {
+      let customTypes = _types.filter((x) => {
+        return (
+          x.ID in
+          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+        );
+      });
+      let customCosts = _costs.filter((x) => {
+        return (
+          x.MaliyetTurId in
+          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+        );
+      });
       this.calculate_ratio_list = [];
       let total = 0;
-      _costs.forEach((x) => {
+      await customCosts.forEach((x) => {
         total += x.Fiyat / x.Kur;
       });
-      _types.forEach((x) => {
+      customTypes.forEach(async (x) => {
+        const { ratio, value } = await this._getCalculateCost(
+          customCosts,
+          x.ID,
+          total
+        );
         this.calculate_ratio_list.push({
           MaliyetTuru: x.MaliyetTuru,
-          Oran: this._getCalculateCost(_costs, x.ID, total),
+          Oran: ratio,
+          Total: value,
         });
       });
     },
@@ -445,7 +476,7 @@ export default {
           __value += y.Fiyat / y.Kur;
         });
       console.log("oran", (__value / total) * 100);
-      return (__value / total) * 100;
+      return { ratio: (__value / total) * 100, value: __value };
     },
   },
   created() {

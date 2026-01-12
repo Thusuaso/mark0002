@@ -72,29 +72,103 @@
           :selection.sync="selectedStripData"
           selectionMode="single"
           @row-click="stripDataSelected($event)"
+          :filters.sync="filteredStrips"
+          filterDisplay="row"
+          @filter="stripsFiltered($event)"
         >
           <template #header>STRIPLER</template>
-          <Column field="Date" header="Tarih">
+          <Column
+            field="Date"
+            header="Tarih"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ slotProps.data.Date | dateToString }}
             </template>
-          </Column>
-          <Column field="Supplier" header="Tedarikçi Adı">
-            <template #body="slotProps">
-              {{ _getSupplierName(slotProps.data.Supplier) }}
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
             </template>
           </Column>
-          <Column field="Quarry" header="Ocak Adı">
+          <Column
+            field="DocumentNo"
+            header="İrsaliye No"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
             <template #body="slotProps">
-              {{ _getQuarryName(slotProps.data.Quarry) }}
+              {{ slotProps.data.DocumentNo }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
             </template>
           </Column>
-          <Column field="Strip" header="Strip Adı">
+          <Column
+            field="SupplierName"
+            header="Tedarikçi Adı"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.SupplierName }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="QuarryName"
+            header="Ocak Adı"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.QuarryName }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <!-- <Column field="Strip" header="Strip Adı">
             <template #body="slotProps">
               {{ _getStripName(slotProps.data.Strip) }}
             </template>
+          </Column> -->
+          <Column
+            field="Invoice"
+            header="Fatura No"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
           </Column>
-          <Column field="Invoice" header="Invoice"> </Column>
           <Column field="StripM2" header="Strip (M2)">
             <template #body="slotProps">
               {{ slotProps.data.StripM2 | formatDecimal }}
@@ -160,39 +234,120 @@
           :selection.sync="selectedMolozData"
           selectionMode="single"
           @row-click="molozDatatableSelected($event)"
+          :filters.sync="filteredMoloz"
+          filterDisplay="row"
+          @filter="molozFiltered($event)"
         >
           <template #header>MOLOZLAR</template>
-          <Column field="Date" header="Tarih">
+          <Column
+            field="Date"
+            header="Tarih"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ slotProps.data.Date | dateToString }}
             </template>
-          </Column>
-          <Column field="Supplier" header="Tedarikçi Adı">
-            <template #body="slotProps">
-              {{ _getSupplierName(slotProps.data.Supplier) }}
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
             </template>
           </Column>
-          <Column field="Quarry" header="Ocak Adı">
-            <template #body="slotProps">
-              {{ _getQuarryName(slotProps.data.Quarry) }}
-            </template>
-          </Column>
-          <Column field="Strip" header="Ürün Adı">
-            <template #body="slotProps">
-              {{ _getStripName(slotProps.data.Strip) }}
-            </template>
-          </Column>
-
-          <Column field="FaturaNo" header="Fatura No">
-            <template #body="slotProps">
-              {{ slotProps.data.FaturaNo }}
-            </template>
-          </Column>
-          <Column field="İrsaliyeNo" header="İrsaliye No">
+          <Column
+            field="İrsaliyeNo"
+            header="İrsaliye No"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ slotProps.data.İrsaliyeNo }}
             </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
           </Column>
+          <Column
+            field="SupplierName"
+            header="Tedarikçi Adı"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.SupplierName }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="FaturaNo"
+            header="Fatura No"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.FaturaNo }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="QuarryName"
+            header="Ocak Adı"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.QuarryName }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="StripName"
+            header="Ürün Adı"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.StripName }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+
           <Column field="Ton" header="Ton">
             <template #body="slotProps">
               {{ slotProps.data.Ton | formatDecimal }}
@@ -290,7 +445,7 @@
             </div>
             <div class="col-3">
               <span class="p-float-label">
-                <AutoComplete
+                <!-- <AutoComplete
                   :disabled="!model.currency"
                   id="strip"
                   v-model="selectedStrip"
@@ -300,18 +455,27 @@
                   @item-select="stripSelected($event)"
                   @input="stripInput($event)"
                 />
-                <label for="strip">Stripler</label>
+                <label for="strip">Stripler</label> -->
+                <span class="p-float-label">
+                  <InputText
+                    id="irsaliye"
+                    type="text"
+                    v-model="model.irsaliye_no"
+                    :disabled="!model.currency"
+                  />
+                  <label for="irsaliye">İrsaliye</label>
+                </span>
               </span>
             </div>
             <div class="col-3">
               <span class="p-float-label">
                 <InputText
-                  id="invoice"
+                  id="fatura"
                   type="text"
                   v-model="model.invoice"
                   :disabled="!model.currency"
                 />
-                <label for="invoice">Invoice</label>
+                <label for="fatura">Fatura No</label>
               </span>
             </div>
           </div>
@@ -578,7 +742,7 @@
             class="w-100 p-button-primary"
             type="button"
             label="Kaydet"
-            :disabled="moloz_model.total > 0 ? false : true"
+            :disabled="!moloz_model.currency"
             @click="processMoloz"
           />
         </div>
@@ -598,12 +762,29 @@
 import server from "../../../plugins/excel.server";
 import date from "../../../plugins/date";
 import { mapGetters } from "vuex";
+import { FilterMatchMode } from "primevue/api";
+
 export default {
   computed: {
     ...mapGetters(["getLocalUrl"]),
   },
   data() {
     return {
+      filteredMoloz: {
+        Date: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        İrsaliyeNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SupplierName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        QuarryName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FaturaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        StripName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
+      filteredStrips: {
+        Date: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        DocumentNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SupplierName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        QuarryName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Invoice: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
       moloz_list: [],
       selectedMolozData: {},
       total_moloz: {
@@ -652,6 +833,7 @@ export default {
         stripPiece: 0,
         invoice: "",
         currency: 0,
+        irsaliye_no: "",
       },
       selectedQuarry: null,
       filteredQuarry: null,
@@ -762,6 +944,12 @@ export default {
       });
   },
   methods: {
+    molozFiltered(event) {
+      this.__molozSumTotal(event.filteredValue);
+    },
+    stripsFiltered(event) {
+      this.totalStrips(event.filteredValue);
+    },
     dateMolozSelected(event) {
       this.moloz_model.date = date.dateToString(event);
     },
@@ -1047,6 +1235,7 @@ export default {
       this.model.stripThickness = event.data.StripThickness;
       this.model.stripPiece = event.data.StripPiece;
       this.model.invoice = event.data.Invoice;
+      this.model.irsaliye_no = event.data.DocumentNo;
       this.selectedDate = date.stringToDate(event.data.Date);
       this.selectedSupplier = this.suppliers.find((x) => {
         return x.ID == event.data.Supplier;
@@ -1323,19 +1512,26 @@ export default {
       let name = this.suppliers.find((x) => {
         return x.ID == _id;
       }).FirmaAdi;
-      return name;
+      return this._nullControl(name);
     },
     _getQuarryName(_id) {
       let name = this.quarries.find((x) => {
         return x.ID == _id;
       }).OcakAdi;
-      return name;
+      return this._nullControl(name);
     },
     _getStripName(_id) {
       let name = this.strips.find((x) => {
         return x.ID == _id;
       }).Strips;
-      return name;
+      return this._nullControl(name);
+    },
+    _nullControl(_value) {
+      if (_value == null || _value == "null" || _value == undefined) {
+        return "";
+      } else {
+        return _value;
+      }
     },
   },
   watch: {},

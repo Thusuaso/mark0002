@@ -66,6 +66,7 @@
             :minFractionDigits="2"
             :maxFractionDigits="2"
             :disabled="!model.Kur"
+            @input="calculatedTl($event)"
           />
           <label for="totalTl">Fiyat (₺)</label>
         </span>
@@ -91,13 +92,14 @@
         <span class="p-float-label">
           <InputNumber
             id="price"
-            v-model="calculatedTl"
+            v-model="model.FiyatUsd"
             mode="currency"
             currency="USD"
             locale="en-US"
             :minFractionDigits="2"
-            :disabled="true"
+            :disabled="!model.Kur"
             class="filled-input"
+            @input="calculatedUsd($event)"
           />
           <label for="price">Fiyat ($)</label>
         </span>
@@ -165,12 +167,12 @@ export default {
   },
   computed: {
     // Fiyat ve Kur girildikçe TL tutarını otomatik hesaplar
-    calculatedTl() {
-      if (this.model.Fiyat && this.model.Kur) {
-        return this.model.Fiyat / this.model.Kur;
-      }
-      return 0;
-    },
+    // calculatedTl() {
+    //   if (this.model.Fiyat && this.model.Kur) {
+    //     return this.model.Fiyat / this.model.Kur;
+    //   }
+    //   return 0;
+    // },
   },
   methods: {
     searchCompany(event) {
@@ -190,8 +192,22 @@ export default {
       this.model.FaturaFirmaId = event.value.ID;
     },
     costTypeInput(event) {
-      this.model.MaliyetFirma = event;
-      this.model.MaliyetTurId = null;
+      console.log("costTypeInput", typeof event);
+      if (typeof event != "object") {
+        const index = this.costTypes.findIndex((x) => {
+          return x.MaliyetTuru.toLowerCase() == event.toLowerCase();
+        });
+        if (index > -1) {
+          alert("Zaten Bu İsimde Bir Maliyet Türü Var");
+          return;
+        } else {
+          this.model.MaliyetFirma = event;
+          this.model.MaliyetTurId = null;
+        }
+      } else {
+        this.model.MaliyetFirma = event;
+        this.model.MaliyetTurId = null;
+      }
     },
     costTypeSelected(event) {
       this.model.MaliyetFirma = event.value.MaliyetTuru;
@@ -281,6 +297,20 @@ export default {
       this.selectedCompany = null;
       this.selectedCostType = null;
     },
+    calculatedUsd(event) {
+      if (event && this.model.Kur) {
+        this.model.Fiyat = event * this.model.Kur;
+      } else {
+        this.model.Fiyat = 0;
+      }
+    },
+    calculatedTl(event) {
+      if (event && this.model.Kur) {
+        this.model.FiyatUsd = event / this.model.Kur;
+      } else {
+        this.model.FiyatUsd = 0;
+      }
+    },
   },
   created() {
     if (!this.status) {
@@ -290,6 +320,9 @@ export default {
       this.selectedCostType = this.costTypes.find((x) => {
         return x.ID == this.model.MaliyetTurId;
       });
+      if (!this.model.FiyatUsd) {
+        this.model.FiyatUsd = this.model.Fiyat / this.model.Kur;
+      }
     }
   },
 };

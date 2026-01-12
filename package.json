@@ -21,6 +21,7 @@
     "hchs-vue-charts": "^1.2.8",
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
+    "lodash": "^4.17.21",
     "mssql": "^10.0.4",
     "nodemailer": "^6.9.7",
     "nuxt": "^2.15.8",

@@ -14583,7 +14583,8 @@ app.get("/reports/mekmer/quarries/supplier/:year/:month", (req, res) => {
 	t.FirmaAdi as SupplierName,
 	uo.OcakAdi as QuarryName,
 	s.Strips as StripName,
-    qs.Invoice
+    qs.Invoice,
+    qs.DocumentNo
 
 
 
@@ -14685,8 +14686,8 @@ app.post("/reports/mekmer/quarries/supplier/strips/save", async (req, res) => {
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
 
   const insertSql = `
-        insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight,Invoice,StripCostUsd,StripThickness,Currency)
-VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}','${req.body.invoice}','${req.body.stripCostUsd}','${req.body.stripThickness}','${req.body.currency}')
+        insert into QuarriesSupplierStripsTB(Date,Supplier,Quarry,StripCost,Strip,StripPrice,StripM2,StripPiece,StripWidth,StripHeight,Invoice,StripCostUsd,StripThickness,Currency,DocumentNo)
+VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCost}','${__stripId}','${req.body.stripPrice}','${req.body.stripM2}','${req.body.stripPiece}','${req.body.stripWidth}','${req.body.stripHeight}','${req.body.invoice}','${req.body.stripCostUsd}','${req.body.stripThickness}','${req.body.currency}','${req.body.irsaliye_no}')
     `;
   console.log(insertSql);
   mssql.query(insertSql, (err, insert) => {
@@ -14721,7 +14722,8 @@ SET
     Invoice='${req.body.invoice}',
     StripCostUsd='${req.body.stripCostUsd}',
     StripThickness='${req.body.stripThickness}',
-    Currency='${req.body.currency}'
+    Currency='${req.body.currency}',
+    DocumentNo='${req.body.irsaliye_no}'
 WHERE
 	ID = '${req.body.Id}'
 
@@ -14852,7 +14854,7 @@ app.get("/reports/mekmer/calculating/cost/:year/:month", async (req, res) => {
 
     // 1. SQL Sorgularını Hazırla
     const sqlCost = `
-            SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat , mb.MaliyetTuru,mf.MaliyetFirma
+            SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat,m.FiyatUsd , mb.MaliyetTuru,mf.MaliyetFirma
       FROM MekmerMaliyetTB m
 	  inner join MekmerMaliyetTurTB mb on mb.ID = m.MaliyetTurId
 	  inner join MekmerMaliyetFirmaTB mf on mf.ID = m.FaturaFirmaId
@@ -14903,7 +14905,7 @@ app.get("/reports/mekmer/calculating/cost/:year", async (req, res) => {
 
     // 1. SQL Sorgularını Hazırla
     const sqlCost = `
-      SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat , mb.MaliyetTuru,mf.MaliyetFirma
+      SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat,m.FiyatUsd , mb.MaliyetTuru,mf.MaliyetFirma
       FROM MekmerMaliyetTB m
 	  inner join MekmerMaliyetTurTB mb on mb.ID = m.MaliyetTurId
 	  inner join MekmerMaliyetFirmaTB mf on mf.ID = m.FaturaFirmaId
@@ -15009,8 +15011,8 @@ app.post("/reports/mekmer/calculating/cost/save", async (req, res) => {
     // Artık elimizde kesinlikle hem activeCostTypeId hem de activeCompanyId var.
 
     const insertCostSql = `
-      INSERT INTO MekmerMaliyetTB (Tarih, MaliyetTurId, FaturaNo, FaturaFirmaId, Kur, Fiyat)
-      VALUES ('${body.Tarih}', '${activeCostTypeId}', '${body.FaturaNo}', '${activeCompanyId}', '${body.Kur}', '${body.Fiyat}')
+      INSERT INTO MekmerMaliyetTB (Tarih, MaliyetTurId, FaturaNo, FaturaFirmaId, Kur, Fiyat,FiyatUsd)
+      VALUES ('${body.Tarih}', '${activeCostTypeId}', '${body.FaturaNo}', '${activeCompanyId}', '${body.Kur}', '${body.Fiyat}','${body.FiyatUsd}')
     `;
 
     await new mssql.Request().query(insertCostSql);
@@ -15064,7 +15066,7 @@ app.put("/reports/mekmer/calculating/cost/update", async (req, res) => {
 
     const insertCostSql = `
       UPDATE MekmerMaliyetTB SET Tarih='${body.Tarih}', MaliyetTurId='${activeCostTypeId}',FaturaNo='${body.FaturaNo}',
-      FaturaFirmaId='${activeCompanyId}',Kur='${body.Kur}',Fiyat='${body.Fiyat}' where ID='${body.ID}'
+      FaturaFirmaId='${activeCompanyId}',Kur='${body.Kur}',Fiyat='${body.Fiyat}',FiyatUsd='${body.FiyatUsd}' where ID='${body.ID}'
     `;
     console.log(insertCostSql);
 
