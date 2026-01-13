@@ -238,13 +238,14 @@ export default {
       this.tl = event;
       this.usd = event / this.currency;
     },
-    onUpload(event) {
-      upload.sendTransport(
+    async onUpload(event) {
+      await upload.sendTransport(
         event.files[0],
         this.selectedCompany.ID,
         this.invoiceno
       );
-      this.$store.dispatch("setTransportFileSave", this.transportList);
+      await this.$store.dispatch("setTransportFileSave", this.transportList);
+      this.reset();
     },
     transportSelected(event) {
       this.disabled = false;
@@ -264,7 +265,6 @@ export default {
     },
     saveTransport() {
       this.$store.dispatch("setTransportSave", this.transportList);
-      this.reset();
       this.newButtonDisabled = false;
     },
     reset() {
@@ -317,7 +317,7 @@ export default {
       this.$logs.save(log);
 
       this.transportList.push(data);
-      this.reset();
+
       this.newButtonDisabled = false;
     },
     update() {
