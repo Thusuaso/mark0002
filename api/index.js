@@ -14635,22 +14635,26 @@ function supplierId(id, supplier) {
 }
 function stripId(id, strip) {
   return new Promise(async (resolve, reject) => {
-    if (id == null || id == "" || id == 0 || id == undefined || id == "") {
-      const insertSql = `insert into StripsTB(Strips) VALUES('${strip}')`;
-      const getIdSql = `select top 1 ID from StripsTB order by ID desc`;
-      await mssql.query(insertSql, async (err, insert) => {
-        if (insert.rowsAffected[0] == 1) {
-          await mssql.query(getIdSql, async (err, _getId) => {
-            if (_getId.recordset) {
-              await resolve(_getId.recordset[0].ID);
-            } else {
-              await reject("Strip Hata Veriyor");
-            }
-          });
-        }
-      });
+    if (strip == null) {
+      await resolve(43);
     } else {
-      await resolve(id);
+      if (id == null || id == "" || id == 0 || id == undefined || id == "") {
+        const insertSql = `insert into StripsTB(Strips) VALUES('${strip}')`;
+        const getIdSql = `select top 1 ID from StripsTB order by ID desc`;
+        await mssql.query(insertSql, async (err, insert) => {
+          if (insert.rowsAffected[0] == 1) {
+            await mssql.query(getIdSql, async (err, _getId) => {
+              if (_getId.recordset) {
+                await resolve(_getId.recordset[0].ID);
+              } else {
+                await resolve(43);
+              }
+            });
+          }
+        });
+      } else {
+        await resolve(id);
+      }
     }
   });
 }
@@ -14713,7 +14717,7 @@ SET
 	Supplier='${__supplierId}',
 	Quarry='${__quarryId}',
 	StripCost='${req.body.stripCost}',
-	Strip='${__stripId}',
+	Strip='${__stripId ?? 43}',
 	StripPrice='${req.body.stripPrice}',
 	StripM2='${req.body.stripM2}',
 	StripPiece='${req.body.stripPiece}',

@@ -149,11 +149,11 @@
               />
             </template>
           </Column>
-          <!-- <Column field="Strip" header="Strip Adı">
+          <Column field="StripName" header="Strip Adı">
             <template #body="slotProps">
-              {{ _getStripName(slotProps.data.Strip) }}
+              {{ slotProps.data.StripName }}
             </template>
-          </Column> -->
+          </Column>
           <Column
             field="Invoice"
             header="Fatura No"
@@ -445,7 +445,7 @@
             </div>
             <div class="col-3">
               <span class="p-float-label">
-                <!-- <AutoComplete
+                <AutoComplete
                   :disabled="!model.currency"
                   id="strip"
                   v-model="selectedStrip"
@@ -455,7 +455,11 @@
                   @item-select="stripSelected($event)"
                   @input="stripInput($event)"
                 />
-                <label for="strip">Stripler</label> -->
+                <label for="strip">Stripler</label>
+              </span>
+            </div>
+            <div class="col-3">
+              <span class="p-float-label">
                 <span class="p-float-label">
                   <InputText
                     id="irsaliye"
@@ -1399,7 +1403,7 @@ export default {
     },
     stripSelected(event) {
       this.model.stripId = event.value.ID;
-      this.model.stripName = event.value.StripName;
+      this.model.stripName = event.value.Strips;
     },
     stripInput(event) {
       this.model.stripId = null;
