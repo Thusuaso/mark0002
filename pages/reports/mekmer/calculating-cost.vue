@@ -1,18 +1,26 @@
 <template>
   <div>
     <div class="row m-auto">
-      <div class="col">
+      <div class="col-3">
         <Calendar v-model="date" view="month" dateFormat="mm/yy" />
       </div>
-      <div class="col">
+      <div class="col-3">
         <Button label="Yeni Maliyet" @click="newCalculatingCost" />
       </div>
-      <div class="col">
+      <div class="col-3">
         <Button
           class="p-button-primary"
           :label="yearly_cost_header"
           @click="yearlyMaliyet"
           :loading="yearly_cost_loading"
+        />
+      </div>
+      <div class="col-3">
+        <Button
+          class="w-100 mb-5 p-button-info"
+          type="button"
+          label="Excel Maliyetler"
+          @click="excel_maliyet_output"
         />
       </div>
     </div>
@@ -178,8 +186,13 @@
 
 <script>
 import { FilterMatchMode } from "primevue/api";
+import { mapGetters } from "vuex";
+import server from "../../../plugins/excel.server";
 
 export default {
+  computed: {
+    ...mapGetters(["getLocalUrl"]),
+  },
   data() {
     return {
       calculate_ratio_list: [],
@@ -225,6 +238,33 @@ export default {
     };
   },
   methods: {
+    excel_maliyet_output() {
+      console.log(this.cost);
+      console.log(this.costWork);
+      console.log(this.productionSqm);
+      console.log(this.costMain);
+
+      const data = {
+        costs: this.costs,
+        ratios: this.calculate_ratio_list,
+        costCalculate: {
+          cost: this.cost,
+          costWork: this.costWork,
+          productionSqm: this.productionSqm,
+          costMain: this.costMain,
+        },
+      };
+      server.post("/reports/mekmer/muhasebe/excel", data).then((res) => {
+        if (res.status) {
+          const link = document.createElement("a");
+          link.href = this.getLocalUrl + "reports/mekmer/muhasebe/excel";
+
+          link.setAttribute("download", "muhasebe_maliyet_excel.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+    },
     costFiltered(value) {
       this.total.priceTl = 0;
       this.total.priceUsd = 0;

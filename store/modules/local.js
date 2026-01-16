@@ -1,6 +1,6 @@
 const state = {
-  // localUrl: "http://localhost:5000/",
-  localUrl: "https://excel-server-mark0002.mekmar.com/",
+  localUrl: "http://localhost:5000/",
+  // localUrl: "https://excel-server-mark0002.mekmar.com/",
 };
 const actions = {};
 
