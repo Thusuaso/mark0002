@@ -355,7 +355,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   name: "ContainerCalculator",
@@ -376,7 +375,6 @@ export default {
           length: 1203,
         },
       ],
-      // Value değerlerini 'standard' ve 'rotated' olarak güncelledik ki mantık netleşsin
       forkliftOptions: [
         { label: "Kısa (En)", value: "standard" },
         { label: "Uzun (Boy)", value: "rotated" },
@@ -402,13 +400,13 @@ export default {
   },
   computed: {
     containerW() {
-      return Number(this.container.width);
+      return Number(this.container.width) || 0;
     },
     containerH() {
-      return Number(this.container.height);
+      return Number(this.container.height) || 0;
     },
     containerL() {
-      return Number(this.container.length);
+      return Number(this.container.length) || 0;
     },
     containerVolume() {
       return (this.containerW * this.containerH * this.containerL) / 1000000;
@@ -466,13 +464,12 @@ export default {
     },
     toggleEuroMode() {
       if (this.newCrate.isEuroMode) {
-        // Sadece ölçüleri ayarlar, yerleşime karışmaz
         this.newCrate.width = 80;
         this.newCrate.length = 120;
         this.newCrate.height = 14.4;
         this.newCrate.name = "Euro Palet (EPAL)";
         this.newCrate.isStackable = true;
-        this.newCrate.forkliftSide = "standard"; // Varsayılan: 80'lik taraf En'e gelir
+        this.newCrate.forkliftSide = "standard";
       }
     },
     generateColor() {
@@ -485,14 +482,8 @@ export default {
     },
 
     getSortedList(list) {
-      const sorted = JSON.parse(JSON.stringify(list));
-      // Sıralama yine Büyükten Küçüğe (En iyi dolum için)
-      return sorted.sort((a, b) => {
-        const areaA = Number(a.width) * Number(a.length);
-        const areaB = Number(b.width) * Number(b.length);
-        if (Math.abs(areaB - areaA) > 1) return areaB - areaA;
-        return Number(b.height) - Number(a.height);
-      });
+      // Listeyi olduğu gibi (kullanıcı sırasıyla) işle
+      return JSON.parse(JSON.stringify(list));
     },
 
     tryAddCrate() {
@@ -502,20 +493,22 @@ export default {
       const boxL = Number(this.newCrate.length);
       const boxH = Number(this.newCrate.height);
 
-      // Temel sığma kontrolü (Seçili yöne göre)
-      let fits = false;
+      // --- Sığma Kontrolü (Seçili Yöne Göre) ---
+      let targetW, targetL;
       if (this.newCrate.forkliftSide === "standard") {
-        // Standart: En -> Konteynır Eni (W), Boy -> Konteynır Boyu (L)
-        if (boxW <= this.containerW && boxL <= this.containerL) fits = true;
+        // Standart: En -> Y (Genişlik), Boy -> X (Uzunluk)
+        targetW = boxW;
+        targetL = boxL;
       } else {
-        // Çevrilmiş: En -> Boy, Boy -> En
-        if (boxL <= this.containerW && boxW <= this.containerL) fits = true;
+        // Rotated: En -> X (Uzunluk), Boy -> Y (Genişlik)
+        targetW = boxL;
+        targetL = boxW;
       }
 
-      if (!fits) {
+      if (targetW > this.containerW || targetL > this.containerL) {
         this.alertState = {
           type: "error",
-          message: "Kasa seçilen yönde konteynıra sığmıyor!",
+          message: "Kasa ölçüleri (seçilen yönde) konteynıra sığmıyor!",
         };
         return;
       }
@@ -533,14 +526,13 @@ export default {
         if (calcMaxStack < 1) calcMaxStack = 1;
       }
 
-      // Aynısı var mı?
       const existingIndex = this.items.findIndex(
         (item) =>
           Math.abs(Number(item.width) - boxW) < 0.1 &&
           Math.abs(Number(item.height) - boxH) < 0.1 &&
           Math.abs(Number(item.length) - boxL) < 0.1 &&
           item.isStackable === this.newCrate.isStackable &&
-          item.forkliftSide === this.newCrate.forkliftSide // Yönü de aynı olmalı
+          item.forkliftSide === this.newCrate.forkliftSide
       );
 
       let candidateList = JSON.parse(JSON.stringify(this.items));
@@ -563,7 +555,7 @@ export default {
         currentItemRef = newItem;
       }
 
-      const result = this.packItems(this.getSortedList(candidateList));
+      const result = this.packItems(candidateList);
 
       let totalFittedForThisItem = 0;
       result.placed.forEach((box) => {
@@ -575,10 +567,7 @@ export default {
       const failed = totalRequested - totalFittedForThisItem;
 
       if (totalFittedForThisItem === 0 && requestedQty > 0) {
-        this.alertState = {
-          type: "error",
-          message: `Hiçbir kasa boşluğa sığmadı!`,
-        };
+        this.alertState = { type: "error", message: `Hiçbir kasa sığmadı!` };
         return;
       }
       if (failed > 0) {
@@ -622,9 +611,10 @@ export default {
       this.placedBoxes = [];
       this.clearAlert();
     },
+
     recalculateAll() {
       let candidateList = JSON.parse(JSON.stringify(this.items));
-      const result = this.packItems(this.getSortedList(candidateList));
+      const result = this.packItems(candidateList);
       this.items.forEach((item) => {
         let fitCount = 0;
         result.placed.forEach((box) => {
@@ -636,12 +626,13 @@ export default {
       this.placedBoxes = result.placed;
     },
 
-    // --- KESİN YÖNLENDİRMELİ ALGORİTMA ---
+    // --- DÜZELTİLMİŞ ALGORİTMA (Raf Sistemi / Shelf Packing) ---
     packItems(itemList) {
-      const cLength = this.containerL;
-      const cWidth = this.containerW; // Y ekseni
-      const cHeight = this.containerH;
+      const cLength = Number(this.container.length) || 0;
+      const cWidth = Number(this.container.width) || 0;
+      const cHeight = Number(this.container.height) || 0;
 
+      // Boşlukları tanımla: {x, y, w (length), h (width)}
       let spaces = [{ x: 0, y: 0, w: cLength, h: cWidth }];
       let placed = [];
 
@@ -650,6 +641,7 @@ export default {
           group.requestedQty !== undefined
             ? group.requestedQty
             : group.quantity;
+
         let stackCap = 1;
         const gHeight = Number(group.height);
         if (group.isStackable && gHeight > 0) {
@@ -660,21 +652,15 @@ export default {
         const rawDim1 = Number(group.length);
         const rawDim2 = Number(group.width);
 
-        // Kullanıcının seçimine göre hedef ölçüleri belirle
-        let targetL, targetW; // L -> X (Boy), W -> Y (En)
+        // Kullanıcı seçimi (Standard: W=En, L=Boy | Rotated: W=Boy, L=En)
+        let targetL, targetW;
         let isRotated = false;
 
         if (group.forkliftSide === "standard") {
-          // Kısa (En): Giriş genişliği Y eksenine paralel.
-          // Yani: Kasa Genişliği -> Konteynır Genişliği (Y)
-          // Kasa Uzunluğu -> Konteynır Uzunluğu (X)
           targetL = rawDim1; // X
           targetW = rawDim2; // Y
           isRotated = false;
         } else {
-          // Uzun (Boy): Giriş uzunluğu Y eksenine paralel.
-          // Yani: Kasa Uzunluğu -> Konteynır Genişliği (Y)
-          // Kasa Genişliği -> Konteynır Uzunluğu (X)
           targetL = rawDim2; // X
           targetW = rawDim1; // Y
           isRotated = true;
@@ -683,20 +669,23 @@ export default {
         while (remainingQty > 0) {
           let currentStack = Math.min(remainingQty, stackCap);
 
-          // Boşlukları sırala: Önce En Arkadakiler (X küçük), Sonra En Soldakiler (Y küçük)
+          // SIRALAMA: Önce X (Sol), Sonra Y (Üst)
           spaces.sort((a, b) => {
-            if (Math.abs(a.x - b.x) > 0.1) return a.x - b.x;
+            // X'e göre sırala (Kapıya yakınlık)
+            if (Math.abs(a.x - b.x) > 0.5) return a.x - b.x;
+            // Aynı X hizasındaysa Y'ye göre sırala (Yukarıdan aşağı)
             return a.y - b.y;
           });
 
           let bestSpaceIndex = -1;
 
-          // Sadece belirlenen hedef ölçüye göre yer ara
+          // İlk sığan boşluğu bul
           for (let i = 0; i < spaces.length; i++) {
             const sp = spaces[i];
-            if (sp.w >= targetL - 0.01 && sp.h >= targetW - 0.01) {
+            // Toleranslı kontrol (0.1 cm)
+            if (sp.w >= targetL - 0.1 && sp.h >= targetW - 0.1) {
               bestSpaceIndex = i;
-              break; // İlk uygun yere koy
+              break;
             }
           }
 
@@ -711,29 +700,42 @@ export default {
               color: group.color,
               name: group.name,
               stackCount: currentStack,
-              forkliftSide: isRotated ? "length" : "width", // Görsel için
+              forkliftSide: isRotated ? "length" : "width",
               groupId: group.id,
               isRotated: isRotated,
             });
 
-            // Alanı Böl: Önce Yan (Sütun), Sonra Arka
+            // --- YENİ ALAN BÖLME MANTIĞI (Shelf Split) ---
+            // Sorunu çözen kısım burası.
+            // Yanındaki boşluğu (Y ekseni) kısıtlamıyoruz, sonuna kadar uzatıyoruz.
+
+            // 1. splitDown (Kutunun YANI / ALTI):
+            // X aynı kalır, Y kutu kadar aşağı kayar.
+            // ÖNEMLİ: W (Uzunluk) kısıtlanmaz, space.w (kalan tüm uzunluk) korunur.
+            // Böylece yanına daha uzun bir parça sığabilir.
             let splitDown = {
-              // Yanındaki (Altındaki) boşluk
               x: space.x,
               y: space.y + targetW,
-              w: targetL,
+              w: space.w, // <-- ESKİ KODDA BURASI 'targetL' İDİ, BU YÜZDEN SIĞMIYORDU.
               h: space.h - targetW,
             };
 
+            // 2. splitRight (Kutunun ARKASI / SAĞI):
+            // X kutu kadar ileri gider.
+            // Y aynı kalır.
+            // H sadece kutunun genişliği kadar kısıtlanır (Bu şerit için).
             let splitRight = {
-              // Arkasındaki (Sağındaki) boşluk
               x: space.x + targetL,
               y: space.y,
               w: space.w - targetL,
-              h: space.h,
+              h: targetW, // Sadece bu şeridin yüksekliği
             };
 
             spaces.splice(bestSpaceIndex, 1);
+
+            // Y eksenini (Genişliği) doldurmak öncelikli olduğu için splitDown'ı önce eklemiyoruz
+            // Çünkü "Shelf" mantığında yan taraf aslında "aynı X" hizasında kalıyor.
+
             if (splitDown.w > 0.1 && splitDown.h > 0.1) spaces.push(splitDown);
             if (splitRight.w > 0.1 && splitRight.h > 0.1)
               spaces.push(splitRight);
@@ -749,7 +751,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 /* GENEL */
 .calculator-wrapper {
