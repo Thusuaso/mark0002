@@ -344,6 +344,8 @@
 <script>
 import { mapGetters } from "vuex";
 import date from "../../../plugins/date";
+import Cookies from "js-cookie";
+
 export default {
   computed: {
     ...mapGetters(["getProductionCrateNo"]),
@@ -611,6 +613,7 @@ export default {
         KasaKayıtAdedi: this.crateAmount,
         Fason: this.fasonStatus,
         Kutulama: this.kutulamaStatus,
+        KullaniciID: Cookies.get("userId"),
       };
       // if(data.UrunOcakID == ' ' || data.UrunOcakID == '' || data.UrunOcakID == 0 || data.UrunOcakID == undefined || data.UrunOcakID == null){
       //   this.$toast.error('Ürün Ocağını Giriniz!')
@@ -720,13 +723,13 @@ export default {
     },
     createdProcess() {
       this.selectedSaveKind = this.kinds.find(
-        (x) => x.id == this.model.UretimTurID
+        (x) => x.id == this.model.UretimTurID,
       );
       this.selectedPo = this.orders.find(
-        (x) => x.SiparisNo == this.model.SiparisAciklama
+        (x) => x.SiparisNo == this.model.SiparisAciklama,
       );
       this.selectedSupplier = this.suppliers.find(
-        (x) => x.FirmaAdi == this.model.FirmaAdi
+        (x) => x.FirmaAdi == this.model.FirmaAdi,
       );
       this.selectedDate = date.stringToDate(this.model.Tarih);
       this.selectedAmountStatus = this.model.UrunBirimAdi;
@@ -769,7 +772,7 @@ export default {
       this.kutulamaStatus = this.model.Kutulama;
       this.description = this.model.Aciklama;
       this.notFindStatus = this.__nullNoneTrueFalseControl(
-        this.model.Bulunamadi
+        this.model.Bulunamadi,
       );
       this.outStatus = this.__nullNoneTrueFalseControl(this.model.Disarda);
       this.stringStatus = this.__nullNoneTrueFalseControl(this.model.Bagli);
@@ -861,10 +864,10 @@ export default {
             confirm("Ürün kartı değiştirilecek. Devam etmek istiyor musunuz?")
           ) {
             this.selectedSupplier = this.suppliers.find(
-              (x) => x.ID == event.value.TedarikciID
+              (x) => x.ID == event.value.TedarikciID,
             );
             this.selectedAmountStatus = this.amountStatus.find(
-              (x) => x.id == event.value.UrunBirimID
+              (x) => x.id == event.value.UrunBirimID,
             ).status;
             this.orderProductCardDesc = event.value.Aciklama;
             this.productCardId = event.value.UrunKartId;
@@ -899,10 +902,10 @@ export default {
         }
       } else {
         this.selectedSupplier = this.suppliers.find(
-          (x) => x.ID == event.value.TedarikciID
+          (x) => x.ID == event.value.TedarikciID,
         );
         this.selectedAmountStatus = this.amountStatus.find(
-          (x) => x.id == event.value.UrunBirimID
+          (x) => x.id == event.value.UrunBirimID,
         ).status;
         this.orderProductCardDesc = event.value.Aciklama;
         this.productCardId = event.value.UrunKartId;
@@ -933,7 +936,7 @@ export default {
     poSelected(event) {
       this.$store.dispatch(
         "setSelectionProductionProductsList",
-        event.value.SiparisNo
+        event.value.SiparisNo,
       );
       this.description = event.value.SiparisNo;
     },
@@ -944,7 +947,7 @@ export default {
       } else {
         results = this.orders.filter((x) => {
           return x.SiparisNo.toLowerCase().startsWith(
-            event.query.toLowerCase()
+            event.query.toLowerCase(),
           );
         });
       }
