@@ -81,7 +81,8 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: process.env.client,
+    baseURL: process.env.server,
+    browserBaseURL: process.env.server,
   },
 
   proxy: {
@@ -113,6 +114,7 @@ export default {
     bodyParser.json(),
     "~/api",
     { path: "/tcmb-api", handler: "~/api/tcmb.js" },
+    // { path: "/translate", handler: "~/api/translate.js" },
   ],
   io: {
     // module options

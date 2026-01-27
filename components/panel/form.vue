@@ -1092,40 +1092,21 @@ export default {
     }
   },
   methods: {
-    async translateProductName(event) {
-      console.log("translateProductName", event.target._value);
-      const product_fr = debounce(
-        await this.translateIt(event.target._value, "fr"),
-        500
-      );
-      console.log("product_fr", product_fr);
-    },
-    async translateIt(value, lang) {
-      if (!value) {
-        this.model.urunadi_en = "";
-        this.model.urunadi_fr = "";
-        this.model.urunadi_es = "";
-        this.model.urunadi_ru = "";
-        this.model.urunadi_ar = "";
-        return;
-      }
+    // async translateProductName() {
+    //   try {
+    //     const data = await this.$axios.post("/translate/api", {
+    //       text: "Product Name",
+    //     });
 
-      try {
-        // Ücretsiz hızlı bir API endpoint (Örnek amaçlıdır)
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURI(
-          value
-        )}`;
+    //     // data.translations içerisinde 4 dilin çevirisi hazır:
+    //     // { fransizca: "...", ispanyolca: "...", rusca: "...", arapca: "..." }
+    //     // this.allTranslations = data.translations;
+    //     console.log("data.translations", data);
+    //   } catch (e) {
+    //     console.error("Çeviri başarısız", e);
+    //   }
+    // },
 
-        const response = await this.$axios.$get(url);
-
-        // Google Translate bu formatta [["çeviri", "orijinal"...]] bir array döndürür
-        const ceviri = response[0].map((item) => item[0]).join("");
-        return ceviri;
-      } catch (error) {
-        console.error("Çeviri hatası:", error);
-      } finally {
-      }
-    },
     publishChange(event) {
       if (event == false) {
         this.model.unpublished = true;

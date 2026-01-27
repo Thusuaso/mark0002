@@ -720,6 +720,10 @@
               >Strip & Moloz</nuxt-link
             >
           </li>
+          <li class="nav-item"> 
+            <nuxt-link to="/operation/shipment" tag="a" class="nav-link"
+              >Sevk Et</nuxt-link>
+          </li>
         </ul>
       </div>
     </div>

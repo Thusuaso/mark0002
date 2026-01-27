@@ -3,6 +3,7 @@ import mssql from "mssql";
 import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
 import server from "../plugins/excel.server";
+import { translate } from "@vitalets/google-translate-api";
 
 const app = express();
 const sql = {
@@ -34,13 +35,13 @@ const connectDB = async (retries = 5) => {
 
     if (retries === 0) {
       console.error(
-        "Artık denemiyorum, sunucu kapalı olabilir. Proje kapatılıyor.",
+        "Artık denemiyorum, sunucu kapalı olabilir. Proje kapatılıyor."
       );
       process.exit(1); // Umut yoksa kapat
     }
 
     console.log(
-      `⏳ 5 saniye sonra tekrar denenecek... (Kalan Hak: ${retries})`,
+      `⏳ 5 saniye sonra tekrar denenecek... (Kalan Hak: ${retries})`
     );
 
     // 5 Saniye bekle
@@ -383,10 +384,10 @@ select
                             (err, supplierCostList) => {
                               let _productsChartData = _chartProductsSum(
                                 chartProducts?.recordset,
-                                chartProductsSpecial.recordset,
+                                chartProductsSpecial.recordset
                               );
                               let _offeresChartData = _chartOffersSum(
-                                chartOffers?.recordset,
+                                chartOffers?.recordset
                               );
                               res.status(200).json({
                                 supplierCostList: supplierCostList.recordset,
@@ -447,7 +448,7 @@ select
                                   datasets: [
                                     {
                                       data: _chartCustomerShippedSum(
-                                        chartShippedCustomer?.recordset,
+                                        chartShippedCustomer?.recordset
                                       ),
                                       backgroundColor: [
                                         "#aba34f",
@@ -531,13 +532,13 @@ select
                                   ],
                                 },
                               });
-                            },
+                            }
                           );
-                        },
+                        }
                       );
                     });
                   });
-                },
+                }
               );
             });
           });
@@ -764,10 +765,10 @@ app.get("/sales/todos/list", (req, res) => {
     "select y.ID,y.Yapilacak,y.Yapildi,y.GirisTarihi,y.YapildiTarihi,y.YapilacakOncelik,y.Acil,y.Sira,y.OrtakGorev from Yapilacaklar y where y.Yapildi=0 order by y.GirisTarihi";
   mssql.query(sql, (err, todo) => {
     const listA = todo.recordset.filter(
-      (todo) => todo.YapilacakOncelik == "A" || todo.YapilacakOncelik == "B",
+      (todo) => todo.YapilacakOncelik == "A" || todo.YapilacakOncelik == "B"
     );
     const listMail = todo.recordset.filter(
-      (todo) => todo.YapilacakOncelik == "C",
+      (todo) => todo.YapilacakOncelik == "C"
     );
     res.status(200).json({
       listA: listA,
@@ -1249,15 +1250,15 @@ app.post("/selection/production/save", (req, res) => {
                 '${req.body.UrunBirimID}','${req.body.UrunOcakID}',
                 '${req.body.Adet}','${req.body.KutuAdet}',
                 '${req.body.Miktar}','${__stringCharacterChange(
-                  req.body.Aciklama,
-                )}',
+      req.body.Aciklama
+    )}',
                 '${req.body.UretimTurID}','${req.body.UrunDurumID}',
                 '${req.body.SiparisAciklama}','${req.body.Kutu}',
                 '${req.body.Duzenleyen}','${req.body.Kasalayan}',
                 '${req.body.Disarda}','${req.body.KutuIciAdet}',
                 '${req.body.SqmMiktar}','${req.body.Bagli}','${
-                  req.body.Bulunamadi
-                }','${req.body.Fason}','${req.body.Kutulama}','${req.body.KullaniciID}')
+      req.body.Bulunamadi
+    }','${req.body.Fason}','${req.body.Kutulama}','${req.body.KullaniciID}')
                 `;
 
     console.log("/selection/production/save", sql);
@@ -1509,16 +1510,16 @@ app.post("/card/save", (req, res) => {
                             }
                           });
                         }
-                      },
+                      }
                     );
                   }
-                },
+                }
               );
             }
-          },
+          }
         );
       }
-    },
+    }
   );
 });
 
@@ -1639,7 +1640,7 @@ app.put("/card/update", (req, res) => {
     req.body.En,
     req.body.Boy,
     req.body.Kenar,
-    req.body.OlcuId,
+    req.body.OlcuId
   ).then((sizeId) => {
     if (sizeId) {
       productIdControl(req.body.UrunAdi, req.body.UrunId).then((productId) => {
@@ -1657,10 +1658,10 @@ app.put("/card/update", (req, res) => {
                         res.status(200).json({ status: false });
                       }
                     });
-                  },
+                  }
                 );
               }
-            },
+            }
           );
         }
       });
@@ -1840,7 +1841,7 @@ app.get(
         });
       });
     });
-  },
+  }
 );
 app.post("/shipment/products/save", (req, res) => {
   const updateOrderSql = `update SiparislerTB SET SiparisDurumID=3, YuklemeTarihi='${req.body.YuklemeTarihi}' where SiparisNo='${req.body.SiparisNo}'`;
@@ -1881,7 +1882,7 @@ function documentColor(po, doc, cb) {
     let docModel = [];
     for (const item of doc) {
       const index = poDocument.recordset.findIndex(
-        (x) => x.YuklemeEvrakID == item.ID,
+        (x) => x.YuklemeEvrakID == item.ID
       );
       if (index > -1) {
         docModel.push({
@@ -1909,7 +1910,7 @@ app.get("/upload/document/:po", (req, res) => {
         res.status(200).json({
           model: data,
         });
-      },
+      }
     );
   });
 });
@@ -1959,10 +1960,10 @@ app.post("/upload/file", (req, res) => {
                         EvrakYuklemeTarihi,KullaniciID)
                         
                     values ('${value.tarih}', '${0}','${0}','${
-                      value.siparisno
-                    }','${value.id}','${2}','${value.siparisno + ".pdf"}','${value.tarih}','${
-                      value.kullaniciId
-                    }')
+    value.siparisno
+  }','${value.id}','${2}','${value.siparisno + ".pdf"}','${value.tarih}','${
+    value.kullaniciId
+  }')
                 `;
   mssql.query(sql).then((response) => {
     res.status(200).json({
@@ -2087,7 +2088,7 @@ app.post("/container/input/save", (req, res) => {
             status: true,
             containerResults: containerResults,
           });
-        },
+        }
       );
     } else {
       res.status(200).json({
@@ -2114,12 +2115,12 @@ app.post("/container/input/file/save", (req, res) => {
                         )   
                     VALUES
                     ('${req.body.date}','${req.body.invoiceid}','${
-                      req.body.invoicekindid
-                    }','${req.body.po}','${req.body.usd}','${1}','${
-                      req.body.invoicedocumentid
-                    }','${2}','${req.body.nowDate}','${req.body.invoiceno + ".pdf"}','${
-                      req.body.userId
-                    }')
+    req.body.invoicekindid
+  }','${req.body.po}','${req.body.usd}','${1}','${
+    req.body.invoicedocumentid
+  }','${2}','${req.body.nowDate}','${req.body.invoiceno + ".pdf"}','${
+    req.body.userId
+  }')
                 `;
 
   mssql.query(sql).then((response) => {
@@ -4788,7 +4789,7 @@ group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
           .json({ items: [thisYear.recordset, previousYear.recordset] });
       });
     });
-  },
+  }
 );
 app.get(
   "/reports/mekmar/summary/order/list/by/representative/detail/:userId/:month/:year",
@@ -4817,7 +4818,7 @@ app.get(
     mssql.query(detailSql, (err, detail) => {
       res.status(200).json({ list: detail.recordset });
     });
-  },
+  }
 );
 
 function noneControl(value) {
@@ -5240,27 +5241,27 @@ group by MONTH(s.YuklemeTarihi)
                                               twoYearAgoOperationForwarding:
                                                 twoyearagoopForw.recordset,
                                             });
-                                          },
+                                          }
                                         );
-                                      },
+                                      }
                                     );
-                                  },
+                                  }
                                 );
-                              },
+                              }
                             );
-                          },
+                          }
                         );
-                      },
+                      }
                     );
-                  },
+                  }
                 );
-              },
+              }
             );
           });
         });
       });
     });
-  },
+  }
 );
 app.get(
   "/reports/gu/mekmar/order/seller/:month/:year/:userId",
@@ -5284,7 +5285,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  },
+  }
 );
 
 app.get(
@@ -5310,7 +5311,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  },
+  }
 );
 
 app.get(
@@ -5335,7 +5336,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  },
+  }
 );
 
 app.get(
@@ -5361,7 +5362,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  },
+  }
 );
 
 /*Sample */
@@ -5714,13 +5715,13 @@ function __getTlToUsdorEuro(date, value) {
       .then(async (tl_to_usd) => {
         await server
           .get(
-            "/finance/doviz/liste/euro/to/tl/" + year + "/" + month + "/" + day,
+            "/finance/doviz/liste/euro/to/tl/" + year + "/" + month + "/" + day
           )
           .then((tl_to_euro) => {
             resolve({
               usd: (parseFloat(value) / parseFloat(tl_to_usd.data)).toFixed(2),
               euro: (parseFloat(value) / parseFloat(tl_to_euro.data)).toFixed(
-                2,
+                2
               ),
             });
           });
@@ -5738,18 +5739,13 @@ function __getUsdToTlorEuro(date, value) {
       .then(async (usd_to_tl) => {
         await server
           .get(
-            "/finance/doviz/liste/usd/to/euro/" +
-              year +
-              "/" +
-              month +
-              "/" +
-              day,
+            "/finance/doviz/liste/usd/to/euro/" + year + "/" + month + "/" + day
           )
           .then(async (usd_to_euro) => {
             resolve({
               tl: (parseFloat(value) * parseFloat(usd_to_tl.data)).toFixed(2),
               euro: (parseFloat(value) * parseFloat(usd_to_euro.data)).toFixed(
-                2,
+                2
               ),
             });
           });
@@ -5767,18 +5763,13 @@ function __getUsdToTlorUsd(date, value) {
       .then((euro_to_tl) => {
         server
           .get(
-            "/finance/doviz/liste/usd/to/euro/" +
-              year +
-              "/" +
-              month +
-              "/" +
-              day,
+            "/finance/doviz/liste/usd/to/euro/" + year + "/" + month + "/" + day
           )
           .then((usd_to_euro) => {
             resolve({
               tl: (parseFloat(value) * parseFloat(euro_to_tl.data)).toFixed(2),
               usd: (parseFloat(value) / parseFloat(usd_to_euro.data)).toFixed(
-                2,
+                2
               ),
             });
           });
@@ -6588,7 +6579,7 @@ app.post("/offer/save", (req, res) => {
                                     '${req.body.offer.Tarih}',
                                     '${custId}',
                                     '${__stringCharacterChange(
-                                      req.body.offer.Aciklama,
+                                      req.body.offer.Aciklama
                                     )}',
                                     '${req.body.offer.KullaniciId}',
                                     '${1}',
@@ -6622,7 +6613,7 @@ app.post("/offer/save", (req, res) => {
             update YeniTeklif_MusterilerTB
             SET 
             MusteriAdi='${__stringCharacterChange(
-              req.body.customer.MusteriAdi,
+              req.body.customer.MusteriAdi
             )}',
             UlkeId='${req.body.customer.UlkeId}',
             Company='${__stringCharacterChange(req.body.customer.Company)}',
@@ -6630,7 +6621,7 @@ app.post("/offer/save", (req, res) => {
             Phone='${__stringCharacterChange(req.body.customer.Phone)}',
             Adress='${__stringCharacterChange(req.body.customer.Adress)}',
             Description='${__stringCharacterChange(
-              req.body.customer.Description,
+              req.body.customer.Description
             )}'
             WHERE Id = '${req.body.customer.Id}'
         `;
@@ -6658,7 +6649,7 @@ app.post("/offer/save", (req, res) => {
                                     '${req.body.offer.Tarih}',
                                     '${req.body.offer.MusteriId}',
                                     '${__stringCharacterChange(
-                                      req.body.offer.Aciklama,
+                                      req.body.offer.Aciklama
                                     )}',
                                     '${req.body.offer.KullaniciId}',
                                     '${1}',
@@ -6694,7 +6685,7 @@ app.put("/offer/update", (req, res) => {
                 
                     Tarih='${req.body.offer.Tarih}',
                     Aciklama='${__stringCharacterChange(
-                      req.body.offer.Aciklama,
+                      req.body.offer.Aciklama
                     )}',
                     TakipEt='${req.body.offer.TakipEt}',
                     KaynakYeri='${req.body.offer.KaynakYeri}',
@@ -6715,7 +6706,7 @@ app.put("/offer/update", (req, res) => {
             Phone='${__stringCharacterChange(req.body.customer.Phone)}',
             Adress='${__stringCharacterChange(req.body.customer.Adress)}',
             Description='${__stringCharacterChange(
-              req.body.customer.Description,
+              req.body.customer.Description
             )}'
             WHERE Id = '${req.body.customer.Id}'
     `;
@@ -6876,7 +6867,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "Toplantı"),
+            x.TeklifOncelik == "Toplantı")
       );
       // const _h_t = results.recordset.filter(x=>(x.KullaniciId == 44 && x.TeklifOncelik == 'Toplantı'));
       const _o_a = results.recordset.filter(
@@ -6885,7 +6876,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "Toplantı"),
+            x.TeklifOncelik == "Toplantı")
       );
       // const _o_t = results.recordset.filter(x=>(x.KullaniciId == 19 && x.TeklifOncelik == 'Toplantı'));
 
@@ -6894,7 +6885,7 @@ order by yt.TeklifOncelik,yt.Sira
           x.TeklifOncelik == "A" ||
           x.TeklifOncelik == "B" ||
           x.TeklifOncelik == "C" ||
-          x.TeklifOncelik == "Toplantı",
+          x.TeklifOncelik == "Toplantı"
       );
 
       const h_b = bList.recordset.filter(
@@ -6903,7 +6894,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "Toplantı"),
+            x.TeklifOncelik == "Toplantı")
       );
       const o_b = bList.recordset.filter(
         (x) =>
@@ -6911,14 +6902,14 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "Toplantı"),
+            x.TeklifOncelik == "Toplantı")
       );
       const b_list = bList.recordset.filter(
         (x) =>
           x.TeklifOncelik == "A" ||
           x.TeklifOncelik == "B" ||
           x.TeklifOncelik == "C" ||
-          x.TeklifOncelik == "Toplantı",
+          x.TeklifOncelik == "Toplantı"
       );
 
       // const t_list = results.recordset.filter(x=>(x.TeklifOncelik == 'Toplantı'));
@@ -8370,16 +8361,16 @@ app.post("/panel/project/information/update", (req, res) => {
 SET
 	ProjectInformation='${__stringCharacterChange(req.body.ProjectInformation)}',
 	ProjectInformation_Fr='${__stringCharacterChange(
-    req.body.ProjectInformation_Fr,
+    req.body.ProjectInformation_Fr
   )}',
 	ProjectInformation_Es='${__stringCharacterChange(
-    req.body.ProjectInformation_Es,
+    req.body.ProjectInformation_Es
   )}',
 	ProjectInformation_Ru=N'${__stringCharacterChange(
-    req.body.ProjectInformation_Ru,
+    req.body.ProjectInformation_Ru
   )}',
     ProjectInformation_Ar=N'${__stringCharacterChange(
-      req.body.ProjectInformation_Ar,
+      req.body.ProjectInformation_Ar
     )}'
 
 WHERE
@@ -8705,10 +8696,10 @@ app.post("/todo/by/username/save", (req, res) => {
             Sira
         )
         VALUES('${req.body.CustomYapilacak}','${0}','${
-          req.body.GorevVerenID
-        }','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${
-          req.body.YapilacakOncelik
-        }','${req.body.Acil}','${req.body.OrtakGorev}','0',${queue})
+        req.body.GorevVerenID
+      }','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${
+        req.body.YapilacakOncelik
+      }','${req.body.Acil}','${req.body.OrtakGorev}','0',${queue})
         `;
       mssql.query(todoInsertSql, (err, todo) => {
         if (todo.rowsAffected[0] == 1) {
@@ -8732,10 +8723,10 @@ app.post("/todo/by/username/save", (req, res) => {
             Goruldu
         )
         VALUES('${req.body.CustomYapilacak}','${0}','${
-          req.body.GorevVerenID
-        }','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${
-          req.body.YapilacakOncelik
-        }','${req.body.Acil}','${req.body.OrtakGorev}','0')
+      req.body.GorevVerenID
+    }','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${
+      req.body.YapilacakOncelik
+    }','${req.body.Acil}','${req.body.OrtakGorev}','0')
     `;
     mssql.query(todoInsertSql, (err, todo) => {
       if (todo.rowsAffected[0] == 1) {
@@ -9286,7 +9277,7 @@ order by s.YuklemeTarihi desc
       }
     });
     const uretimde = poList.recordset.filter(
-      (x) => x.Durum == "Üretimde" || x.Durum == "Beklemede",
+      (x) => x.Durum == "Üretimde" || x.Durum == "Beklemede"
     );
     const sevkiyatta = poList.recordset.filter((x) => x.Durum == "Sevk Edilen");
     uretimde.forEach((x) => {
@@ -11995,7 +11986,7 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID in (1,123)
           .json({ list: mekmer.recordset.concat(mekmar.recordset) });
       });
     });
-  },
+  }
 );
 
 function __floatNullControl(value) {
@@ -12164,8 +12155,8 @@ app.post("/order/production/proforma/upload", (req, res) => {
                    EvrakYuklemeTarihi,KullaniciID)
                    
                 values ('${req.body.date}','${0}','${0}','${req.body.po}','${
-                  req.body.id
-                }',${2},'${req.body.document}','${req.body.date}','${req.body.userId}')
+    req.body.id
+  }',${2},'${req.body.document}','${req.body.date}','${req.body.userId}')
     `;
   mssql.query(sql, (err, proforma) => {
     if (proforma.rowsAffected[0] == 1) {
@@ -12298,7 +12289,7 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID='${req.params.supplier}
       }
       res.status(200).json({ list: supplier.recordset });
     });
-  },
+  }
 );
 function supplierIsfDocId(value) {
   return new Promise((resolve, reject) => {
@@ -12640,10 +12631,10 @@ app.post("/upload/document/product/supplier/save", async (req, res) => {
            )   
                values
             ('${req.body.date}','${0}','${0}','${
-              req.body.siparisno
-            }','${0}','${30}','${2}','${req.body.date}','${req.body.evrak}','${
-              req.body.kullaniciAdi
-            }','${docId + 101}')
+      req.body.siparisno
+    }','${0}','${30}','${2}','${req.body.date}','${req.body.evrak}','${
+      req.body.kullaniciAdi
+    }','${docId + 101}')
         `;
 
     await mssql.query(sql, (err, supplier) => {
@@ -12831,7 +12822,7 @@ where sg.SiparisNo='${req.params.po}'
         });
       });
     });
-  },
+  }
 );
 app.post("/order/production/product/workerman/save", (req, res) => {
   const sql = `
@@ -13148,10 +13139,10 @@ app.get("/production/isf/delete/:id/:document/:po", async (req, res) => {
                     } else {
                       res.status(200).json({ status: false });
                     }
-                  },
+                  }
                 );
               }
-            },
+            }
           );
         });
       }
@@ -13558,7 +13549,7 @@ VALUES(
               } else {
                 res.status(200).json({ status: false });
               }
-            },
+            }
           );
         } else {
           res.status(200).json({ status: false });
@@ -13946,7 +13937,7 @@ async function addedSendMail(payload) {
     content = content + "</table>";
 
     const mekmer_product = payload.added.filter(
-      (x) => x.FirmaAdi == "Mekmer" || x.FirmaAdi == "Mek-Moz",
+      (x) => x.FirmaAdi == "Mekmer" || x.FirmaAdi == "Mek-Moz"
     );
     if (mekmer_product.length > 0) {
       mekmer_product.forEach((x) => {
@@ -14121,24 +14112,24 @@ async function updatedSendMail(payload) {
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">${po}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   x.FirmaAdi,
-                  company,
+                  company
                 )};">${company}</td>
                 <td style="border: 1px solid;text-align:center;"style="border:1px solid gray;text-align:center;" >${desc}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   x.UretimAciklama,
-                  pdesc,
+                  pdesc
                 )};">${pdesc}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   x.Miktar,
-                  amount,
+                  amount
                 )};">${amount}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   noneControl(x.AlisFiyati),
-                  buying,
+                  buying
                 )};">$${buying}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   noneControl(x.SatisFiyati),
-                  selling,
+                  selling
                 )};">$${selling}</td>
             </tr>`;
     });
@@ -14157,8 +14148,8 @@ async function updatedSendMail(payload) {
                 <td style="border: 1px solid;text-align:center;">${
                   x.KategoriAdi
                 }-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${
-                  x.Kenar
-                }</td>
+          x.Kenar
+        }</td>
                 <td style="border: 1px solid;text-align:center;">${
                   x.UretimAciklama
                 }</td>
@@ -14166,10 +14157,10 @@ async function updatedSendMail(payload) {
                   x.Miktar
                 }</td>
                 <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.AlisFiyati,
+                  x.AlisFiyati
                 )}</td>
                 <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.SatisFiyati,
+                  x.SatisFiyati
                 )}</td>
             </tr>`;
     });
@@ -14196,7 +14187,7 @@ async function updatedSendMail(payload) {
         `;
     /*Eğer Mekmer ve Mekmoz ise Sergen ile Muhsin abiye mail gitsin */
     const mekmer_product = payload.updated.filter(
-      (x) => x.FirmaAdi == "Mekmer" || x.FirmaAdi == "Mek-Moz",
+      (x) => x.FirmaAdi == "Mekmer" || x.FirmaAdi == "Mek-Moz"
     );
 
     if (mekmer_product.length > 0) {
@@ -14229,24 +14220,24 @@ async function updatedSendMail(payload) {
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">${po}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   x.FirmaAdi,
-                  company,
+                  company
                 )};">${company}</td>
                 <td style="border: 1px solid;text-align:center;"style="border:1px solid gray;text-align:center;" >${desc}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   x.UretimAciklama,
-                  pdesc,
+                  pdesc
                 )};">${pdesc}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   x.Miktar,
-                  amount,
+                  amount
                 )};">${amount}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   noneControl(x.AlisFiyati),
-                  buying,
+                  buying
                 )};">$${buying}</td>
                 <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
                   noneControl(x.SatisFiyati),
-                  selling,
+                  selling
                 )};">$${selling}</td>
             </tr>`;
       });
@@ -14265,8 +14256,8 @@ async function updatedSendMail(payload) {
                 <td style="border: 1px solid;text-align:center;">${
                   x.KategoriAdi
                 }-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${
-                  x.Kenar
-                }</td>
+            x.Kenar
+          }</td>
                 <td style="border: 1px solid;text-align:center;">${
                   x.UretimAciklama
                 }</td>
@@ -14274,10 +14265,10 @@ async function updatedSendMail(payload) {
                   x.Miktar
                 }</td>
                 <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.AlisFiyati,
+                  x.AlisFiyati
                 )}</td>
                 <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.SatisFiyati,
+                  x.SatisFiyati
                 )}</td>
             </tr>`;
       });
@@ -14695,7 +14686,7 @@ function quarryId(id, quarry) {
 app.post("/reports/mekmer/quarries/supplier/strips/save", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName,
+    req.body.supplierName
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -14716,7 +14707,7 @@ VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCos
 app.put("/reports/mekmer/quarries/supplier/strips/update", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName,
+    req.body.supplierName
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -14762,14 +14753,14 @@ app.delete(
         res.status(200).json({ status: false });
       }
     });
-  },
+  }
 );
 
 /*Molozlar*/
 app.post("/reports/mekmer/moloz/save", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName,
+    req.body.supplierName
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -14821,7 +14812,7 @@ app.get("/reports/mekmer/moloz/list/:year/:month", async (req, res) => {
 app.put("/reports/mekmer/moloz/update", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName,
+    req.body.supplierName
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -16935,35 +16926,35 @@ app.get("/reports/ayo/costs/list/:year/:month", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
+                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
@@ -17017,34 +17008,34 @@ app.get("/reports/ayo/costs/yearly/:year", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
+                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
@@ -17100,34 +17091,34 @@ app.get("/reports/ayo/costs/quarter/:q1/:q2/:year", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
+                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
@@ -17183,35 +17174,35 @@ app.get("/reports/ayo/costs/half/:month_1/:month_2/:year", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
+                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  ((usd += x.USD), (tl += x.TL));
+                  (usd += x.USD), (tl += x.TL);
                 });
               }
 
@@ -18341,6 +18332,42 @@ app.get("/order/production/source/types", (req, res) => {
     res.status(200).json({ list: data.recordset });
   });
 });
+// app.post("/translate/api", async (req, res) => {
+//   const body = req.body;
+//   try {
+//     const targetLangs = [
+//       { key: "fransizca", code: "fr" },
+//       { key: "ispanyolca", code: "es" },
+//       { key: "rusca", code: "ru" },
+//       { key: "arapca", code: "ar" },
+//     ];
+
+//     const translations = {};
+
+//     // Sıralı çeviri döngüsü
+//     for (const lang of targetLangs) {
+//       try {
+//         // Çeviriyi yap
+//         const result = await translate(body.text, { to: lang.code });
+//         translations[lang.key] = result.text;
+
+//         console.log(`${lang.key} çevrildi.`);
+
+//         // Her çeviri arasına 1.5 saniye bekleme ekle (Google'ı uyutmak için)
+//         await new Promise((resolve) => setTimeout(resolve, 1500));
+//       } catch (err) {
+//         console.error(`${lang.key} hatası:`, err.message);
+//         translations[lang.key] = "Limit aşıldı veya hata oluştu";
+//       }
+//     }
+
+//     res.setHeader("Content-Type", "application/json");
+//     res.end(JSON.stringify({ success: true, translations }));
+//   } catch (error) {
+//     res.statusCode = 500;
+//     res.end(JSON.stringify({ error: error.message }));
+//   }
+// });
 
 module.exports = {
   path: "/api",
