@@ -11,7 +11,6 @@
           @rateFetchedEmit="rateFetched($event)"
         />
       </div>
-
       <div class="field col-12 md:col-4">
         <span class="p-float-label">
           <AutoComplete
@@ -23,6 +22,8 @@
             @item-select="costTypeSelected($event)"
             @input="costTypeInput($event)"
             :disabled="!model.Kur"
+            :inputProps="{ tabindex: '1' }"
+            autofocus
           />
           <label for="costType">Maliyet Türü</label>
         </span>
@@ -38,6 +39,7 @@
             @item-select="companySelected($event)"
             @input="companyInput($event)"
             :disabled="!model.Kur"
+            :inputProps="{ tabindex: '2' }"
           />
           <label for="company">Fatura Şirketi / Tedarikçi</label>
         </span>
@@ -50,6 +52,7 @@
             :disabled="!model.Kur"
             v-model="model.FaturaNo"
             type="text"
+            :inputProps="{ tabindex: '3' }"
           />
           <label for="invoiceNo">Fatura No</label>
         </span>
@@ -67,6 +70,7 @@
             :maxFractionDigits="2"
             :disabled="!model.Kur"
             @input="calculatedTl($event)"
+            :tabindex="4"
           />
           <label for="totalTl">Fiyat (₺)</label>
         </span>
@@ -83,6 +87,7 @@
             :minFractionDigits="2"
             :maxFractionDigits="2"
             :disabled="!model.Kur"
+            :tabindex="5"
           />
           <label for="rate">Kur (TL)</label>
         </span>
@@ -100,6 +105,7 @@
             :disabled="!model.Kur"
             class="filled-input"
             @input="calculatedUsd($event)"
+            :tabindex="6"
           />
           <label for="price">Fiyat ($)</label>
         </span>
@@ -192,7 +198,6 @@ export default {
       this.model.FaturaFirmaId = event.value.ID;
     },
     costTypeInput(event) {
-      console.log("costTypeInput", typeof event);
       if (typeof event != "object") {
         const index = this.costTypes.findIndex((x) => {
           return x.MaliyetTuru.toLowerCase() == event.toLowerCase();

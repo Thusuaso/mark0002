@@ -143,6 +143,7 @@ export default {
   },
   data() {
     return {
+      socket: null,
       selectedCards: null,
       filters: {
         ID: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -165,6 +166,15 @@ export default {
     cardsSelected(event) {
       this.$emit("cards_selected_emit", event.data);
     },
+  },
+  mounted() {
+    this.$store.dispatch("setConnection");
+    this.$store.getters.getSocket.on("card_list_update_on", () => {
+      this.$store.dispatch("setCardList");
+    });
+  },
+  beforeDestroy() {
+    this.$store.dispatch("setDisconnect")
   },
 };
 </script>

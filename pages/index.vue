@@ -5,9 +5,6 @@
 </template>
 
 <script>
-import api from '@/plugins/excel.server';
-
-// import { io } from "socket.io-client";
 export default {
   computed: {
     home() {
@@ -16,23 +13,17 @@ export default {
   },
   components: {},
   data() {
-    return {
-    
-    };
+    return {};
   },
   beforeMount() {},
   created() {
-    if(process.client){
+    if (process.client) {
       // api.get('/reports/production/send/mail');
       this.$store.dispatch("getHome");
-
     }
-
   },
   mounted() {},
-  methods: {
-
-  },
+  methods: {},
 };
 </script>
 <style></style>

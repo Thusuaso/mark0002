@@ -43,8 +43,13 @@
           @filter="costFiltered($event)"
           scrollable
           scrollHeight="500px"
+          sortField="Tarih"
+          :sortOrder="-1"
         >
-          <Column field="Tarih" header="Tarih">
+          <Column field="Tarih" header="Tarih"
+                    :showFilterMenu="false"
+          :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ formatDateTR(slotProps.data.Tarih) }}
             </template>
@@ -57,7 +62,11 @@
               />
             </template>
           </Column>
-          <Column field="MaliyetTuru" header="Maliyet Türü">
+          <Column field="MaliyetTuru" header="Maliyet Türü"
+                    :showFilterMenu="false"
+          :showClearButton="false"
+          
+          >
             <template #body="slotProps">
               {{ slotProps.data.MaliyetTuru }}
             </template>
@@ -70,7 +79,11 @@
               />
             </template>
           </Column>
-          <Column field="MaliyetFirma" header="Fatura Şirketi">
+          <Column field="MaliyetFirma" header="Fatura Şirketi"
+          
+                    :showFilterMenu="false"
+          :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ slotProps.data.MaliyetFirma }}
             </template>
@@ -83,7 +96,11 @@
               />
             </template>
           </Column>
-          <Column field="FaturaNo" header="Fatura No">
+          <Column field="FaturaNo" header="Fatura No"
+                    :showFilterMenu="false"
+          :showClearButton="false"
+          
+          >
             <template #filter="{ filterModel, filterCallback }">
               <InputText
                 v-model="filterModel.value"
@@ -93,7 +110,10 @@
               />
             </template>
           </Column>
-          <Column field="Fiyat" header="Fiyat (TL)">
+          <Column field="Fiyat" header="Fiyat (TL)"
+                    :showFilterMenu="false"
+          :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ formatPriceTl(slotProps.data.Fiyat) }}
             </template>
@@ -101,12 +121,19 @@
               {{ formatPriceTl(total.priceTl) }}
             </template>
           </Column>
-          <Column field="Kur" header="Kur">
+          <Column field="Kur" header="Kur"
+          
+                    :showFilterMenu="false"
+          :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ formatPriceTl(slotProps.data.Kur) }}
             </template>
           </Column>
-          <Column header="Dolar">
+          <Column header="Dolar"
+                    :showFilterMenu="false"
+          :showClearButton="false"
+          >
             <template #body="slotProps">
               {{ formatPriceUsd(slotProps.data.Fiyat / slotProps.data.Kur) }}
             </template>
@@ -141,7 +168,6 @@
           <Column field="Total" header="Toplam">
             <template #body="slotProps">
               {{ slotProps.data.Total | formatPriceUsd }}
-              %
             </template>
           </Column>
 
@@ -159,6 +185,8 @@
       :visible.sync="calculatingCostFormVisible"
       header="Yeni Maliyet Girişi"
       modal
+      blockScroll
+      focusOnShow
     >
       <calculatingCostForm
         :status="status"
@@ -239,11 +267,6 @@ export default {
   },
   methods: {
     excel_maliyet_output() {
-      console.log(this.cost);
-      console.log(this.costWork);
-      console.log(this.productionSqm);
-      console.log(this.costMain);
-
       const data = {
         costs: this.costs,
         ratios: this.calculate_ratio_list,

@@ -1,2 +1,4 @@
 .qodo
 node_modules
+.nuxt
+package-lock.json

@@ -131,7 +131,7 @@
 </template>
 <script>
 import Cookies from "js-cookie";
-// import { io } from "socket.io-client";
+import { io } from "socket.io-client";
 export default {
   props: {
     status: {
@@ -184,9 +184,7 @@ export default {
     if (!this.status) {
       this.createdProcess();
     }
-    // this.socket = io("http://localhost:3001",{
-    //   reconnectionDelayMax: 10000,
-    // })
+
   },
   methods: {
     capitalizeFirstLetter(val) {
@@ -201,23 +199,28 @@ export default {
       this.selectedEdge = null;
       this.model = {};
     },
-    deleteForm() {
-      this.$store.dispatch("setCardsDelete", this.model.ID);
+    async deleteForm() {
+      await this.$store.dispatch("setCardsDelete", this.model.ID);
+      this.$store.getters.getSocket.emit("card_list_update_emit");
+
       this.$emit("card_dialog_form_emit", false);
     },
-    update() {
+    async update() {
       this.model.userId = Cookies.get("userId");
       this.model.date = new Date();
-      this.$store.dispatch("setCardsUpdate", this.model);
+      await this.$store.dispatch("setCardsUpdate", this.model);
+      this.$store.getters.getSocket.emit("card_list_update_emit");
+
       this.$emit("card_dialog_form_emit", false);
       this.$emit("card_dialog_update_values_emit");
 
       this.reset();
     },
-    save() {
+    async save() {
       this.model.userId = Cookies.get("userId");
       this.model.date = new Date();
-      this.$store.dispatch("setCardsSave", this.model);
+      await this.$store.dispatch("setCardsSave", this.model);
+      this.$store.getters.getSocket.emit("card_list_update_emit");
       this.$emit("card_dialog_update_values_emit");
       this.reset();
     },
@@ -396,6 +399,12 @@ export default {
       }
       this.filteredCategory = results;
     },
+  },
+  mounted() {
+    this.$store.dispatch("setConnection");
+  },
+  beforeDestroy() {
+    this.$store.dispatch('setDisconnect')
   },
 };
 </script>

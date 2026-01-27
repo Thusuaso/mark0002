@@ -523,6 +523,8 @@ import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 import date from "../../plugins/date";
 import api from "../../plugins/excel.server";
+import { io } from "socket.io-client";
+
 export default {
   computed: {
     ...mapGetters([
@@ -1081,7 +1083,7 @@ export default {
         return event.toString();
       }
     },
-    save() {
+    async save() {
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||
@@ -1191,7 +1193,7 @@ export default {
         alert("Estimated date is missing");
         return;
       }
-            if (
+      if (
         this.productionModel.KaynakTuruID == null ||
         this.productionModel.KaynakTuruID == "" ||
         this.productionModel.KaynakTuruID == " " ||
@@ -1236,7 +1238,11 @@ export default {
 
       this.$store.dispatch("setOrderProductionSaveButtonStatus", true);
 
-      this.$store.dispatch("setOrderProductionSave", this.productionModel);
+      await this.$store.dispatch(
+        "setOrderProductionSave",
+        this.productionModel
+      );
+      this.$store.getters.getSocket.emit("production_save_emit");
       this.$store.dispatch(
         "setOrderProductionPo",
         this.productionModel.SiparisNo
@@ -2542,22 +2548,16 @@ export default {
     },
   },
   mounted() {
-    // this.$socket.socketIO.on('supplier_list_on', () => {
-    //   this.$store.dispatch('setSupplierList');
-    // });
-    // this.$socket.socketIO.on("production_update_on", () => {
-    //   if (this.$route.path == '/orders/production') {
-    //     this.$store.dispatch("setOrderProductionList");
-    //   } else if (this.$route.path == '/orders/waiting'){
-    //     this.$store.dispatch("setOrderWaitingList")
-    //   }
-    // });
-    // this.$socket.socketIO.on("cards_update_on", () => {
-    //   this.$store.dispatch("setCardList");
-    // });
-    // this.$socket.socketIO.on('customer_list_on', () => {
-    //   this.$store.dispatch('setCustomerList');
-    // });
+    this.$store.dispatch("setConnection");
+
+    this.$store.getters.getSocket.on("update_production_on", () => {
+      console.log("update_production_on");
+      this.$store.dispatch("setOrderProductionList");
+    });
+  },
+  beforeDestroy() {
+    // Sayfadan ayrılınca soketi kapatmayı unutmayın
+    this.$store.dispatch("setDisconnect");
   },
 
   watch: {

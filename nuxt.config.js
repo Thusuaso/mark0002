@@ -37,7 +37,6 @@ export default {
   plugins: [
     "~/plugins/components.js",
     { src: "~/plugins/excel.js", mode: "client" },
-    // '~/plugins/socket.io.js',
     "~/plugins/logs.js",
     "~/plugins/cookies",
     { src: "~/plugins/tcmb-service.js", mode: "client" },
@@ -62,7 +61,6 @@ export default {
     // https://go.nuxtjs.dev/axios
     "@nuxtjs/axios",
     "@nuxtjs/toast",
-    "nuxt-socket-io",
   ],
   toast: {
     position: "top-center",
@@ -117,13 +115,7 @@ export default {
     // { path: "/translate", handler: "~/api/translate.js" },
   ],
   io: {
-    // module options
-    sockets: [
-      {
-        name: "main",
-        url: "socket-io.mekmar.com",
-      },
-    ],
+    sockets: [{ name: "main", url: "http://localhost:3001" }],
   },
   vite: {
     server: {

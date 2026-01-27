@@ -345,6 +345,7 @@
 import { mapGetters } from "vuex";
 import date from "../../../plugins/date";
 import Cookies from "js-cookie";
+import { io } from "socket.io-client";
 
 export default {
   computed: {
@@ -378,6 +379,7 @@ export default {
   },
   data() {
     return {
+      socket: null,
       kutulamaStatus: false,
       fasonStatus: false,
       width: null,
@@ -552,8 +554,12 @@ export default {
         }
       }
     },
-    deleteForm() {
-      this.$store.dispatch("setSelectionProductionDelete", this.model.KasaNo);
+    async deleteForm() {
+      await this.$store.dispatch(
+        "setSelectionProductionDelete",
+        this.model.KasaNo
+      );
+      this.$store.getters.getSocket.emit("update_production_emit");
       this.$emit("selection_production_dialog_form", false);
       this.$store.dispatch("setSelectionProductionTotal");
     },
@@ -571,7 +577,7 @@ export default {
         this.update();
       }
     },
-    save() {
+    async save() {
       let sipAciklama;
       if (this.selectedSaveKind.id == 1) {
         sipAciklama = "Stok";
@@ -615,31 +621,14 @@ export default {
         Kutulama: this.kutulamaStatus,
         KullaniciID: Cookies.get("userId"),
       };
-      // if(data.UrunOcakID == ' ' || data.UrunOcakID == '' || data.UrunOcakID == 0 || data.UrunOcakID == undefined || data.UrunOcakID == null){
-      //   this.$toast.error('Ürün Ocağını Giriniz!')
-      //   return;
-      // }
-      // if(data.UrunKartID == ' ' || data.UrunKartID == '' || data.UrunKartID == 0 || data.UrunKartID == undefined || data.UrunKartID == null){
-      //   this.$toast.error('Ürün Kartını Seçiniz!')
-      //   return;
-      // }
-      // if(data.TedarikciID == ' ' || data.TedarikciID == '' || data.TedarikciID == 0 || data.TedarikciID == undefined || data.TedarikciID == null){
-      //   this.$toast.error('Tedarikçiyi Giriniz!')
-      //   return;
-      // }
-      // if(data.Miktar == ' ' || data.Miktar == '' || data.Miktar == 0 || data.Miktar == undefined || data.Miktar == null){
-      //   this.$toast.error('Miktar Giriniz!')
-      //   return;
-      // }
-      // if(data.Tarih == ' ' || data.Tarih == '' || data.Tarih == 0 || data.Tarih == undefined || data.Tarih == null){
-      //   this.$toast.error('Tarih Giriniz!')
-      //   return;
-      // }
-      this.$store.dispatch("setSelectionProductionSave", data);
+
+      await this.$store.dispatch("setSelectionProductionSave", data);
+      this.$store.getters.getSocket.emit("update_production_emit");
+
       this.$store.dispatch("setSelectionProductionTotal");
       this.reset();
     },
-    update() {
+    async update() {
       let sipAciklama;
       if (this.selectedSaveKind.id == 1) {
         sipAciklama = "Stok";
@@ -683,7 +672,8 @@ export default {
         Fason: this.fasonStatus,
         Kutulama: this.kutulamaStatus,
       };
-      this.$store.dispatch("setSelectionProductionUpdate", data);
+      await this.$store.dispatch("setSelectionProductionUpdate", data);
+      this.$store.getters.getSocket.emit("update_production_emit");
       this.$emit("selection_production_dialog_form", false);
     },
     reset() {
@@ -723,13 +713,13 @@ export default {
     },
     createdProcess() {
       this.selectedSaveKind = this.kinds.find(
-        (x) => x.id == this.model.UretimTurID,
+        (x) => x.id == this.model.UretimTurID
       );
       this.selectedPo = this.orders.find(
-        (x) => x.SiparisNo == this.model.SiparisAciklama,
+        (x) => x.SiparisNo == this.model.SiparisAciklama
       );
       this.selectedSupplier = this.suppliers.find(
-        (x) => x.FirmaAdi == this.model.FirmaAdi,
+        (x) => x.FirmaAdi == this.model.FirmaAdi
       );
       this.selectedDate = date.stringToDate(this.model.Tarih);
       this.selectedAmountStatus = this.model.UrunBirimAdi;
@@ -772,7 +762,7 @@ export default {
       this.kutulamaStatus = this.model.Kutulama;
       this.description = this.model.Aciklama;
       this.notFindStatus = this.__nullNoneTrueFalseControl(
-        this.model.Bulunamadi,
+        this.model.Bulunamadi
       );
       this.outStatus = this.__nullNoneTrueFalseControl(this.model.Disarda);
       this.stringStatus = this.__nullNoneTrueFalseControl(this.model.Bagli);
@@ -864,10 +854,10 @@ export default {
             confirm("Ürün kartı değiştirilecek. Devam etmek istiyor musunuz?")
           ) {
             this.selectedSupplier = this.suppliers.find(
-              (x) => x.ID == event.value.TedarikciID,
+              (x) => x.ID == event.value.TedarikciID
             );
             this.selectedAmountStatus = this.amountStatus.find(
-              (x) => x.id == event.value.UrunBirimID,
+              (x) => x.id == event.value.UrunBirimID
             ).status;
             this.orderProductCardDesc = event.value.Aciklama;
             this.productCardId = event.value.UrunKartId;
@@ -902,10 +892,10 @@ export default {
         }
       } else {
         this.selectedSupplier = this.suppliers.find(
-          (x) => x.ID == event.value.TedarikciID,
+          (x) => x.ID == event.value.TedarikciID
         );
         this.selectedAmountStatus = this.amountStatus.find(
-          (x) => x.id == event.value.UrunBirimID,
+          (x) => x.id == event.value.UrunBirimID
         ).status;
         this.orderProductCardDesc = event.value.Aciklama;
         this.productCardId = event.value.UrunKartId;
@@ -936,7 +926,7 @@ export default {
     poSelected(event) {
       this.$store.dispatch(
         "setSelectionProductionProductsList",
-        event.value.SiparisNo,
+        event.value.SiparisNo
       );
       this.description = event.value.SiparisNo;
     },
@@ -947,7 +937,7 @@ export default {
       } else {
         results = this.orders.filter((x) => {
           return x.SiparisNo.toLowerCase().startsWith(
-            event.query.toLowerCase(),
+            event.query.toLowerCase()
           );
         });
       }
@@ -964,6 +954,13 @@ export default {
       }
       this.filteredSuppliers = results;
     },
+  },
+  mounted() {
+    this.$store.dispatch("setConnection");
+  },
+  beforeDestroy() {
+    // Sayfadan ayrılınca soketi kapatmayı unutmayın
+    this.$store.dispatch("setDisconnect");
   },
 };
 </script>
