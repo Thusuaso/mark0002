@@ -131,27 +131,22 @@
             </td>
 
             <td class="text-center">
-              <span v-if="item.kar_zarar > 0">
+              <span>
                 <span
                   :class="item.profitUsd < 0 ? 'text-danger' : 'text-success'"
                 >
                   {{ formatCurrency(item.kar_zarar) }}
                 </span>
               </span>
-              <span v-else class="text-muted">-</span>
             </td>
 
             <td class="text-center">
-              <span v-if="item.kar_zarar_tl > 0">
+              <span>
                 {{ formatCurrency(item.kar_zarar_tl, "TRY") }}
               </span>
-              <span v-else class="text-muted">-</span>
             </td>
             <td class="text-center text-sm">
-              <span v-if="item.kar_zarar_tl_yuzdesi > 0">
-                %{{ item.kar_zarar_tl_yuzdesi }}
-              </span>
-              <span v-else class="text-muted">-</span>
+              <span> %{{ item.kar_zarar_tl_yuzdesi }} </span>
             </td>
 
             <td class="text-center">
