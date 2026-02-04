@@ -111,7 +111,6 @@
 <script>
 import Cookies from "js-cookie";
 import {mapGetters} from 'vuex';
-import api from "~/plugins/excel.server";
 import {FilterMatchMode,FilterOperator} from 'primevue/api/';
 
 export default {
@@ -218,7 +217,7 @@ export default {
         'paid':this.paidList
       }
 
-      api.post("/finance/mekmar/excel/custom", data).then((response) => {
+      this.$excelApi.post("/finance/mekmar/excel/custom", data).then((response) => {
         if (response.status) {
           const link = document.createElement("a");
           link.href = this.getLocalUrl + "finance/mekmar/excel/custom";

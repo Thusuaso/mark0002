@@ -352,8 +352,7 @@
 <script>
 import { mapGetters } from "vuex";
 import date from "@/plugins/date";
-import api from "@/plugins/excel.server.js";
-import server from "@/plugins/excel.server";
+
 
 export default {
   computed: {
@@ -474,7 +473,7 @@ export default {
       labour: 0,
       balanced: 0,
     };
-    api.get("/finance/po/list/mekmer/month/" + month).then((res) => {
+    this.$excelApi.get("/finance/po/list/mekmer/month/" + month).then((res) => {
       this.monthly_mekmar_finance_list = res.data.ayrinti_list;
       res.data.ayrinti_list.forEach((x) => {
         this.mekmarListTotal.order += x.toplam;
@@ -529,10 +528,10 @@ export default {
         });
     },
     saveFinanceMekmar() {
-      api.post("/finance/mekmar/po/paid/save", this.model).then((res) => {
+      this.$excelApi.post("/finance/mekmar/po/paid/save", this.model).then((res) => {
         if (res) {
           this.$toast.success("Success");
-          api
+          this.$excelApi
             .get("/finance/po/list/mekmer/month/" + this.selectedMonth.id)
             .then((res) => {
               this.monthly_mekmar_finance_list = res.data.ayrinti_list;
@@ -552,14 +551,14 @@ export default {
       const year = event.getFullYear();
       const month = event.getMonth() + 1;
       const day = event.getDate();
-      server
+      this.$excelApi
         .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
         .then((response) => {
           this.model.currency = parseFloat(response.data);
         });
     },
     monthSelected(event) {
-      api.get("/finance/po/list/mekmer/month/" + event.value.id).then((res) => {
+      this.$excelApi.get("/finance/po/list/mekmer/month/" + event.value.id).then((res) => {
         this.mekmarListTotal.order = 0;
         this.mekmarListTotal.labour = 0;
         this.mekmarListTotal.balanced = 0;
@@ -585,7 +584,7 @@ export default {
       }
     },
     excel_output() {
-      api
+      this.$excelApi
         .post("/finance/reports/test/excel/mekmer", this.getFinanceListFilter)
         .then((response) => {
           if (response.status) {

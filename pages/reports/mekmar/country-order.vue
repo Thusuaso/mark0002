@@ -147,7 +147,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "~/plugins/excel.server";
 export default {
   computed: {
     ...mapGetters(["getLocalUrl"]),
@@ -260,7 +259,7 @@ export default {
         four_year_ago: this.list_four_year_ago,
         five_year_ago: this.list_five_year_ago,
       };
-      api.post("/maliyet/dosyalar/countries", data).then((response) => {
+      this.$excelApi.post("/maliyet/dosyalar/countries", data).then((response) => {
         if (response.status) {
           const link = document.createElement("a");
           link.href = this.getLocalUrl + "maliyet/dosyalar/countries";

@@ -230,7 +230,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import api from '@/plugins/excel.server';
 export default {
   computed: {
     ...mapGetters(["getProductList", "getLocalUrl","getOrderList","getFilteredSelectionList"]),
@@ -578,7 +577,7 @@ export default {
   methods: {
     ticket_click_excel(){
 
-      api.post('/seleksiyon/etiket/excel',this.getFilteredSelectionList)
+      this.$excelApi.post('/seleksiyon/etiket/excel',this.getFilteredSelectionList)
       .then(res=>{
         if (res.status) {
             const link = document.createElement("a");
@@ -591,7 +590,7 @@ export default {
       });
     },
     selection_click_excel(){
-      api
+      this.$excelApi
         .post("/siparisler/dosyalar/seleksiyon/excel/output", this.getProductList)
         .then((response) => {
           if (response.status) {
@@ -606,7 +605,7 @@ export default {
     },
 
     orders_click_excel(){
-      api
+      this.$excelApi
         .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
         .then((response) => {
           if (response.status) {

@@ -489,7 +489,6 @@
 <script>
 import date from "../../plugins/date";
 import Cookies from "js-cookie";
-import api from "@/plugins/excel.server";
 
 import fileService from "~/plugins/upload.js";
 import { mapGetters } from "vuex";

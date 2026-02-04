@@ -73,7 +73,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "@/plugins/excel.server.js";
 export default {
   computed: {
     ...mapGetters([
@@ -118,7 +117,7 @@ export default {
     excel_output() {
       this.$store.dispatch("setBeginLoadingAction");
 
-      api
+      this.$excelApi
         .post("/raporlar/listeler/stokRaporExcelListe", this.getReportsMekmerStockList)
         .then((response) => {
           if (response.status) {

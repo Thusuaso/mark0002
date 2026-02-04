@@ -138,7 +138,6 @@ import date from "../../../plugins/date";
 import upload from "../../../plugins/upload";
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
-import server from "../../../plugins/excel.server";
 export default {
   computed: {
     ...mapGetters(["getContainerResults"]),
@@ -278,7 +277,7 @@ export default {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      server
+      this.$excelApi
         .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
         .then((response) => {
           this.currency = parseFloat(response.data);

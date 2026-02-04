@@ -184,7 +184,6 @@ export default {
     if (!this.status) {
       this.createdProcess();
     }
-
   },
   methods: {
     capitalizeFirstLetter(val) {
@@ -404,7 +403,9 @@ export default {
     this.$store.dispatch("setConnection");
   },
   beforeDestroy() {
-    this.$store.dispatch('setDisconnect')
+    if (this.socket) {
+      this.$store.dispatch("setDisconnect");
+    }
   },
 };
 </script>

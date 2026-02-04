@@ -189,7 +189,6 @@ import currency from "../../plugins/currency";
 import date from "../../plugins/date";
 import upload from "../../plugins/upload";
 import Cookies from "js-cookie";
-import server from "@/plugins/excel.server";
 
 export default {
   props: {
@@ -354,7 +353,7 @@ export default {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      server
+      this.$excelApi
         .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
         .then((response) => {
           this.currency = parseFloat(response.data);

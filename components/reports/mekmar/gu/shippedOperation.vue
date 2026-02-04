@@ -628,7 +628,6 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import api from '../../../../plugins/excel.server';
 
 export default {
     computed: {
@@ -742,7 +741,7 @@ export default {
                 'previousYearOperation': this.getReportsMekmarGuOperationPreviousYearForw,
                 'twoYearAgoOperation': this.getReportsMekmarGuOperationTwoYearAgoForw
             };
-            api.post('/gu/reports/seller/operation/forwarding', data)
+            this.$excelApi.post('/gu/reports/seller/operation/forwarding', data)
                 .then(response => {
                     if (response.status) {
                         const link = document.createElement("a");

@@ -94,7 +94,6 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 import date from "@/plugins/date";
-import api from "@/plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
@@ -184,7 +183,7 @@ export default {
 
         return new_date_b - new_date_a;
       });
-      api
+      this.$excelApi
         .post("/siparisler/dosyalar/uretimExcelCikti", new_data)
         .then((response) => {
           if (response.status) {

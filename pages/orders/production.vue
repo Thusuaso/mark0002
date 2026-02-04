@@ -522,7 +522,6 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 import date from "../../plugins/date";
-import api from "../../plugins/excel.server";
 import { io } from "socket.io-client";
 
 export default {
@@ -833,7 +832,7 @@ export default {
       this.$store.dispatch("setOrderProductionProformaDelete", id);
     },
     excel_output() {
-      api
+      this.$excelApi
         .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
         .then((response) => {
           if (response.status) {
@@ -2556,8 +2555,9 @@ export default {
     });
   },
   beforeDestroy() {
-    // Sayfadan ayrılınca soketi kapatmayı unutmayın
-    this.$store.dispatch("setDisconnect");
+    if (this.socket) {
+      this.$store.dispatch("setDisconnect");
+    }
   },
 
   watch: {

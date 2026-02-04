@@ -1,9 +1,37 @@
 import bodyParser from "body-parser";
+import crypto from "crypto";
+import https from "https";
+
+try {
+  const httpsAgent = new https.Agent({
+    secureOptions:
+      crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT |
+      crypto.constants.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION,
+  });
+
+  // Hem global https isteklerini hem de axios'u etkilemesi için:
+  https.globalAgent.options.secureOptions = httpsAgent.options.secureOptions;
+} catch (error) {
+  console.log("SSL Patch uyarısı (Önemli değil):", error.message);
+}
 export default {
+  // SSR modunun açık olduğundan emin olalım
+  ssr: true,
+
+  // --- KRİTİK AYAR ---
+  // Windows'ta dosya takılmalarını önleyen en önemli ayar budur.
+  // Dosyaları sürekli dinlemek yerine belirli aralıklarla yoklar.
+  watchers: {
+    webpack: {
+      poll: 1000,
+      ignored: /node_modules/,
+    },
+  },
+
   typescript: {
     shim: false,
   },
-  // Global page headers: https://go.nuxtjs.dev/config-head
+
   head: {
     title: "GOZ",
     htmlAttrs: {
@@ -14,10 +42,6 @@ export default {
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { hid: "description", name: "description", content: "" },
       { name: "format-detection", content: "telephone=no" },
-      {
-        name: "google-site-verification",
-        content: "-2spBZ_-lBKXZMQ9r5jpKUNxQ_KOI1Gf_CVKyn7URHA",
-      },
     ],
     link: [{ rel: "primevue/resources/themes/vela-orange/theme.css" }],
     script: [
@@ -26,30 +50,26 @@ export default {
       },
     ],
   },
-  // Global CSS: https://go.nuxtjs.dev/config-css
+
   css: [
     "primeflex/primeflex.css",
-    "~/assets/css/bootstrap.css",
-    "~/assets/css/bootstrap.min.css",
+    "~/assets/css/bootstrap.min.css", // Sadece minified olan kalsın, diğeri silindi.
   ],
 
-  // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     "~/plugins/components.js",
     { src: "~/plugins/excel.js", mode: "client" },
     "~/plugins/logs.js",
     "~/plugins/cookies",
     { src: "~/plugins/tcmb-service.js", mode: "client" },
+    "~/plugins/excelApi.js",
   ],
 
-  // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
-  // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [],
-  // Modules: https://go.nuxtjs.dev/config-modules
+
   modules: [
-    // Doc: https://www.primefaces.org/primevue/showcase-v2/#/setup
     [
       "primevue/nuxt",
       {
@@ -57,39 +77,22 @@ export default {
         ripple: true,
       },
     ],
-
-    // https://go.nuxtjs.dev/axios
     "@nuxtjs/axios",
     "@nuxtjs/toast",
   ],
-  toast: {
-    position: "top-center",
-    duration: 3000,
-    register: [
-      // Register custom toasts
-      {
-        name: "my-error",
-        message: "Oops...Something went wrong",
-        options: {
-          type: "error",
-        },
-      },
-    ],
-  },
-  // Axios module configuration: https://go.nuxtjs.dev/config-axios
+
   axios: {
-    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
     baseURL: process.env.server,
     browserBaseURL: process.env.server,
   },
 
+  // Proxy ayarları
   proxy: {
     "/tcmb-api/": {
       target: "https://www.tcmb.gov.tr/kurlar/",
       pathRewrite: { "^/tcmb-api/": "" },
       changeOrigin: true,
-      secure: false, // SSL sertifika hatalarını yoksay (bazen gerekir)
-      // Kendimizi tarayıcı gibi gösterelim
+      secure: false,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -97,31 +100,51 @@ export default {
       },
     },
   },
-  // Build Configuration: https://go.nuxtjs.dev/config-build
+
+  // --- BUILD OPTİMİZASYONU ---
   build: {
-    // https://github.com/primefaces/primevue/issues/844
+    // Windows kilitlenmelerini önleyen ayarlar:
+    parallel: false,
+    cache: false,
+    hardSource: false,
+
+    // Derleme hızını artırır
+    productionSourceMap: false,
+
+    // Minifikasyon işleminin sistemi kilitlemesini önler
+    terser: {
+      parallel: false,
+      sourceMap: false,
+    },
+
     transpile: ["primevue"],
-    standalone: false,
+
     loaders: {
+      scss: {
+        implementation: require("sass"),
+      },
       vue: {
         prettify: false,
       },
     },
+
+    // Geliştirme modu için hafif kaynak haritası
+    extend(config, ctx) {
+      if (ctx.isDev) {
+        config.devtool = "eval-cheap-module-source-map";
+      }
+    },
   },
+
   serverMiddleware: [
     bodyParser.json(),
     "~/api",
     { path: "/tcmb-api", handler: "~/api/tcmb.js" },
-    // { path: "/translate", handler: "~/api/translate.js" },
   ],
+
   io: {
     sockets: [{ name: "main", url: "http://localhost:3001" }],
   },
-  vite: {
-    server: {
-      hmr: {
-        protocol: "ws",
-      },
-    },
-  },
+
+  // Vite ayarı kaldırıldı.
 };

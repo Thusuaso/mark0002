@@ -9,11 +9,10 @@
           @click="newForm"
         />
       </div>
-      <div class="col-sm-3">
+      <div class="col-sm-1">
         <Button
-          class="w-100 mb-5 p-button-info"
+          class="mb-5 p-button-info pi pi-file-excel"
           type="button"
-          label="Excel Stripler"
           @click="excel_strip_output"
         />
       </div>
@@ -25,12 +24,26 @@
           @click="newFormMoloz"
         />
       </div>
+      <div class="col-sm-1">
+        <Button
+          class="pi pi-file-excel mb-5 p-button-info"
+          type="button"
+          @click="excel_strip_output_moloz"
+        />
+      </div>
       <div class="col-sm-3">
         <Button
-          class="w-100 mb-5 p-button-info"
+          class="w-100 mb-5 p-button-success"
           type="button"
-          label="Excel Molozlar"
-          @click="excel_strip_output_moloz"
+          label="Yeni Nakliye"
+          @click="newFormNakliye"
+        />
+      </div>
+      <div class="col-sm-1">
+        <Button
+          class="pi pi-file-excel mb-5 p-button-info"
+          type="button"
+          @click="excel_strip_output_nakliye"
         />
       </div>
     </div>
@@ -61,7 +74,7 @@
       </span>
     </div>
     <div class="row m-auto text-center">
-      <div class="col-6">
+      <div class="col-4">
         <DataTable
           :value="list"
           responsiveLayout="scroll"
@@ -75,6 +88,8 @@
           :filters.sync="filteredStrips"
           filterDisplay="row"
           @filter="stripsFiltered($event)"
+          scrollable
+          scrollHeight="500px"
         >
           <template #header>STRIPLER</template>
           <Column
@@ -223,7 +238,7 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col-6">
+      <div class="col-4">
         <DataTable
           :value="moloz_list"
           responsiveLayout="scroll"
@@ -237,6 +252,8 @@
           :filters.sync="filteredMoloz"
           filterDisplay="row"
           @filter="molozFiltered($event)"
+          scrollable
+          scrollHeight="500px"
         >
           <template #header>MOLOZLAR</template>
           <Column
@@ -385,6 +402,174 @@
             </template>
             <template #footer>
               {{ total_moloz.total_usd | formatPriceUsd }}
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+      <div class="col-4">
+        <DataTable
+          :value="nakliyeList"
+          responsiveLayout="scroll"
+          class="p-datatable-sm"
+          :resizableColumns="true"
+          columnResizeMode="fit"
+          showGridlines
+          :selection.sync="selectedNakliye"
+          selectionMode="single"
+          @row-click="nakliyeDatatableSelected($event)"
+          :filters.sync="filteredNakliye"
+          filterDisplay="row"
+          @filter="nakliyeFiltered($event)"
+          scrollable
+          scrollHeight="500px"
+        >
+          <template #header>Nakliye</template>
+          <Column
+            field="Tarih"
+            header="Tarih"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.Tarih | dateToString }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="PlakaNo"
+            header="Plaka No"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.PlakaNo }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="İrsaliyeNo"
+            header="İrsaliye No"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.İrsaliyeNo }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="FaturaNo"
+            header="Fatura No"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.FaturaNo }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="FirmaAdi"
+            header="Firma Adı"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.FirmaAdi }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+          <Column
+            field="KimdenAdi"
+            header="Kimden"
+            :showFilterMenu="false"
+            :showClearButton="false"
+          >
+            <template #body="slotProps">
+              {{ slotProps.data.KimdenAdi }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
+          </Column>
+
+          <Column field="Ton" header="Ton">
+            <template #body="slotProps">
+              {{ slotProps.data.Ton | formatDecimal }}
+            </template>
+            <template #footer>
+              {{ nakliyeTotal.ton | formatDecimal }}
+            </template>
+          </Column>
+          <Column field="BirimFiyatTL" header="Fiyat (TL)">
+            <template #body="slotProps">
+              {{ slotProps.data.BirimFiyatTL | formatPriceTl }}
+            </template>
+          </Column>
+          <Column field="BirimFiyatDolar" header="Fiyat ($)">
+            <template #body="slotProps">
+              {{ slotProps.data.BirimFiyatDolar | formatPriceUsd }}
+            </template>
+          </Column>
+          <Column field="Currency" header="Kur">
+            <template #body="slotProps">
+              {{ slotProps.data.Kur | formatPriceUsd }}
+            </template>
+          </Column>
+          <Column field="ToplamTl" header="Toplam (₺)">
+            <template #body="slotProps">
+              {{ slotProps.data.ToplamTl | formatPriceTl }}
+            </template>
+            <template #footer>
+              {{ nakliyeTotal.total_tl | formatPriceTl }}
+            </template>
+          </Column>
+          <Column field="ToplamDolar" header="Toplam ($)">
+            <template #body="slotProps">
+              {{ slotProps.data.ToplamDolar | formatPriceUsd }}
+            </template>
+            <template #footer>
+              {{ nakliyeTotal.total_usd | formatPriceUsd }}
             </template>
           </Column>
         </DataTable>
@@ -760,10 +945,164 @@
         </div>
       </div>
     </Dialog>
+    <Dialog
+      :visible.sync="nakliye_dialog_visible"
+      :header="nakliye_dialog_header"
+      modal
+    >
+      <div class="row mt-3">
+        <div class="col-6">
+          <currencyApi
+            @dateSelectedEmit="dateNakliyeSelected($event)"
+            @rateFetchedEmit="rateFetchedNakliye($event)"
+          />
+        </div>
+        <div class="col-6">
+          <div class="row gap-1">
+            <div class="col-3">
+              <span class="p-float-label">
+                <InputText
+                  class="w-100"
+                  id="plate_no"
+                  v-model="modelNakliye.plate_no"
+                  :disabled="!modelNakliye.currency"
+                />
+                <label for="plate_no">Plaka No</label>
+              </span>
+            </div>
+            <div class="col-3">
+              <span class="p-float-label">
+                <InputText
+                  class="w-100"
+                  id="document_no"
+                  v-model="modelNakliye.document_no"
+                  :disabled="!modelNakliye.currency"
+                />
+                <label for="document_no">İrsaliye No</label>
+              </span>
+            </div>
+            <div class="col-3">
+              <span class="p-float-label">
+                <InputText
+                  class="w-100"
+                  id="invoice_no"
+                  v-model="modelNakliye.invoice_no"
+                  :disabled="!modelNakliye.currency"
+                />
+                <label for="invoice_no">Fatura No</label>
+              </span>
+            </div>
+            <div class="col-3">
+              <span class="p-float-label">
+                <AutoComplete
+                  id="supplier"
+                  v-model="selectedNakliyeFirma"
+                  :suggestions="filteredNakliyeFirma"
+                  @complete="searchNakliyeFirma($event)"
+                  field="FirmaAdi"
+                  @item-select="nakliyeSelectedFirma($event)"
+                  @input="supplierInputFirma($event)"
+                  :disabled="!modelNakliye.currency"
+                />
+                <label for="supplier">Firma</label>
+              </span>
+            </div>
+            <div class="col-3">
+              <span class="p-float-label">
+                <AutoComplete
+                  id="supplier"
+                  v-model="selectedNakliyeKimden"
+                  :suggestions="filteredNakliyeKimden"
+                  @complete="searchNakliyeKimden($event)"
+                  field="KimdenAdi"
+                  @item-select="nakliyeSelectedKimden($event)"
+                  @input="supllierInputKimden($event)"
+                  :disabled="!modelNakliye.currency"
+                />
+                <label for="supplier">Kimden</label>
+              </span>
+            </div>
+            <div class="col-3">
+              <CustomInput
+                :value="modelNakliye.ton"
+                text="Ton"
+                @onInput="modelNakliye.ton = $event"
+                :disabled="!modelNakliye.currency"
+              />
+            </div>
+            <div class="col-3">
+              <CustomInput
+                :value="modelNakliye.price_tl"
+                text="Fiyat (₺)"
+                @onInput="modelNakliye.price_tl = $event"
+                :disabled="!modelNakliye.currency"
+              />
+            </div>
+            <div class="col-3">
+              <CustomInput
+                :value="modelNakliye.price_usd"
+                text="Fiyat ($)"
+                @onInput="modelNakliye.price_usd = $event"
+                :disabled="true"
+              />
+            </div>
+            <div class="col-3">
+              <CustomInput
+                :value="modelNakliye.total_tl"
+                text="Toplam (₺)"
+                @onInput="modelNakliye.total_tl = $event"
+                :disabled="true"
+              />
+            </div>
+            <div class="col-3">
+              <CustomInput
+                :value="modelNakliye.total_usd"
+                text="Toplam ($)"
+                @onInput="modelNakliye.total_usd = $event"
+                :disabled="true"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4">
+              <Button
+                class="w-100 p-button-secondary"
+                type="button"
+                label="Hesapla"
+                @click="calculateNakliyeUsdTl"
+                :disabled="!modelNakliye.currency"
+              />
+            </div>
+            <div :class="new_button_status_nakliye ? 'col-6' : 'col-4'">
+              <Button
+                :class="
+                  new_button_status_nakliye
+                    ? 'w-100 p-button-success'
+                    : 'w-100 p-button-warning'
+                "
+                type="button"
+                :label="new_button_status_nakliye ? 'Kaydet' : 'Güncelle'"
+                :disabled="!modelNakliye.currency"
+                @click="processNakliye"
+                :loading="nakliye_save_button_loading"
+              />
+            </div>
+            <div class="col-4" v-if="!new_button_status_nakliye">
+              <Button
+                class="w-100 p-button-danger"
+                type="button"
+                label="Sil"
+                @click="deleteNakliye"
+                :loading="nakliye_delete_button_loading"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script>
-import server from "../../../plugins/excel.server";
 import date from "../../../plugins/date";
 import { mapGetters } from "vuex";
 import { FilterMatchMode } from "primevue/api";
@@ -774,6 +1113,20 @@ export default {
   },
   data() {
     return {
+      selectedNakliye: null,
+      nakliye_delete_button_loading: false,
+      nakliyeTotal: {
+        ton: 0,
+        total_tl: 0,
+        total_usd: 0,
+      },
+      nakliye_save_button_loading: false,
+      filteredNakliyeKimden: null,
+      selectedNakliyeKimden: null,
+      nakliyeFirmaList: [],
+      nakliyeKimdenList: [],
+      filteredNakliyeFirma: null,
+      selectedNakliyeFirma: null,
       filteredMoloz: {
         Date: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         İrsaliyeNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -788,6 +1141,14 @@ export default {
         SupplierName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         QuarryName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Invoice: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
+      filteredNakliye: {
+        Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        PlakaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        İrsaliyeNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FaturaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KimdenAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       moloz_list: [],
       selectedMolozData: {},
@@ -839,6 +1200,23 @@ export default {
         currency: 0,
         irsaliye_no: "",
       },
+      modelNakliye: {
+        id: 0,
+        date: null,
+        plate_no: "",
+        document_no: "",
+        invoice_no: "",
+        company_name: "",
+        company_id: "",
+        supplier_name: "",
+        supplier_id: "",
+        ton: 0,
+        price_tl: 0,
+        price_usd: 0,
+        total_tl: 0,
+        total_usd: 0,
+        currency: 0,
+      },
       selectedQuarry: null,
       filteredQuarry: null,
       selectedStrip: null,
@@ -881,6 +1259,10 @@ export default {
         { id: 1, currency: "USD" },
         { id: 2, currency: "TL" },
       ],
+      new_button_status_nakliye: false,
+      nakliye_dialog_header: "",
+      nakliye_dialog_visible: false,
+      nakliyeList: [],
     };
   },
   created() {
@@ -946,8 +1328,245 @@ export default {
       .catch((err) => {
         console.log("err", err);
       });
+    this.nakliyeCalculate();
   },
   methods: {
+    nakliyeFiltered(event) {
+      this.nakliyeTotal = {
+        ton: 0,
+        total_tl: 0,
+        total_usd: 0,
+      };
+
+      event.filteredValue.forEach((x) => {
+        this.nakliyeTotal.ton += x.Ton;
+        this.nakliyeTotal.total_tl += x.ToplamTl;
+        this.nakliyeTotal.total_usd += x.ToplamDolar;
+      });
+    },
+    async calculateNakliyeUsdTl() {
+      if (!this.modelNakliye.currency) {
+        alert("Lütfen önce kuru seçiniz.");
+        return;
+      }
+      if (!this.modelNakliye.ton || !this.modelNakliye.price_tl) {
+        alert("Lütfen ton ve fiyat (₺) alanlarını doldurunuz.");
+        return;
+      }
+      this.modelNakliye.total_tl = await parseFloat(
+        this.modelNakliye.ton * this.modelNakliye.price_tl
+      );
+      this.modelNakliye.price_usd = await parseFloat(
+        this.modelNakliye.price_tl / this.modelNakliye.currency
+      );
+      this.modelNakliye.total_usd = await parseFloat(
+        this.modelNakliye.ton * this.modelNakliye.price_usd
+      );
+    },
+    deleteNakliye() {
+      this.nakliye_delete_button_loading = true;
+      this.$axios
+        .get(`/reports/mekmer/nakliye/deleted/${this.modelNakliye.id}`)
+        .then((res) => {
+          if (res.data.status) {
+            this.nakliye_delete_button_loading = false;
+            this.nakliye_dialog_visible = false;
+            this.$toast.success("Silme Başarılı.");
+            this.nakliyeReset();
+          } else {
+            this.$toast.error("Silme Başarısız.");
+          }
+        });
+    },
+    nakliyeDatatableSelected(event) {
+      this.new_button_status_nakliye = false;
+      this.nakliye_dialog_header = "Nakliye Düzenle";
+      this.nakliye_dialog_visible = true;
+      this.modelNakliye.id = event.data.ID;
+      this.modelNakliye.date = event.data.Tarih;
+      this.modelNakliye.plate_no = event.data.PlakaNo;
+      this.modelNakliye.document_no = event.data.İrsaliyeNo;
+      this.modelNakliye.invoice_no = event.data.FaturaNo;
+      this.modelNakliye.company_name = event.data.FirmaAdi;
+      this.modelNakliye.company_id = event.data.FirmaID;
+      this.modelNakliye.supplier_name = event.data.KimdenAdi;
+      this.modelNakliye.supplier_id = event.data.KimdenID;
+      this.modelNakliye.ton = event.data.Ton;
+      this.modelNakliye.price_tl = event.data.BirimFiyatTL;
+      this.modelNakliye.price_usd = event.data.BirimFiyatDolar;
+      this.modelNakliye.total_tl = event.data.ToplamTl;
+      this.modelNakliye.total_usd = event.data.ToplamDolar;
+      this.modelNakliye.currency = event.data.Kur;
+      this.selectedNakliyeFirma = this.nakliyeFirmaList.find(
+        (x) => x.ID === event.data.FirmaID
+      );
+      this.selectedNakliyeKimden = this.nakliyeKimdenList.find(
+        (x) => x.ID === event.data.KimdenID
+      );
+    },
+    async nakliyeCalculate() {
+      await this.$axios
+        .get(
+          `/reports/mekmer/nakliye/listesi/${this.selectedYear.year}/${this.selectedMonth.month_id}`
+        )
+        .then(async (res) => {
+          this.nakliyeList = await res.data.list;
+          this.nakliyeTotal = {
+            ton: 0,
+            total_tl: 0,
+            total_usd: 0,
+          };
+
+          res.data.list.forEach((x) => {
+            this.nakliyeTotal.ton += x.Ton;
+            this.nakliyeTotal.total_tl += x.ToplamTl;
+            this.nakliyeTotal.total_usd += x.ToplamDolar;
+          });
+        });
+      this.$axios.get("/reports/mekmer/nakliye/firma/list").then((res) => {
+        this.nakliyeFirmaList = res.data.list;
+      });
+      this.$axios.get("/reports/mekmer/nakliye/kimden/list").then((res) => {
+        this.nakliyeKimdenList = res.data.list;
+      });
+    },
+    async processNakliye() {
+      if (this.new_button_status_nakliye) {
+        if (!this.modelNakliye.price_tl) {
+          alert("Lütfen fiyat (₺) alanını doldurunuz.");
+          return;
+        }
+        if (!this.modelNakliye.ton) {
+          alert("Lütfen ton alanını doldurunuz.");
+          return;
+        }
+        this.nakliye_save_button_loading = true;
+
+        await this.calculateNakliyeUsdTl();
+        await this.$axios
+          .post("/reports/mekmer/nakliye/save", this.modelNakliye)
+          .then((res) => {
+            if (res.data.status) {
+              this.nakliye_save_button_loading = false;
+              this.$toast.success("Kayıt Başarılı.");
+
+              this.nakliyeReset();
+            } else {
+              this.$toast.error("Kayıt Başarısız.");
+            }
+          });
+      } else {
+        this.nakliye_save_button_loading = true;
+
+        await this.calculateNakliyeUsdTl();
+        await this.$axios
+          .put("/reports/mekmer/nakliye/update", this.modelNakliye)
+          .then((res) => {
+            if (res.data.status) {
+              this.nakliye_save_button_loading = false;
+              this.$toast.success("Güncelleme Başarılı.");
+              this.nakliyeCalculate();
+            } else {
+              this.$toast.error("Güncelleme Başarısız.");
+            }
+          });
+      }
+    },
+    nakliyeReset() {
+      this.modelNakliye = {
+        id: null,
+        date: null,
+        plate_no: "",
+        document_no: "",
+        invoice_no: "",
+        company_name: "",
+        company_id: "",
+        supplier_name: "",
+        supplier_id: "",
+        ton: 0,
+        price_tl: 0,
+        price_usd: 0,
+        total_tl: 0,
+        total_usd: 0,
+        currency: 0,
+      };
+      this.selectedNakliyeFirma = null;
+      this.selectedNakliyeKimden = null;
+      this.nakliyeCalculate();
+    },
+    supllierInputKimden(event) {
+      this.modelNakliye.supplier_id = null;
+      this.modelNakliye.supplier_name = event;
+    },
+    nakliyeSelectedKimden(event) {
+      this.modelNakliye.supplier_id = event.value.ID;
+      this.modelNakliye.supplier_name = event.value.KimdenAdi;
+    },
+    searchNakliyeKimden(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.nakliyeKimdenList;
+      } else {
+        results = this.nakliyeKimdenList
+          .filter((x) => {
+            return x.KimdenAdi.toUpperCase().startsWith(
+              event.query.toUpperCase()
+            );
+          })
+          .slice(0, 15);
+      }
+      this.filteredNakliyeKimden = results;
+    },
+    /*Firma */
+    searchNakliyeFirma(event) {
+      let results;
+      if (event.query.length == 0) {
+        results = this.nakliyeFirmaList;
+      } else {
+        results = this.nakliyeFirmaList
+          .filter((x) => {
+            return x.FirmaAdi.toUpperCase().startsWith(
+              event.query.toUpperCase()
+            );
+          })
+          .slice(0, 15);
+      }
+      this.filteredNakliyeFirma = results;
+    },
+    nakliyeSelectedFirma(event) {
+      this.modelNakliye.company_id = event.value.ID;
+      this.modelNakliye.company_name = event.value.FirmaAdi;
+    },
+    supplierInputFirma(event) {
+      this.modelNakliye.company_id = null;
+      this.modelNakliye.company_name = event;
+    },
+
+    rateFetchedNakliye(event) {
+      this.modelNakliye.currency = event.rate;
+    },
+    dateNakliyeSelected(event) {
+      this.modelNakliye.date = date.dateToString(event);
+    },
+    excel_strip_output_nakliye() {
+      this.$excelApi
+        .post("/reports/mekmer/nakliye/excel", this.nakliyeList)
+        .then((res) => {
+          if (res.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "reports/mekmer/nakliye/excel";
+            link.setAttribute("download", "reports_mekmer_nakliye.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
+    },
+    newFormNakliye() {
+      this.nakliyeReset();
+      this.new_button_status_nakliye = true;
+      this.nakliye_dialog_header = "Yeni Nakliye";
+      this.nakliye_dialog_visible = true;
+    },
     molozFiltered(event) {
       this.__molozSumTotal(event.filteredValue);
     },
@@ -1144,7 +1763,7 @@ export default {
       const month = event.getMonth() + 1;
       const day = event.getDate();
 
-      server
+      this.$excelApi
         .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
         .then((response) => {
           this.moloz_model.currency = parseFloat(response.data);
@@ -1166,13 +1785,12 @@ export default {
       this.new_button_status_moloz = true;
     },
     excel_strip_output_moloz() {
-      server
+      this.$excelApi
         .post("/reports/mekmer/moloz/excel", this.moloz_list)
         .then((res) => {
           if (res.status) {
             const link = document.createElement("a");
             link.href = this.getLocalUrl + "reports/mekmer/moloz/excel";
-
             link.setAttribute("download", "reports_mekmer_moloz.xlsx");
             document.body.appendChild(link);
             link.click();
@@ -1209,16 +1827,17 @@ export default {
       });
     },
     excel_strip_output() {
-      server.post("/reports/mekmer/strips/excel", this.list).then((res) => {
-        if (res.status) {
-          const link = document.createElement("a");
-          link.href = this.getLocalUrl + "reports/mekmer/strips/excel";
-
-          link.setAttribute("download", "reports_mekmer_strips.xlsx");
-          document.body.appendChild(link);
-          link.click();
-        }
-      });
+      this.$excelApi
+        .post("/reports/mekmer/strips/excel", this.list)
+        .then((res) => {
+          if (res.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "reports/mekmer/strips/excel";
+            link.setAttribute("download", "reports_mekmer_strips.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
     },
     stripDataSelected(event) {
       this.new_button_status = false;
@@ -1269,7 +1888,7 @@ export default {
           (parseFloat(this.model.stripWidth) / 100) /
           (parseFloat(this.model.stripHeight) / 100)
       );
-      if (this.model.stripPiece == NaN || !isFinite(this.model.stripPiece)) {
+      if (isNaN(this.model.stripPiece) || !isFinite(this.model.stripPiece)) {
         this.model.stripPiece = 0;
       }
       this.model.stripCostUsd =
@@ -1339,10 +1958,12 @@ export default {
           this.moloz_list = res.data.list;
           this.__molozSumTotal(res.data.list);
         });
+
+      this.nakliyeCalculate();
     },
     searchSupplier(event) {
       let results;
-      if (event.query.lenght == 0) {
+      if (event.query.length == 0) {
         results = this.suppliers;
       } else {
         results = this.suppliers
@@ -1366,7 +1987,7 @@ export default {
     },
     searchQuarry(event) {
       let results;
-      if (event.query.lenght == 0) {
+      if (event.query.length == 0) {
         results = this.quarries;
       } else {
         results = this.quarries
@@ -1390,7 +2011,7 @@ export default {
     },
     searchStrip(event) {
       let results;
-      if (event.query.lenght == 0) {
+      if (event.query.length == 0) {
         results = this.strips;
       } else {
         results = this.strips

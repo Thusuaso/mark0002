@@ -101,8 +101,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "~/plugins/excel.server.js";
-import OfferCountry from "../../../components/reports/mekmar/gu/offerCountry.vue";
 export default {
   middleware: ["authority"],
   computed: {
@@ -134,18 +132,18 @@ export default {
   },
   created() {
     this.selectedYear = { Year: 2026 };
-    api
+    this.$excelApi
       .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year}`)
       .then((res) => {
         this.ayoListThisYear = res.data;
       });
 
-    api
+    this.$excelApi
       .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 1}`)
       .then((res) => {
         this.ayoListOneYearAgo = res.data;
       });
-    api
+    this.$excelApi
       .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year - 2}`)
       .then((res) => {
         this.ayoListTwoYearAgo = res.data;
@@ -154,7 +152,7 @@ export default {
 
   methods: {
     forwarding_excel_output() {
-      api
+      this.$excelApi
         .post("/reports/gu/forwarding", this.getReportsMekmarGuForwList)
         .then((response) => {
           if (response.status) {
@@ -168,7 +166,7 @@ export default {
         });
     },
     forwarding_excel_output_2() {
-      api
+      this.$excelApi
         .post("/reports/gu/forwarding", this.getReportsMekmarGuOrderList)
         .then((response) => {
           if (response.status) {

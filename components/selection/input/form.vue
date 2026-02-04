@@ -959,8 +959,9 @@ export default {
     this.$store.dispatch("setConnection");
   },
   beforeDestroy() {
-    // Sayfadan ayrılınca soketi kapatmayı unutmayın
-    this.$store.dispatch("setDisconnect");
+    if (this.socket) {
+      this.$store.dispatch("setDisconnect");
+    }
   },
 };
 </script>

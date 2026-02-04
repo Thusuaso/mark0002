@@ -53,7 +53,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "~/plugins/excel.server.js";
 
 export default {
   computed: {
@@ -123,7 +122,7 @@ export default {
   },
   methods: {
     excel_output(){
-      api.post("/reports/excel/forwarding", this.getreportsMekmarForwardingList).then((response) => {
+      this.$excelApi.post("/reports/excel/forwarding", this.getreportsMekmarForwardingList).then((response) => {
         if (response.status) {
           const link = document.createElement("a");
           link.href = this.getLocalUrl + "reports/excel/forwarding";

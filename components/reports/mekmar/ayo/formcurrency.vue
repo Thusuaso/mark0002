@@ -39,7 +39,6 @@
   </div>
 </template>
 <script>
-import server from "@/plugins/excel.server";
 
 export default {
   props: {
@@ -111,7 +110,7 @@ export default {
       this.currency_loading = true;
       const date = new Date(this.year, month_, 0);
       const days = date.getDate();
-      server
+      this.$excelApi
         .get(
           "/finance/doviz/liste/average/" +
             this.year +

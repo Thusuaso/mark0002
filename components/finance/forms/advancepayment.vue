@@ -83,7 +83,6 @@
 <script>
 import date from "../../../plugins/date";
 import Cookies from "js-cookie";
-import server from "@/plugins/excel.server";
 
 export default {
   props: {
@@ -151,7 +150,7 @@ export default {
       const year = event.getFullYear();
       const month = event.getMonth() + 1;
       const day = event.getDate();
-      server
+      this.$excelApi
         .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
         .then((response) => {
           this.model.Kur = parseFloat(response.data);

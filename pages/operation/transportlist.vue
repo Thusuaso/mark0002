@@ -54,7 +54,6 @@
 <script>
 import { mapGetters } from "vuex";
 import date from '../../plugins/date';
-import server from "@/plugins/excel.server";
 
 export default {
   middleware: ["authority"],
@@ -120,7 +119,7 @@ export default {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      server
+      this.$excelApi
         .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
         .then((response) => {
           this.model.currency = parseFloat(response.data);

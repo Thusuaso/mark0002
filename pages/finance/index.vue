@@ -123,7 +123,6 @@
 <script>
 import { mapGetters } from "vuex";
 import date from "../../plugins/date";
-import api from "../../plugins/excel.server.js";
 export default {
   middleware: ["authority"],
   computed: {
@@ -196,7 +195,7 @@ export default {
       }
     },
     excel_output() {
-      api
+      this.$excelApi
         .post("/finance/reports/test/excel", this.getfinanceList)
         .then((response) => {
           if (response.status) {

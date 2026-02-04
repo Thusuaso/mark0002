@@ -2,7 +2,12 @@
   <div>
     <div class="row m-auto">
       <div class="col-3">
-        <Calendar v-model="date" view="month" dateFormat="mm/yy" />
+        <Calendar
+          v-model="date"
+          view="month"
+          dateFormat="mm/yy"
+          @date-select="MonthlySelected($event)"
+        />
       </div>
       <div class="col-3">
         <Button label="Yeni Maliyet" @click="newCalculatingCost" />
@@ -46,9 +51,11 @@
           sortField="Tarih"
           :sortOrder="-1"
         >
-          <Column field="Tarih" header="Tarih"
-                    :showFilterMenu="false"
-          :showClearButton="false"
+          <Column
+            field="Tarih"
+            header="Tarih"
+            :showFilterMenu="false"
+            :showClearButton="false"
           >
             <template #body="slotProps">
               {{ formatDateTR(slotProps.data.Tarih) }}
@@ -62,10 +69,11 @@
               />
             </template>
           </Column>
-          <Column field="MaliyetTuru" header="Maliyet Türü"
-                    :showFilterMenu="false"
-          :showClearButton="false"
-          
+          <Column
+            field="MaliyetTuru"
+            header="Maliyet Türü"
+            :showFilterMenu="false"
+            :showClearButton="false"
           >
             <template #body="slotProps">
               {{ slotProps.data.MaliyetTuru }}
@@ -79,10 +87,11 @@
               />
             </template>
           </Column>
-          <Column field="MaliyetFirma" header="Fatura Şirketi"
-          
-                    :showFilterMenu="false"
-          :showClearButton="false"
+          <Column
+            field="MaliyetFirma"
+            header="Fatura Şirketi"
+            :showFilterMenu="false"
+            :showClearButton="false"
           >
             <template #body="slotProps">
               {{ slotProps.data.MaliyetFirma }}
@@ -96,10 +105,11 @@
               />
             </template>
           </Column>
-          <Column field="FaturaNo" header="Fatura No"
-                    :showFilterMenu="false"
-          :showClearButton="false"
-          
+          <Column
+            field="FaturaNo"
+            header="Fatura No"
+            :showFilterMenu="false"
+            :showClearButton="false"
           >
             <template #filter="{ filterModel, filterCallback }">
               <InputText
@@ -110,9 +120,11 @@
               />
             </template>
           </Column>
-          <Column field="Fiyat" header="Fiyat (TL)"
-                    :showFilterMenu="false"
-          :showClearButton="false"
+          <Column
+            field="Fiyat"
+            header="Fiyat (TL)"
+            :showFilterMenu="false"
+            :showClearButton="false"
           >
             <template #body="slotProps">
               {{ formatPriceTl(slotProps.data.Fiyat) }}
@@ -121,18 +133,20 @@
               {{ formatPriceTl(total.priceTl) }}
             </template>
           </Column>
-          <Column field="Kur" header="Kur"
-          
-                    :showFilterMenu="false"
-          :showClearButton="false"
+          <Column
+            field="Kur"
+            header="Kur"
+            :showFilterMenu="false"
+            :showClearButton="false"
           >
             <template #body="slotProps">
               {{ formatPriceTl(slotProps.data.Kur) }}
             </template>
           </Column>
-          <Column header="Dolar"
-                    :showFilterMenu="false"
-          :showClearButton="false"
+          <Column
+            header="Dolar"
+            :showFilterMenu="false"
+            :showClearButton="false"
           >
             <template #body="slotProps">
               {{ formatPriceUsd(slotProps.data.Fiyat / slotProps.data.Kur) }}
@@ -215,7 +229,6 @@
 <script>
 import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from "vuex";
-import server from "../../../plugins/excel.server";
 
 export default {
   computed: {
@@ -266,6 +279,33 @@ export default {
     };
   },
   methods: {
+    MonthlySelected(event) {
+      const date = new Date(event);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      this.yearly_cost_loading = true;
+      this.$axios
+        .get(`/reports/mekmer/calculating/cost/${year}/${month}`)
+        .then(async (res) => {
+          this.costs = res.data.list;
+          this.companies = res.data.companies;
+          this.costTypes = res.data.costTypes;
+          this.production = res.data.production;
+          this.total.priceTl = 0;
+          this.total.priceUsd = 0;
+          await res.data.list.forEach((x) => {
+            this.total.priceTl += x.Fiyat;
+            this.total.priceUsd += x.Fiyat / x.Kur;
+          });
+
+          this.calculateCost(this.costs, this.production);
+          this.getCalculateRatio(res.data.list, res.data.costTypes);
+
+          this.yearly_cost_loading = false;
+          this.yearly_cost_header = "Aylık";
+        });
+    },
     excel_maliyet_output() {
       const data = {
         costs: this.costs,
@@ -277,16 +317,18 @@ export default {
           costMain: this.costMain,
         },
       };
-      server.post("/reports/mekmer/muhasebe/excel", data).then((res) => {
-        if (res.status) {
-          const link = document.createElement("a");
-          link.href = this.getLocalUrl + "reports/mekmer/muhasebe/excel";
+      this.$excelApi
+        .post("/reports/mekmer/muhasebe/excel", data)
+        .then((res) => {
+          if (res.status) {
+            const link = document.createElement("a");
+            link.href = this.getLocalUrl + "reports/mekmer/muhasebe/excel";
 
-          link.setAttribute("download", "muhasebe_maliyet_excel.xlsx");
-          document.body.appendChild(link);
-          link.click();
-        }
-      });
+            link.setAttribute("download", "muhasebe_maliyet_excel.xlsx");
+            document.body.appendChild(link);
+            link.click();
+          }
+        });
     },
     costFiltered(value) {
       this.total.priceTl = 0;

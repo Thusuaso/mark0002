@@ -21,7 +21,6 @@
 </template>
 <script>
 import {mapGetters} from 'vuex';
-import api from "~/plugins/excel.server.js";
 
 export default {
     middleware: ["authority"],
@@ -57,7 +56,7 @@ export default {
     },
     methods:{
         excel_output(){
-            api.post("/reports/excel/loading", this.getReportsMekmarLoadingList).then((response) => {
+            this.$excelApi.post("/reports/excel/loading", this.getReportsMekmarLoadingList).then((response) => {
                 if (response.status) {
                 const link = document.createElement("a");
                 link.href = this.getLocalUrl + "reports/excel/loading";

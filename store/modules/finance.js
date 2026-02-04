@@ -1,5 +1,3 @@
-import api from "../../plugins/excel.server";
-
 const state = {
   financeExpiryListTotal: 0,
   financeDetailInsuranceList: [],
@@ -49,7 +47,7 @@ const state = {
 const actions = {
   setFinanceAllListMekmer(vuexContext) {
     return new Promise((resolve, reject) => {
-      api.get("/finance/reports/mekmer/all").then((response) => {
+      this.$excelApi.get("/finance/reports/mekmer/all").then((response) => {
         if (response) {
           vuexContext.commit("setFinanceListFilter", response.data.financeList);
           vuexContext.commit("setFinanceTotalList", response.data.financeList);
@@ -63,7 +61,7 @@ const actions = {
   setFinanceList(vuexContext) {
     vuexContext.dispatch("setBeginLoadingAction");
 
-    api.get("/finance/reports/test").then((response) => {
+    this.$excelApi.get("/finance/reports/test").then((response) => {
       if (response.data) {
         vuexContext.commit("setFinanceList", response.data);
         vuexContext.commit("setFinanceTotalList", response.data.financeList);
@@ -83,7 +81,7 @@ const actions = {
   setFinanceListFilter(vuexContext) {
     vuexContext.dispatch("setBeginLoadingAction");
 
-    api.get("/finance/reports/test/filter").then((response) => {
+    this.$excelApi.get("/finance/reports/test/filter").then((response) => {
       if (response.data) {
         vuexContext.commit("setFinanceListFilter", response.data.financeList);
         vuexContext.commit(
@@ -293,7 +291,7 @@ const actions = {
   setFinancePoMekmerList(vuexContext, customerId) {
     vuexContext.dispatch("setBeginLoadingAction");
 
-    api
+    this.$excelApi
       .get("/finance/po/list/mekmer/" + customerId)
 
       .then((res) => {
@@ -364,30 +362,32 @@ const actions = {
   },
 
   setPoPaidMekmerSave(vuexContext, paid) {
-    api.post("/finance/po/paid/mekmer/save", paid).then((response) => {
-      if (response.status) {
-        this.$toast.success("Ödeme Kaydedildi.");
-        vuexContext.dispatch("setPoPaidSaveSendMailMekmer", {
-          ...paid,
-          Mail: "bilgiislem@mekmar.com",
-        });
-        vuexContext.dispatch("setPoPaidSaveSendMailMekmer", {
-          ...paid,
-          Mail: "huseyin@mekmer.com",
-        });
-        vuexContext.dispatch("setPoPaidSaveSendMailMekmer", {
-          ...paid,
-          Mail: "sergen@mekmer.com",
-        });
+    this.$excelApi
+      .post("/finance/po/paid/mekmer/save", paid)
+      .then((response) => {
+        if (response.status) {
+          this.$toast.success("Ödeme Kaydedildi.");
+          vuexContext.dispatch("setPoPaidSaveSendMailMekmer", {
+            ...paid,
+            Mail: "bilgiislem@mekmar.com",
+          });
+          vuexContext.dispatch("setPoPaidSaveSendMailMekmer", {
+            ...paid,
+            Mail: "huseyin@mekmer.com",
+          });
+          vuexContext.dispatch("setPoPaidSaveSendMailMekmer", {
+            ...paid,
+            Mail: "sergen@mekmer.com",
+          });
 
-        vuexContext.dispatch("setFinancePoMekmerList", paid.musteri_id);
-        vuexContext.dispatch("setFinancePoPaidListMekmer", paid.siparisno);
-        vuexContext.dispatch("setFinanceListFilter");
-        vuexContext.dispatch("setFinancePoModelMekmer");
-      } else {
-        this.$toast.success("Ödeme Kaydedilemedi.");
-      }
-    });
+          vuexContext.dispatch("setFinancePoMekmerList", paid.musteri_id);
+          vuexContext.dispatch("setFinancePoPaidListMekmer", paid.siparisno);
+          vuexContext.dispatch("setFinanceListFilter");
+          vuexContext.dispatch("setFinancePoModelMekmer");
+        } else {
+          this.$toast.success("Ödeme Kaydedilemedi.");
+        }
+      });
   },
 
   setPoPaidSaveSendMail(vuexContext, paid) {
@@ -417,9 +417,11 @@ const actions = {
     });
   },
   setFinancePoPaidListMekmer(vuexContext, po) {
-    api.get(`/finance/po/paid/list/mekmer/${po}`).then((response) => {
-      vuexContext.commit("setFinancePoPaidListMekmer", response.data.liste);
-    });
+    this.$excelApi
+      .get(`/finance/po/paid/list/mekmer/${po}`)
+      .then((response) => {
+        vuexContext.commit("setFinancePoPaidListMekmer", response.data.liste);
+      });
   },
 
   setPoPaidDelete(vuexContext, paid) {

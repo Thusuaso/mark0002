@@ -400,7 +400,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "../../../plugins/excel.server";
 import currency from "../../../plugins/currency";
 export default {
   middleware: ["authority"],
@@ -616,7 +615,7 @@ export default {
       month: new Date().getMonth() + 1,
     };
 
-    api
+    this.$excelApi
       .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
       .then((response) => {
         this.$store.commit("setReportsMekmarAyoList", response.data);
@@ -697,7 +696,7 @@ export default {
                                 meal: meal.data.list,
                               };
 
-                              api
+                              this.$excelApi
                                 .post("/reports/mekmar/ayo/cost/excel", data)
                                 .then((response) => {
                                   if (response.status) {
@@ -945,7 +944,7 @@ export default {
       if (event.value.id == 0) {
         this.$store.dispatch("setBeginLoadingAction");
 
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             if (response) {
@@ -971,7 +970,7 @@ export default {
           });
       } else if (event.value.id == 1) {
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             if (response) {
@@ -998,7 +997,7 @@ export default {
           });
       } else if (event.value.id == 2) {
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             this.$store.commit("setReportsMekmarAyoList", response.data);
@@ -1019,7 +1018,7 @@ export default {
     quarterSelected(event) {
       if (event.value.id == 0) {
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(
             `/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`
           )
@@ -1044,7 +1043,7 @@ export default {
           });
       } else if (event.value.id == 1) {
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             if (response) {
@@ -1070,7 +1069,7 @@ export default {
           });
       } else if (event.value.id == 2) {
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             if (response) {
@@ -1096,7 +1095,7 @@ export default {
           });
       } else if (event.value.id == 3) {
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             if (response) {
@@ -1122,7 +1121,7 @@ export default {
           });
       } else if (event.value.id == 4) {
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             if (response) {
@@ -1149,7 +1148,7 @@ export default {
       }
     },
     excel_output() {
-      api
+      this.$excelApi
         .post(
           "/maliyet/dosyalar/maliyetRaporExcelListe",
           this.getReportsMekmarAyoList
@@ -1170,7 +1169,7 @@ export default {
       if (this.checked) {
         this.date_disabled = true;
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}`)
           .then((response) => {
             this.$store.commit("setReportsMekmarAyoList", response.data);
@@ -1193,7 +1192,7 @@ export default {
         );
         this.date_disabled = false;
         this.$store.dispatch("setBeginLoadingAction");
-        api
+        this.$excelApi
           .get(
             `/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.getReportsMekmarAyoMonthList[0].Ay}`
           )
@@ -1229,7 +1228,7 @@ export default {
     },
     yearSelected(event) {
       this.$store.dispatch("setBeginLoadingAction");
-      api
+      this.$excelApi
         .get(`/maliyet/listeler/maliyetListesi/${event.value.Yil}/${12}`)
         .then((response) => {
           this.$store.dispatch("setReportsMekmarAyoMonthList", event.value.Yil);
@@ -1253,7 +1252,7 @@ export default {
       };
       this.$store.dispatch("setBeginLoadingAction");
 
-      api
+      this.$excelApi
         .get(`/maliyet/listeler/maliyetListesi/${date.year}/${date.month}`)
         .then((response) => {
           this.$store.commit("setReportsMekmarAyoList", response.data);
@@ -1281,7 +1280,7 @@ export default {
     getReportsMekmarAyoMonthList() {
       this.selectedMonth = this.getReportsMekmarAyoMonthList[0];
       this.$store.dispatch("setBeginLoadingAction");
-      api
+      this.$excelApi
         .get(
           `/maliyet/listeler/maliyetListesi/${this.selectedYear.Yil}/${this.selectedMonth.Ay}`
         )

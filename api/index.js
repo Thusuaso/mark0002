@@ -2,8 +2,6 @@ import express from "express";
 import mssql from "mssql";
 import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
-import server from "../plugins/excel.server";
-import { translate } from "@vitalets/google-translate-api";
 
 const app = express();
 const sql = {
@@ -260,15 +258,15 @@ select
       }
     });
 
-    data2.forEach((x) => {
-      if (x.UrunBirimID == 1) {
-        chart_sqm[x.Month - 1] += x.Miktar;
-      } else if (x.UrunBirimID == 2) {
-        chart_piece[x.Month - 1] += x.Miktar;
-      } else if (x.UrunBirimID == 3) {
-        chart_mt[x.Month - 1] += x.Miktar;
-      }
-    });
+    // data2.forEach((x) => {
+    //   if (x.UrunBirimID == 1) {
+    //     chart_sqm[x.Month - 1] += x.Miktar;
+    //   } else if (x.UrunBirimID == 2) {
+    //     chart_piece[x.Month - 1] += x.Miktar;
+    //   } else if (x.UrunBirimID == 3) {
+    //     chart_mt[x.Month - 1] += x.Miktar;
+    //   }
+    // });
 
     return {
       sqm: chart_sqm,
@@ -5710,10 +5708,10 @@ function __getTlToUsdorEuro(date, value) {
   const month = newDate.getMonth() + 1;
   const day = newDate.getDate();
   return new Promise(async (resolve, reject) => {
-    await server
+    await api
       .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
       .then(async (tl_to_usd) => {
-        await server
+        await api
           .get(
             "/finance/doviz/liste/euro/to/tl/" + year + "/" + month + "/" + day
           )
@@ -5734,10 +5732,10 @@ function __getUsdToTlorEuro(date, value) {
   const month = newDate.getMonth() + 1;
   const day = newDate.getDate();
   return new Promise(async (resolve, reject) => {
-    await server
+    await this.$excelApi
       .get("/finance/doviz/liste/" + year + "/" + month + "/" + day)
       .then(async (usd_to_tl) => {
-        await server
+        await this.$excelApi
           .get(
             "/finance/doviz/liste/usd/to/euro/" + year + "/" + month + "/" + day
           )
@@ -5758,10 +5756,10 @@ function __getUsdToTlorUsd(date, value) {
   const month = newDate.getMonth() + 1;
   const day = newDate.getDate();
   return new Promise((resolve, reject) => {
-    server
+    this.$excelApi
       .get("/finance/doviz/liste/euro/to/tl/" + year + "/" + month + "/" + day)
       .then((euro_to_tl) => {
-        server
+        this.$excelApi
           .get(
             "/finance/doviz/liste/usd/to/euro/" + year + "/" + month + "/" + day
           )
@@ -14872,7 +14870,7 @@ app.get("/reports/mekmer/calculating/cost/:year/:month", async (req, res) => {
       FROM UretimTB u 
       INNER JOIN UrunKartTB uk ON uk.ID = u.UrunKartID
       INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
-      WHERE YEAR(u.Tarih) = @year AND MONTH(u.Tarih) = @month AND u.TedarikciID = 1
+      WHERE YEAR(u.Tarih) = @year AND MONTH(u.Tarih) = @month AND u.TedarikciID = 1 and u.Kutulama != 1
     `;
 
     const sqlCompany = `SELECT * FROM MekmerMaliyetFirmaTB`;
@@ -14923,7 +14921,7 @@ app.get("/reports/mekmer/calculating/cost/:year", async (req, res) => {
       FROM UretimTB u 
       INNER JOIN UrunKartTB uk ON uk.ID = u.UrunKartID
       INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
-      WHERE YEAR(u.Tarih) = @year AND u.TedarikciID = 1
+      WHERE YEAR(u.Tarih) = @year AND u.TedarikciID = 1 and u.Kutulama != 1
     `;
 
     const sqlCompany = `SELECT * FROM MekmerMaliyetFirmaTB`;
@@ -18332,42 +18330,256 @@ app.get("/order/production/source/types", (req, res) => {
     res.status(200).json({ list: data.recordset });
   });
 });
-// app.post("/translate/api", async (req, res) => {
-//   const body = req.body;
-//   try {
-//     const targetLangs = [
-//       { key: "fransizca", code: "fr" },
-//       { key: "ispanyolca", code: "es" },
-//       { key: "rusca", code: "ru" },
-//       { key: "arapca", code: "ar" },
-//     ];
 
-//     const translations = {};
+app.get("/reports/mekmer/nakliye/firma/list", (req, res) => {
+  const sql = `select ID,FirmaAdi from YeniMekmerNakliyeFirmaTB`;
+  mssql.query(sql, (err, data) => {
+    res.status(200).json({ list: data.recordset });
+  });
+});
 
-//     // Sıralı çeviri döngüsü
-//     for (const lang of targetLangs) {
-//       try {
-//         // Çeviriyi yap
-//         const result = await translate(body.text, { to: lang.code });
-//         translations[lang.key] = result.text;
+app.get("/reports/mekmer/nakliye/kimden/list", (req, res) => {
+  const sql = `select ID,KimdenAdi from YeniMekmerNakliyeKimdenTB`;
+  mssql.query(sql, (err, data) => {
+    res.status(200).json({ list: data.recordset });
+  });
+});
 
-//         console.log(`${lang.key} çevrildi.`);
+app.post("/reports/mekmer/nakliye/save", async (req, res) => {
+  const body = req.body;
+  const __companyMekmerId = await companyMekmerId(
+    body.company_id,
+    body.company_name
+  );
+  const __supplierMekmerId = await supplierMekmerId(
+    body.supplier_id,
+    body.supplier_name
+  );
 
-//         // Her çeviri arasına 1.5 saniye bekleme ekle (Google'ı uyutmak için)
-//         await new Promise((resolve) => setTimeout(resolve, 1500));
-//       } catch (err) {
-//         console.error(`${lang.key} hatası:`, err.message);
-//         translations[lang.key] = "Limit aşıldı veya hata oluştu";
-//       }
-//     }
+  const sql = `
+    insert into YeniMekmerNakliyeGirisFaturalarıTB(Tarih,PlakaNo,İrsaliyeNo,FaturaNo,FirmaAdi,FirmaID,KimdenAdi,KimdenID,Ton,BirimFiyatTL,BirimFiyatDolar,ToplamTl,ToplamDolar,Kur)
 
-//     res.setHeader("Content-Type", "application/json");
-//     res.end(JSON.stringify({ success: true, translations }));
-//   } catch (error) {
-//     res.statusCode = 500;
-//     res.end(JSON.stringify({ error: error.message }));
-//   }
-// });
+    VALUES('${body.date}','${body.plate_no}','${body.document_no}','${body.invoice_no}','${body.company_name}',${__companyMekmerId},'${body.supplier_name}',${__supplierMekmerId},${body.ton},${body.price_tl},${body.price_usd},${body.total_tl},${body.total_usd},${body.currency})
+  `;
+  await mssql.query(sql, async (err, result) => {
+    await res.status(200).json({ status: true });
+  });
+});
+
+app.put("/reports/mekmer/nakliye/update", async (req, res) => {
+  const body = req.body;
+  const __companyMekmerId = await companyMekmerId(
+    body.company_id,
+    body.company_name
+  );
+  const __supplierMekmerId = await supplierMekmerId(
+    body.supplier_id,
+    body.supplier_name
+  );
+
+  const sql = `
+
+  update YeniMekmerNakliyeGirisFaturalarıTB SET Tarih='${body.date}',PlakaNo='${body.plate_no}',İrsaliyeNo='${body.document_no}',FaturaNo='${body.invoice_no}',FirmaAdi='${body.company_name}',FirmaID='${__companyMekmerId}',KimdenAdi='${body.supplier_name}',KimdenID='${__supplierMekmerId}',Ton='${body.ton}',BirimFiyatTL='${body.price_tl}',BirimFiyatDolar='${body.price_usd}',ToplamTl='${body.total_tl}',ToplamDolar='${body.total_usd}',Kur='${body.currency}'
+
+where ID='${body.id}'
+   
+  `;
+  console.log(sql);
+  await mssql.query(sql, async (err, result) => {
+    await res.status(200).json({ status: true });
+  });
+});
+
+app.get("/reports/mekmer/nakliye/deleted/:id", async (req, res) => {
+  const id = req.params.id;
+  const sql = `delete YeniMekmerNakliyeGirisFaturalarıTB where ID='${id}'`;
+  await mssql.query(sql, (err, result) => {
+    res.status(200).json({ status: true });
+  });
+});
+
+app.get("/reports/mekmer/nakliye/listesi/:year/:month", (req, res) => {
+  const year = req.params.year;
+  const month = req.params.month;
+  const sql = `
+    select ID,Tarih,PlakaNo,İrsaliyeNo,FaturaNo,FirmaAdi,FirmaID,KimdenAdi,KimdenID,Ton,BirimFiyatTL,BirimFiyatDolar,ToplamTl,ToplamDolar,Kur from YeniMekmerNakliyeGirisFaturalarıTB
+    where YEAR(Tarih) = '${year}' and MONTH(Tarih) = '${month}'
+    order by Tarih desc
+  `;
+  mssql.query(sql, (err, data) => {
+    res.status(200).json({ list: data.recordset });
+  });
+});
+function companyMekmerId(id, company) {
+  return new Promise(async (resolve, reject) => {
+    if (
+      id == null ||
+      id == "" ||
+      id == " " ||
+      id == undefined ||
+      id == 0 ||
+      isNaN(id)
+    ) {
+      const insertSql = `insert into YeniMekmerNakliyeFirmaTB(FirmaAdi) VALUES('${company}')`;
+      const getIdSql = `select top 1 ID from YeniMekmerNakliyeFirmaTB order by ID desc`;
+      await mssql.query(insertSql, async (err, insert) => {
+        if (insert.rowsAffected[0] == 1) {
+          await mssql.query(getIdSql, async (err, getId) => {
+            if (getId.recordset) {
+              await resolve(getId.recordset[0].ID);
+            }
+          });
+        }
+      });
+    } else {
+      await resolve(id);
+    }
+  });
+}
+
+function supplierMekmerId(id, supplier) {
+  return new Promise(async (resolve, reject) => {
+    if (
+      id == null ||
+      id == "" ||
+      id == " " ||
+      id == undefined ||
+      id == 0 ||
+      isNaN(id)
+    ) {
+      const insertSql = `insert into YeniMekmerNakliyeKimdenTB(KimdenAdi) VALUES('${supplier}')`;
+      const getIdSql = `select top 1 ID from YeniMekmerNakliyeKimdenTB order by ID desc`;
+      await mssql.query(insertSql, async (err, insert) => {
+        if (insert.rowsAffected[0] == 1) {
+          await mssql.query(getIdSql, async (err, getId) => {
+            if (getId.recordset) {
+              await resolve(getId.recordset[0].ID);
+            }
+          });
+        }
+      });
+    } else {
+      await resolve(id);
+    }
+  });
+}
+
+/*Mekmer New Finance */
+
+app.get("/mekmer/new/finance/list", async (req, res) => {
+  try {
+    const siparislerSql = `
+     select
+      m.ID,
+    m.FirmaAdi,
+	s.SiparisNo,
+    su.Miktar * su.AlisFiyati as Alis,
+	(select ymo.Durum from YeniMekmerOdemelerTB ymo where ymo.SiparisNo = s.SiparisNo) as Durum
+
+  from SiparislerTB s
+  inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
+  inner join MusterilerTB m on m.ID = s.MusteriID
+
+  where YEAR(s.YuklemeTarihi) >= 2026 and su.TedarikciID=1 and (select ymo.Durum from YeniMekmerOdemelerTB ymo where ymo.SiparisNo = s.SiparisNo) is null
+  order by su.Miktar * su.AlisFiyati desc
+  `;
+    const musterilerSql = `
+          select
+      m.ID,
+    m.FirmaAdi
+
+  from SiparislerTB s
+  inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
+  inner join MusterilerTB m on m.ID = s.MusteriID
+
+  where YEAR(s.YuklemeTarihi) = 2026 and su.TedarikciID=1
+
+  group by m.ID,m.FirmaAdi
+  order by sum(su.Miktar * su.AlisFiyati) desc
+    `;
+
+    const siparisler = (await mssql.query(siparislerSql)).recordset;
+    const musteriler = (await mssql.query(musterilerSql)).recordset;
+    const data = await calculateFinance(siparisler, musteriler);
+    res.status(200).json({ list: data });
+  } catch (err) {
+    res.status(200).json({ list: false });
+  }
+});
+
+app.get("/mekmer/new/finance/list/detail/:musteriId", async (req, res) => {
+  const id = req.params.musteriId;
+  const sql = `
+    select
+	s.SiparisNo,
+	sum(su.Miktar * su.AlisFiyati) as Alis,
+	(select ymo.Durum from YeniMekmerOdemelerTB ymo where ymo.SiparisNo = s.SiparisNo) as Durum,
+  s.SiparisTarihi,s.YuklemeTarihi,
+  s.MusteriID
+
+from SiparislerTB s
+inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
+inner join MusterilerTB m on m.ID = s.MusteriID
+
+where YEAR(s.YuklemeTarihi) = 2026 and su.TedarikciID=1 and m.ID='${id}'
+group by s.SiparisNo,s.SiparisTarihi,s.YuklemeTarihi,s.MusteriID
+order by (select ymo.Durum from YeniMekmerOdemelerTB ymo where ymo.SiparisNo = s.SiparisNo)
+  
+  `;
+  const result = (await mssql.query(sql)).recordset;
+  res.status(200).json({ list: result });
+});
+
+async function calculateFinance(order, musteriler) {
+  let data = [];
+  await musteriler.forEach(async (x) => {
+    const __orders = await order.filter((y) => {
+      return x.ID == y.ID;
+    });
+    let total = 0;
+    await __orders.forEach((z) => {
+      total += z.Alis;
+    });
+
+    data.push({
+      ID: x.ID,
+      Musteri: x.FirmaAdi,
+      Toplam: total,
+    });
+  });
+  return data;
+}
+
+app.post("/mekmer/new/finance/paid/status", async (req, res) => {
+  try {
+    const body = req.body;
+    const sql = `
+    insert into YeniMekmerOdemelerTB(Tarih,MusteriID,SiparisNo,Kur,KullaniciId,Durum)
+VALUES('${body.Tarih}','${body.MusteriID}','${body.SiparisNo}',0,'${body.KullaniciId}',1)  
+  `;
+    console.log(sql);
+    await mssql.query(sql);
+    res.status(200).json({ status: true });
+  } catch (err) {
+    res.status(200).json({ status: false });
+  }
+});
+
+app.post("/mekmer/new/finance/detail/order", async (req, res) => {
+  const body = req.body;
+  const sql = `
+    select s.SiparisNo,k.KategoriAdi,urun.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar,su.Miktar,su.AlisFiyati,(su.Miktar * su.AlisFiyati) as Toplam from SiparislerTB s
+    inner join SiparisUrunTB su on su.SiparisNo= s.SiparisNo
+    inner join UrunKartTB uk on uk.ID = su.UrunKartID
+    inner join KategoriTB k on k.ID = uk.KategoriID
+    inner join UrunlerTB urun on urun.ID = uk.UrunId
+    inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+    inner join OlculerTB ol on ol.ID = uk.OlcuID
+    where su.TedarikciID = 1 and s.SiparisNo='${body.Po}'
+  `;
+  const result = (await mssql.query(sql)).recordset;
+  res.status(200).json({ list: result });
+});
 
 module.exports = {
   path: "/api",

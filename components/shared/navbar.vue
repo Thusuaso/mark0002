@@ -720,9 +720,19 @@
               >Strip & Moloz</nuxt-link
             >
           </li>
-          <li class="nav-item"> 
+          <li class="nav-item">
             <nuxt-link to="/operation/shipment" tag="a" class="nav-link"
-              >Sevk Et</nuxt-link>
+              >Sevk Et</nuxt-link
+            >
+          </li>
+
+          <li class="nav-item">
+            <nuxt-link
+              to="/reports/mekmer/new-mekmer-finance"
+              tag="a"
+              class="nav-link"
+              >Mekmer Finans</nuxt-link
+            >
           </li>
         </ul>
       </div>

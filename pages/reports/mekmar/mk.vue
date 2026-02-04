@@ -43,7 +43,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "../../../plugins/excel.server";
 export default {
   middleware: ["authority"],
   data() {
@@ -62,7 +61,7 @@ export default {
   created() {
     const year = new Date().getFullYear();
     this.$store.dispatch("setBeginLoadingAction");
-    api.get(`/raporlar/listeler/mkraporlari/${year}`).then((response) => {
+    this.$excelApi.get(`/raporlar/listeler/mkraporlari/${year}`).then((response) => {
       this.$store.dispatch("setReportsMekmarMkList", response.data);
       this.$store.dispatch("setEndLoadingAction");
     });
@@ -70,7 +69,7 @@ export default {
   methods: {
     excel_output() {
       this.$store.dispatch("setBeginLoadingAction");
-      api
+      this.$excelApi
         .post(
           "/raporlar/listeler/mkraporlari/excel",
           this.getReportsMekmarMkList
@@ -89,7 +88,7 @@ export default {
     },
     yearSelected(event) {
       this.$store.dispatch("setBeginLoadingAction");
-      api
+      this.$excelApi
         .get(`/raporlar/listeler/mkraporlari/${event.value.Year}`)
         .then((response) => {
           this.$store.dispatch("setReportsMekmarMkList", response.data);

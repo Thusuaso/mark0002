@@ -93,7 +93,6 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 import date from "@/plugins/date";
-import api from "@/plugins/excel.server";
 export default {
   computed: {
     ...mapGetters([
@@ -174,7 +173,7 @@ export default {
       this.$store.dispatch("setOrderProductionProformaDelete", id);
     },
     excel_output() {
-      api
+      this.$excelApi
         .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
         .then((response) => {
           if (response.status) {

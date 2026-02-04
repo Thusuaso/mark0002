@@ -89,7 +89,11 @@ export default {
     });
   },
   beforeDestroy() {
-    this.$store.dispatch("setDisconnect");
+    if (this.socket) {
+this.$store.dispatch("setDisconnect");
+
+     }
+    
   },
 };
 </script>

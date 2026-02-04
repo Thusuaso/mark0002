@@ -42,7 +42,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "../../plugins/excel.server";
 
 export default {
   middleware: ["authority"],
@@ -115,7 +114,7 @@ export default {
   },
   methods: {
     customer_excel_output(){
-      api
+      this.$excelApi
         .post("/customer/mekmar/excel", this.getMekmarList)
         .then((response) => {
           if (response.status) {

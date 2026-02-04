@@ -79,7 +79,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import api from "~/plugins/excel.server.js";
 
 export default {
   computed: {
@@ -165,7 +164,7 @@ export default {
       this.mekmer_filtered_list = event;
     },
     excel_output() {
-      api
+      this.$excelApi
         .post(
           "/reports/excel/production",
           this.is_filtered

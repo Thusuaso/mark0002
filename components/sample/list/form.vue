@@ -336,7 +336,6 @@
 import date from "../../../plugins/date";
 import upload from "../../../plugins/upload";
 import Cookies from "js-cookie";
-import server from "@/plugins/excel.server";
 
 export default {
   computed: {},
