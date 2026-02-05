@@ -84,30 +84,17 @@ export default {
   ],
 
   axios: {
-    // 1. SSR (Sunucu Tarafı) İçin:
-    // Nuxt sunucusu kendi içindeki api'ye ulaşırken "localhost" kullanmalı.
-    // Domain kullanırsa (goz.mekmar.com) DNS ve SSL sorunları yaşatır ve 502 verir.
     baseURL: "http://localhost:3000/api",
-
-    // 2. Client (Tarayıcı) İçin:
-    // Kullanıcı tarayıcıdan girdiğinde "/api" yolunu kullanmalı.
     browserBaseURL: "/api",
-
-    debug: true,
+    debug: false,
     proxyHeaders: false,
     retry: { retries: 3 },
   },
 
-  // Proxy ayarı SİLİNDİ.
-  // Çünkü aşağıda 'serverMiddleware' ile tcmb.js kullanıyoruz.
-  // İkisi aynı anda olursa çakışma yaratır.
-
-  // --- BUILD OPTİMİZASYONU ---
   build: {
-    // Windows kilitlenmelerini önleyen ayarlar:
     parallel: false,
     cache: false,
-    hardSource: false, // Windows'ta bazen sorun çıkarır, kapalı kalsın
+    hardSource: false,
     productionSourceMap: false,
 
     terser: {
@@ -143,5 +130,10 @@ export default {
   // Socket.io Ayarları
   io: {
     sockets: [{ name: "main", url: "http://localhost:3001" }],
+  },
+  toast: {
+    position: "top-right",
+    duration: 3000,
+    keepOnHover: true,
   },
 };

@@ -1,0 +1,32 @@
+name: Deploy GOZ Project
+on:
+  push:
+    branches:
+      - main # Hangi dala kod atınca çalışsın? (main veya master olabilir)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            # 1. Proje klasörüne git (BURAYI KENDİ YOLUNLA DEĞİŞTİR!)
+            cd /var/www/mark0002
+
+            # 2. En güncel kodu çek
+            git pull origin main
+
+            # 3. Yeni paket varsa yükle
+            npm install
+
+            # 4. Projeyi derle (Build)
+            npm run build
+
+            # 5. PM2'yu yeniden başlat (Uygulama adı 'goz' varsayıldı)
+            pm2 restart nuxt-server --update-env
