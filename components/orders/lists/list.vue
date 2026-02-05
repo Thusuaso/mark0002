@@ -903,6 +903,7 @@
       filterDisplay="row"
       :filters.sync="filtersShipped"
       v-if="status == 'Shipped 2'"
+      z
       sortField="YuklemeTarihi"
       :sortOrder="-1"
       :rowClass="rowClass2"

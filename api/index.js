@@ -18581,6 +18581,37 @@ app.post("/mekmer/new/finance/detail/order", async (req, res) => {
   res.status(200).json({ list: result });
 });
 
+app.post("/mekmar/panel/faq/video/add", async (req, res) => {
+  const body = req.body;
+  const sql = `
+    insert into Mekmar_Com_Faq_Videos(Url,Title_En,Title_Fr,Title_Es,Title_Ru,Title_Ar)
+
+values('${body.url}','${body.title_en}','${body.title_fr}','${body.title_es}',N'${body.title_ru}',N'${body.title_ar}')
+  `;
+  try {
+    await mssql.query(sql);
+    res.status(200).json({ status: true });
+  } catch (err) {
+    await mssql.query(sql);
+    res.status(200).json({ status: false });
+  }
+});
+
+app.get("/mekmar/panel/faq/video/list", async (req, res) => {
+  const sql = `select * from Mekmar_Com_Faq_Videos`;
+  const result = (await mssql.query(sql)).recordset;
+  res.status(200).json(result);
+});
+app.delete("/mekmar/panel/faq/video/delete/:id", async (req, res) => {
+  const __id = req.params.id;
+  const sql = `delete Mekmar_Com_Faq_Videos where ID='${__id}'`;
+  try {
+    await mssql.query(sql);
+    res.status(200).json({ status: true });
+  } catch (err) {
+    res.status(200).json({ status: false });
+  }
+});
 module.exports = {
   path: "/api",
   handler: app,

@@ -17,13 +17,25 @@
           @click="changeQueue"
         />
       </div>
+      <div class="col">
+        <Button
+          type="button"
+          class="p-button-secondary w-100"
+          label="Add Faq Video"
+          @click="faqOpenDialog"
+        />
+      </div>
     </div>
 
     <panelProjectList
       :list="getPanelProjectList"
       @panel_project_selected_emit="panelProjectSelected($event)"
     />
-    <Dialog :visible.sync="panel_project_detail_form" :header="getPanelProjectId" modal>
+    <Dialog
+      :visible.sync="panel_project_detail_form"
+      :header="getPanelProjectId"
+      modal
+    >
       <panelProjectForm
         :photos="getPanelProjectPhotos"
         :suggested="getPanelProjectSuggested"
@@ -32,15 +44,25 @@
         :status="getPanelProjectButtonStatus"
         :projectId="getPanelProjectId"
         @move_to_target_project_photo_emit="moveToTargetProjectPhoto($event)"
-        @panel_project_information_save_emit="panelProjectInformationSave($event)"
-        @panel_project_information_update_emit="panelProjectInformationUpdate($event)"
+        @panel_project_information_save_emit="
+          panelProjectInformationSave($event)
+        "
+        @panel_project_information_update_emit="
+          panelProjectInformationUpdate($event)
+        "
         @panel_project_photos_upload="panelProjectPhotosUpload($event)"
-        @panel_project_photo_change_product_name="panelProjectPhotoChangeProductName"
+        @panel_project_photo_change_product_name="
+          panelProjectPhotoChangeProductName
+        "
         @panel_project_suggested="panelProjectSuggested"
         @panel_project_video_emit="panelProjectVideoAdd($event)"
       />
     </Dialog>
-    <Dialog :visible.sync="panel_project_photo_change_product_name_form" header="" modal>
+    <Dialog
+      :visible.sync="panel_project_photo_change_product_name_form"
+      header=""
+      modal
+    >
       <div class="container">
         <DataTable
           :value="getPanelProjectPhotos[0]"
@@ -50,7 +72,10 @@
         >
           <Column field="ImageLink" header="Image">
             <template #body="slotProps">
-              <img :src="slotProps.data.ImageLink" style="width: 100px; height: 100px" />
+              <img
+                :src="slotProps.data.ImageLink"
+                style="width: 100px; height: 100px"
+              />
             </template>
           </Column>
           <Column field="ID" header="Id">
@@ -63,7 +88,10 @@
               {{ slotProps.data.ProductName }}
             </template>
             <template #editor="slotProps">
-              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+              <InputText
+                v-model="slotProps.data[slotProps.column.field]"
+                autofocus
+              />
             </template>
           </Column>
           <Column field="ProductName_Fr" header="Project Name (Fr)">
@@ -71,7 +99,10 @@
               {{ slotProps.data.ProductName_Fr }}
             </template>
             <template #editor="slotProps">
-              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+              <InputText
+                v-model="slotProps.data[slotProps.column.field]"
+                autofocus
+              />
             </template>
           </Column>
           <Column field="ProductName_Es" header="Project Name (Es)">
@@ -79,7 +110,10 @@
               {{ slotProps.data.ProductName_Es }}
             </template>
             <template #editor="slotProps">
-              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+              <InputText
+                v-model="slotProps.data[slotProps.column.field]"
+                autofocus
+              />
             </template>
           </Column>
           <Column field="ProductName_Ru" header="Project Name (Ru)">
@@ -87,7 +121,10 @@
               {{ slotProps.data.ProductName_Ru }}
             </template>
             <template #editor="slotProps">
-              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+              <InputText
+                v-model="slotProps.data[slotProps.column.field]"
+                autofocus
+              />
             </template>
           </Column>
           <Column field="ProductName_Ar" header="Project Name (Ar)">
@@ -95,7 +132,10 @@
               {{ slotProps.data.ProductName_Ar }}
             </template>
             <template #editor="slotProps">
-              <InputText v-model="slotProps.data[slotProps.column.field]" autofocus />
+              <InputText
+                v-model="slotProps.data[slotProps.column.field]"
+                autofocus
+              />
             </template>
           </Column>
           <Column
@@ -218,6 +258,82 @@
         </div>
       </div>
     </Dialog>
+
+    <Dialog
+      :visible.sync="faq_video_dialog_visible"
+      header="Add Faq Video"
+      modal
+    >
+      <div class="row gap-1 mt-2">
+        <div class="col-3">
+          <span class="p-float-label">
+            <InputText id="url" v-model="faqVideoModel.url" />
+            <label for="url">Url</label>
+          </span>
+        </div>
+        <div class="col-3">
+          <span class="p-float-label">
+            <InputText id="title_en" v-model="faqVideoModel.title_en" />
+            <label for="title_en">Title (En)</label>
+          </span>
+        </div>
+        <div class="col-3">
+          <span class="p-float-label">
+            <InputText id="title_fr" v-model="faqVideoModel.title_fr" />
+            <label for="title_fr">Title Fr</label>
+          </span>
+        </div>
+        <div class="col-3">
+          <span class="p-float-label">
+            <InputText id="title_es" v-model="faqVideoModel.title_es" />
+            <label for="title_es">Title Es</label>
+          </span>
+        </div>
+        <div class="col-3">
+          <span class="p-float-label">
+            <InputText id="title_ru" v-model="faqVideoModel.title_ru" />
+            <label for="title_ru">Title Ru</label>
+          </span>
+        </div>
+        <div class="col-3">
+          <span class="p-float-label">
+            <InputText id="title_ar" v-model="faqVideoModel.title_ar" />
+            <label for="title_ar">Title Ar</label>
+          </span>
+        </div>
+      </div>
+
+      <div class="row gap-1">
+        <div class="col">
+          <Button
+            type="Button"
+            class="p-button-success w-100"
+            label="Add"
+            @click="addFaqVideo"
+            :loading="faq_video_button_loading"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <DataTable :value="faqVideoList">
+          <Column field="Url" header="Url"></Column>
+          <Column field="Title_En" header="Title En"></Column>
+          <Column field="Title_Fr" header="Title Fr"></Column>
+          <Column field="Title_Es" header="Title Es"></Column>
+          <Column field="Title_Ru" header="Title Ru"></Column>
+          <Column field="Title_Ar" header="Title Ar"></Column>
+          <Column header="#">
+            <template #body="slotProps">
+              <Button
+                class="p-button-danger"
+                label="Del"
+                @click="deleteFaqVideo(slotProps.data.ID)"
+              />
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script>
@@ -240,6 +356,17 @@ export default {
   },
   data() {
     return {
+      faqVideoList: [],
+      faq_video_button_loading: false,
+      faqVideoModel: {
+        url: "",
+        title_en: "",
+        title_fr: "",
+        title_es: "",
+        title_ru: "",
+        title_ar: "",
+      },
+      faq_video_dialog_visible: false,
       panel_project_detail_form: false,
       panel_project_photo_change_product_name_form: false,
       edditingProjectPhotoName: null,
@@ -254,13 +381,62 @@ export default {
     this.$store.dispatch("setPanelProjectList");
   },
   methods: {
+    async deleteFaqVideo(event) {
+      await this.$axios
+        .delete(`/mekmar/panel/faq/video/delete/${event}`)
+        .then(async (res) => {
+          if (res.data.status) {
+            await this.$toast.success("Başarıyla Silindi");
+            await this.$axios.get("/mekmar/panel/faq/video/list").then((res) => {
+              this.faqVideoList = res.data;
+            });
+          } else {
+            this.$toast.error("Silme İşlemi Başarısız");
+          }
+        });
+    },
+    async faqOpenDialog() {
+      await this.$axios.get("/mekmar/panel/faq/video/list").then((res) => {
+        this.faqVideoList = res.data;
+      });
+      this.faq_video_dialog_visible = true;
+    },
+    async addFaqVideo() {
+      this.faq_video_button_loading = true;
+      await this.$axios
+        .post("/mekmar/panel/faq/video/add", this.faqVideoModel)
+        .then((res) => {
+          if (res.data.status) {
+            this.$toast.success("Başarıyla Eklendi.");
+            this.faqVideoModel = {
+              url: "",
+              title_en: "",
+              title_fr: "",
+              title_es: "",
+              title_ru: "",
+              title_ar: "",
+            };
+            this.faq_video_dialog_visible = false;
+            this.faq_video_button_loading = false;
+          } else {
+            this.$toast.error("Hata Oluştu");
+            this.faq_video_button_loading = false;
+          }
+        });
+    },
     changeQueue() {
-      this.$store.dispatch("setPanelProjectQueueChange", this.getPanelProjectList);
+      this.$store.dispatch(
+        "setPanelProjectQueueChange",
+        this.getPanelProjectList
+      );
     },
     projectChangeNameMouseOver() {},
     saveProject() {
       this.project_save_button_disabled = true;
-      this.$store.dispatch("setPanelProjectSave", this.getPanelProductProjectModel);
+      this.$store.dispatch(
+        "setPanelProjectSave",
+        this.getPanelProductProjectModel
+      );
     },
     countrySelected(event) {
       this.getPanelProductProjectModel.CountryId = event.value.Id;
@@ -269,9 +445,6 @@ export default {
       this.getPanelProductProjectModel.CountryName_Es = event.value.UlkeAdi_Es;
       this.getPanelProductProjectModel.CountryName_Ru = event.value.UlkeAdi_Ru;
       this.getPanelProductProjectModel.CountryName_Ar = event.value.UlkeAdi_Ar;
-
-      
-
     },
     projectPhotoUpload(event) {
       const data = {
@@ -330,7 +503,10 @@ export default {
       this.panel_project_suggested_form = true;
     },
     projectPhotoNameEditing(event) {
-      this.$store.dispatch("setPanelProjectProductPhotoNameSave", event.newData);
+      this.$store.dispatch(
+        "setPanelProjectProductPhotoNameSave",
+        event.newData
+      );
     },
     panelProjectPhotoChangeProductName() {
       this.panel_project_photo_change_product_name_form = true;

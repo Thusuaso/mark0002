@@ -231,7 +231,7 @@
           />
         </template>
         <template #footer>
-          {{ total.order | formatDecimal }}
+          {{ totalamount | formatDecimal }}
         </template>
       </Column>
       <Column
@@ -254,7 +254,7 @@
           {{ slotProps.data.Ton | formatDecimal }}
         </template>
         <template #footer>
-          {{ total.ton | formatDecimal }}
+          {{ totalton | formatDecimal }}
         </template>
       </Column>
       <Column
@@ -329,6 +329,8 @@ export default {
   },
   data() {
     return {
+      totalton: 0,
+      totalamount: 0,
       userId: 0,
       totalsPurchase: 0,
       totals: 0,
@@ -375,17 +377,29 @@ export default {
     this.userId = Cookies.get("userId");
   },
   methods: {
+    shippedFiltered(event) {
+      console.log(event.filteredValue);
+      this.$store.dispatch(
+        " shipped setOrderProductionTotal",
+        event.filteredValue
+      );
+    },
     filtersProduction(event) {
+      console.log("filteredsShipped");
       this.__totalSum(event.filteredValue);
     },
     __totalSum(val) {
       this.totals = 0;
       this.totalsPurchase = 0;
+      this.totalamount = 0;
+      this.totalton = 0;
       val.forEach((x) => {
         this.totals +=
           this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
         this.totalsPurchase +=
           this.__noneControl(x.SatisFiyati) * this.__noneControl(x.Miktar);
+        this.totalamount += this.__noneControl(x.Miktar);
+        this.totalton += this.__noneControl(x.Ton);
       });
     },
     __noneControl(val) {

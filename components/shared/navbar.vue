@@ -371,6 +371,14 @@
                   >Finance</nuxt-link
                 >
               </li>
+              <li class="nav-item">
+                <nuxt-link
+                  to="/reports/mekmer/new-mekmer-finance"
+                  tag="a"
+                  class="nav-link"
+                  >Mekmer Alış Finans</nuxt-link
+                >
+              </li>
               <li v-show="getAuthorityStatus">
                 <nuxt-link
                   to="/reports/mekmer/by-buying-production"
