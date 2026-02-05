@@ -81,7 +81,6 @@ export default {
     ],
     "@nuxtjs/axios",
     "@nuxtjs/toast",
-    "nuxt-socket-io", // <-- EKLENDİ: io ayarının çalışması için gerekli
   ],
 
   axios: {
