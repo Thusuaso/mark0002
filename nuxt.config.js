@@ -84,7 +84,7 @@ export default {
   ],
 
   axios: {
-    baseURL: process.env.server || "http://localhost:3000", // Fallback eklendi
+    baseURL: process.env.server,
     browserBaseURL: process.env.server,
   },
 
