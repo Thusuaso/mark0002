@@ -84,8 +84,18 @@ export default {
   ],
 
   axios: {
-    baseURL: process.env.server,
-    browserBaseURL: process.env.server,
+    // 1. SSR (Sunucu Tarafı) İçin:
+    // Nuxt sunucusu kendi içindeki api'ye ulaşırken "localhost" kullanmalı.
+    // Domain kullanırsa (goz.mekmar.com) DNS ve SSL sorunları yaşatır ve 502 verir.
+    baseURL: "http://localhost:3000/api",
+
+    // 2. Client (Tarayıcı) İçin:
+    // Kullanıcı tarayıcıdan girdiğinde "/api" yolunu kullanmalı.
+    browserBaseURL: "/api",
+
+    debug: true,
+    proxyHeaders: false,
+    retry: { retries: 3 },
   },
 
   // Proxy ayarı SİLİNDİ.

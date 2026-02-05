@@ -1,20 +1,26 @@
+import https from "https";
 import axios from "axios";
-import https from "https"; // <-- 1. YENİ: Https modülünü çağır
 
 export default function (context, inject) {
-  // 2. YENİ: SSL hatalarını yok sayan bir ajan (agent) oluştur
+  // --- KRİTİK SSL AYARI ---
+  // Python sunucusunun (excel-server-mark0002) sertifikasını
+  // Node.js tarafında kabul ettirmek için:
   const agent = new https.Agent({
-    rejectUnauthorized: false,
+    rejectUnauthorized: false, // Sertifika hatasını görmezden gel
   });
 
-  const api = axios.create({
+  // Python Sunucusu İçin Özel Axios Oluşturuyoruz
+  const excelApi = axios.create({
     baseURL: "https://excel-server-mark0002.mekmar.com",
-    // 3. YENİ: Oluşturduğumuz ajanı buraya ekle
-    httpsAgent: agent,
+    httpsAgent: agent, // Agent'ı buraya ekledik (SSR Hatasını çözer)
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
     },
   });
 
-  inject("excelApi", api);
+  // Client tarafında (Tarayıcıda) çalışırken CORS hatası almamak için
+  // Tarayıcı otomatik olarak httpsAgent'ı yok sayar, bu normaldir.
+
+  // Plugin'i sisteme enjekte et: this.$excelApi olarak kullanılabilir
+  inject("excelApi", excelApi);
 }
