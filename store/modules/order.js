@@ -58,6 +58,7 @@ const state = {
     production: 0,
     ton: 0,
     price: 0,
+    buying: 0,
   },
   orderProductionDivideList: [],
   orderProductionDivideOrderList: [],
@@ -218,6 +219,18 @@ const actions = {
   setOrderShippedMekmer2List(vuexContext) {
     vuexContext.dispatch("setBeginLoadingAction");
     this.$axios.get("/order/shipped/mekmer2/list").then((response) => {
+      if (response.data.list) {
+        vuexContext.commit("setOrderList", response.data.list);
+        vuexContext.commit("setOrderProductionYearsList", response.data.years);
+        vuexContext.commit("setOrderProductionTotal", response.data.list);
+
+        vuexContext.dispatch("setEndLoadingAction");
+      }
+    });
+  },
+  setOrderShippedMekmer2ListYears(vuexContext, year) {
+    vuexContext.dispatch("setBeginLoadingAction");
+    this.$axios.get(`/order/shipped/mekmer2/list/${year}`).then((response) => {
       if (response.data.list) {
         vuexContext.commit("setOrderList", response.data.list);
         vuexContext.commit("setOrderProductionYearsList", response.data.years);
@@ -702,12 +715,14 @@ const mutations = {
       production: 0,
       ton: 0,
       price: 0,
+      buying: 0,
     };
     list.forEach((x) => {
       state.orderProductionTotal.order += __noneNullControl(x.Miktar);
       state.orderProductionTotal.production += __noneNullControl(x.Uretim);
       state.orderProductionTotal.ton += __noneNullControl(x.Ton);
       state.orderProductionTotal.price += __noneNullControl(x.SatisToplam);
+      state.orderProductionTotal.buying += __noneNullControl(x.AlisFiyati);
     });
   },
   setOrderProductionProformaDelete(state, id) {

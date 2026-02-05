@@ -24,15 +24,14 @@
     >
       <template #header>
         <div class="flex justify-content-between">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText
-              v-model="globalSearch"
-              placeholder="Keyword Search"
-              @keyup.enter="globalSearchFilter($event)"
-              @input="globalSearchFilterInput($event)"
-            />
-          </span>
+          <Calendar
+            v-model="selectedYear"
+            view="year"
+            dateFormat="yy"
+            showIcon
+            @date-select="yearSelected($event)"
+          />
+          Alış Fiyatı - {{ totalbuying | formatPriceUsd }}
         </div>
       </template>
       <Column header="#" headerStyle="width:3rem;font-size:16px;">
@@ -291,6 +290,9 @@
         <template #body="slotProps">
           {{ slotProps.data.AlisFiyati | formatPriceUsd }}
         </template>
+        <template #footer>
+          {{ totalbuying | formatPriceUsd }}
+        </template>
       </Column>
       <Column
         header="Total (Puchase)"
@@ -329,6 +331,8 @@ export default {
   },
   data() {
     return {
+      selectedYear: null,
+      totalbuying: 0,
       totalton: 0,
       totalamount: 0,
       userId: 0,
@@ -377,6 +381,11 @@ export default {
     this.userId = Cookies.get("userId");
   },
   methods: {
+    yearSelected(event) {
+      const date = new Date(event);
+      const year = date.getFullYear();
+      this.$store.dispatch("setOrderShippedMekmer2ListYears", year);
+    },
     shippedFiltered(event) {
       console.log(event.filteredValue);
       this.$store.dispatch(
@@ -393,6 +402,7 @@ export default {
       this.totalsPurchase = 0;
       this.totalamount = 0;
       this.totalton = 0;
+      this.totalbuying = 0;
       val.forEach((x) => {
         this.totals +=
           this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
@@ -400,6 +410,7 @@ export default {
           this.__noneControl(x.SatisFiyati) * this.__noneControl(x.Miktar);
         this.totalamount += this.__noneControl(x.Miktar);
         this.totalton += this.__noneControl(x.Ton);
+        this.totalbuying += this.__noneControl(x.AlisFiyati);
       });
     },
     __noneControl(val) {
