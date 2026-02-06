@@ -31,8 +31,8 @@
             showIcon
             @date-select="yearSelected($event)"
           />
-          Alış Fiyatı - {{ totalbuying | formatPriceUsd }}
         </div>
+        Alış Fiyatı - {{ totals | formatPriceUsd }}
       </template>
       <Column header="#" headerStyle="width:3rem;font-size:16px;">
         <template #body="slotProps">
