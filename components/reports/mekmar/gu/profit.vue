@@ -109,7 +109,7 @@
       </div>
     </div>
 
-    <div class="row m-auto-text-center">
+    <!-- <div class="row m-auto-text-center">
       <div class="col-sm-4">
         <DataTable
           :value="operation_this_year_total"
@@ -206,7 +206,7 @@
           </Column>
         </DataTable>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>

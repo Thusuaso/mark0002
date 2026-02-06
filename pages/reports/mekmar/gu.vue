@@ -17,9 +17,9 @@
           :contCustList="getReportsMekmarGuContByCustList"
         />
       </TabPanel>
-      <TabPanel header="Mekus">
+      <!-- <TabPanel header="Mekus">
         <reportsMekmarGuMekusList :list="getReportsMekmarGuMekusList" />
-      </TabPanel>
+      </TabPanel> -->
       <TabPanel header="Logs">
         <reportsMekmarGuLogsList :list="getReportsMekmarGuLogsList" />
       </TabPanel>
@@ -77,13 +77,13 @@
 
 
       </TabPanel> -->
-      <TabPanel header="Seller and Operation Orders">
+      <TabPanel header="Seller Orders">
         <ordererOperation />
       </TabPanel>
-      <TabPanel header="Seller and Operation Shipped">
+      <TabPanel header="Seller Shipped">
         <shippedOperation />
       </TabPanel>
-      <TabPanel header="Seller and Operation Shipped Profit">
+      <TabPanel header="Seller Shipped Profit">
         <profitGu
           :thisyear="ayoListThisYear"
           :oneyear="ayoListOneYearAgo"
