@@ -1345,14 +1345,14 @@ export default {
       });
     },
     async calculateNakliyeUsdTl() {
-      if (!this.modelNakliye.currency) {
-        alert("Lütfen önce kuru seçiniz.");
-        return;
-      }
-      if (!this.modelNakliye.ton || !this.modelNakliye.price_tl) {
-        alert("Lütfen ton ve fiyat (₺) alanlarını doldurunuz.");
-        return;
-      }
+      // if (!this.modelNakliye.currency) {
+      //   alert("Lütfen önce kuru seçiniz.");
+      //   return;
+      // }
+      // if (!this.modelNakliye.ton || !this.modelNakliye.price_tl) {
+      //   alert("Lütfen ton ve fiyat (₺) alanlarını doldurunuz.");
+      //   return;
+      // }
       this.modelNakliye.total_tl = await parseFloat(
         this.modelNakliye.ton * this.modelNakliye.price_tl
       );
@@ -1432,17 +1432,9 @@ export default {
     },
     async processNakliye() {
       if (this.new_button_status_nakliye) {
-        if (!this.modelNakliye.price_tl) {
-          alert("Lütfen fiyat (₺) alanını doldurunuz.");
-          return;
-        }
-        if (!this.modelNakliye.ton) {
-          alert("Lütfen ton alanını doldurunuz.");
-          return;
-        }
         this.nakliye_save_button_loading = true;
 
-        await this.calculateNakliyeUsdTl();
+        // await this.calculateNakliyeUsdTl();
         await this.$axios
           .post("/reports/mekmer/nakliye/save", this.modelNakliye)
           .then((res) => {

@@ -371,11 +371,11 @@
                   >Finance</nuxt-link
                 >
               </li>
-              <li class="nav-item">
+              <li>
                 <nuxt-link
                   to="/reports/mekmer/new-mekmer-finance"
                   tag="a"
-                  class="nav-link"
+                  class="dropdown-item"
                   >Mekmer Alış Finans</nuxt-link
                 >
               </li>
