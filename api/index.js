@@ -6891,19 +6891,6 @@ order by yt.TeklifOncelik,yt.Sira
         }
       }
 
-      // if(t_list.length > 0){
-      //     let i = 0;
-      //     while (t_list.length  > i){
-      //         if(_h_t.length >= (i+1)){
-      //             list.push(_h_t[i]);
-      //         }
-      //         if(_o_t.length >= (i+1)){
-      //             list.push(_o_t[i]);
-      //         }
-      //         i+=1;
-      //     }
-      // }
-
       res.status(200).json({ list: list, bList: list_b });
     });
   });

@@ -1220,28 +1220,36 @@ export default {
     },
     panelProductPhotoUpload(event) {
       event.files.forEach((x) => {
-        let photoModel = {
-          Id: 0,
-          urunid: 0,
-          name: "",
-          uzanti: "",
-          imagePath: "",
-          macPath: "",
-          sira: 0,
-        };
-        photoModel.urunid = this.productId;
-        photoModel.name = x.name;
-        photoModel.uzanti = x.name.split(".")[1];
-        photoModel.imagePath = "https://cdn.mekmarimage.com/products/" + x.name;
-        photoModel.macPath = "https://cdn.mekmarimage.com/products/" + x.name;
-
-        photoModel.sira = this.photoList[0].length += 1;
-
-        oceanservice.panelProductSendPhoto(x).then((response) => {
-          if (response) {
-            this.$store.dispatch("setPanelProductPhotoAdd", photoModel);
-          }
+        const index = this.photoList[0].filter((y) => {
+          return y.name == x.name;
         });
+        if (index.length > 0) {
+          alert("bu fotoğraf ismi daha önce kullanılmış " + index[0].name);
+        } else {
+          let photoModel = {
+            Id: 0,
+            urunid: 0,
+            name: "",
+            uzanti: "",
+            imagePath: "",
+            macPath: "",
+            sira: 0,
+          };
+          photoModel.urunid = this.productId;
+          photoModel.name = x.name;
+          photoModel.uzanti = x.name.split(".")[1];
+          photoModel.imagePath =
+            "https://cdn.mekmarimage.com/products/" + x.name;
+          photoModel.macPath = "https://cdn.mekmarimage.com/products/" + x.name;
+
+          photoModel.sira = this.photoList[0].length += 1;
+
+          oceanservice.panelProductSendPhoto(x).then((response) => {
+            if (response) {
+              this.$store.dispatch("setPanelProductPhotoAdd", photoModel);
+            }
+          });
+        }
       });
     },
     reOrderPhotoChangeButton(event) {
