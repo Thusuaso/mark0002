@@ -14617,6 +14617,7 @@ app.post("/shipment/products/save/mail", (req, res) => {
             </tr>`;
   });
   content = content + "</table>";
+
   transporter
     .sendMail({
       to: req.body.mail,
@@ -14625,7 +14626,7 @@ app.post("/shipment/products/save/mail", (req, res) => {
       html: content,
     })
     .then((response) => {
-      if (response.response == "250 message sent ok ") {
+      if (response.response.includes("250")) {
         res.status(200).json({ status: true });
       } else {
         res.status(200).json({ status: false });

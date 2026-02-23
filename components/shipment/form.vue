@@ -284,7 +284,7 @@ export default {
       this.getShipmentAmount.order = 0;
       this.getShipmentAmount.production = 0;
       this.getShipmentAmount.remainder = 0;
-      this.getShipmentProductionList = null;
+      this.getShipmentProductionList = [];
       this.selectedProducts = null;
       this.$store.dispatch("setShipmentSendProductionList");
       this.$store.dispatch("setShipmentSendProductionTotalCrateReset");
@@ -348,7 +348,7 @@ export default {
       this.getShipmentAmount.order = 0;
       this.getShipmentAmount.production = 0;
       this.getShipmentAmount.remainder = 0;
-      this.getShipmentProductionList = null;
+      this.getShipmentProductionList = [];
       this.selectedProducts = null;
       this.$store.dispatch("setShipmentSendProductionList");
     },

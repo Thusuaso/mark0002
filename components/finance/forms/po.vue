@@ -158,13 +158,13 @@ export default {
     deleteForm() {
       this.$emit("po_paid_delete_emit", {
         ...this.model,
-        Tarih: date.dateToString(this.paid_date),
       });
       this.paid_date = null;
     },
     poPaidListSelected(event) {
       this.$store.dispatch("setFinancePoButtonStatus", false);
       this.paid_date = date.stringToDate(event.data.Tarih);
+      this.model.Tarih = date.dateToString(event.data.Tarih);
       this.model.ID = event.data.ID;
       this.model.MusteriID = event.data.MusteriID;
       this.model.FirmaAdi = event.data.FirmaAdi;
@@ -183,7 +183,7 @@ export default {
         this.$toast.error("Kur girilmesi zorunludur.");
       } else {
         this.model.MusteriID = this.po.MusteriID;
-        this.model.Tarih = date.dateToString(this.paid_date);
+        this.model.Tarih = date.dateToString(this.model.Tarih);
         this.model.FirmaAdi = this.po.FirmaAdi;
         this.model.SiparisNo = this.po.SiparisNo;
         this.model.FinansOdemeTurID = 2;

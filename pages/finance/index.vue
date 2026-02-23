@@ -209,6 +209,7 @@ export default {
         });
     },
     poPaidDetailListSelected(event) {
+      console.log("poPaidDetailListSelected", event);
       const data = {
         Tarih: date.dateToString(event.data.Tarih),
         MusteriID: this.customerId,
