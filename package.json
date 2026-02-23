@@ -4,10 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "nuxt dev",
-    "build": "nuxt build",
-    "start": "nuxt start --hostname 127.0.0.1 --port 3000",
-    "generate": "nuxt generate"
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt dev",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt start --hostname 127.0.0.1 --port 3000",
+    "generate": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt generate"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/polyfill": "^7.12.1",
+    "cross-env": "^10.1.0",
     "sass": "1.62.1",
     "sass-loader": "^10.5.2"
   }

@@ -54,9 +54,9 @@ const connectDB = async (retries = 5) => {
 connectDB();
 
 let transporter = nodemailer.createTransport({
-  host: "mail.kurumsaleposta.com",
-  port: 465,
-  secure: true, // use TLS
+  host: "mail.mekmar.com",
+  port: 587,
+  secure: false, // use TLS
   auth: {
     user: "goz@mekmar.com",
     pass: "_bwt64h-3SR_-G2O",
@@ -64,6 +64,7 @@ let transporter = nodemailer.createTransport({
   tls: {
     // do not fail on invalid certs
     rejectUnauthorized: false,
+    minVersion: "TLSv1.2",
   },
 });
 function __noneNullControl(value) {
