@@ -625,14 +625,12 @@ export default {
       });
       this.placedBoxes = result.placed;
     },
-
-    // --- DÜZELTİLMİŞ ALGORİTMA (Raf Sistemi / Shelf Packing) ---
     packItems(itemList) {
       const cLength = Number(this.container.length) || 0;
       const cWidth = Number(this.container.width) || 0;
       const cHeight = Number(this.container.height) || 0;
 
-      // Boşlukları tanımla: {x, y, w (length), h (width)}
+      // Başlangıçta tüm konteynır tek bir boşluktur
       let spaces = [{ x: 0, y: 0, w: cLength, h: cWidth }];
       let placed = [];
 
@@ -652,37 +650,30 @@ export default {
         const rawDim1 = Number(group.length);
         const rawDim2 = Number(group.width);
 
-        // Kullanıcı seçimi (Standard: W=En, L=Boy | Rotated: W=Boy, L=En)
         let targetL, targetW;
         let isRotated = false;
 
         if (group.forkliftSide === "standard") {
-          targetL = rawDim1; // X
-          targetW = rawDim2; // Y
-          isRotated = false;
+          targetL = rawDim1;
+          targetW = rawDim2;
         } else {
-          targetL = rawDim2; // X
-          targetW = rawDim1; // Y
+          targetL = rawDim2;
+          targetW = rawDim1;
           isRotated = true;
         }
 
         while (remainingQty > 0) {
           let currentStack = Math.min(remainingQty, stackCap);
 
-          // SIRALAMA: Önce X (Sol), Sonra Y (Üst)
+          // Boşlukları X (derinlik) ve sonra Y (genişlik) eksenine göre sıralıyoruz
           spaces.sort((a, b) => {
-            // X'e göre sırala (Kapıya yakınlık)
-            if (Math.abs(a.x - b.x) > 0.5) return a.x - b.x;
-            // Aynı X hizasındaysa Y'ye göre sırala (Yukarıdan aşağı)
+            if (Math.abs(a.x - b.x) > 0.1) return a.x - b.x;
             return a.y - b.y;
           });
 
           let bestSpaceIndex = -1;
-
-          // İlk sığan boşluğu bul
           for (let i = 0; i < spaces.length; i++) {
             const sp = spaces[i];
-            // Toleranslı kontrol (0.1 cm)
             if (sp.w >= targetL - 0.1 && sp.h >= targetW - 0.1) {
               bestSpaceIndex = i;
               break;
@@ -705,44 +696,35 @@ export default {
               isRotated: isRotated,
             });
 
-            // --- YENİ ALAN BÖLME MANTIĞI (Shelf Split) ---
-            // Sorunu çözen kısım burası.
-            // Yanındaki boşluğu (Y ekseni) kısıtlamıyoruz, sonuna kadar uzatıyoruz.
+            // --- KRİTİK DÜZELTME BURADA ---
 
-            // 1. splitDown (Kutunun YANI / ALTI):
-            // X aynı kalır, Y kutu kadar aşağı kayar.
-            // ÖNEMLİ: W (Uzunluk) kısıtlanmaz, space.w (kalan tüm uzunluk) korunur.
-            // Böylece yanına daha uzun bir parça sığabilir.
+            // 1. splitDown: Kutunun YANINDAKİ boşluk.
+            // Genişliği (w) kısıtlamıyoruz (space.w kullanıyoruz), böylece yanına daha uzun kasalar sığabiliyor.
             let splitDown = {
               x: space.x,
               y: space.y + targetW,
-              w: space.w, // <-- ESKİ KODDA BURASI 'targetL' İDİ, BU YÜZDEN SIĞMIYORDU.
+              w: space.w,
               h: space.h - targetW,
             };
 
-            // 2. splitRight (Kutunun ARKASI / SAĞI):
-            // X kutu kadar ileri gider.
-            // Y aynı kalır.
-            // H sadece kutunun genişliği kadar kısıtlanır (Bu şerit için).
+            // 2. splitRight: Kutunun ARKASINDAKİ (kapıya doğru) boşluk.
+            // Bu boşluk sadece o kutunun hizasında kalmalı.
             let splitRight = {
               x: space.x + targetL,
               y: space.y,
               w: space.w - targetL,
-              h: targetW, // Sadece bu şeridin yüksekliği
+              h: targetW,
             };
 
             spaces.splice(bestSpaceIndex, 1);
 
-            // Y eksenini (Genişliği) doldurmak öncelikli olduğu için splitDown'ı önce eklemiyoruz
-            // Çünkü "Shelf" mantığında yan taraf aslında "aynı X" hizasında kalıyor.
-
-            if (splitDown.w > 0.1 && splitDown.h > 0.1) spaces.push(splitDown);
+            if (splitDown.h > 0.1 && splitDown.w > 0.1) spaces.push(splitDown);
             if (splitRight.w > 0.1 && splitRight.h > 0.1)
               spaces.push(splitRight);
 
             remainingQty -= currentStack;
           } else {
-            break; // Sığmadı
+            break;
           }
         }
       });

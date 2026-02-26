@@ -4638,6 +4638,7 @@ app.get("/reports/mekmar/summary/forwarding/list", (req, res) => {
                     sum(s.DetayTutar_2) +
                     sum(s.DetayTutar_3) +
                     sum(s.DetayTutar_4) +
+                    sum(s.sigorta_tutar_satis)+
                     dbo.SiparisUrunler_Toplami_by_YukTarihi(MONTH(s.YuklemeTarihi),YEAR(GETDATE()))) as DDP,
 
                     dbo.SiparisUrunler_Toplami_by_YukTarihi(MONTH(s.YuklemeTarihi),YEAR(GETDATE())) as FOB
@@ -4657,6 +4658,7 @@ app.get("/reports/mekmar/summary/forwarding/list", (req, res) => {
 	sum(s.DetayTutar_2) +
 	sum(s.DetayTutar_3) +
 	sum(s.DetayTutar_4) +
+  sum(s.sigorta_tutar_satis)+
 	dbo.SiparisUrunler_Toplami_by_YukTarihi(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 1)) as DDP,
 
 	dbo.SiparisUrunler_Toplami_by_YukTarihi(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 1) as FOB
@@ -4676,6 +4678,7 @@ group by MONTH(s.YuklemeTarihi),YEAR(s.YuklemeTarihi)
 	sum(s.DetayTutar_2) +
 	sum(s.DetayTutar_3) +
 	sum(s.DetayTutar_4) +
+  sum(s.sigorta_tutar_satis)+
 	dbo.SiparisUrunler_Toplami_by_YukTarihi(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 2)) as DDP,
 
 	dbo.SiparisUrunler_Toplami_by_YukTarihi(MONTH(s.YuklemeTarihi),YEAR(GETDATE()) - 2) as FOB
@@ -4732,7 +4735,7 @@ app.post("/reports/mekmar/summary/forwarding/detail/list", (req, res) => {
                     select 
 
                         dbo.SiparisUrunler_Toplami_by_Po(s.SiparisNo) as Fob,
-                        s.NavlunSatis + s.DetayTutar_1 +s.DetayTutar_2+s.DetayTutar_3 + s.DetayTutar_4 + dbo.SiparisUrunler_Toplami_by_Po(s.SiparisNo) as Ddp,
+                        s.NavlunSatis + s.DetayTutar_1 +s.DetayTutar_2+s.DetayTutar_3 + s.DetayTutar_4  + s.sigorta_tutar_satis + dbo.SiparisUrunler_Toplami_by_Po(s.SiparisNo) as Ddp,
                         s.SiparisNo,
                         s.SiparisTarihi,
                         st.TeslimTur,
