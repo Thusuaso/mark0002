@@ -15085,7 +15085,7 @@ app.get("/reports/mekmer/calculating/cost/:year/:month", async (req, res) => {
       FROM UretimTB u 
       INNER JOIN UrunKartTB uk ON uk.ID = u.UrunKartID
       INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
-      WHERE YEAR(u.Tarih) = @year AND MONTH(u.Tarih) = @month AND u.TedarikciID = 1 and u.Kutulama != 1
+      WHERE YEAR(u.Tarih) = @year AND MONTH(u.Tarih) = @month AND u.TedarikciID = 1
     `;
 
     const sqlCompany = `SELECT * FROM MekmerMaliyetFirmaTB`;
