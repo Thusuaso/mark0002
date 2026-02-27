@@ -12,8 +12,6 @@
             <th scope="col">Year (SQM)</th>
             <th scope="col">Year (PCS)</th>
             <th scope="col">Year (MT)</th>
-
-            
           </tr>
         </thead>
         <tbody>
@@ -26,8 +24,6 @@
             <td>{{ productionTotal.mekmerYearSqm | formatDecimal }}</td>
             <td>{{ productionTotal.mekmerYearPcs | formatDecimal }}</td>
             <td>{{ productionTotal.mekmerYearMt | formatDecimal }}</td>
-
-
           </tr>
           <tr>
             <th>Mekmoz</th>
@@ -38,8 +34,6 @@
             <td>{{ productionTotal.mekmozYearSqm | formatDecimal }}</td>
             <td>{{ productionTotal.mekmozYearPcs | formatDecimal }}</td>
             <td>{{ productionTotal.mekmozYearMt | formatDecimal }}</td>
-
-
           </tr>
           <tr>
             <th>External Crates</th>
@@ -71,23 +65,43 @@
             <td>
               <b>{{ productionTotal.yearTotalMt | formatDecimal }}</b>
             </td>
-
           </tr>
         </tbody>
       </table>
     </div>
     <div class="col-1">
-      <Button type="button" class="p-button-success w-100" label="New" @click="newForm" />
+      <Button
+        type="button"
+        class="p-button-success w-100"
+        label="New"
+        @click="newForm"
+      />
     </div>
     <div class="col-1">
-      <Button type="button" class="p-button-primary w-100 mb-2" label="Mekmer"
-        @click="$emit('products_status_selected', 1)" />
-      <Button type="button" class="p-button-secondary w-100 mb-2" label="External Crates"
-        @click="$emit('products_status_selected', 2)" />
-      <Button type="button" class="p-button-warning w-100 mb-2" label="Ext. Crates in Mekmer"
-        @click="$emit('products_status_selected', 3)" />
-      <Button type="button" class="p-button-danger w-100" label="Not Found"
-        @click="$emit('products_status_selected', 4)" />
+      <Button
+        type="button"
+        class="p-button-primary w-100 mb-2"
+        label="Mekmer"
+        @click="$emit('products_status_selected', 1)"
+      />
+      <Button
+        type="button"
+        class="p-button-secondary w-100 mb-2"
+        label="External Crates"
+        @click="$emit('products_status_selected', 2)"
+      />
+      <Button
+        type="button"
+        class="p-button-warning w-100 mb-2"
+        label="Ext. Crates in Mekmer"
+        @click="$emit('products_status_selected', 3)"
+      />
+      <Button
+        type="button"
+        class="p-button-danger w-100"
+        label="Not Found"
+        @click="$emit('products_status_selected', 4)"
+      />
     </div>
     <div class="col-1">
       <!-- <JsonExcel
@@ -177,36 +191,75 @@
         </vue-excel-editor>
       </div> -->
 
-      <Button class="p-button-secondary" type="button" label="Selection Excel" @click="selection_click_excel"
-      :disabled="selection_orders_disabled" />
+      <Button
+        class="p-button-secondary"
+        type="button"
+        label="Selection Excel"
+        @click="selection_click_excel"
+        :disabled="selection_orders_disabled"
+      />
       <!-- <vue-excel-xlsx :data="getProductList" :columns="excelColumnsField" :file-name="'Seleksiyon'" :file-type="'xlsx'"
         :sheet-name="'sheetname'" style="border: none; background-color: white">
         <Button type="button" class="p-button-info w-100" icon="pi pi-file-excel" label="Excel" />
       </vue-excel-xlsx> -->
       <br />
 
-      <Dropdown class="mt-1" v-model="selectedEfeTicket" :options="efeTickets" optionLabel="name"
-        placeholder="EFE Labels" @change="downloadEfeTicket($event)" />
+      <Dropdown
+        class="mt-1"
+        v-model="selectedEfeTicket"
+        :options="efeTickets"
+        optionLabel="name"
+        placeholder="EFE Labels"
+        @change="downloadEfeTicket($event)"
+      />
 
-      <a :href="ticketLink" download type="button" class="btn btn-secondary" v-if="!isEfeTicketForm">Download</a>
+      <a
+        :href="ticketLink"
+        download
+        type="button"
+        class="btn btn-secondary"
+        v-if="!isEfeTicketForm"
+        >Download</a
+      >
     </div>
     <div class="col-1">
-      <Button class="p-button-secondary" type="button" label="Orders Excel" @click="orders_click_excel"
-        :disabled="selection_orders_disabled" />
+      <Button
+        class="p-button-secondary"
+        type="button"
+        label="Orders Excel"
+        @click="orders_click_excel"
+        :disabled="selection_orders_disabled"
+      />
     </div>
     <div class="col-1">
-      <Button class="p-button-secondary" type="button" label="Ticket" @click="ticket_click_excel"
-         />
+      <Button
+        class="p-button-secondary"
+        type="button"
+        label="Ticket"
+        @click="ticket_click_excel"
+      />
     </div>
     <div class="col-3">
       <div class="row">
         <div class="col-6">
-          <Dropdown v-model="selectedVeikBox" :options="etiketlerVeikKutu" optionLabel="urun"
-            placeholder="VEIK Box Labels" class="w-100 mb-2" @change="isDropDownChange($event)" />
+          <Dropdown
+            v-model="selectedVeikBox"
+            :options="etiketlerVeikKutu"
+            optionLabel="urun"
+            placeholder="VEIK Box Labels"
+            class="w-100 mb-2"
+            @change="isDropDownChange($event)"
+          />
         </div>
         <div class="col-6">
-          <Dropdown v-model="selectedVeikCrate" :options="etiketlerVeikKasa" optionLabel="urun"
-            placeholder="Veik Crate Labels" class="w-100 mb-2" @change="isDropDownChange($event)" />
+          <Dropdown
+            v-model="selectedVeikCrate"
+            :options="etiketlerVeikKasa"
+            optionLabel="urun"
+            placeholder="Veik Crate Labels"
+            class="w-100 mb-2"
+            @change="isDropDownChange($event)"
+          />
         </div>
       </div>
       <!-- <div class="row">
@@ -221,7 +274,13 @@
       </div> -->
       <div class="row">
         <div class="col">
-          <a :href="boxCrateTicket" download type="button" class="btn btn-secondary w-100">Download</a>
+          <a
+            :href="boxCrateTicket"
+            download
+            type="button"
+            class="btn btn-secondary w-100"
+            >Download</a
+          >
         </div>
       </div>
     </div>
@@ -232,18 +291,22 @@
 import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters(["getProductList", "getLocalUrl","getOrderList","getFilteredSelectionList"]),
+    ...mapGetters([
+      "getProductList",
+      "getLocalUrl",
+      "getOrderList",
+      "getFilteredSelectionList",
+    ]),
   },
   props: {
     productionTotal: {
       type: Object,
       required: true,
     },
-
   },
   data() {
     return {
-      selection_orders_disabled:true,
+      selection_orders_disabled: true,
       boxCrateTicket: null,
       code: null,
       etiketlerVeikKutu: [
@@ -321,7 +384,6 @@ export default {
         { code: "FP-10", urun: "SILVER RUSTIC KENARI KIRIK (FP-10)" },
       ],
       etiketlerVeikKasa: [
-        
         {
           code: "SNS-01-K",
           urun: "MINA RUSTIC KENARI KIRIK (SNS01)",
@@ -398,26 +460,25 @@ export default {
           link: "https://file-service.mekmar.com/file/download/etiket/1/SAS01.doc",
         },
         {
-          code:"SBR-01-1",
-          urun:"SILVER MINI PATTERN",
-          link:"https://cdn.mekmarimage.com/etiket/SBR-01-1.doc"
+          code: "SBR-01-1",
+          urun: "SILVER MINI PATTERN (SBR-01-1)",
+          link: "https://cdn.mekmarimage.com/etiket/SBR-01-1.doc",
         },
         {
-          code:"SBY-02-1",
-          urun:"ELA MINI PATTERN",
-          link:"https://cdn.mekmarimage.com/etiket/SBY-02-1.doc"
+          code: "SBY-02-1",
+          urun: "ELA MINI PATTERN (SBY-02-1)",
+          link: "https://cdn.mekmarimage.com/etiket/SBY-02-1.doc",
         },
         {
-          code:"ST448-1",
-          urun:"Silver 15,25x30,5 Unfilled Brushed",
-          link:"https://cdn.mekmarimage.com/etiket/ST448-1.doc"
+          code: "ST448-1",
+          urun: "Silver 15,25x30,5 Unfilled Brushed (ST448-1)",
+          link: "https://cdn.mekmarimage.com/etiket/ST448-1.doc",
         },
         {
-          code:"ST450-1",
-          urun:"Mina Rustic 15,25x30,5 Unfilled Brushed",
-          link:"https://cdn.mekmarimage.com/etiket/ST450-1.doc"
-        }
-
+          code: "ST450-1",
+          urun: "Mina Rustic 15,25x30,5 Unfilled Brushed (ST450-1)",
+          link: "https://cdn.mekmarimage.com/etiket/ST450-1.doc",
+        },
       ],
       etiketlerNovaKasa: [
         { code: "FP-01-K", urun: "SCABOS KENARI KIRIK (FP-01)" },
@@ -566,20 +627,18 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("setOrderProductionMekmerList")
-      .then(res => {
-        if (res) {
-          this.selection_orders_disabled = false;
-
-        }
-      });
+    this.$store.dispatch("setOrderProductionMekmerList").then((res) => {
+      if (res) {
+        this.selection_orders_disabled = false;
+      }
+    });
   },
   methods: {
-    ticket_click_excel(){
-
-      this.$excelApi.post('/seleksiyon/etiket/excel',this.getFilteredSelectionList)
-      .then(res=>{
-        if (res.status) {
+    ticket_click_excel() {
+      this.$excelApi
+        .post("/seleksiyon/etiket/excel", this.getFilteredSelectionList)
+        .then((res) => {
+          if (res.status) {
             const link = document.createElement("a");
             link.href = this.getLocalUrl + "seleksiyon/etiket/excel";
 
@@ -587,15 +646,19 @@ export default {
             document.body.appendChild(link);
             link.click();
           }
-      });
+        });
     },
-    selection_click_excel(){
+    selection_click_excel() {
       this.$excelApi
-        .post("/siparisler/dosyalar/seleksiyon/excel/output", this.getProductList)
+        .post(
+          "/siparisler/dosyalar/seleksiyon/excel/output",
+          this.getProductList
+        )
         .then((response) => {
           if (response.status) {
             const link = document.createElement("a");
-            link.href = this.getLocalUrl + "siparisler/dosyalar/seleksiyon/excel/output";
+            link.href =
+              this.getLocalUrl + "siparisler/dosyalar/seleksiyon/excel/output";
 
             link.setAttribute("download", "selection.xlsx");
             document.body.appendChild(link);
@@ -604,13 +667,14 @@ export default {
         });
     },
 
-    orders_click_excel(){
+    orders_click_excel() {
       this.$excelApi
         .post("/siparisler/dosyalar/uretimExcelCikti", this.getOrderList)
         .then((response) => {
           if (response.status) {
             const link = document.createElement("a");
-            link.href = this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
+            link.href =
+              this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
 
             link.setAttribute("download", "Uretim_list.xlsx");
             document.body.appendChild(link);
@@ -665,28 +729,26 @@ export default {
 };
 </script>
 <style scoped>
-  @media screen and (max-width:576px) {
-    .row {
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col-3{
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col-2{
-      clear:both;
-      display:block;
-      width:100%;
-    }
-    .col-1{
-      clear:both;
-      display:block;
-      width:100%;
-    }
+@media screen and (max-width: 576px) {
+  .row {
+    clear: both;
+    display: block;
+    width: 100%;
   }
-
-
+  .col-3 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-2 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+  .col-1 {
+    clear: both;
+    display: block;
+    width: 100%;
+  }
+}
 </style>
