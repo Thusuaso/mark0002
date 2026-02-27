@@ -3,12 +3,12 @@
     <DataTable :value="list">
       <Column field="YuklemeEvrakID" header="Y.ID">
         <template #body="slotProps">
-          {{ slotProps.data.YuklemeEvrakID  }}
+          {{ slotProps.data.YuklemeEvrakID }}
         </template>
       </Column>
       <Column field="SiparisFaturaTurID" header="S.ID">
         <template #body="slotProps">
-          {{ slotProps.data.SiparisFaturaTurID  }}
+          {{ slotProps.data.SiparisFaturaTurID }}
         </template>
       </Column>
       <Column field="Tarih" header="Upload Date">
@@ -39,6 +39,12 @@
             class="p-button-danger"
             @click="isfDelete(slotProps.data)"
           ></Button>
+          <Button
+            v-if="slotProps.data.YuklemeEvrakID == 200"
+            label="Sil"
+            class="p-button-danger"
+            @click="drawingDelete(slotProps.data.ID)"
+          ></Button>
         </template>
       </Column>
     </DataTable>
@@ -53,16 +59,19 @@ export default {
     },
   },
   methods: {
+    drawingDelete(id) {
+      if (confirm("Are you sure you want to delete?")) {
+        this.$emit("drawing_delete_emit", id);
+      }
+    },
     isfDelete(event) {
-      if(confirm('Are you sure you want to delete?')){
+      if (confirm("Are you sure you want to delete?")) {
         this.$emit("isf_delete_emit", event);
-
       }
     },
     proformaDelete(id) {
-      if(confirm('Are you sure you want to delete?')){
+      if (confirm("Are you sure you want to delete?")) {
         this.$emit("proforma_delete_emit", id);
-
       }
     },
   },

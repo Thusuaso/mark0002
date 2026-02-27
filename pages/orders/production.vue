@@ -128,6 +128,7 @@
         @close_production_form_emit="closeProductionForm"
         @proforma_delete_emit="proformaDelete($event)"
         @isf_delete_emit="isfDelete($event)"
+        @drawing_delete_emit="drawingDelete($event)"
         @divide="divide"
         :source="getOrderProductionSourceTypes"
       />
@@ -824,6 +825,16 @@ export default {
             this.divide_dialog_form = false;
           }
         });
+    },
+    drawingDelete(event) {
+      this.$axios.get(`/production/drawing/delete/${event}`).then((res) => {
+        if (res.data.status) {
+          this.$toast.success("Drawing deleted successfully");
+          this.$store.commit("setOrderProductionProformaDelete", event);
+        } else {
+          this.$toast.error("Error while deleting drawing");
+        }
+      });
     },
     isfDelete(event) {
       this.$store.dispatch("setOrderProductionIsfDelete", event);

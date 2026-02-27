@@ -13322,6 +13322,14 @@ app.get("/production/proforma/delete/:id", async (req, res) => {
     }
   });
 });
+
+app.get("/production/drawing/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  const sql = `delete SiparisFaturaKayitTB where ID='${id}'`;
+  const request = await mssql.query(sql);
+  res.status(200).json({ status: true });
+});
+
 app.get("/production/isf/delete/:id/:document/:po", async (req, res) => {
   const id = req.params.id;
   const document = req.params.document.split("-");

@@ -47,6 +47,7 @@
             :list="document"
             @proforma_delete_emit="$emit('proforma_delete_emit', $event)"
             @isf_delete_emit="$emit('isf_delete_emit', $event)"
+            @drawing_delete_emit="$emit('drawing_delete_emit', $event)"
           />
         </TabPanel>
         <TabPanel header="Check">
