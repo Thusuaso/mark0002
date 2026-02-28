@@ -7463,6 +7463,12 @@ app.put("/panel/product/update", (req, res) => {
           subject: "Yayından Kaldırılan Ürün",
           html: content,
         });
+        transporter.sendMail({
+          to: "fatma@mekmar.com",
+          from: "goz@mekmar.com",
+          subject: "Yayından Kaldırılan Ürün",
+          html: content,
+        });
       } else {
         content = content + "</table>";
         transporter.sendMail({
@@ -13936,6 +13942,12 @@ app.post("/production/isf/send/mail", (req, res) => {
            
         `,
   });
+  transporter.sendMail({
+    to: "fatma@mekmar.com",
+    from: "goz@mekmar.com",
+    subject: "Yayından Kaldırılan Ürün",
+    html: content,
+  });
   res.status(200).json({ status: true });
 });
 
@@ -14199,6 +14211,12 @@ async function addedSendMail(payload) {
 
     transporter.sendMail({
       to: "export@mekmar.com",
+      from: "goz@mekmar.com",
+      subject: customSubject,
+      html: content,
+    });
+    transporter.sendMail({
+      to: "fatma@mekmar.com",
       from: "goz@mekmar.com",
       subject: customSubject,
       html: content,
@@ -14522,6 +14540,12 @@ async function updatedSendMail(payload) {
       html: content,
     });
     transporter.sendMail({
+      to: "fatma@mekmar.com",
+      from: "goz@mekmar.com",
+      subject: customSubject,
+      html: content,
+    });
+    transporter.sendMail({
       to: "export1@mekmar.com",
       from: "goz@mekmar.com",
       subject: "Sipariş Ürün Güncelleme",
@@ -14667,6 +14691,12 @@ app.post("/mail/product/control/send", (req, res) => {
   let content = `
         <h3>${req.body.kontrol_eden} Adlı Kullanıcı ${req.body.po} Siparişini ${req.body.date} Tarihinde Kontrol Etmiştir.</h3>
     `;
+  transporter.sendMail({
+    to: "fatma@mekmar.com",
+    from: "goz@mekmar.com",
+    subject: "Yayından Kaldırılan Ürün",
+    html: content,
+  });
   transporter
     .sendMail({
       to: "bilgiislem@mekmar.com",
@@ -14710,6 +14740,13 @@ app.post("/mail/product/control/send", (req, res) => {
         res.status(200).json({ status: false });
       }
     });
+
+  transporter.sendMail({
+    to: "fatma@mekmar.com",
+    from: "goz@mekmar.com",
+    subject: customSubject,
+    html: content,
+  });
   transporter
     .sendMail({
       to: "export@mekmar.com",
