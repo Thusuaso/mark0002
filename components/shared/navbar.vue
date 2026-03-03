@@ -742,6 +742,12 @@
               >Mekmer Finans</nuxt-link
             >
           </li>
+
+          <li class="nav-item">
+            <nuxt-link to="/operation/cards" tag="a" class="nav-link"
+              >Product Data</nuxt-link
+            >
+          </li>
         </ul>
       </div>
     </div>
