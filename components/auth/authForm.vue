@@ -33,7 +33,10 @@
             type="submit"
             label="İlerle"
             class="mt-3"
-            :disabled="!usernameStatus || !passwordStatus"
+            :disabled="
+              !usernameStatus || !passwordStatus || next_step_loading_button
+            "
+            :loading="next_step_loading_button"
           />
           <div class="flex justify-content-end mt-1">
             <Button
@@ -65,6 +68,8 @@
             type="submit"
             label="Giriş Yap"
             class="mt-3 p-button-success"
+            :disabled="step_2_loading_button"
+            :loading="step_2_loading_button"
           />
           <Button
             type="button"
@@ -98,6 +103,8 @@ export default {
       },
       usernameStatus: false,
       passwordStatus: false,
+      next_step_loading_button: false,
+      step_2_loading_button: false,
     };
   },
   methods: {
@@ -118,6 +125,7 @@ export default {
 
     // Tek bir onSubmit metodu ile iki aşamayı da yönetiyoruz
     async onSubmit() {
+      this.next_step_loading_button = true;
       try {
         if (this.step === 1) {
           // 1. AŞAMA: Kullanıcı adı ve şifreyi backend'e gönder
@@ -133,8 +141,11 @@ export default {
             alert(
               response.message || "Giriş bilgileri hatalı veya sunucu reddetti."
             );
+            this.next_step_loading_button = false;
           }
         } else if (this.step === 2) {
+          this.next_step_loading_button = false;
+          this.step_2_loading_button = true;
           // 2. AŞAMA: Mailden gelen kodu backend'e doğrulat
           const response = await this.$axios.$post("/verify-otp", {
             username: this.user.username,
@@ -167,15 +178,17 @@ export default {
             this.$store.dispatch("login_mailer", response);
             this.$store.dispatch("setToDoListByUsername", response.username);
             this.$store.dispatch("setUserId", response.userId);
-
+            this.step_2_loading_button = false;
             this.$router.push("/"); // Ana sayfaya veya dashboarda yönlendir
           } else {
             alert(response.message || "Kod hatalı veya süresi dolmuş.");
+            this.step_2_loading_button = false;
           }
         }
       } catch (error) {
         console.error("İşlem hatası:", error);
         alert("Sunucuyla iletişim kurulurken bir hata oluştu.");
+        this.step_2_loading_button = false;
       }
     },
     async goToForgotPassword() {
