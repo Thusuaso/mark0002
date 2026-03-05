@@ -2,6 +2,8 @@ import express from "express";
 import mssql from "mssql";
 import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
+import jwt from "jsonwebtoken";
+const JWT_SECRET = "Mekmar_Goz_2026_!SuperGizliAnahtar";
 const otpStore = new Map();
 const app = express();
 const sql = {
@@ -21,48 +23,41 @@ const sql = {
     idleTimeoutMillis: 30000,
   },
 };
-// mssql.connect(sql);
 const connectDB = async (retries = 5) => {
   try {
-    // Bağlanmayı dene
     await mssql.connect(sql);
     console.log("✅ Veritabanı bağlantısı başarılı!");
   } catch (err) {
-    // Hata olursa buraya düşer
     console.error("❌ Bağlantı hatası:", err.message);
 
     if (retries === 0) {
       console.error(
         "Artık denemiyorum, sunucu kapalı olabilir. Proje kapatılıyor."
       );
-      process.exit(1); // Umut yoksa kapat
+      process.exit(1);
     }
 
     console.log(
       `⏳ 5 saniye sonra tekrar denenecek... (Kalan Hak: ${retries})`
     );
 
-    // 5 Saniye bekle
     await new Promise((res) => setTimeout(res, 30000));
 
-    // Fonksiyonu tekrar çağır (Recursive)
     return connectDB(retries - 1);
   }
 };
 
-// Uygulama başlarken bu fonksiyonu çağır
 connectDB();
 
 let transporter = nodemailer.createTransport({
   host: "mail.mekmar.com",
   port: 587,
-  secure: false, // use TLS
+  secure: false,
   auth: {
     user: "goz@mekmar.com",
     pass: "_bwt64h-3SR_-G2O",
   },
   tls: {
-    // do not fail on invalid certs
     rejectUnauthorized: false,
     minVersion: "TLSv1.2",
   },
@@ -82,32 +77,6 @@ function __noneNullControl(value) {
     return value;
   }
 }
-/*Auth*/
-// app.post("/login", (req, res) => {
-//   if (req.body) {
-//     const sql = `select * from KullaniciTB where KullaniciAdi='${req.body.username}' and YSifre='${req.body.password}'`;
-//     mssql.query(sql, (err, results) => {
-//       const user = results.recordset[0];
-//       if (results.recordset.length == 0) {
-//         res.status(200).json({
-//           status: false,
-//         });
-//       } else {
-//         res.status(200).json({
-//           username: user.KullaniciAdi,
-//           userId: user.ID,
-//           mail: user.MailAdres,
-//           token: Math.random().toString(36).slice(2),
-//           status: true,
-//         });
-//       }
-//     });
-//   } else {
-//     res.status(200).json({
-//       status: false,
-//     });
-//   }
-// });
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -140,14 +109,12 @@ app.post("/login", async (req, res) => {
 
       const user = results.recordset[0];
 
-      // OTP Kodu Üret ve Kaydet
       const pinCode = Math.floor(100000 + Math.random() * 900000).toString();
       otpStore.set(username, {
         code: pinCode,
-        expires: Date.now() + 5 * 60 * 1000, // 5 dakika geçerli
+        expires: Date.now() + 5 * 60 * 1000,
       });
 
-      // Mail Gönderme İşlemi
       const mailOptions = {
         from: "goz@mekmar.com",
         to: user.MailAdres,
@@ -159,7 +126,6 @@ app.post("/login", async (req, res) => {
 
       try {
         await transporter.sendMail(mailOptions);
-        // Frontend'in beklediği kritik yanıt burası:
         res
           .status(200)
           .json({ status: true, step: "otp_sent", mail: user.MailAdres });
@@ -173,7 +139,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-/* 2. ADIM: Gelen Kodu Doğrula ve Login İşlemini Bitir */
 app.post("/verify-otp", (req, res) => {
   const { username, code } = req.body;
   const storedData = otpStore.get(username);
@@ -192,7 +157,6 @@ app.post("/verify-otp", (req, res) => {
   }
 
   if (storedData.code === code) {
-    // Kodu doğruladık, şimdi SQL Injection korumalı şekilde kullanıcıyı çekelim
     const request = new mssql.Request();
     request.input("user", mssql.VarChar, username);
 
@@ -206,18 +170,138 @@ app.post("/verify-otp", (req, res) => {
       }
 
       const user = results.recordset[0];
-      otpStore.delete(username); // Kullanılan kodu temizle
+      otpStore.delete(username);
+
+      const JWT_SECRET = "Mekmar_Goz_2026_!SuperGizliAnahtar";
+
+      const generatedToken = jwt.sign(
+        {
+          userId: user.ID,
+          username: user.KullaniciAdi,
+          mail: user.MailAdres,
+        },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
 
       res.status(200).json({
         username: user.KullaniciAdi,
         userId: user.ID,
         mail: user.MailAdres,
-        token: Math.random().toString(36).slice(2),
+        token: generatedToken,
         status: true,
       });
     });
   } else {
     res.status(200).json({ status: false, message: "Hatalı kod girdiniz." });
+  }
+});
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token)
+    return res
+      .status(401)
+      .json({ status: false, message: "Yetkisiz erişim, token yok." });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({
+        status: false,
+        message: "Oturum süreniz dolmuş, lütfen tekrar giriş yapın.",
+      });
+    }
+
+    req.user = user;
+    next();
+  });
+};
+
+app.post("/forgot-password-init", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const request = new mssql.Request();
+    request.input("email", mssql.VarChar, email);
+
+    const query =
+      "SELECT * FROM KullaniciTB WHERE MailAdres = @email AND Aktif = 1";
+    const results = await request.query(query);
+
+    if (results.recordset.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Hesap bulunamadı veya aktif değil." });
+    }
+
+    const user = results.recordset[0];
+    const pinCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    otpStore.set(email, {
+      code: pinCode,
+      expires: Date.now() + 10 * 60 * 1000,
+    });
+
+    const mailOptions = {
+      from: "goz@mekmar.com",
+      to: email,
+      subject: "Şifre Değiştirme Onay Kodu",
+      html: `<h2>Mekmar Şifre Değiştirme</h2>
+             <p>Merhaba <b>${user.KullaniciAdi}</b>, şifrenizi değiştirmek için onay kodunuz:</p>
+             <h1 style="color:blue;">${pinCode}</h1>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("Şifre sıfırlama mail hatası:", error);
+    res.status(500).json({ status: false, message: "Sunucu hatası." });
+  }
+});
+
+app.post("/change-password", async (req, res) => {
+  const { email, code, oldPassword, newPassword } = req.body;
+  const storedData = otpStore.get(email);
+
+  if (!storedData || Date.now() > storedData.expires) {
+    return res.status(200).json({
+      status: false,
+      message: "Doğrulama kodunun süresi dolmuş veya geçersiz.",
+    });
+  }
+
+  if (storedData.code !== code) {
+    return res
+      .status(200)
+      .json({ status: false, message: "Hatalı doğrulama kodu." });
+  }
+
+  try {
+    const request = new mssql.Request();
+    request.input("email", mssql.VarChar, email);
+    request.input("oldPass", mssql.VarChar, oldPassword);
+    request.input("newPass", mssql.VarChar, newPassword);
+
+    const query = `
+      UPDATE KullaniciTB 
+      SET YSifre = @newPass 
+      OUTPUT inserted.ID
+      WHERE MailAdres = @email AND YSifre = @oldPass AND Aktif = 1
+    `;
+
+    const results = await request.query(query);
+
+    if (results.recordset && results.recordset.length > 0) {
+      otpStore.delete(email);
+      res.status(200).json({ status: true, message: "Şifre güncellendi." });
+    } else {
+      res.status(200).json({ status: false, message: "Eski şifreniz hatalı." });
+    }
+  } catch (error) {
+    console.error("Şifre güncelleme hatası:", error);
+    res.status(500).json({ status: false, message: "Sunucu hatası." });
   }
 });
 

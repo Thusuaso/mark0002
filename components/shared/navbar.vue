@@ -1,68 +1,72 @@
 <template>
-  <nav
-    class="navbar navbar-expand-lg bg-body-tertiary"
-    style="font-size: 100%"
-    data-bs-theme="blue"
-    v-if="!getAuthorityStatus"
-  >
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">GOZ</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item" v-show="getAuthorityStatus">
-            <nuxt-link to="/selection/input" tag="a" class="nav-link"
-              >SELECTION</nuxt-link
-            >
-          </li>
-          <!-- <li class="nav-item" v-show="getAuthorityStatus">
+  <div v-if="isLoggedIn">
+    <nav
+      class="navbar navbar-expand-lg bg-body-tertiary"
+      style="font-size: 100%"
+      data-bs-theme="blue"
+      v-if="!getAuthorityStatus"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">GOZ</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item" v-show="getAuthorityStatus">
+              <nuxt-link to="/selection/input" tag="a" class="nav-link"
+                >SELECTION</nuxt-link
+              >
+            </li>
+            <!-- <li class="nav-item" v-show="getAuthorityStatus">
             <nuxt-link to="/operation/cards" tag="a" class="nav-link"
               >PRODUCT CARDS</nuxt-link
             >
           </li> -->
 
-          <li class="nav-item" v-show="!getAuthorityStatus">
-            <nuxt-link to="/" tag="a" class="nav-link">HOME</nuxt-link>
-          </li>
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              ORDERS
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/orders/production" class="dropdown-item" tag="a"
-                  >Production</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/orders/shipped" class="dropdown-item" tag="a"
-                  >Shipped</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a"
-                  >On Hold</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <!-- <li class="nav-item dropdown" v-show="getAuthorityStatus">
+            <li class="nav-item" v-show="!getAuthorityStatus">
+              <nuxt-link to="/" tag="a" class="nav-link">HOME</nuxt-link>
+            </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                ORDERS
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link
+                    to="/orders/production"
+                    class="dropdown-item"
+                    tag="a"
+                    >Production</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/orders/shipped" class="dropdown-item" tag="a"
+                    >Shipped</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a"
+                    >On Hold</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <!-- <li class="nav-item dropdown" v-show="getAuthorityStatus">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               ORDERS
             </a>
@@ -73,685 +77,707 @@
               </li>
             </ul>
           </li> -->
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              SALES
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/sales/maintodo" class="dropdown-item" tag="a"
-                  >Main To Do</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
-                  >To Do</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/sales/representative"
-                  class="dropdown-item"
-                  tag="a"
-                  >Sales & Operation</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/sales/follow" class="dropdown-item" tag="a"
-                  >Customer Notes</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/sales/bgp" class="dropdown-item" tag="a"
-                  >BGP Projects</nuxt-link
-                >
-              </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                SALES
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link to="/sales/maintodo" class="dropdown-item" tag="a"
+                    >Main To Do</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
+                    >To Do</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/sales/representative"
+                    class="dropdown-item"
+                    tag="a"
+                    >Sales & Operation</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/sales/follow" class="dropdown-item" tag="a"
+                    >Customer Notes</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/sales/bgp" class="dropdown-item" tag="a"
+                    >BGP Projects</nuxt-link
+                  >
+                </li>
 
-              <li>
-                <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
-                  >Points to Consider</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/passwords" class="dropdown-item" tag="a"
-                  >Passwords</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/sales/important-links"
-                  class="dropdown-item"
-                  tag="a"
-                  >Important Links</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
+                <li>
+                  <nuxt-link to="/sales/consider" class="dropdown-item" tag="a"
+                    >Points to Consider</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/passwords" class="dropdown-item" tag="a"
+                    >Passwords</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/sales/important-links"
+                    class="dropdown-item"
+                    tag="a"
+                    >Important Links</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
 
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              SELECTION
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/selection/input" class="dropdown-item" tag="a"
-                  >Entry</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/selection/size" class="dropdown-item" tag="a"
-                  >Crate Size</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/container" class="dropdown-item" tag="a"
-                  >Container Calculator</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item" v-show="!getAuthorityStatus">
-            <nuxt-link to="/finance" tag="a" class="nav-link"
-              >FINANCE</nuxt-link
-            >
-          </li>
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              OPERATION
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/operation/cards" class="dropdown-item" tag="a"
-                  >Product Data</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/supplier"
-                  class="dropdown-item"
-                  tag="a"
-                  >Suppliers</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/shipment"
-                  class="dropdown-item"
-                  tag="a"
-                  >Dispatch</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/uploadform"
-                  class="dropdown-item"
-                  tag="a"
-                  >Shipment Form</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/operation/follow" class="dropdown-item" tag="a"
-                  >Container Tracking</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/unfollow"
-                  class="dropdown-item"
-                  tag="a"
-                  >Shipped Containers</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/transport"
-                  class="dropdown-item"
-                  tag="a"
-                  >Shipment Costs</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/transportlist"
-                  class="dropdown-item"
-                  tag="a"
-                  >Shipment Invoices</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/container"
-                  class="dropdown-item"
-                  tag="a"
-                  >FOB Costs</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/operation/containerlist"
-                  class="dropdown-item"
-                  tag="a"
-                  >FOB Invoices</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              CUSTOMERS
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/customer/mekmar" class="dropdown-item" tag="a"
-                  >Sale Customers</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/customer/offer" class="dropdown-item" tag="a"
-                  >Quote Customers</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/customer/bgp" class="dropdown-item" tag="a"
-                  >BGP Customer</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/customer/fair" class="dropdown-item" tag="a"
-                  >Expo Customers</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/customer/selection"
-                  class="dropdown-item"
-                  tag="a"
-                  >Selection</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              MEKMER
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/production"
-                  class="dropdown-item"
-                  tag="a"
-                  >Production Crates</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/stock"
-                  class="dropdown-item"
-                  tag="a"
-                  >Stock Report</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/mine"
-                  class="dropdown-item"
-                  tag="a"
-                  >Quarry Info</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/atlanta"
-                  class="dropdown-item"
-                  tag="a"
-                  >ATL</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/productions"
-                  class="dropdown-item"
-                  tag="a"
-                  >Production</nuxt-link
-                >
-              </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                SELECTION
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link to="/selection/input" class="dropdown-item" tag="a"
+                    >Entry</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/selection/size" class="dropdown-item" tag="a"
+                    >Crate Size</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/container" class="dropdown-item" tag="a"
+                    >Container Calculator</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item" v-show="!getAuthorityStatus">
+              <nuxt-link to="/finance" tag="a" class="nav-link"
+                >FINANCE</nuxt-link
+              >
+            </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                OPERATION
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link to="/operation/cards" class="dropdown-item" tag="a"
+                    >Product Data</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/supplier"
+                    class="dropdown-item"
+                    tag="a"
+                    >Suppliers</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/shipment"
+                    class="dropdown-item"
+                    tag="a"
+                    >Dispatch</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/uploadform"
+                    class="dropdown-item"
+                    tag="a"
+                    >Shipment Form</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/follow"
+                    class="dropdown-item"
+                    tag="a"
+                    >Container Tracking</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/unfollow"
+                    class="dropdown-item"
+                    tag="a"
+                    >Shipped Containers</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/transport"
+                    class="dropdown-item"
+                    tag="a"
+                    >Shipment Costs</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/transportlist"
+                    class="dropdown-item"
+                    tag="a"
+                    >Shipment Invoices</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/container"
+                    class="dropdown-item"
+                    tag="a"
+                    >FOB Costs</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/operation/containerlist"
+                    class="dropdown-item"
+                    tag="a"
+                    >FOB Invoices</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                CUSTOMERS
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link to="/customer/mekmar" class="dropdown-item" tag="a"
+                    >Sale Customers</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/customer/offer" class="dropdown-item" tag="a"
+                    >Quote Customers</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/customer/bgp" class="dropdown-item" tag="a"
+                    >BGP Customer</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/customer/fair" class="dropdown-item" tag="a"
+                    >Expo Customers</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/customer/selection"
+                    class="dropdown-item"
+                    tag="a"
+                    >Selection</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                MEKMER
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/production"
+                    class="dropdown-item"
+                    tag="a"
+                    >Production Crates</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/stock"
+                    class="dropdown-item"
+                    tag="a"
+                    >Stock Report</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/mine"
+                    class="dropdown-item"
+                    tag="a"
+                    >Quarry Info</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/atlanta"
+                    class="dropdown-item"
+                    tag="a"
+                    >ATL</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/productions"
+                    class="dropdown-item"
+                    tag="a"
+                    >Production</nuxt-link
+                  >
+                </li>
 
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/shipped"
-                  class="dropdown-item"
-                  tag="a"
-                  >Shipped</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/onhold"
-                  class="dropdown-item"
-                  tag="a"
-                  >On Hold</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/finance"
-                  class="dropdown-item"
-                  tag="a"
-                  >Finance</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/new-mekmer-finance"
-                  tag="a"
-                  class="dropdown-item"
-                  >Mekmer Alış Finans</nuxt-link
-                >
-              </li>
-              <li v-show="getAuthorityStatus">
-                <nuxt-link
-                  to="/reports/mekmer/by-buying-production"
-                  class="dropdown-item"
-                  tag="a"
-                  >Product Purchase</nuxt-link
-                >
-              </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/shipped"
+                    class="dropdown-item"
+                    tag="a"
+                    >Shipped</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/onhold"
+                    class="dropdown-item"
+                    tag="a"
+                    >On Hold</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/finance"
+                    class="dropdown-item"
+                    tag="a"
+                    >Finance</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/new-mekmer-finance"
+                    tag="a"
+                    class="dropdown-item"
+                    >Mekmer Alış Finans</nuxt-link
+                  >
+                </li>
+                <li v-show="getAuthorityStatus">
+                  <nuxt-link
+                    to="/reports/mekmer/by-buying-production"
+                    class="dropdown-item"
+                    tag="a"
+                    >Product Purchase</nuxt-link
+                  >
+                </li>
 
-              <li v-show="getAuthorityStatus">
-                <nuxt-link
-                  to="/reports/mekmar/forwarding"
-                  class="dropdown-item"
-                  tag="a"
-                  >Shipped Crates</nuxt-link
-                >
-              </li>
-              <li v-show="getAuthorityStatus">
-                <nuxt-link
-                  to="/reports/mekmer/strips"
-                  class="dropdown-item"
-                  tag="a"
-                  >Stripler</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              MEKMAR REPORTS
-            </a>
-            <ul class="dropdown-menu">
-              <li v-show="getAyoStatus">
-                <nuxt-link
-                  to="/reports/mekmar/ayo"
-                  class="dropdown-item"
-                  tag="a"
-                  >AYO</nuxt-link
-                >
-              </li>
+                <li v-show="getAuthorityStatus">
+                  <nuxt-link
+                    to="/reports/mekmar/forwarding"
+                    class="dropdown-item"
+                    tag="a"
+                    >Shipped Crates</nuxt-link
+                  >
+                </li>
+                <li v-show="getAuthorityStatus">
+                  <nuxt-link
+                    to="/reports/mekmer/strips"
+                    class="dropdown-item"
+                    tag="a"
+                    >Stripler</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                MEKMAR REPORTS
+              </a>
+              <ul class="dropdown-menu">
+                <li v-show="getAyoStatus">
+                  <nuxt-link
+                    to="/reports/mekmar/ayo"
+                    class="dropdown-item"
+                    tag="a"
+                    >AYO</nuxt-link
+                  >
+                </li>
 
-              <li>
-                <nuxt-link
-                  to="/reports/mekmar/loading"
-                  class="dropdown-item"
-                  tag="a"
-                  >List of Shipments</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmar/forwarding"
-                  class="dropdown-item"
-                  tag="a"
-                  >Shipped Crates</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmar/summary"
-                  class="dropdown-item"
-                  tag="a"
-                  >Order Summary</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/reports/mekmar/mk" class="dropdown-item" tag="a"
-                  >MK Reports</nuxt-link
-                >
-              </li>
-              <li v-show="getAyoStatus">
-                <nuxt-link to="/reports/mekmar/gu" class="dropdown-item" tag="a"
-                  >GU Reports</nuxt-link
-                >
-              </li>
-              <li v-show="getAyoStatus">
-                <nuxt-link
-                  to="/reports/mekmar/filter-finance"
-                  class="dropdown-item"
-                  tag="a"
-                  >GU Finance</nuxt-link
-                >
-              </li>
-              <li v-show="getAyoStatus">
-                <nuxt-link
-                  to="/reports/mekmar/country-order"
-                  class="dropdown-item"
-                  tag="a"
-                  >Country Orders</nuxt-link
-                >
-              </li>
-              <li v-show="getAyoStatus">
-                <nuxt-link
-                  to="/reports/mekmar/supplier-cost"
-                  class="dropdown-item"
-                  tag="a"
-                  >Supplier Cost</nuxt-link
-                >
-              </li>
-              <li v-show="getAyoStatus">
-                <nuxt-link
-                  to="/reports/mekmar/continent-order"
-                  class="dropdown-item"
-                  tag="a"
-                  >Continent Orders</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              SAMPLE
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/sample/sample" class="dropdown-item" tag="a"
-                  >Sample List</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/sample/finance" class="dropdown-item" tag="a"
-                  >Sample Finance</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item" v-show="!getAuthorityStatus">
-            <nuxt-link to="/offers" tag="a" class="nav-link">QUOTES</nuxt-link>
-          </li>
-          <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              W. PANEL
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link
-                  to="/panel/products/published"
-                  class="dropdown-item"
-                  tag="a"
-                  >Products (Published)</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/panel/products/notpublished"
-                  class="dropdown-item"
-                  tag="a"
-                  >Products (Unpublished)</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/panel/project" class="dropdown-item" tag="a"
-                  >Projects</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/panel/products/queue"
-                  class="dropdown-item"
-                  tag="a"
-                  >Product Queue</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/panel/users" class="dropdown-item" tag="a"
-                  >Users</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link to="/panel/usa" class="dropdown-item" tag="a"
-                  >USA Panel</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-      <div class="d-flex" v-show="!getAuthorityStatus">
-        <div>
-          <Button clas="p-button-danger mr-5" label="Logout" @click="logout" />
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmar/loading"
+                    class="dropdown-item"
+                    tag="a"
+                    >List of Shipments</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmar/forwarding"
+                    class="dropdown-item"
+                    tag="a"
+                    >Shipped Crates</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmar/summary"
+                    class="dropdown-item"
+                    tag="a"
+                    >Order Summary</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmar/mk"
+                    class="dropdown-item"
+                    tag="a"
+                    >MK Reports</nuxt-link
+                  >
+                </li>
+                <li v-show="getAyoStatus">
+                  <nuxt-link
+                    to="/reports/mekmar/gu"
+                    class="dropdown-item"
+                    tag="a"
+                    >GU Reports</nuxt-link
+                  >
+                </li>
+                <li v-show="getAyoStatus">
+                  <nuxt-link
+                    to="/reports/mekmar/filter-finance"
+                    class="dropdown-item"
+                    tag="a"
+                    >GU Finance</nuxt-link
+                  >
+                </li>
+                <li v-show="getAyoStatus">
+                  <nuxt-link
+                    to="/reports/mekmar/country-order"
+                    class="dropdown-item"
+                    tag="a"
+                    >Country Orders</nuxt-link
+                  >
+                </li>
+                <li v-show="getAyoStatus">
+                  <nuxt-link
+                    to="/reports/mekmar/supplier-cost"
+                    class="dropdown-item"
+                    tag="a"
+                    >Supplier Cost</nuxt-link
+                  >
+                </li>
+                <li v-show="getAyoStatus">
+                  <nuxt-link
+                    to="/reports/mekmar/continent-order"
+                    class="dropdown-item"
+                    tag="a"
+                    >Continent Orders</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                SAMPLE
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link to="/sample/sample" class="dropdown-item" tag="a"
+                    >Sample List</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/sample/finance" class="dropdown-item" tag="a"
+                    >Sample Finance</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item" v-show="!getAuthorityStatus">
+              <nuxt-link to="/offers" tag="a" class="nav-link"
+                >QUOTES</nuxt-link
+              >
+            </li>
+            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                W. PANEL
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link
+                    to="/panel/products/published"
+                    class="dropdown-item"
+                    tag="a"
+                    >Products (Published)</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/panel/products/notpublished"
+                    class="dropdown-item"
+                    tag="a"
+                    >Products (Unpublished)</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/panel/project" class="dropdown-item" tag="a"
+                    >Projects</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/panel/products/queue"
+                    class="dropdown-item"
+                    tag="a"
+                    >Product Queue</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/panel/users" class="dropdown-item" tag="a"
+                    >Users</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/panel/usa" class="dropdown-item" tag="a"
+                    >USA Panel</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
         </div>
-        <i
-          v-badge.danger="parseInt(getToDoMainListByUsernameLenght)"
-          class="pi pi-calendar"
-          style="font-size: 2rem; cursor: pointer"
-          @click="visibleRight = true"
-        />
+        <div class="d-flex" v-show="!getAuthorityStatus">
+          <div>
+            <Button
+              clas="p-button-danger mr-5"
+              label="Logout"
+              @click="logout"
+            />
+          </div>
+          <i
+            v-badge.danger="parseInt(getToDoMainListByUsernameLenght)"
+            class="pi pi-calendar"
+            style="font-size: 2rem; cursor: pointer"
+            @click="visibleRight = true"
+          />
 
-        <Sidebar
-          :visible.sync="visibleRight"
-          header="Right Sidebar"
-          position="right"
-          class="w-50 md:w-20rem lg:w-30rem"
+          <Sidebar
+            :visible.sync="visibleRight"
+            header="Right Sidebar"
+            position="right"
+            class="w-50 md:w-20rem lg:w-30rem"
+          >
+            <Button
+              type="button"
+              class="p-button-success w-100"
+              label="New"
+              @click="newForm"
+            />
+            <todoByUsernameList
+              :list="getToDoMainListByUsername"
+              @to_do_list_selected_emit="toDoListSelected($event)"
+              @todo_done_emit="todoDone($event)"
+            />
+          </Sidebar>
+          <Dialog :visible.sync="to_do_form" header="" modal>
+            <todoByUsernameForm
+              :model="model"
+              :users="getUserList"
+              :status="getTodoMainListByUsernameButtonStatus"
+              @process="process($event)"
+              @deleteProcess="deleteProcess($event)"
+            />
+          </Dialog>
+        </div>
+      </div>
+    </nav>
+
+    <nav
+      class="navbar navbar-expand-lg bg-body-tertiary"
+      style="font-size: 100%"
+      data-bs-theme="blue"
+      v-else
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">GOZ</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
         >
-          <Button
-            type="button"
-            class="p-button-success w-100"
-            label="New"
-            @click="newForm"
-          />
-          <todoByUsernameList
-            :list="getToDoMainListByUsername"
-            @to_do_list_selected_emit="toDoListSelected($event)"
-            @todo_done_emit="todoDone($event)"
-          />
-        </Sidebar>
-        <Dialog :visible.sync="to_do_form" header="" modal>
-          <todoByUsernameForm
-            :model="model"
-            :users="getUserList"
-            :status="getTodoMainListByUsernameButtonStatus"
-            @process="process($event)"
-            @deleteProcess="deleteProcess($event)"
-          />
-        </Dialog>
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <nuxt-link
+                to="/reports/mekmer/productions"
+                tag="a"
+                class="nav-link"
+                >Siparişler</nuxt-link
+              >
+            </li>
+            <li class="nav-item">
+              <nuxt-link
+                to="/reports/mekmer/production"
+                tag="a"
+                class="nav-link"
+                >Üretim Raporu</nuxt-link
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Seleksiyon
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link to="/selection/input" class="dropdown-item" tag="a"
+                    >Stok</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/stock"
+                    class="dropdown-item"
+                    tag="a"
+                    >Stok Raporu</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Yükleme
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/shipped"
+                    class="dropdown-item"
+                    tag="a"
+                    >Yüklenen</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmar/forwarding"
+                    class="dropdown-item"
+                    tag="a"
+                    >Yükleme Raporu</nuxt-link
+                  >
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <nuxt-link to="/reports/mekmer/finance" tag="a" class="nav-link"
+                >Cari (Finans)</nuxt-link
+              >
+            </li>
+            <li class="nav-item">
+              <nuxt-link
+                to="/reports/mekmer/by-buying-production"
+                tag="a"
+                class="nav-link"
+                >Kasa Satış Fiyatı</nuxt-link
+              >
+            </li>
+            <li class="nav-item">
+              <nuxt-link
+                to="/reports/mekmer/calculating-cost"
+                tag="a"
+                class="nav-link"
+                >Muhasebe</nuxt-link
+              >
+            </li>
+            <li class="nav-item">
+              <nuxt-link to="/reports/mekmer/strips" tag="a" class="nav-link"
+                >Strip & Moloz</nuxt-link
+              >
+            </li>
+            <li class="nav-item">
+              <nuxt-link to="/operation/shipment" tag="a" class="nav-link"
+                >Sevk Et</nuxt-link
+              >
+            </li>
+
+            <li class="nav-item">
+              <nuxt-link
+                to="/reports/mekmer/new-mekmer-finance"
+                tag="a"
+                class="nav-link"
+                >Mekmer Finans</nuxt-link
+              >
+            </li>
+
+            <li class="nav-item">
+              <nuxt-link to="/operation/cards" tag="a" class="nav-link"
+                >Product Data</nuxt-link
+              >
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
-
-  <nav
-    class="navbar navbar-expand-lg bg-body-tertiary"
-    style="font-size: 100%"
-    data-bs-theme="blue"
-    v-else
-  >
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">GOZ</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <nuxt-link to="/reports/mekmer/productions" tag="a" class="nav-link"
-              >Siparişler</nuxt-link
-            >
-          </li>
-          <li class="nav-item">
-            <nuxt-link to="/reports/mekmer/production" tag="a" class="nav-link"
-              >Üretim Raporu</nuxt-link
-            >
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Seleksiyon
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link to="/selection/input" class="dropdown-item" tag="a"
-                  >Stok</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/stock"
-                  class="dropdown-item"
-                  tag="a"
-                  >Stok Raporu</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Yükleme
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <nuxt-link
-                  to="/reports/mekmer/shipped"
-                  class="dropdown-item"
-                  tag="a"
-                  >Yüklenen</nuxt-link
-                >
-              </li>
-              <li>
-                <nuxt-link
-                  to="/reports/mekmar/forwarding"
-                  class="dropdown-item"
-                  tag="a"
-                  >Yükleme Raporu</nuxt-link
-                >
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <nuxt-link to="/reports/mekmer/finance" tag="a" class="nav-link"
-              >Cari (Finans)</nuxt-link
-            >
-          </li>
-          <li class="nav-item">
-            <nuxt-link
-              to="/reports/mekmer/by-buying-production"
-              tag="a"
-              class="nav-link"
-              >Kasa Satış Fiyatı</nuxt-link
-            >
-          </li>
-          <li class="nav-item">
-            <nuxt-link
-              to="/reports/mekmer/calculating-cost"
-              tag="a"
-              class="nav-link"
-              >Muhasebe</nuxt-link
-            >
-          </li>
-          <li class="nav-item">
-            <nuxt-link to="/reports/mekmer/strips" tag="a" class="nav-link"
-              >Strip & Moloz</nuxt-link
-            >
-          </li>
-          <li class="nav-item">
-            <nuxt-link to="/operation/shipment" tag="a" class="nav-link"
-              >Sevk Et</nuxt-link
-            >
-          </li>
-
-          <li class="nav-item">
-            <nuxt-link
-              to="/reports/mekmer/new-mekmer-finance"
-              tag="a"
-              class="nav-link"
-              >Mekmer Finans</nuxt-link
-            >
-          </li>
-
-          <li class="nav-item">
-            <nuxt-link to="/operation/cards" tag="a" class="nav-link"
-              >Product Data</nuxt-link
-            >
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+    </nav>
+  </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
@@ -775,26 +801,34 @@ export default {
       "getUserId",
       "getAyoStatus",
     ]),
+    isLoggedIn() {
+      const storeAuth =
+        this.isAuthenticated !== undefined ? this.isAuthenticated : false;
+      return storeAuth || !!this.userId;
+    },
   },
   data() {
     return {
+      userId: Cookies.get("userId") || null,
       visibleRight: false,
       to_do_form: false,
       model: {},
       items: [],
-      userId: null,
     };
   },
 
   created() {
-    this.$store.dispatch("setToDoListByUsername", Cookies.get("username"));
+    this.userId = Cookies.get("userId") || null;
+    if (this.isLoggedIn) {
+      this.$store.dispatch("setToDoListByUsername", Cookies.get("username"));
+    }
   },
   mounted() {
     this.userId = Cookies.get("userId");
   },
 
   methods: {
-    logout() {
+    async logout() {
       if (confirm("Are you sure you want to log out?")) {
         Cookies.remove("mail");
         Cookies.remove("token");
@@ -804,7 +838,11 @@ export default {
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
         localStorage.removeItem("username");
-        this.$router.push("/auth");
+        await this.$cookie.remove("userId");
+        this.userId = null;
+        await this.$store.dispatch("setAuthorityNavbarStatus", false);
+
+        window.location.href = "/auth";
       }
     },
     __stringCharacterChange(event) {

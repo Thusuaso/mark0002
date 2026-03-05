@@ -4,12 +4,11 @@ export default function (context) {
     let userId = cookie.split(";").find((x) => x.trim().startsWith("userId="));
     if (userId) userId = userId.split("=")[1];
     if (
-      userId == 10 ||
       userId == 47 ||
       userId == 13 ||
       userId == 19 ||
       userId == 57 ||
-      userId == 58
+      userId == 59
     ) {
       context.store.dispatch("setAyoControlStatus", true);
     } else {
@@ -17,7 +16,7 @@ export default function (context) {
     }
   } else {
     if (
-      context.$cookie.get("userId") == 10 ||
+      context.$cookie.get("userId") == 59 ||
       context.$cookie.get("userId") == 47 ||
       context.$cookie.get("userId") == 13 ||
       context.$cookie.get("userId") == 57 ||

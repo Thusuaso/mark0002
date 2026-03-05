@@ -35,6 +35,14 @@
             class="mt-3"
             :disabled="!usernameStatus || !passwordStatus"
           />
+          <div class="flex justify-content-end mt-1">
+            <Button
+              type="button"
+              label="Şifremi Unuttum?"
+              class="p-button-link p-0 text-sm text-color-secondary"
+              @click="goToForgotPassword"
+            />
+          </div>
         </div>
       </form>
 
@@ -169,6 +177,9 @@ export default {
         console.error("İşlem hatası:", error);
         alert("Sunucuyla iletişim kurulurken bir hata oluştu.");
       }
+    },
+    async goToForgotPassword() {
+      this.$router.push("/auth/change-password");
     },
   },
 };

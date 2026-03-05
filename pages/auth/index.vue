@@ -7,6 +7,7 @@
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 export default {
+  layout: "empty",
   computed: {
     ...mapGetters(["getUserList"]),
   },

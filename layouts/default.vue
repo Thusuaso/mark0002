@@ -1,20 +1,28 @@
 <template>
   <div class="">
     <loadingSpinner v-show="getLoading" />
-    <navbar v-show="$store.getters.isAuthenticated" style="margin-bottom: 5px" />
+    <navbar
+      v-show="$store.getters.isAuthenticated"
+      style="margin-bottom: 5px"
+    />
     <nuxt />
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 export default {
-  middleware: ["sessionControl", "authControl", "navbarControl","ayoControl"],
+  middleware: [
+    "sessionControl",
+    "authControl",
+    "navbarControl",
+    "ayoControl",
+    "auth-check",
+  ],
   computed: {
-    ...mapGetters(['getLoading'])
+    ...mapGetters(["getLoading"]),
   },
-  data(){
-    return {
-    }
+  data() {
+    return {};
   },
   created() {
     this.$store.dispatch("setCountryList");
@@ -42,7 +50,6 @@ export default {
     this.$store.dispatch("setOrderKindOfDeliverySupplierList");
     this.$store.dispatch("setYearList");
     this.$store.dispatch("setMonthList");
-
   },
 };
 </script>

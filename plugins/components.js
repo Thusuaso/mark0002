@@ -146,6 +146,8 @@ import ayoListForm from "~/components/reports/mekmar/ayo/listForm";
 import currency from "~/components/tcmb/currency";
 import calculatingCostForm from "~/components/reports/mekmer/calculatingCost/form";
 import calculatingCost from "~/components/reports/mekmer/calculatingCost/cost";
+import changePasswordForm from "~/components/auth/changePasswordForm";
+Vue.component("changePasswordForm", changePasswordForm);
 
 Vue.component("calculatingCost", calculatingCost);
 
