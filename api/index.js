@@ -2,7 +2,7 @@ import express from "express";
 import mssql from "mssql";
 import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
-
+const otpStore = new Map();
 const app = express();
 const sql = {
   user: "userEC52E044DE",
@@ -83,29 +83,141 @@ function __noneNullControl(value) {
   }
 }
 /*Auth*/
-app.post("/login", (req, res) => {
-  if (req.body) {
-    const sql = `select * from KullaniciTB where KullaniciAdi='${req.body.username}' and YSifre='${req.body.password}'`;
-    mssql.query(sql, (err, results) => {
+// app.post("/login", (req, res) => {
+//   if (req.body) {
+//     const sql = `select * from KullaniciTB where KullaniciAdi='${req.body.username}' and YSifre='${req.body.password}'`;
+//     mssql.query(sql, (err, results) => {
+//       const user = results.recordset[0];
+//       if (results.recordset.length == 0) {
+//         res.status(200).json({
+//           status: false,
+//         });
+//       } else {
+//         res.status(200).json({
+//           username: user.KullaniciAdi,
+//           userId: user.ID,
+//           mail: user.MailAdres,
+//           token: Math.random().toString(36).slice(2),
+//           status: true,
+//         });
+//       }
+//     });
+//   } else {
+//     res.status(200).json({
+//       status: false,
+//     });
+//   }
+// });
+
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ status: false, message: "Eksik bilgi." });
+  }
+
+  try {
+    const request = new mssql.Request();
+    request.input("user", mssql.VarChar, username);
+    request.input("pass", mssql.VarChar, password);
+
+    const query =
+      "SELECT * FROM KullaniciTB WHERE KullaniciAdi = @user AND YSifre = @pass";
+
+    request.query(query, async (err, results) => {
+      if (err) {
+        console.error("SQL Hatası:", err);
+        return res
+          .status(500)
+          .json({ status: false, message: "Veritabanı hatası." });
+      }
+
+      if (results.recordset.length === 0) {
+        return res
+          .status(200)
+          .json({ status: false, message: "Kullanıcı adı veya şifre hatalı." });
+      }
+
       const user = results.recordset[0];
-      if (results.recordset.length == 0) {
-        res.status(200).json({
-          status: false,
-        });
-      } else {
-        res.status(200).json({
-          username: user.KullaniciAdi,
-          userId: user.ID,
-          mail: user.MailAdres,
-          token: Math.random().toString(36).slice(2),
-          status: true,
-        });
+
+      // OTP Kodu Üret ve Kaydet
+      const pinCode = Math.floor(100000 + Math.random() * 900000).toString();
+      otpStore.set(username, {
+        code: pinCode,
+        expires: Date.now() + 5 * 60 * 1000, // 5 dakika geçerli
+      });
+
+      // Mail Gönderme İşlemi
+      const mailOptions = {
+        from: "goz@mekmar.com",
+        to: user.MailAdres,
+        subject: "Mekmar Giriş Onay Kodu",
+        html: `<h2>Mekmar Sistem Girişi</h2>
+               <p>Merhaba <b>${user.KullaniciAdi}</b>, giriş onay kodunuz:</p>
+               <h1 style="color:blue;">${pinCode}</h1>`,
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        // Frontend'in beklediği kritik yanıt burası:
+        res
+          .status(200)
+          .json({ status: true, step: "otp_sent", mail: user.MailAdres });
+      } catch (mailErr) {
+        console.error("Mail gönderilemedi:", mailErr);
+        res.status(500).json({ status: false, message: "Mail gönderilemedi." });
       }
     });
-  } else {
-    res.status(200).json({
-      status: false,
+  } catch (error) {
+    res.status(500).json({ status: false, message: "Sunucu hatası." });
+  }
+});
+
+/* 2. ADIM: Gelen Kodu Doğrula ve Login İşlemini Bitir */
+app.post("/verify-otp", (req, res) => {
+  const { username, code } = req.body;
+  const storedData = otpStore.get(username);
+
+  if (!storedData) {
+    return res
+      .status(200)
+      .json({ status: false, message: "Kod süresi dolmuş veya geçersiz." });
+  }
+
+  if (Date.now() > storedData.expires) {
+    otpStore.delete(username);
+    return res
+      .status(200)
+      .json({ status: false, message: "Kodun süresi dolmuş." });
+  }
+
+  if (storedData.code === code) {
+    // Kodu doğruladık, şimdi SQL Injection korumalı şekilde kullanıcıyı çekelim
+    const request = new mssql.Request();
+    request.input("user", mssql.VarChar, username);
+
+    const query = "SELECT * FROM KullaniciTB WHERE KullaniciAdi = @user";
+
+    request.query(query, (err, results) => {
+      if (err || results.recordset.length === 0) {
+        return res
+          .status(500)
+          .json({ status: false, message: "Veritabanı hatası." });
+      }
+
+      const user = results.recordset[0];
+      otpStore.delete(username); // Kullanılan kodu temizle
+
+      res.status(200).json({
+        username: user.KullaniciAdi,
+        userId: user.ID,
+        mail: user.MailAdres,
+        token: Math.random().toString(36).slice(2),
+        status: true,
+      });
     });
+  } else {
+    res.status(200).json({ status: false, message: "Hatalı kod girdiniz." });
   }
 });
 
@@ -18872,6 +18984,41 @@ app.delete("/mekmar/panel/faq/video/delete/:id", async (req, res) => {
     res.status(200).json({ status: false });
   }
 });
+
+app.get("/reports/mekmer/stocks/list", async (req, res) => {
+  const year = req.params.year;
+  const monthly_stock_sql = `
+  select MONTH(Tarih) as MONTH,SUM(SqmMiktar)as SqmMiktar,SUM(Miktar) as Miktar, COUNT(ID) as KasaAdedi from UretimTB where 
+YEAR(Tarih) = YEAR(GETDATE())  and TedarikciID=1
+
+group by MONTH(Tarih)
+
+  `;
+  const current_stock_sql = `
+    select KasaM2,KasaAdet,KayitTarihi,MONTH(KayitTarihi) as Month from MekmerAylikStokTB
+    where YEAR(KayitTarihi) = YEAR(GETDATE())
+  `;
+
+  const mekmer_shipped_sql = `
+    select MONTH(s.YuklemeTarihi) as Month,sum(su.AlisFiyati * su.Miktar) as Satis from SiparislerTB s
+    inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+    inner join MusterilerTB m on m.ID = s.MusteriID
+
+    where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and su.TedarikciID=1 and s.SiparisDurumID=3
+
+    group by MONTH(s.YuklemeTarihi)
+  `;
+
+  const monthly_stock_data = (await mssql.query(monthly_stock_sql)).recordset;
+  const current_stock_data = (await mssql.query(current_stock_sql)).recordset;
+  const mekmer_shipped_data = (await mssql.query(mekmer_shipped_sql)).recordset;
+  res.status(200).json({
+    monthly_stock: monthly_stock_data,
+    current_stock: current_stock_data,
+    mekmer_shipped: mekmer_shipped_data,
+  });
+});
+
 module.exports = {
   path: "/api",
   handler: app,

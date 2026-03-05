@@ -950,14 +950,14 @@
       :header="nakliye_dialog_header"
       modal
     >
-      <div class="row mt-3">
-        <div class="col-6">
+      <div class="row mt-1" style="height: 400px">
+        <div class="col-3">
           <currencyApi
             @dateSelectedEmit="dateNakliyeSelected($event)"
             @rateFetchedEmit="rateFetchedNakliye($event)"
           />
         </div>
-        <div class="col-6">
+        <div class="col-9">
           <div class="row gap-1">
             <div class="col-3">
               <span class="p-float-label">
