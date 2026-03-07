@@ -6,6 +6,7 @@ function __noneNullControl(value) {
   }
 }
 const state = {
+  orderProductionCustomer: "",
   orderList: [],
   orderListAll: [],
   orderProductionButtonStatus: false,
@@ -346,6 +347,9 @@ const actions = {
   setOrderProductionPo(vuexContext, po) {
     vuexContext.commit("setOrderProductionPo", po);
   },
+  setOrderProductionCustomer(vuexContext, customer) {
+    vuexContext.commit("setOrderProductionCustomer", customer);
+  },
   setOrderProductAdded(vuexContext, payload) {
     this.$axios
       .post("/order/production/product/add", payload)
@@ -684,6 +688,9 @@ const actions = {
   },
 };
 const mutations = {
+  setOrderProductionCustomer(state, payload) {
+    state.orderProductionCustomer = payload;
+  },
   setOrderProductionSourceTypes(state, payload) {
     state.orderProductionSourceTypes = payload;
   },
@@ -1066,6 +1073,9 @@ const mutations = {
   },
 };
 const getters = {
+  getOrderProductionCustomer(state) {
+    return state.orderProductionCustomer;
+  },
   getOrderProductionSourceTypes(state) {
     return state.orderProductionSourceTypes;
   },

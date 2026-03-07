@@ -2552,6 +2552,7 @@ export default {
       this.$store.dispatch("setOrderProductionId", event.SiparisId);
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
+      this.$store.dispatch("setOrderProductionCustomer", event.FirmaAdi);
       this.production_detail_form = true;
       this.oldOrderPayload = { ...event };
       this.$store.dispatch("resetCostList");

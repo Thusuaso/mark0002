@@ -12,10 +12,10 @@ const sql = {
   database: "Yeni_Mekmar_DB",
   server: "94.73.151.2",
   options: {
-    encrypt: false, // for azure
-    trustServerCertificate: false, // change to true for local dev / self-signed certs
-    connectTimeout: 60000, // Bağlanmak için 60 saniye bekle (Varsayılan 15000)
-    requestTimeout: 60000, // Sorgu cevabı için 60 saniye bekle
+    encrypt: false, 
+    trustServerCertificate: false, 
+    connectTimeout: 60000, 
+    requestTimeout: 60000, 
   },
   pool: {
     max: 10,
@@ -181,7 +181,7 @@ app.post("/verify-otp", (req, res) => {
           mail: user.MailAdres,
         },
         JWT_SECRET,
-        { expiresIn: "24h" }
+        { expiresIn: "7d" }
       );
 
       res.status(200).json({

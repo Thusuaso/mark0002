@@ -1,26 +1,23 @@
 <template>
   <div>
     <div class="container">
-      <!-- <JsonExcel
-        class="w-100"
-        :data="list"
-        :fields="checkListFields"
-        worksheet="Çeki"
-        name="Çeki.xls"
-      >
-        <Button
-          type="button"
-          class="p-button-info w-100"
-          icon="pi pi-file-excel"
-          label="Excel"
-        />
-      </JsonExcel> -->
+      <div class="row">
+        <div class="col-6">
+          <Button
+            class="p-button-primary w-100"
+            label="Excel"
+            @click="excel_test"
+          />
+        </div>
+        <div class="col-6">
+          <Button
+            class="p-button-primary w-100"
+            label="Etiket Excel"
+            @click="excel_labels"
+          />
+        </div>
+      </div>
 
-      <Button
-        class="p-button-primary w-100"
-        label="Excel"
-        @click="excel_test"
-      />
       <DataTable
         :value="list"
         filterDisplay="row"
@@ -298,7 +295,11 @@ import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters(["getLocalUrl", "getOrderProductionPo"]),
+    ...mapGetters([
+      "getLocalUrl",
+      "getOrderProductionPo",
+      "getOrderProductionCustomer",
+    ]),
   },
   props: {
     list: {
@@ -362,6 +363,23 @@ export default {
           const link = document.createElement("a");
           link.href = this.getLocalUrl + "excel/check/list";
 
+          link.setAttribute("download", "check_list.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        }
+      });
+    },
+    excel_labels() {
+      const data = {
+        list: this.list,
+        po: this.getOrderProductionPo,
+        customer: this.getOrderProductionCustomer,
+      };
+      console.log(data);
+      this.$excelApi.post("/excel/labels/list", data).then((response) => {
+        if (response) {
+          const link = document.createElement("a");
+          link.href = this.getLocalUrl + "/excel/labels/list";
           link.setAttribute("download", "check_list.xlsx");
           document.body.appendChild(link);
           link.click();

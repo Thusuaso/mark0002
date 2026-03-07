@@ -23,7 +23,8 @@
             type="submit"
             label="Kod Gönder"
             class="mt-3"
-            :disabled="!email"
+            :disabled="!email || step_1_loading_button"
+            :loading="step_1_loading_button"
           />
           <Button
             type="button"
@@ -98,7 +99,8 @@
             type="submit"
             label="Şifremi Değiştir"
             class="mt-3 p-button-success"
-            :disabled="!canSubmit"
+            :disabled="!canSubmit || step_2_loading_button"
+            :loading="step_2_loading_button"
           />
           <Button
             type="button"
@@ -122,6 +124,8 @@ export default {
       oldPassword: "",
       newPassword: "",
       confirmPassword: "",
+      step_1_loading_button: false,
+      step_2_loading_button: false,
     };
   },
   computed: {
@@ -160,6 +164,7 @@ export default {
       this.$router.push("/auth");
     },
     async sendMailCode() {
+      this.step_1_loading_button = true;
       try {
         // Backend'e maili gönderip, SQL'de Aktif mi kontrol ettiriyoruz
         const response = await this.$axios.$post("/forgot-password-init", {
@@ -169,17 +174,21 @@ export default {
         if (response.status) {
           alert("Mailinize doğrulama kodu gönderildi.");
           this.step = 2;
+          this.step_1_loading_button = false;
         } else {
           alert(
             response.message ||
               "Bu mail adresine ait aktif bir hesap bulunamadı."
           );
+          this.step_1_loading_button = false;
         }
       } catch (error) {
         alert("Sunucuyla iletişim kurulamadı.");
+        this.step_1_loading_button = false;
       }
     },
     async changePassword() {
+      this.step_2_loading_button = true;
       try {
         const response = await this.$axios.$post("/change-password", {
           email: this.email,
@@ -192,15 +201,18 @@ export default {
           alert(
             "Şifreniz başarıyla değiştirildi! Yeni şifrenizle giriş yapabilirsiniz."
           );
+          this.step_2_loading_button = false;
           // İşlem bitince ana giriş sayfasına veya dashboarda yönlendir
           this.$router.push("/auth");
         } else {
           alert(
             response.message || "İşlem başarısız. Bilgilerinizi kontrol edin."
           );
+          this.step_2_loading_button = false;
         }
       } catch (error) {
         alert("Sunucu hatası oluştu.");
+        this.step_2_loading_button = false;
       }
     },
     async cancel() {
