@@ -65,6 +65,7 @@ export default {
     { src: "~/plugins/tcmb-service.js", mode: "client" },
     // Excel API Servisi (Artık .server.js DEĞİL):
     "~/plugins/excelApi.js",
+    "~/plugins/axios.js",
   ],
 
   components: true,

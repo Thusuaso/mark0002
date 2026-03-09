@@ -88,11 +88,11 @@
                 SALES
               </a>
               <ul class="dropdown-menu">
-                <li>
+                <!-- <li>
                   <nuxt-link to="/sales/maintodo" class="dropdown-item" tag="a"
                     >Main To Do</nuxt-link
                   >
-                </li>
+                </li> -->
                 <li>
                   <nuxt-link to="/sales/todo" class="dropdown-item" tag="a"
                     >To Do</nuxt-link

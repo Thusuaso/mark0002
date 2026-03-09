@@ -5,6 +5,15 @@ import currency from "../plugins/currency";
 import jwt from "jsonwebtoken";
 const JWT_SECRET = "Mekmar_Goz_2026_!SuperGizliAnahtar";
 const otpStore = new Map();
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [username, data] of otpStore.entries()) {
+    if (now > data.expires) {
+      otpStore.delete(username);
+    }
+  }
+}, 60 * 60 * 1000);
 const app = express();
 const sql = {
   user: "userEC52E044DE",
@@ -12,10 +21,10 @@ const sql = {
   database: "Yeni_Mekmar_DB",
   server: "94.73.151.2",
   options: {
-    encrypt: false, 
-    trustServerCertificate: false, 
-    connectTimeout: 60000, 
-    requestTimeout: 60000, 
+    encrypt: false,
+    trustServerCertificate: false,
+    connectTimeout: 60000,
+    requestTimeout: 60000,
   },
   pool: {
     max: 10,
@@ -64,18 +73,14 @@ let transporter = nodemailer.createTransport({
 });
 function __noneNullControl(value) {
   if (
-    value == null ||
-    value == " " ||
-    value == undefined ||
-    value == "null" ||
-    value == "NULL" ||
-    value == "Null" ||
-    value == "undefined"
-  ) {
+    !value ||
+    value === " " ||
+    value === "null" ||
+    value === "NULL" ||
+    value === "undefined"
+  )
     return "";
-  } else {
-    return value;
-  }
+  return value;
 }
 
 app.post("/login", async (req, res) => {
@@ -196,29 +201,6 @@ app.post("/verify-otp", (req, res) => {
     res.status(200).json({ status: false, message: "Hatalı kod girdiniz." });
   }
 });
-
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token)
-    return res
-      .status(401)
-      .json({ status: false, message: "Yetkisiz erişim, token yok." });
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({
-        status: false,
-        message: "Oturum süreniz dolmuş, lütfen tekrar giriş yapın.",
-      });
-    }
-
-    req.user = user;
-    next();
-  });
-};
-
 app.post("/forgot-password-init", async (req, res) => {
   const { email } = req.body;
 
@@ -304,444 +286,697 @@ app.post("/change-password", async (req, res) => {
     res.status(500).json({ status: false, message: "Sunucu hatası." });
   }
 });
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token)
+    return res
+      .status(401)
+      .json({ status: false, message: "Yetkisiz erişim, token yok." });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({
+        status: false,
+        message: "Oturum süreniz dolmuş, lütfen tekrar giriş yapın.",
+      });
+    }
+
+    req.user = user;
+    next();
+  });
+};
+
+app.use((req, res, next) => {
+  const openRoutes = [
+    "/login",
+    "/verify-otp",
+    "/forgot-password-init",
+    "/change-password",
+    "/users",
+  ];
+
+  // Tarayıcının 'OPTIONS' yoklamalarını ve açık rotaları serbest bırak
+  if (req.method === "OPTIONS" || openRoutes.includes(req.path)) {
+    return next();
+  }
+
+  authenticateToken(req, res, next);
+});
 
 /*Home*/
-app.get("/home", (req, res) => {
-  let sqlMonth =
-    "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' group by s.SiparisNo";
-  let sqlYear =
-    "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' group by s.SiparisNo";
-  let sqlMonthForwarding =
-    "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo";
-  let sqlYearForwarding =
-    "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo";
-  let sqlChartYearOne =
-    "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)";
-  let sqlChartYearTwo =
-    "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 1 and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)";
-  let sqlChartCustomerShipped = `
-            select 
 
-                m.Marketing,
-                (select sum(su.SatisFiyati * su.Miktar) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)
-                + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as total
+app.get("/home", async (req, res) => {
+  try {
+    const request = new mssql.Request();
 
+    const [
+      monthOrderRes,
+      yearOrderRes,
+      monthForwardingRes,
+      yearForwardingRes,
+      chartYearOneRes,
+      chartYearTwoRes,
+      chartShippedCustomerRes,
+      chartProductsRes,
+      chartOffersRes,
+      chartProductsSpecialRes,
+      supplierCostListRes,
+    ] = await Promise.all([
+      request.query(
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' group by s.SiparisNo"
+      ),
+      request.query(
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' group by s.SiparisNo"
+      ),
+      request.query(
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo"
+      ),
+      request.query(
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo"
+      ),
+      request.query(
+        "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)"
+      ),
+      request.query(
+        "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 1 and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)"
+      ),
+      request.query(
+        "select m.Marketing, (select sum(su.SatisFiyati * su.Miktar) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 group by m.Marketing, s.SiparisNo"
+      ),
+      request.query(
+        "select sum(u.Miktar) as total, u.UrunBirimID as BirimId, (select ub.BirimAdi from UrunBirimTB ub where ub.ID = u.UrunBirimID) as BirimAdi, MONTH(u.Tarih) as month from UretimTB u where YEAR(u.Tarih) = YEAR(GETDATE()) and u.TedarikciID in (1,123) group by u.UrunBirimID,MONTH(u.Tarih) order by MONTH(u.Tarih)"
+      ),
+      request.query(
+        "select t.KullaniciId as UserId,count(t.Id) as Offer, MONTH(t.Tarih) as Month, (select k.KullaniciAdi from KullaniciTB k where k.ID = t.KullaniciId) as Username from YeniTeklifTB t where YEAR(t.Tarih) = YEAR(GETDATE()) group by MONTH(t.Tarih),t.KullaniciId order by MONTH(t.Tarih)"
+      ),
+      request.query(
+        "select YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())"
+      ),
+      request.query(
+        "select su.TedarikciID, sum(su.AlisFiyati * su.Miktar) as Total, t.FirmaAdi from SiparislerTB s inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo inner join TedarikciTB t on t.ID = su.TedarikciID inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar' group by su.TedarikciID,t.FirmaAdi order by sum(su.AlisFiyati * su.Miktar) desc"
+      ),
+    ]);
 
-            from SiparislerTB s
-            inner join MusterilerTB m on m.ID = s.MusteriID
+    const totalMonthOrder = monthOrderRes.recordset.reduce(
+      (acc, curr) => acc + (curr.Total || 0),
+      0
+    );
+    const totalYearOrder = yearOrderRes.recordset.reduce(
+      (acc, curr) => acc + (curr.Total || 0),
+      0
+    );
+    const totalMonthForwarding = monthForwardingRes.recordset.reduce(
+      (acc, curr) => acc + (curr.Total || 0),
+      0
+    );
+    const totalYearForwarding = yearForwardingRes.recordset.reduce(
+      (acc, curr) => acc + (curr.Total || 0),
+      0
+    );
 
-            where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3
+    const currentMonth = new Date().getMonth() + 1;
+    const monthLabels = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
 
-            group by m.Marketing, s.SiparisNo
-    `;
-  let sqlChartProduct = `
-    select 
-
-        sum(u.Miktar) as total,
-        u.UrunBirimID as BirimId,
-        (select ub.BirimAdi from UrunBirimTB ub where ub.ID = u.UrunBirimID) as BirimAdi,
-        MONTH(u.Tarih) as month
-
-    from UretimTB u
-
-    where YEAR(u.Tarih) = YEAR(GETDATE()) and u.TedarikciID in (1,123)
-
-    group by u.UrunBirimID,MONTH(u.Tarih)
-    order by MONTH(u.Tarih)
-    `;
-  let sqlChartOffers = `
-    select t.KullaniciId as UserId,count(t.Id) as Offer, MONTH(t.Tarih) as Month,
-        (select k.KullaniciAdi from KullaniciTB k where k.ID = t.KullaniciId) as Username
-    from YeniTeklifTB t
-
-    where YEAR(t.Tarih) = YEAR(GETDATE())
-
-    group by MONTH(t.Tarih),t.KullaniciId
-    order by MONTH(t.Tarih)
-    `;
-
-  let sqlChartProductSpecial = `
-        select YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se 
-inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
-where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
-    `;
-
-  let sqlSupplierCostList = `
-select 
-
-
-            su.TedarikciID,
-            sum(su.AlisFiyati * su.Miktar) as Total,
-            t.FirmaAdi
-
-
-        from SiparislerTB s
-        inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
-        inner join TedarikciTB t on t.ID = su.TedarikciID
-		inner join MusterilerTB m on m.ID = s.MusteriID
-        where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar'
-        group by su.TedarikciID,t.FirmaAdi
-        order by sum(su.AlisFiyati * su.Miktar) desc
-    `;
-
-  function _forSum(data) {
-    let sum = 0;
-    if (data.length == 0) {
-      sum = 0;
-    } else {
-      data.forEach((x) => {
-        sum += x.Total;
-      });
-    }
-    return sum;
-  }
-  function _chartSum(data) {
-    let chart = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    for (const item of data) {
-      if (item.Ay == 1) {
-        chart[0] += +item.Total;
-      } else if (item.Ay == 2) {
-        chart[1] += +item.Total;
-      } else if (item.Ay == 3) {
-        chart[2] += +item.Total;
-      } else if (item.Ay == 4) {
-        chart[3] += +item.Total;
-      } else if (item.Ay == 5) {
-        chart[4] += +item.Total;
-      } else if (item.Ay == 6) {
-        chart[5] += +item.Total;
-      } else if (item.Ay == 7) {
-        chart[6] += +item.Total;
-      } else if (item.Ay == 8) {
-        chart[7] += +item.Total;
-      } else if (item.Ay == 9) {
-        chart[8] += +item.Total;
-      } else if (item.Ay == 10) {
-        chart[9] += +item.Total;
-      } else if (item.Ay == 11) {
-        chart[10] += +item.Total;
-      } else if (item.Ay == 12) {
-        chart[11] += +item.Total;
-      }
-    }
-    return chart;
-  }
-  function _chartCustomerShippedSum(data) {
-    let chart = [0, 0, 0, 0];
-    data.forEach((x) => {
-      if (x.Marketing == "Mekmar") {
-        chart[0] += +x.total;
-      } else if (x.Marketing == "İç Piyasa") {
-        chart[1] += +x.total;
-      } else if (x.Marketing == "Imperial Homes") {
-        chart[2] += +x.total;
-      } else if (x.Marketing == "Mekmer") {
-        chart[3] += +x.total;
-      }
+    let chartOne = Array(12).fill(0);
+    chartYearOneRes.recordset.forEach((i) => {
+      if (i.Ay >= 1 && i.Ay <= 12) chartOne[i.Ay - 1] += +i.Total;
     });
-    return chart;
-  }
-  function _chartProductsSum(data, data2) {
-    const chart_sqm = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const chart_piece = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const chart_mt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    data.forEach((x) => {
-      if (x.BirimId == 1) {
-        chart_sqm[x.month - 1] += x.total;
-      } else if (x.BirimId == 2) {
-        chart_piece[x.month - 1] += x.total;
-      } else if (x.BirimId == 3) {
-        chart_mt[x.month - 1] += x.total;
+
+    let chartTwo = Array(12).fill(0);
+    chartYearTwoRes.recordset.forEach((i) => {
+      if (i.Ay >= 1 && i.Ay <= 12) chartTwo[i.Ay - 1] += +i.Total;
+    });
+
+    let chartCustomerShippedData = [0, 0, 0, 0];
+    chartShippedCustomerRes.recordset.forEach((x) => {
+      if (x.Marketing == "Mekmar") chartCustomerShippedData[0] += +x.total;
+      else if (x.Marketing == "İç Piyasa")
+        chartCustomerShippedData[1] += +x.total;
+      else if (x.Marketing == "Imperial Homes")
+        chartCustomerShippedData[2] += +x.total;
+      else if (x.Marketing == "Mekmer") chartCustomerShippedData[3] += +x.total;
+    });
+
+    let chart_sqm = Array(12).fill(0);
+    let chart_piece = Array(12).fill(0);
+    let chart_mt = Array(12).fill(0);
+
+    chartProductsRes.recordset.forEach((x) => {
+      if (x.month >= 1 && x.month <= 12) {
+        if (x.BirimId == 1) chart_sqm[x.month - 1] += x.total;
+        else if (x.BirimId == 2) chart_piece[x.month - 1] += x.total;
+        else if (x.BirimId == 3) chart_mt[x.month - 1] += x.total;
       }
     });
 
-    // data2.forEach((x) => {
-    //   if (x.UrunBirimID == 1) {
-    //     chart_sqm[x.Month - 1] += x.Miktar;
-    //   } else if (x.UrunBirimID == 2) {
-    //     chart_piece[x.Month - 1] += x.Miktar;
-    //   } else if (x.UrunBirimID == 3) {
-    //     chart_mt[x.Month - 1] += x.Miktar;
-    //   }
-    // });
+    let chart_o = Array(12).fill(0); // 19 ID -> Özlem
+    let chart_h = Array(12).fill(0); // 44 ID -> Hakan
 
-    return {
-      sqm: chart_sqm,
-      piece: chart_piece,
-      mt: chart_mt,
-    };
-  }
-  function _chartOffersSum(data) {
-    const chart_h = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const chart_o = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    data.forEach((x) => {
-      if (x.UserId == 19) {
-        chart_o[x.Month - 1] += x.Offer;
-      } else if (x.UserId == 44) {
-        chart_h[x.Month - 1] += x.Offer;
+    chartOffersRes.recordset.forEach((x) => {
+      if (x.Month >= 1 && x.Month <= 12) {
+        if (x.UserId == 19) chart_o[x.Month - 1] += x.Offer;
+        else if (x.UserId == 44) chart_h[x.Month - 1] += x.Offer;
       }
     });
-    return {
-      chart_h: chart_h,
-      chart_o: chart_o,
-    };
-  }
 
-  mssql.query(sqlMonth, (err, monthOrder) => {
-    let totalMonthOrder = 0;
-    for (const item of monthOrder.recordset) {
-      totalMonthOrder += +item.Total;
-    }
-    mssql.query(sqlYear, (err, yearOrder) => {
-      let totalYearOrder = 0;
-      for (const item of yearOrder.recordset) {
-        totalYearOrder += +item.Total;
-      }
-      mssql.query(sqlMonthForwarding, (err, monthForwarding) => {
-        let totalMonthForwarding = 0;
-        for (const item of monthForwarding.recordset) {
-          totalMonthForwarding += +item.Total;
-        }
-        mssql.query(sqlYearForwarding, (err, yearForwarding) => {
-          let totalYearForwarding = 0;
-          for (const item of yearForwarding.recordset) {
-            totalYearForwarding += +item.Total;
-          }
-          let chartOne = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-          mssql.query(sqlChartYearOne, (err, chartYearOne) => {
-            for (const item of chartYearOne.recordset) {
-              if (item.Ay == 1) {
-                chartOne[0] += +item.Total;
-              } else if (item.Ay == 2) {
-                chartOne[1] += +item.Total;
-              } else if (item.Ay == 3) {
-                chartOne[2] += +item.Total;
-              } else if (item.Ay == 4) {
-                chartOne[3] += +item.Total;
-              } else if (item.Ay == 5) {
-                chartOne[4] += +item.Total;
-              } else if (item.Ay == 6) {
-                chartOne[5] += +item.Total;
-              } else if (item.Ay == 7) {
-                chartOne[6] += +item.Total;
-              } else if (item.Ay == 8) {
-                chartOne[7] += +item.Total;
-              } else if (item.Ay == 9) {
-                chartOne[8] += +item.Total;
-              } else if (item.Ay == 10) {
-                chartOne[9] += +item.Total;
-              } else if (item.Ay == 11) {
-                chartOne[10] += +item.Total;
-              } else if (item.Ay == 12) {
-                chartOne[11] += +item.Total;
-              }
-            }
-            let chartTwo = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-            mssql.query(sqlChartYearTwo, (err, chartYearTwo) => {
-              for (const item of chartYearTwo.recordset) {
-                if (item.Ay == 1) {
-                  chartTwo[0] += +item.Total;
-                } else if (item.Ay == 2) {
-                  chartTwo[1] += +item.Total;
-                } else if (item.Ay == 3) {
-                  chartTwo[2] += +item.Total;
-                } else if (item.Ay == 4) {
-                  chartTwo[3] += +item.Total;
-                } else if (item.Ay == 5) {
-                  chartTwo[4] += +item.Total;
-                } else if (item.Ay == 6) {
-                  chartTwo[5] += +item.Total;
-                } else if (item.Ay == 7) {
-                  chartTwo[6] += +item.Total;
-                } else if (item.Ay == 8) {
-                  chartTwo[7] += +item.Total;
-                } else if (item.Ay == 9) {
-                  chartTwo[8] += +item.Total;
-                } else if (item.Ay == 10) {
-                  chartTwo[9] += +item.Total;
-                } else if (item.Ay == 11) {
-                  chartTwo[10] += +item.Total;
-                } else if (item.Ay == 12) {
-                  chartTwo[11] += +item.Total;
-                }
-              }
+    res.status(200).json({
+      supplierCostList: supplierCostListRes.recordset,
 
-              mssql.query(
-                sqlChartCustomerShipped,
-                (err, chartShippedCustomer) => {
-                  mssql.query(sqlChartProduct, (err, chartProducts) => {
-                    mssql.query(sqlChartOffers, (err, chartOffers) => {
-                      mssql.query(
-                        sqlChartProductSpecial,
-                        (err, chartProductsSpecial) => {
-                          mssql.query(
-                            sqlSupplierCostList,
-                            (err, supplierCostList) => {
-                              let _productsChartData = _chartProductsSum(
-                                chartProducts?.recordset,
-                                chartProductsSpecial.recordset
-                              );
-                              let _offeresChartData = _chartOffersSum(
-                                chartOffers?.recordset
-                              );
-                              res.status(200).json({
-                                supplierCostList: supplierCostList.recordset,
-                                aylikSiparis: totalMonthOrder,
-                                yillikSiparis: totalYearOrder,
-                                ortalamaSiparis:
-                                  totalYearOrder / (new Date().getMonth() + 1),
-                                tahminiYillikSiparis:
-                                  (totalYearOrder /
-                                    (new Date().getMonth() + 1)) *
-                                  12,
-                                aylikYukleme: totalMonthForwarding,
-                                yillikYukleme: totalYearForwarding,
-                                ortalamaYukleme:
-                                  totalYearForwarding /
-                                  (new Date().getMonth() + 1),
-                                tahminiYillikYukleme:
-                                  (totalYearForwarding /
-                                    (new Date().getMonth() + 1)) *
-                                  12,
-                                chartOne: {
-                                  labels: [
-                                    "January",
-                                    "February",
-                                    "March",
-                                    "April",
-                                    "May",
-                                    "June",
-                                    "July",
-                                    "August",
-                                    "September",
-                                    "October",
-                                    "November",
-                                    "December",
-                                  ],
-                                  datasets: [
-                                    {
-                                      label: new Date().getFullYear(),
-                                      backgroundColor: "grey",
-                                      borderColor: "black",
-                                      data: chartOne,
-                                    },
-                                    {
-                                      label: new Date().getFullYear() - 1,
-                                      backgroundColor: "black",
-                                      borderColor: "grey",
-                                      data: chartTwo,
-                                    },
-                                  ],
-                                },
-                                chartCustomerShipped: {
-                                  labels: [
-                                    "Mekmar",
-                                    "İç Piyasa",
-                                    "Imperial Homes",
-                                    "Mekmer",
-                                  ],
-                                  datasets: [
-                                    {
-                                      data: _chartCustomerShippedSum(
-                                        chartShippedCustomer?.recordset
-                                      ),
-                                      backgroundColor: [
-                                        "#aba34f",
-                                        "#ab6e4f",
-                                        "#4fab9f",
-                                        "#ab4f86",
-                                      ],
-                                      hoverBackgroundColor: [
-                                        "grey",
-                                        "grey",
-                                        "grey",
-                                        "grey",
-                                      ],
-                                    },
-                                  ],
-                                },
-                                chartProducts: {
-                                  labels: [
-                                    "January",
-                                    "February",
-                                    "March",
-                                    "April",
-                                    "May",
-                                    "June",
-                                    "July",
-                                    "August",
-                                    "September",
-                                    "October",
-                                    "November",
-                                    "December",
-                                  ],
-                                  datasets: [
-                                    {
-                                      type: "bar",
-                                      label: "SQM",
-                                      backgroundColor: "#f2bf33",
-                                      data: _productsChartData.sqm,
-                                    },
-                                    {
-                                      type: "bar",
-                                      label: "PIECE",
-                                      backgroundColor: "#33f2e2",
-                                      data: _productsChartData.piece,
-                                    },
-                                    {
-                                      type: "bar",
-                                      label: "MT",
-                                      backgroundColor: "#5333f2",
-                                      data: _productsChartData.mt,
-                                    },
-                                  ],
-                                },
-                                chartOffers: {
-                                  labels: [
-                                    "January",
-                                    "February",
-                                    "March",
-                                    "April",
-                                    "May",
-                                    "June",
-                                    "July",
-                                    "August",
-                                    "September",
-                                    "October",
-                                    "November",
-                                    "December",
-                                  ],
-                                  datasets: [
-                                    {
-                                      label: "Özlem",
-                                      backgroundColor: "#e86db3",
-                                      borderColor: "grey",
-                                      data: _offeresChartData.chart_o,
-                                    },
-                                    {
-                                      label: "Hakan",
-                                      backgroundColor: "#6d94e8",
-                                      borderColor: "grey",
-                                      data: _offeresChartData.chart_h,
-                                    },
-                                  ],
-                                },
-                              });
-                            }
-                          );
-                        }
-                      );
-                    });
-                  });
-                }
-              );
-            });
-          });
-        });
-      });
+      aylikSiparis: totalMonthOrder,
+      yillikSiparis: totalYearOrder,
+      ortalamaSiparis: totalYearOrder / currentMonth,
+      tahminiYillikSiparis: (totalYearOrder / currentMonth) * 12,
+
+      aylikYukleme: totalMonthForwarding,
+      yillikYukleme: totalYearForwarding,
+      ortalamaYukleme: totalYearForwarding / currentMonth,
+      tahminiYillikYukleme: (totalYearForwarding / currentMonth) * 12,
+
+      chartOne: {
+        labels: monthLabels,
+        datasets: [
+          {
+            label: new Date().getFullYear().toString(),
+            backgroundColor: "grey",
+            borderColor: "black",
+            data: chartOne,
+          },
+          {
+            label: (new Date().getFullYear() - 1).toString(),
+            backgroundColor: "black",
+            borderColor: "grey",
+            data: chartTwo,
+          },
+        ],
+      },
+
+      chartCustomerShipped: {
+        labels: ["Mekmar", "İç Piyasa", "Imperial Homes", "Mekmer"],
+        datasets: [
+          {
+            data: chartCustomerShippedData,
+            backgroundColor: ["#aba34f", "#ab6e4f", "#4fab9f", "#ab4f86"],
+            hoverBackgroundColor: ["grey", "grey", "grey", "grey"],
+          },
+        ],
+      },
+
+      chartProducts: {
+        labels: monthLabels,
+        datasets: [
+          {
+            type: "bar",
+            label: "SQM",
+            backgroundColor: "#f2bf33",
+            data: chart_sqm,
+          },
+          {
+            type: "bar",
+            label: "PIECE",
+            backgroundColor: "#33f2e2",
+            data: chart_piece,
+          },
+          {
+            type: "bar",
+            label: "MT",
+            backgroundColor: "#5333f2",
+            data: chart_mt,
+          },
+        ],
+      },
+
+      chartOffers: {
+        labels: monthLabels,
+        datasets: [
+          {
+            label: "Özlem",
+            backgroundColor: "#e86db3",
+            borderColor: "grey",
+            data: chart_o,
+          },
+          {
+            label: "Hakan",
+            backgroundColor: "#6d94e8",
+            borderColor: "grey",
+            data: chart_h,
+          },
+        ],
+      },
     });
-  });
+  } catch (e) {
+    console.error("/home hatası:", e);
+    res.status(500).json({ error: "Veri yüklenemedi." });
+  }
 });
+
+// app.get("/home", (req, res) => {
+//   let sqlMonth =
+//     "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' group by s.SiparisNo";
+//   let sqlYear =
+//     "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' group by s.SiparisNo";
+//   let sqlMonthForwarding =
+//     "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo";
+//   let sqlYearForwarding =
+//     "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo";
+//   let sqlChartYearOne =
+//     "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)";
+//   let sqlChartYearTwo =
+//     "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 1 and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)";
+//   let sqlChartCustomerShipped = `
+//             select
+
+//                 m.Marketing,
+//                 (select sum(su.SatisFiyati * su.Miktar) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)
+//                 + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as total
+
+//             from SiparislerTB s
+//             inner join MusterilerTB m on m.ID = s.MusteriID
+
+//             where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3
+
+//             group by m.Marketing, s.SiparisNo
+//     `;
+//   let sqlChartProduct = `
+//     select
+
+//         sum(u.Miktar) as total,
+//         u.UrunBirimID as BirimId,
+//         (select ub.BirimAdi from UrunBirimTB ub where ub.ID = u.UrunBirimID) as BirimAdi,
+//         MONTH(u.Tarih) as month
+
+//     from UretimTB u
+
+//     where YEAR(u.Tarih) = YEAR(GETDATE()) and u.TedarikciID in (1,123)
+
+//     group by u.UrunBirimID,MONTH(u.Tarih)
+//     order by MONTH(u.Tarih)
+//     `;
+//   let sqlChartOffers = `
+//     select t.KullaniciId as UserId,count(t.Id) as Offer, MONTH(t.Tarih) as Month,
+//         (select k.KullaniciAdi from KullaniciTB k where k.ID = t.KullaniciId) as Username
+//     from YeniTeklifTB t
+
+//     where YEAR(t.Tarih) = YEAR(GETDATE())
+
+//     group by MONTH(t.Tarih),t.KullaniciId
+//     order by MONTH(t.Tarih)
+//     `;
+
+//   let sqlChartProductSpecial = `
+//         select YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se
+// inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
+// where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())
+//     `;
+
+//   let sqlSupplierCostList = `
+// select
+
+//             su.TedarikciID,
+//             sum(su.AlisFiyati * su.Miktar) as Total,
+//             t.FirmaAdi
+
+//         from SiparislerTB s
+//         inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo
+//         inner join TedarikciTB t on t.ID = su.TedarikciID
+// 		inner join MusterilerTB m on m.ID = s.MusteriID
+//         where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar'
+//         group by su.TedarikciID,t.FirmaAdi
+//         order by sum(su.AlisFiyati * su.Miktar) desc
+//     `;
+
+//   function _forSum(data) {
+//     let sum = 0;
+//     if (data.length == 0) {
+//       sum = 0;
+//     } else {
+//       data.forEach((x) => {
+//         sum += x.Total;
+//       });
+//     }
+//     return sum;
+//   }
+//   function _chartSum(data) {
+//     let chart = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//     for (const item of data) {
+//       if (item.Ay == 1) {
+//         chart[0] += +item.Total;
+//       } else if (item.Ay == 2) {
+//         chart[1] += +item.Total;
+//       } else if (item.Ay == 3) {
+//         chart[2] += +item.Total;
+//       } else if (item.Ay == 4) {
+//         chart[3] += +item.Total;
+//       } else if (item.Ay == 5) {
+//         chart[4] += +item.Total;
+//       } else if (item.Ay == 6) {
+//         chart[5] += +item.Total;
+//       } else if (item.Ay == 7) {
+//         chart[6] += +item.Total;
+//       } else if (item.Ay == 8) {
+//         chart[7] += +item.Total;
+//       } else if (item.Ay == 9) {
+//         chart[8] += +item.Total;
+//       } else if (item.Ay == 10) {
+//         chart[9] += +item.Total;
+//       } else if (item.Ay == 11) {
+//         chart[10] += +item.Total;
+//       } else if (item.Ay == 12) {
+//         chart[11] += +item.Total;
+//       }
+//     }
+//     return chart;
+//   }
+//   function _chartCustomerShippedSum(data) {
+//     let chart = [0, 0, 0, 0];
+//     data.forEach((x) => {
+//       if (x.Marketing == "Mekmar") {
+//         chart[0] += +x.total;
+//       } else if (x.Marketing == "İç Piyasa") {
+//         chart[1] += +x.total;
+//       } else if (x.Marketing == "Imperial Homes") {
+//         chart[2] += +x.total;
+//       } else if (x.Marketing == "Mekmer") {
+//         chart[3] += +x.total;
+//       }
+//     });
+//     return chart;
+//   }
+//   function _chartProductsSum(data, data2) {
+//     const chart_sqm = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//     const chart_piece = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//     const chart_mt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//     data.forEach((x) => {
+//       if (x.BirimId == 1) {
+//         chart_sqm[x.month - 1] += x.total;
+//       } else if (x.BirimId == 2) {
+//         chart_piece[x.month - 1] += x.total;
+//       } else if (x.BirimId == 3) {
+//         chart_mt[x.month - 1] += x.total;
+//       }
+//     });
+
+//     // data2.forEach((x) => {
+//     //   if (x.UrunBirimID == 1) {
+//     //     chart_sqm[x.Month - 1] += x.Miktar;
+//     //   } else if (x.UrunBirimID == 2) {
+//     //     chart_piece[x.Month - 1] += x.Miktar;
+//     //   } else if (x.UrunBirimID == 3) {
+//     //     chart_mt[x.Month - 1] += x.Miktar;
+//     //   }
+//     // });
+
+//     return {
+//       sqm: chart_sqm,
+//       piece: chart_piece,
+//       mt: chart_mt,
+//     };
+//   }
+//   function _chartOffersSum(data) {
+//     const chart_h = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//     const chart_o = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//     data.forEach((x) => {
+//       if (x.UserId == 19) {
+//         chart_o[x.Month - 1] += x.Offer;
+//       } else if (x.UserId == 44) {
+//         chart_h[x.Month - 1] += x.Offer;
+//       }
+//     });
+//     return {
+//       chart_h: chart_h,
+//       chart_o: chart_o,
+//     };
+//   }
+
+//   mssql.query(sqlMonth, (err, monthOrder) => {
+//     let totalMonthOrder = 0;
+//     for (const item of monthOrder.recordset) {
+//       totalMonthOrder += +item.Total;
+//     }
+//     mssql.query(sqlYear, (err, yearOrder) => {
+//       let totalYearOrder = 0;
+//       for (const item of yearOrder.recordset) {
+//         totalYearOrder += +item.Total;
+//       }
+//       mssql.query(sqlMonthForwarding, (err, monthForwarding) => {
+//         let totalMonthForwarding = 0;
+//         for (const item of monthForwarding.recordset) {
+//           totalMonthForwarding += +item.Total;
+//         }
+//         mssql.query(sqlYearForwarding, (err, yearForwarding) => {
+//           let totalYearForwarding = 0;
+//           for (const item of yearForwarding.recordset) {
+//             totalYearForwarding += +item.Total;
+//           }
+//           let chartOne = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//           mssql.query(sqlChartYearOne, (err, chartYearOne) => {
+//             for (const item of chartYearOne.recordset) {
+//               if (item.Ay == 1) {
+//                 chartOne[0] += +item.Total;
+//               } else if (item.Ay == 2) {
+//                 chartOne[1] += +item.Total;
+//               } else if (item.Ay == 3) {
+//                 chartOne[2] += +item.Total;
+//               } else if (item.Ay == 4) {
+//                 chartOne[3] += +item.Total;
+//               } else if (item.Ay == 5) {
+//                 chartOne[4] += +item.Total;
+//               } else if (item.Ay == 6) {
+//                 chartOne[5] += +item.Total;
+//               } else if (item.Ay == 7) {
+//                 chartOne[6] += +item.Total;
+//               } else if (item.Ay == 8) {
+//                 chartOne[7] += +item.Total;
+//               } else if (item.Ay == 9) {
+//                 chartOne[8] += +item.Total;
+//               } else if (item.Ay == 10) {
+//                 chartOne[9] += +item.Total;
+//               } else if (item.Ay == 11) {
+//                 chartOne[10] += +item.Total;
+//               } else if (item.Ay == 12) {
+//                 chartOne[11] += +item.Total;
+//               }
+//             }
+//             let chartTwo = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//             mssql.query(sqlChartYearTwo, (err, chartYearTwo) => {
+//               for (const item of chartYearTwo.recordset) {
+//                 if (item.Ay == 1) {
+//                   chartTwo[0] += +item.Total;
+//                 } else if (item.Ay == 2) {
+//                   chartTwo[1] += +item.Total;
+//                 } else if (item.Ay == 3) {
+//                   chartTwo[2] += +item.Total;
+//                 } else if (item.Ay == 4) {
+//                   chartTwo[3] += +item.Total;
+//                 } else if (item.Ay == 5) {
+//                   chartTwo[4] += +item.Total;
+//                 } else if (item.Ay == 6) {
+//                   chartTwo[5] += +item.Total;
+//                 } else if (item.Ay == 7) {
+//                   chartTwo[6] += +item.Total;
+//                 } else if (item.Ay == 8) {
+//                   chartTwo[7] += +item.Total;
+//                 } else if (item.Ay == 9) {
+//                   chartTwo[8] += +item.Total;
+//                 } else if (item.Ay == 10) {
+//                   chartTwo[9] += +item.Total;
+//                 } else if (item.Ay == 11) {
+//                   chartTwo[10] += +item.Total;
+//                 } else if (item.Ay == 12) {
+//                   chartTwo[11] += +item.Total;
+//                 }
+//               }
+
+//               mssql.query(
+//                 sqlChartCustomerShipped,
+//                 (err, chartShippedCustomer) => {
+//                   mssql.query(sqlChartProduct, (err, chartProducts) => {
+//                     mssql.query(sqlChartOffers, (err, chartOffers) => {
+//                       mssql.query(
+//                         sqlChartProductSpecial,
+//                         (err, chartProductsSpecial) => {
+//                           mssql.query(
+//                             sqlSupplierCostList,
+//                             (err, supplierCostList) => {
+//                               let _productsChartData = _chartProductsSum(
+//                                 chartProducts?.recordset,
+//                                 chartProductsSpecial.recordset
+//                               );
+//                               let _offeresChartData = _chartOffersSum(
+//                                 chartOffers?.recordset
+//                               );
+//                               res.status(200).json({
+//                                 supplierCostList: supplierCostList.recordset,
+//                                 aylikSiparis: totalMonthOrder,
+//                                 yillikSiparis: totalYearOrder,
+//                                 ortalamaSiparis:
+//                                   totalYearOrder / (new Date().getMonth() + 1),
+//                                 tahminiYillikSiparis:
+//                                   (totalYearOrder /
+//                                     (new Date().getMonth() + 1)) *
+//                                   12,
+//                                 aylikYukleme: totalMonthForwarding,
+//                                 yillikYukleme: totalYearForwarding,
+//                                 ortalamaYukleme:
+//                                   totalYearForwarding /
+//                                   (new Date().getMonth() + 1),
+//                                 tahminiYillikYukleme:
+//                                   (totalYearForwarding /
+//                                     (new Date().getMonth() + 1)) *
+//                                   12,
+//                                 chartOne: {
+//                                   labels: [
+//                                     "January",
+//                                     "February",
+//                                     "March",
+//                                     "April",
+//                                     "May",
+//                                     "June",
+//                                     "July",
+//                                     "August",
+//                                     "September",
+//                                     "October",
+//                                     "November",
+//                                     "December",
+//                                   ],
+//                                   datasets: [
+//                                     {
+//                                       label: new Date().getFullYear(),
+//                                       backgroundColor: "grey",
+//                                       borderColor: "black",
+//                                       data: chartOne,
+//                                     },
+//                                     {
+//                                       label: new Date().getFullYear() - 1,
+//                                       backgroundColor: "black",
+//                                       borderColor: "grey",
+//                                       data: chartTwo,
+//                                     },
+//                                   ],
+//                                 },
+//                                 chartCustomerShipped: {
+//                                   labels: [
+//                                     "Mekmar",
+//                                     "İç Piyasa",
+//                                     "Imperial Homes",
+//                                     "Mekmer",
+//                                   ],
+//                                   datasets: [
+//                                     {
+//                                       data: _chartCustomerShippedSum(
+//                                         chartShippedCustomer?.recordset
+//                                       ),
+//                                       backgroundColor: [
+//                                         "#aba34f",
+//                                         "#ab6e4f",
+//                                         "#4fab9f",
+//                                         "#ab4f86",
+//                                       ],
+//                                       hoverBackgroundColor: [
+//                                         "grey",
+//                                         "grey",
+//                                         "grey",
+//                                         "grey",
+//                                       ],
+//                                     },
+//                                   ],
+//                                 },
+//                                 chartProducts: {
+//                                   labels: [
+//                                     "January",
+//                                     "February",
+//                                     "March",
+//                                     "April",
+//                                     "May",
+//                                     "June",
+//                                     "July",
+//                                     "August",
+//                                     "September",
+//                                     "October",
+//                                     "November",
+//                                     "December",
+//                                   ],
+//                                   datasets: [
+//                                     {
+//                                       type: "bar",
+//                                       label: "SQM",
+//                                       backgroundColor: "#f2bf33",
+//                                       data: _productsChartData.sqm,
+//                                     },
+//                                     {
+//                                       type: "bar",
+//                                       label: "PIECE",
+//                                       backgroundColor: "#33f2e2",
+//                                       data: _productsChartData.piece,
+//                                     },
+//                                     {
+//                                       type: "bar",
+//                                       label: "MT",
+//                                       backgroundColor: "#5333f2",
+//                                       data: _productsChartData.mt,
+//                                     },
+//                                   ],
+//                                 },
+//                                 chartOffers: {
+//                                   labels: [
+//                                     "January",
+//                                     "February",
+//                                     "March",
+//                                     "April",
+//                                     "May",
+//                                     "June",
+//                                     "July",
+//                                     "August",
+//                                     "September",
+//                                     "October",
+//                                     "November",
+//                                     "December",
+//                                   ],
+//                                   datasets: [
+//                                     {
+//                                       label: "Özlem",
+//                                       backgroundColor: "#e86db3",
+//                                       borderColor: "grey",
+//                                       data: _offeresChartData.chart_o,
+//                                     },
+//                                     {
+//                                       label: "Hakan",
+//                                       backgroundColor: "#6d94e8",
+//                                       borderColor: "grey",
+//                                       data: _offeresChartData.chart_h,
+//                                     },
+//                                   ],
+//                                 },
+//                               });
+//                             }
+//                           );
+//                         }
+//                       );
+//                     });
+//                   });
+//                 }
+//               );
+//             });
+//           });
+//         });
+//       });
+//     });
+//   });
+// });
 
 /*Sales Follow */
 app.get("/sales/follow", (req, res) => {
@@ -838,20 +1073,37 @@ app.delete("/sales/follow/detail/delete/:id", (req, res) => {
     }
   });
 });
-app.put("/sales/follow/detail/update", (req, res) => {
-  const sql = `update SatisciAyrintiTB SET Aciklama='${req.body.Aciklama}',Baslik='${req.body.Baslik}',Tarih='${req.body.Tarih}',Hatirlatma_Tarih='${req.body.Hatirlatma_Tarih}',Hatirlatma_Notu='${req.body.Hatirlatma_Notu}' where ID='${req.body.ID}'`;
-  mssql.query(sql, (err, results) => {
-    if (results.rowsAffected[0] == 1) {
-      res.status(201).json({
-        data: req.body,
-        status: true,
-      });
+app.put("/sales/follow/detail/update", async (req, res) => {
+  try {
+    const request = new mssql.Request();
+
+    // 1. Gelen verileri SQL tiplerine göre tanımla (Zırh)
+    request.input("Aciklama", mssql.NVarChar, req.body.Aciklama);
+    request.input("Baslik", mssql.NVarChar, req.body.Baslik);
+    request.input("Tarih", mssql.VarChar, req.body.Tarih);
+    request.input("Hatirlatma_Tarih", mssql.VarChar, req.body.Hatirlatma_Tarih);
+    request.input("Hatirlatma_Notu", mssql.NVarChar, req.body.Hatirlatma_Notu);
+    request.input("ID", mssql.Int, req.body.ID);
+
+    // 2. Değişkenleri @ isimlendirmesi ile güvenli bir şekilde SQL'e ver
+    const sql = `
+      UPDATE SatisciAyrintiTB 
+      SET Aciklama=@Aciklama, Baslik=@Baslik, Tarih=@Tarih, 
+          Hatirlatma_Tarih=@Hatirlatma_Tarih, Hatirlatma_Notu=@Hatirlatma_Notu 
+      WHERE ID=@ID
+    `;
+
+    const results = await request.query(sql);
+
+    if (results.rowsAffected[0] === 1) {
+      res.status(200).json({ data: req.body, status: true });
     } else {
-      res.status(200).json({
-        status: false,
-      });
+      res.status(200).json({ status: false, message: "Kayıt bulunamadı." });
     }
-  });
+  } catch (error) {
+    console.error("Güncelleme Hatası:", error);
+    res.status(500).json({ status: false, message: "Sunucu hatası oluştu." });
+  }
 });
 
 /*Sales Bgp */
@@ -1181,210 +1433,143 @@ app.get("/selection/production/list", (req, res) => {
   });
 });
 
-app.get("/selection/production/total", (req, res) => {
-  const sql =
-    "select u.UrunBirimID,sum(u.Miktar) as Miktar,(select t.FirmaAdi from TedarikciTB t where t.ID = u.TedarikciID) as TedarikciAdi,u.TedarikciID from UretimTB u where  YEAR(u.Tarih) = YEAR(GETDATE()) and MONTH(u.Tarih) = MONTH(GETDATE()) group by u.TedarikciID,u.UrunBirimID";
-  const sql2 = `
-        select sum(u.Miktar) as Miktar,(select t.FirmaAdi from TedarikciTB t where 
-        t.ID = u.TedarikciID) as TedarikciAdi,u.TedarikciID,u.UrunBirimID from UretimTB u where u.UrunBirimID = 1 and YEAR(u.Tarih) = YEAR(GETDATE()) 
-        group by u.TedarikciID,u.UrunBirimID
+app.get("/selection/production/total", async (req, res) => {
+  try {
+    const sql = `
+      select u.UrunBirimID, sum(u.Miktar) as Miktar, (select t.FirmaAdi from TedarikciTB t where t.ID = u.TedarikciID) as TedarikciAdi, u.TedarikciID 
+      from UretimTB u 
+      where YEAR(u.Tarih) = YEAR(GETDATE()) and MONTH(u.Tarih) = MONTH(GETDATE()) 
+      group by u.TedarikciID, u.UrunBirimID
     `;
-  const sql3 = `
-    select su.TedarikciID,YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se 
-    inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
-    where YEAR(se.Tarih) = YEAR(GETDATE()) and MONTH(se.Tarih) = MONTH(GETDATE())
-
+    const sql2 = `
+      select sum(u.Miktar) as Miktar, (select t.FirmaAdi from TedarikciTB t where t.ID = u.TedarikciID) as TedarikciAdi, u.TedarikciID, u.UrunBirimID 
+      from UretimTB u 
+      where u.UrunBirimID = 1 and YEAR(u.Tarih) = YEAR(GETDATE()) 
+      group by u.TedarikciID, u.UrunBirimID
     `;
-  const sql4 = `
-            select su.TedarikciID,YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se 
-    inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
-    where YEAR(se.Tarih) = YEAR(GETDATE()) 
-
-        
+    const sql3 = `
+      select su.TedarikciID, YEAR(se.Tarih) as Year, MONTH(se.Tarih) as Month, se.Tarih, se.SiparisNo, su.Miktar, su.UrunBirimID, (select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi 
+      from SiparisEkstraGiderlerTB se 
+      inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
+      where YEAR(se.Tarih) = YEAR(GETDATE()) and MONTH(se.Tarih) = MONTH(GETDATE())
+    `;
+    const sql4 = `
+      select su.TedarikciID, YEAR(se.Tarih) as Year, MONTH(se.Tarih) as Month, se.Tarih, se.SiparisNo, su.Miktar, su.UrunBirimID, (select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi 
+      from SiparisEkstraGiderlerTB se 
+      inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo
+      where YEAR(se.Tarih) = YEAR(GETDATE()) 
     `;
 
-  mssql.query(sql, (err, productMonth) => {
-    mssql.query(sql2, (err, productYear) => {
-      mssql.query(sql3, (err, productSelectionMonth) => {
-        mssql.query(sql4, (err, productSelectionYear) => {
-          let data = {
-            mekmerMonthSqm: 0,
-            mekmerMonthPcs: 0,
-            mekmerMonthMt: 0,
+    const request = new mssql.Request();
 
-            mekmozMonthSqm: 0,
-            mekmozMonthPcs: 0,
-            mekmozMonthMt: 0,
+    const [
+      productMonth,
+      productYear,
+      productSelectionMonth,
+      productSelectionYear,
+    ] = await Promise.all([
+      request.query(sql),
+      request.query(sql2),
+      request.query(sql3),
+      request.query(sql4),
+    ]);
 
-            disMonthSqm: 0,
-            disMonthPcs: 0,
-            disMonthMt: 0,
+    let data = {
+      mekmerMonthSqm: 0,
+      mekmerMonthPcs: 0,
+      mekmerMonthMt: 0,
+      mekmozMonthSqm: 0,
+      mekmozMonthPcs: 0,
+      mekmozMonthMt: 0,
+      disMonthSqm: 0,
+      disMonthPcs: 0,
+      disMonthMt: 0,
+      mekmerYearSqm: 0,
+      mekmerYearPcs: 0,
+      mekmerYearMt: 0,
+      mekmozYearSqm: 0,
+      mekmozYearPcs: 0,
+      mekmozYearMt: 0,
+      disYearSqm: 0,
+      disYearPcs: 0,
+      disYearMt: 0,
+      monthTotalSqm: 0,
+      monthTotalPcs: 0,
+      monthTotalMt: 0,
+      yearTotalSqm: 0,
+      yearTotalPcs: 0,
+      yearTotalMt: 0,
+    };
 
-            mekmerYearSqm: 0,
-            mekmerYearPcs: 0,
-            mekmerYearMt: 0,
+    const processData = (record, isMonth) => {
+      if (record.UrunBirimID == 1)
+        isMonth
+          ? (data.monthTotalSqm += record.Miktar)
+          : (data.yearTotalSqm += record.Miktar);
+      else if (record.UrunBirimID == 2)
+        isMonth
+          ? (data.monthTotalPcs += record.Miktar)
+          : (data.yearTotalPcs += record.Miktar);
+      else if (record.UrunBirimID == 3)
+        isMonth
+          ? (data.monthTotalMt += record.Miktar)
+          : (data.yearTotalMt += record.Miktar);
 
-            mekmozYearSqm: 0,
-            mekmozYearPcs: 0,
-            mekmozYearMt: 0,
+      if (record.TedarikciID == 1) {
+        if (record.UrunBirimID == 1)
+          isMonth
+            ? (data.mekmerMonthSqm += record.Miktar)
+            : (data.mekmerYearSqm += record.Miktar);
+        else if (record.UrunBirimID == 2)
+          isMonth
+            ? (data.mekmerMonthPcs += record.Miktar)
+            : (data.mekmerYearPcs += record.Miktar);
+        else if (record.UrunBirimID == 3)
+          isMonth
+            ? (data.mekmerMonthMt += record.Miktar)
+            : (data.mekmerYearMt += record.Miktar);
+      } else if (record.TedarikciID == 123) {
+        if (record.UrunBirimID == 1)
+          isMonth
+            ? (data.mekmozMonthSqm += record.Miktar)
+            : (data.mekmozYearSqm += record.Miktar);
+        else if (record.UrunBirimID == 2)
+          isMonth
+            ? (data.mekmozMonthPcs += record.Miktar)
+            : (data.mekmozYearPcs += record.Miktar);
+        else if (record.UrunBirimID == 3)
+          isMonth
+            ? (data.mekmozMonthMt += record.Miktar)
+            : (data.mekmozYearMt += record.Miktar);
+      } else {
+        if (record.UrunBirimID == 1)
+          isMonth
+            ? (data.disMonthSqm += record.Miktar)
+            : (data.disYearSqm += record.Miktar);
+        else if (record.UrunBirimID == 2)
+          isMonth
+            ? (data.disMonthPcs += record.Miktar)
+            : (data.disYearPcs += record.Miktar);
+        else if (record.UrunBirimID == 3)
+          isMonth
+            ? (data.disMonthMt += record.Miktar)
+            : (data.disYearMt += record.Miktar);
+      }
+    };
 
-            disYearSqm: 0,
-            disYearPcs: 0,
-            disYearMt: 0,
+    productMonth.recordset.forEach((x) => processData(x, true));
+    productSelectionMonth.recordset.forEach((x) => processData(x, true));
 
-            monthTotalSqm: 0,
-            monthTotalPcs: 0,
-            monthTotalMt: 0,
+    productYear.recordset.forEach((x) => processData(x, false));
+    productSelectionYear.recordset.forEach((x) => processData(x, false));
 
-            yearTotalSqm: 0,
-            yearTotalPcs: 0,
-            yearTotalMt: 0,
-          };
-          productMonth.recordset.forEach((x) => {
-            if (x.UrunBirimID == 1) {
-              data.monthTotalSqm += x.Miktar;
-            } else if (x.UrunBirimID == 2) {
-              data.monthTotalPcs += x.Miktar;
-            } else if (x.UrunBirimID == 3) {
-              data.monthTotalMt += x.Miktar;
-            }
-            if (x.TedarikciID == 1) {
-              if (x.UrunBirimID == 1) {
-                data.mekmerMonthSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmerMonthPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmerMonthMt += x.Miktar;
-              }
-            } else if (x.TedarikciID == 123) {
-              if (x.UrunBirimID == 1) {
-                data.mekmozMonthSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmozMonthPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmozMonthMt += x.Miktar;
-              }
-            } else {
-              if (x.UrunBirimID == 1) {
-                data.disMonthSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.disMonthPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.disMonthMt += x.Miktar;
-              }
-            }
-          });
-
-          productYear.recordset.forEach((x) => {
-            if (x.UrunBirimID == 1) {
-              data.yearTotalSqm += x.Miktar;
-            } else if (x.UrunBirimID == 2) {
-              data.yearTotalPcs += x.Miktar;
-            } else if (x.UrunBirimID == 3) {
-              data.yearTotalMt += x.Miktar;
-            }
-            if (x.TedarikciID == 1) {
-              if (x.UrunBirimID == 1) {
-                data.mekmerYearSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmerYearPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmerYearMt += x.Miktar;
-              }
-            } else if (x.TedarikciID == 123) {
-              if (x.UrunBirimID == 1) {
-                data.mekmozYearSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmozYearPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmozYearMt += x.Miktar;
-              }
-            } else {
-              if (x.UrunBirimID == 1) {
-                data.disYearSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.disYearPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.disYearMt += x.Miktar;
-              }
-            }
-          });
-          productSelectionMonth.recordset.forEach((x) => {
-            if (x.UrunBirimID == 1) {
-              data.monthTotalSqm += x.Miktar;
-            } else if (x.UrunBirimID == 2) {
-              data.monthTotalPcs += x.Miktar;
-            } else if (x.UrunBirimID == 3) {
-              data.monthTotalMt += x.Miktar;
-            }
-            if (x.TedarikciID == 1) {
-              if (x.UrunBirimID == 1) {
-                data.mekmerMonthSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmerMonthPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmerMonthMt += x.Miktar;
-              }
-            } else if (x.TedarikciID == 123) {
-              if (x.UrunBirimID == 1) {
-                data.mekmozMonthSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmozMonthPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmozMonthMt += x.Miktar;
-              }
-            } else {
-              if (x.UrunBirimID == 1) {
-                data.disMonthSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.disMonthPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.disMonthMt += x.Miktar;
-              }
-            }
-          });
-          productSelectionYear.recordset.forEach((x) => {
-            if (x.UrunBirimID == 1) {
-              data.yearTotalSqm += x.Miktar;
-            } else if (x.UrunBirimID == 2) {
-              data.yearTotalPcs += x.Miktar;
-            } else if (x.UrunBirimID == 3) {
-              data.yearTotalMt += x.Miktar;
-            }
-            if (x.TedarikciID == 1) {
-              if (x.UrunBirimID == 1) {
-                data.mekmerYearSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmerYearPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmerYearMt += x.Miktar;
-              }
-            } else if (x.TedarikciID == 123) {
-              if (x.UrunBirimID == 1) {
-                data.mekmozYearSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.mekmozYearPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.mekmozYearMt += x.Miktar;
-              }
-            } else {
-              if (x.UrunBirimID == 1) {
-                data.disYearSqm += x.Miktar;
-              } else if (x.UrunBirimID == 2) {
-                data.disYearPcs += x.Miktar;
-              } else if (x.UrunBirimID == 3) {
-                data.disYearMt += x.Miktar;
-              }
-            }
-          });
-
-          res.status(200).json({
-            data: data,
-          });
-        });
-      });
-    });
-  });
+    res.status(200).json({ data: data });
+  } catch (error) {
+    console.error("Üretim Total API Hatası:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Veriler yüklenirken hata oluştu." });
+  }
 });
 
 app.get("/selection/production/crateno/in", (req, res) => {
@@ -8345,19 +8530,30 @@ app.put("/panel/usa/stock/update", (req, res) => {
   });
 });
 app.post("/panel/usa/stock/photo/upload", async (req, res) => {
-  await req.body.forEach((x) => {
-    const sql = `
-                INSERT INTO DepoUrunKart_MekmarFotolarTB(UrunId,Image,Webp,Sira)
-                VALUES(
-                    '${x.UrunId}',
-                    '${x.Image}',
-                    '${x.Webp}',
-                    '${x.Sira}'
-                )
-            `;
-    mssql.query(sql);
-  });
-  res.status(200).json({ status: true });
+  try {
+    const uploadPromises = req.body.map((x) => {
+      const request = new mssql.Request();
+
+      request.input("UrunId", mssql.Int, x.UrunId);
+      request.input("Image", mssql.VarChar, x.Image);
+      request.input("Webp", mssql.VarChar, x.Webp);
+      request.input("Sira", mssql.Int, x.Sira);
+
+      const sql = `
+        INSERT INTO DepoUrunKart_MekmarFotolarTB (UrunId, Image, Webp, Sira)
+        VALUES (@UrunId, @Image, @Webp, @Sira)
+      `;
+
+      return request.query(sql);
+    });
+
+    await Promise.all(uploadPromises);
+
+    res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("Fotoğraf yükleme hatası:", error);
+    res.status(500).json({ status: false });
+  }
 });
 
 app.get("/api/usa/photo/delete/:id", (req, res) => {
@@ -12426,20 +12622,21 @@ function __undefinedControl(event) {
 }
 
 app.post("/order/production/product/add", (req, res) => {
-  let buyingPrice = 0;
+  // let buyingPrice = 0;
 
-  if (
-    req.body.AlisFiyati == 0 ||
-    req.body.AlisFiyati == undefined ||
-    req.body.AlisFiyati == null ||
-    req.body.AlisFiyati == ""
-  ) {
-    if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
-      buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
-    }
-  } else {
-    buyingPrice = req.body.AlisFiyati;
-  }
+  // if (
+  //   req.body.AlisFiyati == 0 ||
+  //   req.body.AlisFiyati == undefined ||
+  //   req.body.AlisFiyati == null ||
+  //   req.body.AlisFiyati == ""
+  // ) {
+  //   buyingPrice = req.body.AlisFiyati;
+  //   // if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
+  //   //   buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
+  //   // }
+  // } else {
+  //   buyingPrice = req.body.AlisFiyati;
+  // }
   const insertSql = `
         insert into SiparisUrunTB(
 	SiparisNo,
@@ -12468,7 +12665,7 @@ app.post("/order/production/product/add", (req, res) => {
 	'${__floatNullControl(req.body.SatisToplam)}',
 	'${req.body.UretimAciklama}',
 	'${req.body.MusteriAciklama}',
-	'${__floatNullControl(buyingPrice)}',
+	'${__floatNullControl(req.body.AlisFiyati)}',
 	'${__floatNullControl(req.body.SiraNo)}',
 	'${__floatNullControl(req.body.Ton)}',
 	'${__floatNullControl(req.body.Adet)}',
@@ -12513,19 +12710,19 @@ app.delete("/order/production/product/delete/:id", (req, res) => {
   });
 });
 app.put("/order/production/product/update", (req, res) => {
-  let buyingPrice = 0;
-  if (
-    req.body.AlisFiyati == 0 ||
-    req.body.AlisFiyati == undefined ||
-    req.body.AlisFiyati == null ||
-    req.body.AlisFiyati == ""
-  ) {
-    if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
-      buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
-    }
-  } else {
-    buyingPrice = req.body.AlisFiyati;
-  }
+  // let buyingPrice = 0;
+  // if (
+  //   req.body.AlisFiyati == 0 ||
+  //   req.body.AlisFiyati == undefined ||
+  //   req.body.AlisFiyati == null ||
+  //   req.body.AlisFiyati == ""
+  // ) {
+  //   if (req.body.TedarikciID == 1 || req.body.TedarikciID == 123) {
+  //     buyingPrice = parseFloat(req.body.SatisFiyati) * 0.85;
+  //   }
+  // } else {
+  //   buyingPrice = req.body.AlisFiyati;
+  // }
 
   const sql = `
         update SiparisUrunTB SET
@@ -12538,14 +12735,13 @@ app.put("/order/production/product/update", (req, res) => {
         SatisToplam = '${__floatNullControl(req.body.SatisToplam)}',
         UretimAciklama = '${req.body.UretimAciklama}',
         MusteriAciklama = '${req.body.MusteriAciklama}',
-        AlisFiyati = ${__floatNullControl(buyingPrice)},
+        AlisFiyati = ${__floatNullControl(req.body.AlisFiyati)},
         SiraNo = '${__floatNullControl(req.body.SiraNo)}',
         Ton = '${__floatNullControl(req.body.Ton)}',
         Adet = '${__floatNullControl(req.body.Adet)}',
         KasaOlcusu='${__noneNullControl(req.body.KasaOlcusu)}'
         where ID = '${req.body.ID}'
     `;
-  console.log("sql", sql);
   mssql.query(sql, (err, product) => {
     if (product.rowsAffected[0] == 1) {
       res.status(200).json({ status: true });
@@ -13503,15 +13699,30 @@ ID='${req.body.SiparisId}'
 });
 
 app.post("/production/add/cost/list", async (req, res) => {
-  const body = req.body;
-  body.forEach((x) => {
-    const addCost = `
-            insert into MaliyetAnaliziDegisikliklerTB (DegisiklikTarihi,SiparisNo,IslemAdi,DegisiklikYapan)
-            values('${x.date}','${x.po}','${x.desc}','${x.user}')
-        `;
-    mssql.query(addCost);
-    res.status(200);
-  });
+  try {
+    const body = req.body;
+
+    await Promise.all(
+      body.map((x) => {
+        const request = new mssql.Request();
+        request.input("date", mssql.VarChar, x.date);
+        request.input("po", mssql.VarChar, x.po);
+        request.input("desc", mssql.VarChar, x.desc);
+        request.input("user", mssql.VarChar, x.user);
+
+        const sql = `INSERT INTO MaliyetAnaliziDegisikliklerTB (DegisiklikTarihi,SiparisNo,IslemAdi,DegisiklikYapan) VALUES(@date, @po, @desc, @user)`;
+        return request.query(sql);
+      })
+    );
+
+    // Döngü tamamen bittikten sonra SADECE 1 KERE cevap dön
+    res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("Cost list error:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Kayıt sırasında hata oluştu" });
+  }
 });
 
 app.get("/production/proforma/delete/:id", async (req, res) => {
@@ -14275,498 +14486,291 @@ app.delete("/finance/mekmer/paid/detail/list/delete/:id", (req, res) => {
 });
 
 async function addedSendMail(payload) {
-  return new Promise((resolve, reject) => {
-    let content;
-    let customSubject;
-    let content_mekmer;
+  return new Promise(async (resolve, reject) => {
+    try {
+      const isNew = payload.new;
+      const customSubject = isNew
+        ? "Yeni Sipariş Girişi"
+        : "Siparişe Ürün Eklendi";
+      const actionText = isNew ? "Siparişini Girdi" : "Siparişine Ürün Ekledi";
 
-    if (payload.new) {
-      content = `
-            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişini Girdi.</h3>
-            <br/>
-            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-            <tr style="border: 1px solid;">
-                <th style="border: 1px solid;">Sipariş No</th>
-                <th style="border: 1px solid;">Tedarikçi</th>
-                <th style="border: 1px solid;">Ürün Bilgisi</th>
-                <th style="border: 1px solid;">Üretim açıklama</th>
-                <th style="border: 1px solid;">Miktar</th>
-                <th style="border: 1px solid;">Alış Fiyatı</th>
-                <th style="border: 1px solid;">Satış Fiyatı</th>
+      const tableHeader = `
+        <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} ${actionText}.</h3>
+        <br/>
+        <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+          <tr style="border: 1px solid;">
+            <th style="border: 1px solid;">Sipariş No</th>
+            <th style="border: 1px solid;">Tedarikçi</th>
+            <th style="border: 1px solid;">Ürün Bilgisi</th>
+            <th style="border: 1px solid;">Üretim Açıklama</th>
+            <th style="border: 1px solid;">Miktar</th>
+            <th style="border: 1px solid;">Alış Fiyatı</th>
+            <th style="border: 1px solid;">Satış Fiyatı</th>
+          </tr>
+      `;
 
-            </tr>
-            `;
-      customSubject = "Yeni Sipariş Girişi";
-      content_mekmer = `
-            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişini Girdi.</h3>
-            <br/>
-            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-            <tr style="border: 1px solid;">
-                <th style="border: 1px solid;">Sipariş No</th>
-                <th style="border: 1px solid;">Tedarikçi</th>
-                <th style="border: 1px solid;">Ürün Bilgisi</th>
-                <th style="border: 1px solid;">Üretim açıklama</th>
-                <th style="border: 1px solid;">Miktar</th>
-                <th style="border: 1px solid;">Alış Fiyatı</th>
-                <th style="border: 1px solid;">Satış Fiyatı</th>
+      let contentRows = "";
+      let contentMekmerRows = "";
 
-            </tr>
-            
-            `;
-    } else {
-      content = `
-            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişine Ürün Ekledi.</h3>
-            <br/>
-            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-            <tr style="border: 1px solid;">
-                <th style="border: 1px solid;">Sipariş No</th>
-                <th style="border: 1px solid;">Tedarikçi</th>
-                <th style="border: 1px solid;">Ürün Bilgisi</th>
-                <th style="border: 1px solid;">Üretim açıklama</th>
-                <th style="border: 1px solid;">Miktar</th>
-                <th style="border: 1px solid;">Alış Fiyatı</th>
-                <th style="border: 1px solid;">Satış Fiyatı</th>
-
-            </tr>
+      payload.added.forEach((x) => {
+        const rowHTML = `
+          <tr style="border: 1px solid;">
+            <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
+            <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
+            <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
+            <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
+            <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+            <td style="border: 1px solid;text-align:center;">$${x.AlisFiyati}</td>
+            <td style="border: 1px solid;text-align:center;">$${x.SatisFiyati}</td>
+          </tr>
         `;
-      customSubject = "Siparişe Ürün Eklendi";
-      content_mekmer = `
-                <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişine Ürün Ekledi.</h3>
-                <br/>
-                <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-                <tr style="border: 1px solid;">
-                    <th style="border: 1px solid;">Sipariş No</th>
-                    <th style="border: 1px solid;">Tedarikçi</th>
-                    <th style="border: 1px solid;">Ürün Bilgisi</th>
-                    <th style="border: 1px solid;">Üretim açıklama</th>
-                    <th style="border: 1px solid;">Miktar</th>
-                    <th style="border: 1px solid;">Alış Fiyatı</th>
-                    <th style="border: 1px solid;">Satış Fiyatı</th>
 
-                </tr>
-            `;
+        contentRows += rowHTML;
+
+        if (x.FirmaAdi === "Mekmer" || x.FirmaAdi === "Mek-Moz") {
+          contentMekmerRows += rowHTML;
+        }
+      });
+
+      const finalContent = tableHeader + contentRows + "</table>";
+      const finalMekmerContent = tableHeader + contentMekmerRows + "</table>";
+
+      const generalMailList = [
+        "bilgiislem@mekmar.com",
+        "export@mekmar.com",
+        "fatma@mekmar.com",
+        "export1@mekmar.com",
+        "export2@mekmar.com",
+        "huseyin@mekmer.com",
+      ].join(", ");
+
+      const mailPromises = [];
+
+      mailPromises.push(
+        transporter.sendMail({
+          from: "goz@mekmar.com",
+          to: generalMailList,
+          subject: customSubject,
+          html: finalContent,
+        })
+      );
+
+      if (contentMekmerRows !== "") {
+        const mekmerMailList = ["sergen@mekmar.com", "muhsin@mekmer.com"].join(
+          ", "
+        );
+        mailPromises.push(
+          transporter.sendMail({
+            from: "goz@mekmar.com",
+            to: mekmerMailList,
+            subject: customSubject,
+            html: finalMekmerContent,
+          })
+        );
+      }
+
+      await Promise.all(mailPromises);
+
+      resolve(true);
+    } catch (error) {
+      console.error("Mail gönderim hatası (addedSendMail):", error);
+      reject(error);
     }
-
-    payload.added.forEach((x) => {
-      content =
-        content +
-        `
-            <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
-                <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
-                <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
-                <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
-                <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
-                <td style="border: 1px solid;text-align:center;">$${x.AlisFiyati}</td>
-                <td style="border: 1px solid;text-align:center;">$${x.SatisFiyati}</td>
-
-            </tr>`;
-    });
-    content = content + "</table>";
-
-    const mekmer_product = payload.added.filter(
-      (x) => x.FirmaAdi == "Mekmer" || x.FirmaAdi == "Mek-Moz"
-    );
-    if (mekmer_product.length > 0) {
-      mekmer_product.forEach((x) => {
-        content_mekmer =
-          content_mekmer +
-          `
-                <tr style="border: 1px solid;">
-                    <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
-                    <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
-                    <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
-                    <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
-                    <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
-                    <td style="border: 1px solid;text-align:center;">$${x.AlisFiyati}</td>
-                    <td style="border: 1px solid;text-align:center;">$${x.SatisFiyati}</td>
-    
-                </tr>`;
-      });
-      content_mekmer = content_mekmer + "</table>";
-
-      transporter.sendMail({
-        to: "sergen@mekmar.com",
-        from: "goz@mekmar.com",
-        subject: customSubject,
-        html: content_mekmer,
-      });
-      transporter.sendMail({
-        to: "muhsin@mekmer.com",
-        from: "goz@mekmar.com",
-        subject: customSubject,
-        html: content_mekmer,
-      });
-    }
-    transporter.sendMail({
-      to: "bilgiislem@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-
-    transporter.sendMail({
-      to: "export@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-    transporter.sendMail({
-      to: "fatma@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-    transporter.sendMail({
-      to: "export1@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-    transporter.sendMail({
-      to: "export2@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-    transporter.sendMail({
-      to: "mehmet@mekmer.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-    transporter.sendMail({
-      to: "huseyin@mekmer.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-
-    resolve(true);
   });
 }
 async function deletedSendMail(payload) {
-  return new Promise((resolve, reject) => {
-    let content = `
-            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişinden Aşağıdaki Kalemleri Sildi.</h3>
-            <br/>
-            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-            <tr style="border: 1px solid;">
-                <th style="border: 1px solid;">Sipariş No</th>
-                <th style="border: 1px solid;">Tedarikçi</th>
-                <th style="border: 1px solid;">Ürün Bilgisi</th>
-                <th style="border: 1px solid;">Üretim açıklama</th>
-                <th style="border: 1px solid;">Miktar</th>
-            </tr>
-        `;
-    payload.deleted.forEach((x) => {
-      content =
-        content +
-        `
-            <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
-                <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
-                <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
-                <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
-                <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
-            </tr>`;
-    });
-    content = content + "</table>";
+  return new Promise(async (resolve, reject) => {
+    try {
+      const tableHeader = `
+        <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişinden Aşağıdaki Kalemleri Sildi.</h3>
+        <br/>
+        <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+          <tr style="border: 1px solid;">
+            <th style="border: 1px solid;">Sipariş No</th>
+            <th style="border: 1px solid;">Tedarikçi</th>
+            <th style="border: 1px solid;">Ürün Bilgisi</th>
+            <th style="border: 1px solid;">Üretim açıklama</th>
+            <th style="border: 1px solid;">Miktar</th>
+          </tr>
+      `;
 
-    if (payload.operation == payload.representative) {
-      transporter.sendMail({
-        to: payload.representative,
-        from: "goz@mekmar.com",
-        subject: "Sipariş Ürün Silme",
-        html: content,
-      });
-    } else {
-      transporter.sendMail({
-        to: payload.operation,
-        from: "goz@mekmar.com",
-        subject: "Sipariş Ürün Silme",
-        html: content,
-      });
-      transporter.sendMail({
-        to: payload.representative,
-        from: "goz@mekmar.com",
-        subject: "Sipariş Ürün Silme",
-        html: content,
-      });
+      const tableRows = payload.deleted
+        .map(
+          (x) => `
+          <tr style="border: 1px solid;">
+            <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
+            <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
+            <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
+            <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
+            <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+          </tr>`
+        )
+        .join("");
+
+      const content = tableHeader + tableRows + "</table>";
+
+      const recipients = [];
+      if (payload.representative) recipients.push(payload.representative);
+
+      if (payload.operation && payload.operation !== payload.representative) {
+        recipients.push(payload.operation);
+      }
+
+      const mailList = recipients.join(", ");
+
+      if (mailList) {
+        await transporter.sendMail({
+          from: "goz@mekmar.com",
+          to: mailList,
+          subject: "Sipariş Ürün Silme",
+          html: content,
+        });
+      }
+
+      resolve(true);
+    } catch (error) {
+      console.error("Mail gönderme hatası (deletedSendMail):", error);
+      reject(error);
     }
-    resolve(true);
   });
 }
 async function updatedSendMail(payload) {
-  return new Promise((resolve, reject) => {
-    let content = `
-            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişinden Aşağıdaki Kalemleri Güncelledi.</h3>
-            <br/>
-            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-            <tr style="border: 1px solid;">
+  return new Promise(async (resolve, reject) => {
+    try {
+      const tableHeader = `
+        <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişinden Aşağıdaki Kalemleri Güncelledi.</h3>
+        <br/>
+        <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+          <tr style="border: 1px solid;">
             <th style="border: 1px solid;">Durum</th>
-                <th style="border: 1px solid;">Sipariş No</th>
-                <th style="border: 1px solid;">Tedarikçi</th>
-                <th style="border: 1px solid;">Ürün Bilgisi</th>
-                <th style="border: 1px solid;">Üretim açıklama</th>
-                <th style="border: 1px solid;">Miktar</th>
-                <th style="border: 1px solid;">Alış Fiyatı</th>
-                <th style="border: 1px solid;">Satış Fiyatı</th>
+            <th style="border: 1px solid;">Sipariş No</th>
+            <th style="border: 1px solid;">Tedarikçi</th>
+            <th style="border: 1px solid;">Ürün Bilgisi</th>
+            <th style="border: 1px solid;">Üretim açıklama</th>
+            <th style="border: 1px solid;">Miktar</th>
+            <th style="border: 1px solid;">Alış Fiyatı</th>
+            <th style="border: 1px solid;">Satış Fiyatı</th>
+          </tr>
+      `;
 
+      let beforeRows = "";
+      let afterRows = "";
+      let mekmerBeforeRows = "";
+      let mekmerAfterRows = "";
 
+      payload.updated.forEach((x) => {
+        const oldData = payload.notchange.find((y) => y.ID == x.ID);
+        if (!oldData) return;
 
-            </tr>
-        `;
-    payload.updated.forEach((x) => {
-      const index = payload.notchange.findIndex((y) => y.ID == x.ID);
-      const po = payload.notchange[index].SiparisNo;
-      const company = payload.notchange[index].FirmaAdi;
-      const desc =
-        payload.notchange[index].KategoriAdi +
-        "-" +
-        payload.notchange[index].UrunAdi +
-        "-" +
-        payload.notchange[index].YuzeyIslemAdi +
-        "-" +
-        payload.notchange[index].En +
-        "x" +
-        payload.notchange[index].Boy +
-        "x" +
-        payload.notchange[index].Kenar;
-      const pdesc = payload.notchange[index].UretimAciklama;
-      const amount = payload.notchange[index].Miktar;
-      const buying = noneControl(payload.notchange[index].AlisFiyati);
-      const selling = noneControl(payload.notchange[index].SatisFiyati);
+        const po = oldData.SiparisNo;
+        const company = oldData.FirmaAdi;
+        const desc = `${oldData.KategoriAdi}-${oldData.UrunAdi}-${oldData.YuzeyIslemAdi}-${oldData.En}x${oldData.Boy}x${oldData.Kenar}`;
+        const pdesc = oldData.UretimAciklama;
+        const amount = oldData.Miktar;
+        const buying = noneControl(oldData.AlisFiyati);
+        const selling = noneControl(oldData.SatisFiyati);
 
-      content =
-        content +
-        `
-            <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">Önceki</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">${po}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  x.FirmaAdi,
-                  company
-                )};">${company}</td>
-                <td style="border: 1px solid;text-align:center;"style="border:1px solid gray;text-align:center;" >${desc}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  x.UretimAciklama,
-                  pdesc
-                )};">${pdesc}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  x.Miktar,
-                  amount
-                )};">${amount}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  noneControl(x.AlisFiyati),
-                  buying
-                )};">$${buying}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  noneControl(x.SatisFiyati),
-                  selling
-                )};">$${selling}</td>
-            </tr>`;
-    });
-    payload.updated.forEach((x) => {
-      content =
-        content +
-        `
-            <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;">Sonraki</td>
-                <td style="border: 1px solid;text-align:center;" >${
-                  x.SiparisNo
-                }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.FirmaAdi
-                }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.KategoriAdi
-                }-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${
-          x.Kenar
-        }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.UretimAciklama
-                }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.Miktar
-                }</td>
-                <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.AlisFiyati
-                )}</td>
-                <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.SatisFiyati
-                )}</td>
-            </tr>`;
-    });
+        const bRow = `
+          <tr style="border: 1px solid;">
+            <td style="border: 1px solid;text-align:center;">Önceki</td>
+            <td style="border: 1px solid;text-align:center;">${po}</td>
+            <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
+              x.FirmaAdi,
+              company
+            )};">${company}</td>
+            <td style="border: 1px solid;text-align:center;">${desc}</td>
+            <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
+              x.UretimAciklama,
+              pdesc
+            )};">${pdesc}</td>
+            <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
+              x.Miktar,
+              amount
+            )};">${amount}</td>
+            <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
+              noneControl(x.AlisFiyati),
+              buying
+            )};">$${buying}</td>
+            <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
+              noneControl(x.SatisFiyati),
+              selling
+            )};">$${selling}</td>
+          </tr>`;
 
-    content = content + "</table>";
+        const newDesc = `${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}`;
+        const aRow = `
+          <tr style="border: 1px solid;">
+            <td style="border: 1px solid;text-align:center;">Sonraki</td>
+            <td style="border: 1px solid;text-align:center;">${x.SiparisNo}</td>
+            <td style="border: 1px solid;text-align:center;">${x.FirmaAdi}</td>
+            <td style="border: 1px solid;text-align:center;">${newDesc}</td>
+            <td style="border: 1px solid;text-align:center;">${
+              x.UretimAciklama
+            }</td>
+            <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+            <td style="border: 1px solid;text-align:center;">$${noneControl(
+              x.AlisFiyati
+            )}</td>
+            <td style="border: 1px solid;text-align:center;">$${noneControl(
+              x.SatisFiyati
+            )}</td>
+          </tr>`;
 
-    let content_mekmer = `
-            <h3>${payload.username} Adlı Kullanıcı ${payload.date} Tarihinde ${payload.po} Siparişinden Aşağıdaki Kalemleri Güncelledi.</h3>
-            <br/>
-            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-            <tr style="border: 1px solid;">
-            <th style="border: 1px solid;">Durum</th>
-                <th style="border: 1px solid;">Sipariş No</th>
-                <th style="border: 1px solid;">Tedarikçi</th>
-                <th style="border: 1px solid;">Ürün Bilgisi</th>
-                <th style="border: 1px solid;">Üretim açıklama</th>
-                <th style="border: 1px solid;">Miktar</th>
-                <th style="border: 1px solid;">Alış Fiyatı</th>
-                <th style="border: 1px solid;">Satış Fiyatı</th>
+        beforeRows += bRow;
+        afterRows += aRow;
 
-
-
-            </tr>
-        `;
-    /*Eğer Mekmer ve Mekmoz ise Sergen ile Muhsin abiye mail gitsin */
-    const mekmer_product = payload.updated.filter(
-      (x) => x.FirmaAdi == "Mekmer" || x.FirmaAdi == "Mek-Moz"
-    );
-
-    if (mekmer_product.length > 0) {
-      mekmer_product.forEach((x) => {
-        const index = payload.notchange.findIndex((y) => y.ID == x.ID);
-        const po = payload.notchange[index].SiparisNo;
-        const company = payload.notchange[index].FirmaAdi;
-        const desc =
-          payload.notchange[index].KategoriAdi +
-          "-" +
-          payload.notchange[index].UrunAdi +
-          "-" +
-          payload.notchange[index].YuzeyIslemAdi +
-          "-" +
-          payload.notchange[index].En +
-          "x" +
-          payload.notchange[index].Boy +
-          "x" +
-          payload.notchange[index].Kenar;
-        const pdesc = payload.notchange[index].UretimAciklama;
-        const amount = payload.notchange[index].Miktar;
-        const buying = noneControl(payload.notchange[index].AlisFiyati);
-        const selling = noneControl(payload.notchange[index].SatisFiyati);
-
-        content_mekmer =
-          content_mekmer +
-          `
-            <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">Önceki</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;">${po}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  x.FirmaAdi,
-                  company
-                )};">${company}</td>
-                <td style="border: 1px solid;text-align:center;"style="border:1px solid gray;text-align:center;" >${desc}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  x.UretimAciklama,
-                  pdesc
-                )};">${pdesc}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  x.Miktar,
-                  amount
-                )};">${amount}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  noneControl(x.AlisFiyati),
-                  buying
-                )};">$${buying}</td>
-                <td style="border: 1px solid;text-align:center;" style="border:1px solid gray;text-align:center;background-color:${updateChangedColor(
-                  noneControl(x.SatisFiyati),
-                  selling
-                )};">$${selling}</td>
-            </tr>`;
+        if (x.FirmaAdi === "Mekmer" || x.FirmaAdi === "Mek-Moz") {
+          mekmerBeforeRows += bRow;
+          mekmerAfterRows += aRow;
+        }
       });
-      mekmer_product.forEach((x) => {
-        content_mekmer =
-          content_mekmer +
-          `
-            <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;">Sonraki</td>
-                <td style="border: 1px solid;text-align:center;" >${
-                  x.SiparisNo
-                }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.FirmaAdi
-                }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.KategoriAdi
-                }-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${
-            x.Kenar
-          }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.UretimAciklama
-                }</td>
-                <td style="border: 1px solid;text-align:center;">${
-                  x.Miktar
-                }</td>
-                <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.AlisFiyati
-                )}</td>
-                <td style="border: 1px solid;text-align:center;">$${noneControl(
-                  x.SatisFiyati
-                )}</td>
-            </tr>`;
-      });
-      content_mekmer = content_mekmer + "</table>";
 
-      transporter.sendMail({
-        to: "muhsin@mekmer.com",
-        from: "goz@mekmar.com",
-        subject: "Sipariş Ürün Güncelleme",
-        html: content_mekmer,
-      });
-      transporter.sendMail({
-        to: "sergen@mekmar.com",
-        from: "goz@mekmar.com",
-        subject: "Sipariş Ürün Güncelleme",
-        html: content_mekmer,
-      });
+      const finalContent = tableHeader + beforeRows + afterRows + "</table>";
+      const finalMekmerContent =
+        tableHeader + mekmerBeforeRows + mekmerAfterRows + "</table>";
+
+      const generalMailList = [
+        "bilgiislem@mekmar.com",
+        "export@mekmar.com",
+        "fatma@mekmar.com",
+        "export1@mekmar.com",
+        "export2@mekmar.com",
+        "huseyin@mekmer.com",
+      ].join(", ");
+
+      const mailPromises = [];
+      const mailSubject = "Sipariş Ürün Güncelleme";
+
+      mailPromises.push(
+        transporter.sendMail({
+          from: "goz@mekmar.com",
+          to: generalMailList,
+          subject: mailSubject,
+          html: finalContent,
+        })
+      );
+
+      if (mekmerBeforeRows !== "") {
+        const mekmerMailList = ["muhsin@mekmer.com", "sergen@mekmar.com"].join(
+          ", "
+        );
+        mailPromises.push(
+          transporter.sendMail({
+            from: "goz@mekmar.com",
+            to: mekmerMailList,
+            subject: mailSubject,
+            html: finalMekmerContent,
+          })
+        );
+      }
+
+      await Promise.all(mailPromises);
+
+      resolve(true);
+    } catch (error) {
+      console.error("Mail gönderme hatası (updatedSendMail):", error);
+      reject(error);
     }
-
-    transporter.sendMail({
-      to: "bilgiislem@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: "Sipariş Ürün Güncelleme",
-      html: content,
-    });
-
-    transporter.sendMail({
-      to: "export@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: "Sipariş Ürün Güncelleme",
-      html: content,
-    });
-    transporter.sendMail({
-      to: "fatma@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: customSubject,
-      html: content,
-    });
-    transporter.sendMail({
-      to: "export1@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: "Sipariş Ürün Güncelleme",
-      html: content,
-    });
-    transporter.sendMail({
-      to: "export2@mekmar.com",
-      from: "goz@mekmar.com",
-      subject: "Sipariş Ürün Güncelleme",
-      html: content,
-    });
-    transporter.sendMail({
-      to: "mehmet@mekmer.com",
-      from: "goz@mekmar.com",
-      subject: "Sipariş Ürün Güncelleme",
-      html: content,
-    });
-    transporter.sendMail({
-      to: "huseyin@mekmer.com",
-      from: "goz@mekmar.com",
-      subject: "Sipariş Ürün Güncelleme",
-      html: content,
-    });
-
-    resolve(true);
   });
 }
 function updateProductionTotal(po) {
@@ -14816,71 +14820,67 @@ app.post("/order/production/product/save/mail", async (req, res) => {
     res.status(200).json({ status: false });
   }
 });
-app.post("/shipment/products/save/mail", (req, res) => {
-  let content = `
-            <h3>${req.body.KullaniciAdi} Adlı Kullanıcı ${req.body.YuklemeTarihi} Tarihinde ${req.body.SiparisNo} Sevkiyatı Gerçekleştirdi.</h3>
-            <br/>
-            <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
-            <tr style="border: 1px solid;">
-                <th style="border: 1px solid;">Kasa No</th>
-                <th style="border: 1px solid;">Ürün</th>
-                <th style="border: 1px solid;">Yüzey</th>
-                <th style="border: 1px solid;">Ebat</th>
-                <th style="border: 1px solid;">Birim</th>
-                <th style="border: 1px solid;">Miktar</th>
-                <th style="border: 1px solid;">Toplam</th>
+app.post("/shipment/products/save/mail", async (req, res) => {
+  try {
+    const { KullaniciAdi, YuklemeTarihi, SiparisNo, data, mail } = req.body;
 
-            </tr>
-        `;
-  req.body.data.forEach((x) => {
-    content =
-      content +
-      `
-            <tr style="border: 1px solid;">
-                <td style="border: 1px solid;text-align:center;">${x.KasaNo}</td>
-                <td style="border: 1px solid;text-align:center;">${x.UrunAdi}</td>
-                <td style="border: 1px solid;text-align:center;">${x.YuzeyIslemAdi}</td>
-                <td style="border: 1px solid;text-align:center;">${x.En} x ${x.Boy} x ${x.Kenar}</td>
-                <td style="border: 1px solid;text-align:center;">${x.BirimAdi}</td>
-                <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
-                <td style="border: 1px solid;text-align:center;">$ ${x.TotalProduct}</td>
+    const tableHeader = `
+      <h3>${KullaniciAdi} Adlı Kullanıcı ${YuklemeTarihi} Tarihinde ${SiparisNo} Sevkiyatı Gerçekleştirdi.</h3>
+      <br/>
+      <table style="border: 1px solid;border-collapse: collapse;width: 100%;">
+      <tr style="border: 1px solid;">
+          <th style="border: 1px solid;">Kasa No</th>
+          <th style="border: 1px solid;">Ürün</th>
+          <th style="border: 1px solid;">Yüzey</th>
+          <th style="border: 1px solid;">Ebat</th>
+          <th style="border: 1px solid;">Birim</th>
+          <th style="border: 1px solid;">Miktar</th>
+          <th style="border: 1px solid;">Toplam</th>
+      </tr>
+    `;
 
-            </tr>`;
-  });
-  content = content + "</table>";
+    const tableRows = data
+      .map(
+        (x) => `
+      <tr style="border: 1px solid;">
+          <td style="border: 1px solid;text-align:center;">${x.KasaNo}</td>
+          <td style="border: 1px solid;text-align:center;">${x.UrunAdi}</td>
+          <td style="border: 1px solid;text-align:center;">${x.YuzeyIslemAdi}</td>
+          <td style="border: 1px solid;text-align:center;">${x.En} x ${x.Boy} x ${x.Kenar}</td>
+          <td style="border: 1px solid;text-align:center;">${x.BirimAdi}</td>
+          <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
+          <td style="border: 1px solid;text-align:center;">$ ${x.TotalProduct}</td>
+      </tr>
+    `
+      )
+      .join("");
 
-  transporter
-    .sendMail({
-      to: req.body.mail,
+    const content = tableHeader + tableRows + "</table>";
+
+    const mailList = [
+      mail,
+      "info@mekmar.com",
+      "fatma@mekmer.com",
+      "huseyin@mekmer.com",
+      "bilgiislem@mekmar.com",
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    await transporter.sendMail({
       from: "goz@mekmar.com",
+      to: mailList,
       subject: "Sipariş Sevkiyat İşlemi",
       html: content,
-    })
-    .then((response) => {
-      if (response.response.includes("250")) {
-        res.status(200).json({ status: true });
-      } else {
-        res.status(200).json({ status: false });
-      }
     });
-  transporter.sendMail({
-    to: "info@mekmar.com",
-    from: "goz@mekmar.com",
-    subject: "Sipariş Sevkiyat İşlemi",
-    html: content,
-  });
-  transporter.sendMail({
-    to: "mehmet@mekmer.com",
-    from: "goz@mekmar.com",
-    subject: "Sipariş Sevkiyat İşlemi",
-    html: content,
-  });
-  transporter.sendMail({
-    to: "huseyin@mekmer.com",
-    from: "goz@mekmar.com",
-    subject: "Sipariş Sevkiyat İşlemi",
-    html: content,
-  });
+
+    res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("Sevkiyat mail gönderim hatası:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Mail gönderilirken hata oluştu." });
+  }
 });
 
 app.post("/mail/product/control/send", (req, res) => {

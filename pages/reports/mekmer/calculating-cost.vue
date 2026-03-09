@@ -504,10 +504,9 @@ export default {
       this.productionSqm = 0;
       this.productionPiece = 0;
       const customCosts = costs.filter((x) => {
-        return (
-          x.MaliyetTurId in
-          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-        );
+        return [
+          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+        ].includes(x.MaliyetTurId);
       });
       customCosts.forEach((x) => {
         this.costTypeTotal += x.Fiyat / x.Kur;
@@ -539,16 +538,14 @@ export default {
     },
     async getCalculateRatio(_costs, _types) {
       let customTypes = _types.filter((x) => {
-        return (
-          x.ID in
-          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-        );
+        return [
+          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+        ].includes(x.ID);
       });
-      let customCosts = _costs.filter((x) => {
-        return (
-          x.MaliyetTurId in
-          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-        );
+      let customCosts = await _costs.filter((x) => {
+        return [
+          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+        ].includes(x.MaliyetTurId);
       });
       this.calculate_ratio_list = [];
       let total = 0;
