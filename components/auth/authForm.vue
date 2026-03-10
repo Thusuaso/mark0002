@@ -95,7 +95,7 @@ export default {
   },
   data() {
     return {
-      step: 1, // Hangi aşamada olduğumuzu tutar (1: Login, 2: OTP)
+      step: 1,
       otpCode: "",
       user: {
         username: "",
@@ -122,19 +122,15 @@ export default {
       );
       this.passwordStatus = userObj && userObj.YSifre === val;
     },
-
-    // Tek bir onSubmit metodu ile iki aşamayı da yönetiyoruz
     async onSubmit() {
       this.next_step_loading_button = true;
       try {
         if (this.step === 1) {
-          // 1. AŞAMA: Kullanıcı adı ve şifreyi backend'e gönder
           const response = await this.$axios.$post("/login", {
             username: this.user.username,
             password: this.user.password,
           });
 
-          // Backend "otp_sent" dediyse 2. adıma geç
           if (response.status && response.step === "otp_sent") {
             this.step = 2;
           } else {
@@ -146,18 +142,12 @@ export default {
         } else if (this.step === 2) {
           this.next_step_loading_button = false;
           this.step_2_loading_button = true;
-          // 2. AŞAMA: Mailden gelen kodu backend'e doğrulat
           const response = await this.$axios.$post("/verify-otp", {
             username: this.user.username,
             code: this.otpCode,
           });
 
-          // Kod doğruysa içeri al
           if (response.status) {
-            console.log("Giriş Başarılı:", response);
-
-            // Eğer Nuxt Auth veya Store kullanıyorsan kullanıcıyı kaydetme işlemini burada yapabilirsin
-            // Örn: this.$store.commit("setUser", response);
             const date = new Date();
             response.innerDate =
               date.getFullYear() +
@@ -171,15 +161,15 @@ export default {
               date.getMinutes() +
               ":" +
               date.getSeconds();
-            Cookies.set("token", response.token);
-            Cookies.set("userId", response.userId);
-            Cookies.set("username", response.username);
-            Cookies.set("mail", response.mail);
+            Cookies.set("token", response.token, { expires: 7 });
+            Cookies.set("userId", response.userId, { expires: 7 });
+            Cookies.set("username", response.username, { expires: 7 });
+            Cookies.set("mail", response.mail, { expires: 7 });
             this.$store.dispatch("login_mailer", response);
             this.$store.dispatch("setToDoListByUsername", response.username);
             this.$store.dispatch("setUserId", response.userId);
             this.step_2_loading_button = false;
-            this.$router.push("/"); // Ana sayfaya veya dashboarda yönlendir
+            this.$router.push("/");
           } else {
             alert(response.message || "Kod hatalı veya süresi dolmuş.");
             this.step_2_loading_button = false;

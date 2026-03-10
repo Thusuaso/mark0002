@@ -9015,96 +9015,321 @@ order by y.GirisTarihi desc
     res.status(200).json({ list: todo.recordset });
   });
 });
-app.post("/todo/by/username/save", (req, res) => {
-  if (req.body.GorevVerenID == 10) {
-    const queueSql = `
-        select top 1 Sira + 1 as Sira from Yapilacaklar where GorevVerenAdi='Gizem' and Yapildi=0 and Goruldu=0 order by Sira desc
-        `;
 
-    mssql.query(queueSql, (err, queueResults) => {
-      const queue = queueResults.recordset[0].Sira;
-      const todoInsertSql = `
-        insert into Yapilacaklar(
-            Yapilacak,
-            Yapildi,
-            GorevVerenID,
-            GorevVerenAdi,
-            GirisTarihi,
-            YapilacakOncelik,
-            Acil,
-            OrtakGorev,
-            Goruldu,
-            Sira
-        )
-        VALUES('${req.body.CustomYapilacak}','${0}','${
-        req.body.GorevVerenID
-      }','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${
-        req.body.YapilacakOncelik
-      }','${req.body.Acil}','${req.body.OrtakGorev}','0',${queue})
-        `;
-      mssql.query(todoInsertSql, (err, todo) => {
-        if (todo.rowsAffected[0] == 1) {
-          res.status(200).json({ status: true });
-        } else {
-          res.status(200).json({ status: false });
+app.post("/todo/by/username/save", async (req, res) => {
+  try {
+    const {
+      CustomYapilacak,
+      GorevVerenID,
+      GorevVerenAdi,
+      GirisTarihi,
+      YapilacakOncelik,
+      Acil,
+      OrtakGorev,
+    } = req.body;
+
+    const insertRequest = new mssql.Request();
+    insertRequest.input("CustomYapilacak", mssql.NVarChar, CustomYapilacak);
+    insertRequest.input("GorevVerenID", mssql.Int, GorevVerenID);
+    insertRequest.input("GorevVerenAdi", mssql.NVarChar, GorevVerenAdi);
+    insertRequest.input("GirisTarihi", mssql.VarChar, GirisTarihi);
+    insertRequest.input("YapilacakOncelik", mssql.VarChar, YapilacakOncelik);
+    insertRequest.input("Acil", mssql.Bit, Acil);
+    insertRequest.input("OrtakGorev", mssql.NVarChar, OrtakGorev);
+
+    let sqlQuery = "";
+
+    if (GorevVerenID == 10) {
+      const queueReq = new mssql.Request();
+      const queueRes = await queueReq.query(
+        "SELECT TOP 1 Sira + 1 as Sira FROM Yapilacaklar WHERE GorevVerenAdi='Gizem' AND Yapildi=0 AND Goruldu=0 ORDER BY Sira DESC"
+      );
+      const queue =
+        queueRes.recordset.length > 0 ? queueRes.recordset[0].Sira : 1;
+
+      insertRequest.input("Sira", mssql.Int, queue);
+
+      sqlQuery = `
+        INSERT INTO Yapilacaklar (Yapilacak, Yapildi, GorevVerenID, GorevVerenAdi, GirisTarihi, YapilacakOncelik, Acil, OrtakGorev, Goruldu, Sira)
+        VALUES (@CustomYapilacak, 0, @GorevVerenID, @GorevVerenAdi, @GirisTarihi, @YapilacakOncelik, @Acil, @OrtakGorev, 0, @Sira)
+      `;
+    } else {
+      sqlQuery = `
+        INSERT INTO Yapilacaklar (Yapilacak, Yapildi, GorevVerenID, GorevVerenAdi, GirisTarihi, YapilacakOncelik, Acil, OrtakGorev, Goruldu)
+        VALUES (@CustomYapilacak, 0, @GorevVerenID, @GorevVerenAdi, @GirisTarihi, @YapilacakOncelik, @Acil, @OrtakGorev, 0)
+      `;
+    }
+
+    const todoResult = await insertRequest.query(sqlQuery);
+
+    if (todoResult.rowsAffected[0] !== 1) {
+      return res.status(200).json({ status: false });
+    }
+
+    if (OrtakGorev) {
+      const targetNames = OrtakGorev.split(",")
+        .map((name) => name.trim())
+        .filter((name) => name.length > 0);
+
+      if (targetNames.length > 0) {
+        const mailRequest = new mssql.Request();
+
+        const paramNames = targetNames.map((name, index) => {
+          const paramKey = `name${index}`;
+          mailRequest.input(paramKey, mssql.NVarChar, name);
+          return `@${paramKey}`;
+        });
+
+        const mailQuery = `SELECT MailAdres FROM KullaniciTB WHERE KullaniciAdi IN (${paramNames.join(
+          ","
+        )}) AND Aktif=1`;
+        const mailResults = await mailRequest.query(mailQuery);
+
+        const mailList = mailResults.recordset
+          .map((row) => row.MailAdres)
+          .filter(Boolean)
+          .join(", ");
+
+        if (mailList.length > 0) {
+          const mailHtml = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h2 style="color: #4fab9f;">Yeni Görev Ataması</h2>
+                <p><b>Görev Veren:</b> ${GorevVerenAdi}</p>
+                <p><b>Tarih:</b> ${GirisTarihi}</p>
+                <hr style="border:0; border-top: 1px solid #eee;" />
+                <p style="font-size: 16px;"><b>Görev İçeriği:</b><br/> ${CustomYapilacak}</p>
+                <hr style="border:0; border-top: 1px solid #eee;" />
+                <p>
+                  <span style="background-color: ${
+                    YapilacakOncelik === "A" ? "#ffcccc" : "#e6f7ff"
+                  }; padding: 5px 10px; border-radius: 5px;">
+                    <b>Öncelik:</b> ${YapilacakOncelik}
+                  </span>
+                  &nbsp;
+                  <span style="background-color: ${
+                    Acil ? "#ff4d4f" : "#ccc"
+                  }; color: ${
+            Acil ? "white" : "black"
+          }; padding: 5px 10px; border-radius: 5px;">
+                    <b>Durum:</b> ${Acil ? "ACİL" : "Normal"}
+                  </span>
+                </p>
+            </div>
+          `;
+
+          try {
+            await transporter.sendMail({
+              from: '"Mekmar Panel" <goz@mekmar.com>',
+              to: mailList,
+              subject: `📌 Yeni Görev: ${GorevVerenAdi} size bir görev atadı`,
+              html: mailHtml,
+            });
+          } catch (mailError) {
+            console.error("Görev atama maili gönderilemedi:", mailError);
+          }
         }
-      });
-    });
-  } else {
-    const todoInsertSql = `
-        insert into Yapilacaklar(
-            Yapilacak,
-            Yapildi,
-            GorevVerenID,
-            GorevVerenAdi,
-            GirisTarihi,
-            YapilacakOncelik,
-            Acil,
-            OrtakGorev,
-            Goruldu
-        )
-        VALUES('${req.body.CustomYapilacak}','${0}','${
-      req.body.GorevVerenID
-    }','${req.body.GorevVerenAdi}','${req.body.GirisTarihi}','${
-      req.body.YapilacakOncelik
-    }','${req.body.Acil}','${req.body.OrtakGorev}','0')
-    `;
-    mssql.query(todoInsertSql, (err, todo) => {
-      if (todo.rowsAffected[0] == 1) {
-        res.status(200).json({ status: true });
-      } else {
-        res.status(200).json({ status: false });
       }
-    });
+    }
+
+    return res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("Todo Kayıt Hatası:", error);
+    return res
+      .status(500)
+      .json({ status: false, message: "Sunucu hatası oluştu." });
   }
 });
-app.put("/todo/by/username/update", (req, res) => {
-  const todoUpdateSql = `
-        update Yapilacaklar
-SET Yapilacak='${req.body.CustomYapilacak}',
-	OrtakGorev='${req.body.OrtakGorev}',
-	YapilacakOncelik='${req.body.YapilacakOncelik}',
-	Acil='${req.body.Acil}'
-WHERE
-	ID='${req.body.ID}'
+
+app.put("/todo/by/username/update", async (req, res) => {
+  try {
+    const { CustomYapilacak, OrtakGorev, YapilacakOncelik, Acil, ID } =
+      req.body;
+
+    const updateRequest = new mssql.Request();
+    updateRequest.input("CustomYapilacak", mssql.NVarChar, CustomYapilacak);
+    updateRequest.input("OrtakGorev", mssql.NVarChar, OrtakGorev);
+    updateRequest.input("YapilacakOncelik", mssql.VarChar, YapilacakOncelik);
+    updateRequest.input("Acil", mssql.Bit, Acil);
+    updateRequest.input("ID", mssql.Int, ID);
+
+    const sqlQuery = `
+      UPDATE Yapilacaklar
+      SET Yapilacak = @CustomYapilacak,
+          OrtakGorev = @OrtakGorev,
+          YapilacakOncelik = @YapilacakOncelik,
+          Acil = @Acil
+      WHERE ID = @ID
     `;
-  mssql.query(todoUpdateSql, (err, todo) => {
-    if (todo.rowsAffected[0] == 1) {
-      res.status(200).json({ status: true });
-    } else {
-      res.status(200).json({ status: false });
+
+    const todoResult = await updateRequest.query(sqlQuery);
+
+    if (todoResult.rowsAffected[0] !== 1) {
+      return res.status(200).json({ status: false });
     }
-  });
+
+    if (OrtakGorev) {
+      const targetNames = OrtakGorev.split(",")
+        .map((name) => name.trim())
+        .filter((name) => name.length > 0);
+
+      if (targetNames.length > 0) {
+        const mailRequest = new mssql.Request();
+
+        const paramNames = targetNames.map((name, index) => {
+          const paramKey = `name${index}`;
+          mailRequest.input(paramKey, mssql.NVarChar, name);
+          return `@${paramKey}`;
+        });
+
+        const mailQuery = `SELECT MailAdres FROM KullaniciTB WHERE KullaniciAdi IN (${paramNames.join(
+          ","
+        )}) AND Aktif=1`;
+        const mailResults = await mailRequest.query(mailQuery);
+
+        const mailList = mailResults.recordset
+          .map((row) => row.MailAdres)
+          .filter(Boolean)
+          .join(", ");
+
+        if (mailList.length > 0) {
+          const mailHtml = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h2 style="color: #f59e0b;">✏️ Görev Güncellendi</h2>
+                <p>Ortak olduğunuz bir görev üzerinde değişiklik yapıldı.</p>
+                <hr style="border:0; border-top: 1px solid #eee;" />
+                <p style="font-size: 16px;"><b>Güncel Görev İçeriği:</b><br/> ${CustomYapilacak}</p>
+                <hr style="border:0; border-top: 1px solid #eee;" />
+                <p>
+                  <span style="background-color: ${
+                    YapilacakOncelik === "A" ? "#ffcccc" : "#e6f7ff"
+                  }; padding: 5px 10px; border-radius: 5px;">
+                    <b>Öncelik:</b> ${YapilacakOncelik}
+                  </span>
+                  &nbsp;
+                  <span style="background-color: ${
+                    Acil ? "#ff4d4f" : "#ccc"
+                  }; color: ${
+            Acil ? "white" : "black"
+          }; padding: 5px 10px; border-radius: 5px;">
+                    <b>Durum:</b> ${Acil ? "ACİL" : "Normal"}
+                  </span>
+                </p>
+            </div>
+          `;
+
+          try {
+            await transporter.sendMail({
+              from: '"Mekmar Panel" <goz@mekmar.com>',
+              to: mailList,
+              subject: `✏️ Görev Güncellemesi: Ortak olduğunuz bir görev değiştirildi`,
+              html: mailHtml,
+            });
+          } catch (mailError) {
+            console.error("Görev güncelleme maili gönderilemedi:", mailError);
+          }
+        }
+      }
+    }
+
+    return res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("Todo Güncelleme Hatası:", error);
+    return res
+      .status(500)
+      .json({ status: false, message: "Sunucu hatası oluştu." });
+  }
 });
-app.delete("/todo/by/username/delete/:id", (req, res) => {
-  const todoDeleteSql = `delete Yapilacaklar where ID='${req.params.id}'`;
-  mssql.query(todoDeleteSql, (err, todo) => {
-    if (todo.rowsAffected[0] == 1) {
-      res.status(200).json({ status: true });
-    } else {
-      res.status(200).json({ status: false });
+
+app.delete("/todo/by/username/delete/:id", async (req, res) => {
+  try {
+    const taskID = req.params.id;
+
+    const getRequest = new mssql.Request();
+    getRequest.input("ID", mssql.Int, taskID);
+
+    const getResult = await getRequest.query(
+      "SELECT Yapilacak, OrtakGorev, GorevVerenAdi FROM Yapilacaklar WHERE ID = @ID"
+    );
+
+    if (getResult.recordset.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Görev bulunamadı." });
     }
-  });
+
+    const { Yapilacak, OrtakGorev, GorevVerenAdi } = getResult.recordset[0];
+
+    const deleteRequest = new mssql.Request();
+    deleteRequest.input("ID", mssql.Int, taskID);
+
+    const deleteResult = await deleteRequest.query(
+      "DELETE FROM Yapilacaklar WHERE ID = @ID"
+    );
+
+    if (deleteResult.rowsAffected[0] !== 1) {
+      return res.status(200).json({ status: false });
+    }
+
+    if (OrtakGorev) {
+      const targetNames = OrtakGorev.split(",")
+        .map((name) => name.trim())
+        .filter((name) => name.length > 0);
+
+      if (targetNames.length > 0) {
+        const mailRequest = new mssql.Request();
+
+        const paramNames = targetNames.map((name, index) => {
+          const paramKey = `name${index}`;
+          mailRequest.input(paramKey, mssql.NVarChar, name);
+          return `@${paramKey}`;
+        });
+
+        const mailQuery = `SELECT MailAdres FROM KullaniciTB WHERE KullaniciAdi IN (${paramNames.join(
+          ","
+        )}) AND Aktif=1`;
+        const mailResults = await mailRequest.query(mailQuery);
+
+        const mailList = mailResults.recordset
+          .map((row) => row.MailAdres)
+          .filter(Boolean)
+          .join(", ");
+
+        if (mailList.length > 0) {
+          const mailHtml = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h2 style="color: #ef4444;">🗑️ Görev İptal Edildi</h2>
+                <p>Ortak olduğunuz bir görev sistemden <b>kaldırıldı.</b></p>
+                <p><b>Görevi Veren:</b> ${GorevVerenAdi || "Bilinmiyor"}</p>
+                <hr style="border:0; border-top: 1px solid #eee;" />
+                <p style="font-size: 16px; color: #6b7280; text-decoration: line-through;">
+                  <b>İptal Edilen Görev:</b><br/> ${Yapilacak}
+                </p>
+                <hr style="border:0; border-top: 1px solid #eee;" />
+                <p style="font-size: 12px; color: gray;">Bu mesaj Mekmar Panel tarafından otomatik olarak gönderilmiştir.</p>
+            </div>
+          `;
+
+          try {
+            await transporter.sendMail({
+              from: '"Mekmar Panel" <goz@mekmar.com>',
+              to: mailList,
+              subject: `🗑️ Görev İptali: Ortak olduğunuz bir görev silindi`,
+              html: mailHtml,
+            });
+          } catch (mailError) {
+            console.error("Görev silme maili gönderilemedi:", mailError);
+          }
+        }
+      }
+    }
+
+    return res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("Todo Silme Hatası:", error);
+    return res
+      .status(500)
+      .json({ status: false, message: "Sunucu hatası oluştu." });
+  }
 });
 app.post("/todo/by/username/done", (req, res) => {
   const sql = `
@@ -11220,272 +11445,103 @@ order by YEAR(s.SiparisTarihi) desc
   });
 });
 
-app.get("/order/shipped/mekmer2/list", async (req, res) => {
-  const ordersListSqlMekmar = `
-select 
-
-	s.ID as SiparisId,
-s.SiparisNo,
-s.SiparisTarihi,
-s.OdemeTurID,
-ot.OdemeTur,
-s.TeslimTurID,
-stt.TeslimTur,
-s.MusteriID,
-m.FirmaAdi,
-s.Pesinat,
-s.NavlunFirma,
-s.NavlunMekmarNot,
-s.NavlunAlis,
-s.NavlunSatis,
-s.KayitTarihi,
-s.KullaniciID,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.KullaniciID) as KayitYapan,
-s.SiparisDurumID,
-sdt.Durum,
-s.UretimAciklama,
-s.SevkiyatAciklama,
-s.FinansAciklama,
-s.OdemeAciklama,
-s.TahminiYuklemeTarihi,
-s.YuklemeTarihi,
-s.FaturaNo,
-s.SiparisFaturaNo,
-s.Vade,
-s.Ulke,
-s.Komisyon,
-s.DetayAciklama_1,
-s.DetayMekmarNot_1,
-s.DetayTutar_1,
-s.DetayAlis_1,
-s.DetayAciklama_2,
-s.DetayMekmarNot_2,
-s.DetayTutar_2,
-s.DetayAlis_2,
-s.DetayAciklama_3,
-s.DetayMekmarNot_3,
-s.DetayTutar_3,
-s.DetayAlis_3,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as SiparisSahibiAdi,
-s.EvrakGideri,
-s.Eta,
-s.UlkeId,
-ytu.UlkeAdi,
-fst.FaturaAdi,
-s.depo_yukleme,
-s.DetayTutar_4,
-s.DetayAciklama_4,
-s.sigorta_Tutar,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
-(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
-(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
-s.SiparisSahibi,
-s.Operasyon,
-s.Finansman,
-s.Iade,
-s.MalBedeli,
-s.sigorta_tutar_satis,
-s.KonteynerAyrinti,
-s.MayaControl,
-s.FaturaKesimTurID,
-s.KonteynerNo,
-s.KaynakTuru as KaynakTuruID,
-
-	su.ID as UrunId,
-	su.SiparisNo as UrunSiparisNo,
-	su.TedarikciID,
-	t.FirmaAdi as UrunFirmaAdi,
-	su.UrunKartID,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar,
-	su.UrunBirimID,
-	ub.BirimAdi,
-	su.Miktar,
-	su.OzelMiktar,
-	su.KasaAdet,
-	su.SatisFiyati,
-	su.SatisToplam,
-	su.UretimAciklama as UrunUretimAciklama,
-	su.MusteriAciklama as UrunMusteriAciklama,
-	su.AlisFiyati,
-	su.SiraNo,
-	su.Ton,
-	su.Adet,
-    ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
-    dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
-    dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
-
-
-from SiparisUrunTB su
-inner join SiparislerTB s on s.SiparisNo = su.SiparisNo
-inner join TedarikciTB t on t.ID = su.TedarikciID
-inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
-inner join UrunKartTB uk on uk.ID = su.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join OdemeTurTB ot on ot.ID = s.OdemeTurID
-inner join SiparisTeslimTurTB stt on stt.ID = s.TeslimTurID
-inner join MusterilerTB m on m.ID = s.MusteriID
-inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
-inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
-inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
-
-where s.SiparisDurumID = 3 and su.TedarikciID in (1,123) and m.Marketing='Mekmar'
-    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
-
-
-
-    `;
-  const ordersListSqlMekmer = `
-select 
-
-	s.ID as SiparisId,
-s.SiparisNo,
-s.SiparisTarihi,
-s.OdemeTurID,
-ot.OdemeTur,
-s.TeslimTurID,
-stt.TeslimTur,
-s.MusteriID,
-m.FirmaAdi,
-s.Pesinat,
-s.NavlunFirma,
-s.NavlunMekmarNot,
-s.NavlunAlis,
-s.NavlunSatis,
-s.KayitTarihi,
-s.KullaniciID,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.KullaniciID) as KayitYapan,
-s.SiparisDurumID,
-sdt.Durum,
-s.UretimAciklama,
-s.SevkiyatAciklama,
-s.FinansAciklama,
-s.OdemeAciklama,
-s.TahminiYuklemeTarihi,
-s.YuklemeTarihi,
-s.FaturaNo,
-s.SiparisFaturaNo,
-s.Vade,
-s.Ulke,
-s.Komisyon,
-s.DetayAciklama_1,
-s.DetayMekmarNot_1,
-s.DetayTutar_1,
-s.DetayAlis_1,
-s.DetayAciklama_2,
-s.DetayMekmarNot_2,
-s.DetayTutar_2,
-s.DetayAlis_2,
-s.DetayAciklama_3,
-s.DetayMekmarNot_3,
-s.DetayTutar_3,
-s.DetayAlis_3,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as SiparisSahibiAdi,
-s.EvrakGideri,
-s.Eta,
-s.UlkeId,
-ytu.UlkeAdi,
-fst.FaturaAdi,
-s.depo_yukleme,
-s.DetayTutar_4,
-s.DetayAciklama_4,
-s.sigorta_Tutar,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Operasyon) as OperasyonAdi,
-(select k.KullaniciAdi from KullaniciTB k where k.ID = s.Finansman) as FinansmanAdi,
-(select k.MailAdres from KullaniciTB k where k.ID = s.Operasyon) as operationMail,
-(select k.MailAdres from KullaniciTB k where k.ID = s.SiparisSahibi) as representativeMail,
-s.SiparisSahibi,
-s.Operasyon,
-s.Finansman,
-s.Iade,
-s.MalBedeli,
-s.sigorta_tutar_satis,
-s.KonteynerAyrinti,
-s.MayaControl,
-s.FaturaKesimTurID,
-s.KonteynerNo,
-s.KaynakTuru as KaynakTuruID,
-
-	su.ID as UrunId,
-	su.SiparisNo as UrunSiparisNo,
-	su.TedarikciID,
-	t.FirmaAdi as UrunFirmaAdi,
-	su.UrunKartID,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar,
-	su.UrunBirimID,
-	ub.BirimAdi,
-	su.Miktar,
-	su.OzelMiktar,
-	su.KasaAdet,
-	su.SatisFiyati,
-	su.SatisToplam,
-	su.UretimAciklama as UrunUretimAciklama,
-	su.MusteriAciklama as UrunMusteriAciklama,
-	su.AlisFiyati,
-	su.SiraNo,
-	su.Ton,
-	su.Adet,
-    ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
-    dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
-    dbo.Order_Total_Production(su.UrunKartID,su.SiparisNo) as Uretim,
-    dbo.Production_Isf_Document_Control4(su.SiparisNo,su.TedarikciID) as Isf
-
-
-from SiparisUrunTB su
-inner join SiparislerTB s on s.SiparisNo = su.SiparisNo
-inner join TedarikciTB t on t.ID = su.TedarikciID
-inner join UrunBirimTB ub on ub.ID = su.UrunBirimID
-inner join UrunKartTB uk on uk.ID = su.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join OdemeTurTB ot on ot.ID = s.OdemeTurID
-inner join SiparisTeslimTurTB stt on stt.ID = s.TeslimTurID
-inner join MusterilerTB m on m.ID = s.MusteriID
-inner join SiparisDurumTB sdt on sdt.ID = s.SiparisDurumID
-inner join YeniTeklif_UlkeTB ytu on ytu.Id = s.UlkeId
-inner join FaturaKesilmeTB fst on fst.ID = s.FaturaKesimTurID
-
-where s.SiparisDurumID = 3 and m.Marketing in ('Mekmer','İç Piyasa','Imperial Homes')
-    order by s.SiparisTarihi desc,s.SiparisNo desc,su.SiraNo asc
-
-
-
-    `;
-  const orderYearListSql = `
-    select YEAR(s.SiparisTarihi) as Yil from SiparislerTB s
-group by YEAR(s.SiparisTarihi) 
-order by YEAR(s.SiparisTarihi) desc
+const getBaseShippedOrderSql = () => `
+    SELECT 
+        s.ID as SiparisId, s.SiparisNo, s.SiparisTarihi, s.OdemeTurID, ot.OdemeTur, s.TeslimTurID, 
+        stt.TeslimTur, s.MusteriID, m.FirmaAdi, s.Pesinat, s.NavlunFirma, s.NavlunMekmarNot, s.NavlunAlis, s.NavlunSatis, s.KayitTarihi, s.KullaniciID,
+        k1.KullaniciAdi as KayitYapan, 
+        s.SiparisDurumID, sdt.Durum, s.UretimAciklama, s.SevkiyatAciklama, s.FinansAciklama, s.OdemeAciklama, s.TahminiYuklemeTarihi, s.YuklemeTarihi, s.FaturaNo, s.SiparisFaturaNo, s.Vade, s.Ulke, s.Komisyon, s.DetayAciklama_1, s.DetayMekmarNot_1, s.DetayTutar_1, s.DetayAlis_1, s.DetayAciklama_2, s.DetayMekmarNot_2, s.DetayTutar_2, s.DetayAlis_2, s.DetayAciklama_3, s.DetayMekmarNot_3, s.DetayTutar_3, s.DetayAlis_3,
+        k2.KullaniciAdi as SiparisSahibiAdi, 
+        s.EvrakGideri, s.Eta, s.UlkeId, 
+        ytu.UlkeAdi, -- Zaten JOIN ile geliyor
+        fst.FaturaAdi, -- Zaten JOIN ile geliyor
+        s.depo_yukleme, s.DetayTutar_4, s.DetayAciklama_4, s.sigorta_Tutar,
+        k3.KullaniciAdi as OperasyonAdi, 
+        k4.KullaniciAdi as FinansmanAdi, 
+        k3.MailAdres as operationMail, 
+        k2.MailAdres as representativeMail, 
+        s.SiparisSahibi, s.Operasyon, s.Finansman, s.Iade, s.MalBedeli, s.sigorta_tutar_satis, s.KonteynerAyrinti, s.MayaControl, s.FaturaKesimTurID, s.KonteynerNo, s.KaynakTuru as KaynakTuruID,
+        
+        su.ID as UrunId, su.SiparisNo as UrunSiparisNo, su.TedarikciID, t.FirmaAdi as UrunFirmaAdi, su.UrunKartID, k.KategoriAdi, urun.UrunAdi, yk.YuzeyIslemAdi, ol.En, ol.Boy, ol.Kenar, su.UrunBirimID, ub.BirimAdi, su.Miktar, su.OzelMiktar, su.KasaAdet, su.SatisFiyati, su.SatisToplam, su.UretimAciklama as UrunUretimAciklama, su.MusteriAciklama as UrunMusteriAciklama, su.AlisFiyati, su.SiraNo, su.Ton, su.Adet,
+        
+        ('https://file-service.mekmar.com/file/download/2/' + s.SiparisNo) as PI,
+        dbo.Finance_Order_PI_Count(s.SiparisNo) as EvrakDurum,
+        dbo.Order_Total_Production_2(su.UrunKartID,su.SiparisNo,su.TedarikciID) as Uretim,
+        dbo.Production_Isf_Document_Control4(s.SiparisNo,su.TedarikciID) as Isf
+        
+    FROM SiparisUrunTB su
+    INNER JOIN SiparislerTB s ON s.SiparisNo = su.SiparisNo
+    INNER JOIN TedarikciTB t ON t.ID = su.TedarikciID
+    INNER JOIN UrunBirimTB ub ON ub.ID = su.UrunBirimID
+    INNER JOIN UrunKartTB uk ON uk.ID = su.UrunKartID
+    INNER JOIN KategoriTB k ON k.ID = uk.KategoriID
+    INNER JOIN UrunlerTB urun ON urun.ID = uk.UrunID
+    INNER JOIN YuzeyKenarTB yk ON yk.ID = uk.YuzeyID
+    INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
+    INNER JOIN OdemeTurTB ot ON ot.ID = s.OdemeTurID
+    INNER JOIN SiparisTeslimTurTB stt ON stt.ID = s.TeslimTurID
+    INNER JOIN MusterilerTB m ON m.ID = s.MusteriID
+    INNER JOIN SiparisDurumTB sdt ON sdt.ID = s.SiparisDurumID
+    INNER JOIN YeniTeklif_UlkeTB ytu ON ytu.Id = s.UlkeId
+    INNER JOIN FaturaKesilmeTB fst ON fst.ID = s.FaturaKesimTurID
+    LEFT JOIN KullaniciTB k1 ON k1.ID = s.KullaniciID
+    LEFT JOIN KullaniciTB k2 ON k2.ID = s.SiparisSahibi
+    LEFT JOIN KullaniciTB k3 ON k3.ID = s.Operasyon
+    LEFT JOIN KullaniciTB k4 ON k4.ID = s.Finansman
 `;
-  await mssql.query(ordersListSqlMekmer, async (err, ordersMekmer) => {
-    await mssql.query(ordersListSqlMekmar, async (err, ordersMekmar) => {
-      await mssql.query(orderYearListSql, (err, years) => {
-        let customYearList = [];
-        years.recordset.forEach((x) => {
-          customYearList.push(x);
-        });
-        res.status(200).json({
-          list: ordersMekmer.recordset.concat(ordersMekmar.recordset),
-          years: customYearList,
-        });
-      });
+
+app.get("/order/shipped/mekmer2/list", async (req, res) => {
+  try {
+    const request = new mssql.Request();
+
+    const ordersListSqlMekmar =
+      getBaseShippedOrderSql() +
+      `
+      WHERE s.SiparisDurumID = 3 AND su.TedarikciID IN (1,123) AND m.Marketing = 'Mekmar'
+      ORDER BY s.SiparisTarihi DESC, s.SiparisNo DESC, su.SiraNo ASC
+    `;
+
+    const ordersListSqlMekmer =
+      getBaseShippedOrderSql() +
+      `
+      WHERE s.SiparisDurumID = 3 AND m.Marketing IN ('Mekmer','İç Piyasa','Imperial Homes')
+      ORDER BY s.SiparisTarihi DESC, s.SiparisNo DESC, su.SiraNo ASC
+    `;
+
+    const orderYearListSql = `
+      SELECT YEAR(s.SiparisTarihi) as Yil 
+      FROM SiparislerTB s
+      GROUP BY YEAR(s.SiparisTarihi) 
+      ORDER BY YEAR(s.SiparisTarihi) DESC
+    `;
+
+    const [ordersMekmer, ordersMekmar, years] = await Promise.all([
+      request.query(ordersListSqlMekmer),
+      request.query(ordersListSqlMekmar),
+      request.query(orderYearListSql),
+    ]);
+
+    let customYearList = [];
+    if (years && years.recordset) {
+      years.recordset.forEach((x) => customYearList.push(x));
+    }
+
+    let resultList = [];
+    if (ordersMekmer && ordersMekmer.recordset)
+      resultList = resultList.concat(ordersMekmer.recordset);
+    if (ordersMekmar && ordersMekmar.recordset)
+      resultList = resultList.concat(ordersMekmar.recordset);
+
+    res.status(200).json({
+      list: resultList,
+      years: customYearList,
     });
-  });
+  } catch (error) {
+    console.error("/order/shipped/mekmer2/list API Hatası:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Veriler yüklenirken hata oluştu." });
+  }
 });
 
 app.get("/order/shipped/mekmer2/list/:year", async (req, res) => {

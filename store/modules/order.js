@@ -739,10 +739,10 @@ const mutations = {
     state.orderProductionDocumentList.splice(index, 1);
   },
   setOrderList(state, payload) {
-    state.orderList = payload;
+    state.orderList = Object.freeze(payload);
   },
   setOrderListAll(state, payload) {
-    state.orderListAll = payload;
+    state.orderListAll = Object.freeze(payload);
   },
   setOrderProductionButtonStatus(state, payload) {
     state.orderProductionButtonStatus = payload;

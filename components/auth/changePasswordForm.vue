@@ -129,7 +129,6 @@ export default {
     };
   },
   computed: {
-    // Şifre kurallarını anlık kontrol eden alan
     passwordErrors() {
       const errors = [];
       if (!/.{6,}/.test(this.newPassword))
@@ -149,7 +148,6 @@ export default {
     doPasswordsMatch() {
       return this.newPassword === this.confirmPassword;
     },
-    // Tüm kurallar sağlanmazsa butonu pasif bırakır
     canSubmit() {
       return (
         this.code.length === 6 &&
@@ -166,7 +164,6 @@ export default {
     async sendMailCode() {
       this.step_1_loading_button = true;
       try {
-        // Backend'e maili gönderip, SQL'de Aktif mi kontrol ettiriyoruz
         const response = await this.$axios.$post("/forgot-password-init", {
           email: this.email,
         });
@@ -202,7 +199,6 @@ export default {
             "Şifreniz başarıyla değiştirildi! Yeni şifrenizle giriş yapabilirsiniz."
           );
           this.step_2_loading_button = false;
-          // İşlem bitince ana giriş sayfasına veya dashboarda yönlendir
           this.$router.push("/auth");
         } else {
           alert(

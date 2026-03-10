@@ -761,6 +761,7 @@
       columnResizeMode="fit"
       showGridlines
       responsiveLayout="scroll"
+      
     >
       <template #header>
         <div class="flex justify-content-between">

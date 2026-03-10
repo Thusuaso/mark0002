@@ -1,314 +1,321 @@
 <template>
   <div>
-    <DataTable
-      :value="list"
-      rowGroupMode="rowspan"
-      :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
-      :selection.sync="selectedProduction"
-      :selectionMode="userId != 48 ? 'multiple' : ''"
-      @row-click="$emit('production_selected_emit', $event.data)"
-      class="p-datatable-sm"
-      :paginator="true"
-      :rows="25"
-      style="font-size: 70%; border: 2px solid gray; cursor: pointer"
-      filterDisplay="row"
-      :filters.sync="filtersShipped"
-      v-if="status == 'Shipped 2'"
-      sortField="YuklemeTarihi"
-      :sortOrder="-1"
-      :rowClass="rowClass2"
-      @filter="filtersProduction($event)"
-      columnResizeMode="fit"
-      showGridlines
-      responsiveLayout="scroll"
-    >
-      <template #header>
-        <div class="flex justify-content-between">
-          <Calendar
-            v-model="selectedYear"
-            view="year"
-            dateFormat="yy"
-            showIcon
-            @date-select="yearSelected($event)"
-          />
-        </div>
-        Alış Fiyatı - {{ totals | formatPriceUsd }}
-      </template>
-      <Column header="#" headerStyle="width:3rem;font-size:16px;">
-        <template #body="slotProps">
-          {{ slotProps.index + 1 }}
-        </template>
-      </Column>
-      <Column
-        field="YuklemeTarihi"
-        header="Load Date"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
+    <div v-if="!isRendering" class="text-center p-5">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i> Tablo
+      Yükleniyor...
+    </div>
+    <div v-if="isRendering">
+      <DataTable
+        :value="list"
+        rowGroupMode="rowspan"
+        :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
+        :selection.sync="selectedProduction"
+        :selectionMode="userId != 48 ? 'multiple' : ''"
+        @row-click="$emit('production_selected_emit', $event.data)"
+        class="p-datatable-sm"
+        :paginator="true"
+        :rows="25"
+        style="font-size: 70%; border: 2px solid gray; cursor: pointer"
+        filterDisplay="row"
+        :filters.sync="filtersShipped"
+        v-if="status == 'Shipped 2'"
+        sortField="YuklemeTarihi"
+        :sortOrder="-1"
+        :rowClass="rowClass2"
+        @filter="filtersProduction($event)"
+        columnResizeMode="fit"
+        showGridlines
+        responsiveLayout="scroll"
       >
-        <template #body="slotProps">
-          {{ slotProps.data.YuklemeTarihi | dateToString }}
-        </template>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column
-        field="FirmaAdi"
-        header="Customer"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column
-        field="SiparisNo"
-        header="Po"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column
-        field="PI"
-        header="PI"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          <div v-if="slotProps.data.EvrakDurum > 0">
-            <a
-              :href="
-                'https://file-service.mekmar.com/file/download/2/' +
-                slotProps.data.SiparisNo
-              "
-            >
-              <i class="pi pi-download" />
-            </a>
+        <template #header>
+          <div class="flex justify-content-between">
+            <Calendar
+              v-model="selectedYear"
+              view="year"
+              dateFormat="yy"
+              showIcon
+              @date-select="yearSelected($event)"
+            />
           </div>
-          <div v-else>
-            <a>
-              <i class="pi pi-download" />
-            </a>
-          </div>
+          Alış Fiyatı - {{ totals | formatPriceUsd }}
         </template>
-      </Column>
-      <Column
-        field="UrunAdi"
-        header="Product"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column
-        field="UrunUretimAciklama"
-        header="Details"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-      </Column>
-      <Column
-        field="En"
-        header="Width"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
+        <Column header="#" headerStyle="width:3rem;font-size:16px;">
+          <template #body="slotProps">
+            {{ slotProps.index + 1 }}
+          </template>
+        </Column>
+        <Column
+          field="YuklemeTarihi"
+          header="Load Date"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.YuklemeTarihi | dateToString }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="FirmaAdi"
+          header="Customer"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="SiparisNo"
+          header="Po"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="PI"
+          header="PI"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            <div v-if="slotProps.data.EvrakDurum > 0">
+              <a
+                :href="
+                  'https://file-service.mekmar.com/file/download/2/' +
+                  slotProps.data.SiparisNo
+                "
+              >
+                <i class="pi pi-download" />
+              </a>
+            </div>
+            <div v-else>
+              <a>
+                <i class="pi pi-download" />
+              </a>
+            </div>
+          </template>
+        </Column>
+        <Column
+          field="UrunAdi"
+          header="Product"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="UrunUretimAciklama"
+          header="Details"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+        </Column>
+        <Column
+          field="En"
+          header="Width"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
 
-      <Column
-        field="Boy"
-        header="Height"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column
-        field="Kenar"
-        header="Thickness"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column
-        field="UrunFirmaAdi"
-        header="Supplier"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-      </Column>
-      <Column
-        field="Miktar"
-        header="Amount"
-        :showFilterMenu="false"
-        :showClearButton="false"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          {{ slotProps.data.Miktar | formatDecimal }}
-        </template>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-          />
-        </template>
-        <template #footer>
-          {{ totalamount | formatDecimal }}
-        </template>
-      </Column>
-      <Column
-        field="BirimAdi"
-        header="Unit"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          {{ slotProps.data.BirimAdi }}
-        </template>
-      </Column>
-      <Column
-        field="Ton"
-        header="Ton"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          {{ slotProps.data.Ton | formatDecimal }}
-        </template>
-        <template #footer>
-          {{ totalton | formatDecimal }}
-        </template>
-      </Column>
-      <Column
-        field="SatisFiyati"
-        header="Price (Selling)"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          {{ slotProps.data.SatisFiyati | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column
-        header="Total (Selling)"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          {{
-            (slotProps.data.SatisFiyati * slotProps.data.Miktar)
-              | formatPriceUsd
-          }}
-        </template>
-        <template #footer>
-          {{ totalsPurchase | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column
-        field="AlisFiyati"
-        header="Price (Puchase)"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          {{ slotProps.data.AlisFiyati | formatPriceUsd }}
-        </template>
-        <template #footer>
-          {{ totalbuying | formatPriceUsd }}
-        </template>
-      </Column>
-      <Column
-        header="Total (Puchase)"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      >
-        <template #body="slotProps">
-          {{
-            (slotProps.data.AlisFiyati * slotProps.data.Miktar) | formatPriceUsd
-          }}
-        </template>
-        <template #footer>
-          {{ totals | formatPriceUsd }}
-        </template>
-      </Column>
-    </DataTable>
+        <Column
+          field="Boy"
+          header="Height"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Kenar"
+          header="Thickness"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="UrunFirmaAdi"
+          header="Supplier"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Miktar"
+          header="Amount"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Miktar | formatDecimal }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              class="p-column-filter"
+            />
+          </template>
+          <template #footer>
+            {{ totalamount | formatDecimal }}
+          </template>
+        </Column>
+        <Column
+          field="BirimAdi"
+          header="Unit"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.BirimAdi }}
+          </template>
+        </Column>
+        <Column
+          field="Ton"
+          header="Ton"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Ton | formatDecimal }}
+          </template>
+          <template #footer>
+            {{ totalton | formatDecimal }}
+          </template>
+        </Column>
+        <Column
+          field="SatisFiyati"
+          header="Price (Selling)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.SatisFiyati | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          header="Total (Selling)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{
+              (slotProps.data.SatisFiyati * slotProps.data.Miktar)
+                | formatPriceUsd
+            }}
+          </template>
+          <template #footer>
+            {{ totalsPurchase | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          field="AlisFiyati"
+          header="Price (Puchase)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.AlisFiyati | formatPriceUsd }}
+          </template>
+          <template #footer>
+            {{ totalbuying | formatPriceUsd }}
+          </template>
+        </Column>
+        <Column
+          header="Total (Puchase)"
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{
+              (slotProps.data.AlisFiyati * slotProps.data.Miktar)
+                | formatPriceUsd
+            }}
+          </template>
+          <template #footer>
+            {{ totals | formatPriceUsd }}
+          </template>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 <script>
@@ -331,6 +338,7 @@ export default {
   },
   data() {
     return {
+      isRendering: true,
       selectedYear: null,
       totalbuying: 0,
       totalton: 0,
@@ -655,6 +663,11 @@ export default {
         vm.className = "colorChange";
       }
     },
+  },
+  mounted() {
+    setTimeout(() => {
+      this.isRendering = true;
+    }, 150);
   },
 };
 </script>

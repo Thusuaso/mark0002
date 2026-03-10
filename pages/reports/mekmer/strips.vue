@@ -1696,7 +1696,6 @@ export default {
             this.__created();
             this.reset();
             this.new_button_status_moloz = false;
-            this.cost_supplier_dialog_moloz = false;
             this.$toast.success("Kayıt Başarılı.");
           } else {
             this.$toast.error("Kayıt Başarısız.");
