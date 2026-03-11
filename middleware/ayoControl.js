@@ -20,7 +20,8 @@ export default function (context) {
       context.$cookie.get("userId") == 47 ||
       context.$cookie.get("userId") == 13 ||
       context.$cookie.get("userId") == 57 ||
-      context.$cookie.get("userId") == 58
+      context.$cookie.get("userId") == 58 ||
+      context.$cookie.get("userId") == 19
     ) {
       context.store.dispatch("setAyoControlStatus", true);
     } else {
