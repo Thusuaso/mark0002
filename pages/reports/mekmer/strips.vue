@@ -1695,7 +1695,7 @@ export default {
           if (res.status) {
             this.__created();
             this.reset();
-            this.new_button_status_moloz = false;
+            this.new_button_status_moloz = true;
             this.$toast.success("Kayıt Başarılı.");
           } else {
             this.$toast.error("Kayıt Başarısız.");
