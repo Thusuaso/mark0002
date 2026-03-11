@@ -9,6 +9,7 @@
       :selection="selectedTransport"
       selectionMode="single"
       @row-click="transportSelected($event)"
+      @filter="filteredValue($event)"
     >
       <Column
         field="Tarih"
@@ -85,6 +86,9 @@
         <template #body="slotProps">
           {{ (slotProps.data.Tutar * slotProps.data.Kur) | formatPriceTl }}
         </template>
+        <template #footer>
+          {{ total.tl | formatPriceTl }}
+        </template>
       </Column>
       <Column
         field="Kur"
@@ -99,6 +103,9 @@
       <Column header="$" headerClass="tableHeader" bodyClass="tableBody">
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
+        </template>
+        <template #footer>
+          {{ total.usd | formatPriceUsd }}
         </template>
       </Column>
       <Column
@@ -124,7 +131,6 @@ export default {
       type: Array,
       required: false,
     },
-
   },
   data() {
     return {
@@ -134,13 +140,30 @@ export default {
         firma_adi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         FaturaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
-      selectedTransport:null,
+      selectedTransport: null,
+      total: {
+        tl: 0,
+        usd: 0,
+      },
     };
   },
   methods: {
     transportSelected(event) {
-      this.$emit('selected_transport_emit', event.data);
-    }
-  }
+      this.$emit("selected_transport_emit", event.data);
+    },
+    calculateSum(event) {
+      this.total = {
+        tl: 0,
+        usd: 0,
+      };
+      event.forEach((item) => {
+        this.total.tl += item.Tutar * item.Kur;
+        this.total.usd += item.Tutar;
+      });
+    },
+    filteredValue(event) {
+      this.calculateSum(event.filteredValue);
+    },
+  },
 };
 </script>

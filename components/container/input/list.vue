@@ -6,6 +6,7 @@
       :rows="15"
       :filters.sync="filters1"
       filterDisplay="row"
+      @filter="filteredContainer($event)"
     >
       <Column
         field="EvrakYuklemeTarihi"
@@ -105,14 +106,30 @@
           {{ slotProps.data.Kur | formatPriceTl }}
         </template>
       </Column>
-      <Column field="Tutar" header="$" headerClass="tableHeader" bodyClass="tableBody">
+      <Column
+        field="Tutar"
+        header="$"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ slotProps.data.Tutar | formatPriceUsd }}
         </template>
+        <template #footer>
+          {{ total.usd | formatPriceUsd }}
+        </template>
       </Column>
-      <Column field="Tutar" header="₺" headerClass="tableHeader" bodyClass="tableBody">
+      <Column
+        field="Tutar"
+        header="₺"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           {{ (slotProps.data.Tutar * slotProps.data.Kur) | formatPriceTl }}
+        </template>
+        <template #footer>
+          {{ total.tl | formatPriceUsd }}
         </template>
       </Column>
       <Column
@@ -121,7 +138,12 @@
         headerClass="tableHeader"
         bodyClass="tableBody"
       ></Column>
-      <Column field="Link" header="Link" headerClass="tableHeader" bodyClass="tableBody">
+      <Column
+        field="Link"
+        header="Link"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
         <template #body="slotProps">
           <a :href="slotProps.data.Link">
             <i class="pi pi-download" style="font-size: 1rem"></i>
@@ -139,18 +161,37 @@ export default {
       type: Array,
       required: false,
     },
-
   },
   data() {
     return {
+      total: {
+        tl: 0,
+        usd: 0,
+      },
       filters1: {
-        EvrakYuklemeTarihi: { value: null, matchmode: FilterMatchMode.STARTS_WITH },
+        EvrakYuklemeTarihi: {
+          value: null,
+          matchmode: FilterMatchMode.STARTS_WITH,
+        },
         firma: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         FaturaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Tur: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
     };
+  },
+  methods: {
+    calculateSum(event) {
+      this.total.tl = 0;
+      this.total.usd = 0;
+      event.forEach((item) => {
+        this.total.tl += item.Tutar * item.Kur;
+        this.total.usd += item.Tutar;
+      });
+    },
+    filteredContainer(event) {
+      this.calculateSum(event.filteredValue);
+    },
   },
 };
 </script>
