@@ -147,6 +147,8 @@ import currency from "~/components/tcmb/currency";
 import calculatingCostForm from "~/components/reports/mekmer/calculatingCost/form";
 import calculatingCost from "~/components/reports/mekmer/calculatingCost/cost";
 import changePasswordForm from "~/components/auth/changePasswordForm";
+import mekmarCostForm from "~/components/cost/form";
+Vue.component("mekmarCostForm", mekmarCostForm);
 Vue.component("changePasswordForm", changePasswordForm);
 
 Vue.component("calculatingCost", calculatingCost);

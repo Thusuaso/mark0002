@@ -297,7 +297,9 @@ export default {
       this.$store.dispatch("setOfferAListTotal", event.filteredValue);
     },
     offerClass(event) {
-      return event.TeklifOncelik == "Toplantı" ? "yellow" : "";
+      const color = event.TeklifOncelik == "Toplantı" ? "yellow" : "";
+      const color_2 = event.TeklifOncelik == "D" ? "green" : "";
+      return [color, color_2];
     },
   },
 };
@@ -305,6 +307,10 @@ export default {
 <style scoped>
 :deep(.yellow) {
   background-color: rgb(242, 255, 0) !important;
+  border: 1px solid gray;
+}
+:deep(.green) {
+  background-color: rgb(155, 213, 177) !important;
   border: 1px solid gray;
 }
 </style>

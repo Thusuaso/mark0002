@@ -7204,6 +7204,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
+            x.TeklifOncelik == 'D' ||
             x.TeklifOncelik == "Toplantı")
       );
       // const _h_t = results.recordset.filter(x=>(x.KullaniciId == 44 && x.TeklifOncelik == 'Toplantı'));
@@ -7213,6 +7214,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
+            x.TeklifOncelik == "D" ||
             x.TeklifOncelik == "Toplantı")
       );
       // const _o_t = results.recordset.filter(x=>(x.KullaniciId == 19 && x.TeklifOncelik == 'Toplantı'));
@@ -7222,6 +7224,7 @@ order by yt.TeklifOncelik,yt.Sira
           x.TeklifOncelik == "A" ||
           x.TeklifOncelik == "B" ||
           x.TeklifOncelik == "C" ||
+          x.TeklifOncelik == "D" ||
           x.TeklifOncelik == "Toplantı"
       );
 
@@ -7231,6 +7234,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
+            x.TeklifOncelik == "D" ||
             x.TeklifOncelik == "Toplantı")
       );
       const o_b = bList.recordset.filter(
@@ -7239,6 +7243,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
+            x.TeklifOncelik == "D" ||
             x.TeklifOncelik == "Toplantı")
       );
       const b_list = bList.recordset.filter(
@@ -7246,6 +7251,7 @@ order by yt.TeklifOncelik,yt.Sira
           x.TeklifOncelik == "A" ||
           x.TeklifOncelik == "B" ||
           x.TeklifOncelik == "C" ||
+          x.TeklifOncelik == "D" ||
           x.TeklifOncelik == "Toplantı"
       );
 
@@ -19157,6 +19163,86 @@ group by MONTH(Tarih)
     current_stock: current_stock_data,
     mekmer_shipped: mekmer_shipped_data,
   });
+});
+
+app.get("/reports/mekmar/cost/control/list", async (req, res) => {
+  try {
+    const listSql = `select mc.ID,mc.Po,mc.Freight,mc.Logistic,mc.Custom,mc.Fumigation,mc.Port,mc.Insurance,mc.Lashing,mc.Spanzlet from MekmarCostControlTB mc`;
+
+    const poSql = `
+        select s.SiparisNo,s.SiparisTarihi,s.YuklemeTarihi from SiparislerTB s
+        inner join MusterilerTB m on m.ID = s.MusteriID
+        where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar'
+        order by s.SiparisTarihi desc
+    `;
+
+    const productSql = `
+      select 
+        s.SiparisNo,s.SiparisTarihi,s.YuklemeTarihi,su.TedarikciID,t.FirmaAdi
+      from SiparislerTB s
+      inner join MusterilerTB m on m.ID = s.MusteriID
+      inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+      inner join TedarikciTB t on t.ID = su.TedarikciID
+      where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar'
+      order by s.SiparisTarihi desc
+    `;
+
+    const [listResult, poResult, productResult] = await Promise.all([
+      mssql.query(listSql),
+      mssql.query(poSql),
+      mssql.query(productSql),
+    ]);
+
+    res.status(200).json({
+      status: true,
+      data: {
+        list: listResult.recordset,
+        po: poResult.recordset,
+        product: productResult.recordset,
+      },
+    });
+  } catch (err) {
+    console.error("[Mekmar Cost Control API Error]:", err);
+    res.status(500).json({
+      status: false,
+      message: "An error occurred while fetching data.",
+    });
+  }
+});
+
+app.post("/reports/mekmar/cost/control/save", async (req, res) => {
+  const {
+    Po,
+    Logistic,
+    Custom,
+    Fumigation,
+    Port,
+    Insurance,
+    Lashing,
+    Spanzlet,
+    Freight,
+  } = await req.body;
+  const sql = `
+    insert into MekmarCostControlTB(Po,Logistic,Custom,Fumigation,Port,Insurance,Lashing,Spanzlet,Freight)
+
+VALUES(@po,@logistic,@custom,@fumigation,@port,@insurance,@lashing,@spanzlet,@freight)
+  `;
+  const request = new mssql.Request();
+  request.input("po", mssql.VarChar, Po);
+  request.input("logistic", mssql.Bit, Logistic);
+  request.input("custom", mssql.Bit, Custom);
+  request.input("fumigation", mssql.Bit, Fumigation);
+  request.input("port", mssql.Bit, Port);
+  request.input("insurance", mssql.Bit, Insurance);
+  request.input("lashing", mssql.Bit, Lashing);
+  request.input("spanzlet", mssql.Bit, Spanzlet);
+  request.input("freight", mssql.Bit, Freight);
+  try {
+    await request.query(sql);
+    res.status(200).json({ status: true });
+  } catch (err) {
+    res.status(501).json({ status: false });
+  }
 });
 
 module.exports = {

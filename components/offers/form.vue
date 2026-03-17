@@ -618,6 +618,8 @@ export default {
         { id: 1, priority: "A" },
         { id: 2, priority: "B" },
         { id: 3, priority: "C" },
+        { id: 5, priority: "D" },
+
         { id: 4, priority: "Toplantı" },
       ],
       selectedCustomer: null,
@@ -1066,47 +1068,47 @@ export default {
       ) {
         this.$toast.error("Please select a unit.");
         return;
-      };
-            if (
+      }
+      if (
         this.selectedSurface == null ||
         this.selectedSurface == undefined ||
         this.selectedSurface == ""
       ) {
         this.$toast.error("Please select a surface.");
         return;
-      };
-                  if (
+      }
+      if (
         this.selectedThickness == null ||
         this.selectedThickness == undefined ||
         this.selectedThickness == ""
       ) {
         this.$toast.error("Please select a thickness.");
         return;
-      };
-                        if (
+      }
+      if (
         this.selectedSize == null ||
         this.selectedSize == undefined ||
         this.selectedSize == ""
       ) {
         this.$toast.error("Please select a size.");
         return;
-      };
-                              if (
+      }
+      if (
         this.selectedProduct == null ||
         this.selectedProduct == undefined ||
         this.selectedProduct == ""
       ) {
         this.$toast.error("Please select a product.");
         return;
-      };
-                                    if (
+      }
+      if (
         this.selectedCategory == null ||
         this.selectedCategory == undefined ||
         this.selectedCategory == ""
       ) {
         this.$toast.error("Please select a category.");
         return;
-      };
+      }
       const date = new Date();
       const year = date.getFullYear();
       const month = this.__zeroControl(date.getMonth() + 1);
