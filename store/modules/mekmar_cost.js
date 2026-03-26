@@ -14,6 +14,7 @@ const state = () => ({
     Spanzlet: false,
     Freight: false,
   },
+  supplier: [],
 });
 
 const actions = {
@@ -30,6 +31,7 @@ const mutations = {
     state.list = payload.list || [];
     state.po = payload.po || [];
     state.product = payload.product || [];
+    state.supplier = payload.supplier || [];
   },
   setMekmarCostModelCommit(state, payload) {
     state.model = { ...state.model, ...payload };
@@ -48,6 +50,9 @@ const getters = {
   },
   getMekmarCostModel: (state) => {
     return state.model;
+  },
+  getMekmarSupplier: (state) => {
+    return state.supplier;
   },
 };
 

@@ -403,12 +403,20 @@
                     >Shipped Crates</nuxt-link
                   >
                 </li>
-                <li v-show="getAuthorityStatus">
+                <li>
                   <nuxt-link
                     to="/reports/mekmer/strips"
                     class="dropdown-item"
                     tag="a"
                     >Stripler</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link
+                    to="/reports/mekmer/calculating-cost"
+                    tag="a"
+                    class="dropdown-item"
+                    >Muhasebe</nuxt-link
                   >
                 </li>
               </ul>

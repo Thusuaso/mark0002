@@ -148,6 +148,9 @@ import calculatingCostForm from "~/components/reports/mekmer/calculatingCost/for
 import calculatingCost from "~/components/reports/mekmer/calculatingCost/cost";
 import changePasswordForm from "~/components/auth/changePasswordForm";
 import mekmarCostForm from "~/components/cost/form";
+import mekmarCostList from "~/components/cost/list";
+Vue.component("mekmarCostList", mekmarCostList);
+
 Vue.component("mekmarCostForm", mekmarCostForm);
 Vue.component("changePasswordForm", changePasswordForm);
 

@@ -7204,7 +7204,7 @@ order by yt.TeklifOncelik,yt.Sira
           (x.TeklifOncelik == "A" ||
             x.TeklifOncelik == "B" ||
             x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == 'D' ||
+            x.TeklifOncelik == "D" ||
             x.TeklifOncelik == "Toplantı")
       );
       // const _h_t = results.recordset.filter(x=>(x.KullaniciId == 44 && x.TeklifOncelik == 'Toplantı'));
@@ -19167,7 +19167,11 @@ group by MONTH(Tarih)
 
 app.get("/reports/mekmar/cost/control/list", async (req, res) => {
   try {
-    const listSql = `select mc.ID,mc.Po,mc.Freight,mc.Logistic,mc.Custom,mc.Fumigation,mc.Port,mc.Insurance,mc.Lashing,mc.Spanzlet from MekmarCostControlTB mc`;
+    const listSql = `
+      select t.FirmaAdi,mc.ID,mc.Po,mc.Freight,mc.Logistic,mc.Custom,mc.Fumigation,mc.Port,mc.Insurance,mc.Lashing,mc.Spanzlet,ms.SupplierId,ms.Invoice from MekmarCostControlTB mc
+inner join MekmarCostControlSupplierTB ms on ms.Po = mc.Po
+inner join TedarikciTB t on t.ID = ms.SupplierId
+    `;
 
     const poSql = `
         select s.SiparisNo,s.SiparisTarihi,s.YuklemeTarihi from SiparislerTB s
@@ -19178,20 +19182,28 @@ app.get("/reports/mekmar/cost/control/list", async (req, res) => {
 
     const productSql = `
       select 
-        s.SiparisNo,s.SiparisTarihi,s.YuklemeTarihi,su.TedarikciID,t.FirmaAdi
+        s.SiparisNo,su.TedarikciID,t.FirmaAdi,s.SiparisTarihi
       from SiparislerTB s
       inner join MusterilerTB m on m.ID = s.MusteriID
       inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
       inner join TedarikciTB t on t.ID = su.TedarikciID
-      where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar'
+      where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar' and TedarikciID != 32
+	  group by s.SiparisNo,t.FirmaAdi,su.TedarikciID,s.SiparisTarihi
       order by s.SiparisTarihi desc
+
+    `;
+    const costSupplierSql = `
+      select mcc.ID,mcc.Po,mcc.SupplierId,mcc.Invoice,t.FirmaAdi from MekmarCostControlSupplierTB mcc
+inner join TedarikciTB t on t.ID = mcc.SupplierId
     `;
 
-    const [listResult, poResult, productResult] = await Promise.all([
-      mssql.query(listSql),
-      mssql.query(poSql),
-      mssql.query(productSql),
-    ]);
+    const [listResult, poResult, productResult, costSupplierResult] =
+      await Promise.all([
+        mssql.query(listSql),
+        mssql.query(poSql),
+        mssql.query(productSql),
+        mssql.query(costSupplierSql),
+      ]);
 
     res.status(200).json({
       status: true,
@@ -19199,6 +19211,7 @@ app.get("/reports/mekmar/cost/control/list", async (req, res) => {
         list: listResult.recordset,
         po: poResult.recordset,
         product: productResult.recordset,
+        supplier: costSupplierResult.recordset,
       },
     });
   } catch (err) {
@@ -19239,11 +19252,57 @@ VALUES(@po,@logistic,@custom,@fumigation,@port,@insurance,@lashing,@spanzlet,@fr
   request.input("freight", mssql.Bit, Freight);
   try {
     await request.query(sql);
-    res.status(200).json({ status: true });
+    res.status(200).json({ status: true, message: "Success" });
   } catch (err) {
-    res.status(501).json({ status: false });
+    res.status(501).json({
+      status: false,
+      message: "An error occurred while fetching data.",
+    });
   }
 });
+
+app.put("/reports/mekmar/cost/control/update", async (req, res) => {});
+
+app.post("/reports/mekmar/cost/control/product/save", async (req, res) => {
+  try {
+    const body = req.body;
+    console.log(
+      `[API ÇAĞRILDI] PO: ${body.Po}, Gelen Veri Sayısı: ${body.data.length}`
+    );
+    const sql = `
+      INSERT INTO MekmarCostControlSupplierTB (Po, SupplierId, Invoice)
+      VALUES (@po, @supplier, @invoice)
+    `;
+
+    for (const item of body.data) {
+      const request = new mssql.Request();
+
+      request.input("po", mssql.VarChar, body.Po);
+      request.input("supplier", mssql.Int, item.TedarikciID);
+      request.input("invoice", mssql.Bit, item.Invoice);
+
+      await request.query(sql);
+    }
+
+    res.status(200).json({ status: true, message: "Success" });
+  } catch (err) {
+    console.error("[Save Error]:", err);
+    res.status(500).json({
+      status: false,
+      message: "An error occurred while saving data.",
+    });
+  }
+});
+
+app.put("/reports/mekmar/cost/control/product/update", async (req, res) => {});
+
+// app.put("/selection/input/bulk/edit", async (req, res) => {
+//   const { Po, ProductId } = await req.body;
+//   const request = new mssql.Request();
+//   const sql = `update UretimTB set SiparisAciklama='@po' where KasaNo='@kasaNo'`;
+//   request.input("po", mssql.VarChar, Po);
+//   request.input("productId", mssql.Int, ProductId);
+// });
 
 module.exports = {
   path: "/api",

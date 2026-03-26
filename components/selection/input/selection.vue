@@ -72,9 +72,15 @@
     <div class="col-1">
       <Button
         type="button"
-        class="p-button-success w-100"
+        class="p-button-success w-100 mb-2"
         label="New"
         @click="newForm"
+      />
+      <Button
+        type="button"
+        class="p-button-secondary w-100"
+        label="Bulk Edit"
+        @click="add_bulk_crate_dialog_status = !add_bulk_crate_dialog_status"
       />
     </div>
     <div class="col-1">
@@ -104,93 +110,6 @@
       />
     </div>
     <div class="col-1">
-      <!-- <JsonExcel
-        class="btn w-100"
-        :data="getProductList"
-        :fields="selectionListExcelFields"
-        worksheet="Seleksiyon"
-        name="seleksiyon.xls"
-      >
-        <Button
-          type="button"
-          class="p-button-info w-100"
-          icon="pi pi-file-excel"
-          label="Seleksiyon"
-        />
-      </JsonExcel> -->
-      <!-- <Button
-        type="button"
-        class="p-button-info w-100"
-        icon="pi pi-file-excel"
-        label="Excel"
-        @click="download"
-      />
-      <div>
-        <vue-excel-editor v-model="getProductList" ref="download">
-          <vue-excel-column field="KasaNo" label="Kasa No" type="string" width="80px" />
-          <vue-excel-column
-            field="OcakAdi"
-            label="Ocak Adı"
-            type="string"
-            width="150px"
-          />
-          <vue-excel-column
-            field="FirmaAdi"
-            label="Firma Adı"
-            type="string"
-            width="150px"
-          />
-          <vue-excel-column
-            field="KategoriAdi"
-            label="Kategori Adı"
-            type="string"
-            width="150px"
-          />
-          <vue-excel-column field="UrunAdi" label="Ürün" type="string" width="150px" />
-          <vue-excel-column
-            field="YuzeyIslemAdi"
-            label="Yüzey"
-            type="string"
-            width="150px"
-          />
-          <vue-excel-column field="En" label="En" type="string" width="150px" />
-          <vue-excel-column field="Boy" label="Boy" type="string" width="150px" />
-          <vue-excel-column field="Kenar" label="Kenar" type="string" width="150px" />
-          <vue-excel-column
-            field="KutuAdet"
-            label="Kutu Adet"
-            type="string"
-            width="150px"
-          />
-          <vue-excel-column
-            field="KutuIciAdet"
-            label="Kutu İçi Adet"
-            type="string"
-            width="150px"
-          />
-          <vue-excel-column field="Adet" label="Adet" type="string" width="150px" />
-          <vue-excel-column
-            field="UrunBirimAdi"
-            label="Birim"
-            type="number"
-            width="150px"
-          />
-          <vue-excel-column field="Miktar" label="Miktar" type="number" width="130px" />
-          <vue-excel-column
-            field="SiparisAciklama"
-            label="Po"
-            type="string"
-            width="150px"
-          />
-          <vue-excel-column
-            field="Aciklama"
-            label="Açıklama"
-            type="string"
-            width="150px"
-          />
-        </vue-excel-editor>
-      </div> -->
-
       <Button
         class="p-button-secondary"
         type="button"
@@ -198,10 +117,7 @@
         @click="selection_click_excel"
         :disabled="selection_orders_disabled"
       />
-      <!-- <vue-excel-xlsx :data="getProductList" :columns="excelColumnsField" :file-name="'Seleksiyon'" :file-type="'xlsx'"
-        :sheet-name="'sheetname'" style="border: none; background-color: white">
-        <Button type="button" class="p-button-info w-100" icon="pi pi-file-excel" label="Excel" />
-      </vue-excel-xlsx> -->
+
       <br />
 
       <Dropdown
@@ -262,16 +178,7 @@
           />
         </div>
       </div>
-      <!-- <div class="row">
-        <div class="col-6">
-          <Dropdown v-model="selectedNovaBox" :options="etiketlerNovaKutu" optionLabel="urun" placeholder="Nova Box" class="w-100 mb-2" @change="isDropDownChange($event)" />
 
-        </div>
-        <div class="col-6">
-          <Dropdown v-model="selectedNovaCrate" :options="etiketlerNovaKasa" optionLabel="urun" placeholder="Nova Crate" class="w-100 mb-2" @change="isDropDownChange($event)" />
-
-        </div>
-      </div> -->
       <div class="row">
         <div class="col">
           <a
@@ -284,11 +191,287 @@
         </div>
       </div>
     </div>
+    <Dialog
+      :visible.sync="add_bulk_crate_dialog_status"
+      modal
+      header="Bulk Edit"
+    >
+      <Button
+        type="button"
+        label="Change"
+        class="p-button-success w-100"
+        @click="update"
+      />
+      <DataTable
+        :selection.sync="selectedBulkProducts"
+        :value="getProductList"
+        dataKey="KasaNo"
+        tableStyle="min-width: 50rem"
+        :filters.sync="filters2"
+        filterDisplay="row"
+        columnResizeMode="fit"
+        showGridlines
+        responsiveLayout="scroll"
+        paginator
+        :rows="10"
+      >
+        <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+        <Column
+          field="KasaNo"
+          header="Crate No"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Tarih"
+          header="Date"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+          headerClass="tableHeader"
+          bodyClass="tableBody"
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Tarih | dateToString }}
+          </template>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 80px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="KategoriAdi"
+          header="Category"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 80px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="OcakAdi"
+          header="Quarry"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 80px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="UrunAdi"
+          header="Product"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 80px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="YuzeyIslemAdi"
+          header="Surface"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 80px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="En"
+          header="Width"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Boy"
+          header="Height"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Kenar"
+          header="Thickness"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Adet"
+          header="Pcs in Box"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="KutuAdet"
+          header="Box Amount"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Miktar"
+          header="Amount"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #body="slotProps">
+            {{ slotProps.data.Miktar | formatDecimal }}
+          </template>
+
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 50px"
+            />
+          </template>
+        </Column>
+
+        <Column
+          field="SiparisAciklama"
+          header="Po"
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 80px"
+            />
+          </template>
+        </Column>
+        <Column
+          field="Aciklama"
+          header="Expl."
+          :showFilterMenu="false"
+          :showClearButton="false"
+          sortable
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText
+              type="text"
+              v-model="filterModel.value"
+              @input="filterCallback()"
+              class="p-column-filter"
+              style="width: 80px"
+            />
+          </template>
+        </Column>
+      </DataTable>
+    </Dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import { FilterMatchMode } from "primevue/api";
+
 export default {
   computed: {
     ...mapGetters([
@@ -306,6 +489,28 @@ export default {
   },
   data() {
     return {
+      filters2: {
+        KasaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KategoriAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        OcakAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        YuzeyIslemAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        SiparisAciklama: {
+          value: null,
+          matchMode: FilterMatchMode.STARTS_WITH,
+        },
+        Aciklama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
+        Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        KutuAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      },
+      selectedBulkProducts: [],
+      add_bulk_crate_dialog_status: false,
       selection_orders_disabled: true,
       boxCrateTicket: null,
       code: null,
@@ -634,6 +839,17 @@ export default {
     });
   },
   methods: {
+    async update() {
+      try {
+        await this.$axios.put("/selection/input/bulk/edit");
+        this.selectedBulkProducts = [];
+        this.add_bulk_crate_dialog_status = false;
+        this.$store.dispatch("setOrderProductionMekmerList");
+        this.$toast.success("Success");
+      } catch (err) {
+        this.$toast.error("Error");
+      }
+    },
     ticket_click_excel() {
       this.$excelApi
         .post("/seleksiyon/etiket/excel", this.getFilteredSelectionList)

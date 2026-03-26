@@ -10,6 +10,8 @@
         />
       </div>
     </div>
+    <mekmarCostList @cost_selected_emit="costSelected($event)" />
+
     <Dialog
       :visible.sync="cost_control_visible"
       :header="cost_control_header"
@@ -21,11 +23,7 @@
 </template>
 
 <script>
-// Eğer Nuxt auto-import aktif değilse bileşeni manuel eklemeniz gerekir:
-// import mekmarCostForm from '@/components/mekmarCostForm.vue';
-
 export default {
-  // components: { mekmarCostForm },
   data() {
     return {
       cost_control_visible: false,
@@ -34,6 +32,12 @@ export default {
     };
   },
   methods: {
+    costSelected(event) {
+      this.$store.dispatch("setMekmarCostModel", event);
+      this.cost_control_visible = true;
+      this.status = false;
+      this.cost_control_header = "Update Cost Control";
+    },
     newForm() {
       const model = {
         ID: 0,

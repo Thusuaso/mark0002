@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    {{ supplierChecked }}
     <table class="table">
       <thead>
         <tr>
@@ -59,6 +58,7 @@
         </tr>
       </tbody>
     </table>
+    {{ productList }}
     <table class="table" v-show="productList.length > 0">
       <thead>
         <tr>
@@ -108,6 +108,7 @@ export default {
       "getMekmarCostModel",
       "getMekmarPoList",
       "getMekmarProductList",
+      "getMekmarSupplier",
     ]),
   },
   data() {
@@ -119,8 +120,50 @@ export default {
     };
   },
   methods: {
-    save() {},
-    update() {},
+    async save() {
+      const response = await this.$axios.post(
+        "/reports/mekmar/cost/control/save",
+        this.getMekmarCostModel
+      );
+      if (response.data.status) {
+        this.$toast.success(response.data.message);
+      } else {
+        this.$toast.error(response.data.message);
+      }
+      if (this.supplierChecked.length > 0) {
+        const response_2 = await this.$axios.post(
+          "/reports/mekmar/cost/control/product/save",
+          { data: this.supplierChecked, Po: this.getMekmarCostModel.Po }
+        );
+        if (response_2.data.status) {
+          this.$toast.success(response_2.data.message);
+        } else {
+          this.$toast.error(response_2.data.message);
+        }
+      }
+    },
+    async update() {
+      const response = await this.$axios.put(
+        "/reports/mekmar/cost/control/update",
+        this.getMekmarCostModel
+      );
+      if (response.data.status) {
+        this.$toast.success(response.data.message);
+      } else {
+        this.$toast.error(response.data.message);
+      }
+      if (this.supplierChecked.length > 0) {
+        const response_2 = await this.$axios.put(
+          "/reports/mekmar/cost/control/product/save",
+          { data: this.supplierChecked, Po: this.getMekmarCostModel.Po }
+        );
+        if (response_2.data.status) {
+          this.$toast.success(response_2.data.message);
+        } else {
+          this.$toast.error(response_2.data.message);
+        }
+      }
+    },
     process() {
       if (this.status) {
         this.save();
@@ -153,6 +196,20 @@ export default {
         index++;
       });
       this.supplierChecked = [];
+
+      this.productList = customProductList;
+    },
+    changeSupplierChecked(event) {
+      if (event.Invoice) {
+        this.supplierChecked.push(event);
+      } else {
+        const index = this.supplierChecked.indexOf((x) => {
+          return x.TedarikciID === event.TedarikciID;
+        });
+        this.supplierChecked.splice(index, 1);
+      }
+    },
+    reset() {
       const model = {
         ID: 0,
         Po: "",
@@ -166,20 +223,37 @@ export default {
         Freight: false,
       };
       this.$store.dispatch("setMekmarCostModel", model);
-      this.productList = customProductList;
-    },
-    changeSupplierChecked(event) {
-      if (event.Invoice) {
-        this.supplierChecked.push(event);
-      } else {
-        const index = this.supplierChecked.indexOf((x) => {
-          return x.TedarikciID === event.TedarikciID;
-        });
-        this.supplierChecked.splice(index, 1);
-      }
     },
   },
-  created() {},
+  created() {
+    if (!this.status) {
+      this.selectedPo = this.getMekmarCostModel.Po;
+      this.productList = this.getMekmarProductList.filter((x) => {
+        return x.SiparisNo === this.getMekmarCostModel.Po;
+      });
+      const supplierMap = new Map();
+
+      for (const supplier of this.getMekmarSupplier) {
+        const key = `${supplier.Po}_${supplier.TedarikciID}`;
+        supplierMap.set(key, !!supplier.Invoice);
+      }
+
+      const optimizedData = [];
+
+      for (const product of this.productList) {
+        const key = `${product.SiparisNo}_${product.ID}`;
+
+        if (supplierMap.has(key)) {
+          optimizedData.push({
+            ...product,
+            Invoice: supplierMap.get(key),
+          });
+        }
+      }
+
+      this.productList = optimizedData;
+    }
+  },
   mounted() {},
 };
 </script>
