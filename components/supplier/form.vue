@@ -1,31 +1,64 @@
 <template>
-  <div class="row mt-3">
-    <div class="col w-100">
-      <span class="p-float-label">
-        <InputText
-          id="supplier"
-          type="text"
-          v-model="supplier"
-          @input="inputSupplier($event)"
+  <div>
+    <div class="row mt-3">
+      <div class="col w-100">
+        <span class="p-float-label">
+          <InputText
+            id="supplier"
+            type="text"
+            v-model="supplier"
+            @input="inputSupplier($event)"
+          />
+          <label for="supplier">Supplier</label>
+        </span>
+      </div>
+      <div class="col w-100">
+        <span class="p-float-label">
+          <InputText type="text" v-model="model.Telefon" id="phone" />
+
+          <label for="phone">Phone</label>
+        </span>
+      </div>
+      <div class="col w-100">
+        <span class="p-float-label">
+          <InputText type="text" v-model="model.MailAdres" id="email" />
+
+          <label for="email">Email</label>
+        </span>
+      </div>
+      <div class="col w-100">
+        <span class="p-float-label">
+          <InputText type="text" v-model="model.Il" id="City" />
+
+          <label for="City">City</label>
+        </span>
+      </div>
+      <div class="col w-100">
+        <span class="p-float-label">
+          <InputText type="text" v-model="model.Notlar" id="Notlar" />
+
+          <label for="Notlar">Notes</label>
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col w-100">
+        <Button
+          type="button"
+          class="p-button-success"
+          label="Save"
+          @click="saveProcess"
         />
-        <label for="supplier">Supplier</label>
-      </span>
-    </div>
-    <div class="col w-100">
-      <Button
-        type="button"
-        class="p-button-success"
-        label="Save"
-        @click="saveProcess"
-      />
-    </div>
-    <div class="col w-100" v-if="!status">
-      <Button
-        type="button"
-        class="p-button-danger"
-        label="Delete"
-        @click="deleteForm"
-      />
+      </div>
+      <div class="col w-100" v-if="!status">
+        <Button
+          type="button"
+          class="p-button-danger"
+          label="Delete"
+          @click="deleteForm"
+        />
+      </div>
     </div>
   </div>
 </template>

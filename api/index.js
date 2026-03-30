@@ -2133,33 +2133,42 @@ where su.UrunKartID=${req.params.id}
 });
 
 /*Supplier*/
-app.post("/supplier/save", (req, res) => {
-  const sql = `insert into TedarikciTB(FirmaAdi) VALUES('${req.body.FirmaAdi}')`;
-  mssql.query(sql).then((results) => {
-    if (results.rowsAffected[0] == 1) {
-      res.status(200).json({
-        status: true,
-      });
-    } else {
-      res.status(200).json({
-        status: false,
-      });
-    }
-  });
+app.post("/supplier/save", async (req, res) => {
+  const body = req.body;
+
+  const sql = `
+    insert into TedarikciTB(FirmaAdi,Telefon,MailAdres,Il,Notlar)VALUES(@FirmaAdi,@Telefon,@MailAdres,@Il,@Notlar)`;
+  try {
+    const request = new mssql.Request();
+    request.input("FirmaAdi", mssql.VarChar, body.FirmaAdi);
+    request.input("Telefon", mssql.VarChar, body.Telefon);
+    request.input("MailAdres", mssql.VarChar, body.MailAdres);
+    request.input("Il", mssql.VarChar, body.Il);
+    request.input("Notlar", mssql.VarChar, body.Notlar);
+    await request.query(sql);
+    res.status(200).json({ status: true });
+  } catch (err) {
+    res.status(501).json({ status: false });
+  }
 });
-app.put("/supplier/update", (req, res) => {
-  const sql = `update TedarikciTB SET FirmaAdi='${req.body.FirmaAdi}' where ID='${req.body.ID}'`;
-  mssql.query(sql).then((results) => {
-    if (results.rowsAffected[0] == 1) {
-      res.status(200).json({
-        status: true,
-      });
-    } else {
-      res.status(200).json({
-        status: false,
-      });
-    }
-  });
+app.put("/supplier/update", async (req, res) => {
+  const body = req.body;
+
+  try {
+    const sql = `update TedarikciTB SET FirmaAdi=@FirmaAdi,Telefon=@Telefon,MailAdres=@MailAdres,Il=@Il,Notlar=@Notlar where ID=@ID`;
+
+    const request = new mssql.Request();
+    request.input("ID", mssql.Int, body.ID);
+    request.input("FirmaAdi", mssql.VarChar, body.FirmaAdi);
+    request.input("Telefon", mssql.VarChar, body.Telefon);
+    request.input("MailAdres", mssql.VarChar, body.MailAdres);
+    request.input("Il", mssql.VarChar, body.Il);
+    request.input("Notlar", mssql.VarChar, body.Notlar);
+    await request.query(sql);
+    res.status(200).json({ status: true });
+  } catch (err) {
+    res.status(501).json({ status: false });
+  }
 });
 app.delete("/supplier/delete/:id", (req, res) => {
   const sql = `delete TedarikciTB where ID='${req.params.id}'`;
@@ -15112,6 +15121,7 @@ inner join TedarikciTB t on t.ID = qs.Supplier
 inner join UrunOcakTB uo on uo.ID = qs.Quarry
 inner join StripsTB s on s.ID = qs.Strip
 where YEAR(Date) = '${req.params.year}' and MONTH(Date) = '${req.params.month}'
+order by qs.Date desc
     `;
   const suppliersList = "select ID,FirmaAdi from TedarikciTB";
   const stripsList = "select ID,Strips from StripsTB";
@@ -15306,6 +15316,7 @@ app.get("/reports/mekmer/moloz/list/:year/:month", async (req, res) => {
         inner join UrunOcakTB uo on uo.ID = qsm.Quarry
         inner join StripsTB s on s.ID = qsm.Strip
         where YEAR(Date) = '${req.params.year}' and MONTH(Date)= '${req.params.month}'
+        order by Date desc
     `;
   const suppliersList = "select ID,FirmaAdi from TedarikciTB";
   const stripsList = "select ID,Strips from StripsTB";
@@ -15656,10 +15667,10 @@ app.get("/orders", (req, res) => {
     });
   });
 });
-app.get("/orders/all", (req, res) => {
+app.get("/orders/all", async (req, res) => {
   const sql =
     "select s.SiparisNo,s.MusteriID from SiparislerTB s order by s.SiparisTarihi desc";
-  mssql.query(sql).then((orders) => {
+  await mssql.query(sql).then((orders) => {
     res.status(200).json({
       orders: orders.recordset,
     });
@@ -15700,6 +15711,10 @@ app.get("/suppliers", (req, res) => {
                 select 
                 t.ID,
                 t.FirmaAdi,
+				t.Telefon,
+				t.MailAdres,
+				t.Il,
+				t.Notlar,
                 (select count(su.TedarikciID) from SiparisUrunTB su where su.TedarikciID = t.ID) as ToplamTedarikci
 
             from TedarikciTB t
@@ -19296,13 +19311,34 @@ app.post("/reports/mekmar/cost/control/product/save", async (req, res) => {
 
 app.put("/reports/mekmar/cost/control/product/update", async (req, res) => {});
 
-// app.put("/selection/input/bulk/edit", async (req, res) => {
-//   const { Po, ProductId } = await req.body;
-//   const request = new mssql.Request();
-//   const sql = `update UretimTB set SiparisAciklama='@po' where KasaNo='@kasaNo'`;
-//   request.input("po", mssql.VarChar, Po);
-//   request.input("productId", mssql.Int, ProductId);
-// });
+app.put("/selection/input/bulk/edit", async (req, res) => {
+  try {
+    const { po, crates, product_id } = req.body; // 'await req.body' gereksizdir, req.body zaten bir objedir.
+    console.log("İstek geldi! Crates eleman sayısı:", crates.length);
+    console.log("Crates içeriği:", JSON.stringify(crates));
+    for (const item of crates) {
+      // 1. Request nesnesini döngü İÇİNE almalısın ki her iterasyonda temiz bir nesne başlasın.
+      const request = new mssql.Request();
+
+      // 2. Parametrelerin etrafındaki tek tırnakları kaldırıyoruz.
+      const sql = `update UretimTB set SiparisAciklama=@po, Aciklama=@po,UrunKartID=@urunKartId where KasaNo=@kasaNo`;
+
+      request.input("po", mssql.VarChar, po);
+      request.input("kasaNo", mssql.VarChar, String(item.KasaNo));
+      request.input("urunKartId", mssql.Int, product_id);
+
+      console.log(`Çalışan Kasa: ${item.KasaNo}`);
+      await request.query(sql);
+    }
+
+    res.status(200).json({ status: true, message: "Success" });
+  } catch (err) {
+    console.error(err); // Hatayı sunucu loglarında görmek için
+    res
+      .status(500)
+      .json({ status: false, message: "An error occurred while saving data." });
+  }
+});
 
 module.exports = {
   path: "/api",

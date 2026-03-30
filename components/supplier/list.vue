@@ -45,6 +45,30 @@
         </template>
       </Column>
       <Column
+        field="Telefon"
+        header="Phone"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="MailAdres"
+        header="Email"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="ıl"
+        header="City"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
+        field="Notlar"
+        header="Notes"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      ></Column>
+      <Column
         field="ToplamTedarikci"
         header="Total Order"
         headerClass="tableHeader"
@@ -61,7 +85,6 @@ export default {
       type: Array,
       required: false,
     },
-
   },
   data() {
     return {

@@ -196,12 +196,45 @@
       modal
       header="Bulk Edit"
     >
-      <Button
-        type="button"
-        label="Change"
-        class="p-button-success w-100"
-        @click="update"
-      />
+      <div class="row mt-3">
+        <div class="col-4">
+          <span class="p-float-label">
+            <AutoComplete
+              v-model="selectedPo"
+              inputId="po"
+              :suggestions="filteredOrdersPo"
+              field="SiparisNo"
+              @complete="searchOrdersPo"
+              @item-select="ordersPoSelected($event)"
+            />
+            <label for="po">Po</label>
+          </span>
+        </div>
+        <div class="col-4">
+          <span class="p-float-label">
+            <Dropdown
+              v-model="selectedProduct"
+              :options="product_list"
+              optionLabel="Aciklama"
+              placeholder="Products"
+              class="mb-4"
+              style="width: 300px"
+              @change="productSelected($event)"
+            />
+            <label for="products">Products</label>
+          </span>
+        </div>
+        <div class="col-4">
+          <Button
+            type="button"
+            label="Change"
+            class="p-button-success w-100"
+            @click="update"
+            :disabled="bulk_edit_update_button_status"
+          />
+        </div>
+      </div>
+
       <DataTable
         :selection.sync="selectedBulkProducts"
         :value="getProductList"
@@ -489,6 +522,12 @@ export default {
   },
   data() {
     return {
+      selectedProduct: {},
+      product_list: [],
+      bulk_edit_update_button_status: true,
+      filteredOrdersPo: null,
+      selectedPo: null,
+      ordersPo: [],
       filters2: {
         KasaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -831,23 +870,49 @@ export default {
       ],
     };
   },
-  created() {
+  async created() {
     this.$store.dispatch("setOrderProductionMekmerList").then((res) => {
       if (res) {
         this.selection_orders_disabled = false;
       }
     });
+    this.ordersPo = (await this.$axios.get("/orders")).data.orders;
   },
   methods: {
+    async productSelected(event) {
+      this.bulk_edit_update_button_status = false;
+    },
+    async ordersPoSelected(event) {
+      const product = await this.$axios.get(
+        `/order/products/normal/${event.value.SiparisNo}`
+      );
+      this.product_list = product.data.products;
+    },
+    searchOrdersPo(event) {
+      const query = event.query?.toLowerCase();
+
+      this.filteredOrdersPo = !query
+        ? [...this.ordersPo]
+        : this.ordersPo.filter((order) =>
+            order.SiparisNo.toLowerCase().includes(query)
+          );
+    },
     async update() {
-      try {
-        await this.$axios.put("/selection/input/bulk/edit");
-        this.selectedBulkProducts = [];
-        this.add_bulk_crate_dialog_status = false;
-        this.$store.dispatch("setOrderProductionMekmerList");
-        this.$toast.success("Success");
-      } catch (err) {
-        this.$toast.error("Error");
+      if (confirm("Are you sure you want to update the selected crates?")) {
+        const data = {
+          po: this.selectedPo.SiparisNo,
+          crates: this.selectedBulkProducts,
+          product_id: this.selectedProduct.UrunKartId,
+        };
+        try {
+          await this.$axios.put("/selection/input/bulk/edit", data);
+          this.selectedBulkProducts = [];
+          this.add_bulk_crate_dialog_status = false;
+          this.$store.dispatch("setOrderProductionMekmerList");
+          this.$toast.success("Success");
+        } catch (err) {
+          this.$toast.error("Error");
+        }
       }
     },
     ticket_click_excel() {
