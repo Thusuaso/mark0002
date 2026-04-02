@@ -173,6 +173,9 @@
           :sortOrder="-1"
           scrollable
           scrollHeight="500px"
+          :selection.sync="selectedRatio"
+          selectionMode="single"
+          @row-click="ratioSelected($event)"
         >
           <Column field="MaliyetTuru" header="Maliyet Türü">
             <template #body="slotProps">
@@ -223,6 +226,13 @@
         @cost_saved_update_emit="costSavedUpdate($event)"
       />
     </Dialog>
+    <Dialog
+      :visible.sync="ratio_detail_dialog_visible"
+      :header="ratio_detail_dialog_header"
+      modal
+    >
+      deneme
+    </Dialog>
   </div>
 </template>
 
@@ -236,6 +246,9 @@ export default {
   },
   data() {
     return {
+      ratio_detail_dialog_header: "",
+      ratio_detail_dialog_visible: false,
+      selectedRatio: null,
       calculate_ratio_list: [],
       filteredCosts: {
         Tarih: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -279,6 +292,10 @@ export default {
     };
   },
   methods: {
+    ratioSelected(event) {
+      this.ratio_detail_dialog_header = event.data.MaliyetTuru + " Detayları";
+      this.ratio_detail_dialog_visible = true;
+    },
     MonthlySelected(event) {
       const date = new Date(event);
       const month = date.getMonth() + 1;
@@ -559,6 +576,7 @@ export default {
           total
         );
         this.calculate_ratio_list.push({
+          MaliyetID: x.ID,
           MaliyetTuru: x.MaliyetTuru,
           Oran: ratio,
           Total: value,

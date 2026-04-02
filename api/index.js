@@ -3,6 +3,7 @@ import mssql from "mssql";
 import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
 import jwt from "jsonwebtoken";
+var cookieParser = require('cookie-parser')
 const JWT_SECRET = "Mekmar_Goz_2026_!SuperGizliAnahtar";
 const otpStore = new Map();
 
@@ -82,6 +83,30 @@ function __noneNullControl(value) {
     return "";
   return value;
 }
+app.use(cookieParser());
+app.use((req, res, next) => {
+  console.log();
+  // Sadece SİLME (DELETE) ve GÜNCELLEME (PUT, PATCH) isteklerini yakala
+  if (
+    req.method === "DELETE" ||
+    req.method === "PUT" ||
+    req.method === "PATCH"
+  ) {
+    // cookie-parser kullanılıyorsa
+    const userId = req.cookies?.userId;
+    console.log(`İstek Yöntemi: ${req.method}, Kullanıcı ID: ${userId}`);
+    if (userId == 51) {
+      // İşlemi burada kes ve Frontend'e hata döndür
+      return res.status(403).json({
+        status: false,
+        message: "Bu işlem için yetkiniz bulunmamaktadır.",
+      });
+    }
+  }
+
+  // İstek SİLME değilse veya ID 51 değilse, asıl işleme sorunsuz devam etmesini sağla
+  next();
+});
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -15609,6 +15634,23 @@ app.put("/reports/mekmer/calculating/cost/update", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("Bir hata oluştu: " + error.message);
+  }
+});
+
+app.post("/reports/mekmer/calculating/cost/detail", async (req, res) => {
+  const body = req.body;
+  try {
+    const sql = ``;
+    const request = new mssql.Request();
+    request.input("", mssql.Int, body.id);
+    request.input("", mssql.Int, body.id);
+    request.input("", mssql.Int, body.id);
+    const result = await request.query(sql);
+    res.status(200).json({
+      list: result,
+    });
+  } catch (err) {
+    res.status(500);
   }
 });
 
