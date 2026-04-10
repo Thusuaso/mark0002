@@ -663,6 +663,26 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="dropdown-menu">
+                <li>
+                  <nuxt-link
+                    to="/orders/production"
+                    class="dropdown-item"
+                    tag="a"
+                    >Production</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/orders/shipped" class="dropdown-item" tag="a"
+                    >Shipped</nuxt-link
+                  >
+                </li>
+                <li>
+                  <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a"
+                    >On Hold</nuxt-link
+                  >
+                </li>
+              </ul>
           <ul class="navbar-nav">
             <li class="nav-item">
               <nuxt-link
