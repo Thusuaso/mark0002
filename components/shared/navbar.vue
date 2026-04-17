@@ -663,7 +663,21 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="dropdown-menu">
+
+          <ul class="navbar-nav">
+
+
+              <li class="nav-item dropdown">
+                <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Mekmar Siparişler
+              </a>
+               <ul class="dropdown-menu">
                 <li>
                   <nuxt-link
                     to="/orders/production"
@@ -683,7 +697,7 @@
                   >
                 </li>
               </ul>
-          <ul class="navbar-nav">
+              </li>
             <li class="nav-item">
               <nuxt-link
                 to="/reports/mekmer/productions"
