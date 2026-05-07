@@ -7103,222 +7103,159 @@ app.delete("/offer/delete/:id", (req, res) => {
   });
 });
 app.get("/offer/detail/all/list", (req, res) => {
-  const sql = `
-    select 
+const priorityOrder = ["Toplantı", "A", "B", "C", "D"];
+const validPriorities = ["Toplantı", "A", "B", "C", "D"];
 
+function mergeByPriority(hList, oList) {
+  const result = [];
+  for (const priority of priorityOrder) {
+    const hFiltered = hList.filter(x => x.TeklifOncelik === priority);
+    const oFiltered = oList.filter(x => x.TeklifOncelik === priority);
+    const maxLen = Math.max(hFiltered.length, oFiltered.length);
+    for (let i = 0; i < maxLen; i++) {
+      if (i < hFiltered.length) result.push(hFiltered[i]);
+      if (i < oFiltered.length) result.push(oFiltered[i]);
+    }
+  }
+  return result;
+}
 
-	yt.Id,
-	yt.Tarih,
-	yt.HatirlatmaTarihi,
-	yt.HatirlatmaSonTarih,
-	yt.MusteriId,
-	yt.Aciklama,
-	yt.Cfr,
-	yt.Fob,
-	yt.Dtp,
-	yt.Fca,
-	yt.KullaniciId,
-	yt.TakipEt,
-	yt.KaynakYeri,
-	yt.TeklifYeri,
-	yt.HatirlatmaAciklama,
-	yt.HatirlatmaId,
-	yt.DosyaAdi,
-	yt.Numune_Giris_Tarihi,
-	yt.Numune_Hatirlatma_Tarihi,
-	yt.Numune_Hatirlatma_SonTarih,
-	yt.Numune_Tracking_No,
-	yt.Numune_Odenen_Tutar,
-	yt.Numune_Musteriden_Alinan,
-	yt.Proforma_Po_No,
-	yt.Proforma_Tarih,
-	yt.Proforma_Tutar,
-	yt.ProformaNot,
-	yt.Teklif_Cloud,
-	yt.Teklif_Cloud_Dosya,
-	yt.Proforma_Cloud,
-	yt.Proforma_Cloud_Dosya,
-	yt.Numune_Cloud,
-	yt.Numune_Cloud_Dosya,
-	yt.NumuneNot,
-	yt.TeklifOncelik,
-	yt.Sira,
-	yt.BList,
-	yt.SonGorulme_Cloud,
-	yt.SonGorulme_Cloud_Dosya,
-	yt.HatirlatilmaDurumu,
-	yt.Company,
-	yt.Email,
-	yt.Phone,
-    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
-	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi,
-	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as KullaniciAdi
+const sql = `
+  SELECT
+    yt.Id,
+    yt.Tarih,
+    yt.HatirlatmaTarihi,
+    yt.HatirlatmaSonTarih,
+    yt.MusteriId,
+    yt.Aciklama,
+    yt.Cfr,
+    yt.Fob,
+    yt.Dtp,
+    yt.Fca,
+    yt.KullaniciId,
+    yt.TakipEt,
+    yt.KaynakYeri,
+    yt.TeklifYeri,
+    yt.HatirlatmaAciklama,
+    yt.HatirlatmaId,
+    yt.DosyaAdi,
+    yt.Numune_Giris_Tarihi,
+    yt.Numune_Hatirlatma_Tarihi,
+    yt.Numune_Hatirlatma_SonTarih,
+    yt.Numune_Tracking_No,
+    yt.Numune_Odenen_Tutar,
+    yt.Numune_Musteriden_Alinan,
+    yt.Proforma_Po_No,
+    yt.Proforma_Tarih,
+    yt.Proforma_Tutar,
+    yt.ProformaNot,
+    yt.Teklif_Cloud,
+    yt.Teklif_Cloud_Dosya,
+    yt.Proforma_Cloud,
+    yt.Proforma_Cloud_Dosya,
+    yt.Numune_Cloud,
+    yt.Numune_Cloud_Dosya,
+    yt.NumuneNot,
+    yt.TeklifOncelik,
+    yt.Sira,
+    yt.BList,
+    yt.SonGorulme_Cloud,
+    yt.SonGorulme_Cloud_Dosya,
+    yt.HatirlatilmaDurumu,
+    yt.Company,
+    yt.Email,
+    yt.Phone,
+    (SELECT ytm.MusteriAdi FROM YeniTeklif_MusterilerTB ytm WHERE ytm.Id = yt.MusteriId) AS MusteriAdi,
+    (SELECT ytu.UlkeAdi FROM YeniTeklif_UlkeTB ytu WHERE ytu.Id = (SELECT ytm.UlkeId FROM YeniTeklif_MusterilerTB ytm WHERE ytm.Id = yt.MusteriId)) AS UlkeAdi,
+    (SELECT k.KullaniciAdi FROM KullaniciTB k WHERE k.ID = yt.KullaniciId) AS KullaniciAdi
+  FROM YeniTeklifTB yt
+  INNER JOIN KullaniciTB k ON k.ID = yt.KullaniciId
+  WHERE yt.TakipEt = 1 AND yt.BList != 1
+  ORDER BY yt.TeklifOncelik, yt.Sira
+`;
 
+const bListSql = `
+  SELECT
+    yt.Id,
+    yt.Tarih,
+    yt.HatirlatmaTarihi,
+    yt.HatirlatmaSonTarih,
+    yt.MusteriId,
+    yt.Aciklama,
+    yt.Cfr,
+    yt.Fob,
+    yt.Dtp,
+    yt.Fca,
+    yt.KullaniciId,
+    yt.TakipEt,
+    yt.KaynakYeri,
+    yt.TeklifYeri,
+    yt.HatirlatmaAciklama,
+    yt.HatirlatmaId,
+    yt.DosyaAdi,
+    yt.Numune_Giris_Tarihi,
+    yt.Numune_Hatirlatma_Tarihi,
+    yt.Numune_Hatirlatma_SonTarih,
+    yt.Numune_Tracking_No,
+    yt.Numune_Odenen_Tutar,
+    yt.Numune_Musteriden_Alinan,
+    yt.Proforma_Po_No,
+    yt.Proforma_Tarih,
+    yt.Proforma_Tutar,
+    yt.ProformaNot,
+    yt.Teklif_Cloud,
+    yt.Teklif_Cloud_Dosya,
+    yt.Proforma_Cloud,
+    yt.Proforma_Cloud_Dosya,
+    yt.Numune_Cloud,
+    yt.Numune_Cloud_Dosya,
+    yt.NumuneNot,
+    yt.TeklifOncelik,
+    yt.Sira,
+    yt.BList,
+    yt.SonGorulme_Cloud,
+    yt.SonGorulme_Cloud_Dosya,
+    yt.HatirlatilmaDurumu,
+    yt.Company,
+    yt.Email,
+    yt.Phone,
+    (SELECT ytm.MusteriAdi FROM YeniTeklif_MusterilerTB ytm WHERE ytm.Id = yt.MusteriId) AS MusteriAdi,
+    (SELECT ytu.UlkeAdi FROM YeniTeklif_UlkeTB ytu WHERE ytu.Id = (SELECT ytm.UlkeId FROM YeniTeklif_MusterilerTB ytm WHERE ytm.Id = yt.MusteriId)) AS UlkeAdi,
+    (SELECT k.KullaniciAdi FROM KullaniciTB k WHERE k.ID = yt.KullaniciId) AS KullaniciAdi
+  FROM YeniTeklifTB yt
+  INNER JOIN KullaniciTB k ON k.ID = yt.KullaniciId
+  WHERE yt.TakipEt = 1 AND yt.BList = 1
+  ORDER BY yt.TeklifOncelik, yt.Sira
+`;
 
-
-from YeniTeklifTB yt
-inner join KullaniciTB k on k.ID = yt.KullaniciId
- 
-where yt.TakipEt = 1 and yt.BList != 1
-order by yt.TeklifOncelik,yt.Sira
-    `;
-  const bListSql = `
-    select 
-
-
-	yt.Id,
-	yt.Tarih,
-	yt.HatirlatmaTarihi,
-	yt.HatirlatmaSonTarih,
-	yt.MusteriId,
-	yt.Aciklama,
-	yt.Cfr,
-	yt.Fob,
-	yt.Dtp,
-	yt.Fca,
-	yt.KullaniciId,
-	yt.TakipEt,
-	yt.KaynakYeri,
-	yt.TeklifYeri,
-	yt.HatirlatmaAciklama,
-	yt.HatirlatmaId,
-	yt.DosyaAdi,
-	yt.Numune_Giris_Tarihi,
-	yt.Numune_Hatirlatma_Tarihi,
-	yt.Numune_Hatirlatma_SonTarih,
-	yt.Numune_Tracking_No,
-	yt.Numune_Odenen_Tutar,
-	yt.Numune_Musteriden_Alinan,
-	yt.Proforma_Po_No,
-	yt.Proforma_Tarih,
-	yt.Proforma_Tutar,
-	yt.ProformaNot,
-	yt.Teklif_Cloud,
-	yt.Teklif_Cloud_Dosya,
-	yt.Proforma_Cloud,
-	yt.Proforma_Cloud_Dosya,
-	yt.Numune_Cloud,
-	yt.Numune_Cloud_Dosya,
-	yt.NumuneNot,
-	yt.TeklifOncelik,
-	yt.Sira,
-	yt.BList,
-	yt.SonGorulme_Cloud,
-	yt.SonGorulme_Cloud_Dosya,
-	yt.HatirlatilmaDurumu,
-	yt.Company,
-	yt.Email,
-	yt.Phone,
-
-    (select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as MusteriAdi,
-	(select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = (select ytm.UlkeId from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId)) as UlkeAdi,
-	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as KullaniciAdi
-
-
-
-from YeniTeklifTB yt
-inner join KullaniciTB k on k.ID = yt.KullaniciId
- 
-where yt.TakipEt = 1 and yt.BList = 1
-order by yt.TeklifOncelik,yt.Sira
-    `;
-
-  mssql.query(sql, (err, results) => {
-    mssql.query(bListSql, (err, bList) => {
-      results.recordset.forEach((x) => {
-        x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;
-      });
-
-      const list = [];
-      const list_b = [];
-
-      const _h_a = results.recordset.filter(
-        (x) =>
-          x.KullaniciId == 44 &&
-          (x.TeklifOncelik == "A" ||
-            x.TeklifOncelik == "B" ||
-            x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "D" ||
-            x.TeklifOncelik == "Toplantı")
-      );
-      // const _h_t = results.recordset.filter(x=>(x.KullaniciId == 44 && x.TeklifOncelik == 'Toplantı'));
-      const _o_a = results.recordset.filter(
-        (x) =>
-          x.KullaniciId == 19 &&
-          (x.TeklifOncelik == "A" ||
-            x.TeklifOncelik == "B" ||
-            x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "D" ||
-            x.TeklifOncelik == "Toplantı")
-      );
-      // const _o_t = results.recordset.filter(x=>(x.KullaniciId == 19 && x.TeklifOncelik == 'Toplantı'));
-
-      const a_list = results.recordset.filter(
-        (x) =>
-          x.TeklifOncelik == "A" ||
-          x.TeklifOncelik == "B" ||
-          x.TeklifOncelik == "C" ||
-          x.TeklifOncelik == "D" ||
-          x.TeklifOncelik == "Toplantı"
-      );
-
-      const h_b = bList.recordset.filter(
-        (x) =>
-          x.KullaniciId == 44 &&
-          (x.TeklifOncelik == "A" ||
-            x.TeklifOncelik == "B" ||
-            x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "D" ||
-            x.TeklifOncelik == "Toplantı")
-      );
-      const o_b = bList.recordset.filter(
-        (x) =>
-          x.KullaniciId == 19 &&
-          (x.TeklifOncelik == "A" ||
-            x.TeklifOncelik == "B" ||
-            x.TeklifOncelik == "C" ||
-            x.TeklifOncelik == "D" ||
-            x.TeklifOncelik == "Toplantı")
-      );
-      const b_list = bList.recordset.filter(
-        (x) =>
-          x.TeklifOncelik == "A" ||
-          x.TeklifOncelik == "B" ||
-          x.TeklifOncelik == "C" ||
-          x.TeklifOncelik == "D" ||
-          x.TeklifOncelik == "Toplantı"
-      );
-
-      // const t_list = results.recordset.filter(x=>(x.TeklifOncelik == 'Toplantı'));
-
-      if (a_list.length > 0) {
-        let i = 0;
-        while (a_list.length > i) {
-          if (_h_a.length >= i + 1) {
-            list.push(_h_a[i]);
-          }
-          if (_o_a.length >= i + 1) {
-            list.push(_o_a[i]);
-          }
-          i += 1;
-        }
-      }
-      if (b_list.length > 0) {
-        let a = 0;
-        while (b_list.length > a) {
-          if (h_b.length >= a + 1) {
-            list_b.push(h_b[a]);
-          }
-          if (o_b.length >= a + 1) {
-            list_b.push(o_b[a]);
-          }
-          a += 1;
-        }
-      }
-
-      res.status(200).json({ list: list, bList: list_b });
+mssql.query(sql, (err, results) => {
+  mssql.query(bListSql, (err, bList) => {
+    results.recordset.forEach((x) => {
+      x.cloudLink = `https://file-service.mekmar.com/file/download/teklif/teklifDosya/${x.Id}/${x.Teklif_Cloud_Dosya}`;
     });
+
+    // A List — Hakan (44) ve Özlem (19)
+    const _h_a = results.recordset.filter(x =>
+      x.KullaniciId == 44 && validPriorities.includes(x.TeklifOncelik)
+    );
+    const _o_a = results.recordset.filter(x =>
+      x.KullaniciId == 19 && validPriorities.includes(x.TeklifOncelik)
+    );
+
+    // B List — Hakan (44) ve Özlem (19)
+    const h_b = bList.recordset.filter(x =>
+      x.KullaniciId == 44 && validPriorities.includes(x.TeklifOncelik)
+    );
+    const o_b = bList.recordset.filter(x =>
+      x.KullaniciId == 19 && validPriorities.includes(x.TeklifOncelik)
+    );
+
+    const list = mergeByPriority(_h_a, _o_a);
+    const list_b = mergeByPriority(h_b, o_b);
+
+    res.status(200).json({ list: list, bList: list_b });
   });
+});
 });
 app.get("/offer/old/list", (req, res) => {
   const sql = `

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- A LIST -->
     <DataTable
       :value="list"
       scrollable
@@ -32,6 +33,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="Sira"
         header="Queue"
@@ -49,6 +51,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="MusteriAdi"
         header="Customer"
@@ -66,6 +69,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="UlkeAdi"
         header="Country"
@@ -83,6 +87,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="KullaniciAdi"
         header="Representative"
@@ -103,6 +108,7 @@
           {{ aListTotal }}
         </template>
       </Column>
+
       <Column
         field="TeklifOncelik"
         header="Priority"
@@ -121,6 +127,8 @@
         </template>
       </Column>
     </DataTable>
+
+    <!-- B LIST -->
     <DataTable
       :value="bList"
       scrollable
@@ -136,6 +144,7 @@
       <template #header>
         <h3 class="header">B List</h3>
       </template>
+
       <Column
         field="Tarih"
         header="Tarih"
@@ -156,6 +165,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="Sira"
         header="Queue"
@@ -173,6 +183,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="MusteriAdi"
         header="Customer"
@@ -190,6 +201,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="UlkeAdi"
         header="Country"
@@ -207,6 +219,7 @@
           />
         </template>
       </Column>
+
       <Column
         field="KullaniciAdi"
         header="Representative"
@@ -227,6 +240,7 @@
           {{ bListTotal }}
         </template>
       </Column>
+
       <Column
         field="TeklifOncelik"
         header="Priority"
@@ -247,8 +261,10 @@
     </DataTable>
   </div>
 </template>
+
 <script>
 import { FilterMatchMode } from "primevue/api";
+
 export default {
   props: {
     list: {
@@ -297,13 +313,14 @@ export default {
       this.$store.dispatch("setOfferAListTotal", event.filteredValue);
     },
     offerClass(event) {
-      const color = event.TeklifOncelik == "Toplantı" ? "yellow" : "";
-      const color_2 = event.TeklifOncelik == "D" ? "green" : "";
+      const color = event.TeklifOncelik === "Toplantı" ? "yellow" : "";
+      const color_2 = event.TeklifOncelik === "D" ? "green" : "";
       return [color, color_2];
     },
   },
 };
 </script>
+
 <style scoped>
 :deep(.yellow) {
   background-color: rgb(242, 255, 0) !important;
