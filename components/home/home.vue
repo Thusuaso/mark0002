@@ -213,7 +213,7 @@
       </div>
     </div>
     <div class="row text-center m-auto">
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <Card>
           <template #header>
             <h3>{{ new Date().getFullYear() }} Supplier Cost</h3>
@@ -238,7 +238,45 @@
           </template>
         </Card>
       </div>
-      <div class="col-sm-6"></div>
+      <div class="col-sm-4">
+        <Card>
+          <template #header>
+            <h3>Aylık Üretim</h3>
+          </template>
+
+          <template #content>
+            <DataTable :value="mekmer_datas.monthly_stock">
+              <Column field="MONTH" header="Ay"></Column>
+              <Column field="SqmMiktar" header="M2">
+                <template #body="slotProps">
+                  {{ slotProps.data.SqmMiktar | formatDecimal }}
+                </template>
+              </Column>
+              <Column field="KasaAdedi" header="Kasa Adedi"></Column>
+            </DataTable>
+          </template>
+        </Card>
+
+      </div>
+      <div class="col-sm-4">
+                <Card>
+          <template #header>
+            <h3>Mekmer Anlık Stok</h3>
+          </template>
+
+          <template #content>
+            <DataTable :value="mekmer_datas.current_stock">
+              <Column field="Month" header="Ay"></Column>
+              <Column field="KasaM2" header="M2">
+                <template #body="slotProps">
+                  {{ slotProps.data.KasaM2 | formatDecimal }}
+                </template>
+              </Column>
+              <Column field="KasaAdet" header="Kasa Adedi"></Column>
+            </DataTable>
+          </template>
+        </Card>
+      </div>
     </div>
   </div>
 
@@ -441,12 +479,9 @@ export default {
     },
   },
   created() {
-    this.userId = Cookies.get("userId");
-    if (this.userId == 48) {
       this.$axios.get("/reports/mekmer/stocks/list").then((res) => {
         this.mekmer_datas = res.data;
       });
-    }
   },
   mounted() {},
   watch: {
