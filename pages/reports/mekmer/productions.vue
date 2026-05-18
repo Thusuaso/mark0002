@@ -90,10 +90,12 @@
     </Dialog>
   </div>
 </template>
+
 <script>
 import { mapGetters } from "vuex";
 import Cookies from "js-cookie";
 import date from "@/plugins/date";
+
 export default {
   computed: {
     ...mapGetters([
@@ -143,6 +145,7 @@ export default {
   },
   data() {
     return {
+      localOrderList: [],
       production_detail_form: false,
       productionModel: {},
       productModel: {},
@@ -166,9 +169,20 @@ export default {
 
   created() {
     this.$store.dispatch("setOrderProductionMekmerList");
-        this.$store.dispatch("setOrderProductionSourceTypes");
-
+    this.$store.dispatch("setOrderProductionSourceTypes");
   },
+
+  watch: {
+    getOrderList(newVal) {
+      if (newVal && newVal.length > 0) {
+        this.localOrderList = JSON.parse(JSON.stringify(newVal));
+      }
+    },
+    getOrderProductionYearsList() {
+      this.selectedYear = { Yil: new Date().getFullYear() };
+    },
+  },
+
   methods: {
     isfDelete(event) {
       this.$store.dispatch("setOrderProductionIsfDelete", event);
@@ -177,24 +191,34 @@ export default {
       this.$store.dispatch("setOrderProductionProformaDelete", id);
     },
     excel_output() {
-      const new_data = this.getOrderList.sort(function (a, b) {
-        const new_date_a = new Date(a.SiparisTarihi).getTime();
-        const new_date_b = new Date(b.SiparisTarihi).getTime();
+      const rawData =
+        this.localOrderList.length > 0
+          ? this.localOrderList
+          : this.getOrderList;
 
-        return new_date_b - new_date_a;
-      });
+      const clonedData = rawData
+        .map((item) => Object.assign({}, item))
+        .sort(function (a, b) {
+          const new_date_a = new Date(a.SiparisTarihi).getTime();
+          const new_date_b = new Date(b.SiparisTarihi).getTime();
+          return new_date_b - new_date_a;
+        });
+
       this.$excelApi
-        .post("/siparisler/dosyalar/uretimExcelCikti", new_data)
+        .post("/siparisler/dosyalar/uretimExcelCikti", clonedData)
         .then((response) => {
-          if (response.status) {
+          if (response.status === 200) {
             const link = document.createElement("a");
             link.href =
               this.getLocalUrl + "siparisler/dosyalar/uretimExcelCikti";
-
             link.setAttribute("download", "Uretim_list.xlsx");
             document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
           }
+        })
+        .catch((err) => {
+          console.error("Excel hatası:", err);
         });
     },
     marketingChange(event) {
@@ -258,13 +282,11 @@ export default {
         po: this.getOrderProductionPo,
       };
       this.$store.dispatch("setProductionProductWorkermanList", data);
-
       this.workerman_dialog_form = true;
     },
     __stringCharacterChange(event) {
       const data = event.split("'");
       let value = "";
-
       data.forEach((x) => {
         value += x + "''";
       });
@@ -360,7 +382,6 @@ export default {
     },
     newForm() {
       this.$store.dispatch("setOrderProductionSourceTypes");
-
       this.$store.dispatch("setOrderProductionButtonStatus", true);
       this.$store.dispatch("setOrderProductionModel");
       this.$store.dispatch("setOrderProductModel");
@@ -377,7 +398,6 @@ export default {
     },
     productionSelected(event) {
       this.$store.dispatch("setOrderProductionSourceTypes");
-
       this.$store.dispatch("setOrderProductionButtonStatus", false);
       this.$store.dispatch("setOrderProductModel");
       this.$store.dispatch(
@@ -405,23 +425,13 @@ export default {
         false
       );
       this.$store.commit("setOrderSupplierProductList", []);
-
       this.$store.dispatch("setOrderProductionId", event.SiparisId);
       this.productionModel = event;
       this.$store.dispatch("setOrderProductionPo", event.SiparisNo);
       this.production_detail_form = true;
     },
   },
-  mounted() {
-    // this.$socket.socketIO.on("cards_update_on", () => {
-    //   this.$store.dispatch("setCardList");
-    // });
-  },
 
-  watch: {
-    getOrderProductionYearsList() {
-      this.selectedYear = { Yil: new Date().getFullYear() };
-    },
-  },
+  mounted() {},
 };
 </script>
