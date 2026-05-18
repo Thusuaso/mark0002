@@ -1709,36 +1709,47 @@ app.post("/selection/production/save", async (req, res) => {
 });
 
 app.put("/selection/production/update", async (req, res) => {
-  try {
-    const request = new mssql.Request();
-    request.input("Tarih", mssql.VarChar, req.body.Tarih);
-    request.input("KutuAdet", mssql.NVarChar, req.body.KutuAdet);
-    request.input("KasaNo", mssql.NVarChar, req.body.KasaNo);
-    request.input("UrunKartID", mssql.Int, req.body.UrunKartID);
-    request.input("TedarikciID", mssql.Int, req.body.TedarikciID);
-    request.input("UrunBirimID", mssql.Int, req.body.UrunBirimID);
-    request.input("UrunOcakID", mssql.Int, req.body.UrunOcakID);
-    request.input("Adet", mssql.NVarChar, req.body.Adet);
-    request.input("Miktar", mssql.NVarChar, req.body.Miktar);
-    request.input("Aciklama", mssql.NVarChar, req.body.Aciklama);
-    request.input("UretimTurID", mssql.Int, req.body.UretimTurID);
-    request.input("SiparisAciklama", mssql.NVarChar, req.body.SiparisAciklama);
-    request.input("Kutu", mssql.NVarChar, req.body.Kutu);
-    request.input("Duzenleyen", mssql.NVarChar, req.body.Duzenleyen);
-    request.input("Kasalayan", mssql.NVarChar, req.body.Kasalayan);
-    request.input("Disarda", mssql.NVarChar, req.body.Disarda);
-    request.input("KutuIciAdet", mssql.NVarChar, req.body.KutuIciAdet);
-    request.input("SqmMiktar", mssql.NVarChar, req.body.SqmMiktar);
-    request.input("Bagli", mssql.NVarChar, req.body.Bagli);
-    request.input("Bulunamadi", mssql.NVarChar, req.body.Bulunamadi);
-    request.input("Fason", mssql.NVarChar, req.body.Fason);
-    request.input("Kutulama", mssql.NVarChar, req.body.Kutulama);
-    request.input("ID", mssql.Int, req.body.ID);
-    const results = await request.query("update UretimTB SET Tarih=@Tarih,KutuAdet=@KutuAdet,KasaNo=@KasaNo,UrunKartID=@UrunKartID,TedarikciID=@TedarikciID,UrunBirimID=@UrunBirimID,UrunOcakID=@UrunOcakID,Adet=@Adet,Miktar=@Miktar,Aciklama=@Aciklama,UretimTurID=@UretimTurID,SiparisAciklama=@SiparisAciklama,Kutu=@Kutu,Duzenleyen=@Duzenleyen,Kasalayan=@Kasalayan,Disarda=@Disarda,KutuIciAdet=@KutuIciAdet,SqmMiktar=@SqmMiktar,Bagli=@Bagli,Bulunamadi=@Bulunamadi,Fason=@Fason,Kutulama=@Kutulama where ID=@ID");
-    res.status(200).json({ status: results.rowsAffected[0] == 1 });
-  } catch (err) {
-    res.status(500).json({ status: false });
-  }
+ try {
+   const safe = (val) => (val == null || val === undefined ? "" : String(val));
+
+   const request = new mssql.Request();
+   request.input("Tarih", mssql.VarChar, safe(req.body.Tarih));
+   request.input("KutuAdet", mssql.NVarChar, safe(req.body.KutuAdet));
+   request.input("KasaNo", mssql.NVarChar, safe(req.body.KasaNo));
+   request.input("UrunKartID", mssql.Int, parseInt(req.body.UrunKartID) || 0);
+   request.input("TedarikciID", mssql.Int, parseInt(req.body.TedarikciID) || 0);
+   request.input("UrunBirimID", mssql.Int, parseInt(req.body.UrunBirimID) || 0);
+   request.input("UrunOcakID", mssql.Int, parseInt(req.body.UrunOcakID) || 0);
+   request.input("Adet", mssql.NVarChar, safe(req.body.Adet));
+   request.input("Miktar", mssql.NVarChar, safe(req.body.Miktar));
+   request.input("Aciklama", mssql.NVarChar, safe(req.body.Aciklama));
+   request.input("UretimTurID", mssql.Int, parseInt(req.body.UretimTurID) || 0);
+   request.input(
+     "SiparisAciklama",
+     mssql.NVarChar,
+     safe(req.body.SiparisAciklama)
+   );
+   request.input("Kutu", mssql.NVarChar, safe(req.body.Kutu));
+   request.input("Duzenleyen", mssql.NVarChar, safe(req.body.Duzenleyen));
+   request.input("Kasalayan", mssql.NVarChar, safe(req.body.Kasalayan));
+   request.input("Disarda", mssql.NVarChar, safe(req.body.Disarda));
+   request.input("KutuIciAdet", mssql.NVarChar, safe(req.body.KutuIciAdet));
+   request.input("SqmMiktar", mssql.NVarChar, safe(req.body.SqmMiktar));
+   request.input("Bagli", mssql.NVarChar, safe(req.body.Bagli));
+   request.input("Bulunamadi", mssql.NVarChar, safe(req.body.Bulunamadi));
+   request.input("Fason", mssql.NVarChar, safe(req.body.Fason));
+   request.input("Kutulama", mssql.NVarChar, safe(req.body.Kutulama));
+   request.input("ID", mssql.Int, parseInt(req.body.ID) || 0);
+
+   const results = await request.query(
+     "update UretimTB SET Tarih=@Tarih,KutuAdet=@KutuAdet,KasaNo=@KasaNo,UrunKartID=@UrunKartID,TedarikciID=@TedarikciID,UrunBirimID=@UrunBirimID,UrunOcakID=@UrunOcakID,Adet=@Adet,Miktar=@Miktar,Aciklama=@Aciklama,UretimTurID=@UretimTurID,SiparisAciklama=@SiparisAciklama,Kutu=@Kutu,Duzenleyen=@Duzenleyen,Kasalayan=@Kasalayan,Disarda=@Disarda,KutuIciAdet=@KutuIciAdet,SqmMiktar=@SqmMiktar,Bagli=@Bagli,Bulunamadi=@Bulunamadi,Fason=@Fason,Kutulama=@Kutulama where ID=@ID"
+   );
+
+   res.status(200).json({ status: results.rowsAffected[0] == 1 });
+ } catch (err) {
+   console.error("❌ /selection/production/update HATA:", err);
+   res.status(500).json({ status: false, error: err.message });
+ }
 });
 app.delete("/selection/production/delete/:crateNo", async (req, res) => {
   try {
