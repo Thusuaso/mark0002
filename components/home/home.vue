@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid" v-if="userId != 48">
+  <div class="container-fluid" v-if="getUserId != 48">
     <div class="row">
       <!-- Earnings (Monthly) Card Example -->
       <div class="col-xl-3 col-md-6 mb-4">
@@ -280,7 +280,7 @@
     </div>
   </div>
 
-  <div class="container-fluid" v-else-if="userId == 48">
+  <div class="container-fluid" v-else-if="getUserId == 48">
     <div class="row m-auto text-center">
       <div class="col">
         <Card>
