@@ -2292,27 +2292,43 @@ app.get(
 );
 app.post("/shipment/products/save", async (req, res) => {
   try {
+    const safe = (val) => (val == null || val === undefined ? "" : String(val));
+
     const orderReq = new mssql.Request();
-    orderReq.input("YuklemeTarihi", mssql.VarChar, req.body.YuklemeTarihi);
-    orderReq.input("SiparisNo", mssql.NVarChar, req.body.SiparisNo);
-    await orderReq.query("update SiparislerTB SET SiparisDurumID=3, YuklemeTarihi=@YuklemeTarihi where SiparisNo=@SiparisNo");
+    orderReq.input(
+      "YuklemeTarihi",
+      mssql.VarChar,
+      safe(req.body.YuklemeTarihi)
+    );
+    orderReq.input("SiparisNo", mssql.NVarChar, safe(req.body.SiparisNo));
+    await orderReq.query(
+      "update SiparislerTB SET SiparisDurumID=3, YuklemeTarihi=@YuklemeTarihi where SiparisNo=@SiparisNo"
+    );
+
     for (const item of req.body.data) {
       const prodReq = new mssql.Request();
-      prodReq.input("KasaNo", mssql.NVarChar, item.KasaNo);
-      await prodReq.query("update UretimTB SET UrunDurumID=0 where KasaNo=@KasaNo");
+      prodReq.input("KasaNo", mssql.NVarChar, safe(item.KasaNo));
+      await prodReq.query(
+        "update UretimTB SET UrunDurumID=0 where KasaNo=@KasaNo"
+      );
+
       const insReq = new mssql.Request();
-      insReq.input("Tarih", mssql.VarChar, item.Tarih);
-      insReq.input("KasaNo", mssql.NVarChar, item.KasaNo);
-      insReq.input("MusteriId", mssql.Int, item.MusteriId);
-      insReq.input("SatisFiyati", mssql.NVarChar, item.SatisFiyati);
-      insReq.input("TotalProduct", mssql.NVarChar, item.TotalProduct);
-      insReq.input("SiparisNo", mssql.NVarChar, item.SiparisNo);
-      insReq.input("KullaniciId", mssql.Int, item.KullaniciId);
-      await insReq.query("insert into SevkiyatTB(Tarih,KasaNo,MusteriID,BirimFiyat,Toplam,CikisNo,RaporDurum,KullaniciID) VALUES(@Tarih,@KasaNo,@MusteriId,@SatisFiyati,@TotalProduct,@SiparisNo,'1',@KullaniciId)");
+      insReq.input("Tarih", mssql.VarChar, safe(item.Tarih));
+      insReq.input("KasaNo", mssql.NVarChar, safe(item.KasaNo)); // ← Int yerine NVarChar
+      insReq.input("MusteriId", mssql.Int, parseInt(item.MusteriId) || 0);
+      insReq.input("SatisFiyati", mssql.NVarChar, safe(item.SatisFiyati));
+      insReq.input("TotalProduct", mssql.NVarChar, safe(item.TotalProduct));
+      insReq.input("SiparisNo", mssql.NVarChar, safe(item.SiparisNo));
+      insReq.input("KullaniciId", mssql.Int, parseInt(item.KullaniciId) || 0);
+      await insReq.query(
+        "insert into SevkiyatTB(Tarih,KasaNo,MusteriID,BirimFiyat,Toplam,CikisNo,RaporDurum,KullaniciID) VALUES(@Tarih,@KasaNo,@MusteriId,@SatisFiyati,@TotalProduct,@SiparisNo,'1',@KullaniciId)"
+      );
     }
+
     res.status(200).json({ status: true });
   } catch (err) {
-    res.status(500).json({ status: false });
+    console.error("/shipment/products/save HATA:", err.message);
+    res.status(500).json({ status: false, error: err.message });
   }
 });
 app.get("/shipment/order/control/:po", async (req, res) => {
