@@ -16,6 +16,8 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000);
 const app = express();
+const safe = (val) => (val == null || val === undefined ? "" : String(val));
+const safeInt = (val) => parseInt(val) || 0;
 const sql = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -2858,34 +2860,49 @@ app.get("/customer/mekmar/detail/orders/products/:po", async (req, res) => {
 
 app.post("/customer/mekmar/save", async (req, res) => {
   try {
+    const safe = (val) => (val == null || val === undefined ? "" : String(val));
+
     const request = new mssql.Request();
-    request.input("FirmaAdi", mssql.NVarChar, req.body.FirmaAdi);
-    request.input("Unvan", mssql.NVarChar, req.body.Unvan);
-    request.input("Adres", mssql.NVarChar, req.body.Adres);
-    request.input("Ulke", mssql.NVarChar, req.body.Ulke);
-    request.input("UlkeId", mssql.Int, req.body.UlkeId);
-    request.input("Marketing", mssql.NVarChar, req.body.Marketing);
-    request.input("Aktif", mssql.NVarChar, req.body.Aktif);
-    request.input("Sira", mssql.NVarChar, req.body.Sira);
-    request.input("Mt_No", mssql.NVarChar, req.body.Mt_No);
-    request.input("TemsilciId", mssql.NVarChar, req.body.TemsilciId);
-    request.input("KullaniciID", mssql.Int, req.body.KullaniciID);
-    request.input("MailAdresi", mssql.NVarChar, req.body.MailAdresi);
-    request.input("Telefon", mssql.NVarChar, req.body.Telefon);
-    request.input("Devir", mssql.NVarChar, req.body.Devir);
-    request.input("Ozel", mssql.NVarChar, req.body.Ozel);
-    request.input("MusteriOncelik", mssql.NVarChar, req.body.MusteriOncelik);
-    request.input("SatisciId", mssql.NVarChar, req.body.SatisciId);
-    request.input("Takip", mssql.NVarChar, req.body.Takip);
-    request.input("Notlar", mssql.NVarChar, req.body.Notlar);
-    request.input("SonKullanici", mssql.NVarChar, req.body.SonKullanici);
-    request.input("KayitTarihi", mssql.VarChar, req.body.KayitTarihi);
-    const results = await request.query("insert into MusterilerTB(FirmaAdi,Unvan,Adres,Ulke,UlkeId,Marketing,Aktif,Sira,Mt_No,MusteriTemsilciId,KullaniciID,MailAdresi,Telefon,Devir,Ozel,MusteriOncelik,Satisci,Takip,Notlar,SonKullanici,KayitTarihi) VALUES(@FirmaAdi,@Unvan,@Adres,@Ulke,@UlkeId,@Marketing,@Aktif,@Sira,@Mt_No,@TemsilciId,@KullaniciID,@MailAdresi,@Telefon,@Devir,@Ozel,@MusteriOncelik,@SatisciId,@Takip,@Notlar,@SonKullanici,@KayitTarihi)");
+    request.input("FirmaAdi", mssql.NVarChar, safe(req.body.FirmaAdi));
+    request.input("Unvan", mssql.NVarChar, safe(req.body.Unvan));
+    request.input("Adres", mssql.NVarChar, safe(req.body.Adres));
+    request.input("Ulke", mssql.NVarChar, safe(req.body.Ulke));
+    request.input("UlkeId", mssql.Int, parseInt(req.body.UlkeId) || 0);
+    request.input("Marketing", mssql.NVarChar, safe(req.body.Marketing));
+    request.input("Aktif", mssql.NVarChar, safe(req.body.Aktif));
+    request.input("Sira", mssql.NVarChar, safe(req.body.Sira));
+    request.input("Mt_No", mssql.NVarChar, safe(req.body.Mt_No));
+    request.input("TemsilciId", mssql.NVarChar, safe(req.body.TemsilciId));
+    request.input(
+      "KullaniciID",
+      mssql.Int,
+      parseInt(req.body.KullaniciID) || 0
+    );
+    request.input("MailAdresi", mssql.NVarChar, safe(req.body.MailAdresi));
+    request.input("Telefon", mssql.NVarChar, safe(req.body.Telefon));
+    request.input("Devir", mssql.NVarChar, safe(req.body.Devir));
+    request.input("Ozel", mssql.NVarChar, safe(req.body.Ozel));
+    request.input(
+      "MusteriOncelik",
+      mssql.NVarChar,
+      safe(req.body.MusteriOncelik)
+    );
+    request.input("SatisciId", mssql.NVarChar, safe(req.body.SatisciId));
+    request.input("Takip", mssql.NVarChar, safe(req.body.Takip));
+    request.input("Notlar", mssql.NVarChar, safe(req.body.Notlar));
+    request.input("SonKullanici", mssql.NVarChar, safe(req.body.SonKullanici));
+    request.input("KayitTarihi", mssql.VarChar, safe(req.body.KayitTarihi));
+
+    const results = await request.query(
+      "insert into MusterilerTB(FirmaAdi,Unvan,Adres,Ulke,UlkeId,Marketing,Aktif,Sira,Mt_No,MusteriTemsilciId,KullaniciID,MailAdresi,Telefon,Devir,Ozel,MusteriOncelik,Satisci,Takip,Notlar,SonKullanici,KayitTarihi) VALUES(@FirmaAdi,@Unvan,@Adres,@Ulke,@UlkeId,@Marketing,@Aktif,@Sira,@Mt_No,@TemsilciId,@KullaniciID,@MailAdresi,@Telefon,@Devir,@Ozel,@MusteriOncelik,@SatisciId,@Takip,@Notlar,@SonKullanici,@KayitTarihi)"
+    );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
-    res.status(500).json({ status: false });
+    console.error("❌ /customer/mekmar/save HATA:", err.message);
+    res.status(500).json({ status: false, error: err.message });
   }
 });
+
 app.delete("/customer/mekmar/delete/:id", async (req, res) => {
   try {
     const request = new mssql.Request();
@@ -2896,30 +2913,41 @@ app.delete("/customer/mekmar/delete/:id", async (req, res) => {
     res.status(500).json({ status: false });
   }
 });
+
 app.put("/customer/mekmar/update", async (req, res) => {
   try {
+    const safe = (val) => (val == null || val === undefined ? "" : String(val));
+
     const request = new mssql.Request();
-    request.input("FirmaAdi", mssql.NVarChar, req.body.FirmaAdi);
-    request.input("Unvan", mssql.NVarChar, req.body.Unvan);
-    request.input("Adres", mssql.NVarChar, req.body.Adres);
-    request.input("Ulke", mssql.NVarChar, req.body.Ulke);
-    request.input("UlkeId", mssql.Int, req.body.UlkeId);
-    request.input("Marketing", mssql.NVarChar, req.body.Marketing);
-    request.input("TemsilciId", mssql.NVarChar, req.body.TemsilciId);
-    request.input("MailAdresi", mssql.NVarChar, req.body.MailAdresi);
-    request.input("Telefon", mssql.NVarChar, req.body.Telefon);
-    request.input("Devir", mssql.NVarChar, req.body.Devir);
-    request.input("Ozel", mssql.NVarChar, req.body.Ozel);
-    request.input("MusteriOncelik", mssql.NVarChar, req.body.MusteriOncelik);
-    request.input("SatisciId", mssql.NVarChar, req.body.SatisciId);
-    request.input("Takip", mssql.NVarChar, req.body.Takip);
-    request.input("Notlar", mssql.NVarChar, req.body.Notlar);
-    request.input("SonKullanici", mssql.NVarChar, req.body.SonKullanici);
-    request.input("ID", mssql.Int, req.body.ID);
-    const results = await request.query(`update MusterilerTB SET FirmaAdi=@FirmaAdi,Unvan=@Unvan,Adres=@Adres,Ulke=@Ulke,UlkeId=@UlkeId,Marketing=@Marketing,MusteriTemsilciId=@TemsilciId,MailAdresi=@MailAdresi,Telefon=@Telefon,Devir=@Devir,Ozel=@Ozel,MusteriOncelik=@MusteriOncelik,Satisci=@SatisciId,Takip=@Takip,Notlar=@Notlar,SonKullanici=@SonKullanici WHERE ID=@ID`);
+    request.input("FirmaAdi", mssql.NVarChar, safe(req.body.FirmaAdi));
+    request.input("Unvan", mssql.NVarChar, safe(req.body.Unvan));
+    request.input("Adres", mssql.NVarChar, safe(req.body.Adres));
+    request.input("Ulke", mssql.NVarChar, safe(req.body.Ulke));
+    request.input("UlkeId", mssql.Int, parseInt(req.body.UlkeId) || 0);
+    request.input("Marketing", mssql.NVarChar, safe(req.body.Marketing));
+    request.input("TemsilciId", mssql.NVarChar, safe(req.body.TemsilciId));
+    request.input("MailAdresi", mssql.NVarChar, safe(req.body.MailAdresi));
+    request.input("Telefon", mssql.NVarChar, safe(req.body.Telefon));
+    request.input("Devir", mssql.NVarChar, safe(req.body.Devir));
+    request.input("Ozel", mssql.NVarChar, safe(req.body.Ozel));
+    request.input(
+      "MusteriOncelik",
+      mssql.NVarChar,
+      safe(req.body.MusteriOncelik)
+    );
+    request.input("SatisciId", mssql.NVarChar, safe(req.body.SatisciId));
+    request.input("Takip", mssql.NVarChar, safe(req.body.Takip));
+    request.input("Notlar", mssql.NVarChar, safe(req.body.Notlar));
+    request.input("SonKullanici", mssql.NVarChar, safe(req.body.SonKullanici));
+    request.input("ID", mssql.Int, parseInt(req.body.ID) || 0);
+
+    const results = await request.query(
+      `update MusterilerTB SET FirmaAdi=@FirmaAdi,Unvan=@Unvan,Adres=@Adres,Ulke=@Ulke,UlkeId=@UlkeId,Marketing=@Marketing,MusteriTemsilciId=@TemsilciId,MailAdresi=@MailAdresi,Telefon=@Telefon,Devir=@Devir,Ozel=@Ozel,MusteriOncelik=@MusteriOncelik,Satisci=@SatisciId,Takip=@Takip,Notlar=@Notlar,SonKullanici=@SonKullanici WHERE ID=@ID`
+    );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
-    res.status(500).json({ status: false });
+    console.error("❌ /customer/mekmar/update HATA:", err.message);
+    res.status(500).json({ status: false, error: err.message });
   }
 });
 app.get("/customer/offer/list", (req, res) => {
