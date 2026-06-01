@@ -253,7 +253,7 @@ export default {
           " faturası $" +
           this.usd.toFixed(4) +
           " ve $" +
-          this.currency.toFixed(4) +
+          this.currency +
           " kur girilmiştir.",
         po: this.selectedPo.SiparisNo,
         color: "#ffec31",

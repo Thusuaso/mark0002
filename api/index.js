@@ -2538,17 +2538,17 @@ function containerInputResults(po, cb) {
 app.post("/container/input/save", async (req, res) => {
   try {
     const request = new mssql.Request();
-    request.input("companyid", mssql.Int, req.body.companyid);
-    request.input("date", mssql.VarChar, req.body.date);
-    request.input("invoiceno", mssql.NVarChar, req.body.invoiceno);
-    request.input("currency", mssql.NVarChar, req.body.currency);
-    request.input("nowDate", mssql.VarChar, req.body.nowDate);
-    request.input("description", mssql.NVarChar, req.body.description);
-    request.input("userId", mssql.Int, req.body.userId);
+    request.input("companyid", mssql.Int, safe(req.body.companyid));
+    request.input("date", mssql.VarChar, safe(req.body.date));
+    request.input("invoiceno", mssql.NVarChar, safe(req.body.invoiceno));
+    request.input("currency", mssql.NVarChar, safe(req.body.currency));
+    request.input("nowDate", mssql.VarChar, safe(req.body.nowDate));
+    request.input("description", mssql.NVarChar, safe(req.body.description));
+    request.input("userId", mssql.Int, safe(req.body.userId));
     const response = await request.query("INSERT INTO KonteynerDigerFaturalarKayitTB(FirmaID,Tarih,FaturaNo,Kur,KayitTarihi,Aciklama,KullaniciID) values(@companyid,@date,@invoiceno,@currency,@nowDate,@description,@userId)");
     if (response.rowsAffected[0] == 1) {
       const r2 = new mssql.Request();
-      r2.input("invoiceno", mssql.NVarChar, req.body.invoiceno);
+      r2.input("invoiceno", mssql.NVarChar, safe(req.body.invoiceno));
       const containerResults = await r2.query("select ID,FaturaNo,FirmaID from KonteynerDigerFaturalarKayitTB where FaturaNo=@invoiceno");
       res.status(200).json({ status: true, containerResults: containerResults.recordset[0] });
     } else {
@@ -2562,15 +2562,15 @@ app.post("/container/input/save", async (req, res) => {
 app.post("/container/input/file/save", async (req, res) => {
   try {
     const request = new mssql.Request();
-    request.input("date", mssql.VarChar, req.body.date);
-    request.input("invoiceid", mssql.Int, req.body.invoiceid);
-    request.input("invoicekindid", mssql.Int, req.body.invoicekindid);
-    request.input("po", mssql.NVarChar, req.body.po);
-    request.input("usd", mssql.NVarChar, req.body.usd);
-    request.input("invoicedocumentid", mssql.Int, req.body.invoicedocumentid);
-    request.input("nowDate", mssql.VarChar, req.body.nowDate);
-    request.input("evrakAdi", mssql.NVarChar, req.body.invoiceno + ".pdf");
-    request.input("userId", mssql.Int, req.body.userId);
+    request.input("date", mssql.VarChar, safe(req.body.date));
+    request.input("invoiceid", mssql.Int, safe(req.body.invoiceid));
+    request.input("invoicekindid", mssql.Int, safe(req.body.invoicekindid));
+    request.input("po", mssql.NVarChar, safe(req.body.po));
+    request.input("usd", mssql.NVarChar, safe(req.body.usd));
+    request.input("invoicedocumentid", mssql.Int, safe(req.body.invoicedocumentid));
+    request.input("nowDate", mssql.VarChar, safe(req.body.nowDate));
+    request.input("evrakAdi", mssql.NVarChar, safe(req.body.invoiceno + ".pdf"));
+    request.input("userId", mssql.Int, safe(req.body.userId));
     const response = await request.query("INSERT INTO SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,Tutar,EvrakDurum,YuklemeEvrakID,YuklemeEvrakDurumID,EvrakYuklemeTarihi,EvrakAdi,KullaniciID) VALUES(@date,@invoiceid,@invoicekindid,@po,@usd,1,@invoicedocumentid,2,@nowDate,@evrakAdi,@userId)");
     res.status(200).json({ status: response.rowsAffected[0] == 1 });
   } catch (err) {
@@ -2680,13 +2680,13 @@ app.post("/transport/list/save", async (req, res) => {
   try {
     for (const x of req.body) {
       const request = new mssql.Request();
-      request.input("companyId", mssql.Int, x.companyId);
-      request.input("date", mssql.VarChar, x.date);
-      request.input("invoiceno", mssql.NVarChar, x.invoiceno);
-      request.input("tl", mssql.NVarChar, x.tl);
-      request.input("currency", mssql.NVarChar, x.currency);
-      request.input("nowDate", mssql.VarChar, x.nowDate);
-      request.input("userId", mssql.Int, x.userId);
+      request.input("companyId", mssql.Int, safe(x.companyId));
+      request.input("date", mssql.VarChar, safe(x.date));
+      request.input("invoiceno", mssql.NVarChar, safe(x.invoiceno));
+      request.input("tl", mssql.NVarChar, safe(x.tl));
+      request.input("currency", mssql.NVarChar, safe(x.currency));
+      request.input("nowDate", mssql.VarChar, safe(x.nowDate));
+      request.input("userId", mssql.Int, safe(x.userId));
       const response = await request.query("INSERT INTO NakliyeFaturaKayitTB(FirmaID,Tarih,FaturaNo,Tutar,Kur,KayitTarihi,KullaniciID) values(@companyId,@date,@invoiceno,@tl,@currency,@nowDate,@userId)");
       if (response.rowsAffected[0] == 1) {
         await invoiceIdSave(x);
@@ -2715,14 +2715,14 @@ app.post("/transport/file/list/save", async (req, res) => {
       const tProductId = await transportProductId(x);
       const tInvoiceId = await transportInvoiceId(x);
       const request = new mssql.Request();
-      request.input("date", mssql.VarChar, x.date);
-      request.input("tProductId", mssql.Int, tProductId);
-      request.input("po", mssql.NVarChar, x.po);
-      request.input("usd", mssql.NVarChar, x.usd);
-      request.input("tInvoiceId", mssql.Int, tInvoiceId);
-      request.input("nowDate", mssql.VarChar, x.nowDate);
-      request.input("evrakAdi", mssql.NVarChar, x.invoiceno + ".pdf");
-      request.input("userId", mssql.Int, x.userId);
+      request.input("date", mssql.VarChar, safe(x.date));
+      request.input("tProductId", mssql.Int, safe(tProductId));
+      request.input("po", mssql.NVarChar, safe(x.po));
+      request.input("usd", mssql.NVarChar, safe(x.usd));
+      request.input("tInvoiceId", mssql.Int, safe(tInvoiceId));
+      request.input("nowDate", mssql.VarChar, safe(x.nowDate));
+      request.input("evrakAdi", mssql.NVarChar, safe(x.invoiceno + ".pdf"));
+      request.input("userId", mssql.Int, safe(x.userId));
       await request.query("INSERT INTO SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,Tutar,EvrakDurum,YuklemeEvrakID,YeniEvrakID,YuklemeEvrakDurumID,EvrakYuklemeTarihi,EvrakAdi,KullaniciID) values(@date,@tProductId,11,@po,@usd,1,13,@tInvoiceId,2,@nowDate,@evrakAdi,@userId)");
     }
     res.status(200).json({ status: true });
@@ -2762,17 +2762,17 @@ app.get("/transport/list", (req, res) => {
 app.put("/transport/list/update", async (req, res) => {
   try {
     const tReq = new mssql.Request();
-    tReq.input("date", mssql.VarChar, req.body.date);
-    tReq.input("invoice", mssql.NVarChar, req.body.invoice);
-    tReq.input("tl", mssql.NVarChar, req.body.tl);
-    tReq.input("currency", mssql.NVarChar, req.body.currency);
-    tReq.input("transportId", mssql.Int, req.body.transportId);
+    tReq.input("date", mssql.VarChar, safe(req.body.date));
+    tReq.input("invoice", mssql.NVarChar, safe(req.body.invoice));
+    tReq.input("tl", mssql.NVarChar, safe(req.body.tl));
+    tReq.input("currency", mssql.NVarChar, safe(req.body.currency));
+    tReq.input("transportId", mssql.Int, safe(req.body.transportId));
     const transport = await tReq.query("update NakliyeFaturaKayitTB SET Tarih=@date,FaturaNo=@invoice,Tutar=@tl,Kur=@currency where ID=@transportId");
     if (transport.rowsAffected[0] != 1) return res.status(200).json({ status: false });
     const pReq = new mssql.Request();
-    pReq.input("po", mssql.NVarChar, req.body.po);
-    pReq.input("usd", mssql.NVarChar, req.body.usd);
-    pReq.input("productInvoiceId", mssql.Int, req.body.productInvoiceId);
+    pReq.input("po", mssql.NVarChar, safe(req.body.po));
+    pReq.input("usd", mssql.NVarChar, safe(req.body.usd));
+    pReq.input("productInvoiceId", mssql.Int, safe(req.body.productInvoiceId));
     const product = await pReq.query("update SiparisFaturaKayitTB SET SiparisNo=@po,Tutar=@usd where ID=@productInvoiceId");
     res.status(200).json({ status: product.rowsAffected[0] == 1 });
   } catch (err) {

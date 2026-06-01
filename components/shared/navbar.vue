@@ -26,11 +26,7 @@
                 >SELECTION</nuxt-link
               >
             </li>
-            <!-- <li class="nav-item" v-show="getAuthorityStatus">
-            <nuxt-link to="/operation/cards" tag="a" class="nav-link"
-              >PRODUCT CARDS</nuxt-link
-            >
-          </li> -->
+
 
             <li class="nav-item" v-show="!getAuthorityStatus">
               <nuxt-link to="/" tag="a" class="nav-link">HOME</nuxt-link>
@@ -66,17 +62,7 @@
                 </li>
               </ul>
             </li>
-            <!-- <li class="nav-item dropdown" v-show="getAuthorityStatus">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              ORDERS
-            </a>
-            <ul class="dropdown-menu">
 
-              <li>
-                <nuxt-link to="/orders/waiting" class="dropdown-item" tag="a">On Hold</nuxt-link>
-              </li>
-            </ul>
-          </li> -->
             <li class="nav-item dropdown" v-show="!getAuthorityStatus">
               <a
                 class="nav-link dropdown-toggle"
@@ -815,6 +801,11 @@
                 >Product Data</nuxt-link
               >
             </li>
+            <li class="nav-item">
+                <nuxt-link to="/customer/mekmar" class="nav-link" tag="a"
+                  >Sale Customers</nuxt-link
+                >
+              </li>
           </ul>
         </div>
       </div>
