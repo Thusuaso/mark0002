@@ -3713,363 +3713,125 @@ app.get("/reports/mekmer/stock/list/outer", (req, res) => {
     });
   });
 });
-app.post("/reports/all/stock/detail", (req, res) => {
-  const sql = `
-                        select 
+app.post("/reports/all/stock/detail", async (req, res) => {
+  try {
+    const { KategoriAdi, UrunAdi, YuzeyIslemAdi, En, Boy, Kenar } = req.body;
 
-	u.Tarih,
-	u.KasaNo,
-	t.FirmaAdi,
-	ub.BirimAdi,
-	uo.OcakAdi,
-	u.Adet,
-	u.Miktar,
-	u.Aciklama,
-	u.SiparisAciklama,
-	u.Kutu,
-	u.Bagli,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar
-	
+    const sql = `
+      select 
+        u.Tarih, u.KasaNo, t.FirmaAdi, ub.BirimAdi, uo.OcakAdi,
+        u.Adet, u.Miktar, u.Aciklama, u.SiparisAciklama,
+        u.Kutu, u.Bagli, k.KategoriAdi, urun.UrunAdi,
+        yk.YuzeyIslemAdi, ol.En, ol.Boy, ol.Kenar
+      from UretimTB u
+      inner join UrunKartTB uk on uk.ID = u.UrunKartID
+      inner join KategoriTB k on k.ID = uk.KategoriID
+      inner join UrunlerTB urun on urun.ID = uk.UrunID
+      inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+      inner join OlculerTB ol on ol.ID = uk.OlcuID
+      inner join TedarikciTB t on t.ID = u.TedarikciID
+      inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
+      inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
+      where u.UrunDurumID = 1 and u.Bulunamadi != 1
+        and k.KategoriAdi = @KategoriAdi
+        and urun.UrunAdi = @UrunAdi
+        and yk.YuzeyIslemAdi = @YuzeyIslemAdi
+        and ol.En = @En and ol.Boy = @Boy and ol.Kenar = @Kenar
+    `;
 
-from UretimTB u
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
+    const request = new mssql.Request();
+    request.input("KategoriAdi", mssql.NVarChar, safe(KategoriAdi));
+    request.input("UrunAdi", mssql.NVarChar, safe(UrunAdi));
+    request.input("YuzeyIslemAdi", mssql.NVarChar, safe(YuzeyIslemAdi));
+    request.input("En", mssql.NVarChar, safe(En));
+    request.input("Boy", mssql.NVarChar, safe(Boy));
+    request.input("Kenar", mssql.NVarChar, safe(Kenar));
 
-where u.UrunDurumID = 1 and u.Bulunamadi != 1 and 
-k.KategoriAdi=@KategoriAdi
-and urun.UrunAdi=@UrunAdi
-and yk.YuzeyIslemAdi=@YuzeyIslemAdi
-and ol.En=@En and
-ol.Boy=@Boy
-and ol.Kenar=@Kenar
-                `;
-  mssql.query(sql, (err, results) => {
+    const results = await request.query(sql);
     res.status(200).json({ list: results.recordset });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+const STOCK_DETAIL_SQL = (extraWhere) => `
+select 
+  u.Tarih,
+  u.KasaNo,
+  t.FirmaAdi,
+  ub.BirimAdi,
+  uo.OcakAdi,
+  u.Adet,
+  u.Miktar,
+  u.Aciklama,
+  u.SiparisAciklama,
+  u.Kutu,
+  u.Bagli,
+  k.KategoriAdi,
+  urun.UrunAdi,
+  yk.YuzeyIslemAdi,
+  ol.En,
+  ol.Boy,
+  ol.Kenar
+from UretimTB u
+inner join UrunKartTB uk on uk.ID = u.UrunKartID
+inner join KategoriTB k on k.ID = uk.KategoriID
+inner join UrunlerTB urun on urun.ID = uk.UrunID
+inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+inner join OlculerTB ol on ol.ID = uk.OlcuID
+inner join TedarikciTB t on t.ID = u.TedarikciID
+inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
+inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
+where u.UrunDurumID = 1
+  and u.Bulunamadi != 1
+  ${extraWhere ? `and ${extraWhere}` : ""}
+  and k.KategoriAdi = @KategoriAdi
+  and urun.UrunAdi = @UrunAdi
+  and yk.YuzeyIslemAdi = @YuzeyIslemAdi
+  and ol.En = @En
+  and ol.Boy = @Boy
+  and ol.Kenar = @Kenar
+`;
+
+function registerStockDetailEndpoint(path, extraWhere) {
+  app.post(path, async (req, res) => {
+    try {
+      const { KategoriAdi, UrunAdi, YuzeyIslemAdi, En, Boy, Kenar } = req.body;
+
+      const request = new mssql.Request();
+      request.input("KategoriAdi", mssql.NVarChar, safe(KategoriAdi));
+      request.input("UrunAdi", mssql.NVarChar, safe(UrunAdi));
+      request.input("YuzeyIslemAdi", mssql.NVarChar, safe(YuzeyIslemAdi));
+      request.input("En", mssql.NVarChar, safe(En));
+      request.input("Boy", mssql.NVarChar, safe(Boy));
+      request.input("Kenar", mssql.NVarChar, safe(Kenar));
+
+      const results = await request.query(STOCK_DETAIL_SQL(extraWhere));
+      res.status(200).json({ list: results.recordset });
+    } catch (err) {
+      console.error(`[${path}]`, err.message);
+      res.status(500).json({ list: [], error: err.message });
+    }
   });
-});
-app.post("/reports/stock/stock/detail", (req, res) => {
-  const sql = `
-                        select 
+}
 
-	u.Tarih,
-	u.KasaNo,
-	t.FirmaAdi,
-	ub.BirimAdi,
-	uo.OcakAdi,
-	u.Adet,
-	u.Miktar,
-	u.Aciklama,
-	u.SiparisAciklama,
-	u.Kutu,
-	u.Bagli,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar
-	
+// Endpoint tanımları — tek fark route + ekstra WHERE koşulu
+registerStockDetailEndpoint("/reports/stock/stock/detail", "u.UretimTurID = 1");
+registerStockDetailEndpoint("/reports/outer/stock/detail", "u.Disarda = 1");
+registerStockDetailEndpoint("/reports/mekmer/stock/detail", "u.Disarda != 1");
+registerStockDetailEndpoint(
+  "/reports/mekmer/stock/detail/in",
+  "u.TedarikciID = 1"
+);
+registerStockDetailEndpoint(
+  "/reports/mekmoz/stock/detail",
+  "u.TedarikciID = 123"
+);
+registerStockDetailEndpoint(
+  "/reports/mekmer/stock/only/stock/mekmer/detail",
+  "u.TedarikciID in (1, 123) and u.UretimTurID = 1"
+);
 
-from UretimTB u
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
-
-where u.UrunDurumID = 1 and u.UretimTurID = 1 and u.Bulunamadi != 1 and
-k.KategoriAdi=@KategoriAdi
-and urun.UrunAdi=@UrunAdi
-and yk.YuzeyIslemAdi=@YuzeyIslemAdi
-and ol.En=@En and
-ol.Boy=@Boy
-and ol.Kenar=@Kenar
-                `;
-  mssql.query(sql, (err, results) => {
-    res.status(200).json({ list: results.recordset });
-  });
-});
-app.post("/reports/outer/stock/detail", async (req, res) => {
-  try {
-  const request = new mssql.Request();
-  request.input("KategoriAdi", mssql.NVarChar, req.body.KategoriAdi);
-  request.input("UrunAdi", mssql.NVarChar, req.body.UrunAdi);
-  request.input("YuzeyIslemAdi", mssql.NVarChar, req.body.YuzeyIslemAdi);
-  request.input("En", mssql.NVarChar, req.body.En);
-  request.input("Boy", mssql.NVarChar, req.body.Boy);
-  request.input("Kenar", mssql.NVarChar, req.body.Kenar);
-  const sql = `
-                        select 
-
-	u.Tarih,
-	u.KasaNo,
-	t.FirmaAdi,
-	ub.BirimAdi,
-	uo.OcakAdi,
-	u.Adet,
-	u.Miktar,
-	u.Aciklama,
-	u.SiparisAciklama,
-	u.Kutu,
-	u.Bagli,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar
-	
-
-from UretimTB u
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
-
-where u.UrunDurumID = 1 and u.Disarda = 1 and u.Bulunamadi != 1 and
-k.KategoriAdi=@KategoriAdi
-and urun.UrunAdi=@UrunAdi
-and yk.YuzeyIslemAdi=@YuzeyIslemAdi
-and ol.En=@En and
-ol.Boy=@Boy
-and ol.Kenar=@Kenar
-                `;
-  const results = await request.query(sql);
-  res.status(200).json({ list: results.recordset });
-  } catch (err) { res.status(500).json({ list: [] }); }
-});
-app.post("/reports/mekmer/stock/detail", async (req, res) => {
-  try {
-  const request = new mssql.Request();
-  request.input("KategoriAdi", mssql.NVarChar, req.body.KategoriAdi);
-  request.input("UrunAdi", mssql.NVarChar, req.body.UrunAdi);
-  request.input("YuzeyIslemAdi", mssql.NVarChar, req.body.YuzeyIslemAdi);
-  request.input("En", mssql.NVarChar, req.body.En);
-  request.input("Boy", mssql.NVarChar, req.body.Boy);
-  request.input("Kenar", mssql.NVarChar, req.body.Kenar);
-  const sql = `
-                        select 
-
-	u.Tarih,
-	u.KasaNo,
-	t.FirmaAdi,
-	ub.BirimAdi,
-	uo.OcakAdi,
-	u.Adet,
-	u.Miktar,
-	u.Aciklama,
-	u.SiparisAciklama,
-	u.Kutu,
-	u.Bagli,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar
-	
-
-from UretimTB u
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
-
-where u.UrunDurumID = 1 and u.Disarda != 1 and u.Bulunamadi != 1 and
-k.KategoriAdi=@KategoriAdi
-and urun.UrunAdi=@UrunAdi
-and yk.YuzeyIslemAdi=@YuzeyIslemAdi
-and ol.En=@En and
-ol.Boy=@Boy
-and ol.Kenar=@Kenar
-                `;
-  const results = await request.query(sql);
-  res.status(200).json({ list: results.recordset });
-  } catch (err) { res.status(500).json({ list: [] }); }
-});
-
-app.post("/reports/mekmer/stock/detail/in", async (req, res) => {
-  try {
-  const request = new mssql.Request();
-  request.input("KategoriAdi", mssql.NVarChar, req.body.KategoriAdi);
-  request.input("UrunAdi", mssql.NVarChar, req.body.UrunAdi);
-  request.input("YuzeyIslemAdi", mssql.NVarChar, req.body.YuzeyIslemAdi);
-  request.input("En", mssql.NVarChar, req.body.En);
-  request.input("Boy", mssql.NVarChar, req.body.Boy);
-  request.input("Kenar", mssql.NVarChar, req.body.Kenar);
-  const sql = `
-                    select 
-
-u.Tarih,
-u.KasaNo,
-t.FirmaAdi,
-ub.BirimAdi,
-uo.OcakAdi,
-u.Adet,
-u.Miktar,
-u.Aciklama,
-u.SiparisAciklama,
-u.Kutu,
-u.Bagli,
-k.KategoriAdi,
-urun.UrunAdi,
-yk.YuzeyIslemAdi,
-ol.En,
-ol.Boy,
-ol.Kenar
-
-
-from UretimTB u
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
-
-where u.UrunDurumID = 1 and u.TedarikciID = 1 and u.Bulunamadi != 1 and
-k.KategoriAdi=@KategoriAdi
-and urun.UrunAdi=@UrunAdi
-and yk.YuzeyIslemAdi=@YuzeyIslemAdi
-and ol.En=@En and
-ol.Boy=@Boy
-and ol.Kenar=@Kenar
-            `;
-  const results = await request.query(sql);
-  res.status(200).json({ list: results.recordset });
-  } catch (err) { res.status(500).json({ list: [] }); }
-});
-app.post("/reports/mekmoz/stock/detail", async (req, res) => {
-  try {
-  const request = new mssql.Request();
-  request.input("KategoriAdi", mssql.NVarChar, req.body.KategoriAdi);
-  request.input("UrunAdi", mssql.NVarChar, req.body.UrunAdi);
-  request.input("YuzeyIslemAdi", mssql.NVarChar, req.body.YuzeyIslemAdi);
-  request.input("En", mssql.NVarChar, req.body.En);
-  request.input("Boy", mssql.NVarChar, req.body.Boy);
-  request.input("Kenar", mssql.NVarChar, req.body.Kenar);
-  const sql = `
-                    select 
-
-u.Tarih,
-u.KasaNo,
-t.FirmaAdi,
-ub.BirimAdi,
-uo.OcakAdi,
-u.Adet,
-u.Miktar,
-u.Aciklama,
-u.SiparisAciklama,
-u.Kutu,
-u.Bagli,
-k.KategoriAdi,
-urun.UrunAdi,
-yk.YuzeyIslemAdi,
-ol.En,
-ol.Boy,
-ol.Kenar
-
-
-from UretimTB u
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
-
-where u.UrunDurumID = 1 and u.TedarikciID = 123 and u.Bulunamadi != 1 and 
-k.KategoriAdi=@KategoriAdi
-and urun.UrunAdi=@UrunAdi
-and yk.YuzeyIslemAdi=@YuzeyIslemAdi
-and ol.En=@En and
-ol.Boy=@Boy
-and ol.Kenar=@Kenar
-            `;
-  const results = await request.query(sql);
-  res.status(200).json({ list: results.recordset });
-  } catch (err) { res.status(500).json({ list: [] }); }
-});
-
-app.post("/reports/mekmer/stock/only/stock/mekmer/detail", async (req, res) => {
-  try {
-  const request = new mssql.Request();
-  request.input("KategoriAdi", mssql.NVarChar, req.body.KategoriAdi);
-  request.input("UrunAdi", mssql.NVarChar, req.body.UrunAdi);
-  request.input("YuzeyIslemAdi", mssql.NVarChar, req.body.YuzeyIslemAdi);
-  request.input("En", mssql.NVarChar, req.body.En);
-  request.input("Boy", mssql.NVarChar, req.body.Boy);
-  request.input("Kenar", mssql.NVarChar, req.body.Kenar);
-  const sql = `
-                    select 
-
-u.Tarih,
-u.KasaNo,
-t.FirmaAdi,
-ub.BirimAdi,
-uo.OcakAdi,
-u.Adet,
-u.Miktar,
-u.Aciklama,
-u.SiparisAciklama,
-u.Kutu,
-u.Bagli,
-k.KategoriAdi,
-urun.UrunAdi,
-yk.YuzeyIslemAdi,
-ol.En,
-ol.Boy,
-ol.Kenar
-
-
-from UretimTB u
-inner join UrunKartTB uk on uk.ID = u.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB t on t.ID = u.TedarikciID
-inner join UrunBirimTB ub on ub.ID = u.UrunBirimID
-inner join UrunOcakTB uo on uo.ID = u.UrunOcakID
-
-where u.UrunDurumID = 1 and u.TedarikciID in (1,123) and u.UretimTurID=1 and u.Bulunamadi != 1 and 
-k.KategoriAdi=@KategoriAdi
-and urun.UrunAdi=@UrunAdi
-and yk.YuzeyIslemAdi=@YuzeyIslemAdi
-and ol.En=@En and
-ol.Boy=@Boy
-and ol.Kenar=@Kenar
-            `;
-  const results = await request.query(sql);
-  res.status(200).json({ list: results.recordset });
-  } catch (err) { res.status(500).json({ list: [] }); }
-});
 
 app.get("/reports/mekmer/mine/list", (req, res) => {
   const sql = `
