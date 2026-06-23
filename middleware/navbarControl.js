@@ -21,7 +21,7 @@ export default function (context) {
   }
 
   // 2. Aşama: Alınan userId değerine göre Navbar'ı aç veya kapat
-  if (userId == 48 || userId == 54 || userId == 56) {
+  if (userId == 48 || userId == 54 || userId == 56 || userId == 62) {
     context.store.dispatch("setAuthorityNavbarStatus", true);
   } else {
     context.store.dispatch("setAuthorityNavbarStatus", false);
