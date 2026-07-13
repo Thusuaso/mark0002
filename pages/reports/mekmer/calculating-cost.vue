@@ -56,6 +56,7 @@
             header="Tarih"
             :showFilterMenu="false"
             :showClearButton="false"
+            style="min-width: 120px"
           >
             <template #body="slotProps">
               {{ formatDateTR(slotProps.data.Tarih) }}
@@ -444,12 +445,26 @@ export default {
           this.yearly_cost_header = "Aylık";
         });
     },
-    formatDateTR(dateInput) {
-      if (!dateInput) return "";
-      const d = new Date(dateInput);
+formatDateTR(dateInput) {
+  if (!dateInput) return "";
 
-      return new Intl.DateTimeFormat("tr-TR").format(d);
-    },
+  let d = dateInput instanceof Date ? dateInput : new Date(dateInput);
+
+  // Safari/Samsung "2026-05-12 00:00:00" formatını parse edemez -> T ile dene
+  if (isNaN(d.getTime()) && typeof dateInput === "string") {
+    d = new Date(dateInput.replace(" ", "T"));
+  }
+
+  // "12.05.2026" gibi Türkçe formata karşı yedek
+  if (isNaN(d.getTime()) && typeof dateInput === "string") {
+    const m = dateInput.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+    if (m) d = new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00`);
+  }
+
+  if (isNaN(d.getTime())) return "";
+
+  return new Intl.DateTimeFormat("tr-TR").format(d);
+},
     getCostType(id) {
       const costType = this.costTypes.find((cost) => cost.ID === id);
       return costType ? costType.MaliyetTuru : "";
