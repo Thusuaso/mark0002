@@ -15120,21 +15120,23 @@ app.get("/reports/mekmer/calculating/cost/:year/:month", async (req, res) => {
   try {
     const { year, month } = req.params;
 
-    // 1. SQL Sorgularını Hazırla
     const sqlCost = `
-            SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat,m.FiyatUsd , mb.MaliyetTuru,mf.MaliyetFirma
+      SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat, m.FiyatUsd, mb.MaliyetTuru, mf.MaliyetFirma
       FROM MekmerMaliyetTB m
-	  inner join MekmerMaliyetTurTB mb on mb.ID = m.MaliyetTurId
-	  inner join MekmerMaliyetFirmaTB mf on mf.ID = m.FaturaFirmaId
-      WHERE YEAR(Tarih) = @year AND MONTH(Tarih) = @month
+      INNER JOIN MekmerMaliyetTurTB mb ON mb.ID = m.MaliyetTurId
+      INNER JOIN MekmerMaliyetFirmaTB mf ON mf.ID = m.FaturaFirmaId
+      WHERE YEAR(TRY_CONVERT(datetime, m.Tarih)) = @year
+        AND MONTH(TRY_CONVERT(datetime, m.Tarih)) = @month
     `;
 
     const sqlProductionSqm = `
-      SELECT u.UrunBirimID, u.Miktar, ol.En, ol.Boy 
-      FROM UretimTB u 
+      SELECT u.UrunBirimID, u.Miktar, ol.En, ol.Boy
+      FROM UretimTB u
       INNER JOIN UrunKartTB uk ON uk.ID = u.UrunKartID
       INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
-      WHERE YEAR(u.Tarih) = @year AND MONTH(u.Tarih) = @month AND u.TedarikciID = 1
+      WHERE YEAR(TRY_CONVERT(datetime, u.Tarih)) = @year
+        AND MONTH(TRY_CONVERT(datetime, u.Tarih)) = @month
+        AND u.TedarikciID = 1
     `;
 
     const sqlCompany = `SELECT * FROM MekmerMaliyetFirmaTB`;
@@ -15142,8 +15144,18 @@ app.get("/reports/mekmer/calculating/cost/:year/:month", async (req, res) => {
 
     const [listResult, productionResult, companiesResult, costTypesResult] =
       await Promise.all([
-        (() => { const r = new mssql.Request(); r.input("year", mssql.Int, year); r.input("month", mssql.Int, month); return r.query(sqlCost); })(),
-        (() => { const r = new mssql.Request(); r.input("year", mssql.Int, year); r.input("month", mssql.Int, month); return r.query(sqlProductionSqm); })(),
+        (() => {
+          const r = new mssql.Request();
+          r.input("year", mssql.Int, year);
+          r.input("month", mssql.Int, month);
+          return r.query(sqlCost);
+        })(),
+        (() => {
+          const r = new mssql.Request();
+          r.input("year", mssql.Int, year);
+          r.input("month", mssql.Int, month);
+          return r.query(sqlProductionSqm);
+        })(),
         mssql.query(sqlCompany),
         mssql.query(sqlCostType),
       ]);
@@ -15159,16 +15171,17 @@ app.get("/reports/mekmer/calculating/cost/:year/:month", async (req, res) => {
     res.status(500).send("Veritabanı işlemi sırasında bir hata oluştu.");
   }
 });
+
 app.get("/reports/mekmer/calculating/cost/:year", async (req, res) => {
   try {
     const { year } = req.params;
 
     const sqlCost = `
-      SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat,m.FiyatUsd , mb.MaliyetTuru,mf.MaliyetFirma
+      SELECT m.ID, m.Tarih, m.MaliyetTurId, m.FaturaNo, m.FaturaFirmaId, m.Kur, m.Fiyat, m.FiyatUsd, mb.MaliyetTuru, mf.MaliyetFirma
       FROM MekmerMaliyetTB m
-	  inner join MekmerMaliyetTurTB mb on mb.ID = m.MaliyetTurId
-	  inner join MekmerMaliyetFirmaTB mf on mf.ID = m.FaturaFirmaId
-      WHERE YEAR(m.Tarih) = @year
+      INNER JOIN MekmerMaliyetTurTB mb ON mb.ID = m.MaliyetTurId
+      INNER JOIN MekmerMaliyetFirmaTB mf ON mf.ID = m.FaturaFirmaId
+      WHERE YEAR(TRY_CONVERT(datetime, m.Tarih)) = @year
     `;
 
     const sqlProductionSqm = `
@@ -15176,7 +15189,9 @@ app.get("/reports/mekmer/calculating/cost/:year", async (req, res) => {
       FROM UretimTB u
       INNER JOIN UrunKartTB uk ON uk.ID = u.UrunKartID
       INNER JOIN OlculerTB ol ON ol.ID = uk.OlcuID
-      WHERE YEAR(u.Tarih) = @year AND u.TedarikciID = 1 and u.Kutulama != 1
+      WHERE YEAR(TRY_CONVERT(datetime, u.Tarih)) = @year
+        AND u.TedarikciID = 1
+        AND u.Kutulama != 1
     `;
 
     const sqlCompany = `SELECT * FROM MekmerMaliyetFirmaTB`;
@@ -15184,8 +15199,16 @@ app.get("/reports/mekmer/calculating/cost/:year", async (req, res) => {
 
     const [listResult, productionResult, companiesResult, costTypesResult] =
       await Promise.all([
-        (() => { const r = new mssql.Request(); r.input("year", mssql.Int, year); return r.query(sqlCost); })(),
-        (() => { const r = new mssql.Request(); r.input("year", mssql.Int, year); return r.query(sqlProductionSqm); })(),
+        (() => {
+          const r = new mssql.Request();
+          r.input("year", mssql.Int, year);
+          return r.query(sqlCost);
+        })(),
+        (() => {
+          const r = new mssql.Request();
+          r.input("year", mssql.Int, year);
+          return r.query(sqlProductionSqm);
+        })(),
         mssql.query(sqlCompany),
         mssql.query(sqlCostType),
       ]);
@@ -15203,70 +15226,54 @@ app.get("/reports/mekmer/calculating/cost/:year", async (req, res) => {
 });
 
 app.post("/reports/mekmer/calculating/cost/save", async (req, res) => {
-  //   const body = req.body;
-  //   const insertCostTypeSql = `
-  //     insert into MekmerMaliyetTurTB(MaliyetTuru) VALUES('${body.costType}')
-
-  //   `;
-  //   const getCostTypeIdSql = `select top 1 ID from MekmerMaliyetTurTB order by ID desc`;
-  //   const insertCompanySql = `
-  //     insert into MekmerMaliyetFirmaTB(MaliyetFirma) VALUES('${body.company}')
-
-  //   `;
-  //   const getCompanyIdSql = `
-  //   select top 1 ID from MekmerMaliyetFirmaTB order by ID desc
-
-  //   `;
-  //   const insertCostSql = `
-  //     insert into MekmerMaliyetTB(Tarih,MaliyetTurId,FaturaNo,FaturaFirmaId,Kur,Fiyat)
-  // VALUES('${body.date}','${body.costTypeId}','${body.invoiceNo}','${body.companyId}','${body.rate}','${body.price}')
-  //   `;
-
   try {
     const body = req.body;
-
-    // 1. Değişkenleri body'den gelenle başlatıyoruz.
-    // Eğer body.costTypeId null veya undefined ise, aşağıda yenisini oluşturacağız.
     let activeCostTypeId = body.MaliyetTurId;
     let activeCompanyId = body.FaturaFirmaId;
 
-    // --- ADIM 1: Maliyet Türü Kontrolü ---
+    // Maliyet türü yoksa oluştur
     if (!activeCostTypeId) {
-      // ID yoksa önce yeni türü kaydet
-      const insertCostTypeSql = `insert into MekmerMaliyetTurTB(MaliyetTuru) VALUES('${body.MaliyetFirma}')`;
-      await new mssql.Request().query(insertCostTypeSql);
-
-      // Sonra oluşan ID'yi çek (SCOPE_IDENTITY kullanımı daha güvenlidir ama senin sorguna sadık kaldım)
-      const getCostTypeIdSql = `select top 1 ID from MekmerMaliyetTurTB order by ID desc`;
-      const typeResult = await new mssql.Request().query(getCostTypeIdSql);
-
-      // Yeni ID'yi değişkene ata
-      activeCostTypeId = typeResult.recordset[0].ID;
+      const r = new mssql.Request();
+      r.input("ad", mssql.NVarChar, body.MaliyetFirma);
+      const ins = await r.query(
+        `INSERT INTO MekmerMaliyetTurTB(MaliyetTuru)
+         OUTPUT INSERTED.ID VALUES(@ad)`
+      );
+      activeCostTypeId = ins.recordset[0].ID;
     }
 
-    // --- ADIM 2: Firma Kontrolü ---
+    // Firma yoksa oluştur
     if (!activeCompanyId) {
-      // ID yoksa önce firmayı kaydet
-      const insertCompanySql = `insert into MekmerMaliyetFirmaTB(MaliyetFirma) VALUES('${body.FaturaFirma}')`;
-      await new mssql.Request().query(insertCompanySql);
-
-      // Sonra oluşan ID'yi çek
-      const getCompanyIdSql = `select top 1 ID from MekmerMaliyetFirmaTB order by ID desc`;
-      const companyResult = await new mssql.Request().query(getCompanyIdSql);
-
-      // Yeni ID'yi değişkene ata
-      activeCompanyId = companyResult.recordset[0].ID;
+      const r = new mssql.Request();
+      r.input("ad", mssql.NVarChar, body.FaturaFirma);
+      const ins = await r.query(
+        `INSERT INTO MekmerMaliyetFirmaTB(MaliyetFirma)
+         OUTPUT INSERTED.ID VALUES(@ad)`
+      );
+      activeCompanyId = ins.recordset[0].ID;
     }
 
-    // --- ADIM 3: Ana Kayıt İşlemi ---
-    // Artık elimizde kesinlikle hem activeCostTypeId hem de activeCompanyId var.
+    // Tarih güvenli parse
+    const tarih = body.Tarih ? new Date(body.Tarih) : null;
+    if (!tarih || isNaN(tarih.getTime())) {
+      return res.status(400).send("Geçersiz tarih.");
+    }
 
-    const insertCostSql = `
-      INSERT INTO MekmerMaliyetTB (Tarih, MaliyetTurId, FaturaNo, FaturaFirmaId, Kur, Fiyat,FiyatUsd)
-      VALUES ('${body.Tarih}', '${activeCostTypeId}', '${body.FaturaNo}', '${activeCompanyId}', '${body.Kur}', '${body.Fiyat}','${body.FiyatUsd}')
-    `;
+    const r = new mssql.Request();
+    r.input("Tarih", mssql.DateTime, tarih);
+    r.input("MaliyetTurId", mssql.Int, activeCostTypeId);
+    r.input("FaturaNo", mssql.NVarChar, body.FaturaNo);
+    r.input("FaturaFirmaId", mssql.Int, activeCompanyId);
+    r.input("Kur", mssql.Float, Number(body.Kur));
+    r.input("Fiyat", mssql.Float, Number(body.Fiyat));
+    r.input("FiyatUsd", mssql.Float, Number(body.FiyatUsd));
 
-    await new mssql.Request().query(insertCostSql);
+    await r.query(`
+      INSERT INTO MekmerMaliyetTB
+        (Tarih, MaliyetTurId, FaturaNo, FaturaFirmaId, Kur, Fiyat, FiyatUsd)
+      VALUES
+        (@Tarih, @MaliyetTurId, @FaturaNo, @FaturaFirmaId, @Kur, @Fiyat, @FiyatUsd)
+    `);
 
     res.status(200).send("Kayıt başarıyla tamamlandı.");
   } catch (error) {
@@ -15277,51 +15284,50 @@ app.post("/reports/mekmer/calculating/cost/save", async (req, res) => {
 app.put("/reports/mekmer/calculating/cost/update", async (req, res) => {
   try {
     const body = req.body;
-    console.log(body);
-
-    // 1. Değişkenleri body'den gelenle başlatıyoruz.
-    // Eğer body.costTypeId null veya undefined ise, aşağıda yenisini oluşturacağız.
     let activeCostTypeId = body.MaliyetTurId;
     let activeCompanyId = body.FaturaFirmaId;
 
-    // --- ADIM 1: Maliyet Türü Kontrolü ---
     if (!activeCostTypeId) {
-      // ID yoksa önce yeni türü kaydet
-      const insertCostTypeSql = `insert into MekmerMaliyetTurTB(MaliyetTuru) VALUES('${body.MaliyetFirma}')`;
-      await new mssql.Request().query(insertCostTypeSql);
-
-      // Sonra oluşan ID'yi çek (SCOPE_IDENTITY kullanımı daha güvenlidir ama senin sorguna sadık kaldım)
-      const getCostTypeIdSql = `select top 1 ID from MekmerMaliyetTurTB order by ID desc`;
-      const typeResult = await new mssql.Request().query(getCostTypeIdSql);
-
-      // Yeni ID'yi değişkene ata
-      activeCostTypeId = typeResult.recordset[0].ID;
+      const r = new mssql.Request();
+      r.input("ad", mssql.NVarChar, body.MaliyetFirma);
+      const ins = await r.query(
+        `INSERT INTO MekmerMaliyetTurTB(MaliyetTuru)
+         OUTPUT INSERTED.ID VALUES(@ad)`
+      );
+      activeCostTypeId = ins.recordset[0].ID;
     }
 
-    // --- ADIM 2: Firma Kontrolü ---
     if (!activeCompanyId) {
-      // ID yoksa önce firmayı kaydet
-      const insertCompanySql = `insert into MekmerMaliyetFirmaTB(MaliyetFirma) VALUES('${body.FaturaFirma}')`;
-      await new mssql.Request().query(insertCompanySql);
-
-      // Sonra oluşan ID'yi çek
-      const getCompanyIdSql = `select top 1 ID from MekmerMaliyetFirmaTB order by ID desc`;
-      const companyResult = await new mssql.Request().query(getCompanyIdSql);
-
-      // Yeni ID'yi değişkene ata
-      activeCompanyId = companyResult.recordset[0].ID;
+      const r = new mssql.Request();
+      r.input("ad", mssql.NVarChar, body.FaturaFirma);
+      const ins = await r.query(
+        `INSERT INTO MekmerMaliyetFirmaTB(MaliyetFirma)
+         OUTPUT INSERTED.ID VALUES(@ad)`
+      );
+      activeCompanyId = ins.recordset[0].ID;
     }
 
-    // --- ADIM 3: Ana Kayıt İşlemi ---
-    // Artık elimizde kesinlikle hem activeCostTypeId hem de activeCompanyId var.
+    const tarih = body.Tarih ? new Date(body.Tarih) : null;
+    if (!tarih || isNaN(tarih.getTime())) {
+      return res.status(400).send("Geçersiz tarih.");
+    }
 
-    const insertCostSql = `
-      UPDATE MekmerMaliyetTB SET Tarih='${body.Tarih}', MaliyetTurId='${activeCostTypeId}',FaturaNo='${body.FaturaNo}',
-      FaturaFirmaId='${activeCompanyId}',Kur='${body.Kur}',Fiyat='${body.Fiyat}',FiyatUsd='${body.FiyatUsd}' where ID='${body.ID}'
-    `;
-    console.log(insertCostSql);
+    const r = new mssql.Request();
+    r.input("Tarih", mssql.DateTime, tarih);
+    r.input("MaliyetTurId", mssql.Int, activeCostTypeId);
+    r.input("FaturaNo", mssql.NVarChar, body.FaturaNo);
+    r.input("FaturaFirmaId", mssql.Int, activeCompanyId);
+    r.input("Kur", mssql.Float, Number(body.Kur));
+    r.input("Fiyat", mssql.Float, Number(body.Fiyat));
+    r.input("FiyatUsd", mssql.Float, Number(body.FiyatUsd));
+    r.input("ID", mssql.Int, body.ID);
 
-    await new mssql.Request().query(insertCostSql);
+    await r.query(`
+      UPDATE MekmerMaliyetTB SET
+        Tarih=@Tarih, MaliyetTurId=@MaliyetTurId, FaturaNo=@FaturaNo,
+        FaturaFirmaId=@FaturaFirmaId, Kur=@Kur, Fiyat=@Fiyat, FiyatUsd=@FiyatUsd
+      WHERE ID=@ID
+    `);
 
     res.status(200).send("Güncelleme başarıyla tamamlandı.");
   } catch (error) {
