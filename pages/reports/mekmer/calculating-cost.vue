@@ -446,24 +446,21 @@ export default {
         });
     },
     formatDateTR(dateInput) {
-      console.log("RAW Tarih:", JSON.stringify(dateInput), typeof dateInput);
       if (!dateInput) return "";
 
-      let d = dateInput instanceof Date ? dateInput : new Date(dateInput);
-
-      // Safari/Samsung "2026-05-12 00:00:00" formatını parse edemez -> T ile dene
-      if (isNaN(d.getTime()) && typeof dateInput === "string") {
-        d = new Date(dateInput.replace(" ", "T"));
-      }
-
-      // "12.05.2026" gibi Türkçe formata karşı yedek
-      if (isNaN(d.getTime()) && typeof dateInput === "string") {
+      // 1) Önce "12.05.2026" Türkçe formatını yakala (new Date'e sokmadan!)
+      if (typeof dateInput === "string") {
         const m = dateInput.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
-        if (m) d = new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00`);
+        if (m) return `${m[1]}.${m[2]}.${m[3]}`; // zaten istediğin format, direkt bas
+
+        // 2) ISO "2026-05-12..." formatı — Safari için T'li dene
+        const iso = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (iso) return `${iso[3]}.${iso[2]}.${iso[1]}`;
       }
 
+      // 3) Date objesi veya diğer durumlar
+      const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
       if (isNaN(d.getTime())) return "";
-
       return new Intl.DateTimeFormat("tr-TR").format(d);
     },
     getCostType(id) {
