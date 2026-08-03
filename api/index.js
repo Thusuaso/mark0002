@@ -1074,12 +1074,10 @@ app.post("/sales/follow/detail/save", async (req, res) => {
     if (results.recordset.length == 0) {
       res.status(200).json({ status: false });
     } else {
-      res
-        .status(200)
-        .json({
-          data: { ID: results.recordset[0].ID, ...req.body },
-          status: true,
-        });
+      res.status(200).json({
+        data: { ID: results.recordset[0].ID, ...req.body },
+        status: true,
+      });
     }
   } catch (err) {
     res.status(500).json({ status: false });
@@ -1163,12 +1161,10 @@ app.post("/sales/bgp/save", async (req, res) => {
       "select top 1 ID from BgpNetworkProjects order by ID desc"
     );
     if (results.recordset.length > 0) {
-      res
-        .status(200)
-        .json({
-          data: { ID: results.recordset[0].ID, ...req.body },
-          status: true,
-        });
+      res.status(200).json({
+        data: { ID: results.recordset[0].ID, ...req.body },
+        status: true,
+      });
     } else {
       res.status(200).json({ status: false });
     }
@@ -1233,12 +1229,10 @@ app.post("/sales/bgp/detail/save", async (req, res) => {
       "select top 1 ID from BgpProjectDetailList order by ID desc"
     );
     if (results.recordset.length > 0) {
-      res
-        .status(200)
-        .json({
-          data: { ID: results.recordset[0].ID, ...req.body },
-          status: true,
-        });
+      res.status(200).json({
+        data: { ID: results.recordset[0].ID, ...req.body },
+        status: true,
+      });
     } else {
       res.status(200).json({ status: false });
     }
@@ -2672,12 +2666,10 @@ app.post("/container/input/save", async (req, res) => {
       const containerResults = await r2.query(
         "select ID,FaturaNo,FirmaID from KonteynerDigerFaturalarKayitTB where FaturaNo=@invoiceno"
       );
-      res
-        .status(200)
-        .json({
-          status: true,
-          containerResults: containerResults.recordset[0],
-        });
+      res.status(200).json({
+        status: true,
+        containerResults: containerResults.recordset[0],
+      });
     } else {
       res.status(200).json({ status: false, containerResults: null });
     }
@@ -2995,12 +2987,10 @@ app.get(`/customer/mekmar/detail/orders/:id`, async (req, res) => {
         "select YEAR(s.YuklemeTarihi) as Year,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+sum(s.NavlunSatis)+sum(s.DetayTutar_1)+sum(s.DetayTutar_2)+sum(s.DetayTutar_3) as Total from SiparislerTB s where s.MusteriID=@id and YEAR(s.YuklemeTarihi) is not null group by YEAR(s.YuklemeTarihi),s.SiparisNo order by YEAR(s.YuklemeTarihi) desc"
       ),
     ]);
-    res
-      .status(200)
-      .json({
-        yearList: yearResults.recordset,
-        orderList: orderResults.recordset,
-      });
+    res.status(200).json({
+      yearList: yearResults.recordset,
+      orderList: orderResults.recordset,
+    });
   } catch (err) {
     res.status(500).json({ yearList: [], orderList: [] });
   }
@@ -7271,6 +7261,7 @@ app.get("/offer/old/list", (req, res) => {
 	(select ytm.MusteriAdi from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as Customer,
 	(select (select ytu.UlkeAdi from YeniTeklif_UlkeTB ytu where ytu.Id = ytm.UlkeId) from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as Country,
 	(select k.KullaniciAdi from KullaniciTB k where k.ID = yt.KullaniciId) as Username,
+	(select ytm.Mail from YeniTeklif_MusterilerTB ytm where ytm.Id = yt.MusteriId) as Mail,
 	yurun.FobFiyat as FobPrice,
 	yurun.FcaFiyat as FcaPrice,
 	yurun.DFiyat as DtpPrice,
