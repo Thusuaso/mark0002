@@ -324,29 +324,135 @@ export default {
           this.yearly_cost_header = "Aylık";
         });
     },
-    excel_maliyet_output() {
-      const data = {
-        costs: this.costs,
-        ratios: this.calculate_ratio_list,
-        costCalculate: {
-          cost: this.cost,
-          costWork: this.costWork,
-          productionSqm: this.productionSqm,
-          costMain: this.costMain,
-        },
-      };
-      this.$excelApi
-        .post("/reports/mekmer/muhasebe/excel", data)
-        .then((res) => {
-          if (res.status) {
-            const link = document.createElement("a");
-            link.href = this.getLocalUrl + "reports/mekmer/muhasebe/excel";
+    async excel_maliyet_output() {
+      const XLSX = await import("xlsx");
 
-            link.setAttribute("download", "muhasebe_maliyet_excel.xlsx");
-            document.body.appendChild(link);
-            link.click();
-          }
-        });
+      const num = (v) => {
+        const n = parseFloat(v);
+        return isNaN(n) || !isFinite(n) ? 0 : n;
+      };
+
+      const d = new Date(this.date);
+      const isYearly = this.yearly_cost_header === "Yıllık";
+      const donem = isYearly
+        ? `${d.getFullYear()} (Yıllık)`
+        : `${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
+
+      // Hücre formatı uygulayıcı: { kolonIndex: format }
+      const applyFormat = (ws, colFormats, startRow) => {
+        const range = XLSX.utils.decode_range(ws["!ref"]);
+        for (let R = startRow; R <= range.e.r; R++) {
+          Object.entries(colFormats).forEach(([C, z]) => {
+            const cell = ws[XLSX.utils.encode_cell({ r: R, c: Number(C) })];
+            if (cell && cell.t === "n") cell.z = z;
+          });
+        }
+      };
+
+      const TL = '#,##0.00" ₺"';
+      const USD = '"$"#,##0.00';
+      const DEC = "#,##0.00";
+
+      const wb = XLSX.utils.book_new();
+
+      /* ---------- 1) ÖZET ---------- */
+      const ozetAoa = [
+        ["MALİYET ÖZETİ"],
+        ["Dönem", donem],
+        [],
+        ["Toplam Maliyet (TL)", num(this.total.priceTl)],
+        ["Toplam Maliyet (USD)", num(this.total.priceUsd)],
+        ["Toplam Üretim (m²)", num(this.productionSqm)],
+        [],
+        ["Birim Maliyet (USD/m²)", num(this.cost)],
+        ["İşçilik + SGK Maliyeti (USD/m²)", num(this.costWork)],
+        ["Ana Maliyet (USD/m²)", num(this.costMain)],
+        [],
+        ["Kayıt Sayısı", this.costs.length],
+      ];
+      const wsOzet = XLSX.utils.aoa_to_sheet(ozetAoa);
+      wsOzet["!cols"] = [{ wch: 32 }, { wch: 20 }];
+      if (wsOzet["B4"]) wsOzet["B4"].z = TL;
+      ["B5", "B8", "B9", "B10"].forEach((a) => {
+        if (wsOzet[a]) wsOzet[a].z = USD;
+      });
+      if (wsOzet["B6"]) wsOzet["B6"].z = DEC;
+      XLSX.utils.book_append_sheet(wb, wsOzet, "Özet");
+
+      /* ---------- 2) MALİYETLER ---------- */
+      const costAoa = [
+        [
+          "Tarih",
+          "Maliyet Türü",
+          "Fatura Şirketi",
+          "Fatura No",
+          "Fiyat (TL)",
+          "Kur",
+          "Dolar",
+        ],
+      ];
+      this.costs.forEach((x) => {
+        costAoa.push([
+          this.formatDateTR(x.Tarih),
+          x.MaliyetTuru || "",
+          x.MaliyetFirma || "",
+          x.FaturaNo || "",
+          num(x.Fiyat),
+          num(x.Kur),
+          num(x.Kur) ? num(x.Fiyat) / num(x.Kur) : 0,
+        ]);
+      });
+      costAoa.push([]);
+      costAoa.push([
+        "TOPLAM",
+        "",
+        "",
+        "",
+        num(this.total.priceTl),
+        "",
+        num(this.total.priceUsd),
+      ]);
+
+      const wsCost = XLSX.utils.aoa_to_sheet(costAoa);
+      wsCost["!cols"] = [
+        { wch: 12 },
+        { wch: 28 },
+        { wch: 28 },
+        { wch: 16 },
+        { wch: 16 },
+        { wch: 10 },
+        { wch: 14 },
+      ];
+      wsCost["!autofilter"] = { ref: `A1:G${this.costs.length + 1}` };
+      wsCost["!freeze"] = { xSplit: 0, ySplit: 1 };
+      applyFormat(wsCost, { 4: TL, 5: DEC, 6: USD }, 1);
+      XLSX.utils.book_append_sheet(wb, wsCost, "Maliyetler");
+
+      /* ---------- 3) ORANLAR ---------- */
+      const ratios = [...this.calculate_ratio_list].sort(
+        (a, b) => num(b.Oran) - num(a.Oran)
+      );
+      const ratioAoa = [["Maliyet Türü", "Toplam (USD)", "Oran (%)"]];
+      ratios.forEach((x) => {
+        ratioAoa.push([x.MaliyetTuru || "", num(x.Total), num(x.Oran)]);
+      });
+      ratioAoa.push([]);
+      ratioAoa.push([
+        "TOPLAM",
+        ratios.reduce((s, x) => s + num(x.Total), 0),
+        ratios.reduce((s, x) => s + num(x.Oran), 0),
+      ]);
+
+      const wsRatio = XLSX.utils.aoa_to_sheet(ratioAoa);
+      wsRatio["!cols"] = [{ wch: 30 }, { wch: 16 }, { wch: 12 }];
+      applyFormat(wsRatio, { 1: USD, 2: '0.00"%"' }, 1);
+      XLSX.utils.book_append_sheet(wb, wsRatio, "Oranlar");
+
+      /* ---------- İNDİR ---------- */
+      const fileName = `maliyet_${donem.replace(/[.\s()]/g, "_")}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+
+      this.$toast && this.$toast.success("Excel oluşturuldu.");
     },
     costFiltered(value) {
       this.total.priceTl = 0;
