@@ -28,7 +28,7 @@
         responsiveLayout="scroll"
       >
         <template #header>
-          <div class="flex justify-content-between">
+          <div class="flex justify-content-between align-items-center">
             <Calendar
               v-model="selectedYear"
               view="year"
@@ -36,8 +36,18 @@
               showIcon
               @date-select="yearSelected($event)"
             />
+            <Button
+              class="p-button-success p-button-sm ml-2"
+              icon="pi pi-file-excel"
+              label="Excel'e Aktar"
+              :loading="excelLoading"
+              @click="excelOutput"
+            />
           </div>
           Alış Fiyatı - {{ totals | formatPriceUsd }}
+          <span class="ml-3" style="font-size: 90%; opacity: 0.7">
+            ({{ exportRows.length }} kayıt{{ isFiltered ? " - filtreli" : "" }})
+          </span>
         </template>
         <Column header="#" headerStyle="width:3rem;font-size:16px;">
           <template #body="slotProps">
@@ -106,7 +116,7 @@
         >
           <template #body="slotProps">
             <div v-if="slotProps.data.EvrakDurum > 0">
-              <a
+              
                 :href="
                   'https://file-service.mekmar.com/file/download/2/' +
                   slotProps.data.SiparisNo
@@ -339,6 +349,8 @@ export default {
   data() {
     return {
       isRendering: true,
+      excelLoading: false,
+      filteredList: null,
       selectedYear: null,
       totalbuying: 0,
       totalton: 0,
@@ -384,26 +396,229 @@ export default {
       },
     };
   },
+  computed: {
+    isFiltered() {
+      return Object.values(this.filtersShipped).some(
+        (f) => f && f.value !== null && f.value !== ""
+      );
+    },
+    exportRows() {
+      if (this.isFiltered && Array.isArray(this.filteredList)) {
+        return this.filteredList;
+      }
+      return this.list || [];
+    },
+  },
+  watch: {
+    list() {
+      // Yeni veri geldiğinde eski filtre sonucu geçersiz
+      this.filteredList = null;
+    },
+  },
   created() {
     this.__totalSum(this.list);
     this.userId = Cookies.get("userId");
   },
   methods: {
+    /* ---------------- EXCEL ---------------- */
+    async excelOutput() {
+      const rows = this.exportRows;
+      if (!rows.length) {
+        this.$toast && this.$toast.warning("Aktarılacak kayıt bulunamadı.");
+        return;
+      }
+
+      this.excelLoading = true;
+      try {
+        const XLSX = await import("xlsx");
+
+        const USD = '"$"#,##0.00';
+        const DEC = "#,##0.00";
+        const DATE = "dd.mm.yyyy";
+
+        const headers = [
+          "#",
+          "Load Date",
+          "Customer",
+          "PO",
+          "PI",
+          "Product",
+          "Details",
+          "Width",
+          "Height",
+          "Thickness",
+          "Supplier",
+          "Amount",
+          "Unit",
+          "Ton",
+          "Price (Selling)",
+          "Total (Selling)",
+          "Price (Purchase)",
+          "Total (Purchase)",
+        ];
+
+        const aoa = [headers];
+        const links = []; // { r, c, target }
+
+        let tAmount = 0,
+          tTon = 0,
+          tSelling = 0,
+          tPurchase = 0;
+
+        // Ekrandaki sıralamayla aynı: YuklemeTarihi DESC
+        const sorted = [...rows].sort(
+          (a, b) =>
+            this.__toDate(b.YuklemeTarihi) - this.__toDate(a.YuklemeTarihi)
+        );
+
+        sorted.forEach((x, i) => {
+          const miktar = this.__num(x.Miktar);
+          const ton = this.__num(x.Ton);
+          const satis = this.__num(x.SatisFiyati);
+          const alis = this.__num(x.AlisFiyati);
+
+          tAmount += miktar;
+          tTon += ton;
+          tSelling += satis * miktar;
+          tPurchase += alis * miktar;
+
+          const d = this.__toDate(x.YuklemeTarihi);
+
+          aoa.push([
+            i + 1,
+            d ? d : this.__str(x.YuklemeTarihi),
+            this.__str(x.FirmaAdi),
+            this.__str(x.SiparisNo),
+            x.EvrakDurum > 0 ? "PI İndir" : "-",
+            this.__str(x.UrunAdi),
+            this.__str(x.UrunUretimAciklama),
+            this.__str(x.En),
+            this.__str(x.Boy),
+            this.__str(x.Kenar),
+            this.__str(x.UrunFirmaAdi),
+            miktar,
+            this.__str(x.BirimAdi),
+            ton,
+            satis,
+            satis * miktar,
+            alis,
+            alis * miktar,
+          ]);
+
+          if (x.EvrakDurum > 0 && x.SiparisNo) {
+            links.push({
+              r: aoa.length - 1,
+              c: 4,
+              target:
+                "https://file-service.mekmar.com/file/download/2/" +
+                x.SiparisNo,
+            });
+          }
+        });
+
+        const lastDataRow = aoa.length; // 1-indexed (header dahil)
+
+        aoa.push([]);
+        const totalRow = new Array(headers.length).fill("");
+        totalRow[0] = "TOPLAM";
+        totalRow[11] = tAmount;
+        totalRow[13] = tTon;
+        totalRow[15] = tSelling;
+        totalRow[17] = tPurchase;
+        aoa.push(totalRow);
+
+        const ws = XLSX.utils.aoa_to_sheet(aoa, { cellDates: true });
+
+        ws["!cols"] = [
+          { wch: 5 },  { wch: 12 }, { wch: 26 }, { wch: 14 }, { wch: 10 },
+          { wch: 30 }, { wch: 26 }, { wch: 10 }, { wch: 10 }, { wch: 11 },
+          { wch: 24 }, { wch: 12 }, { wch: 8 },  { wch: 10 }, { wch: 14 },
+          { wch: 16 }, { wch: 14 }, { wch: 16 },
+        ];
+        ws["!freeze"] = { xSplit: 0, ySplit: 1 };
+        ws["!autofilter"] = { ref: `A1:R${lastDataRow}` };
+
+        // Hücre formatları
+        const fmt = {
+          1: DATE,
+          11: DEC,
+          13: DEC,
+          14: USD,
+          15: USD,
+          16: USD,
+          17: USD,
+        };
+        const range = XLSX.utils.decode_range(ws["!ref"]);
+        for (let R = 1; R <= range.e.r; R++) {
+          Object.entries(fmt).forEach(([C, z]) => {
+            const cell = ws[XLSX.utils.encode_cell({ r: R, c: Number(C) })];
+            if (cell && (cell.t === "n" || cell.t === "d")) cell.z = z;
+          });
+        }
+
+        // PI hyperlink'leri
+        links.forEach((l) => {
+          const addr = XLSX.utils.encode_cell({ r: l.r, c: l.c });
+          if (ws[addr]) ws[addr].l = { Target: l.target, Tooltip: "PI İndir" };
+        });
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Shipped");
+
+        const yil = this.selectedYear
+          ? new Date(this.selectedYear).getFullYear()
+          : new Date().getFullYear();
+        const suffix = this.isFiltered ? "_filtreli" : "";
+        XLSX.writeFile(wb, `shipped_${yil}${suffix}.xlsx`);
+
+        this.$toast &&
+          this.$toast.success(`${sorted.length} kayıt Excel'e aktarıldı.`);
+      } catch (e) {
+        console.error("excelOutput", e);
+        this.$toast && this.$toast.error("Excel oluşturulurken hata oluştu.");
+      } finally {
+        this.excelLoading = false;
+      }
+    },
+    __num(val) {
+      if (val === null || val === undefined || val === "") return 0;
+      if (typeof val === "number") return isFinite(val) ? val : 0;
+      const n = parseFloat(String(val).replace(/\s/g, "").replace(",", "."));
+      return isNaN(n) || !isFinite(n) ? 0 : n;
+    },
+    __str(val) {
+      return val === null || val === undefined ? "" : String(val);
+    },
+    __toDate(val) {
+      if (!val) return null;
+      if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+      if (typeof val === "string") {
+        // 12.05.2026
+        const tr = val.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+        if (tr) return new Date(+tr[3], +tr[2] - 1, +tr[1]);
+        // 2026-05-12...
+        const iso = val.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
+      }
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? null : d;
+    },
+    /* --------------- /EXCEL ---------------- */
+
     yearSelected(event) {
       const date = new Date(event);
       const year = date.getFullYear();
       this.$store.dispatch("setOrderShippedMekmer2ListYears", year);
     },
     shippedFiltered(event) {
-      console.log(event.filteredValue);
       this.$store.dispatch(
         " shipped setOrderProductionTotal",
         event.filteredValue
       );
     },
     filtersProduction(event) {
-      console.log("filteredsShipped");
-      this.__totalSum(event.filteredValue);
+      this.filteredList = event.filteredValue || [];
+      this.__totalSum(this.filteredList);
     },
     __totalSum(val) {
       this.totals = 0;
@@ -411,7 +626,7 @@ export default {
       this.totalamount = 0;
       this.totalton = 0;
       this.totalbuying = 0;
-      val.forEach((x) => {
+      (val || []).forEach((x) => {
         this.totals +=
           this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
         this.totalsPurchase +=
@@ -450,131 +665,51 @@ export default {
       }
     },
     filterShipmentAmountInput(event) {
-      if (event) {
-        this.filterModel.amount = event;
-      } else {
-        this.filterModel.amount = "";
-      }
+      this.filterModel.amount = event ? event : "";
     },
     filterShipmentSupplierInput(event) {
-      if (event) {
-        this.filterModel.supplier = event;
-      } else {
-        this.filterModel.supplier = "";
-      }
+      this.filterModel.supplier = event ? event : "";
     },
     filterShipmentEdgeInput(event) {
-      if (event) {
-        this.filterModel.edge = event;
-      } else {
-        this.filterModel.edge = "";
-      }
+      this.filterModel.edge = event ? event : "";
     },
     filterShipmentHeightInput(event) {
-      if (event) {
-        this.filterModel.height = event;
-      } else {
-        this.filterModel.height = "";
-      }
+      this.filterModel.height = event ? event : "";
     },
     filterShipmentWidthInput(event) {
-      if (event) {
-        this.filterModel.width = event;
-      } else {
-        this.filterModel.width = "";
-      }
+      this.filterModel.width = event ? event : "";
     },
     filterShipmentProductInput(event) {
-      if (event) {
-        this.filterModel.product = event;
-      } else {
-        this.filterModel.product = "";
-      }
+      this.filterModel.product = event ? event : "";
     },
     filterShipmentPoInput(event) {
-      if (event) {
-        this.filterModel.po = event;
-      } else {
-        this.filterModel.po = "";
-      }
+      this.filterModel.po = event ? event : "";
     },
     filterShipmentCompanyInput(event) {
-      if (event) {
-        this.filterModel.company = event;
-      } else {
-        this.filterModel.company = "";
-      }
+      this.filterModel.company = event ? event : "";
     },
-
     filterShipmentLoadDateInput(event) {
-      if (event) {
-        this.filterModel.loaddate = event;
-      } else {
-        this.filterModel.loaddate = "";
-      }
+      this.filterModel.loaddate = event ? event : "";
     },
-
     filterShipmentAmount(event) {
-      if (event) {
-        this.filterModel.amount = event;
-      } else {
-        this.filterModel.amount = "";
-      }
-
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.filterModel.amount = event ? event : "";
+      this.__dispatchFilter();
     },
     filterShipmentSupplier(event) {
-      if (event) {
-        this.filterModel.supplier = event;
-      } else {
-        this.filterModel.supplier = "";
-      }
-
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.filterModel.supplier = event ? event : "";
+      this.__dispatchFilter();
     },
     filterShipmentEdge(event) {
-      if (event) {
-        this.filterModel.edge = event;
-      } else {
-        this.filterModel.edge = "";
-      }
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.filterModel.edge = event ? event : "";
+      this.__dispatchFilter();
     },
     filterShipmentHeight(event) {
-      if (event) {
-        this.filterModel.height = event;
-      } else {
-        this.filterModel.height = "";
-      }
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.filterModel.height = event ? event : "";
+      this.__dispatchFilter();
     },
     filterShipmentWidth(event) {
-      if (event) {
-        this.filterModel.width = event;
-      } else {
-        this.filterModel.width = "";
-      }
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.filterModel.width = event ? event : "";
+      this.__dispatchFilter();
     },
     filterShipmentProduct(event) {
       if (event) {
@@ -592,52 +727,29 @@ export default {
       } else {
         this.filterModel.product = "";
       }
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.__dispatchFilter();
     },
     filterShipmentPo(event) {
-      if (event) {
-        this.filterModel.po = event;
-      } else {
-        this.filterModel.po = "";
-      }
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.filterModel.po = event ? event : "";
+      this.__dispatchFilter();
     },
     filterShipmentCompany(event) {
-      if (event) {
-        this.filterModel.company = event;
-      } else {
-        this.filterModel.company = "";
-      }
-      this.__controlFilter();
-      if (this.__controlFilter()) {
-        this.$store.dispatch("setOrderShippedList");
-      } else {
-        this.$store.dispatch("filterShipment", this.filterModel);
-      }
+      this.filterModel.company = event ? event : "";
+      this.__dispatchFilter();
     },
     filterShipmentLoadDate(event) {
-      if (event) {
-        this.filterModel.loaddate = event;
-      } else {
-        this.filterModel.loaddate = "";
-      }
+      this.filterModel.loaddate = event ? event : "";
+      this.__dispatchFilter();
+    },
+    __dispatchFilter() {
       if (this.__controlFilter()) {
         this.$store.dispatch("setOrderShippedList");
       } else {
         this.$store.dispatch("filterShipment", this.filterModel);
       }
     },
-
     __controlFilter() {
-      if (
+      return (
         this.filterModel.loaddate == "" &&
         this.filterModel.company == "" &&
         this.filterModel.po == "" &&
@@ -647,9 +759,7 @@ export default {
         this.filterModel.edge == "" &&
         this.filterModel.supplier == "" &&
         this.filterModel.amount == ""
-      ) {
-        return true;
-      }
+      );
     },
     productSupplierNull(event) {
       const vm = document.getElementById("productSupplier" + event.UrunId);
