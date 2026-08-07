@@ -3,18 +3,22 @@ import mssql from "mssql";
 import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
 import jwt from "jsonwebtoken";
+import AWS from "aws-sdk";
 var cookieParser = require("cookie-parser");
 const JWT_SECRET = process.env.JWT_SECRET;
 const otpStore = new Map();
 
-setInterval(() => {
-  const now = Date.now();
-  for (const [username, data] of otpStore.entries()) {
-    if (now > data.expires) {
-      otpStore.delete(username);
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [username, data] of otpStore.entries()) {
+      if (now > data.expires) {
+        otpStore.delete(username);
+      }
     }
-  }
-}, 60 * 60 * 1000);
+  },
+  60 * 60 * 1000,
+);
 const app = express();
 const safe = (val) => (val == null || val === undefined ? "" : String(val));
 const safeInt = (val) => parseInt(val) || 0;
@@ -44,13 +48,13 @@ const connectDB = async (retries = 5) => {
 
     if (retries === 0) {
       console.error(
-        "Artık denemiyorum, sunucu kapalı olabilir. Proje kapatılıyor."
+        "Artık denemiyorum, sunucu kapalı olabilir. Proje kapatılıyor.",
       );
       process.exit(1);
     }
 
     console.log(
-      `⏳ 5 saniye sonra tekrar denenecek... (Kalan Hak: ${retries})`
+      `⏳ 5 saniye sonra tekrar denenecek... (Kalan Hak: ${retries})`,
     );
 
     await new Promise((res) => setTimeout(res, 30000));
@@ -211,7 +215,7 @@ app.post("/verify-otp", (req, res) => {
           mail: user.MailAdres,
         },
         JWT_SECRET,
-        { expiresIn: "7d" }
+        { expiresIn: "7d" },
       );
 
       res.status(200).json({
@@ -349,6 +353,71 @@ app.use((req, res, next) => {
 
   authenticateToken(req, res, next);
 });
+/*Digital Ocean */
+const spacesS3 = new AWS.S3({
+  endpoint: new AWS.Endpoint(process.env.DO_SPACES_ENDPOINT),
+  accessKeyId: process.env.DO_SPACES_KEY,
+  secretAccessKey: process.env.DO_SPACES_SECRET,
+});
+
+const SPACES_BUCKET = process.env.DO_SPACES_BUCKET;
+
+const SPACES_ALLOWED_PREFIXES = [
+  "usa-products/",
+  "products/",
+  "test-reports/",
+  "galleria-project_photos/",
+  "galleria-project_photos/photos/",
+];
+
+const spacesKeyAllowed = (key) =>
+  typeof key === "string" &&
+  key.length > 0 &&
+  !key.includes("..") &&
+  SPACES_ALLOWED_PREFIXES.some((p) => key.startsWith(p));
+
+app.post("/spaces/sign-upload", (req, res) => {
+  const { key, contentType } = req.body || {};
+
+  if (!spacesKeyAllowed(key)) {
+    return res
+      .status(400)
+      .json({ status: false, message: "Gecersiz dosya yolu" });
+  }
+
+  try {
+    const url = spacesS3.getSignedUrl("putObject", {
+      Bucket: SPACES_BUCKET,
+      Key: key,
+      ACL: "public-read",
+      ContentType: contentType || "application/octet-stream",
+      CacheControl: "public,max-age=1,s-max-age=500,must-revalidate",
+      Expires: 300,
+    });
+    return res.json({ status: true, url });
+  } catch (err) {
+    console.error("sign-upload hatasi:", err.message);
+    return res.status(500).json({ status: false, message: "Imza uretilemedi" });
+  }
+});
+
+app.post("/spaces/delete", (req, res) => {
+  const { key } = req.body || {};
+
+  if (!spacesKeyAllowed(key)) {
+    return res
+      .status(400)
+      .json({ status: false, message: "Gecersiz dosya yolu" });
+  }
+
+  spacesS3.deleteObject({ Bucket: SPACES_BUCKET, Key: key }, (err) => {
+    if (err) {
+      console.error("spaces delete hatasi:", err.message);
+      return res.status(500).json({ status: false });
+    }
+    return res.json({ status: true });
+  });
+});
 
 /*Home*/
 
@@ -368,55 +437,55 @@ app.get("/home", async (req, res) => {
       supplierCostListRes,
     ] = await Promise.all([
       mssql.query(
-        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' group by s.SiparisNo"
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' group by s.SiparisNo",
       ),
       mssql.query(
-        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' group by s.SiparisNo"
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.SiparisTarihi) = YEAR(GETDATE()) and MONTH(s.SiparisTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' group by s.SiparisNo",
       ),
       mssql.query(
-        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo"
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) = MONTH(GETDATE()) and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo",
       ),
       mssql.query(
-        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo"
+        "select (select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and MONTH(s.YuklemeTarihi) <= MONTH(GETDATE()) - 1  and m.Marketing='Mekmar' and s.SiparisDurumID = 3 group by s.SiparisNo",
       ),
       mssql.query(
-        "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)"
+        "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)",
       ),
       mssql.query(
-        "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 1 and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)"
+        "select MONTH(s.YuklemeTarihi) as Ay,s.SiparisNo,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo = s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as Total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) - 1 and s.SiparisDurumID=3 and m.Marketing ='Mekmar' group by MONTH(s.YuklemeTarihi),s.SiparisNo order by MONTH(s.YuklemeTarihi)",
       ),
       mssql.query(
-        "select m.Marketing, (select sum(su.SatisFiyati * su.Miktar) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 group by m.Marketing, s.SiparisNo"
+        "select m.Marketing, (select sum(su.SatisFiyati * su.Miktar) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo) + sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as total from SiparislerTB s inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and s.SiparisDurumID=3 group by m.Marketing, s.SiparisNo",
       ),
       mssql.query(
-        "select sum(u.Miktar) as total, u.UrunBirimID as BirimId, (select ub.BirimAdi from UrunBirimTB ub where ub.ID = u.UrunBirimID) as BirimAdi, MONTH(u.Tarih) as month from UretimTB u where YEAR(u.Tarih) = YEAR(GETDATE()) and u.TedarikciID in (1,123) group by u.UrunBirimID,MONTH(u.Tarih) order by MONTH(u.Tarih)"
+        "select sum(u.Miktar) as total, u.UrunBirimID as BirimId, (select ub.BirimAdi from UrunBirimTB ub where ub.ID = u.UrunBirimID) as BirimAdi, MONTH(u.Tarih) as month from UretimTB u where YEAR(u.Tarih) = YEAR(GETDATE()) and u.TedarikciID in (1,123) group by u.UrunBirimID,MONTH(u.Tarih) order by MONTH(u.Tarih)",
       ),
       mssql.query(
-        "select t.KullaniciId as UserId,count(t.Id) as Offer, MONTH(t.Tarih) as Month, (select k.KullaniciAdi from KullaniciTB k where k.ID = t.KullaniciId) as Username from YeniTeklifTB t where YEAR(t.Tarih) = YEAR(GETDATE()) group by MONTH(t.Tarih),t.KullaniciId order by MONTH(t.Tarih)"
+        "select t.KullaniciId as UserId,count(t.Id) as Offer, MONTH(t.Tarih) as Month, (select k.KullaniciAdi from KullaniciTB k where k.ID = t.KullaniciId) as Username from YeniTeklifTB t where YEAR(t.Tarih) = YEAR(GETDATE()) group by MONTH(t.Tarih),t.KullaniciId order by MONTH(t.Tarih)",
       ),
       mssql.query(
-        "select YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())"
+        "select YEAR(se.Tarih) as Year,MONTH(se.Tarih) as Month,se.Tarih,se.SiparisNo,su.Miktar,su.UrunBirimID,(select ub.BirimAdi from UrunBirimTB ub where ub.ID = su.UrunBirimID)as BirimAdi from SiparisEkstraGiderlerTB se inner join SiparisUrunTB su on su.SiparisNo=se.SiparisNo where se.TedarikciID=1 and YEAR(se.Tarih) = YEAR(GETDATE())",
       ),
       mssql.query(
-        "select su.TedarikciID, sum(su.AlisFiyati * su.Miktar) as Total, t.FirmaAdi from SiparislerTB s inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo inner join TedarikciTB t on t.ID = su.TedarikciID inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar' group by su.TedarikciID,t.FirmaAdi order by sum(su.AlisFiyati * su.Miktar) desc"
+        "select su.TedarikciID, sum(su.AlisFiyati * su.Miktar) as Total, t.FirmaAdi from SiparislerTB s inner join SiparisUrunTB su on su.SiparisNo=s.SiparisNo inner join TedarikciTB t on t.ID = su.TedarikciID inner join MusterilerTB m on m.ID = s.MusteriID where YEAR(s.YuklemeTarihi) = YEAR(GETDATE()) and m.Marketing='Mekmar' group by su.TedarikciID,t.FirmaAdi order by sum(su.AlisFiyati * su.Miktar) desc",
       ),
     ]);
 
     const totalMonthOrder = monthOrderRes.recordset.reduce(
       (acc, curr) => acc + (curr.Total || 0),
-      0
+      0,
     );
     const totalYearOrder = yearOrderRes.recordset.reduce(
       (acc, curr) => acc + (curr.Total || 0),
-      0
+      0,
     );
     const totalMonthForwarding = monthForwardingRes.recordset.reduce(
       (acc, curr) => acc + (curr.Total || 0),
-      0
+      0,
     );
     const totalYearForwarding = yearForwardingRes.recordset.reduce(
       (acc, curr) => acc + (curr.Total || 0),
-      0
+      0,
     );
 
     const currentMonth = new Date().getMonth() + 1;
@@ -1048,7 +1117,7 @@ app.get("/sales/follow/detail/:customer", async (req, res) => {
     const request = new mssql.Request();
     request.input("customer", mssql.NVarChar, req.params.customer);
     const followDetail = await request.query(
-      "select k.KullaniciAdi,a.ID,a.MusteriAdi,a.Satisci_Cloud,a.Satisci_Cloud_Dosya,a.Aciklama,a.Baslik,a.Hatirlatma_Notu,a.Hatirlatma_Tarih,a.Tarih from SatisciAyrintiTB a,KullaniciTB k where k.ID=a.Temsilci and a.MusteriAdi=@customer"
+      "select k.KullaniciAdi,a.ID,a.MusteriAdi,a.Satisci_Cloud,a.Satisci_Cloud_Dosya,a.Aciklama,a.Baslik,a.Hatirlatma_Notu,a.Hatirlatma_Tarih,a.Tarih from SatisciAyrintiTB a,KullaniciTB k where k.ID=a.Temsilci and a.MusteriAdi=@customer",
     );
     res.status(200).json({ data: followDetail.recordset });
   } catch (err) {
@@ -1066,10 +1135,10 @@ app.post("/sales/follow/detail/save", async (req, res) => {
     request.input("Hatirlatma_Notu", mssql.NVarChar, req.body.Hatirlatma_Notu);
     request.input("Temsilci", mssql.NVarChar, req.body.Temsilci);
     await request.query(
-      `insert into SatisciAyrintiTB(MusteriAdi,Aciklama,Baslik,Tarih,Hatirlatma_Tarih,Hatirlatma_Notu,Temsilci) VALUES(@MusteriAdi,@Aciklama,@Baslik,@Tarih,@Hatirlatma_Tarih,@Hatirlatma_Notu,@Temsilci)`
+      `insert into SatisciAyrintiTB(MusteriAdi,Aciklama,Baslik,Tarih,Hatirlatma_Tarih,Hatirlatma_Notu,Temsilci) VALUES(@MusteriAdi,@Aciklama,@Baslik,@Tarih,@Hatirlatma_Tarih,@Hatirlatma_Notu,@Temsilci)`,
     );
     const results = await mssql.query(
-      "select top 1 ID from SatisciAyrintiTB order by ID desc"
+      "select top 1 ID from SatisciAyrintiTB order by ID desc",
     );
     if (results.recordset.length == 0) {
       res.status(200).json({ status: false });
@@ -1088,7 +1157,7 @@ app.delete("/sales/follow/detail/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete from SatisciAyrintiTB where ID = @id"
+      "delete from SatisciAyrintiTB where ID = @id",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({ data: req.params.id, status: true });
@@ -1149,16 +1218,16 @@ app.post("/sales/bgp/save", async (req, res) => {
     request.input(
       "DateofRegistiration",
       mssql.VarChar,
-      req.body.DateofRegistiration
+      req.body.DateofRegistiration,
     );
     request.input("Temsilci", mssql.NVarChar, req.body.Temsilci);
     request.input("UlkeAdi", mssql.NVarChar, req.body.UlkeAdi);
     request.input("UlkeLogo", mssql.NVarChar, req.body.UlkeLogo);
     await request.query(
-      "insert into BgpNetworkProjects(ProjectName,DateofRegistiration,Temsilci,UlkeAdi,UlkeLogo) VALUES(@ProjectName,@DateofRegistiration,@Temsilci,@UlkeAdi,@UlkeLogo)"
+      "insert into BgpNetworkProjects(ProjectName,DateofRegistiration,Temsilci,UlkeAdi,UlkeLogo) VALUES(@ProjectName,@DateofRegistiration,@Temsilci,@UlkeAdi,@UlkeLogo)",
     );
     const results = await mssql.query(
-      "select top 1 ID from BgpNetworkProjects order by ID desc"
+      "select top 1 ID from BgpNetworkProjects order by ID desc",
     );
     if (results.recordset.length > 0) {
       res.status(200).json({
@@ -1177,7 +1246,7 @@ app.delete("/sales/bgp/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete BgpNetworkProjects where ID=@id"
+      "delete BgpNetworkProjects where ID=@id",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(201).json({ id: req.params.id, status: true });
@@ -1193,7 +1262,7 @@ app.get("/sales/bgp/detail/:projectName", async (req, res) => {
     const request = new mssql.Request();
     request.input("projectName", mssql.NVarChar, req.params.projectName);
     const bgpDetail = await request.query(
-      "select bgp.ID,bgp.ProjectName,bgp.FirmaAdi,bgp.Aciklama,bgp.KayitTarihi,bgp.Baslik,bgp.HatirlatmaTarihi,bgp.HatirlatmaAciklama,k.KullaniciAdi,bgp.Email,bgp.Unvan,bgp.PhoneNumber,bgp.WrongNumber,bgp.NotResponse,bgp.NotInterested,bgp.UlkeAdi,bgp.Interested from BgpProjectDetailList bgp inner join KullaniciTB k on k.ID = bgp.Temsilci where bgp.ProjectName = @projectName"
+      "select bgp.ID,bgp.ProjectName,bgp.FirmaAdi,bgp.Aciklama,bgp.KayitTarihi,bgp.Baslik,bgp.HatirlatmaTarihi,bgp.HatirlatmaAciklama,k.KullaniciAdi,bgp.Email,bgp.Unvan,bgp.PhoneNumber,bgp.WrongNumber,bgp.NotResponse,bgp.NotInterested,bgp.UlkeAdi,bgp.Interested from BgpProjectDetailList bgp inner join KullaniciTB k on k.ID = bgp.Temsilci where bgp.ProjectName = @projectName",
     );
     res.status(200).json({ data: bgpDetail.recordset });
   } catch (err) {
@@ -1212,7 +1281,7 @@ app.post("/sales/bgp/detail/save", async (req, res) => {
     request.input(
       "HatirlatmaAciklama",
       mssql.NVarChar,
-      req.body.HatirlatmaAciklama
+      req.body.HatirlatmaAciklama,
     );
     request.input("Temsilci", mssql.NVarChar, req.body.Temsilci);
     request.input("Email", mssql.NVarChar, req.body.Email);
@@ -1223,10 +1292,10 @@ app.post("/sales/bgp/detail/save", async (req, res) => {
     request.input("Interested", mssql.NVarChar, req.body.Interested);
     request.input("Unvan", mssql.NVarChar, req.body.Unvan);
     await request.query(
-      "insert into BgpProjectDetailList(ProjectName,FirmaAdi,KayitTarihi,Baslik,Aciklama,HatirlatmaTarihi,HatirlatmaAciklama,Temsilci,Email,PhoneNumber,WrongNumber,NotResponse,NotInterested,Interested,Unvan) VALUES(@ProjectName,@FirmaAdi,@KayitTarihi,@Baslik,@Aciklama,@HatirlatmaTarihi,@HatirlatmaAciklama,@Temsilci,@Email,@PhoneNumber,@WrongNumber,@NotResponse,@NotInterested,@Interested,@Unvan)"
+      "insert into BgpProjectDetailList(ProjectName,FirmaAdi,KayitTarihi,Baslik,Aciklama,HatirlatmaTarihi,HatirlatmaAciklama,Temsilci,Email,PhoneNumber,WrongNumber,NotResponse,NotInterested,Interested,Unvan) VALUES(@ProjectName,@FirmaAdi,@KayitTarihi,@Baslik,@Aciklama,@HatirlatmaTarihi,@HatirlatmaAciklama,@Temsilci,@Email,@PhoneNumber,@WrongNumber,@NotResponse,@NotInterested,@Interested,@Unvan)",
     );
     const results = await mssql.query(
-      "select top 1 ID from BgpProjectDetailList order by ID desc"
+      "select top 1 ID from BgpProjectDetailList order by ID desc",
     );
     if (results.recordset.length > 0) {
       res.status(200).json({
@@ -1245,7 +1314,7 @@ app.delete("/sales/bgp/detail/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete BgpProjectDetailList where ID = @id"
+      "delete BgpProjectDetailList where ID = @id",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({ id: req.params.id, status: true });
@@ -1266,7 +1335,7 @@ app.put("/sales/bgp/detail/update", async (req, res) => {
     request.input(
       "HatirlatmaAciklama",
       mssql.NVarChar,
-      req.body.HatirlatmaAciklama
+      req.body.HatirlatmaAciklama,
     );
     request.input("Email", mssql.NVarChar, req.body.Email);
     request.input("PhoneNumber", mssql.NVarChar, req.body.PhoneNumber);
@@ -1277,7 +1346,7 @@ app.put("/sales/bgp/detail/update", async (req, res) => {
     request.input("Unvan", mssql.NVarChar, req.body.Unvan);
     request.input("ID", mssql.Int, req.body.ID);
     const results = await request.query(
-      "update BgpProjectDetailList SET FirmaAdi=@FirmaAdi,Baslik=@Baslik,Aciklama=@Aciklama,HatirlatmaTarihi=@HatirlatmaTarihi,HatirlatmaAciklama=@HatirlatmaAciklama,Email=@Email,PhoneNumber=@PhoneNumber,WrongNumber=@WrongNumber,NotResponse=@NotResponse,NotInterested=@NotInterested,Interested=@Interested,Unvan=@Unvan WHERE ID=@ID"
+      "update BgpProjectDetailList SET FirmaAdi=@FirmaAdi,Baslik=@Baslik,Aciklama=@Aciklama,HatirlatmaTarihi=@HatirlatmaTarihi,HatirlatmaAciklama=@HatirlatmaAciklama,Email=@Email,PhoneNumber=@PhoneNumber,WrongNumber=@WrongNumber,NotResponse=@NotResponse,NotInterested=@NotInterested,Interested=@Interested,Unvan=@Unvan WHERE ID=@ID",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({ data: req.body, status: true });
@@ -1295,10 +1364,10 @@ app.get("/sales/todos/list", (req, res) => {
     "select y.ID,y.Yapilacak,y.Yapildi,y.GirisTarihi,y.YapildiTarihi,y.YapilacakOncelik,y.Acil,y.Sira,y.OrtakGorev from Yapilacaklar y where y.Yapildi=0 order by y.GirisTarihi";
   mssql.query(sql, (err, todo) => {
     const listA = todo.recordset.filter(
-      (todo) => todo.YapilacakOncelik == "A" || todo.YapilacakOncelik == "B"
+      (todo) => todo.YapilacakOncelik == "A" || todo.YapilacakOncelik == "B",
     );
     const listMail = todo.recordset.filter(
-      (todo) => todo.YapilacakOncelik == "C"
+      (todo) => todo.YapilacakOncelik == "C",
     );
     res.status(200).json({
       listA: listA,
@@ -1311,7 +1380,7 @@ app.put("/sales/todos/change/status/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "update Yapilacaklar SET Yapildi=1 where ID=@id"
+      "update Yapilacaklar SET Yapildi=1 where ID=@id",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({ id: req.params.id, status: true });
@@ -1329,13 +1398,13 @@ app.put("/sales/todos/update", async (req, res) => {
     request.input(
       "YapilacakOncelik",
       mssql.NVarChar,
-      req.body.YapilacakOncelik
+      req.body.YapilacakOncelik,
     );
     request.input("OrtakGorev", mssql.NVarChar, req.body.OrtakGorev);
     request.input("Acil", mssql.NVarChar, req.body.Acil);
     request.input("ID", mssql.Int, req.body.ID);
     const results = await request.query(
-      "update Yapilacaklar SET Yapilacak=@CustomYapilacak,YapilacakOncelik=@YapilacakOncelik,OrtakGorev=@OrtakGorev,Acil=@Acil WHERE ID=@ID"
+      "update Yapilacaklar SET Yapilacak=@CustomYapilacak,YapilacakOncelik=@YapilacakOncelik,OrtakGorev=@OrtakGorev,Acil=@Acil WHERE ID=@ID",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({ todo: req.body, status: true });
@@ -1365,7 +1434,7 @@ app.get("/sales/todos/main/list/:username", async (req, res) => {
     const request = new mssql.Request();
     request.input("username", mssql.NVarChar, req.params.username);
     const todos = await request.query(
-      "select y.ID,y.Yapilacak,y.Yapildi,y.GirisTarihi,y.YapildiTarihi,y.YapilacakOncelik,y.Acil,y.Sira,y.OrtakGorev from Yapilacaklar y where y.Yapildi=0 and y.Goruldu=0 and y.GorevVerenAdi=@username order by y.Sira"
+      "select y.ID,y.Yapilacak,y.Yapildi,y.GirisTarihi,y.YapildiTarihi,y.YapilacakOncelik,y.Acil,y.Sira,y.OrtakGorev from Yapilacaklar y where y.Yapildi=0 and y.Goruldu=0 and y.GorevVerenAdi=@username order by y.Sira",
     );
     res.status(200).json({ list: todos.recordset });
   } catch (err) {
@@ -1378,7 +1447,7 @@ app.get("/todo/main/list/change/done/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const todo = await request.query(
-      "update Yapilacaklar SET Yapildi=1 where ID=@id"
+      "update Yapilacaklar SET Yapildi=1 where ID=@id",
     );
     res.status(200).json({ status: todo.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1390,7 +1459,7 @@ app.get("/todo/main/list/change/seen/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const todo = await request.query(
-      "update Yapilacaklar SET Goruldu=1 where ID=@id"
+      "update Yapilacaklar SET Goruldu=1 where ID=@id",
     );
     res.status(200).json({ status: todo.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1402,7 +1471,7 @@ app.get("/todo/main/list/change/not/seen/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const todo = await request.query(
-      "update Yapilacaklar SET Goruldu=0 where ID=@id"
+      "update Yapilacaklar SET Goruldu=0 where ID=@id",
     );
     res.status(200).json({ status: todo.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1430,7 +1499,7 @@ app.post("/sales/points/of/consider/save", async (req, res) => {
     const request = new mssql.Request();
     request.input("Hata", mssql.NVarChar, req.body.Hata);
     const consider = await request.query(
-      "insert into MaliyetHatalariTB(Hata) Values(@Hata)"
+      "insert into MaliyetHatalariTB(Hata) Values(@Hata)",
     );
     res.status(200).json({ status: consider.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1443,7 +1512,7 @@ app.put("/sales/points/of/consider/update", async (req, res) => {
     request.input("Hata", mssql.NVarChar, req.body.Hata);
     request.input("ID", mssql.Int, req.body.ID);
     const consider = await request.query(
-      "update MaliyetHatalariTB SET Hata=@Hata WHERE ID=@ID"
+      "update MaliyetHatalariTB SET Hata=@Hata WHERE ID=@ID",
     );
     res.status(200).json({ status: consider.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1455,7 +1524,7 @@ app.delete("/sales/points/of/consider/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const consider = await request.query(
-      "delete MaliyetHatalariTB where ID=@id"
+      "delete MaliyetHatalariTB where ID=@id",
     );
     res.status(200).json({ status: consider.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1490,7 +1559,7 @@ app.put("/sales/representative/change", async (req, res) => {
     request.input("operasyonId", mssql.NVarChar, req.body.operasyonId);
     request.input("SiparisNo", mssql.NVarChar, req.body.SiparisNo);
     const results = await request.query(
-      "update SiparislerTB SET SiparisSahibi=@siparisSahibiId, Operasyon=@operasyonId where SiparisNo=@SiparisNo"
+      "update SiparislerTB SET SiparisSahibi=@siparisSahibiId, Operasyon=@operasyonId where SiparisNo=@SiparisNo",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({ data: req.body, status: true });
@@ -1713,22 +1782,22 @@ app.post("/selection/production/save", async (req, res) => {
       request.input(
         "UrunKartID",
         mssql.Int,
-        parseInt(req.body.UrunKartID) || 0
+        parseInt(req.body.UrunKartID) || 0,
       );
       request.input(
         "TedarikciID",
         mssql.Int,
-        parseInt(req.body.TedarikciID) || 0
+        parseInt(req.body.TedarikciID) || 0,
       );
       request.input(
         "UrunBirimID",
         mssql.Int,
-        parseInt(req.body.UrunBirimID) || 0
+        parseInt(req.body.UrunBirimID) || 0,
       );
       request.input(
         "UrunOcakID",
         mssql.Int,
-        parseInt(req.body.UrunOcakID) || 0
+        parseInt(req.body.UrunOcakID) || 0,
       );
       request.input("Adet", mssql.NVarChar, safe(req.body.Adet));
       request.input("KutuAdet", mssql.NVarChar, safe(req.body.KutuAdet)); // ← SORUNLU ALAN
@@ -1737,17 +1806,17 @@ app.post("/selection/production/save", async (req, res) => {
       request.input(
         "UretimTurID",
         mssql.Int,
-        parseInt(req.body.UretimTurID) || 0
+        parseInt(req.body.UretimTurID) || 0,
       );
       request.input(
         "UrunDurumID",
         mssql.Int,
-        parseInt(req.body.UrunDurumID) || 0
+        parseInt(req.body.UrunDurumID) || 0,
       );
       request.input(
         "SiparisAciklama",
         mssql.NVarChar,
-        safe(req.body.SiparisAciklama)
+        safe(req.body.SiparisAciklama),
       );
       request.input("Kutu", mssql.NVarChar, safe(req.body.Kutu));
       request.input("Duzenleyen", mssql.NVarChar, safe(req.body.Duzenleyen));
@@ -1762,11 +1831,11 @@ app.post("/selection/production/save", async (req, res) => {
       request.input(
         "KullaniciID",
         mssql.Int,
-        parseInt(req.body.KullaniciID) || 0
+        parseInt(req.body.KullaniciID) || 0,
       );
 
       await request.query(
-        "insert into UretimTB(Tarih,KasaNo,UrunKartID,TedarikciID,UrunBirimID,UrunOcakID,Adet,KutuAdet,Miktar,Aciklama,UretimTurID,UrunDurumID,SiparisAciklama,Kutu,Duzenleyen,Kasalayan,Disarda,KutuIciAdet,SqmMiktar,Bagli,Bulunamadi,Fason,Kutulama,KullaniciID) VALUES(@Tarih,@KasaNo,@UrunKartID,@TedarikciID,@UrunBirimID,@UrunOcakID,@Adet,@KutuAdet,@Miktar,@Aciklama,@UretimTurID,@UrunDurumID,@SiparisAciklama,@Kutu,@Duzenleyen,@Kasalayan,@Disarda,@KutuIciAdet,@SqmMiktar,@Bagli,@Bulunamadi,@Fason,@Kutulama,@KullaniciID)"
+        "insert into UretimTB(Tarih,KasaNo,UrunKartID,TedarikciID,UrunBirimID,UrunOcakID,Adet,KutuAdet,Miktar,Aciklama,UretimTurID,UrunDurumID,SiparisAciklama,Kutu,Duzenleyen,Kasalayan,Disarda,KutuIciAdet,SqmMiktar,Bagli,Bulunamadi,Fason,Kutulama,KullaniciID) VALUES(@Tarih,@KasaNo,@UrunKartID,@TedarikciID,@UrunBirimID,@UrunOcakID,@Adet,@KutuAdet,@Miktar,@Aciklama,@UretimTurID,@UrunDurumID,@SiparisAciklama,@Kutu,@Duzenleyen,@Kasalayan,@Disarda,@KutuIciAdet,@SqmMiktar,@Bagli,@Bulunamadi,@Fason,@Kutulama,@KullaniciID)",
       );
 
       crateNo = parseInt(crateNo) + 1;
@@ -1790,12 +1859,12 @@ app.put("/selection/production/update", async (req, res) => {
     request.input(
       "TedarikciID",
       mssql.Int,
-      parseInt(req.body.TedarikciID) || 0
+      parseInt(req.body.TedarikciID) || 0,
     );
     request.input(
       "UrunBirimID",
       mssql.Int,
-      parseInt(req.body.UrunBirimID) || 0
+      parseInt(req.body.UrunBirimID) || 0,
     );
     request.input("UrunOcakID", mssql.Int, parseInt(req.body.UrunOcakID) || 0);
     request.input("Adet", mssql.NVarChar, safe(req.body.Adet));
@@ -1804,12 +1873,12 @@ app.put("/selection/production/update", async (req, res) => {
     request.input(
       "UretimTurID",
       mssql.Int,
-      parseInt(req.body.UretimTurID) || 0
+      parseInt(req.body.UretimTurID) || 0,
     );
     request.input(
       "SiparisAciklama",
       mssql.NVarChar,
-      safe(req.body.SiparisAciklama)
+      safe(req.body.SiparisAciklama),
     );
     request.input("Kutu", mssql.NVarChar, safe(req.body.Kutu));
     request.input("Duzenleyen", mssql.NVarChar, safe(req.body.Duzenleyen));
@@ -1824,7 +1893,7 @@ app.put("/selection/production/update", async (req, res) => {
     request.input("ID", mssql.Int, parseInt(req.body.ID) || 0);
 
     const results = await request.query(
-      "update UretimTB SET Tarih=@Tarih,KutuAdet=@KutuAdet,KasaNo=@KasaNo,UrunKartID=@UrunKartID,TedarikciID=@TedarikciID,UrunBirimID=@UrunBirimID,UrunOcakID=@UrunOcakID,Adet=@Adet,Miktar=@Miktar,Aciklama=@Aciklama,UretimTurID=@UretimTurID,SiparisAciklama=@SiparisAciklama,Kutu=@Kutu,Duzenleyen=@Duzenleyen,Kasalayan=@Kasalayan,Disarda=@Disarda,KutuIciAdet=@KutuIciAdet,SqmMiktar=@SqmMiktar,Bagli=@Bagli,Bulunamadi=@Bulunamadi,Fason=@Fason,Kutulama=@Kutulama where ID=@ID"
+      "update UretimTB SET Tarih=@Tarih,KutuAdet=@KutuAdet,KasaNo=@KasaNo,UrunKartID=@UrunKartID,TedarikciID=@TedarikciID,UrunBirimID=@UrunBirimID,UrunOcakID=@UrunOcakID,Adet=@Adet,Miktar=@Miktar,Aciklama=@Aciklama,UretimTurID=@UretimTurID,SiparisAciklama=@SiparisAciklama,Kutu=@Kutu,Duzenleyen=@Duzenleyen,Kasalayan=@Kasalayan,Disarda=@Disarda,KutuIciAdet=@KutuIciAdet,SqmMiktar=@SqmMiktar,Bagli=@Bagli,Bulunamadi=@Bulunamadi,Fason=@Fason,Kutulama=@Kutulama where ID=@ID",
     );
 
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
@@ -1838,7 +1907,7 @@ app.delete("/selection/production/delete/:crateNo", async (req, res) => {
     const request = new mssql.Request();
     request.input("crateNo", mssql.NVarChar, req.params.crateNo);
     const results = await request.query(
-      "delete UretimTB where KasaNo=@crateNo"
+      "delete UretimTB where KasaNo=@crateNo",
     );
     res.status(201).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1879,10 +1948,10 @@ app.post("/selection/production/cratesize/save", async (req, res) => {
     request.input("TedarikciAdi", mssql.NVarChar, req.body.TedarikciAdi);
     request.input("Adet", mssql.NVarChar, req.body.Adet);
     await request.query(
-      "insert into Kasa_Detaylari_Yeni(Crate_Width,Crate_Height,Crate_Thickness,Stone_Size,SupplierId,Supplier,Piece) VALUES(@width,@height,@thickness,@Ebat,@TedarikciId,@TedarikciAdi,@Adet)"
+      "insert into Kasa_Detaylari_Yeni(Crate_Width,Crate_Height,Crate_Thickness,Stone_Size,SupplierId,Supplier,Piece) VALUES(@width,@height,@thickness,@Ebat,@TedarikciId,@TedarikciAdi,@Adet)",
     );
     const cratesize = await mssql.query(
-      "select top 1 * from Kasa_Detaylari_Yeni order by ID desc"
+      "select top 1 * from Kasa_Detaylari_Yeni order by ID desc",
     );
     if (cratesize.recordset.length > 0) {
       res.status(200).json({ cratesize: cratesize.recordset[0], status: true });
@@ -1905,7 +1974,7 @@ app.put("/selection/production/cratesize/update", async (req, res) => {
     request.input("Adet", mssql.NVarChar, req.body.Adet);
     request.input("ID", mssql.Int, req.body.ID);
     const results = await request.query(
-      "update Kasa_Detaylari_Yeni SET Crate_Width=@width,Crate_Height=@height,Crate_Thickness=@thickness,Stone_Size=@Ebat,SupplierId=@TedarikciId,Supplier=@TedarikciAdi,Piece=@Adet WHERE ID=@ID"
+      "update Kasa_Detaylari_Yeni SET Crate_Width=@width,Crate_Height=@height,Crate_Thickness=@thickness,Stone_Size=@Ebat,SupplierId=@TedarikciId,Supplier=@TedarikciAdi,Piece=@Adet WHERE ID=@ID",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -1917,7 +1986,7 @@ app.delete("/selection/production/cratesize/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete Kasa_Detaylari_Yeni where Id=@id"
+      "delete Kasa_Detaylari_Yeni where Id=@id",
     );
     if (results.rowsAffected[0] == 1) {
       res.status(200).json({ id: req.params.id, status: true });
@@ -2040,16 +2109,16 @@ app.post("/card/save", (req, res) => {
                             }
                           });
                         }
-                      }
+                      },
                     );
                   }
-                }
+                },
               );
             }
-          }
+          },
         );
       }
-    }
+    },
   );
 });
 
@@ -2170,7 +2239,7 @@ app.put("/card/update", (req, res) => {
     req.body.En,
     req.body.Boy,
     req.body.Kenar,
-    req.body.OlcuId
+    req.body.OlcuId,
   ).then((sizeId) => {
     if (sizeId) {
       productIdControl(req.body.UrunAdi, req.body.UrunId).then((productId) => {
@@ -2188,7 +2257,7 @@ app.put("/card/update", (req, res) => {
                     cardRequest.input("ID", mssql.Int, req.body.ID);
                     cardRequest
                       .query(
-                        "update UrunKartTB SET UrunID=@UrunID, YuzeyID=@YuzeyID,OlcuID=@OlcuID,KategoriID=@KategoriID where ID=@ID"
+                        "update UrunKartTB SET UrunID=@UrunID, YuzeyID=@YuzeyID,OlcuID=@OlcuID,KategoriID=@KategoriID where ID=@ID",
                       )
                       .then((updateCard) => {
                         if (updateCard.rowsAffected[0] == 1) {
@@ -2198,10 +2267,10 @@ app.put("/card/update", (req, res) => {
                         }
                       })
                       .catch(() => res.status(500).json({ status: false }));
-                  }
+                  },
                 );
               }
-            }
+            },
           );
         }
       });
@@ -2364,7 +2433,7 @@ app.get(
         [
           r1.query("select Miktar from SiparisUrunTB where ID=@orderId"),
           r2.query(
-            "select sum(Miktar) as Miktar from UretimTB where SiparisAciklama=@po and UrunKartID=@cardId"
+            "select sum(Miktar) as Miktar from UretimTB where SiparisAciklama=@po and UrunKartID=@cardId",
           ),
           r3.query(`select ur.ID,ur.KasaNo,ur.Miktar,uk.ID as UrunKartId,k.KategoriAdi,urun.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar,ub.BirimAdi,
           (select su.SatisFiyati * ur.Miktar from SiparisUrunTB su where su.SiparisNo = ur.SiparisAciklama and su.UrunKartID = ur.UrunKartID and su.TedarikciID = ur.TedarikciID) as TotalProduct,
@@ -2377,7 +2446,7 @@ app.get(
           inner join OlculerTB ol on ol.ID = uk.OlcuID
           inner join UrunBirimTB ub on ub.ID = ur.UrunBirimID
           where ur.SiparisAciklama=@po and ur.UrunKartID=@cardId and ur.TedarikciID=@supplier`),
-        ]
+        ],
       );
       const remainder =
         parseFloat(orderAmount.recordset[0].Miktar) -
@@ -2391,7 +2460,7 @@ app.get(
     } catch (err) {
       res.status(500).json({ productionList: [] });
     }
-  }
+  },
 );
 app.post("/shipment/products/save", async (req, res) => {
   try {
@@ -2401,18 +2470,18 @@ app.post("/shipment/products/save", async (req, res) => {
     orderReq.input(
       "YuklemeTarihi",
       mssql.VarChar,
-      safe(req.body.YuklemeTarihi)
+      safe(req.body.YuklemeTarihi),
     );
     orderReq.input("SiparisNo", mssql.NVarChar, safe(req.body.SiparisNo));
     await orderReq.query(
-      "update SiparislerTB SET SiparisDurumID=3, YuklemeTarihi=@YuklemeTarihi where SiparisNo=@SiparisNo"
+      "update SiparislerTB SET SiparisDurumID=3, YuklemeTarihi=@YuklemeTarihi where SiparisNo=@SiparisNo",
     );
 
     for (const item of req.body.data) {
       const prodReq = new mssql.Request();
       prodReq.input("KasaNo", mssql.NVarChar, safe(item.KasaNo));
       await prodReq.query(
-        "update UretimTB SET UrunDurumID=0 where KasaNo=@KasaNo"
+        "update UretimTB SET UrunDurumID=0 where KasaNo=@KasaNo",
       );
 
       const insReq = new mssql.Request();
@@ -2424,7 +2493,7 @@ app.post("/shipment/products/save", async (req, res) => {
       insReq.input("SiparisNo", mssql.NVarChar, safe(item.SiparisNo));
       insReq.input("KullaniciId", mssql.Int, parseInt(item.KullaniciId) || 0);
       await insReq.query(
-        "insert into SevkiyatTB(Tarih,KasaNo,MusteriID,BirimFiyat,Toplam,CikisNo,RaporDurum,KullaniciID) VALUES(@Tarih,@KasaNo,@MusteriId,@SatisFiyati,@TotalProduct,@SiparisNo,'1',@KullaniciId)"
+        "insert into SevkiyatTB(Tarih,KasaNo,MusteriID,BirimFiyat,Toplam,CikisNo,RaporDurum,KullaniciID) VALUES(@Tarih,@KasaNo,@MusteriId,@SatisFiyati,@TotalProduct,@SiparisNo,'1',@KullaniciId)",
       );
     }
 
@@ -2439,7 +2508,7 @@ app.get("/shipment/order/control/:po", async (req, res) => {
     const request = new mssql.Request();
     request.input("po", mssql.NVarChar, req.params.po);
     const po = await request.query(
-      "select NavlunSatis,TeslimTurID from SiparislerTB where SiparisNo=@po"
+      "select NavlunSatis,TeslimTurID from SiparislerTB where SiparisNo=@po",
     );
     res.status(200).json({ po: po.recordset[0] });
   } catch (err) {
@@ -2461,7 +2530,7 @@ function documentColor(po, doc, cb) {
     let docModel = [];
     for (const item of doc) {
       const index = poDocument.recordset.findIndex(
-        (x) => x.YuklemeEvrakID == item.ID
+        (x) => x.YuklemeEvrakID == item.ID,
       );
       if (index > -1) {
         docModel.push({
@@ -2489,7 +2558,7 @@ app.get("/upload/document/:po", (req, res) => {
         res.status(200).json({
           model: data,
         });
-      }
+      },
     );
   });
 });
@@ -2512,7 +2581,7 @@ app.get(`/upload/document/form/:po/:docId`, async (req, res) => {
     request.input("po", mssql.NVarChar, req.params.po);
     request.input("docId", mssql.Int, req.params.docId);
     const doc = await request.query(
-      "select ID,SiparisFaturaTurID,SiparisNo,YuklemeEvrakID,EvrakAdi,Evrak_Kontrol from SiparisFaturaKayitTB where SiparisNo=@po and YuklemeEvrakID=@docId"
+      "select ID,SiparisFaturaTurID,SiparisNo,YuklemeEvrakID,EvrakAdi,Evrak_Kontrol from SiparisFaturaKayitTB where SiparisNo=@po and YuklemeEvrakID=@docId",
     );
     const data = [];
     doc.recordset.forEach((x) => {
@@ -2538,7 +2607,7 @@ app.post("/upload/file", async (req, res) => {
     request.input("kullaniciId", mssql.Int, value.kullaniciId);
     request.input("evrakAdi", mssql.NVarChar, value.siparisno + ".pdf");
     await request.query(
-      "insert into SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,YuklemeEvrakID,YuklemeEvrakDurumID,EvrakAdi,EvrakYuklemeTarihi,KullaniciID) values(@tarih,0,0,@siparisno,@id,2,@evrakAdi,@tarih,@kullaniciId)"
+      "insert into SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,YuklemeEvrakID,YuklemeEvrakDurumID,EvrakAdi,EvrakYuklemeTarihi,KullaniciID) values(@tarih,0,0,@siparisno,@id,2,@evrakAdi,@tarih,@kullaniciId)",
     );
     res.status(200).json({ status: true });
   } catch (err) {
@@ -2602,7 +2671,7 @@ app.post("/container/follow/save", async (req, res) => {
     request.input("Takip", mssql.NVarChar, req.body.Takip);
     request.input("SiparisNo", mssql.NVarChar, req.body.SiparisNo);
     const response = await request.query(
-      "update SiparislerTB SET Eta=@EtaTarihi,KonteynerNo=@KonteynırNo,KonsimentoDurum=@KonsimentoDurum,Line=@Line,Takip=@Takip where SiparisNo=@SiparisNo"
+      "update SiparislerTB SET Eta=@EtaTarihi,KonteynerNo=@KonteynırNo,KonsimentoDurum=@KonsimentoDurum,Line=@Line,Takip=@Takip where SiparisNo=@SiparisNo",
     );
     res.status(200).json({ status: response.rowsAffected[0] == 1 });
   } catch (err) {
@@ -2658,13 +2727,13 @@ app.post("/container/input/save", async (req, res) => {
     request.input("description", mssql.NVarChar, safe(req.body.description));
     request.input("userId", mssql.Int, safe(req.body.userId));
     const response = await request.query(
-      "INSERT INTO KonteynerDigerFaturalarKayitTB(FirmaID,Tarih,FaturaNo,Kur,KayitTarihi,Aciklama,KullaniciID) values(@companyid,@date,@invoiceno,@currency,@nowDate,@description,@userId)"
+      "INSERT INTO KonteynerDigerFaturalarKayitTB(FirmaID,Tarih,FaturaNo,Kur,KayitTarihi,Aciklama,KullaniciID) values(@companyid,@date,@invoiceno,@currency,@nowDate,@description,@userId)",
     );
     if (response.rowsAffected[0] == 1) {
       const r2 = new mssql.Request();
       r2.input("invoiceno", mssql.NVarChar, safe(req.body.invoiceno));
       const containerResults = await r2.query(
-        "select ID,FaturaNo,FirmaID from KonteynerDigerFaturalarKayitTB where FaturaNo=@invoiceno"
+        "select ID,FaturaNo,FirmaID from KonteynerDigerFaturalarKayitTB where FaturaNo=@invoiceno",
       );
       res.status(200).json({
         status: true,
@@ -2689,17 +2758,17 @@ app.post("/container/input/file/save", async (req, res) => {
     request.input(
       "invoicedocumentid",
       mssql.Int,
-      safe(req.body.invoicedocumentid)
+      safe(req.body.invoicedocumentid),
     );
     request.input("nowDate", mssql.VarChar, safe(req.body.nowDate));
     request.input(
       "evrakAdi",
       mssql.NVarChar,
-      safe(req.body.invoiceno + ".pdf")
+      safe(req.body.invoiceno + ".pdf"),
     );
     request.input("userId", mssql.Int, safe(req.body.userId));
     const response = await request.query(
-      "INSERT INTO SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,Tutar,EvrakDurum,YuklemeEvrakID,YuklemeEvrakDurumID,EvrakYuklemeTarihi,EvrakAdi,KullaniciID) VALUES(@date,@invoiceid,@invoicekindid,@po,@usd,1,@invoicedocumentid,2,@nowDate,@evrakAdi,@userId)"
+      "INSERT INTO SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,Tutar,EvrakDurum,YuklemeEvrakID,YuklemeEvrakDurumID,EvrakYuklemeTarihi,EvrakAdi,KullaniciID) VALUES(@date,@invoiceid,@invoicekindid,@po,@usd,1,@invoicedocumentid,2,@nowDate,@evrakAdi,@userId)",
     );
     res.status(200).json({ status: response.rowsAffected[0] == 1 });
   } catch (err) {
@@ -2789,7 +2858,7 @@ app.post("/transport/company/save", async (req, res) => {
     request.input("mail", mssql.NVarChar, req.body.mail);
     request.input("description", mssql.NVarChar, req.body.description);
     const response = await request.query(
-      "insert into FirmalarTB(FirmaAdi,Telefon,MailAdresi,Notlar) VALUES(@companyname,@phone,@mail,@description)"
+      "insert into FirmalarTB(FirmaAdi,Telefon,MailAdresi,Notlar) VALUES(@companyname,@phone,@mail,@description)",
     );
     res.status(200).json({ status: response.rowsAffected[0] == 1 });
   } catch (err) {
@@ -2800,7 +2869,7 @@ async function invoiceIdSave(x) {
   const r1 = new mssql.Request();
   r1.input("po", mssql.NVarChar, x.po);
   const response = await r1.query(
-    "select count(*) as durum from YeniNakliyeFaturalarıTB where SiparisNo=@po"
+    "select count(*) as durum from YeniNakliyeFaturalarıTB where SiparisNo=@po",
   );
   const id = 201 + response.recordset[0].durum;
   const r2 = new mssql.Request();
@@ -2808,7 +2877,7 @@ async function invoiceIdSave(x) {
   r2.input("po", mssql.NVarChar, x.po);
   r2.input("invoiceno", mssql.NVarChar, x.invoiceno);
   await r2.query(
-    "INSERT INTO YeniNakliyeFaturalarıTB(EvrakID,SiparisNo,EvrakAdi) values(@id,@po,@invoiceno)"
+    "INSERT INTO YeniNakliyeFaturalarıTB(EvrakID,SiparisNo,EvrakAdi) values(@id,@po,@invoiceno)",
   );
 }
 app.post("/transport/list/save", async (req, res) => {
@@ -2823,7 +2892,7 @@ app.post("/transport/list/save", async (req, res) => {
       request.input("nowDate", mssql.VarChar, safe(x.nowDate));
       request.input("userId", mssql.Int, safe(x.userId));
       const response = await request.query(
-        "INSERT INTO NakliyeFaturaKayitTB(FirmaID,Tarih,FaturaNo,Tutar,Kur,KayitTarihi,KullaniciID) values(@companyId,@date,@invoiceno,@tl,@currency,@nowDate,@userId)"
+        "INSERT INTO NakliyeFaturaKayitTB(FirmaID,Tarih,FaturaNo,Tutar,Kur,KayitTarihi,KullaniciID) values(@companyId,@date,@invoiceno,@tl,@currency,@nowDate,@userId)",
       );
       if (response.rowsAffected[0] == 1) {
         await invoiceIdSave(x);
@@ -2838,7 +2907,7 @@ async function transportProductId(x) {
   const request = new mssql.Request();
   request.input("invoiceno", mssql.NVarChar, x.invoiceno);
   const results = await request.query(
-    "Select ID from NakliyeFaturaKayitTB where FaturaNo=@invoiceno"
+    "Select ID from NakliyeFaturaKayitTB where FaturaNo=@invoiceno",
   );
   return results.recordset.length > 0 ? results.recordset[0].ID : null;
 }
@@ -2846,7 +2915,7 @@ async function transportInvoiceId(x) {
   const request = new mssql.Request();
   request.input("po", mssql.NVarChar, x.po);
   const results = await request.query(
-    "Select count(*) as durum from YeniNakliyeFaturalarıTB where SiparisNo=@po"
+    "Select count(*) as durum from YeniNakliyeFaturalarıTB where SiparisNo=@po",
   );
   return results.recordset[0].durum + 201;
 }
@@ -2865,7 +2934,7 @@ app.post("/transport/file/list/save", async (req, res) => {
       request.input("evrakAdi", mssql.NVarChar, safe(x.invoiceno + ".pdf"));
       request.input("userId", mssql.Int, safe(x.userId));
       await request.query(
-        "INSERT INTO SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,Tutar,EvrakDurum,YuklemeEvrakID,YeniEvrakID,YuklemeEvrakDurumID,EvrakYuklemeTarihi,EvrakAdi,KullaniciID) values(@date,@tProductId,11,@po,@usd,1,13,@tInvoiceId,2,@nowDate,@evrakAdi,@userId)"
+        "INSERT INTO SiparisFaturaKayitTB(Tarih,FaturaKayitID,SiparisFaturaTurID,SiparisNo,Tutar,EvrakDurum,YuklemeEvrakID,YeniEvrakID,YuklemeEvrakDurumID,EvrakYuklemeTarihi,EvrakAdi,KullaniciID) values(@date,@tProductId,11,@po,@usd,1,13,@tInvoiceId,2,@nowDate,@evrakAdi,@userId)",
       );
     }
     res.status(200).json({ status: true });
@@ -2911,7 +2980,7 @@ app.put("/transport/list/update", async (req, res) => {
     tReq.input("currency", mssql.NVarChar, safe(req.body.currency));
     tReq.input("transportId", mssql.Int, safe(req.body.transportId));
     const transport = await tReq.query(
-      "update NakliyeFaturaKayitTB SET Tarih=@date,FaturaNo=@invoice,Tutar=@tl,Kur=@currency where ID=@transportId"
+      "update NakliyeFaturaKayitTB SET Tarih=@date,FaturaNo=@invoice,Tutar=@tl,Kur=@currency where ID=@transportId",
     );
     if (transport.rowsAffected[0] != 1)
       return res.status(200).json({ status: false });
@@ -2920,7 +2989,7 @@ app.put("/transport/list/update", async (req, res) => {
     pReq.input("usd", mssql.NVarChar, safe(req.body.usd));
     pReq.input("productInvoiceId", mssql.Int, safe(req.body.productInvoiceId));
     const product = await pReq.query(
-      "update SiparisFaturaKayitTB SET SiparisNo=@po,Tutar=@usd where ID=@productInvoiceId"
+      "update SiparisFaturaKayitTB SET SiparisNo=@po,Tutar=@usd where ID=@productInvoiceId",
     );
     res.status(200).json({ status: product.rowsAffected[0] == 1 });
   } catch (err) {
@@ -2933,14 +3002,14 @@ app.put("/transport/list/delete", async (req, res) => {
     const tReq = new mssql.Request();
     tReq.input("transportId", mssql.Int, req.body.transportId);
     const transport = await tReq.query(
-      "delete NakliyeFaturaKayitTB where ID=@transportId"
+      "delete NakliyeFaturaKayitTB where ID=@transportId",
     );
     if (transport.rowsAffected[0] != 1)
       return res.status(200).json({ status: false });
     const pReq = new mssql.Request();
     pReq.input("productInvoiceId", mssql.Int, req.body.productInvoiceId);
     const product = await pReq.query(
-      "delete SiparisFaturaKayitTB where ID=@productInvoiceId"
+      "delete SiparisFaturaKayitTB where ID=@productInvoiceId",
     );
     res.status(200).json({ status: product.rowsAffected[0] == 1 });
   } catch (err) {
@@ -2981,10 +3050,10 @@ app.get(`/customer/mekmar/detail/orders/:id`, async (req, res) => {
     r2.input("id", mssql.Int, req.params.id);
     const [yearResults, orderResults] = await Promise.all([
       r1.query(
-        "select YEAR(s.YuklemeTarihi) as Year,s.MusteriID as CustomerId from SiparislerTB s where s.MusteriID=@id and YEAR(s.YuklemeTarihi) IS NOT NULL group by YEAR(s.YuklemeTarihi),s.MusteriID"
+        "select YEAR(s.YuklemeTarihi) as Year,s.MusteriID as CustomerId from SiparislerTB s where s.MusteriID=@id and YEAR(s.YuklemeTarihi) IS NOT NULL group by YEAR(s.YuklemeTarihi),s.MusteriID",
       ),
       r2.query(
-        "select YEAR(s.YuklemeTarihi) as Year,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+sum(s.NavlunSatis)+sum(s.DetayTutar_1)+sum(s.DetayTutar_2)+sum(s.DetayTutar_3) as Total from SiparislerTB s where s.MusteriID=@id and YEAR(s.YuklemeTarihi) is not null group by YEAR(s.YuklemeTarihi),s.SiparisNo order by YEAR(s.YuklemeTarihi) desc"
+        "select YEAR(s.YuklemeTarihi) as Year,(select sum(su.SatisToplam) from SiparisUrunTB su where su.SiparisNo=s.SiparisNo)+sum(s.NavlunSatis)+sum(s.DetayTutar_1)+sum(s.DetayTutar_2)+sum(s.DetayTutar_3) as Total from SiparislerTB s where s.MusteriID=@id and YEAR(s.YuklemeTarihi) is not null group by YEAR(s.YuklemeTarihi),s.SiparisNo order by YEAR(s.YuklemeTarihi) desc",
       ),
     ]);
     res.status(200).json({
@@ -3003,13 +3072,13 @@ app.get(
       request.input("customerid", mssql.Int, req.params.customerid);
       request.input("year", mssql.Int, req.params.year);
       const results = await request.query(
-        "select s.ID,s.SiparisNo,(select k.KullaniciAdi from KullaniciTB k where k.ID=s.SiparisSahibi) as SiparisSahibi,(select k.KullaniciAdi from KullaniciTB k where k.ID=s.Operasyon) as Operasyon from SiparislerTB s where s.MusteriID=@customerid and YEAR(s.YuklemeTarihi)=@year"
+        "select s.ID,s.SiparisNo,(select k.KullaniciAdi from KullaniciTB k where k.ID=s.SiparisSahibi) as SiparisSahibi,(select k.KullaniciAdi from KullaniciTB k where k.ID=s.Operasyon) as Operasyon from SiparislerTB s where s.MusteriID=@customerid and YEAR(s.YuklemeTarihi)=@year",
       );
       res.status(200).json({ poList: results.recordset });
     } catch (err) {
       res.status(500).json({ poList: [] });
     }
-  }
+  },
 );
 
 app.get("/customer/mekmar/detail/orders/products/:po", async (req, res) => {
@@ -3017,7 +3086,7 @@ app.get("/customer/mekmar/detail/orders/products/:po", async (req, res) => {
     const request = new mssql.Request();
     request.input("po", mssql.NVarChar, req.params.po);
     const results = await request.query(
-      "select k.KategoriAdi,u.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar,su.Miktar,ub.BirimAdi,su.SatisFiyati,(su.Miktar*su.SatisFiyati) as SatisToplam from SiparisUrunTB su inner join UrunKartTb ukt on ukt.ID=su.UrunKartID inner join KategoriTB k on k.ID=ukt.KategoriID inner join UrunlerTB u on u.ID=ukt.UrunID inner join YuzeyKenarTB yk on yk.ID=ukt.YuzeyID inner join OlculerTB ol on ol.ID=ukt.OlcuID inner join UrunBirimTB ub on ub.ID=su.UrunBirimId where su.SiparisNo=@po"
+      "select k.KategoriAdi,u.UrunAdi,yk.YuzeyIslemAdi,ol.En,ol.Boy,ol.Kenar,su.Miktar,ub.BirimAdi,su.SatisFiyati,(su.Miktar*su.SatisFiyati) as SatisToplam from SiparisUrunTB su inner join UrunKartTb ukt on ukt.ID=su.UrunKartID inner join KategoriTB k on k.ID=ukt.KategoriID inner join UrunlerTB u on u.ID=ukt.UrunID inner join YuzeyKenarTB yk on yk.ID=ukt.YuzeyID inner join OlculerTB ol on ol.ID=ukt.OlcuID inner join UrunBirimTB ub on ub.ID=su.UrunBirimId where su.SiparisNo=@po",
     );
     res.status(200).json({ products: results.recordset });
   } catch (err) {
@@ -3043,7 +3112,7 @@ app.post("/customer/mekmar/save", async (req, res) => {
     request.input(
       "KullaniciID",
       mssql.Int,
-      parseInt(req.body.KullaniciID) || 0
+      parseInt(req.body.KullaniciID) || 0,
     );
     request.input("MailAdresi", mssql.NVarChar, safe(req.body.MailAdresi));
     request.input("Telefon", mssql.NVarChar, safe(req.body.Telefon));
@@ -3052,7 +3121,7 @@ app.post("/customer/mekmar/save", async (req, res) => {
     request.input(
       "MusteriOncelik",
       mssql.NVarChar,
-      safe(req.body.MusteriOncelik)
+      safe(req.body.MusteriOncelik),
     );
     request.input("SatisciId", mssql.NVarChar, safe(req.body.SatisciId));
     request.input("Takip", mssql.NVarChar, safe(req.body.Takip));
@@ -3061,7 +3130,7 @@ app.post("/customer/mekmar/save", async (req, res) => {
     request.input("KayitTarihi", mssql.VarChar, safe(req.body.KayitTarihi));
 
     const results = await request.query(
-      "insert into MusterilerTB(FirmaAdi,Unvan,Adres,Ulke,UlkeId,Marketing,Aktif,Sira,Mt_No,MusteriTemsilciId,KullaniciID,MailAdresi,Telefon,Devir,Ozel,MusteriOncelik,Satisci,Takip,Notlar,SonKullanici,KayitTarihi) VALUES(@FirmaAdi,@Unvan,@Adres,@Ulke,@UlkeId,@Marketing,@Aktif,@Sira,@Mt_No,@TemsilciId,@KullaniciID,@MailAdresi,@Telefon,@Devir,@Ozel,@MusteriOncelik,@SatisciId,@Takip,@Notlar,@SonKullanici,@KayitTarihi)"
+      "insert into MusterilerTB(FirmaAdi,Unvan,Adres,Ulke,UlkeId,Marketing,Aktif,Sira,Mt_No,MusteriTemsilciId,KullaniciID,MailAdresi,Telefon,Devir,Ozel,MusteriOncelik,Satisci,Takip,Notlar,SonKullanici,KayitTarihi) VALUES(@FirmaAdi,@Unvan,@Adres,@Ulke,@UlkeId,@Marketing,@Aktif,@Sira,@Mt_No,@TemsilciId,@KullaniciID,@MailAdresi,@Telefon,@Devir,@Ozel,@MusteriOncelik,@SatisciId,@Takip,@Notlar,@SonKullanici,@KayitTarihi)",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3100,7 +3169,7 @@ app.put("/customer/mekmar/update", async (req, res) => {
     request.input(
       "MusteriOncelik",
       mssql.NVarChar,
-      safe(req.body.MusteriOncelik)
+      safe(req.body.MusteriOncelik),
     );
     request.input("SatisciId", mssql.NVarChar, safe(req.body.SatisciId));
     request.input("Takip", mssql.NVarChar, safe(req.body.Takip));
@@ -3109,7 +3178,7 @@ app.put("/customer/mekmar/update", async (req, res) => {
     request.input("ID", mssql.Int, parseInt(req.body.ID) || 0);
 
     const results = await request.query(
-      `update MusterilerTB SET FirmaAdi=@FirmaAdi,Unvan=@Unvan,Adres=@Adres,Ulke=@Ulke,UlkeId=@UlkeId,Marketing=@Marketing,MusteriTemsilciId=@TemsilciId,MailAdresi=@MailAdresi,Telefon=@Telefon,Devir=@Devir,Ozel=@Ozel,MusteriOncelik=@MusteriOncelik,Satisci=@SatisciId,Takip=@Takip,Notlar=@Notlar,SonKullanici=@SonKullanici WHERE ID=@ID`
+      `update MusterilerTB SET FirmaAdi=@FirmaAdi,Unvan=@Unvan,Adres=@Adres,Ulke=@Ulke,UlkeId=@UlkeId,Marketing=@Marketing,MusteriTemsilciId=@TemsilciId,MailAdresi=@MailAdresi,Telefon=@Telefon,Devir=@Devir,Ozel=@Ozel,MusteriOncelik=@MusteriOncelik,Satisci=@SatisciId,Takip=@Takip,Notlar=@Notlar,SonKullanici=@SonKullanici WHERE ID=@ID`,
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3166,7 +3235,7 @@ app.post("/customer/offer/save", async (req, res) => {
     request.input("Adress", mssql.NVarChar, req.body.Adress);
     request.input("Description", mssql.NVarChar, req.body.Description);
     const results = await request.query(
-      "insert into YeniTeklif_MusterilerTB(MusteriAdi,UlkeId,Company,Mail,Phone,Kullanici,Adress,Description) VALUES(@MusteriAdi,@UlkeId,@Company,@Mail,@Phone,@Kullanici,@Adress,@Description)"
+      "insert into YeniTeklif_MusterilerTB(MusteriAdi,UlkeId,Company,Mail,Phone,Kullanici,Adress,Description) VALUES(@MusteriAdi,@UlkeId,@Company,@Mail,@Phone,@Kullanici,@Adress,@Description)",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3178,7 +3247,7 @@ app.delete("/customer/offer/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete YeniTeklif_MusterilerTB where Id=@id"
+      "delete YeniTeklif_MusterilerTB where Id=@id",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3197,7 +3266,7 @@ app.put("/customer/offer/update", async (req, res) => {
     request.input("Description", mssql.NVarChar, req.body.Description);
     request.input("Id", mssql.Int, req.body.Id);
     const results = await request.query(
-      "update YeniTeklif_MusterilerTB SET MusteriAdi=@MusteriAdi,UlkeId=@UlkeId,Company=@Company,Mail=@Mail,Phone=@Phone,Adress=@Adress,Description=@Description where Id=@Id"
+      "update YeniTeklif_MusterilerTB SET MusteriAdi=@MusteriAdi,UlkeId=@UlkeId,Company=@Company,Mail=@Mail,Phone=@Phone,Adress=@Adress,Description=@Description where Id=@Id",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3233,7 +3302,7 @@ app.delete("/customer/bgp/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete BgpProjectMusteriler where ID=@id"
+      "delete BgpProjectMusteriler where ID=@id",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3251,7 +3320,7 @@ app.post("/customer/bgp/save", async (req, res) => {
     request.input("KullaniciId", mssql.NVarChar, req.body.KullaniciId);
     request.input("UlkeAdi", mssql.NVarChar, req.body.UlkeAdi);
     const results = await request.query(
-      "insert into BgpProjectMusteriler(Customer,Company,Email,Phone,Adress,Kullanici,Ulke) VALUES(@Customer,@Company,@Email,@Phone,@Adress,@KullaniciId,@UlkeAdi)"
+      "insert into BgpProjectMusteriler(Customer,Company,Email,Phone,Adress,Kullanici,Ulke) VALUES(@Customer,@Company,@Email,@Phone,@Adress,@KullaniciId,@UlkeAdi)",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3269,7 +3338,7 @@ app.put("/customer/bgp/update", async (req, res) => {
     request.input("UlkeAdi", mssql.NVarChar, req.body.UlkeAdi);
     request.input("ID", mssql.Int, req.body.ID);
     const results = await request.query(
-      "update BgpProjectMusteriler SET Customer=@Customer,Company=@Company,Email=@Email,Phone=@Phone,Adress=@Adress,Ulke=@UlkeAdi WHERE ID=@ID"
+      "update BgpProjectMusteriler SET Customer=@Customer,Company=@Company,Email=@Email,Phone=@Phone,Adress=@Adress,Ulke=@UlkeAdi WHERE ID=@ID",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3320,7 +3389,7 @@ app.post("/customer/fair/save", async (req, res) => {
     request.input("Fuar", mssql.NVarChar, req.body.Fuar);
     request.input("Ziyaret", mssql.NVarChar, req.body.Ziyaret);
     const results = await request.query(
-      "insert into FuarMusterilerTB(Customer,Company,Email,Phone,Country,Adress,Orderer,Kullanici,Fuar,Ziyaret) VALUES(@Customer,@Company,@Email,@Phone,@Country,@Adress,@Orderer,@Kullanici,@Fuar,@Ziyaret)"
+      "insert into FuarMusterilerTB(Customer,Company,Email,Phone,Country,Adress,Orderer,Kullanici,Fuar,Ziyaret) VALUES(@Customer,@Company,@Email,@Phone,@Country,@Adress,@Orderer,@Kullanici,@Fuar,@Ziyaret)",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3351,7 +3420,7 @@ app.put("/customer/fair/update", async (req, res) => {
     request.input("Ziyaret", mssql.NVarChar, req.body.Ziyaret);
     request.input("ID", mssql.Int, req.body.ID);
     const results = await request.query(
-      "update FuarMusterilerTB SET Customer=@Customer,Company=@Company,Email=@Email,Phone=@Phone,Country=@Country,Adress=@Adress,Orderer=@Orderer,Fuar=@Fuar,Ziyaret=@Ziyaret where ID=@ID"
+      "update FuarMusterilerTB SET Customer=@Customer,Company=@Company,Email=@Email,Phone=@Phone,Country=@Country,Adress=@Adress,Orderer=@Orderer,Fuar=@Fuar,Ziyaret=@Ziyaret where ID=@ID",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3401,23 +3470,23 @@ async function ___addSurface(event) {
   const checkReq = new mssql.Request();
   checkReq.input("Surface", mssql.NVarChar, event);
   const status = await checkReq.query(
-    "select count(*) as durum from CustomersSurfaceTB where Surface=@Surface"
+    "select count(*) as durum from CustomersSurfaceTB where Surface=@Surface",
   );
   if (status.recordset[0].durum == 0) {
     const insertReq = new mssql.Request();
     insertReq.input("Surface", mssql.NVarChar, event);
     await insertReq.query(
-      "insert into CustomersSurfaceTB(Surface,UserId) values(@Surface,'44')"
+      "insert into CustomersSurfaceTB(Surface,UserId) values(@Surface,'44')",
     );
     const getId = await new mssql.Request().query(
-      "select top 1 ID from CustomersSurfaceTB order by ID desc"
+      "select top 1 ID from CustomersSurfaceTB order by ID desc",
     );
     return { id: getId.recordset[0].ID };
   } else {
     const getReq = new mssql.Request();
     getReq.input("Surface", mssql.NVarChar, event);
     const getIdBySurface = await getReq.query(
-      "select top 1 ID from CustomersSurfaceTB where Surface=@Surface"
+      "select top 1 ID from CustomersSurfaceTB where Surface=@Surface",
     );
     return { id: getIdBySurface.recordset[0].ID };
   }
@@ -3434,7 +3503,7 @@ app.post("/customer/selection/save", async (req, res) => {
     request.input("SurfaceId", mssql.Int, surface_id["id"]);
     request.input("UserId", mssql.NVarChar, req.body.UserId);
     const results = await request.query(
-      "insert into SurfaceCustomersTB(FirstName,Adress,City,Email,Phone,SurfaceId,UserId) VALUES(@FirstName,@Adress,@City,@Email,@Phone,@SurfaceId,@UserId)"
+      "insert into SurfaceCustomersTB(FirstName,Adress,City,Email,Phone,SurfaceId,UserId) VALUES(@FirstName,@Adress,@City,@Email,@Phone,@SurfaceId,@UserId)",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3446,7 +3515,7 @@ app.delete("/customer/selection/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete SurfaceCustomersTB where ID=@id"
+      "delete SurfaceCustomersTB where ID=@id",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3464,7 +3533,7 @@ app.put("/customer/selection/update", async (req, res) => {
     request.input("SurfaceId", mssql.NVarChar, req.body.SurfaceId);
     request.input("ID", mssql.Int, req.body.ID);
     const results = await request.query(
-      "update SurfaceCustomersTB SET FirstName=@FirstName,Adress=@Adress,City=@City,Email=@Email,Phone=@Phone,SurfaceId=@SurfaceId where ID=@ID"
+      "update SurfaceCustomersTB SET FirstName=@FirstName,Adress=@Adress,City=@City,Email=@Email,Phone=@Phone,SurfaceId=@SurfaceId where ID=@ID",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -3556,7 +3625,7 @@ app.post("/reports/mekmer/production/filter", async (req, res) => {
     request.input(
       "supplier",
       mssql.NVarChar,
-      (req.body.supplier || "").toUpperCase()
+      (req.body.supplier || "").toUpperCase(),
     );
     request.input("category", mssql.NVarChar, req.body.category);
     request.input("crate", mssql.NVarChar, req.body.crate);
@@ -4024,15 +4093,15 @@ registerStockDetailEndpoint("/reports/outer/stock/detail", "u.Disarda = 1");
 registerStockDetailEndpoint("/reports/mekmer/stock/detail", "u.Disarda != 1");
 registerStockDetailEndpoint(
   "/reports/mekmer/stock/detail/in",
-  "u.TedarikciID = 1"
+  "u.TedarikciID = 1",
 );
 registerStockDetailEndpoint(
   "/reports/mekmoz/stock/detail",
-  "u.TedarikciID = 123"
+  "u.TedarikciID = 123",
 );
 registerStockDetailEndpoint(
   "/reports/mekmer/stock/only/stock/mekmer/detail",
-  "u.TedarikciID in (1, 123) and u.UretimTurID = 1"
+  "u.TedarikciID in (1, 123) and u.UretimTurID = 1",
 );
 
 app.get("/reports/mekmer/mine/list", (req, res) => {
@@ -5194,7 +5263,7 @@ group by MONTH(s.SiparisTarihi),YEAR(s.SiparisTarihi)
           .json({ items: [thisYear.recordset, previousYear.recordset] });
       });
     });
-  }
+  },
 );
 app.get(
   "/reports/mekmar/summary/order/list/by/representative/detail/:userId/:month/:year",
@@ -5223,7 +5292,7 @@ app.get(
     mssql.query(detailSql, (err, detail) => {
       res.status(200).json({ list: detail.recordset });
     });
-  }
+  },
 );
 
 function noneControl(value) {
@@ -5611,16 +5680,16 @@ select
                         previousYearOperationForwarding: [],
                         twoYearAgoOperationForwarding: [],
                       });
-                    }
+                    },
                   );
-                }
+                },
               );
-            }
+            },
           );
         });
       });
     });
-  }
+  },
 );
 app.get(
   "/reports/gu/mekmar/order/seller/:month/:year/:userId",
@@ -5644,7 +5713,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  }
+  },
 );
 
 app.get(
@@ -5670,7 +5739,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  }
+  },
 );
 
 app.get(
@@ -5695,7 +5764,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  }
+  },
 );
 
 app.get(
@@ -5721,7 +5790,7 @@ group by s.SiparisNo
     mssql.query(sql, (err, seller) => {
       res.status(200).json({ detail: seller.recordset });
     });
-  }
+  },
 );
 
 /*Sample */
@@ -6074,13 +6143,13 @@ function __getTlToUsdorEuro(date, value) {
       .then(async (tl_to_usd) => {
         await api
           .get(
-            "/finance/doviz/liste/euro/to/tl/" + year + "/" + month + "/" + day
+            "/finance/doviz/liste/euro/to/tl/" + year + "/" + month + "/" + day,
           )
           .then((tl_to_euro) => {
             resolve({
               usd: (parseFloat(value) / parseFloat(tl_to_usd.data)).toFixed(2),
               euro: (parseFloat(value) / parseFloat(tl_to_euro.data)).toFixed(
-                2
+                2,
               ),
             });
           });
@@ -6098,13 +6167,18 @@ function __getUsdToTlorEuro(date, value) {
       .then(async (usd_to_tl) => {
         await this.$excelApi
           .get(
-            "/finance/doviz/liste/usd/to/euro/" + year + "/" + month + "/" + day
+            "/finance/doviz/liste/usd/to/euro/" +
+              year +
+              "/" +
+              month +
+              "/" +
+              day,
           )
           .then(async (usd_to_euro) => {
             resolve({
               tl: (parseFloat(value) * parseFloat(usd_to_tl.data)).toFixed(2),
               euro: (parseFloat(value) * parseFloat(usd_to_euro.data)).toFixed(
-                2
+                2,
               ),
             });
           });
@@ -6122,13 +6196,18 @@ function __getUsdToTlorUsd(date, value) {
       .then((euro_to_tl) => {
         this.$excelApi
           .get(
-            "/finance/doviz/liste/usd/to/euro/" + year + "/" + month + "/" + day
+            "/finance/doviz/liste/usd/to/euro/" +
+              year +
+              "/" +
+              month +
+              "/" +
+              day,
           )
           .then((usd_to_euro) => {
             resolve({
               tl: (parseFloat(value) * parseFloat(euro_to_tl.data)).toFixed(2),
               usd: (parseFloat(value) / parseFloat(usd_to_euro.data)).toFixed(
-                2
+                2,
               ),
             });
           });
@@ -6318,7 +6397,7 @@ app.get("/sample/detail/paid/list/:po", async (req, res) => {
     const request = new mssql.Request();
     request.input("po", mssql.NVarChar, req.params.po);
     const results = await request.query(
-      "select nu.ID,nu.Tarih,nu.MusteriID,nu.NumuneNo,nu.Aciklama,nu.Tutar,nu.Banka from NumuneOdemelerTB nu where nu.NumuneNo=@po"
+      "select nu.ID,nu.Tarih,nu.MusteriID,nu.NumuneNo,nu.Aciklama,nu.Tutar,nu.Banka from NumuneOdemelerTB nu where nu.NumuneNo=@po",
     );
     res.status(200).json({ list: results.recordset });
   } catch (err) {
@@ -6866,7 +6945,7 @@ app.delete("/offer/product/delete/:id", async (req, res) => {
     const request = new mssql.Request();
     request.input("id", mssql.Int, req.params.id);
     const results = await request.query(
-      "delete YeniTeklif_UrunKayitTB where Id=@id"
+      "delete YeniTeklif_UrunKayitTB where Id=@id",
     );
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
@@ -6946,7 +7025,7 @@ app.post("/offer/save", (req, res) => {
                                     '${req.body.offer.Tarih}',
                                     '${custId}',
                                     '${__stringCharacterChange(
-                                      req.body.offer.Aciklama
+                                      req.body.offer.Aciklama,
                                     )}',
                                     '${req.body.offer.KullaniciId}',
                                     '${1}',
@@ -6980,7 +7059,7 @@ app.post("/offer/save", (req, res) => {
             update YeniTeklif_MusterilerTB
             SET 
             MusteriAdi='${__stringCharacterChange(
-              req.body.customer.MusteriAdi
+              req.body.customer.MusteriAdi,
             )}',
             UlkeId='${req.body.customer.UlkeId}',
             Company='${__stringCharacterChange(req.body.customer.Company)}',
@@ -6988,7 +7067,7 @@ app.post("/offer/save", (req, res) => {
             Phone='${__stringCharacterChange(req.body.customer.Phone)}',
             Adress='${__stringCharacterChange(req.body.customer.Adress)}',
             Description='${__stringCharacterChange(
-              req.body.customer.Description
+              req.body.customer.Description,
             )}'
             WHERE Id = '${req.body.customer.Id}'
         `;
@@ -7016,7 +7095,7 @@ app.post("/offer/save", (req, res) => {
                                     '${req.body.offer.Tarih}',
                                     '${req.body.offer.MusteriId}',
                                     '${__stringCharacterChange(
-                                      req.body.offer.Aciklama
+                                      req.body.offer.Aciklama,
                                     )}',
                                     '${req.body.offer.KullaniciId}',
                                     '${1}',
@@ -7052,7 +7131,7 @@ app.put("/offer/update", (req, res) => {
                 
                     Tarih='${req.body.offer.Tarih}',
                     Aciklama='${__stringCharacterChange(
-                      req.body.offer.Aciklama
+                      req.body.offer.Aciklama,
                     )}',
                     TakipEt='${req.body.offer.TakipEt}',
                     KaynakYeri='${req.body.offer.KaynakYeri}',
@@ -7073,7 +7152,7 @@ app.put("/offer/update", (req, res) => {
             Phone='${__stringCharacterChange(req.body.customer.Phone)}',
             Adress='${__stringCharacterChange(req.body.customer.Adress)}',
             Description='${__stringCharacterChange(
-              req.body.customer.Description
+              req.body.customer.Description,
             )}'
             WHERE Id = '${req.body.customer.Id}'
     `;
@@ -7233,18 +7312,18 @@ app.get("/offer/detail/all/list", (req, res) => {
 
       // A List — Hakan (44) ve Özlem (19)
       const _h_a = results.recordset.filter(
-        (x) => x.KullaniciId == 44 && validPriorities.includes(x.TeklifOncelik)
+        (x) => x.KullaniciId == 44 && validPriorities.includes(x.TeklifOncelik),
       );
       const _o_a = results.recordset.filter(
-        (x) => x.KullaniciId == 19 && validPriorities.includes(x.TeklifOncelik)
+        (x) => x.KullaniciId == 19 && validPriorities.includes(x.TeklifOncelik),
       );
 
       // B List — Hakan (44) ve Özlem (19)
       const h_b = bList.recordset.filter(
-        (x) => x.KullaniciId == 44 && validPriorities.includes(x.TeklifOncelik)
+        (x) => x.KullaniciId == 44 && validPriorities.includes(x.TeklifOncelik),
       );
       const o_b = bList.recordset.filter(
-        (x) => x.KullaniciId == 19 && validPriorities.includes(x.TeklifOncelik)
+        (x) => x.KullaniciId == 19 && validPriorities.includes(x.TeklifOncelik),
       );
 
       const list = mergeByPriority(_h_a, _o_a);
@@ -7376,7 +7455,7 @@ app.put("/offer/reminder/file/upload", async (req, res) => {
     request.input("date", mssql.VarChar, req.body.date);
     request.input("id", mssql.Int, req.body.id);
     const reminder = await request.query(
-      "update YeniTeklifTB set Teklif_Cloud=@cloud,Teklif_Cloud_Dosya=@name,HatirlatmaTarihi=@date where Id=@id"
+      "update YeniTeklifTB set Teklif_Cloud=@cloud,Teklif_Cloud_Dosya=@name,HatirlatmaTarihi=@date where Id=@id",
     );
     res.status(200).json({ status: reminder.rowsAffected[0] == 1 });
   } catch (err) {
@@ -7394,7 +7473,7 @@ app.put("/offer/proforma/file/upload", async (req, res) => {
     request.input("description", mssql.NVarChar, req.body.description);
     request.input("id", mssql.Int, req.body.id);
     const proforma = await request.query(
-      "update YeniTeklifTB set Proforma_Po_No=@po,Proforma_Tarih=@date,Proforma_Tutar=@amount,Proforma_Cloud=@cloud,Proforma_Cloud_Dosya=@name,ProformaNot=@description where Id=@id"
+      "update YeniTeklifTB set Proforma_Po_No=@po,Proforma_Tarih=@date,Proforma_Tutar=@amount,Proforma_Cloud=@cloud,Proforma_Cloud_Dosya=@name,ProformaNot=@description where Id=@id",
     );
     res.status(200).json({ status: proforma.rowsAffected[0] == 1 });
   } catch (err) {
@@ -7415,7 +7494,7 @@ app.put("/offer/sample/file/upload", async (req, res) => {
     request.input("description", mssql.NVarChar, req.body.description);
     request.input("id", mssql.Int, req.body.id);
     const sample = await request.query(
-      "update YeniTeklifTB set Numune_Giris_Tarihi=@entrydate,Numune_Hatirlatma_Tarihi=@reminderdate,Numune_Hatirlatma_SonTarih=@lastreminderdate,Numune_Tracking_No=@followno,Numune_Odenen_Tutar=@paid,Numune_Musteriden_Alinan=@received,Numune_Cloud=@cloud,Numune_Cloud_Dosya=@name,NumuneNot=@description where Id=@id"
+      "update YeniTeklifTB set Numune_Giris_Tarihi=@entrydate,Numune_Hatirlatma_Tarihi=@reminderdate,Numune_Hatirlatma_SonTarih=@lastreminderdate,Numune_Tracking_No=@followno,Numune_Odenen_Tutar=@paid,Numune_Musteriden_Alinan=@received,Numune_Cloud=@cloud,Numune_Cloud_Dosya=@name,NumuneNot=@description where Id=@id",
     );
     res.status(200).json({ status: sample.rowsAffected[0] == 1 });
   } catch (err) {
@@ -8690,16 +8769,16 @@ app.post("/panel/project/information/update", (req, res) => {
 SET
 	ProjectInformation='${__stringCharacterChange(req.body.ProjectInformation)}',
 	ProjectInformation_Fr='${__stringCharacterChange(
-    req.body.ProjectInformation_Fr
+    req.body.ProjectInformation_Fr,
   )}',
 	ProjectInformation_Es='${__stringCharacterChange(
-    req.body.ProjectInformation_Es
+    req.body.ProjectInformation_Es,
   )}',
 	ProjectInformation_Ru=N'${__stringCharacterChange(
-    req.body.ProjectInformation_Ru
+    req.body.ProjectInformation_Ru,
   )}',
     ProjectInformation_Ar=N'${__stringCharacterChange(
-      req.body.ProjectInformation_Ar
+      req.body.ProjectInformation_Ar,
     )}'
 
 WHERE
@@ -9030,7 +9109,7 @@ app.post("/todo/by/username/save", async (req, res) => {
     if (GorevVerenID == 10) {
       const queueReq = new mssql.Request();
       const queueRes = await queueReq.query(
-        "SELECT TOP 1 Sira + 1 as Sira FROM Yapilacaklar WHERE GorevVerenAdi='Gizem' AND Yapildi=0 AND Goruldu=0 ORDER BY Sira DESC"
+        "SELECT TOP 1 Sira + 1 as Sira FROM Yapilacaklar WHERE GorevVerenAdi='Gizem' AND Yapildi=0 AND Goruldu=0 ORDER BY Sira DESC",
       );
       const queue =
         queueRes.recordset.length > 0 ? queueRes.recordset[0].Sira : 1;
@@ -9069,7 +9148,7 @@ app.post("/todo/by/username/save", async (req, res) => {
         });
 
         const mailQuery = `SELECT MailAdres FROM KullaniciTB WHERE KullaniciAdi IN (${paramNames.join(
-          ","
+          ",",
         )}) AND Aktif=1`;
         const mailResults = await mailRequest.query(mailQuery);
 
@@ -9097,8 +9176,8 @@ app.post("/todo/by/username/save", async (req, res) => {
                   <span style="background-color: ${
                     Acil ? "#ff4d4f" : "#ccc"
                   }; color: ${
-            Acil ? "white" : "black"
-          }; padding: 5px 10px; border-radius: 5px;">
+                    Acil ? "white" : "black"
+                  }; padding: 5px 10px; border-radius: 5px;">
                     <b>Durum:</b> ${Acil ? "ACİL" : "Normal"}
                   </span>
                 </p>
@@ -9170,7 +9249,7 @@ app.put("/todo/by/username/update", async (req, res) => {
         });
 
         const mailQuery = `SELECT MailAdres FROM KullaniciTB WHERE KullaniciAdi IN (${paramNames.join(
-          ","
+          ",",
         )}) AND Aktif=1`;
         const mailResults = await mailRequest.query(mailQuery);
 
@@ -9197,8 +9276,8 @@ app.put("/todo/by/username/update", async (req, res) => {
                   <span style="background-color: ${
                     Acil ? "#ff4d4f" : "#ccc"
                   }; color: ${
-            Acil ? "white" : "black"
-          }; padding: 5px 10px; border-radius: 5px;">
+                    Acil ? "white" : "black"
+                  }; padding: 5px 10px; border-radius: 5px;">
                     <b>Durum:</b> ${Acil ? "ACİL" : "Normal"}
                   </span>
                 </p>
@@ -9236,7 +9315,7 @@ app.delete("/todo/by/username/delete/:id", async (req, res) => {
     getRequest.input("ID", mssql.Int, taskID);
 
     const getResult = await getRequest.query(
-      "SELECT Yapilacak, OrtakGorev, GorevVerenAdi FROM Yapilacaklar WHERE ID = @ID"
+      "SELECT Yapilacak, OrtakGorev, GorevVerenAdi FROM Yapilacaklar WHERE ID = @ID",
     );
 
     if (getResult.recordset.length === 0) {
@@ -9251,7 +9330,7 @@ app.delete("/todo/by/username/delete/:id", async (req, res) => {
     deleteRequest.input("ID", mssql.Int, taskID);
 
     const deleteResult = await deleteRequest.query(
-      "DELETE FROM Yapilacaklar WHERE ID = @ID"
+      "DELETE FROM Yapilacaklar WHERE ID = @ID",
     );
 
     if (deleteResult.rowsAffected[0] !== 1) {
@@ -9273,7 +9352,7 @@ app.delete("/todo/by/username/delete/:id", async (req, res) => {
         });
 
         const mailQuery = `SELECT MailAdres FROM KullaniciTB WHERE KullaniciAdi IN (${paramNames.join(
-          ","
+          ",",
         )}) AND Aktif=1`;
         const mailResults = await mailRequest.query(mailQuery);
 
@@ -9831,7 +9910,7 @@ order by s.YuklemeTarihi desc
       }
     });
     const uretimde = poList.recordset.filter(
-      (x) => x.Durum == "Üretimde" || x.Durum == "Beklemede"
+      (x) => x.Durum == "Üretimde" || x.Durum == "Beklemede",
     );
     const sevkiyatta = poList.recordset.filter((x) => x.Durum == "Sevk Edilen");
     uretimde.forEach((x) => {
@@ -12638,7 +12717,7 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID in (1,123)
           .json({ list: mekmer.recordset.concat(mekmar.recordset) });
       });
     });
-  }
+  },
 );
 
 function __floatNullControl(value) {
@@ -12807,8 +12886,8 @@ app.post("/order/production/proforma/upload", (req, res) => {
                    EvrakYuklemeTarihi,KullaniciID)
                    
                 values ('${req.body.date}','${0}','${0}','${req.body.po}','${
-    req.body.id
-  }',${2},'${req.body.document}','${req.body.date}','${req.body.userId}')
+                  req.body.id
+                }',${2},'${req.body.document}','${req.body.date}','${req.body.userId}')
     `;
   mssql.query(sql, (err, proforma) => {
     if (proforma.rowsAffected[0] == 1) {
@@ -12941,7 +13020,7 @@ where su.SiparisNo='${req.params.po}' and su.TedarikciID='${req.params.supplier}
       }
       res.status(200).json({ list: supplier.recordset });
     });
-  }
+  },
 );
 function supplierIsfDocId(value) {
   return new Promise((resolve, reject) => {
@@ -13283,10 +13362,10 @@ app.post("/upload/document/product/supplier/save", async (req, res) => {
            )   
                values
             ('${req.body.date}','${0}','${0}','${
-      req.body.siparisno
-    }','${0}','${30}','${2}','${req.body.date}','${req.body.evrak}','${
-      req.body.kullaniciAdi
-    }','${docId + 101}')
+              req.body.siparisno
+            }','${0}','${30}','${2}','${req.body.date}','${req.body.evrak}','${
+              req.body.kullaniciAdi
+            }','${docId + 101}')
         `;
 
     await mssql.query(sql, (err, supplier) => {
@@ -13474,7 +13553,7 @@ where sg.SiparisNo='${req.params.po}'
         });
       });
     });
-  }
+  },
 );
 app.post("/order/production/product/workerman/save", (req, res) => {
   const sql = `
@@ -13754,7 +13833,7 @@ app.post("/production/add/cost/list", async (req, res) => {
 
         const sql = `INSERT INTO MaliyetAnaliziDegisikliklerTB (DegisiklikTarihi,SiparisNo,IslemAdi,DegisiklikYapan) VALUES(@date, @po, @desc, @user)`;
         return request.query(sql);
-      })
+      }),
     );
 
     // Döngü tamamen bittikten sonra SADECE 1 KERE cevap dön
@@ -13814,10 +13893,10 @@ app.get("/production/isf/delete/:id/:document/:po", async (req, res) => {
                     } else {
                       res.status(200).json({ status: false });
                     }
-                  }
+                  },
                 );
               }
-            }
+            },
           );
         });
       }
@@ -14224,7 +14303,7 @@ VALUES(
               } else {
                 res.status(200).json({ status: false });
               }
-            }
+            },
           );
         } else {
           res.status(200).json({ status: false });
@@ -14594,12 +14673,12 @@ async function addedSendMail(payload) {
           to: generalMailList,
           subject: customSubject,
           html: finalContent,
-        })
+        }),
       );
 
       if (contentMekmerRows !== "") {
         const mekmerMailList = ["sergen@mekmar.com", "muhsin@mekmer.com"].join(
-          ", "
+          ", ",
         );
         mailPromises.push(
           transporter.sendMail({
@@ -14607,7 +14686,7 @@ async function addedSendMail(payload) {
             to: mekmerMailList,
             subject: customSubject,
             html: finalMekmerContent,
-          })
+          }),
         );
       }
 
@@ -14645,7 +14724,7 @@ async function deletedSendMail(payload) {
             <td style="border: 1px solid;text-align:center;">${x.KategoriAdi}-${x.UrunAdi}-${x.YuzeyIslemAdi}-${x.En}x${x.Boy}x${x.Kenar}</td>
             <td style="border: 1px solid;text-align:center;">${x.UretimAciklama}</td>
             <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
-          </tr>`
+          </tr>`,
         )
         .join("");
 
@@ -14718,24 +14797,24 @@ async function updatedSendMail(payload) {
             <td style="border: 1px solid;text-align:center;">${po}</td>
             <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
               x.FirmaAdi,
-              company
+              company,
             )};">${company}</td>
             <td style="border: 1px solid;text-align:center;">${desc}</td>
             <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
               x.UretimAciklama,
-              pdesc
+              pdesc,
             )};">${pdesc}</td>
             <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
               x.Miktar,
-              amount
+              amount,
             )};">${amount}</td>
             <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
               noneControl(x.AlisFiyati),
-              buying
+              buying,
             )};">$${buying}</td>
             <td style="border: 1px solid;text-align:center;background-color:${updateChangedColor(
               noneControl(x.SatisFiyati),
-              selling
+              selling,
             )};">$${selling}</td>
           </tr>`;
 
@@ -14751,10 +14830,10 @@ async function updatedSendMail(payload) {
             }</td>
             <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
             <td style="border: 1px solid;text-align:center;">$${noneControl(
-              x.AlisFiyati
+              x.AlisFiyati,
             )}</td>
             <td style="border: 1px solid;text-align:center;">$${noneControl(
-              x.SatisFiyati
+              x.SatisFiyati,
             )}</td>
           </tr>`;
 
@@ -14789,12 +14868,12 @@ async function updatedSendMail(payload) {
           to: generalMailList,
           subject: mailSubject,
           html: finalContent,
-        })
+        }),
       );
 
       if (mekmerBeforeRows !== "") {
         const mekmerMailList = ["muhsin@mekmer.com", "sergen@mekmar.com"].join(
-          ", "
+          ", ",
         );
         mailPromises.push(
           transporter.sendMail({
@@ -14802,7 +14881,7 @@ async function updatedSendMail(payload) {
             to: mekmerMailList,
             subject: mailSubject,
             html: finalMekmerContent,
-          })
+          }),
         );
       }
 
@@ -14893,7 +14972,7 @@ app.post("/shipment/products/save/mail", async (req, res) => {
           <td style="border: 1px solid;text-align:center;">${x.Miktar}</td>
           <td style="border: 1px solid;text-align:center;">$ ${x.TotalProduct}</td>
       </tr>
-    `
+    `,
       )
       .join("");
 
@@ -15183,7 +15262,7 @@ function quarryId(id, quarry) {
 app.post("/reports/mekmer/quarries/supplier/strips/save", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName
+    req.body.supplierName,
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -15204,7 +15283,7 @@ VALUES('${req.body.date}','${__supplierId}','${__quarryId}','${req.body.stripCos
 app.put("/reports/mekmer/quarries/supplier/strips/update", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName
+    req.body.supplierName,
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -15250,14 +15329,14 @@ app.delete(
         res.status(200).json({ status: false });
       }
     });
-  }
+  },
 );
 
 /*Molozlar*/
 app.post("/reports/mekmer/moloz/save", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName
+    req.body.supplierName,
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -15310,7 +15389,7 @@ app.get("/reports/mekmer/moloz/list/:year/:month", async (req, res) => {
 app.put("/reports/mekmer/moloz/update", async (req, res) => {
   const __supplierId = await supplierId(
     req.body.supplierId,
-    req.body.supplierName
+    req.body.supplierName,
   );
   const __stripId = await stripId(req.body.stripId, req.body.stripName);
   const __quarryId = await quarryId(req.body.quarryId, req.body.quarryName);
@@ -15473,7 +15552,7 @@ app.post("/reports/mekmer/calculating/cost/save", async (req, res) => {
       r.input("ad", mssql.NVarChar, body.MaliyetFirma);
       const ins = await r.query(
         `INSERT INTO MekmerMaliyetTurTB(MaliyetTuru)
-         OUTPUT INSERTED.ID VALUES(@ad)`
+         OUTPUT INSERTED.ID VALUES(@ad)`,
       );
       activeCostTypeId = ins.recordset[0].ID;
     }
@@ -15484,7 +15563,7 @@ app.post("/reports/mekmer/calculating/cost/save", async (req, res) => {
       r.input("ad", mssql.NVarChar, body.FaturaFirma);
       const ins = await r.query(
         `INSERT INTO MekmerMaliyetFirmaTB(MaliyetFirma)
-         OUTPUT INSERTED.ID VALUES(@ad)`
+         OUTPUT INSERTED.ID VALUES(@ad)`,
       );
       activeCompanyId = ins.recordset[0].ID;
     }
@@ -15528,7 +15607,7 @@ app.put("/reports/mekmer/calculating/cost/update", async (req, res) => {
       r.input("ad", mssql.NVarChar, body.MaliyetFirma);
       const ins = await r.query(
         `INSERT INTO MekmerMaliyetTurTB(MaliyetTuru)
-         OUTPUT INSERTED.ID VALUES(@ad)`
+         OUTPUT INSERTED.ID VALUES(@ad)`,
       );
       activeCostTypeId = ins.recordset[0].ID;
     }
@@ -15538,7 +15617,7 @@ app.put("/reports/mekmer/calculating/cost/update", async (req, res) => {
       r.input("ad", mssql.NVarChar, body.FaturaFirma);
       const ins = await r.query(
         `INSERT INTO MekmerMaliyetFirmaTB(MaliyetFirma)
-         OUTPUT INSERTED.ID VALUES(@ad)`
+         OUTPUT INSERTED.ID VALUES(@ad)`,
       );
       activeCompanyId = ins.recordset[0].ID;
     }
@@ -17434,35 +17513,35 @@ app.get("/reports/ayo/costs/list/:year/:month", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
+                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
@@ -17516,34 +17595,34 @@ app.get("/reports/ayo/costs/yearly/:year", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
+                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
@@ -17599,34 +17678,34 @@ app.get("/reports/ayo/costs/quarter/:q1/:q2/:year", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
+                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
@@ -17682,35 +17761,35 @@ app.get("/reports/ayo/costs/half/:month_1/:month_2/:year", async (req, res) => {
               let tl = 0;
               if (one.recordset.length > 0) {
                 await one.recordset.forEach((x) => {
-                  (usd += x.CreditCardUsd), (tl += x.CreditCardTl);
+                  ((usd += x.CreditCardUsd), (tl += x.CreditCardTl));
                 });
               }
 
               if (two.recordset.length > 0) {
                 await two.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
               if (three.recordset.length > 0) {
                 await three.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (four.recordset.length > 0) {
                 await four.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
               if (five.recordset.length > 0) {
                 await five.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
               if (six.recordset.length > 0) {
                 await six.recordset.forEach((x) => {
-                  (usd += x.USD), (tl += x.TL);
+                  ((usd += x.USD), (tl += x.TL));
                 });
               }
 
@@ -18859,11 +18938,11 @@ app.post("/reports/mekmer/nakliye/save", async (req, res) => {
   const body = req.body;
   const __companyMekmerId = await companyMekmerId(
     body.company_id,
-    body.company_name
+    body.company_name,
   );
   const __supplierMekmerId = await supplierMekmerId(
     body.supplier_id,
-    body.supplier_name
+    body.supplier_name,
   );
 
   const sql = `
@@ -18880,11 +18959,11 @@ app.put("/reports/mekmer/nakliye/update", async (req, res) => {
   const body = req.body;
   const __companyMekmerId = await companyMekmerId(
     body.company_id,
-    body.company_name
+    body.company_name,
   );
   const __supplierMekmerId = await supplierMekmerId(
     body.supplier_id,
-    body.supplier_name
+    body.supplier_name,
   );
 
   const sql = `
@@ -19259,7 +19338,7 @@ app.post("/reports/mekmar/cost/control/product/save", async (req, res) => {
   try {
     const body = req.body;
     console.log(
-      `[API ÇAĞRILDI] PO: ${body.Po}, Gelen Veri Sayısı: ${body.data.length}`
+      `[API ÇAĞRILDI] PO: ${body.Po}, Gelen Veri Sayısı: ${body.data.length}`,
     );
     const sql = `
       INSERT INTO MekmarCostControlSupplierTB (Po, SupplierId, Invoice)
