@@ -182,10 +182,9 @@ export default {
   },
   methods: {
     searchCompany(event) {
-      console.log(event);
-      const query = event.query.toLowerCase();
-      this.filteredCompany = this.companies.filter((company) =>
-        company.MaliyetFirma.toLowerCase().includes(query)
+      const query = (event.query || "").toLowerCase();
+      this.filteredCompany = this.companies.filter(
+        (c) => c.MaliyetFirma && c.MaliyetFirma.toLowerCase().includes(query)
       );
     },
     companyInput(event) {
@@ -220,10 +219,9 @@ export default {
       this.model.MaliyetTurId = event.value.ID;
     },
     searchCostType(event) {
-      console.log(event);
-      const query = event.query.toLowerCase();
-      this.filteredCostType = this.costTypes.filter((costType) =>
-        costType.MaliyetTuru.toLowerCase().includes(query)
+      const query = (event.query || "").toLowerCase();
+      this.filteredCostType = this.costTypes.filter(
+        (c) => c.MaliyetTuru && c.MaliyetTuru.toLowerCase().includes(query)
       );
     },
 
