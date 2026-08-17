@@ -142,7 +142,14 @@
       </DataTable>
     </div>
     <div class="col-3" v-if="status">
-      <DataTable :value="expiry" sortField="vade_tarih" :sortOrder="1">
+      <DataTable
+        :value="expiry"
+        sortField="vade_tarih"
+        :sortOrder="1"
+        :scrollable="true"
+        scrollHeight="500px"
+        style="width: 100%"
+      >
         <Column
           field="firmaAdi"
           header="Customer"

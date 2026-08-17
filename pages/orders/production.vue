@@ -1037,6 +1037,10 @@ export default {
         alert("Order date is missing");
         return;
       }
+      if (!this.model.KaynakTuruID) {
+        alert("Kaynak Türü seçilmeden kayıt yapılamaz.");
+        return;
+      }
       if (
         this.productionModel.TahminiYuklemeTarihi == null ||
         this.productionModel.TahminiYuklemeTarihi == "" ||
@@ -1094,6 +1098,10 @@ export default {
       }
     },
     async save() {
+      if (!this.model.KaynakTuruID) {
+        alert("Kaynak Türü seçilmeden kayıt yapılamaz.");
+        return;
+      }
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||
