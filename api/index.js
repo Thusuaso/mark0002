@@ -13430,87 +13430,133 @@ function __amount(amount, unit, w, h, t) {
     }
   }
 }
-app.get("/order/production/product/check/:po", async (req, res) => {
+const mssqlTypes = require("mssql");
+// --- ortak yardımcılar ---
+function safeNum(v) {
+  if (v === null || v === undefined) return 0;
+  const n = parseFloat(String(v).replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function firstWord(v) {
+  return (v ?? "").toString().trim().split(" ")[0] || "";
+}
+
+app.get("/order/production/product/check/:po", (req, res) => {
+  const po = String(req.params.po).replace(/'/g, "''");
+
   const checkListSql = `
-        select    
-t.FirmaAdi as TedarikciAdi,    
-dbo.Get_KategoriAdi(u.UrunKartID) as KategoriAdi,    
-u.KasaNo,    
-dbo.Get_KenarIslem(u.UrunKartID) as YuzeyIslem,    
-dbo.Get_UrunAdi(u.UrunKartID) as UrunAdi,    
-dbo.Get_Olcu_Kenar(u.UrunKartID) as Kenar,    
-dbo.Get_Olcu_En(u.UrunKartID) as En,    
-dbo.Get_Olcu_Boy(u.UrunKartID) as Boy,    
-u.Adet,    
-u.Miktar,    
-b.BirimAdi,    
-u.KutuAdet,    
-u.ID  ,  
-u.UrunKartID,
-su.KasaOlcusu
-from    
-UretimTB u,UrunBirimTB b,TedarikciTB t,SiparisUrunTB su  
-where u.SiparisAciklama='${req.params.po}'   
-and b.ID = u.UrunBirimID    
-and t.ID = u.TedarikciID
-and u.TedarikciID in (select surun.TedarikciID from SiparisUrunTB surun where surun.SiparisNo = u.SiparisAciklama)
-and su.SiparisNo = u.SiparisAciklama
-and su.UrunKartID = u.UrunKartID
-order by u.UrunKartID,KasaNo asc      
-    `;
-  await mssql.query(checkListSql, (err, check) => {
-    let queue = 1;
-    check.recordset.forEach((x) => {
-      x.Sira = queue;
-      queue++;
-      x.Ton =
-        __getCategoryMass(x.KategoriAdi.split(" ")[0]) *
-        10 *
-        __amount(x.Miktar, x.BirimAdi, x.En, x.Boy, x.Kenar) *
-        parseFloat(x.Kenar.replace(",", ".")).toFixed(4);
-    });
-    res.status(200).json({ list: check.recordset });
+    select
+      t.FirmaAdi                          as TedarikciAdi,
+      dbo.Get_KategoriAdi(u.UrunKartID)   as KategoriAdi,
+      u.KasaNo,
+      dbo.Get_KenarIslem(u.UrunKartID)    as YuzeyIslem,
+      dbo.Get_UrunAdi(u.UrunKartID)       as UrunAdi,
+      dbo.Get_Olcu_Kenar(u.UrunKartID)    as Kenar,
+      dbo.Get_Olcu_En(u.UrunKartID)       as En,
+      dbo.Get_Olcu_Boy(u.UrunKartID)      as Boy,
+      u.Adet, u.Miktar, b.BirimAdi, u.KutuAdet, u.ID, u.UrunKartID,
+      su.KasaOlcusu
+    from UretimTB u
+      inner join UrunBirimTB b on b.ID = u.UrunBirimID
+      inner join TedarikciTB  t on t.ID = u.TedarikciID
+      outer apply (
+        select top 1 s.KasaOlcusu
+        from SiparisUrunTB s
+        where s.SiparisNo   = u.SiparisAciklama
+          and s.UrunKartID  = u.UrunKartID
+          and s.TedarikciID = u.TedarikciID
+        order by s.ID
+      ) su
+    where u.SiparisAciklama = '${po}'
+    order by u.UrunKartID, u.KasaNo asc
+  `;
+
+  mssql.query(checkListSql, (err, check) => {
+    if (err) {
+      console.error("check/:po SQL hatası:", err.message);
+      return res
+        .status(500)
+        .json({ message: "Üretim listesi alınamadı", detail: err.message });
+    }
+    try {
+      const list = (check?.recordset || []).map((x, i) => ({
+        ...x,
+        Sira: i + 1,
+        Ton: Number(
+          (
+            __getCategoryMass(firstWord(x.KategoriAdi)) *
+            10 *
+            __amount(x.Miktar, x.BirimAdi, x.En, x.Boy, x.Kenar) *
+            safeNum(x.Kenar)
+          ).toFixed(4)
+        ),
+      }));
+      res.status(200).json({ list });
+    } catch (e) {
+      console.error("check/:po işleme hatası:", e.message);
+      res
+        .status(500)
+        .json({ message: "Veri işlenirken hata", detail: e.message });
+    }
   });
 });
+app.get("/order/production/product/check/mekmer/:po", (req, res) => {
+  const po = String(req.params.po).replace(/'/g, "''");
 
-app.get("/order/production/product/check/mekmer/:po", async (req, res) => {
   const checkListSql = `
-        select    
-t.FirmaAdi as TedarikciAdi,    
-dbo.Get_KategoriAdi(u.UrunKartID) as KategoriAdi,    
-u.KasaNo,    
-dbo.Get_KenarIslem(u.UrunKartID) as YuzeyIslem,    
-dbo.Get_UrunAdi(u.UrunKartID) as UrunAdi,    
-dbo.Get_Olcu_Kenar(u.UrunKartID) as Kenar,    
-dbo.Get_Olcu_En(u.UrunKartID) as En,    
-dbo.Get_Olcu_Boy(u.UrunKartID) as Boy,    
-u.Adet,    
-u.Miktar,    
-b.BirimAdi,    
-u.KutuAdet,    
-u.ID  ,  
-u.UrunKartID,
-(select su.KasaOlcusu from SiparisUrunTB su where su.SiparisNo = u.SiparisAciklama and su.UrunKartID = u.UrunKartID) as KasaOlcusu
+    select
+      t.FirmaAdi                          as TedarikciAdi,
+      dbo.Get_KategoriAdi(u.UrunKartID)   as KategoriAdi,
+      u.KasaNo,
+      dbo.Get_KenarIslem(u.UrunKartID)    as YuzeyIslem,
+      dbo.Get_UrunAdi(u.UrunKartID)       as UrunAdi,
+      dbo.Get_Olcu_Kenar(u.UrunKartID)    as Kenar,
+      dbo.Get_Olcu_En(u.UrunKartID)       as En,
+      dbo.Get_Olcu_Boy(u.UrunKartID)      as Boy,
+      u.Adet, u.Miktar, b.BirimAdi, u.KutuAdet, u.ID, u.UrunKartID,
+      su.KasaOlcusu
+    from UretimTB u
+      inner join UrunBirimTB b on b.ID = u.UrunBirimID
+      inner join TedarikciTB  t on t.ID = u.TedarikciID
+      outer apply (
+        select top 1 s.KasaOlcusu
+        from SiparisUrunTB s
+        where s.SiparisNo  = u.SiparisAciklama
+          and s.UrunKartID = u.UrunKartID
+        order by s.ID
+      ) su
+    where u.SiparisAciklama = '${po}'
+    order by u.UrunKartID asc
+  `;
 
-from    
-UretimTB u,UrunBirimTB b,TedarikciTB t    
-where u.SiparisAciklama='${req.params.po}'   
-and b.ID = u.UrunBirimID    
-and t.ID = u.TedarikciID   
-order by u.UrunKartID asc    
-    `;
-  await mssql.query(checkListSql, (err, check) => {
-    let queue = 1;
-    check.recordset.forEach((x) => {
-      x.Sira = queue;
-      queue++;
-      x.Ton =
-        __getCategoryMass(x.KategoriAdi.split(" ")[0]) *
-        10 *
-        x.Miktar *
-        parseFloat(x.Kenar.replace(",", ".")).toFixed(4);
-    });
-    res.status(200).json({ list: check.recordset });
+  mssql.query(checkListSql, (err, check) => {
+    if (err) {
+      console.error("check/mekmer/:po SQL hatası:", err.message);
+      return res
+        .status(500)
+        .json({ message: "Üretim listesi alınamadı", detail: err.message });
+    }
+    try {
+      const list = (check?.recordset || []).map((x, i) => ({
+        ...x,
+        Sira: i + 1,
+        Ton: Number(
+          (
+            __getCategoryMass(firstWord(x.KategoriAdi)) *
+            10 *
+            safeNum(x.Miktar) *
+            safeNum(x.Kenar)
+          ).toFixed(4)
+        ),
+      }));
+      res.status(200).json({ list });
+    } catch (e) {
+      console.error("check/mekmer/:po işleme hatası:", e.message);
+      res
+        .status(500)
+        .json({ message: "Veri işlenirken hata", detail: e.message });
+    }
   });
 });
 
