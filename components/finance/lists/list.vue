@@ -147,7 +147,7 @@
         sortField="vade_tarih"
         :sortOrder="1"
         :scrollable="true"
-        scrollHeight="500px"
+        scrollHeight="400px"
         style="width: 100%"
       >
         <Column
