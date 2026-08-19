@@ -1037,10 +1037,7 @@ export default {
         alert("Order date is missing");
         return;
       }
-      if (!this.model.KaynakTuruID) {
-        alert("Kaynak Türü seçilmeden kayıt yapılamaz.");
-        return;
-      }
+
       if (
         this.productionModel.TahminiYuklemeTarihi == null ||
         this.productionModel.TahminiYuklemeTarihi == "" ||
@@ -1098,10 +1095,6 @@ export default {
       }
     },
     async save() {
-      if (!this.model.KaynakTuruID) {
-        alert("Kaynak Türü seçilmeden kayıt yapılamaz.");
-        return;
-      }
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||
@@ -1211,16 +1204,7 @@ export default {
         alert("Estimated date is missing");
         return;
       }
-      if (
-        this.productionModel.KaynakTuruID == null ||
-        this.productionModel.KaynakTuruID == "" ||
-        this.productionModel.KaynakTuruID == " " ||
-        this.productionModel.KaynakTuruID == undefined ||
-        this.productionModel.KaynakTuruID == 0
-      ) {
-        alert("Source Type is missing");
-        return;
-      }
+
       this.productionModel.FinansAciklama_2 = this.__stringCharacterChange(
         this.productionModel.FinansAciklama
       );

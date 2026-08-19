@@ -1455,10 +1455,7 @@ export default {
 
       this.productionModel.KullaniciID = Cookies.get("userId");
 
-      if (!this.model.KaynakTuruID) {
-        alert("Kaynak Türü seçilmeden kayıt yapılamaz.");
-        return;
-      }
+
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||
@@ -1593,20 +1590,8 @@ export default {
       this.costControlUpdate(this.productionModel, this.productionCostOldList);
     },
     save() {
-            if (!this.model.KaynakTuruID) {
-        alert("Kaynak Türü seçilmeden kayıt yapılamaz.");
-        return;
-      }
-                  if (
-        this.productionModel.KaynakTuruID == null ||
-        this.productionModel.KaynakTuruID == "" ||
-        this.productionModel.KaynakTuruID == " " ||
-        this.productionModel.KaynakTuruID == undefined ||
-        this.productionModel.KaynakTuruID == 0
-      ) {
-        alert("Source Type is missing");
-        return;
-      }
+
+
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||

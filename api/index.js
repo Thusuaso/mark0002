@@ -13747,7 +13747,7 @@ VALUES(
 	'${req.body.MalBedeli}',
 	'${req.body.sigorta_tutar_satis}',
 	'${req.body.FaturaKesimTurID}',
-	'${req.body.KaynakTuruID}'
+	'${req.body.KaynakTuruID ? req.body.KaynakTuruID : 1}'
 
 
 

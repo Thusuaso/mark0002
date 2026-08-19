@@ -1067,16 +1067,7 @@ export default {
       });
     },
     save() {
-      if (
-        this.productionModel.KaynakTuruID == null ||
-        this.productionModel.KaynakTuruID == "" ||
-        this.productionModel.KaynakTuruID == " " ||
-        this.productionModel.KaynakTuruID == undefined ||
-        this.productionModel.KaynakTuruID == 0
-      ) {
-        alert("Source Type is missing");
-        return;
-      }
+
       if (
         this.productionModel.SiparisNo == null ||
         this.productionModel.SiparisNo == "" ||
