@@ -65,7 +65,10 @@ connectDB();
 let transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT, 10),
-  secure: false,
+  secure: true,
+  pool: true, // ← tek bağlantıyı tekrar kullanır
+  maxConnections: 2,
+  maxMessages: 50,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -75,6 +78,28 @@ let transporter = nodemailer.createTransport({
     minVersion: "TLSv1.2",
   },
 });
+console.log("SMTP DEBUG:", {
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  user: process.env.SMTP_USER,
+});
+
+function mailErrorMessage(err) {
+  if (err && (err.responseCode === 454 || err.code === "EAUTH")) {
+    return "Mail sunucularında sorun var, Natro ile iletişime geçiniz.";
+  }
+  return "Mail gönderilemedi.";
+}
+
+async function safeSendMail(options) {
+  try {
+    await transporter.sendMail(options);
+    return { status: true };
+  } catch (err) {
+    console.error("Mail gönderilemedi:", err.message);
+    return { status: false, message: mailErrorMessage(err) };
+  }
+}
 function __noneNullControl(value) {
   if (
     !value ||
@@ -164,7 +189,9 @@ app.post("/login", async (req, res) => {
           .json({ status: true, step: "otp_sent", mail: user.MailAdres });
       } catch (mailErr) {
         console.error("Mail gönderilemedi:", mailErr);
-        res.status(500).json({ status: false, message: "Mail gönderilemedi." });
+        res
+          .status(500)
+          .json({ status: false, message: mailErrorMessage(mailErr) });
       }
     });
   } catch (error) {
@@ -261,10 +288,17 @@ app.post("/forgot-password-init", async (req, res) => {
              <h1 style="color:blue;">${pinCode}</h1>`,
     };
 
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ status: true });
+    try {
+      await transporter.sendMail(mailOptions);
+      res.status(200).json({ status: true });
+    } catch (mailErr) {
+      console.error("Şifre sıfırlama mail hatası:", mailErr);
+      res
+        .status(500)
+        .json({ status: false, message: mailErrorMessage(mailErr) });
+    }
   } catch (error) {
-    console.error("Şifre sıfırlama mail hatası:", error);
+    console.error("Şifre sıfırlama hatası:", error);
     res.status(500).json({ status: false, message: "Sunucu hatası." });
   }
 });
