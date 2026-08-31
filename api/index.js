@@ -123,7 +123,7 @@ app.use((req, res, next) => {
     // cookie-parser kullanılıyorsa
     const userId = req.cookies?.userId;
     console.log(`İstek Yöntemi: ${req.method}, Kullanıcı ID: ${userId}`);
-    if (userId == 51) {
+    if (userId == 51 || userId == 63 || userId == 59) {
       // İşlemi burada kes ve Frontend'e hata döndür
       return res.status(403).json({
         status: false,
@@ -19536,6 +19536,79 @@ app.put("/selection/input/bulk/edit", async (req, res) => {
     res
       .status(500)
       .json({ status: false, message: "An error occurred while saving data." });
+  }
+});
+
+app.get("/finance/purchase/main/list", async (req, res) => {
+  try {
+    const sql = `
+    select m.FirmaAdi,m.Id as MusteriId,
+       s.SiparisNo,
+       SUM(su.AlisFiyati * su.Miktar) - ISNULL(MAX(f.OdenenToplam), 0) as KalanTutar,
+       YEAR(s.YuklemeTarihi)  as Year,
+       MONTH(s.YuklemeTarihi) as Month,
+       s.YuklemeTarihi,
+       s.SiparisTarihi
+from SiparislerTB s
+inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+inner join MusterilerTB m   on m.ID = s.MusteriID
+outer apply (
+    select SUM(fp.Toplam) as OdenenToplam
+    from FinancePaidPurchaseTB fp
+    where fp.MusteriId = s.MusteriID
+      and fp.SiparisNo = s.SiparisNo
+) f
+where YEAR(s.YuklemeTarihi) >= YEAR(GETDATE())
+  and m.Marketing = 'Mekmar'
+group by s.SiparisNo, YEAR(s.YuklemeTarihi), MONTH(s.YuklemeTarihi), m.FirmaAdi,
+       s.YuklemeTarihi,
+       s.SiparisTarihi,m.Id
+having SUM(su.AlisFiyati * su.Miktar) - ISNULL(MAX(f.OdenenToplam), 0) > 0
+order by MONTH(s.YuklemeTarihi) desc
+  `;
+    const result = await mssql.query(sql);
+    res.status(200).json({ list: result.recordset, status: true });
+  } catch (err) {
+    res.status(500).json({ status: false });
+  }
+});
+
+app.get(`/finance/purchase/detail/list/:po/:supplier`, async (req, res) => {
+  const po = req.params.po;
+  const supplier = req.params.supplier;
+  try {
+    const sql = `
+    select m.FirmaAdi,
+       s.SiparisNo,
+       SUM(su.AlisFiyati * su.Miktar) - ISNULL(MAX(f.OdenenToplam), 0) as KalanTutar,
+       t.FirmaAdi as TedarikciAdi,
+       t.ID,
+       YEAR(s.YuklemeTarihi)  as Year,
+       MONTH(s.YuklemeTarihi) as Month
+from SiparislerTB s
+inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+inner join MusterilerTB m   on m.ID = s.MusteriID
+inner join TedarikciTB t    on t.ID = su.TedarikciID
+inner join UrunKartTB uk    on uk.ID = su.UrunKartID
+outer apply (
+    select SUM(fp.Toplam) as OdenenToplam
+    from FinancePaidPurchaseTB fp
+    where fp.MusteriId   = s.MusteriID
+      and fp.SiparisNo   = s.SiparisNo
+      and fp.TedarikciId = su.TedarikciID
+) f
+where YEAR(s.YuklemeTarihi) >= YEAR(GETDATE())
+  and m.Marketing = 'Mekmar' and s.SiparisNo='${po}' and s.MusteriID='${supplier}'
+group by s.SiparisNo, t.FirmaAdi, YEAR(s.YuklemeTarihi), MONTH(s.YuklemeTarihi), m.FirmaAdi, t.ID
+having SUM(su.AlisFiyati * su.Miktar) - ISNULL(MAX(f.OdenenToplam), 0) > 0
+order by MONTH(s.YuklemeTarihi) desc
+  `;
+    console.log("sql => ", sql);
+    const response = await mssql.query(sql);
+    console.log("response index => ", response);
+    res.status(200).json({ list: response.recordset, status: true });
+  } catch (err) {
+    res.status(500).json({ status: false });
   }
 });
 

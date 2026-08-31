@@ -43,6 +43,8 @@ const state = {
   financeCollectionSampleTotal: 0,
   financePoPaidListMekmer: [],
   financeListFilter: [],
+  financePurchaseList: [],
+  financePurchaseDetailList: [],
 };
 const actions = {
   setFinanceAllListMekmer(vuexContext) {
@@ -614,6 +616,20 @@ const actions = {
   setFinanceCost(vuexContext, payload) {
     this.$axios.post("/finance/cost/control", payload).then((res) => {});
   },
+  setFinancePurchaseMainList(vuexContext) {
+    this.$axios.get("/finance/purchase/main/list").then((res) => {
+      console.log("/finance/purchase/main/list", res);
+      vuexContext.commit("setFinancePurchaseMainList", res.data.list);
+    });
+  },
+  setFinancePurchaseDetail(vuexContext, payload) {
+    this.$axios
+      .get(`/finance/purchase/detail/list/${payload.po}/${payload.supplier}`)
+      .then((response) => {
+        console.log("response => ", response);
+        vuexContext.commit("setFinancePurchaseDetail", response.data.list);
+      });
+  },
 };
 const mutations = {
   setFinanceTotalListMekmer(state, payload) {
@@ -799,6 +815,12 @@ const mutations = {
   setPoPaidDetailList(state, payload) {
     state.financePoPaidDetailList = payload;
   },
+  setFinancePurchaseMainList(state, payload) {
+    state.financePurchaseList = payload;
+  },
+  setFinancePurchaseDetail(state, payload) {
+    state.financePurchaseDetailList = payload;
+  },
 };
 const getters = {
   getFinanceExpiryListTotal(state) {
@@ -872,6 +894,12 @@ const getters = {
   },
   getFinancePoPaidListMekmer(state) {
     return state.financePoPaidListMekmer;
+  },
+  getFinancePurchaseMainList(state) {
+    return state.financePurchaseList;
+  },
+  getFinancePurchaseDetailList(state) {
+    return state.financePurchaseDetailList;
   },
 };
 

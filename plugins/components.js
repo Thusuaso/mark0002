@@ -149,6 +149,9 @@ import calculatingCost from "~/components/reports/mekmer/calculatingCost/cost";
 import changePasswordForm from "~/components/auth/changePasswordForm";
 import mekmarCostForm from "~/components/cost/form";
 import mekmarCostList from "~/components/cost/list";
+import financePurchaseList from "~/components/finance/lists/supplier";
+Vue.component("financePurchaseList", financePurchaseList);
+
 Vue.component("mekmarCostList", mekmarCostList);
 
 Vue.component("mekmarCostForm", mekmarCostForm);

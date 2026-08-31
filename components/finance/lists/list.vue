@@ -187,7 +187,8 @@
         </Column>
       </DataTable>
     </div>
-    <DataTable :value="maya" v-if="status">
+
+    <!-- <DataTable :value="maya" v-if="status">
       <Column
         field="order_date"
         header="Order Date"
@@ -250,7 +251,7 @@
           {{ slotProps.data.balance | formatPriceUsd }}
         </template>
       </Column>
-    </DataTable>
+    </DataTable> -->
   </div>
 </template>
 <script>
