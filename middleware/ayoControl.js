@@ -1,31 +1,22 @@
+const AYO_USER_IDS = [13, 19, 47, 51, 57, 58, 59];
+
 export default function (context) {
+  let userId = null;
+
   if (context.req) {
-    let cookie = context.req.headers.cookie;
-    let userId = cookie.split(";").find((x) => x.trim().startsWith("userId="));
-    if (userId) userId = userId.split("=")[1];
-    if (
-      userId == 47 ||
-      userId == 13 ||
-      userId == 19 ||
-      userId == 57 ||
-      userId == 59
-    ) {
-      context.store.dispatch("setAyoControlStatus", true);
-    } else {
-      context.store.dispatch("setAyoControlStatus", false);
+    const cookieStr = context.req.headers.cookie;
+    if (cookieStr) {
+      const found = cookieStr
+        .split(";")
+        .find((x) => x.trim().startsWith("userId="));
+      if (found) userId = found.split("=")[1];
     }
   } else {
-    if (
-      context.$cookie.get("userId") == 59 ||
-      context.$cookie.get("userId") == 47 ||
-      context.$cookie.get("userId") == 13 ||
-      context.$cookie.get("userId") == 57 ||
-      context.$cookie.get("userId") == 58 ||
-      context.$cookie.get("userId") == 19
-    ) {
-      context.store.dispatch("setAyoControlStatus", true);
-    } else {
-      context.store.dispatch("setAyoControlStatus", false);
-    }
+    userId = context.$cookie.get("userId");
   }
+
+  context.store.dispatch(
+    "setAyoControlStatus",
+    AYO_USER_IDS.includes(parseInt(userId, 10))
+  );
 }
