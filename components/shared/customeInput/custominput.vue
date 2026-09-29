@@ -1,7 +1,14 @@
 <template>
   <span class="p-float-label w-100">
-    <InputText id="freight" v-model="newValueData" @input="change($event)" :disabled="disabled" class="w-100"
-      @blur="isInputActive = false" @focus="isInputActive = true" />
+    <InputText
+      id="freight"
+      v-model="newValueData"
+      @input="change($event)"
+      :disabled="disabled"
+      class="w-100"
+      @blur="isInputActive = false"
+      @focus="isInputActive = true"
+    />
     <label for="freight">{{ text }}</label>
   </span>
 </template>
@@ -15,21 +22,8 @@ export default {
   computed: {
     newValueData: {
       get() {
-        if (this.isInputActive) {
-          return this.value.toString().replace(",", ".");
-        } else {
-          if (
-            this.value == null ||
-            this.value == undefined ||
-            this.value == "" ||
-            this.value == " "
-          ) {
-            this.value = 0;
-            return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
-          } else {
-            return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)\,/g, ".");
-          }
-        }
+        const num = Number(this.value) || 0;
+        return this.isInputActive ? String(num) : num.toFixed(2);
       },
       set(modifiedValue) {
         let newValue = parseFloat(modifiedValue.replace(",", "."));
@@ -56,7 +50,7 @@ export default {
   },
   methods: {
     change(event) {
-      this.$emit('change',event)
+      this.$emit("change", event);
     },
   },
   watch: {
@@ -73,7 +67,6 @@ export default {
     //   }
     // },
   },
-  created() {
-  },
+  created() {},
 };
 </script>

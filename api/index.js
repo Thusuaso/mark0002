@@ -36,9 +36,11 @@ const sql = {
     idleTimeoutMillis: 30000,
   },
 };
+let dbReady = false;
 const connectDB = async (retries = 5) => {
   try {
     await mssql.connect(sql);
+    dbReady = true;
     console.log("✅ Veritabanı bağlantısı başarılı!");
   } catch (err) {
     console.error("❌ Bağlantı hatası:", err.message);
@@ -133,6 +135,15 @@ app.use((req, res, next) => {
   }
 
   // İstek SİLME değilse veya ID 51 değilse, asıl işleme sorunsuz devam etmesini sağla
+  next();
+});
+app.use((req, res, next) => {
+  if (!dbReady) {
+    return res.status(503).json({
+      status: false,
+      message: "Veritabanı hazırlanıyor, birkaç saniye sonra tekrar deneyin.",
+    });
+  }
   next();
 });
 
@@ -19582,9 +19593,10 @@ app.get(`/finance/purchase/detail/list/:po/:supplier`, async (req, res) => {
        s.SiparisNo,
        SUM(su.AlisFiyati * su.Miktar) - ISNULL(MAX(f.OdenenToplam), 0) as KalanTutar,
        t.FirmaAdi as TedarikciAdi,
-       t.ID,
+       t.ID as TedarikciID,
        YEAR(s.YuklemeTarihi)  as Year,
-       MONTH(s.YuklemeTarihi) as Month
+       MONTH(s.YuklemeTarihi) as Month,
+       m.ID as MusteriID
 from SiparislerTB s
 inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
 inner join MusterilerTB m   on m.ID = s.MusteriID
@@ -19599,7 +19611,7 @@ outer apply (
 ) f
 where YEAR(s.YuklemeTarihi) >= YEAR(GETDATE())
   and m.Marketing = 'Mekmar' and s.SiparisNo='${po}' and s.MusteriID='${supplier}'
-group by s.SiparisNo, t.FirmaAdi, YEAR(s.YuklemeTarihi), MONTH(s.YuklemeTarihi), m.FirmaAdi, t.ID
+group by s.SiparisNo, t.FirmaAdi, YEAR(s.YuklemeTarihi), MONTH(s.YuklemeTarihi), m.FirmaAdi, t.ID,m.ID
 having SUM(su.AlisFiyati * su.Miktar) - ISNULL(MAX(f.OdenenToplam), 0) > 0
 order by MONTH(s.YuklemeTarihi) desc
   `;

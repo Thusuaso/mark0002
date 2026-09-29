@@ -4,10 +4,11 @@
       :value="purchaseList"
       :filters.sync="filters"
       filterDisplay="row"
+      @filter="filterSelected($event)"
       :globalFilterFields="['FirmaAdi', 'SiparisNo']"
       scrollable
       scrollHeight="550px"
-      selection.sync="selectedPurchase"
+      :selection.sync="selectedPurchase"
       selectionMode="single"
       @row-click="purchaseSelected($event)"
     >
@@ -106,45 +107,64 @@
         </template>
       </Column>
     </DataTable>
+
     <Dialog :visible.sync="purchase_detail_list_visible" modal>
-      {{ getFinancePurchaseDetailList }}
+      <financePurchaseDetailList />
     </Dialog>
   </div>
 </template>
 
-<script setup lang="javascript">
+<script>
 import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from "vuex";
 
 export default {
   data() {
     return {
-          purchase_detail_list_visible:false,
-        selectedPurchase:{},
+      purchase_detail_list_visible: false,
+      selectedPurchase: {},
+      // null = henüz filtre uygulanmadı, tam liste geçerli
+      filteredList: null,
       filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         FirmaAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
         SiparisNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
         SiparisTarihi: { value: null, matchMode: FilterMatchMode.CONTAINS },
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.CONTAINS },
-
       },
     };
   },
 
   computed: {
-    ...mapGetters(["getFinancePurchaseMainList","getFinancePurchaseDetailList"]),
+    ...mapGetters([
+      "getFinancePurchaseMainList",
+      "getFinancePurchaseDetailList",
+    ]),
 
     purchaseList() {
       const list = this.getFinancePurchaseMainList;
       return Array.isArray(list) ? list : [];
     },
 
+    // Toplamın kaynağı: filtre varsa filtrelenmiş liste, yoksa tam liste
+    visibleList() {
+      return Array.isArray(this.filteredList)
+        ? this.filteredList
+        : this.purchaseList;
+    },
+
     total() {
-      return this.purchaseList.reduce(
+      return this.visibleList.reduce(
         (sum, r) => sum + Number(r.KalanTutar || 0),
         0
       );
+    },
+  },
+
+  watch: {
+    // Store'dan liste yenilenirse eski filtre sonucu bayatlamasın
+    getFinancePurchaseMainList() {
+      this.filteredList = null;
     },
   },
 
@@ -152,17 +172,20 @@ export default {
     this.$store.dispatch("setFinancePurchaseMainList");
   },
 
-    methods: {
-        purchaseSelected(event) {
-
-            const data = {
-                'po': event.data.SiparisNo,
-                'supplier':event.data.MusteriId
-            }
-        this.$store.dispatch('setFinancePurchaseDetail', data)
-        this.purchase_detail_list_visible = true;
-
+  methods: {
+    filterSelected(event) {
+      this.filteredList = event.filteredValue;
     },
+
+    purchaseSelected(event) {
+      const data = {
+        po: event.data.SiparisNo,
+        supplier: event.data.MusteriId,
+      };
+      this.$store.dispatch("setFinancePurchaseDetail", data);
+      this.purchase_detail_list_visible = true;
+    },
+
     formatCurrency(value) {
       return new Intl.NumberFormat("tr-TR", {
         style: "currency",

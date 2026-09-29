@@ -150,7 +150,11 @@ import changePasswordForm from "~/components/auth/changePasswordForm";
 import mekmarCostForm from "~/components/cost/form";
 import mekmarCostList from "~/components/cost/list";
 import financePurchaseList from "~/components/finance/lists/supplier";
+import financePurchaseDetailList from "~/components/finance/forms/supplier";
+import financePurchaseForm from "~/components/finance/forms/supplierPaid";
 Vue.component("financePurchaseList", financePurchaseList);
+Vue.component("financePurchaseDetailList", financePurchaseDetailList);
+Vue.component("financePurchaseForm", financePurchaseForm);
 
 Vue.component("mekmarCostList", mekmarCostList);
 

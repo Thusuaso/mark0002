@@ -72,7 +72,7 @@
       :status="true"
       :expiryTotal="getFinanceExpiryListTotal"
     />
-    <!-- <financePurchaseList /> -->
+    <financePurchaseList />
 
     <Dialog
       :visible.sync="finance_collection_list_form"

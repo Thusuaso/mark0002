@@ -147,6 +147,8 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 export default {
   computed: {
     ...mapGetters(["getLocalUrl"]),
@@ -190,12 +192,12 @@ export default {
   created() {
     this.year = new Date().getFullYear();
     this.$axios.get("/reports/ayo/country/order/list").then((res) => {
-      this.list_this_year = res.data.list.filter((x) => x.Year === 2026);
-      this.list_one_year_ago = res.data.list.filter((x) => x.Year === 2025);
-      this.list_two_year_ago = res.data.list.filter((x) => x.Year === 2024);
-      this.list_three_year_ago = res.data.list.filter((x) => x.Year === 2023);
-      this.list_four_year_ago = res.data.list.filter((x) => x.Year === 2022);
-      this.list_five_year_ago = res.data.list.filter((x) => x.Year === 2021);
+      this.list_this_year = res.data.list.filter((x) => x.Year === this.year);
+      this.list_one_year_ago = res.data.list.filter((x) => x.Year === this.year - 1);
+      this.list_two_year_ago = res.data.list.filter((x) => x.Year === this.year - 2);
+      this.list_three_year_ago = res.data.list.filter((x) => x.Year === this.year - 3);
+      this.list_four_year_ago = res.data.list.filter((x) => x.Year === this.year - 4);
+      this.list_five_year_ago = res.data.list.filter((x) => x.Year === this.year - 5);
 
       this.list_this_year_total = {
         fob: 0,
@@ -251,24 +253,44 @@ export default {
   },
   methods: {
     excel_output() {
-      const data = {
-        this_year: this.list_this_year,
-        one_year_ago: this.list_one_year_ago,
-        two_year_ago: this.list_two_year_ago,
-        three_year_ago: this.list_three_year_ago,
-        four_year_ago: this.list_four_year_ago,
-        five_year_ago: this.list_five_year_ago,
-      };
-      this.$excelApi.post("/maliyet/dosyalar/countries", data).then((response) => {
-        if (response.status) {
-          const link = document.createElement("a");
-          link.href = this.getLocalUrl + "maliyet/dosyalar/countries";
+      const sheets = [
+        { year: this.year, list: this.list_this_year },
+        { year: this.year - 1, list: this.list_one_year_ago },
+        { year: this.year - 2, list: this.list_two_year_ago },
+        { year: this.year - 3, list: this.list_three_year_ago },
+        { year: this.year - 4, list: this.list_four_year_ago },
+        { year: this.year - 5, list: this.list_five_year_ago },
+      ];
 
-          link.setAttribute("download", "ulke_bazinda_siparisler.xlsx");
-          document.body.appendChild(link);
-          link.click();
-        }
+      const workbook = XLSX.utils.book_new();
+
+      sheets.forEach((sheet) => {
+        const rows = sheet.list.map((x) => ({
+          Country: x.UlkeAdi,
+          Fob: x.Fob,
+          Ddp: x.ddp,
+        }));
+
+        rows.push({
+          Country: "Total",
+          Fob: sheet.list.reduce((total, x) => total + x.Fob, 0),
+          Ddp: sheet.list.reduce((total, x) => total + x.ddp, 0),
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(rows, {
+          header: ["Country", "Fob", "Ddp"],
+        });
+        worksheet["!freeze"] = { xSplit: "0", ySplit: "1" };
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, String(sheet.year));
       });
+
+      const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+      saveAs(
+        new Blob([buffer], { type: "application/octet-stream" }),
+        "ulke_bazinda_siparisler.xlsx"
+      );
     },
   },
 };

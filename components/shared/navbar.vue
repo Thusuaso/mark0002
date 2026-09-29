@@ -27,7 +27,6 @@
               >
             </li>
 
-
             <li class="nav-item" v-show="!getAuthorityStatus">
               <nuxt-link to="/" tag="a" class="nav-link">HOME</nuxt-link>
             </li>
@@ -108,7 +107,7 @@
                     >Points to Consider</nuxt-link
                   >
                 </li>
-                <li>
+                <li v-if="canSeePasswords">
                   <nuxt-link to="/passwords" class="dropdown-item" tag="a"
                     >Passwords</nuxt-link
                   >
@@ -635,7 +634,7 @@
       data-bs-theme="blue"
       v-else
     >
-      <div class="container-fluid" v-if="getUserId==62">
+      <div class="container-fluid" v-if="getUserId == 62">
         <a class="navbar-brand" href="/">GOZ</a>
         <button
           class="navbar-toggler"
@@ -649,11 +648,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-
           <ul class="navbar-nav">
-
-
-
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -700,12 +695,9 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-
           <ul class="navbar-nav">
-
-
-              <li class="nav-item dropdown">
-                <a
+            <li class="nav-item dropdown">
+              <a
                 class="nav-link dropdown-toggle"
                 href="#"
                 role="button"
@@ -714,7 +706,7 @@
               >
                 Mekmar Siparişler
               </a>
-               <ul class="dropdown-menu">
+              <ul class="dropdown-menu">
                 <li>
                   <nuxt-link
                     to="/orders/production"
@@ -734,7 +726,7 @@
                   >
                 </li>
               </ul>
-              </li>
+            </li>
             <li class="nav-item">
               <nuxt-link
                 to="/reports/mekmer/productions"
@@ -853,10 +845,10 @@
               >
             </li>
             <li class="nav-item">
-                <nuxt-link to="/customer/mekmar" class="nav-link" tag="a"
-                  >Sale Customers</nuxt-link
-                >
-              </li>
+              <nuxt-link to="/customer/mekmar" class="nav-link" tag="a"
+                >Sale Customers</nuxt-link
+              >
+            </li>
           </ul>
         </div>
       </div>
@@ -889,6 +881,10 @@ export default {
       const storeAuth =
         this.isAuthenticated !== undefined ? this.isAuthenticated : false;
       return storeAuth || !!this.userId;
+    },
+    canSeePasswords() {
+      const id = parseInt(this.getUserId ?? this.userId, 10);
+      return [19, 47].includes(id);
     },
   },
   data() {
