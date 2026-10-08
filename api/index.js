@@ -116,7 +116,7 @@ function __noneNullControl(value) {
 app.use(cookieParser());
 
 // Silme/güncelleme yetkisi olmayan kullanıcılar
-const RESTRICTED_USER_IDS = [51, 59, 63, 64];
+const RESTRICTED_USER_IDS = [51, 59, 63, 64, 65];
 
 // Yöntemi POST olmasına rağmen yıkıcı iş yapan uç noktalar.
 // Bunlar metot kontrolüne yakalanmadığı için ayrıca listelenir.
