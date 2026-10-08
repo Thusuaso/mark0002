@@ -14054,415 +14054,610 @@ app.get("/production/isf/delete/:id/:document/:po", async (req, res) => {
   }
 });
 
-app.get("/orders/product/divide/list/:po", async (req, res) => {
-  const divideProductListSql = `
-        select 
-	su.SiparisNo,
-	su.ID as UrunId,
-	su.UrunKartID,
-	su.TedarikciID,
-	tb.FirmaAdi,
-	k.KategoriAdi,
-	urun.UrunAdi,
-	yk.YuzeyIslemAdi,
-	ol.En,
-	ol.Boy,
-	ol.Kenar,
-	su.Miktar,
-	su.UrunBirimID,
-	ubt.BirimAdi,
-	(tb.FirmaAdi + '/' + STR(su.UrunKartID) +'/' + k.KategoriAdi + '/' + urun.UrunAdi + '/' + yk.YuzeyIslemAdi + '/' + ol.En + '/'+ ol.Boy + '/' + ol.Kenar) as Urun,
-    	su.SatisFiyati,
-	su.SatisToplam,
-	su.UretimAciklama,
-	su.MusteriAciklama,
-	su.KullaniciID,
-	su.AlisFiyati,
-	su.SiraNo,
-	su.Ton,
-	su.musteriID,
-	su.Adet
-	
-from SiparisUrunTB su
-inner join UrunKartTB uk on uk.ID = su.UrunKartID
-inner join KategoriTB k on k.ID = uk.KategoriID
-inner join UrunlerTB urun on urun.ID = uk.UrunID
-inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
-inner join OlculerTB ol on ol.ID = uk.OlcuID
-inner join TedarikciTB tb on tb.ID = su.TedarikciID
-inner join UrunBirimTB ubt on ubt.ID = su.UrunBirimID
-where su.SiparisNo='${req.params.po}'
-    `;
-  await mssql.query(divideProductListSql, (err, product) => {
-    res.status(200).json({ list: product.recordset });
+/* ==========================================================================
+   SIPARIS BOLME (DIVIDE)
+   --------------------------------------------------------------------------
+   Bir siparisin bir kismi sevk edilip kalani beklerken siparis ikiye bolunur:
+     - giden : bu sevkiyatta cikan kisim
+     - kalan : ileride sevk edilecek kisim
+
+   PO numaralandirmasi:
+     26VEIK36    bolununce ->  26VEIK36-1 (giden) / 26VEIK36-2 (kalan)
+     26VEIK36-2  bolununce ->  26VEIK36-2 (giden) / 26VEIK36-3 (kalan)
+
+   Yani zaten ekli bir sipariste giden numara degismez, kalan icin ailedeki
+   en buyuk ekin bir fazlasi kullanilir. Boylece -1 gibi ortadaki bir parca
+   tekrar bolundugunde mevcut bir numaranin uzerine yazilmaz.
+   ========================================================================== */
+
+const DIVIDE_AMOUNT_TOLERANCE = 0.01;
+
+// Sayiya cevirir; bos/gecersiz degerleri 0 yapar.
+function divideNumber(value) {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+// Parametreler NVarChar olarak baglanir; SQL Server hedef kolonun tipine
+// cevirir. Boylece onceki davranis korunur, ama kesme isareti iceren
+// aciklamalar artik sorguyu bozmaz.
+function divideBindNumber(request, name, value) {
+  request.input(name, mssql.NVarChar, String(divideNumber(value)));
+}
+
+// PO'yu taban + sayisal ek olarak ayirir. Tabanda tire olabilir:
+// "26VE-IK36-2" -> { base: "26VE-IK36", suffix: 2 }
+function dividePoParse(po) {
+  const text = String(po == null ? "" : po).trim();
+  const match = text.match(/^(.+)-(\d+)$/);
+  if (!match) return { base: text, suffix: 0 };
+  return { base: match[1], suffix: parseInt(match[2], 10) };
+}
+
+function divideLikeEscape(value) {
+  return String(value).replace(/([[\]%_])/g, "[$1]");
+}
+
+// Ailedeki (taban ve taban-% olan tum PO'lar) en buyuk eki bulur.
+async function divideMaxSuffix(transaction, base) {
+  const request = transaction ? new mssql.Request(transaction) : new mssql.Request();
+  request.input("base", mssql.NVarChar, base);
+  request.input("pattern", mssql.NVarChar, divideLikeEscape(base) + "-%");
+
+  const result = await request.query(`
+    select SiparisNo from SiparislerTB
+      where SiparisNo = @base or SiparisNo like @pattern
+    union
+    select distinct SiparisNo from SiparisUrunTB
+      where SiparisNo = @base or SiparisNo like @pattern
+  `);
+
+  let max = 0;
+  result.recordset.forEach((row) => {
+    const parsed = dividePoParse(row.SiparisNo);
+    if (parsed.base === base && parsed.suffix > max) max = parsed.suffix;
   });
+  return max;
+}
+
+// Bolunme sonrasi olusacak giden/kalan PO numaralarini uretir.
+async function dividePoNumbers(transaction, po) {
+  const current = dividePoParse(po);
+  const nextFree = (await divideMaxSuffix(transaction, current.base)) + 1;
+
+  if (current.suffix === 0) {
+    // Hic bolunmemis siparis: -1 giden, -2 kalan.
+    return {
+      gidenPo: `${current.base}-${nextFree}`,
+      kalanPo: `${current.base}-${nextFree + 1}`,
+    };
+  }
+
+  // Zaten ekli bir parca: giden numarasini korur, kalan yeni numara alir.
+  return {
+    gidenPo: String(po).trim(),
+    kalanPo: `${current.base}-${nextFree}`,
+  };
+}
+
+// Tabloya INSERT edilebilir kolonlar (identity ve computed olanlar haric).
+// Satiri INSERT ... SELECT ile kopyaladigimiz icin elle kolon listesi
+// tutmuyoruz; boylece listeye eklenmesi unutulan kolonlar kaybolmuyor.
+const divideColumnCache = {};
+async function divideInsertableColumns(transaction, table) {
+  if (divideColumnCache[table]) return divideColumnCache[table];
+
+  const request = transaction
+    ? new mssql.Request(transaction)
+    : new mssql.Request();
+  request.input("table", mssql.NVarChar, table);
+  const result = await request.query(`
+    select c.name
+      from sys.columns c
+     where c.object_id = object_id(@table)
+       and c.is_identity = 0
+       and c.is_computed = 0
+       and c.system_type_id <> type_id('timestamp')
+     order by c.column_id
+  `);
+
+  divideColumnCache[table] = result.recordset.map((row) => row.name);
+  return divideColumnCache[table];
+}
+
+// "insert into T (kolonlar) select kolonlar-ya-da-override from T where ..."
+// ciftini kurar. overrides: { KolonAdi: "@parametre" }
+function divideCopySql(table, columns, overrides, whereSql) {
+  const targetList = columns.map((c) => `[${c}]`).join(", ");
+  const selectList = columns
+    .map((c) =>
+      Object.prototype.hasOwnProperty.call(overrides, c)
+        ? `${overrides[c]} as [${c}]`
+        : `[${c}]`
+    )
+    .join(", ");
+
+  return `insert into ${table} (${targetList}) select ${selectList} from ${table} where ${whereSql}`;
+}
+
+// Var olmayan kolonlar icin override gonderilmesini engeller.
+function divideFilterOverrides(columns, overrides) {
+  const filtered = {};
+  Object.keys(overrides).forEach((key) => {
+    if (columns.indexOf(key) !== -1) filtered[key] = overrides[key];
+  });
+  return filtered;
+}
+
+/* Siparis basligindaki bolunecek para alanlari.
+   column : SiparislerTB kolon adi
+   giden / kalan : istekten okunacak alan adlari */
+const DIVIDE_ORDER_AMOUNTS = [
+  { column: "Pesinat", giden: "gidenPesinat", kalan: "kalanPesinat", label: "Prepayment" },
+  { column: "NavlunSatis", giden: "gidenNavlunSatis", kalan: "kalanNavlunSatis", label: "Freight selling" },
+  { column: "NavlunAlis", giden: "gidenNavlunAlis", kalan: "kalanNavlunAlis", label: "Freight buying" },
+  { column: "DetayTutar_1", giden: "gidenDetaySatis_1", kalan: "kalanDetaySatis_1", label: "Detail 1 selling" },
+  { column: "DetayAlis_1", giden: "gidenDetayAlis_1", kalan: "kalanDetayAlis_1", label: "Detail 1 buying" },
+  { column: "DetayTutar_2", giden: "gidenDetaySatis_2", kalan: "kalanDetaySatis_2", label: "Detail 2 selling" },
+  { column: "DetayAlis_2", giden: "gidenDetayAlis_2", kalan: "kalanDetayAlis_2", label: "Detail 2 buying" },
+  { column: "DetayTutar_3", giden: "gidenDetaySatis_3", kalan: "kalanDetaySatis_3", label: "Detail 3 selling" },
+  { column: "DetayAlis_3", giden: "gidenDetayAlis_3", kalan: "kalanDetayAlis_3", label: "Detail 3 buying" },
+  { column: "sigorta_tutar_satis", giden: "gidenSigortaSatis", kalan: "kalanSigortaSatis", label: "Insurance selling" },
+  { column: "sigorta_Tutar", giden: "gidenSigortaAlis", kalan: "kalanSigortaAlis", label: "Insurance buying" },
+  { column: "Komisyon", giden: "gidenKomisyon", kalan: "kalanKomisyon", label: "Commission" },
+  { column: "EvrakGideri", giden: "gidenEvrakGideri", kalan: "kalanEvrakGideri", label: "Document cost" },
+  { column: "MalBedeli", giden: "gidenMalBedeli", kalan: "kalanMalBedeli", label: "Goods value" },
+];
+// DetayTutar_4 bilerek listede degil: bolunmesi gerekmiyor, INSERT ... SELECT
+// ile iki parcaya da oldugu gibi kopyalanir.
+
+app.get("/orders/product/divide/list/:po", async (req, res) => {
+  try {
+    const request = new mssql.Request();
+    request.input("po", mssql.NVarChar, req.params.po);
+
+    const result = await request.query(`
+      select
+        su.SiparisNo,
+        su.ID as UrunId,
+        su.UrunKartID,
+        su.TedarikciID,
+        tb.FirmaAdi,
+        k.KategoriAdi,
+        urun.UrunAdi,
+        yk.YuzeyIslemAdi,
+        ol.En,
+        ol.Boy,
+        ol.Kenar,
+        su.Miktar,
+        su.UrunBirimID,
+        ubt.BirimAdi,
+        (tb.FirmaAdi + '/' + STR(su.UrunKartID) + '/' + k.KategoriAdi + '/' + urun.UrunAdi + '/' + yk.YuzeyIslemAdi + '/' + ol.En + '/' + ol.Boy + '/' + ol.Kenar) as Urun,
+        su.SatisFiyati,
+        su.SatisToplam,
+        su.UretimAciklama,
+        su.MusteriAciklama,
+        su.KullaniciID,
+        su.AlisFiyati,
+        su.SiraNo,
+        su.Ton,
+        su.musteriID,
+        su.Adet
+      from SiparisUrunTB su
+      inner join UrunKartTB uk on uk.ID = su.UrunKartID
+      inner join KategoriTB k on k.ID = uk.KategoriID
+      inner join UrunlerTB urun on urun.ID = uk.UrunID
+      inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+      inner join OlculerTB ol on ol.ID = uk.OlcuID
+      inner join TedarikciTB tb on tb.ID = su.TedarikciID
+      inner join UrunBirimTB ubt on ubt.ID = su.UrunBirimID
+      where su.SiparisNo = @po
+      order by su.SiraNo
+    `);
+
+    res.status(200).json({ status: true, list: result.recordset });
+  } catch (err) {
+    console.error("Divide urun listesi hatasi:", err.message);
+    res
+      .status(200)
+      .json({ status: false, list: [], message: "Urun listesi alinamadi." });
+  }
+});
+
+// Bolme ekranini besler: olusacak PO numaralari, bolunecek tutarlar ve
+// siparisin urunleri. Tutar listesi DIVIDE_ORDER_AMOUNTS'tan uretildigi icin
+// alan listesi tek yerde duruyor, arayuz onu dinamik olarak ciziyor.
+app.get("/order/divide/source/:po", async (req, res) => {
+  const po = String(req.params.po || "").trim();
+
+  try {
+    const orderRequest = new mssql.Request();
+    orderRequest.input("po", mssql.NVarChar, po);
+    const orderResult = await orderRequest.query(
+      `select * from SiparislerTB where SiparisNo = @po`
+    );
+
+    if (orderResult.recordset.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: `${po} numarali siparis bulunamadi.` });
+    }
+    const sourceOrder = orderResult.recordset[0];
+
+    const columns = await divideInsertableColumns(null, "SiparislerTB");
+    const amounts = DIVIDE_ORDER_AMOUNTS.filter(
+      (field) => columns.indexOf(field.column) !== -1
+    ).map((field) => ({
+      column: field.column,
+      label: field.label,
+      giden: field.giden,
+      kalan: field.kalan,
+      original: divideNumber(sourceOrder[field.column]),
+    }));
+
+    const productRequest = new mssql.Request();
+    productRequest.input("po", mssql.NVarChar, po);
+    const productResult = await productRequest.query(`
+      select
+        su.ID as UrunId,
+        su.SiparisNo,
+        su.Miktar,
+        su.SatisFiyati,
+        su.UrunBirimID,
+        ubt.BirimAdi,
+        su.MusteriAciklama,
+        su.SiraNo,
+        tb.FirmaAdi,
+        k.KategoriAdi,
+        urun.UrunAdi,
+        yk.YuzeyIslemAdi,
+        ol.En,
+        ol.Boy,
+        ol.Kenar
+      from SiparisUrunTB su
+      inner join UrunKartTB uk on uk.ID = su.UrunKartID
+      inner join KategoriTB k on k.ID = uk.KategoriID
+      inner join UrunlerTB urun on urun.ID = uk.UrunID
+      inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID
+      inner join OlculerTB ol on ol.ID = uk.OlcuID
+      inner join TedarikciTB tb on tb.ID = su.TedarikciID
+      inner join UrunBirimTB ubt on ubt.ID = su.UrunBirimID
+      where su.SiparisNo = @po
+      order by su.SiraNo
+    `);
+
+    const { gidenPo, kalanPo } = await dividePoNumbers(null, po);
+
+    res.status(200).json({
+      status: true,
+      siparisNo: po,
+      gidenPo,
+      kalanPo,
+      amounts,
+      products: productResult.recordset.map((row) => ({
+        id: row.UrunId,
+        urun: [
+          row.FirmaAdi,
+          row.KategoriAdi,
+          row.UrunAdi,
+          row.YuzeyIslemAdi,
+          row.En,
+          row.Boy,
+          row.Kenar,
+        ]
+          .filter((part) => part !== null && String(part).trim() !== "")
+          .join(" / "),
+        miktar: divideNumber(row.Miktar),
+        satisFiyati: divideNumber(row.SatisFiyati),
+        birimId: row.UrunBirimID,
+        birim: row.BirimAdi,
+        musteriAciklama: row.MusteriAciklama,
+        siraNo: row.SiraNo,
+      })),
+    });
+  } catch (err) {
+    console.error("Divide kaynak siparis hatasi:", err.message);
+    res
+      .status(200)
+      .json({ status: false, message: "Siparis bilgileri alinamadi." });
+  }
 });
 
 app.post("/order/divide", async (req, res) => {
-  const orderInsertSqlGiden = `
-        insert into SiparislerTB(
-SiparisNo,
-SiparisTarihi,
-OdemeTurID,
-TeslimTurID,
-MusteriID,
-Pesinat,
-NavlunFirma,
-NavlunAlis,
-NavlunSatis,
-KayitTarihi,
-KullaniciID,
-SiparisDurumID,
-UretimAciklama,
-SevkiyatAciklama,
-FinansAciklama,
-OdemeAciklama,
-TahminiYuklemeTarihi,
-Ulke,
-Komisyon,
-DetayAciklama_1,
-DetayMekmarNot_1,
-DetayTutar_1,
-DetayAlis_1,
-DetayAciklama_2,
-DetayMekmarNot_2,
-DetayTutar_2,
-DetayAlis_2,
-DetayAciklama_3,
-DetayMekmarNot_3,
-DetayTutar_3,
-DetayAlis_3,
-SiparisSahibi,
-EvrakGideri,
-KonteynerAyrinti,
-UlkeId,
-depo_yukleme,
-DetayTutar_4,
-DetayAciklama_4,
-sigorta_Tutar,
-Operasyon,
-Finansman,
-Iade,
-MalBedeli,
-sigorta_tutar_satis,
-FaturaKesimTurID
-)
-VALUES(
-	'${req.body.order.siparisno_giden}',
-	'${req.body.order.siparisTarihi}',
-	'${req.body.order.odemeTurId}',
-	'${req.body.order.teslimTurId}',
-	'${req.body.order.musteriId}',
-	'${req.body.order.gidenPesinat}',
-	'${req.body.order.navlunFirma}',
-	'${req.body.order.gidenNavlunAlis}',
-	'${req.body.order.gidenNavlunSatis}',
-	'${req.body.order.kayitTarihi}',
-	'${req.body.order.kullaniciId}',
-	'${req.body.order.siparisDurumId}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.sevkiyatAciklama}',
-	'${req.body.order.finansAciklama}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.TahminiYuklemeTarihi}',
-	'${req.body.order.ulke}',
-	'${req.body.order.komisyon}',
-	'${req.body.order.detayAciklama_1}',
-	'${req.body.order.detayMekmarNot_1}',
-	'${req.body.order.gidenDetaySatis_1}',
-	'${req.body.order.gidenDetayAlis_1}',
-	'${req.body.order.detayAciklama_2}',
-	'${req.body.order.detayMekmarNot_2}',
-	'${req.body.order.gidenDetaySatis_2}',
-	'${req.body.order.gidenDetayAlis_2}',
-	'${req.body.order.detayAciklama_3}',
-	'${req.body.order.detayMekmarNot_3}',
-	'${req.body.order.gidenDetaySatis_3}',
-	'${req.body.order.gidenDetayAlis_3}',
-	'${req.body.order.siparisSahibi}',
-	'${req.body.order.evrakGideri}',
-	'${req.body.order.konteynerAyrinti}',
-	'${req.body.order.ulkeId}',
-	'${req.body.order.depo_yukleme}',
-	'${0}',
-	'${""}',
-	'${req.body.order.sigortaTutar}',
-	'${req.body.order.operasyon}',
-	'${req.body.order.finansman}',
-	'${req.body.order.iade}',
-	'${req.body.order.malBedeli}',
-	'${req.body.order.sigortaTutarSatis}',
-	'${req.body.order.faturaKesimTurId}'
-)
-    `;
+  const body = req.body || {};
+  const order = body.order || {};
+  const allocations = Array.isArray(body.product) ? body.product : [];
+  const sourcePo = String(order.siparisno == null ? "" : order.siparisno).trim();
 
-  const orderInsertSqlKalan = `
-        insert into SiparislerTB(
-SiparisNo,
-SiparisTarihi,
-OdemeTurID,
-TeslimTurID,
-MusteriID,
-Pesinat,
-NavlunFirma,
-NavlunAlis,
-NavlunSatis,
-KayitTarihi,
-KullaniciID,
-SiparisDurumID,
-UretimAciklama,
-SevkiyatAciklama,
-FinansAciklama,
-OdemeAciklama,
-TahminiYuklemeTarihi,
-Ulke,
-Komisyon,
-DetayAciklama_1,
-DetayMekmarNot_1,
-DetayTutar_1,
-DetayAlis_1,
-DetayAciklama_2,
-DetayMekmarNot_2,
-DetayTutar_2,
-DetayAlis_2,
-DetayAciklama_3,
-DetayMekmarNot_3,
-DetayTutar_3,
-DetayAlis_3,
-SiparisSahibi,
-EvrakGideri,
-KonteynerAyrinti,
-UlkeId,
-depo_yukleme,
-DetayTutar_4,
-DetayAciklama_4,
-sigorta_Tutar,
-Operasyon,
-Finansman,
-Iade,
-MalBedeli,
-sigorta_tutar_satis,
-FaturaKesimTurID
-)
-VALUES(
-	'${req.body.order.siparisno_kalan}',
-	'${req.body.order.siparisTarihi}',
-	'${req.body.order.odemeTurId}',
-	'${req.body.order.teslimTurId}',
-	'${req.body.order.musteriId}',
-	'${req.body.order.kalanPesinat}',
-	'${req.body.order.navlunFirma}',
-	'${req.body.order.kalanNavlunAlis}',
-	'${req.body.order.kalanNavlunSatis}',
-	'${req.body.order.kayitTarihi}',
-	'${req.body.order.kullaniciId}',
-	'${req.body.order.siparisDurumId}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.sevkiyatAciklama}',
-	'${req.body.order.finansAciklama}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.TahminiYuklemeTarihi}',
-	'${req.body.order.ulke}',
-	'${req.body.order.komisyon}',
-	'${req.body.order.detayAciklama_1}',
-	'${req.body.order.detayMekmarNot_1}',
-	'${req.body.order.kalanDetaySatis_1}',
-	'${req.body.order.kalanDetayAlis_1}',
-	'${req.body.order.detayAciklama_2}',
-	'${req.body.order.detayMekmarNot_2}',
-	'${req.body.order.kalanDetaySatis_2}',
-	'${req.body.order.kalanDetayAlis_2}',
-	'${req.body.order.detayAciklama_3}',
-	'${req.body.order.detayMekmarNot_3}',
-	'${req.body.order.kalanDetaySatis_3}',
-	'${req.body.order.kalanDetayAlis_3}',
-	'${req.body.order.siparisSahibi}',
-	'${req.body.order.evrakGideri}',
-	'${req.body.order.konteynerAyrinti}',
-	'${req.body.order.ulkeId}',
-	'${req.body.order.depo_yukleme}',
-	'${0}',
-	'${""}',
-	'${req.body.order.sigortaTutar}',
-	'${req.body.order.operasyon}',
-	'${req.body.order.finansman}',
-	'${req.body.order.iade}',
-	'${req.body.order.malBedeli}',
-	'${req.body.order.sigortaTutarSatis}',
-	'${req.body.order.faturaKesimTurId}'
-)
-    `;
+  if (!sourcePo) {
+    return res
+      .status(200)
+      .json({ status: false, message: "Siparis numarasi yok." });
+  }
+  if (allocations.length === 0) {
+    return res
+      .status(200)
+      .json({ status: false, message: "Bolunecek urun secilmedi." });
+  }
 
-  await mssql.query(orderInsertSqlGiden, async (err, giden) => {
-    if (giden.rowsAffected[0] == 1) {
-      await mssql.query(orderInsertSqlKalan, async (err, kalan) => {
-        if (kalan.rowsAffected[0] == 1) {
-          const sistemdeSiparisDeleteSql = `delete SiparislerTB where SiparisNo='${req.body.order.siparisno}'`;
-          await mssql.query(
-            sistemdeSiparisDeleteSql,
-            async (err, sistemdekiSiparis) => {
-              if (sistemdekiSiparis.rowsAffected[0] == 1) {
-                await req.body.product.forEach(async (x) => {
-                  if (x.kalan == 0) {
-                    const kalanSqlDelete = `delete SiparisUrunTB where ID='${x.id}'`;
-                    mssql.query(kalanSqlDelete, async (err, kalan) => {
-                      if (kalan.rowsAffected[0] == 1) {
-                        const gidenUrunSql = `
-                                                insert into SiparisUrunTB(
-                                            SiparisNo,
-                                            TedarikciID,
-                                            UrunKartID,
-                                            UrunBirimID,
-                                            Miktar,
-                                            OzelMiktar,
-                                            SatisFiyati,
-                                            SatisToplam,
-                                            UretimAciklama,
-                                            MusteriAciklama,
-                                            AlisFiyati,
-                                            SiraNo,
-                                            Ton,
-                                            Adet
-                                        ) VALUES(
-                                            '${x.giden_po}',
-                                            '${x.tedarikciId}',
-                                            '${x.urunKartId}',
-                                            '${x.urunBirimId}',
-                                            '${x.gonderilen}',
-                                            '${x.gonderilen}',
-                                            '${x.satisFiyat}',
-                                            '${x.gidenToplam}',
-                                            '${x.uretimAciklama}',
-                                            '${x.musteriAciklama}',
-                                            '${x.alisFiyati}',
-                                            '${x.siraNo}',
-                                            '${x.ton}',
-                                            '${x.adet}'
+  const transaction = new mssql.Transaction();
+  let started = false;
 
-                                        )
-                                                                            `;
-                        await mssql.query(gidenUrunSql, async (err, giden) => {
-                          if (giden.rowsAffected[0] == 1) {
-                            res.status(200).json({ status: true });
-                          } else {
-                            res.status(200).json({ status: false });
-                          }
-                        });
-                      } else {
-                        res.status(200).json({ status: false });
-                      }
-                    });
-                  } else if (x.gonderilen == 0) {
-                    const kalanSqlUpdate = `update SiparisUrunTB SET SiparisNo = '${x.kalan_po}' WHERE ID='${x.id}'`;
-                    mssql.query(kalanSqlUpdate, (err, kalan) => {
-                      if (kalan.rowsAffected[0] == 1) {
-                        res.status(200).json({ status: true });
-                      } else {
-                        res.status(200).json({ status: false });
-                      }
-                    });
-                  } else {
-                    const gidenUrunSql = `
-            insert into SiparisUrunTB(
-        SiparisNo,
-        TedarikciID,
-        UrunKartID,
-        UrunBirimID,
-        Miktar,
-        OzelMiktar,
-        SatisFiyati,
-        SatisToplam,
-        UretimAciklama,
-        MusteriAciklama,
-        AlisFiyati,
-        SiraNo,
-        Ton,
-        Adet
-    ) VALUES(
-        '${x.giden_po}',
-        '${x.tedarikciId}',
-        '${x.urunKartId}',
-        '${x.urunBirimId}',
-        '${x.gonderilen}',
-        '${x.gonderilen}',
-        '${x.satisFiyat}',
-        '${x.gidenToplam}',
-        '${x.uretimAciklama}',
-        '${x.musteriAciklama}',
-        '${x.alisFiyati}',
-        '${x.siraNo}',
-        '${x.ton}',
-        '${x.adet}'
+  try {
+    await transaction.begin();
+    started = true;
 
-    )
-                                    `;
-                    const kalanUrunSql = `
-                        insert into SiparisUrunTB(
-                    SiparisNo,
-                    TedarikciID,
-                    UrunKartID,
-                    UrunBirimID,
-                    Miktar,
-                    OzelMiktar,
-                    SatisFiyati,
-                    SatisToplam,
-                    UretimAciklama,
-                    MusteriAciklama,
-                    AlisFiyati,
-                    SiraNo,
-                    Ton,
-                    Adet
-                ) VALUES(
-                    '${x.kalan_po}',
-                    '${x.tedarikciId}',
-                    '${x.urunKartId}',
-                    '${x.urunBirimId}',
-                    '${x.kalan}',
-                    '${x.kalan}',
-                    '${x.satisFiyat}',
-                    '${x.kalanToplam}',
-                    '${x.uretimAciklama}',
-                    '${x.musteriAciklama}',
-                    '${x.alisFiyati}',
-                    '${x.siraNo}',
-                    '${x.ton}',
-                    '${x.adet}'
+    /* --- 1. Kaynak siparis ve urunleri oku ------------------------------ */
+    const orderRequest = new mssql.Request(transaction);
+    orderRequest.input("po", mssql.NVarChar, sourcePo);
+    const orderResult = await orderRequest.query(
+      `select * from SiparislerTB with (updlock, holdlock) where SiparisNo = @po`
+    );
 
-                )
-                                    `;
-                    const sistemUrunDeleteSql = `delete SiparisUrunTB where ID='${x.id}'`;
-                    mssql.query(sistemUrunDeleteSql, async (err, sistem) => {
-                      if (sistem.rowsAffected[0] == 1) {
-                        await mssql.query(gidenUrunSql, async (err, giden) => {
-                          if (giden.rowsAffected[0] == 1) {
-                            await mssql.query(kalanUrunSql, (err, kalan) => {
-                              if (kalan.rowsAffected[0] == 1) {
-                                res.status(200).json({ status: true });
-                              } else {
-                                res.status(200).json({ status: false });
-                              }
-                            });
-                          } else {
-                            res.status(200).json({ status: false });
-                          }
-                        });
-                      }
-                    });
-                  }
-                });
-              } else {
-                res.status(200).json({ status: false });
-              }
-            }
-          );
-        } else {
-          res.status(200).json({ status: false });
-        }
+    if (orderResult.recordset.length === 0) {
+      await transaction.rollback();
+      return res.status(200).json({
+        status: false,
+        message: `${sourcePo} numarali siparis bulunamadi.`,
       });
-    } else {
-      res.status(200).json({ status: false });
     }
-  });
+    const sourceOrder = orderResult.recordset[0];
+
+    const productRequest = new mssql.Request(transaction);
+    productRequest.input("po", mssql.NVarChar, sourcePo);
+    const productResult = await productRequest.query(
+      `select ID, Miktar, SatisFiyati from SiparisUrunTB with (updlock, holdlock) where SiparisNo = @po`
+    );
+    const sourceProducts = productResult.recordset;
+
+    /* --- 2. Urun miktarlarini dogrula ----------------------------------- */
+    const byId = {};
+    sourceProducts.forEach((row) => {
+      byId[String(row.ID)] = row;
+    });
+
+    const seen = {};
+    const problems = [];
+    const plan = [];
+
+    allocations.forEach((item) => {
+      const id = String(item.id);
+      const row = byId[id];
+
+      if (!row) {
+        problems.push(`${id} numarali urun bu sipariste yok.`);
+        return;
+      }
+      if (seen[id]) {
+        problems.push(`${id} numarali urun listede birden fazla kez var.`);
+        return;
+      }
+      seen[id] = true;
+
+      const giden = divideNumber(item.gonderilen);
+      const kalan = divideNumber(item.kalan);
+      const miktar = divideNumber(row.Miktar);
+
+      if (giden < 0 || kalan < 0) {
+        problems.push(`${id} numarali urunde negatif miktar var.`);
+        return;
+      }
+      if (Math.abs(giden + kalan - miktar) > DIVIDE_AMOUNT_TOLERANCE) {
+        problems.push(
+          `${id} numarali urunde giden (${giden}) + kalan (${kalan}) toplami siparis miktarina (${miktar}) esit degil.`
+        );
+        return;
+      }
+
+      plan.push({
+        id: row.ID,
+        giden,
+        kalan,
+        fiyat: divideNumber(row.SatisFiyati),
+      });
+    });
+
+    // Listelenmeyen urun kalirsa eski kodda o urun silinen siparise bagli
+    // kalip kayboluyordu. Artik bolme hic baslamiyor.
+    sourceProducts.forEach((row) => {
+      if (!seen[String(row.ID)]) {
+        problems.push(`${row.ID} numarali urun icin giden/kalan girilmedi.`);
+      }
+    });
+
+    if (problems.length > 0) {
+      await transaction.rollback();
+      return res.status(200).json({
+        status: false,
+        message: "Urun miktarlari uyusmuyor.",
+        problems,
+      });
+    }
+
+    /* --- 3. Bolunecek para alanlarini belirle ---------------------------
+       Tutarlarin toplami siparisteki tutara esit olmak zorunda degil;
+       girilen degerler oldugu gibi yazilir.                              */
+    const orderColumns = await divideInsertableColumns(
+      transaction,
+      "SiparislerTB"
+    );
+    const amountFields = DIVIDE_ORDER_AMOUNTS.filter(
+      (field) => orderColumns.indexOf(field.column) !== -1
+    );
+
+    /* --- 4. PO numaralarini uret ---------------------------------------- */
+    const { gidenPo, kalanPo } = await dividePoNumbers(transaction, sourcePo);
+    const gidenIsSource = gidenPo === sourcePo;
+
+    /* --- 5. Siparis basliklarini olustur --------------------------------
+       Baslik satiri INSERT ... SELECT ile kopyalanir: bolunen tutarlar ve PO
+       disindaki her kolon kaynak sipariste ne ise aynen aktarilir. Eski kodda
+       kolonlar elle yazildigi icin DetayTutar_4 sifirlaniyor, UretimAciklama
+       yerine OdemeAciklama yaziliyordu.                                     */
+    const buildOrderOverrides = (poParam) => {
+      const overrides = { SiparisNo: poParam };
+      amountFields.forEach((field) => {
+        overrides[field.column] = `@amount_${field.column}`;
+      });
+      overrides.KayitTarihi = "getdate()";
+      overrides.KullaniciID = "@kullaniciId";
+      return divideFilterOverrides(orderColumns, overrides);
+    };
+
+    const bindOrderAmounts = (request, part) => {
+      amountFields.forEach((field) => {
+        divideBindNumber(
+          request,
+          `amount_${field.column}`,
+          order[part === "giden" ? field.giden : field.kalan]
+        );
+      });
+      request.input(
+        "kullaniciId",
+        mssql.NVarChar,
+        String(order.kullaniciId || sourceOrder.KullaniciID || "")
+      );
+    };
+
+    // Kalan siparis her zaman yeni satir olarak eklenir. Kaynak satir henuz
+    // giden tutarlarina guncellenmedigi icin kopya dogru degerleri alir.
+    const kalanRequest = new mssql.Request(transaction);
+    kalanRequest.input("po", mssql.NVarChar, sourcePo);
+    kalanRequest.input("kalanPo", mssql.NVarChar, kalanPo);
+    bindOrderAmounts(kalanRequest, "kalan");
+    await kalanRequest.query(
+      divideCopySql(
+        "SiparislerTB",
+        orderColumns,
+        buildOrderOverrides("@kalanPo"),
+        "SiparisNo = @po"
+      )
+    );
+
+    if (gidenIsSource) {
+      // Zaten ekli bir parca tekrar bolunuyor: giden numara degismedigi icin
+      // kaynak satir yerinde guncellenir. (Eski kod bu durumda ayni numarayla
+      // yeni satir ekleyip sonra o numarayi siliyordu, yani giden siparis yok
+      // oluyordu.)
+      const updateRequest = new mssql.Request(transaction);
+      updateRequest.input("po", mssql.NVarChar, sourcePo);
+      bindOrderAmounts(updateRequest, "giden");
+      const setList = amountFields
+        .map((field) => `[${field.column}] = @amount_${field.column}`)
+        .concat(
+          orderColumns.indexOf("KullaniciID") !== -1
+            ? ["[KullaniciID] = @kullaniciId"]
+            : []
+        )
+        .join(", ");
+      await updateRequest.query(
+        `update SiparislerTB set ${setList} where SiparisNo = @po`
+      );
+    } else {
+      const gidenRequest = new mssql.Request(transaction);
+      gidenRequest.input("po", mssql.NVarChar, sourcePo);
+      gidenRequest.input("gidenPo", mssql.NVarChar, gidenPo);
+      bindOrderAmounts(gidenRequest, "giden");
+      await gidenRequest.query(
+        divideCopySql(
+          "SiparislerTB",
+          orderColumns,
+          buildOrderOverrides("@gidenPo"),
+          "SiparisNo = @po"
+        )
+      );
+    }
+
+    /* --- 6. Urunleri dagit ---------------------------------------------- */
+    const productColumns = await divideInsertableColumns(
+      transaction,
+      "SiparisUrunTB"
+    );
+    const hasOzelMiktar = productColumns.indexOf("OzelMiktar") !== -1;
+    const hasSatisToplam = productColumns.indexOf("SatisToplam") !== -1;
+
+    for (const item of plan) {
+      if (item.kalan === 0) {
+        // Tamami gidiyor: satir oldugu gibi giden siparise tasinir.
+        const request = new mssql.Request(transaction);
+        request.input("id", mssql.Int, item.id);
+        request.input("gidenPo", mssql.NVarChar, gidenPo);
+        await request.query(
+          `update SiparisUrunTB set SiparisNo = @gidenPo where ID = @id`
+        );
+        continue;
+      }
+
+      if (item.giden === 0) {
+        // Tamami kaliyor: satir kalan siparise tasinir.
+        const request = new mssql.Request(transaction);
+        request.input("id", mssql.Int, item.id);
+        request.input("kalanPo", mssql.NVarChar, kalanPo);
+        await request.query(
+          `update SiparisUrunTB set SiparisNo = @kalanPo where ID = @id`
+        );
+        continue;
+      }
+
+      // Kismi sevk: once kalan icin satirin kopyasi olusturulur, sonra mevcut
+      // satir giden miktarina guncellenir. Kopyalama INSERT ... SELECT ile
+      // yapildigi icin musteriID gibi kolonlar da korunur.
+      const overrides = { SiparisNo: "@kalanPo", Miktar: "@kalanMiktar" };
+      if (hasOzelMiktar) overrides.OzelMiktar = "@kalanMiktar";
+      if (hasSatisToplam) overrides.SatisToplam = "@kalanToplam";
+
+      const copyRequest = new mssql.Request(transaction);
+      copyRequest.input("id", mssql.Int, item.id);
+      copyRequest.input("kalanPo", mssql.NVarChar, kalanPo);
+      divideBindNumber(copyRequest, "kalanMiktar", item.kalan);
+      divideBindNumber(copyRequest, "kalanToplam", item.kalan * item.fiyat);
+      await copyRequest.query(
+        divideCopySql(
+          "SiparisUrunTB",
+          productColumns,
+          divideFilterOverrides(productColumns, overrides),
+          "ID = @id"
+        )
+      );
+
+      const updateRequest = new mssql.Request(transaction);
+      updateRequest.input("id", mssql.Int, item.id);
+      updateRequest.input("gidenPo", mssql.NVarChar, gidenPo);
+      divideBindNumber(updateRequest, "gidenMiktar", item.giden);
+      divideBindNumber(updateRequest, "gidenToplam", item.giden * item.fiyat);
+      const productSet = ["SiparisNo = @gidenPo", "Miktar = @gidenMiktar"]
+        .concat(hasOzelMiktar ? ["OzelMiktar = @gidenMiktar"] : [])
+        .concat(hasSatisToplam ? ["SatisToplam = @gidenToplam"] : [])
+        .join(", ");
+      await updateRequest.query(
+        `update SiparisUrunTB set ${productSet} where ID = @id`
+      );
+    }
+
+    /* --- 7. Kaynak siparis satirini kaldir ------------------------------ */
+    if (!gidenIsSource) {
+      const deleteRequest = new mssql.Request(transaction);
+      deleteRequest.input("po", mssql.NVarChar, sourcePo);
+      await deleteRequest.query(`delete from SiparislerTB where SiparisNo = @po`);
+    }
+
+    await transaction.commit();
+
+    res.status(200).json({ status: true, gidenPo, kalanPo });
+  } catch (err) {
+    console.error("Siparis bolme hatasi:", err.message);
+    if (started) {
+      try {
+        await transaction.rollback();
+      } catch (rollbackError) {
+        console.error("Bolme geri alinamadi:", rollbackError.message);
+      }
+    }
+    res.status(200).json({
+      status: false,
+      message: "Siparis bolunemedi, degisiklikler geri alindi.",
+    });
+  }
 });
 
 /*Mailler */
