@@ -14211,6 +14211,133 @@ const DIVIDE_ORDER_AMOUNTS = [
 // DetayTutar_4 bilerek listede degil: bolunmesi gerekmiyor, INSERT ... SELECT
 // ile iki parcaya da oldugu gibi kopyalanir.
 
+const DIVIDE_BACKUP_TABLE = "SiparisDivideYedekTB";
+
+// Yedek tablosu yoksa bolme yapilmaz. Tablo api/sql/SiparisDivideYedekTB.sql
+// ile bir kez olusturulur.
+async function divideBackupTableReady(transaction) {
+  const request = transaction
+    ? new mssql.Request(transaction)
+    : new mssql.Request();
+  request.input("table", mssql.NVarChar, DIVIDE_BACKUP_TABLE);
+  const result = await request.query(
+    `select 1 as mevcut from sys.objects where object_id = object_id(@table) and type = 'U'`
+  );
+  return result.recordset.length > 0;
+}
+
+// Musterinin finans tablosunun o andaki hali. Bolme bu tablolari
+// degistirmiyor; yedek, sonradan karsilastirma yapabilmek icin.
+async function divideFinanceSnapshot(transaction, musteriId) {
+  if (musteriId === null || musteriId === undefined || musteriId === "") {
+    return null;
+  }
+
+  const run = async (sql) => {
+    const request = new mssql.Request(transaction);
+    request.input("musteriId", mssql.Int, parseInt(musteriId, 10));
+    const result = await request.query(sql);
+    return result.recordset;
+  };
+
+  const poList = await run(`
+    select
+      sd.Durum,
+      s.SiparisTarihi,
+      s.YuklemeTarihi,
+      s.SiparisNo,
+      m.FirmaAdi,
+      (s.NavlunSatis + s.DetayTutar_1 + s.DetayTutar_2 + s.DetayTutar_3
+        + dbo.Finance_Detail_Po_Order_Total(s.SiparisNo) + s.sigorta_tutar_satis) as OrderTotal,
+      s.Pesinat,
+      dbo.Finance_Detail_Po_Advanced_Payment_Total(s.SiparisNo) as Paid,
+      s.MusteriID,
+      s.MayaControl
+    from SiparislerTB s
+    inner join MusterilerTB m on m.ID = s.MusteriID
+    inner join SiparisDurumTB sd on sd.ID = s.SiparisDurumID
+    where s.MusteriID = @musteriId
+    order by s.YuklemeTarihi desc
+  `);
+
+  // Odemeler ham satir olarak alinir; gruplanmis hali yedekte ise yaramaz.
+  const odemeler = await run(
+    `select * from OdemelerTB where MusteriID = @musteriId order by Tarih desc`
+  );
+
+  const sigorta = await run(`
+    select sigorta_tutar_satis, SiparisNo from SiparislerTB
+     where MusteriID = @musteriId order by YuklemeTarihi desc
+  `);
+
+  return { poList, odemeler, sigorta };
+}
+
+// Bolme oncesi durumu yedek tablosuna yazar. Bolme ile ayni transaction
+// icinde calisir; bolme geri alinirsa yedek de geri alinir.
+async function divideWriteBackup(transaction, payload) {
+  const request = new mssql.Request(transaction);
+  request.input("siparisNo", mssql.NVarChar, payload.siparisNo);
+  request.input("gidenPo", mssql.NVarChar, payload.gidenPo);
+  request.input("kalanPo", mssql.NVarChar, payload.kalanPo);
+  request.input(
+    "musteriId",
+    mssql.Int,
+    payload.musteriId === null || payload.musteriId === undefined
+      ? null
+      : parseInt(payload.musteriId, 10)
+  );
+  request.input(
+    "kullaniciId",
+    mssql.Int,
+    isNaN(parseInt(payload.kullaniciId, 10))
+      ? null
+      : parseInt(payload.kullaniciId, 10)
+  );
+  request.input("siparisJson", mssql.NVarChar, JSON.stringify(payload.siparis));
+  request.input("urunlerJson", mssql.NVarChar, JSON.stringify(payload.urunler));
+  request.input(
+    "finansJson",
+    mssql.NVarChar,
+    payload.finans === null ? null : JSON.stringify(payload.finans)
+  );
+
+  await request.query(`
+    insert into ${DIVIDE_BACKUP_TABLE}
+      (SiparisNo, GidenPo, KalanPo, MusteriID, KullaniciID, SiparisJson, UrunlerJson, FinansJson)
+    values
+      (@siparisNo, @gidenPo, @kalanPo, @musteriId, @kullaniciId, @siparisJson, @urunlerJson, @finansJson)
+  `);
+}
+
+// Bir siparise ait yedekleri listeler. ?detay=1 ile JSON govdeleri de doner.
+app.get("/order/divide/backups/:po", async (req, res) => {
+  try {
+    if (!(await divideBackupTableReady(null))) {
+      return res.status(200).json({
+        status: false,
+        message: `${DIVIDE_BACKUP_TABLE} tablosu yok.`,
+      });
+    }
+
+    const detail = req.query.detay === "1";
+    const request = new mssql.Request();
+    request.input("po", mssql.NVarChar, req.params.po);
+    const result = await request.query(`
+      select ID, SiparisNo, GidenPo, KalanPo, MusteriID, Tarih, KullaniciID
+        ${detail ? ", SiparisJson, UrunlerJson, FinansJson" : ""}
+        from ${DIVIDE_BACKUP_TABLE}
+       where SiparisNo = @po or GidenPo = @po or KalanPo = @po
+       order by Tarih desc
+    `);
+
+    res.status(200).json({ status: true, list: result.recordset });
+  } catch (err) {
+    console.error("Divide yedek listesi hatasi:", err.message);
+    res.status(200).json({ status: false, message: "Yedekler alinamadi." });
+  }
+});
+
 app.get("/orders/product/divide/list/:po", async (req, res) => {
   try {
     const request = new mssql.Request();
@@ -14380,13 +14507,31 @@ app.post("/order/divide", async (req, res) => {
       .json({ status: false, message: "Bolunecek urun secilmedi." });
   }
 
+  // Yedeksiz bolme yapilmaz.
+  try {
+    if (!(await divideBackupTableReady(null))) {
+      return res.status(200).json({
+        status: false,
+        message: `Yedek tablosu (${DIVIDE_BACKUP_TABLE}) yok. api/sql/${DIVIDE_BACKUP_TABLE}.sql bir kez calistirilmali.`,
+      });
+    }
+  } catch (err) {
+    console.error("Yedek tablosu kontrolu hatasi:", err.message);
+    return res
+      .status(200)
+      .json({ status: false, message: "Yedek tablosu kontrol edilemedi." });
+  }
+
   const transaction = new mssql.Transaction();
   let started = false;
+  // Hata olursa kullaniciya hangi adimda oldugunu soyleyebilmek icin.
+  let step = "islem baslatilirken";
 
   try {
     await transaction.begin();
     started = true;
 
+    step = "siparis ve urunler okunurken";
     /* --- 1. Kaynak siparis ve urunleri oku ------------------------------ */
     const orderRequest = new mssql.Request(transaction);
     orderRequest.input("po", mssql.NVarChar, sourcePo);
@@ -14406,10 +14551,11 @@ app.post("/order/divide", async (req, res) => {
     const productRequest = new mssql.Request(transaction);
     productRequest.input("po", mssql.NVarChar, sourcePo);
     const productResult = await productRequest.query(
-      `select ID, Miktar, SatisFiyati from SiparisUrunTB with (updlock, holdlock) where SiparisNo = @po`
+      `select * from SiparisUrunTB with (updlock, holdlock) where SiparisNo = @po`
     );
     const sourceProducts = productResult.recordset;
 
+    step = "urun miktarlari dogrulanirken";
     /* --- 2. Urun miktarlarini dogrula ----------------------------------- */
     const byId = {};
     sourceProducts.forEach((row) => {
@@ -14485,10 +14631,27 @@ app.post("/order/divide", async (req, res) => {
       (field) => orderColumns.indexOf(field.column) !== -1
     );
 
+    step = "yeni PO numaralari uretilirken";
     /* --- 4. PO numaralarini uret ---------------------------------------- */
     const { gidenPo, kalanPo } = await dividePoNumbers(transaction, sourcePo);
     const gidenIsSource = gidenPo === sourcePo;
 
+    /* --- 4b. Bolme oncesi durumu yedekle --------------------------------
+       Dogrulamalar gectikten sonra, veriye dokunmadan once yazilir. Ayni
+       transaction icinde oldugu icin bolme geri alinirsa yedek de gider.  */
+    step = "bolme oncesi yedek alinirken";
+    await divideWriteBackup(transaction, {
+      siparisNo: sourcePo,
+      gidenPo,
+      kalanPo,
+      musteriId: sourceOrder.MusteriID,
+      kullaniciId: order.kullaniciId,
+      siparis: sourceOrder,
+      urunler: sourceProducts,
+      finans: await divideFinanceSnapshot(transaction, sourceOrder.MusteriID),
+    });
+
+    step = "siparis basliklari olusturulurken";
     /* --- 5. Siparis basliklarini olustur --------------------------------
        Baslik satiri INSERT ... SELECT ile kopyalanir: bolunen tutarlar ve PO
        disindaki her kolon kaynak sipariste ne ise aynen aktarilir. Eski kodda
@@ -14568,6 +14731,7 @@ app.post("/order/divide", async (req, res) => {
       );
     }
 
+    step = "urunler dagitilirken";
     /* --- 6. Urunleri dagit ---------------------------------------------- */
     const productColumns = await divideInsertableColumns(
       transaction,
@@ -14634,6 +14798,7 @@ app.post("/order/divide", async (req, res) => {
       );
     }
 
+    step = "kaynak siparis kaldirilirken";
     /* --- 7. Kaynak siparis satirini kaldir ------------------------------ */
     if (!gidenIsSource) {
       const deleteRequest = new mssql.Request(transaction);
@@ -14641,21 +14806,31 @@ app.post("/order/divide", async (req, res) => {
       await deleteRequest.query(`delete from SiparislerTB where SiparisNo = @po`);
     }
 
+    step = "degisiklikler kaydedilirken";
     await transaction.commit();
 
     res.status(200).json({ status: true, gidenPo, kalanPo });
   } catch (err) {
-    console.error("Siparis bolme hatasi:", err.message);
+    console.error(`Siparis bolme hatasi (${sourcePo}) [${step}]:`, err);
+
+    let rolledBack = false;
     if (started) {
       try {
         await transaction.rollback();
+        rolledBack = true;
       } catch (rollbackError) {
         console.error("Bolme geri alinamadi:", rollbackError.message);
       }
     }
+
     res.status(200).json({
       status: false,
-      message: "Siparis bolunemedi, degisiklikler geri alindi.",
+      step,
+      detail: err.message,
+      rolledBack,
+      message: rolledBack
+        ? `Bolme basarisiz (${step}). Degisiklikler geri alindi.`
+        : `Bolme basarisiz (${step}). DIKKAT: geri alma da basarisiz oldu, veriyi kontrol edin.`,
     });
   }
 });

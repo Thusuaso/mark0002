@@ -151,7 +151,17 @@
         </table>
       </div>
 
-      <div class="row mt-4">
+      <!-- Hata, toast kaybolduktan sonra da ekranda kalir -->
+      <div v-if="lastError" class="alert alert-danger mt-3">
+        <div v-for="(line, i) in lastError" :key="i">{{ line }}</div>
+      </div>
+
+      <div class="text-muted small mt-3">
+        A snapshot of this order, its products and the customer's finance table
+        is saved before dividing.
+      </div>
+
+      <div class="row mt-2">
         <div class="col">
           <Button
             type="button"
@@ -192,6 +202,7 @@ export default {
       loading: false,
       saving: false,
       loadError: "",
+      lastError: null,
       source: { siparisNo: "", gidenPo: "", kalanPo: "", amounts: [] },
       rows: [],
       amounts: {},
@@ -204,7 +215,7 @@ export default {
       this.rows.forEach((row) => {
         if (!this.rowValid(row)) {
           problems.push(
-            `${row.urun}: outgoing + remainder must equal ${row.miktar}.`
+            `${row.urun}: giden + kalan toplami ${row.miktar} olmali.`
           );
         }
       });
@@ -242,12 +253,13 @@ export default {
     async load() {
       const po = this.order && this.order.SiparisNo;
       if (!po) {
-        this.loadError = "Order number is missing.";
+        this.loadError = "Siparis numarasi bulunamadi.";
         return;
       }
 
       this.loading = true;
       this.loadError = "";
+      this.lastError = null;
       this.rows = [];
       this.amounts = {};
 
@@ -257,7 +269,8 @@ export default {
         );
 
         if (!response.data.status) {
-          this.loadError = response.data.message || "Order could not be loaded.";
+          this.loadError =
+            response.data.message || "Siparis bilgileri alinamadi.";
           return;
         }
 
@@ -278,7 +291,7 @@ export default {
         });
         this.amounts = amounts;
       } catch (err) {
-        this.loadError = "Order could not be loaded.";
+        this.loadError = `Siparis bilgileri alinamadi. Hata: ${err.message}`;
       } finally {
         this.loading = false;
       }
@@ -351,6 +364,7 @@ export default {
       if (this.productProblems.length > 0) return;
 
       this.saving = true;
+      this.lastError = null;
       try {
         const payload = {
           order: {
@@ -369,24 +383,40 @@ export default {
 
         if (response.data.status) {
           this.$toast.success(
-            `Divided: ${response.data.gidenPo} / ${response.data.kalanPo}`
+            `Bolundu: ${response.data.gidenPo} / ${response.data.kalanPo}`,
+            { duration: 6000 }
           );
           this.$emit("update:visible", false);
           this.$emit("done", response.data);
           return;
         }
 
-        const problems = response.data.problems || [];
-        this.$toast.error(
-          [response.data.message || "Order could not be divided."]
-            .concat(problems)
-            .join(" ")
-        );
+        // Sunucu hangi adimda patladigini (step) ve veritabaninin verdigi
+        // hatayi (detail) donuyor; ikisini de ekranda gosteriyoruz.
+        this.failed(response.data);
       } catch (err) {
-        this.$toast.error("Order could not be divided.");
+        // Istek hic ulasmadi ya da sunucu cevap vermedi.
+        this.failed({
+          message: "Sunucuya ulasilamadi, bolme yapilmadi.",
+          detail: err.message,
+        });
       } finally {
         this.saving = false;
       }
+    },
+
+    // Hatayi ekranda ve konsolda birlikte gosterir. Toast'u uzun tutuyoruz,
+    // kullanici ekran goruntusu alabilsin diye.
+    failed(data) {
+      const lines = [data.message || "Bolme basarisiz."];
+
+      if (data.detail) lines.push(`Hata: ${data.detail}`);
+      (data.problems || []).forEach((problem) => lines.push(problem));
+      lines.push(`Siparis: ${this.source.siparisNo}`);
+
+      this.lastError = lines;
+      this.$toast.error(lines.join(" — "), { duration: 15000 });
+      console.error("Divide basarisiz:", data);
     },
   },
 };
