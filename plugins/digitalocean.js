@@ -26,6 +26,22 @@ async function postJson(path, payload) {
 
   if (!res.ok) {
     console.error("Spaces API hatasi:", res.status);
+
+    // Bu istek $axios'tan geçmediği için interceptor'daki
+    // yetki bildirimi tetiklenmiyor, burada gösteriyoruz.
+    if (res.status === 401 || res.status === 403) {
+      let message = "Bu işlem için yetkiniz bulunmamaktadır.";
+      try {
+        const body = await res.json();
+        if (body && body.message) message = body.message;
+      } catch (e) {
+        // gövde okunamadı, varsayılan mesaj kullanılır
+      }
+      if (typeof window !== "undefined" && window.$nuxt && window.$nuxt.$toast) {
+        window.$nuxt.$toast.error(message);
+      }
+    }
+
     return null;
   }
   return res.json();

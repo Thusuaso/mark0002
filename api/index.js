@@ -114,18 +114,33 @@ function __noneNullControl(value) {
   return value;
 }
 app.use(cookieParser());
+
+// Silme/güncelleme yetkisi olmayan kullanıcılar
+const RESTRICTED_USER_IDS = [51, 59, 63, 64];
+
+// Yöntemi POST olmasına rağmen yıkıcı iş yapan uç noktalar.
+// Bunlar metot kontrolüne yakalanmadığı için ayrıca listelenir.
+const RESTRICTED_POST_PATHS = ["/spaces/delete"];
+
 app.use((req, res, next) => {
-  console.log();
-  // Sadece SİLME (DELETE) ve GÜNCELLEME (PUT, PATCH) isteklerini yakala
-  if (
-    req.method === "DELETE" ||
-    req.method === "PUT" ||
-    req.method === "PATCH"
-  ) {
+  // Sadece SİLME (DELETE), GÜNCELLEME (PUT, PATCH) ve
+  // yukarıda listelenen yıkıcı POST isteklerini yakala
+  const isWriteMethod =
+    req.method === "DELETE" || req.method === "PUT" || req.method === "PATCH";
+
+  const isRestrictedPost =
+    req.method === "POST" &&
+    RESTRICTED_POST_PATHS.some(
+      (p) => req.path === p || req.path.startsWith(p + "/")
+    );
+
+  if (isWriteMethod || isRestrictedPost) {
     // cookie-parser kullanılıyorsa
     const userId = req.cookies?.userId;
-    console.log(`İstek Yöntemi: ${req.method}, Kullanıcı ID: ${userId}`);
-    if (userId == 51 || userId == 63 || userId == 59) {
+    console.log(
+      `İstek Yöntemi: ${req.method} ${req.path}, Kullanıcı ID: ${userId}`
+    );
+    if (RESTRICTED_USER_IDS.includes(parseInt(userId, 10))) {
       // İşlemi burada kes ve Frontend'e hata döndür
       return res.status(403).json({
         status: false,
@@ -134,7 +149,7 @@ app.use((req, res, next) => {
     }
   }
 
-  // İstek SİLME değilse veya ID 51 değilse, asıl işleme sorunsuz devam etmesini sağla
+  // Kullanıcı kısıtlı değilse asıl işleme sorunsuz devam etmesini sağla
   next();
 });
 app.use((req, res, next) => {

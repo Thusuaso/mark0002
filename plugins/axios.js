@@ -24,6 +24,13 @@ export default function ({ $axios, app }) {
     const code = parseInt(error.response && error.response.status);
     if (code === 401 || code === 403) {
       console.warn("Yetkisiz işlem veya token süresi doldu!");
+
+      if (process.client && app.$toast) {
+        const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          "Bu işlem için yetkiniz bulunmamaktadır.";
+        app.$toast.error(message);
+      }
     }
   });
 }
