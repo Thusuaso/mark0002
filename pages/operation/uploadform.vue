@@ -2,7 +2,10 @@
   <div class="container">
     <div class="row">
       <div class="col">
-        <uploadForm :orders="getOrdersAllList" />
+        <uploadForm
+          :orders="getOrdersAllList"
+          :preselectedPo="$route.query.po || null"
+        />
       </div>
       <div class="col">
         <uploadList

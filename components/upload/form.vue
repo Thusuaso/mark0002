@@ -8,10 +8,14 @@
         :suggestions="filteredOrders"
         @complete="searchOrders($event)"
         field="SiparisNo"
-        @item-select="$store.dispatch('setDocumentList', $event.value.SiparisNo)"
+        @item-select="orderSelected($event.value.SiparisNo)"
       />
       <label for="order">Po</label>
     </span>
+    <uploadMissingPanel
+      ref="missingPanel"
+      :po="selectedOrder ? selectedOrder.SiparisNo : null"
+    />
     <FileUpload
       mode="advanced"
       accept=".pdf"
@@ -35,16 +39,60 @@ export default {
       type: Array,
       required: true,
     },
+    // Navbar'daki eksik evrak listesinden gelen PO (?po=...)
+    preselectedPo: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
       selectedOrder: null,
       filteredOrders: null,
       folderProductInfo: {},
+      pendingSaves: [],
     };
   },
+  watch: {
+    // Siparis listesi layout'tan asenkron geldigi icin beklenir
+    orders: {
+      immediate: true,
+      handler() {
+        this.applyPreselectedPo();
+      },
+    },
+    preselectedPo() {
+      this.applyPreselectedPo();
+    },
+  },
   methods: {
+    applyPreselectedPo() {
+      if (!this.preselectedPo) {
+        return;
+      }
+      // Sayfa acikken sidebar'dan baska bir PO secilebilir; bu yuzden
+      // yalnizca ayni PO tekrar gelirse atlanir.
+      if (
+        this.selectedOrder &&
+        this.selectedOrder.SiparisNo == this.preselectedPo
+      ) {
+        return;
+      }
+      const order = this.orders.find(
+        (x) => x.SiparisNo == this.preselectedPo
+      );
+      if (!order) {
+        return;
+      }
+      this.selectedOrder = order;
+      this.orderSelected(order.SiparisNo);
+    },
+    orderSelected(po) {
+      this.$store.dispatch("setDocumentList", po);
+    },
     onUpload(event) {
+      this.pendingSaves = [];
       for (const item of event.files) {
 
         if (item.name == "Purchase Order.pdf") {
@@ -366,7 +414,12 @@ export default {
 
 
       };
-      this.$store.dispatch("setDocumentList", this.selectedOrder.SiparisNo);
+      const po = this.selectedOrder.SiparisNo;
+      Promise.all(this.pendingSaves).then(() => {
+        this.pendingSaves = [];
+        this.$store.dispatch("setDocumentList", po);
+        this.$refs.missingPanel.refresh();
+      });
       this.$toast.success("Kayıt Başarılı.");
     },
     searchOrders(event) {
@@ -388,7 +441,10 @@ export default {
       });
     },
     sendDatabase(event) {
-      this.$store.dispatch("setSendDatabaseInvoice", event);
+      // Eksik evrak uyarisi ancak kayitlar dustukten sonra tazelenebilir
+      this.pendingSaves.push(
+        this.$store.dispatch("setSendDatabaseInvoice", event)
+      );
     },
   },
 };

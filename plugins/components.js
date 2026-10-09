@@ -371,6 +371,13 @@ import Sidebar from "primevue/sidebar";
 import Chips from "primevue/chips";
 import InputSwitch from "primevue/inputswitch";
 import SelectButton from "primevue/selectbutton";
+import Badge from "primevue/badge";
+import BadgeDirective from "primevue/badgedirective";
+
+// v-badge direktifi kayitli degildi, bu yuzden navbar'daki bildirim
+// sayilari gorunmuyordu.
+Vue.component("Badge", Badge);
+Vue.directive("badge", BadgeDirective);
 
 Vue.component("InputSwitch", InputSwitch);
 Vue.component("SelectButton", SelectButton);

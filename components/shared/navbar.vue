@@ -624,6 +624,24 @@
               @deleteProcess="deleteProcess($event)"
             />
           </Dialog>
+          <i
+            v-badge.danger="parseInt(getMissingDocumentOrderCount)"
+            class="pi pi-file-excel ml-4"
+            style="font-size: 2rem; cursor: pointer"
+            title="Eksik Yükleme Evrakları"
+            @click="missingDocumentOpen"
+          />
+          <Sidebar
+            :visible.sync="missing_document_visible"
+            header="Eksik Yükleme Evrakları"
+            position="right"
+            class="w-50 md:w-20rem lg:w-30rem"
+          >
+            <uploadMissingList
+              :list="getMissingDocumentList"
+              @missing_document_selected_emit="missingDocumentSelected($event)"
+            />
+          </Sidebar>
         </div>
       </div>
     </nav>
@@ -876,6 +894,8 @@ export default {
       "isAuthenticated",
       "getUserId",
       "getAyoStatus",
+      "getMissingDocumentList",
+      "getMissingDocumentOrderCount",
     ]),
     isLoggedIn() {
       const storeAuth =
@@ -891,6 +911,7 @@ export default {
     return {
       userId: Cookies.get("userId") || null,
       visibleRight: false,
+      missing_document_visible: false,
       to_do_form: false,
       model: {},
       items: [],
@@ -901,6 +922,7 @@ export default {
     this.userId = Cookies.get("userId") || null;
     if (this.isLoggedIn) {
       this.$store.dispatch("setToDoListByUsername", Cookies.get("username"));
+      this.$store.dispatch("setMissingDocumentOrderCount");
     }
   },
   mounted() {
@@ -908,6 +930,21 @@ export default {
   },
 
   methods: {
+    // Liste sadece panel acildiginda cekilir; badge icin hafif count kullanilir
+    missingDocumentOpen() {
+      this.$store.dispatch("setMissingDocumentList");
+      this.missing_document_visible = true;
+    },
+    missingDocumentSelected(event) {
+      this.missing_document_visible = false;
+      // Ayni PO'ya tekrar tiklanirsa router "duplicated" hatasi atar
+      this.$router
+        .push({
+          path: "/operation/uploadform",
+          query: { po: event.SiparisNo },
+        })
+        .catch(() => {});
+    },
     async logout() {
       if (confirm("Are you sure you want to log out?")) {
         Cookies.remove("mail");

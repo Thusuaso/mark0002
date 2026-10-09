@@ -3,6 +3,8 @@ const state = {
     documentModelList:[],
     documentSupplierList:[],
     documentProductSupplierList:[],
+    missingDocumentList:[],
+    missingDocumentOrderCount:0
 };
 const actions = {
     setDocumentList(vuexContext,po){
@@ -19,7 +21,7 @@ const actions = {
     },
 
     setSendDatabaseInvoice(vuexContext,data){
-        this.$axios.post('/upload/file',data)
+        return this.$axios.post('/upload/file',data)
         .then(response=>{
             if(response.data.status){
                 
@@ -47,6 +49,27 @@ const actions = {
                 this.$toast.error('Error');
             }
         });
+    },
+    // Sevk edilmis siparislerde eksik kalan zorunlu evraklar (son 90 gun)
+    setMissingDocumentList(vuexContext){
+        this.$axios.get('/upload/document/missing/list')
+        .then(response=>{
+            vuexContext.commit('setMissingDocumentList',response.data.list);
+            vuexContext.commit('setMissingDocumentOrderCount',response.data.list.length);
+        })
+        .catch(()=>{
+            vuexContext.commit('setMissingDocumentList',[]);
+            vuexContext.commit('setMissingDocumentOrderCount',0);
+        });
+    },
+    setMissingDocumentOrderCount(vuexContext){
+        this.$axios.get('/upload/document/missing/count')
+        .then(response=>{
+            vuexContext.commit('setMissingDocumentOrderCount',response.data.order);
+        })
+        .catch(()=>{
+            vuexContext.commit('setMissingDocumentOrderCount',0);
+        });
     }
 };
 const mutations = {
@@ -59,8 +82,13 @@ const mutations = {
     },
     setDocumentProductSupplierList(state,payload){
         state.documentProductSupplierList = payload;
+    },
+    setMissingDocumentList(state,payload){
+        state.missingDocumentList = payload;
+    },
+    setMissingDocumentOrderCount(state,payload){
+        state.missingDocumentOrderCount = payload;
     }
-
 };
 const getters = {
 
@@ -72,8 +100,13 @@ const getters = {
     },
     getDocumentProductSupplierList(state){
         return state.documentProductSupplierList;
+    },
+    getMissingDocumentList(state){
+        return state.missingDocumentList;
+    },
+    getMissingDocumentOrderCount(state){
+        return state.missingDocumentOrderCount;
     }
-
 };
 export default {
     state,

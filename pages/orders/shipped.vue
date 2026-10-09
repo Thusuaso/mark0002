@@ -39,6 +39,7 @@
       :closeOnEscape="false"
       :closable="false"
     >
+      <uploadMissingPanel :po="productionModel.SiparisNo || null" />
       <orderDetailForm
         :modelProduction="productionModel"
         :modelProduct="getOrderProductModel"

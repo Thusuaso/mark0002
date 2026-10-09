@@ -57,6 +57,11 @@
         </div>
       </div>
     </div>
+    <div class="row mb-4" v-if="selectedOrder">
+      <div class="col">
+        <uploadMissingPanel :po="selectedOrder.SiparisNo" />
+      </div>
+    </div>
     <div class="row mb-4">
       <div class="col-3">
         <Dropdown

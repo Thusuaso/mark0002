@@ -2672,6 +2672,193 @@ app.post("/upload/file", async (req, res) => {
   }
 });
 
+/*Eksik Zorunlu Yukleme Evraklari Bildirimi*/
+const MISSING_DOC_DEFAULT_DAY = 90;
+/* Bildirim iki migration'a dayanir, her ikisi de bir kez calistirilir:
+     api/sql/YeniYuklemeEvraklarTB_Zorunlu.sql  -> Zorunlu kolonu (yedek kume)
+     api/sql/YuklemeEvrakTeslimTurTB.sql        -> teslim turu basina kume
+   Biri eksikse bildirim sessizce bos doner, uygulama hata vermez. */
+let missingDocColumnReady = null;
+async function missingDocColumnExists() {
+  if (missingDocColumnReady !== null) {
+    return missingDocColumnReady;
+  }
+  try {
+    const check = await mssql.query(`
+      select
+        (select count(*) from sys.columns
+          where object_id = object_id(N'[dbo].[YeniYuklemeEvraklarTB]')
+            and name = N'Zorunlu') as kolon,
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[YuklemeEvrakTeslimTurTB]')
+            and type = N'U') as tablo
+    `);
+    const row = check.recordset[0];
+    missingDocColumnReady = row.kolon > 0 && row.tablo > 0;
+  } catch (err) {
+    missingDocColumnReady = false;
+  }
+  return missingDocColumnReady;
+}
+/* Ic Piyasa musterileri ihracat evraki uretmedigi icin bildirim kapsami
+   disindadir. Kullanan her sorgu @icPiyasa parametresini tanimlamak
+   zorundadir (MusterilerTB m alias'i ile). */
+const MISSING_DOC_SCOPE_CLAUSE = `isnull(ltrim(rtrim(m.Marketing)), '') <> @icPiyasa`;
+const MISSING_DOC_DOMESTIC = "İç Piyasa";
+/* Bir evragin ilgili siparis icin zorunlu olup olmadigini belirler.
+   Teslim turu icin eslesme tablosunda satir varsa yalnizca o kume gecerlidir;
+   yoksa YeniYuklemeEvraklarTB.Zorunlu yedege dusulur. */
+const MISSING_DOC_REQUIRED_CLAUSE = `
+      (
+        exists (
+          select 1 from YuklemeEvrakTeslimTurTB z
+          where z.TeslimTurID = s.TeslimTurID
+            and z.YuklemeEvrakID = try_cast(ltrim(rtrim(e.ID)) as int)
+        )
+        or (
+          e.Zorunlu = 1
+          and not exists (
+            select 1 from YuklemeEvrakTeslimTurTB z
+            where z.TeslimTurID = s.TeslimTurID
+          )
+        )
+      )`;
+function missingDocDay(value) {
+  const day = parseInt(value);
+  if (!day || day < 1) {
+    return MISSING_DOC_DEFAULT_DAY;
+  }
+  return day > 3650 ? 3650 : day;
+}
+/* Sevk edilmis siparislerde eksik kalan zorunlu evraklari PO bazinda gruplar.
+   YeniYuklemeEvraklarTB.ID nchar oldugu icin her karsilastirmada trim edilir. */
+async function missingDocumentOrders(day) {
+  const request = new mssql.Request();
+  request.input("gun", mssql.Int, day);
+  request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+  const result = await request.query(`
+    select
+      s.SiparisNo,
+      m.FirmaAdi as MusteriAdi,
+      s.YuklemeTarihi,
+      (select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as Sorumlu,
+      isnull(t.Aciklama, t.TeslimTur) as TeslimTur,
+      try_cast(ltrim(rtrim(e.ID)) as int) as EvrakID,
+      e.EvrakAdi
+    from SiparislerTB s
+    join MusterilerTB m on m.ID = s.MusteriID
+    left join SiparisTeslimTurTB t on t.ID = s.TeslimTurID
+    cross join YeniYuklemeEvraklarTB e
+    where s.SiparisDurumID = 3
+      and s.YuklemeTarihi >= dateadd(day, -@gun, cast(getdate() as date))
+      and ${MISSING_DOC_SCOPE_CLAUSE}
+      and ${MISSING_DOC_REQUIRED_CLAUSE}
+      and not exists (
+        select 1 from SiparisFaturaKayitTB f
+        where f.SiparisNo = s.SiparisNo
+          and f.YuklemeEvrakID = try_cast(ltrim(rtrim(e.ID)) as int)
+      )
+    order by s.YuklemeTarihi desc, s.SiparisNo, try_cast(ltrim(rtrim(e.ID)) as int)
+  `);
+  const orders = [];
+  for (const row of result.recordset) {
+    let order = orders.find((x) => x.SiparisNo === row.SiparisNo);
+    if (!order) {
+      order = {
+        SiparisNo: row.SiparisNo,
+        MusteriAdi: row.MusteriAdi,
+        YuklemeTarihi: row.YuklemeTarihi,
+        Sorumlu: row.Sorumlu,
+        TeslimTur: row.TeslimTur,
+        EksikEvraklar: [],
+        EksikSayi: 0,
+      };
+      orders.push(order);
+    }
+    order.EksikEvraklar.push({ ID: row.EvrakID, EvrakAdi: row.EvrakAdi });
+    order.EksikSayi = order.EksikEvraklar.length;
+  }
+  return orders;
+}
+app.get("/upload/document/missing/list", async (req, res) => {
+  try {
+    if (!(await missingDocColumnExists())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const list = await missingDocumentOrders(missingDocDay(req.query.gun));
+    res.status(200).json({ list: list, ready: true });
+  } catch (err) {
+    console.error("eksik evrak listesi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+app.get("/upload/document/missing/count", async (req, res) => {
+  try {
+    if (!(await missingDocColumnExists())) {
+      return res.status(200).json({ order: 0, document: 0, ready: false });
+    }
+    const list = await missingDocumentOrders(missingDocDay(req.query.gun));
+    res.status(200).json({
+      order: list.length,
+      document: list.reduce((total, x) => total + x.EksikSayi, 0),
+      ready: true,
+    });
+  } catch (err) {
+    console.error("eksik evrak sayisi hatasi:", err.message);
+    res.status(500).json({ order: 0, document: 0, ready: false });
+  }
+});
+/* Shipment Form'da PO secildiginde gosterilen uyari. Tarih penceresi ve
+   siparis durumu aranmaz; secilen PO ne olursa olsun kontrol edilir. */
+app.get("/upload/document/missing/:po", async (req, res) => {
+  try {
+    if (!(await missingDocColumnExists())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const request = new mssql.Request();
+    request.input("po", mssql.VarChar, req.params.po);
+    request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+    /* Kapsam disi PO'da uyari hic gosterilmez; aksi halde Ic Piyasa
+       siparislerinde yanlislikla "tamami yuklenmis" yazardi. */
+    const scope = await request.query(`
+      select case when exists (
+        select 1 from SiparislerTB s
+        join MusterilerTB m on m.ID = s.MusteriID
+        where s.SiparisNo = @po
+          and ${MISSING_DOC_SCOPE_CLAUSE}
+      ) then 0 else 1 end as kapsamDisi
+    `);
+    if (scope.recordset[0].kapsamDisi) {
+      return res
+        .status(200)
+        .json({ list: [], ready: true, kapsamDisi: true });
+    }
+    const result = await request.query(`
+      select
+        try_cast(ltrim(rtrim(e.ID)) as int) as ID,
+        e.EvrakAdi
+      from SiparislerTB s
+      join MusterilerTB m on m.ID = s.MusteriID
+      cross join YeniYuklemeEvraklarTB e
+      where s.SiparisNo = @po
+        and ${MISSING_DOC_SCOPE_CLAUSE}
+        and ${MISSING_DOC_REQUIRED_CLAUSE}
+        and not exists (
+          select 1 from SiparisFaturaKayitTB f
+          where f.SiparisNo = s.SiparisNo
+            and f.YuklemeEvrakID = try_cast(ltrim(rtrim(e.ID)) as int)
+        )
+      order by try_cast(ltrim(rtrim(e.ID)) as int)
+    `);
+    res
+      .status(200)
+      .json({ list: result.recordset, ready: true, kapsamDisi: false });
+  } catch (err) {
+    console.error("eksik evrak po hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+
 /*Container*/
 app.get("/container/follow/list", (req, res) => {
   const sql = `
