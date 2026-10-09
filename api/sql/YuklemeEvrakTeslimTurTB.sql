@@ -49,7 +49,7 @@ end
 go
 
 /* --------------------------------------------------------------------------
-   EXW (TeslimTurID = 5) - zorunlu kumenin tamami (17 evrak)
+   EXW (TeslimTurID = 5) - zorunlu kumenin tamami (14 evrak)
    --------------------------------------------------------------------------
    Bu blok DECLARATIF'tir: asagidaki liste EXW'nin kumesinin tamamidir,
    listede olmayan EXW satirlari silinir. Baska teslim turlerinin satirlarina
@@ -62,8 +62,8 @@ go
 
 declare @exwKume table ([YuklemeEvrakID] int primary key);
 insert into @exwKume ([YuklemeEvrakID])
-values (4), (5), (7), (9), (10), (12), (13), (14),
-       (16), (17), (20), (50), (71), (72), (73), (74), (76);
+values (5), (7), (9), (10), (12), (13), (16), (17),
+       (20), (50), (72), (73), (74), (76);
 
 delete z
   from [dbo].[YuklemeEvrakTeslimTurTB] z
