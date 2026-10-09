@@ -228,7 +228,11 @@ export default {
           this.sendDatabase(this.folderProductInfo);
         }
 
-        else if (item.name == "ATR.pdf"  || item.name == "atr.pdf") {
+        else if (
+          item.name == "ATR.pdf" ||
+          item.name == "atr.pdf" ||
+          item.name == "ATR (Dolaşım Belgesi).pdf"
+        ) {
           this.folderProductInfo = {
           id: 0,
           siparisno: "",
@@ -392,6 +396,32 @@ export default {
           tarih: date.dateToString(new Date()),
         };
           this.folderProductInfo.id = 76;
+          this.folderProductInfo.siparisno = this.selectedOrder.SiparisNo;
+          this.folderProductInfo.kullaniciId = Cookies.get("userId");
+          this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
+          this.sendDatabase(this.folderProductInfo);
+        }
+        else if (item.name == "Telex Release.pdf") {
+          this.folderProductInfo = {
+          id: 0,
+          siparisno: "",
+          kullaniciId: "",
+          tarih: date.dateToString(new Date()),
+        };
+          this.folderProductInfo.id = 78;
+          this.folderProductInfo.siparisno = this.selectedOrder.SiparisNo;
+          this.folderProductInfo.kullaniciId = Cookies.get("userId");
+          this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);
+          this.sendDatabase(this.folderProductInfo);
+        }
+        else if (item.name == "Türkçe Fatura.pdf") {
+          this.folderProductInfo = {
+          id: 0,
+          siparisno: "",
+          kullaniciId: "",
+          tarih: date.dateToString(new Date()),
+        };
+          this.folderProductInfo.id = 79;
           this.folderProductInfo.siparisno = this.selectedOrder.SiparisNo;
           this.folderProductInfo.kullaniciId = Cookies.get("userId");
           this.sendServer(item, this.folderProductInfo.id, this.selectedOrder.SiparisNo);

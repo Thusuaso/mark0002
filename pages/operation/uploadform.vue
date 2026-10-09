@@ -54,8 +54,16 @@ export default {
         this.document_link = `https://file-service.mekmar.com/file/download/77/${po}`;
         this.document_form = true;
       };
-      if(event.EvrakAdi == 'ATR'){
+      if(event.EvrakAdi == 'ATR' || event.EvrakAdi == 'ATR (Dolaşım Belgesi)'){
         this.document_link = `https://file-service.mekmar.com/file/download/75/${po}`;
+        this.document_form = true;
+      };
+      if(event.EvrakAdi == 'Telex Release'){
+        this.document_link = `https://file-service.mekmar.com/file/download/78/${po}`;
+        this.document_form = true;
+      };
+      if(event.EvrakAdi == 'Türkçe Fatura'){
+        this.document_link = `https://file-service.mekmar.com/file/download/79/${po}`;
         this.document_form = true;
       };
       if(event.EvrakAdi == 'Certificate of Origin'){
@@ -98,10 +106,6 @@ export default {
       };
       if(event.EvrakAdi == 'İlaçlama Belgesi'){
         this.document_link = `https://file-service.mekmar.com/file/download/10/${po}`;
-        this.document_form = true;
-      };
-      if(event.EvrakAdi == 'Dolaşım Belgeleri (Eski)'){
-        this.document_link = `https://file-service.mekmar.com/file/download/11/${po}`;
         this.document_form = true;
       };
       if(event.EvrakAdi == 'Gçb Beyannamesi'){

@@ -2605,8 +2605,19 @@ function documentColor(po, doc, cb) {
     cb(err, docModel);
   });
 }
+/* Shipment Form (uploadform) listesinde gosterilmeyen evraklar.
+   Yalnizca yukleme ekranini etkiler; siparis detayindaki Document sekmesi
+   eski kayitlari gosterebilmek icin bu filtreyi kullanmaz.
+     11  Dolasim Belgeleri (Eski)  -> yerine 75 ATR (Dolasim Belgesi) */
+const UPLOAD_FORM_HIDDEN_DOCS = [11];
+const UPLOAD_FORM_DOC_SQL = `
+  select ID, EvrakAdi
+    from YeniYuklemeEvraklarTB
+   where try_cast(ltrim(rtrim(ID)) as int) not in (${UPLOAD_FORM_HIDDEN_DOCS.join(", ")})
+      or try_cast(ltrim(rtrim(ID)) as int) is null
+`;
 app.get("/upload/document/:po", (req, res) => {
-  const sql = "select ID,EvrakAdi from YeniYuklemeEvraklarTB";
+  const sql = UPLOAD_FORM_DOC_SQL;
   mssql.query(sql).then((documentsModel) => {
     documentColor(
       req.params.po,
@@ -2620,7 +2631,7 @@ app.get("/upload/document/:po", (req, res) => {
   });
 });
 app.get("/upload/model", (req, res) => {
-  const sql = "select ID,EvrakAdi from YeniYuklemeEvraklarTB";
+  const sql = UPLOAD_FORM_DOC_SQL;
   mssql.query(sql).then((model) => {
     const modelData = [];
     model.recordset.forEach((x) => {
@@ -2708,8 +2719,23 @@ const MISSING_DOC_DOMESTIC = "İç Piyasa";
 /* Bir evragin ilgili siparis icin zorunlu olup olmadigini belirler.
    Teslim turu icin eslesme tablosunda satir varsa yalnizca o kume gecerlidir;
    yoksa YeniYuklemeEvraklarTB.Zorunlu yedege dusulur. */
+/* Bildirim kapsami disinda tutulan evraklar. Kume tablolarindan bagimsiz
+   KESIN dislamadir: bu evraklar icin hicbir teslim turunde eksik uyarisi
+   uretilmez (navbar sayaci, sidebar listesi, Shipment Form uyarisi,
+   Shipped PO detayi). Shipment Form listesinde gri olarak gorunmeye ve
+   yuklenebilmeye devam ederler.
+      4  Ceki Listesi            14  Packing Declarition
+      8  ISF vb Formlar          30  Tedarikci Faturalari
+     71  Ilaclama Notasi
+   Kalici cozum icin api/sql/YeniYuklemeEvraklarTB_Zorunlu.sql ve
+   api/sql/YuklemeEvrakTeslimTurTB.sql de ayni kumeyi dislar; bu liste
+   script'ler calistirilmasa da davranisi garanti eder. */
+const MISSING_DOC_EXCLUDED_DOCS = [4, 8, 14, 30, 71];
 const MISSING_DOC_REQUIRED_CLAUSE = `
-      (
+      try_cast(ltrim(rtrim(e.ID)) as int) not in (${MISSING_DOC_EXCLUDED_DOCS.join(
+        ", "
+      )})
+      and (
         exists (
           select 1 from YuklemeEvrakTeslimTurTB z
           where z.TeslimTurID = s.TeslimTurID
@@ -13517,7 +13543,15 @@ app.get("/order/production/product/document/:po", async (req, res) => {
       }
       if (x.YuklemeEvrakID == 75) {
         x.Link = `https://file-service.mekmar.com/file/download/75/${x.SiparisNo}`;
-        x.Evrak = "ATR";
+        x.Evrak = "ATR (Dolaşım Belgesi)";
+      }
+      if (x.YuklemeEvrakID == 78) {
+        x.Link = `https://file-service.mekmar.com/file/download/78/${x.SiparisNo}`;
+        x.Evrak = "Telex Release";
+      }
+      if (x.YuklemeEvrakID == 79) {
+        x.Link = `https://file-service.mekmar.com/file/download/79/${x.SiparisNo}`;
+        x.Evrak = "Türkçe Fatura";
       }
       if (x.YuklemeEvrakID == 76) {
         x.Link = `https://file-service.mekmar.com/file/download/76/${x.SiparisNo}`;
