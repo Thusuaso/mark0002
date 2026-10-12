@@ -3,6 +3,7 @@ const state = {
     containerUnollowList:[],
     containerResults : null,
     containerInputList:[],
+    containerAgencyList:[],
 };
 const actions = {
     setContainerFollowList(vuexContext) {
@@ -32,6 +33,15 @@ const actions = {
             } else{
                 this.$toast.error('Kaydetme Başarışız.');
             }
+        });
+    },
+    setContainerAgencyList(vuexContext) {
+        this.$axios.get('/container/agency/list')
+        .then(response=>{
+            vuexContext.commit('setContainerAgencyList', response.data.list);
+        })
+        .catch(()=>{
+            vuexContext.commit('setContainerAgencyList', []);
         });
     },
     setContainerInputSave(vuexContext,container){
@@ -76,6 +86,9 @@ const mutations = {
     },
     setContainerInputList(state,containerList){
         state.containerInputList = containerList;
+    },
+    setContainerAgencyList(state,containerAgencyList){
+        state.containerAgencyList = containerAgencyList;
     }
 };
 const getters = {
@@ -90,6 +103,9 @@ const getters = {
     },
     getContainerInputList(state){
         return state.containerInputList;
+    },
+    getContainerAgencyList(state){
+        return state.containerAgencyList;
     }
 };
 

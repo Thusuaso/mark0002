@@ -45,9 +45,12 @@
           />
         </template>
       </Column>
+      <!-- Liste sunucudan yukleme tarihine gore (yeniden eskiye) gelir;
+           baslik tiklanarak yon degistirilebilir. -->
       <Column
         field="YuklemeTarihi"
         header="Shipment Date"
+        :sortable="true"
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
@@ -122,6 +125,38 @@
         headerClass="tableHeader"
         bodyClass="tableBody"
       ></Column>
+      <!-- Yuklemenin yapildigi acente. Takip adresi varsa konteyner
+           numarasiyla birlikte yeni sekmede acilan link gosterilir. -->
+      <Column
+        field="AcenteAdi"
+        header="Agency"
+        :showFilterMenu="false"
+        :showClearButton="false"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          <a
+            v-if="slotProps.data.TakipLinki"
+            :href="slotProps.data.TakipLinki"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click.stop
+          >
+            {{ slotProps.data.AcenteAdi }}
+            <i class="pi pi-external-link" style="font-size: 0.7rem"></i>
+          </a>
+          <span v-else>{{ slotProps.data.AcenteAdi || "-" }}</span>
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            type="text"
+            v-model="filterModel.value"
+            @input="filterCallback()"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
       <Column
         field="Sorumlu"
         header="Seller"
@@ -160,6 +195,7 @@ export default {
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         KonteynerNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Sorumlu: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        AcenteAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       selectedFollow: null,
     };

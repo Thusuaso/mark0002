@@ -24,6 +24,8 @@ export default {
   },
   created() {
     this.$store.dispatch("setContainerFollowList");
+    // Agency dropdown'i ve listedeki takip linki icin acente listesi.
+    this.$store.dispatch("setContainerAgencyList");
   },
   methods: {
     followSelectedDialogEmit(event) {

@@ -2886,8 +2886,108 @@ app.get("/upload/document/missing/:po", async (req, res) => {
 });
 
 /*Container*/
-app.get("/container/follow/list", (req, res) => {
-  const sql = `
+/* --------------------------------------------------------------------------
+   Container Follow
+   --------------------------------------------------------------------------
+   Liste, son FOLLOW_WINDOW_DAY gun icinde yuklenmis sevk edilmis siparisleri
+   gosterir. Takip kolonu bit ve varsayilani NULL oldugu icin eskiden
+   "Takip = 1" filtresi kullaniliyordu; yeni siparisler NULL geldiginden ne
+   Follow ne de Unfollow listesinde gorunuyordu. Artik NULL "takip ediliyor"
+   sayilir, yalnizca ekranda bilinli olarak Unfollow isaretlenenler (Takip = 0)
+   listeden duser.
+   -------------------------------------------------------------------------- */
+const FOLLOW_WINDOW_DAY = 120;
+/* Marketing alani "Ic Piyasa" olan musteriler konteyner ile ihracat
+   yapmadigi icin takip listelerinde ve hatirlatma maillerinde yer almaz.
+   Kural ve metin eksik evrak bildirimiyle ayni; tek yerden gelsin diye
+   MISSING_DOC_DOMESTIC yeniden kullanilir. Kullanan her sorgu @icPiyasa
+   parametresini tanimlamak ve MusterilerTB'yi m alias'i ile baglamak
+   zorundadir. */
+const FOLLOW_SCOPE_SQL = `isnull(ltrim(rtrim(m.Marketing)), '') <> @icPiyasa`;
+/* Acente alani ve hatirlatma kaydi api/sql/AcenteTB.sql ile olusur. Script
+   calistirilmadiysa liste acente kolonlari bos donmeli, uygulama patlamamali. */
+let acenteTakipReadyCache = null;
+async function acenteTakipReady() {
+  if (acenteTakipReadyCache !== null) {
+    return acenteTakipReadyCache;
+  }
+  try {
+    const check = await mssql.query(`
+      select
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[AcenteTB]')
+            and type = N'U') as acenteTablo,
+        (select count(*) from sys.columns
+          where object_id = object_id(N'[dbo].[SiparislerTB]')
+            and name = N'AcenteID') as acenteKolon,
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[SiparisEtaHatirlatmaTB]')
+            and type = N'U') as hatirlatmaTablo
+    `);
+    const row = check.recordset[0];
+    acenteTakipReadyCache =
+      row.acenteTablo > 0 && row.acenteKolon > 0 && row.hatirlatmaTablo > 0;
+  } catch (err) {
+    acenteTakipReadyCache = false;
+  }
+  return acenteTakipReadyCache;
+}
+/* Takip adresindeki {KONTEYNER} yer tutucusunu doldurur. Yer tutucu yoksa
+   adres oldugu gibi kullanilir (acentenin genel sorgulama sayfasi). */
+function acenteTakipLinki(url, konteynerNo) {
+  if (!url) {
+    return null;
+  }
+  const no = safe(konteynerNo).trim();
+  if (url.indexOf("{KONTEYNER}") === -1) {
+    return url;
+  }
+  if (!no) {
+    return null;
+  }
+  return url.split("{KONTEYNER}").join(encodeURIComponent(no));
+}
+/* Eta kolonunda girilmemis kayitlar NULL yerine 1900-01-01 tutuluyor
+   (eski formlardan kalma yer tutucu). Son 120 gundeki 72 siparisin 71i
+   bu degerde. Tarih sayilirsa siralama bozulur ve "varisa 0 gun" gibi
+   yanlis bilgi cikar; bu yuzden her yerde bos kabul edilir. */
+const ETA_PLACEHOLDER = "1900-01-01";
+const ETA_VALID_SQL = `s.Eta is not null and s.Eta <> '${ETA_PLACEHOLDER}'`;
+function etaGecerli(eta) {
+  if (eta == null) {
+    return false;
+  }
+  const d = new Date(eta);
+  return !isNaN(d.getTime()) && d.getUTCFullYear() > 1900;
+}
+/* Mailde gosterilen gun/ay/yil bicimi. */
+function etaTarihYazisi(eta) {
+  if (eta == null) {
+    return "";
+  }
+  const d = new Date(eta);
+  if (isNaN(d.getTime())) {
+    return "";
+  }
+  const iki = (n) => (n < 10 ? "0" + n : String(n));
+  return `${iki(d.getDate())}.${iki(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+/* Eta'ya kalan gun. Eta 'date' kolonu oldugu icin saat farkinin bir gun
+   kaydirmamasi adina iki taraf da gun basina yuvarlanir. */
+function etaKalanGun(eta) {
+  if (!etaGecerli(eta)) {
+    return null;
+  }
+  const hedef = new Date(eta);
+  const bugun = new Date();
+  const a = Date.UTC(hedef.getFullYear(), hedef.getMonth(), hedef.getDate());
+  const b = Date.UTC(bugun.getFullYear(), bugun.getMonth(), bugun.getDate());
+  return Math.round((a - b) / 86400000);
+}
+/* Follow ve Unfollow listeleri ayni kolonlari dondurur (ayni Vue bileseni
+   kullanilir); yalnizca Takip kosulu ve tarih penceresi degisir. */
+function followListSql(acenteVar, takipKosulu, pencereVar) {
+  return `
                 select
                 s.ID,
                 s.SiparisNo,
@@ -2903,36 +3003,76 @@ app.get("/container/follow/list", (req, res) => {
                 s.KonsimentoDurum,
                 s.AktarmaLimanAdi,
                 s.Line,
-                s.Takip
-                from
-                SiparislerTB s,MusterilerTB m
-                where s.MusteriID=m.ID
-                and s.SiparisDurumID=3 and s.Takip=1
-                order by s.ID desc
+                s.Takip,
+                ${
+                  acenteVar
+                    ? "s.AcenteID, a.AcenteAdi, a.TakipUrl"
+                    : "null as AcenteID, null as AcenteAdi, null as TakipUrl"
+                }
+                from SiparislerTB s
+                join MusterilerTB m on m.ID = s.MusteriID
+                ${acenteVar ? "left join AcenteTB a on a.ID = s.AcenteID" : ""}
+                where s.SiparisDurumID = 3
+                and ${takipKosulu}
+                and ${FOLLOW_SCOPE_SQL}
+                ${
+                  pencereVar
+                    ? "and s.YuklemeTarihi >= dateadd(day, -@gun, cast(getdate() as date))"
+                    : ""
+                }
+                order by
+                  s.YuklemeTarihi desc,
+                  s.ID desc
               `;
-  mssql.query(sql).then((response) => {
+}
+app.get("/container/follow/list", async (req, res) => {
+  try {
+    const acenteVar = await acenteTakipReady();
+    const request = new mssql.Request();
+    request.input("gun", mssql.Int, FOLLOW_WINDOW_DAY);
+    request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+    const response = await request.query(
+      followListSql(acenteVar, "isnull(s.Takip, 1) = 1", true)
+    );
     const data = response.recordset;
     data.forEach((x) => {
-      if (x.Eta == null) {
-        x.Kalan = 0;
-      } else {
-        const today = new Date();
-        const date = new Date(x.Eta);
-        const reminderDate = Math.round((date - today) / 86400000);
-        if (reminderDate < 0) {
-          x.Kalan = 0;
-        } else {
-          x.Kalan = reminderDate;
-        }
+      /* Yer tutucu tarih istemciye hic gitmesin: liste bos hucre, form bos
+         takvim gosterir ve kayit sirasinda NULL olarak guncellenir. */
+      if (!etaGecerli(x.Eta)) {
+        x.Eta = null;
       }
+      const kalan = etaKalanGun(x.Eta);
+      x.Kalan = kalan == null || kalan < 0 ? 0 : kalan;
+      x.TakipLinki = acenteTakipLinki(x.TakipUrl, x.KonteynerNo);
     });
     res.status(200).json({
       follow: data,
+      gun: FOLLOW_WINDOW_DAY,
+      acenteHazir: acenteVar,
     });
-  });
+  } catch (err) {
+    console.error("container follow listesi hatasi:", err.message);
+    res.status(500).json({ follow: [], acenteHazir: false });
+  }
+});
+/* Agency dropdown'inin kaynagi. Script calistirilmadiysa bos liste doner. */
+app.get("/container/agency/list", async (req, res) => {
+  try {
+    if (!(await acenteTakipReady())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const response = await mssql.query(
+      "select ID, AcenteAdi, TakipUrl from AcenteTB where Aktif = 1 order by AcenteAdi"
+    );
+    res.status(200).json({ list: response.recordset, ready: true });
+  } catch (err) {
+    console.error("acente listesi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
 });
 app.post("/container/follow/save", async (req, res) => {
   try {
+    const acenteVar = await acenteTakipReady();
     const request = new mssql.Request();
     request.input("EtaTarihi", mssql.VarChar, req.body.EtaTarihi);
     request.input("KonteynırNo", mssql.NVarChar, req.body.KonteynırNo);
@@ -2940,43 +3080,280 @@ app.post("/container/follow/save", async (req, res) => {
     request.input("Line", mssql.NVarChar, req.body.Line);
     request.input("Takip", mssql.NVarChar, req.body.Takip);
     request.input("SiparisNo", mssql.NVarChar, req.body.SiparisNo);
+    let acenteSet = "";
+    if (acenteVar) {
+      const acenteId = parseInt(req.body.AcenteID);
+      request.input(
+        "AcenteID",
+        mssql.Int,
+        acenteId > 0 ? acenteId : null
+      );
+      acenteSet = ",AcenteID=@AcenteID";
+    }
     const response = await request.query(
-      "update SiparislerTB SET Eta=@EtaTarihi,KonteynerNo=@KonteynırNo,KonsimentoDurum=@KonsimentoDurum,Line=@Line,Takip=@Takip where SiparisNo=@SiparisNo"
+      `update SiparislerTB SET Eta=@EtaTarihi,KonteynerNo=@KonteynırNo,KonsimentoDurum=@KonsimentoDurum,Line=@Line,Takip=@Takip${acenteSet} where SiparisNo=@SiparisNo`
     );
     res.status(200).json({ status: response.rowsAffected[0] == 1 });
   } catch (err) {
+    console.error("container follow kaydetme hatasi:", err.message);
     res.status(500).json({ status: false });
   }
 });
-app.get("/container/unfollow/list", (req, res) => {
-  const sql = `
-            select
-            s.ID,
-            s.SiparisNo,
-            m.FirmaAdi as MusteriAdi,
-            s.Pesinat,
-            NavlunSatis + DetayTutar_1 + DetayTutar_2 + DetayTutar_3  as Navlun,
-            ( Select Sum(o.Tutar) from OdemelerTB o where o.SiparisNo=s.SiparisNo ) as Odemeler,
-            (Select Sum(u.SatisToplam) from SiparisUrunTB u where u.SiparisNo=s.SiparisNo) as MalBedeli,
-            (select k.KullaniciAdi from KullaniciTB k where k.ID=s.SiparisSahibi ) as Sorumlu,
-            s.Eta,
-            s.KonteynerNo,
-            s.YuklemeTarihi,
-            s.KonsimentoDurum,
-            s.AktarmaLimanAdi,
-            s.Line,
-            s.Takip
-            from
-            SiparislerTB s,MusterilerTB m
-            where s.MusteriID=m.ID
-            and s.SiparisDurumID=3 and s.Takip=0
-            order by s.ID desc
-        `;
-  mssql.query(sql).then((response) => {
+/* --------------------------------------------------------------------------
+   Eta hatirlatma mailleri
+   --------------------------------------------------------------------------
+   Estimated Date girilmis PO'lar icin varista 10 / 5 / 3 / 1 gun kalinca
+   operasyon adresine mail atar. Her esik icin tek mail gider; gonderilenler
+   SiparisEtaHatirlatmaTB'ye yazilir ve bir daha gonderilmez.
+
+   Neden kayit tablosu: ecosystem.config.js PM2'yi cluster + instances:'max'
+   ile calistiriyor, yani bu dosya her worker'da ayri ayri yuklenir.
+   Zamanlayici yalnizca ilk worker'da acilir (etaReminderWorkerAllowed) ve
+   buna ek olarak kayit tablosu mukerrer gonderimi veritabani seviyesinde
+   engeller: sunucu yeniden baslasa da ayni mail ikinci kez gitmez.
+   -------------------------------------------------------------------------- */
+const ETA_REMINDER_TO = "operasyon@mekmar.com";
+const ETA_REMINDER_FROM = "goz@mekmar.com";
+const ETA_REMINDER_THRESHOLDS = [10, 5, 3, 1];
+const ETA_REMINDER_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const ETA_REMINDER_START_DELAY_MS = 60 * 1000;
+
+/* Gonderilmeyi bekleyen hatirlatmalar: esige denk gelen ve daha once
+   gonderilmemis PO'lar. */
+async function etaReminderPending() {
+  const request = new mssql.Request();
+  request.input("gun", mssql.Int, FOLLOW_WINDOW_DAY);
+  request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+  const result = await request.query(`
+    select
+      s.SiparisNo,
+      m.FirmaAdi as MusteriAdi,
+      s.KonteynerNo,
+      s.Line,
+      s.Eta,
+      s.AktarmaLimanAdi,
+      a.AcenteAdi,
+      a.TakipUrl,
+      (select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as Sorumlu,
+      datediff(day, cast(getdate() as date), s.Eta) as Kalan
+    from SiparislerTB s
+    join MusterilerTB m on m.ID = s.MusteriID
+    left join AcenteTB a on a.ID = s.AcenteID
+    where s.SiparisDurumID = 3
+      and isnull(s.Takip, 1) = 1
+      and ${FOLLOW_SCOPE_SQL}
+      and ${ETA_VALID_SQL}
+      and s.YuklemeTarihi >= dateadd(day, -@gun, cast(getdate() as date))
+      and datediff(day, cast(getdate() as date), s.Eta) in (${ETA_REMINDER_THRESHOLDS.join(
+        ", "
+      )})
+      and not exists (
+        select 1 from SiparisEtaHatirlatmaTB h
+        where h.SiparisNo = s.SiparisNo
+          and h.Esik = datediff(day, cast(getdate() as date), s.Eta)
+          and h.Eta = s.Eta
+      )
+    order by datediff(day, cast(getdate() as date), s.Eta), s.SiparisNo
+  `);
+  return result.recordset.map((x) => ({
+    ...x,
+    TakipLinki: acenteTakipLinki(x.TakipUrl, x.KonteynerNo),
+  }));
+}
+function etaReminderHtml(kalan, rows) {
+  const hucre = (v) =>
+    `<td style="padding:6px 10px;border:1px solid #ddd">${
+      __noneNullControl(v) || "-"
+    }</td>`;
+  const satirlar = rows
+    .map((x) => {
+      const takip = x.TakipLinki
+        ? `<a href="${x.TakipLinki}">${
+            __noneNullControl(x.AcenteAdi) || "Takip"
+          }</a>`
+        : __noneNullControl(x.AcenteAdi) || "-";
+      return `<tr>
+        ${hucre(x.SiparisNo)}
+        ${hucre(x.MusteriAdi)}
+        ${hucre(x.KonteynerNo)}
+        ${hucre(x.Line)}
+        ${hucre(etaTarihYazisi(x.Eta))}
+        ${hucre(x.AktarmaLimanAdi)}
+        <td style="padding:6px 10px;border:1px solid #ddd">${takip}</td>
+        ${hucre(x.Sorumlu)}
+      </tr>`;
+    })
+    .join("");
+  const baslik = [
+    "PO",
+    "Müşteri",
+    "Konteyner No",
+    "Line",
+    "Estimated Date",
+    "Liman",
+    "Acente / Takip",
+    "Sorumlu",
+  ]
+    .map(
+      (x) =>
+        `<th style="padding:6px 10px;border:1px solid #ddd;background:#f3f4f6;text-align:left">${x}</th>`
+    )
+    .join("");
+  return `
+    <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#111">
+      <p>Aşağıdaki konteynerlerin tahmini varışına <b>${kalan} gün</b> kaldı.</p>
+      <table style="border-collapse:collapse;border:1px solid #ddd">
+        <thead><tr>${baslik}</tr></thead>
+        <tbody>${satirlar}</tbody>
+      </table>
+      <p style="color:#666;font-size:11px">
+        Bu mail Container Follow ekranındaki Estimated Date alanına göre
+        otomatik gönderilmiştir (${ETA_REMINDER_THRESHOLDS.join(
+          " / "
+        )} gün kala).
+      </p>
+    </div>
+  `;
+}
+/* Gonderim kaydi. Benzersiz kisit nedeniyle ayni satir ikinci kez yazilamaz;
+   yarisma durumunda hata yutulur, cunku mail zaten gonderilmis demektir. */
+async function etaReminderLog(siparisNo, esik, eta) {
+  try {
+    const request = new mssql.Request();
+    request.input("SiparisNo", mssql.NVarChar, safe(siparisNo));
+    request.input("Esik", mssql.Int, esik);
+    request.input("Eta", mssql.Date, eta);
+    await request.query(`
+      insert into SiparisEtaHatirlatmaTB (SiparisNo, Esik, Eta)
+      select @SiparisNo, @Esik, @Eta
+      where not exists (
+        select 1 from SiparisEtaHatirlatmaTB
+        where SiparisNo = @SiparisNo and Esik = @Esik and Eta = @Eta
+      )
+    `);
+    return true;
+  } catch (err) {
+    console.error("eta hatirlatma kaydi hatasi:", err.message);
+    return false;
+  }
+}
+let etaReminderRunning = false;
+async function runEtaReminders() {
+  if (etaReminderRunning || !dbReady) {
+    return { gonderilen: 0, atlanan: 0, calisti: false };
+  }
+  etaReminderRunning = true;
+  try {
+    if (!(await acenteTakipReady())) {
+      return { gonderilen: 0, atlanan: 0, calisti: false };
+    }
+    const pending = await etaReminderPending();
+    if (pending.length === 0) {
+      return { gonderilen: 0, atlanan: 0, calisti: true };
+    }
+    let gonderilen = 0;
+    let atlanan = 0;
+    /* Esik basina tek mail: 10 gun kalanlar bir mailde, 5 gun kalanlar
+       digerinde. Mail gitmezse kayit yazilmaz, sonraki turda tekrar denenir. */
+    for (const esik of ETA_REMINDER_THRESHOLDS) {
+      const rows = pending.filter((x) => x.Kalan === esik);
+      if (rows.length === 0) {
+        continue;
+      }
+      const sonuc = await safeSendMail({
+        from: `"Mekmar Panel" <${ETA_REMINDER_FROM}>`,
+        to: ETA_REMINDER_TO,
+        subject: `Varışa ${esik} gün - ${rows.length} konteyner`,
+        html: etaReminderHtml(esik, rows),
+      });
+      if (!sonuc.status) {
+        atlanan += rows.length;
+        continue;
+      }
+      for (const row of rows) {
+        await etaReminderLog(row.SiparisNo, esik, row.Eta);
+      }
+      gonderilen += rows.length;
+      console.log(
+        `Eta hatirlatma gonderildi: ${esik} gun, ${rows.length} siparis`
+      );
+    }
+    return { gonderilen: gonderilen, atlanan: atlanan, calisti: true };
+  } catch (err) {
+    console.error("eta hatirlatma hatasi:", err.message);
+    return { gonderilen: 0, atlanan: 0, calisti: false };
+  } finally {
+    etaReminderRunning = false;
+  }
+}
+/* PM2 cluster'da yalnizca ilk worker zamanlayiciyi acar. Nuxt dev modunda
+   NODE_APP_INSTANCE tanimsizdir, orada da calisir. */
+function etaReminderWorkerAllowed() {
+  const instance = process.env.NODE_APP_INSTANCE;
+  return instance === undefined || instance === "" || instance === "0";
+}
+/* Nuxt dev modunda bu dosya her degisiklikte yeniden yukleniyor (HMR /api).
+   Zamanlayici globalThis uzerinde isaretlenir, aksi halde her reload bir
+   interval daha birakir ve ayni kontrol ust uste calisirdi. */
+if (etaReminderWorkerAllowed() && !globalThis.__etaReminderTimerKurulu) {
+  globalThis.__etaReminderTimerKurulu = true;
+  setTimeout(() => {
+    runEtaReminders();
+    setInterval(runEtaReminders, ETA_REMINDER_INTERVAL_MS);
+  }, ETA_REMINDER_START_DELAY_MS);
+}
+/* Mail atmadan kontrol: hangi PO'lar hangi esikte bekliyor. */
+app.get("/container/follow/reminder/preview", async (req, res) => {
+  try {
+    if (!(await acenteTakipReady())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const pending = await etaReminderPending();
     res.status(200).json({
-      unfollow: response.recordset,
+      list: pending,
+      ready: true,
+      alici: ETA_REMINDER_TO,
+      esikler: ETA_REMINDER_THRESHOLDS,
     });
-  });
+  } catch (err) {
+    console.error("eta hatirlatma onizleme hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+/* Zamanlayiciyi beklemeden elle tetikleme. */
+app.post("/container/follow/reminder/send", async (req, res) => {
+  const sonuc = await runEtaReminders();
+  res.status(200).json(sonuc);
+});
+/* Unfollow listesi: ekranda bilinli olarak takipten cikarilanlar. Burada
+   tarih penceresi uygulanmaz, gecmis kayitlar da gorunmeye devam eder. */
+app.get("/container/unfollow/list", async (req, res) => {
+  try {
+    const acenteVar = await acenteTakipReady();
+    const request = new mssql.Request();
+    request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+    const response = await request.query(
+      followListSql(acenteVar, "isnull(s.Takip, 1) = 0", false)
+    );
+    const data = response.recordset;
+    data.forEach((x) => {
+      /* Yer tutucu tarih istemciye hic gitmesin: liste bos hucre, form bos
+         takvim gosterir ve kayit sirasinda NULL olarak guncellenir. */
+      if (!etaGecerli(x.Eta)) {
+        x.Eta = null;
+      }
+      const kalan = etaKalanGun(x.Eta);
+      x.Kalan = kalan == null || kalan < 0 ? 0 : kalan;
+      x.TakipLinki = acenteTakipLinki(x.TakipUrl, x.KonteynerNo);
+    });
+    res.status(200).json({
+      unfollow: data,
+      acenteHazir: acenteVar,
+    });
+  } catch (err) {
+    console.error("container unfollow listesi hatasi:", err.message);
+    res.status(500).json({ unfollow: [], acenteHazir: false });
+  }
 });
 
 function containerInputResults(po, cb) {
