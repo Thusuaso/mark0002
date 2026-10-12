@@ -129,8 +129,19 @@ export default {
   ],
 
   // Socket.io Ayarları
+  // NOT: Asagidaki "io" blogu nuxt-socket-io modulune aittir, o modul bu
+  // projede kurulu DEGIL; yani bu ayar etkisizdir. Gercek socket baglantisi
+  // store/modules/socket.js ve store/modules/chat.js icinde kurulur ve
+  // adresini publicRuntimeConfig.socketUrl'den alir.
   io: {
     sockets: [{ name: "main", url: "http://localhost:3001" }],
+  },
+
+  // Socket sunucusunun adresi (api/server.js, "npm run socket").
+  // Eskiden store icinde "https://goz.mekmar.com" olarak sabitti; bu yuzden
+  // gelistirme ortami canli socket sunucusuna baglaniyordu.
+  publicRuntimeConfig: {
+    socketUrl: process.env.SOCKET_URL || "http://localhost:3001",
   },
   toast: {
     position: "top-right",

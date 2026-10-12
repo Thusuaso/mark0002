@@ -29,6 +29,7 @@ import accounts from "./modules/accounts";
 import importantLinks from "./modules/importantLink";
 import cost from "./modules/cost";
 import socket from "./modules/socket";
+import chat from "./modules/chat";
 import mekmarCost from "./modules/mekmar_cost";
 const createStore = () => {
   return new Vuex.Store({
@@ -67,6 +68,7 @@ const createStore = () => {
       importantLinks,
       cost,
       socket,
+      chat,
       mekmarCost,
     ],
   });

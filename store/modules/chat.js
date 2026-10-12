@@ -1,0 +1,336 @@
+import { io } from "socket.io-client";
+import { tokenOku, socketUrl } from "./socket";
+
+/* Sirket ici birebir sohbet ve online durumu.
+
+   Kendi socket baglantisini kurar (store/modules/socket.js'teki liste
+   tazeleme baglantisindan bagimsiz): o baglanti sayfa gezintilerinde
+   yenileniyor, sohbetin ise layout boyunca ayakta kalmasi gerekiyor.
+   Sunucu ayni kullanicinin birden fazla baglantisini tek online kullanici
+   sayar, bu yuzden iki baglanti online gostergesini bozmaz. */
+
+const state = {
+  socket: null,
+  users: [],          // sohbet edilebilecek kullanicilar
+  online: [],         // online kullanici ID'leri
+  activeUserId: null, // acik olan yazisma
+  messages: [],       // acik yazismanin mesajlari
+  loadingHistory: false,
+  dahaVar: false,
+  ready: true,        // SohbetMesajTB kurulu mu
+  panelOpen: false,
+};
+
+const actions = {
+  /* Layout'tan bir kez cagrilir. */
+  setChatConnection(vuexContext) {
+    if (process.server || vuexContext.state.socket) {
+      return;
+    }
+    const token = tokenOku();
+    if (!token) {
+      return; // oturum yok, sohbet kurulmaz
+    }
+    const socket = io(socketUrl(this), {
+      transports: ["websocket", "polling"],
+      path: "/socket.io/",
+      auth: { token: token },
+    });
+
+    socket.on("presence:list", (veri) => {
+      vuexContext.commit("setChatOnline", (veri && veri.online) || []);
+    });
+    socket.on("presence:update", (veri) => {
+      vuexContext.commit("setChatPresence", veri);
+    });
+    socket.on("chat:message", (mesaj) => {
+      vuexContext.dispatch("chatIncoming", mesaj);
+    });
+    socket.on("chat:read", (veri) => {
+      /* Karsi taraf okudu: acik yazismadaki kendi mesajlarimi okundu yap. */
+      if (veri && Number(veri.okuyanId) === Number(vuexContext.state.activeUserId)) {
+        vuexContext.commit("setChatOwnRead");
+      }
+    });
+    /* Yeniden baglanildiginda online listesi bayatlamasin. */
+    socket.on("connect", () => {
+      socket.emit("presence:list");
+    });
+
+    vuexContext.commit("setChatSocket", socket);
+  },
+
+  setChatDisconnect(vuexContext) {
+    vuexContext.commit("destroyChatSocket");
+  },
+
+  /* Kullanici listesi ve okunmamis sayaclari. */
+  setChatUserList(vuexContext) {
+    return this.$axios
+      .get("/chat/users")
+      .then((response) => {
+        vuexContext.commit("setChatUsers", response.data.list || []);
+        vuexContext.commit("setChatReady", response.data.ready !== false);
+      })
+      .catch(() => {
+        vuexContext.commit("setChatUsers", []);
+      });
+  },
+
+  /* Bir kisiyle yazismayi ac: gecmisi yukle ve okundu isaretle. */
+  setChatActiveUser(vuexContext, userId) {
+    vuexContext.commit("setChatActiveUser", userId);
+    vuexContext.commit("setChatMessages", []);
+    if (!userId) {
+      return Promise.resolve();
+    }
+    vuexContext.commit("setChatLoadingHistory", true);
+    return this.$axios
+      .get(`/chat/history/${userId}`)
+      .then((response) => {
+        vuexContext.commit("setChatMessages", response.data.list || []);
+        vuexContext.commit("setChatDahaVar", !!response.data.dahaVar);
+        vuexContext.commit("setChatReady", response.data.ready !== false);
+        vuexContext.dispatch("setChatRead", userId);
+      })
+      .catch(() => {
+        vuexContext.commit("setChatMessages", []);
+      })
+      .then(() => {
+        vuexContext.commit("setChatLoadingHistory", false);
+      });
+  },
+
+  /* Yukari kaydirinca daha eski mesajlari ekle. */
+  setChatOlderMessages(vuexContext) {
+    const { activeUserId, messages, dahaVar, loadingHistory } = vuexContext.state;
+    if (!activeUserId || !dahaVar || loadingHistory || messages.length === 0) {
+      return Promise.resolve();
+    }
+    vuexContext.commit("setChatLoadingHistory", true);
+    const enEski = messages[0].ID;
+    return this.$axios
+      .get(`/chat/history/${activeUserId}?beforeId=${enEski}`)
+      .then((response) => {
+        vuexContext.commit("prependChatMessages", response.data.list || []);
+        vuexContext.commit("setChatDahaVar", !!response.data.dahaVar);
+      })
+      .catch(() => {})
+      .then(() => {
+        vuexContext.commit("setChatLoadingHistory", false);
+      });
+  },
+
+  setChatSend(vuexContext, mesaj) {
+    const { socket, activeUserId } = vuexContext.state;
+    const metin = String(mesaj || "").trim();
+    if (!metin || !activeUserId) {
+      return Promise.resolve({ status: false });
+    }
+    if (!socket || !socket.connected) {
+      this.$toast.error("Sohbet sunucusuna bağlanılamadı.");
+      return Promise.resolve({ status: false });
+    }
+    return new Promise((resolve) => {
+      socket.emit(
+        "chat:send",
+        { aliciId: activeUserId, mesaj: metin },
+        (sonuc) => {
+          if (!sonuc || !sonuc.status) {
+            this.$toast.error(
+              (sonuc && sonuc.message) || "Mesaj gönderilemedi."
+            );
+          }
+          /* Mesaj ekrana chat:message olayi ile eklenir (gonderenin tum
+             sekmeleri ayni paketi alir), burada tekrar eklenmez. */
+          resolve(sonuc || { status: false });
+        }
+      );
+    });
+  },
+
+  setChatRead(vuexContext, userId) {
+    const socket = vuexContext.state.socket;
+    vuexContext.commit("clearChatUnread", userId);
+    if (socket && socket.connected) {
+      socket.emit("chat:read", { karsiId: userId });
+      return Promise.resolve();
+    }
+    /* Socket kapaliysa REST ile isaretle. */
+    return this.$axios.post("/chat/read", { karsiId: userId }).catch(() => {});
+  },
+
+  /* Gelen mesaj: acik yazismaya ait ise listeye eklenir ve okundu yapilir,
+     degilse ilgili kisinin okunmamis sayaci artirilir. */
+  chatIncoming(vuexContext, mesaj) {
+    const benId = Number(vuexContext.getters.getUserId);
+    const gonderen = Number(mesaj.GonderenID);
+    const alici = Number(mesaj.AliciID);
+    const karsiId = gonderen === benId ? alici : gonderen;
+    const aktif = Number(vuexContext.state.activeUserId);
+
+    vuexContext.commit("setChatUserPreview", {
+      userId: karsiId,
+      mesaj: mesaj.Mesaj,
+      tarih: mesaj.GonderimTarihi,
+    });
+
+    if (karsiId === aktif) {
+      vuexContext.commit("appendChatMessage", mesaj);
+      if (gonderen !== benId) {
+        vuexContext.dispatch("setChatRead", karsiId);
+      }
+      return;
+    }
+    if (gonderen !== benId) {
+      /* Gonderen onbellekteki listede yoksa sayac artirilamaz ve rozet
+         gorunmezdi (ornegin yeni bir calisan eklenip siz sayfayi hic
+         yenilemediyseniz). Bu durumda liste tazelenir. */
+      const listede = vuexContext.state.users.some(
+        (u) => Number(u.ID) === karsiId
+      );
+      if (!listede) {
+        vuexContext.dispatch("setChatUserList");
+        return;
+      }
+      vuexContext.commit("incrementChatUnread", karsiId);
+    }
+  },
+
+  setChatPanelOpen(vuexContext, acik) {
+    vuexContext.commit("setChatPanelOpen", acik);
+  },
+};
+
+const mutations = {
+  setChatSocket(state, socket) {
+    state.socket = socket;
+  },
+  destroyChatSocket(state) {
+    if (state.socket) {
+      state.socket.close();
+    }
+    state.socket = null;
+    state.online = [];
+  },
+  setChatUsers(state, users) {
+    state.users = users;
+  },
+  setChatReady(state, ready) {
+    state.ready = ready;
+  },
+  setChatOnline(state, online) {
+    state.online = (online || []).map((x) => Number(x));
+  },
+  setChatPresence(state, veri) {
+    if (!veri) {
+      return;
+    }
+    const id = Number(veri.userId);
+    const varMi = state.online.indexOf(id) !== -1;
+    if (veri.online && !varMi) {
+      state.online = state.online.concat([id]);
+    } else if (!veri.online && varMi) {
+      state.online = state.online.filter((x) => x !== id);
+    }
+  },
+  setChatActiveUser(state, userId) {
+    state.activeUserId = userId ? Number(userId) : null;
+  },
+  setChatMessages(state, messages) {
+    state.messages = messages;
+  },
+  appendChatMessage(state, mesaj) {
+    /* Ayni mesaj iki kez gelmesin (yeniden baglanma / cift olay). */
+    if (state.messages.some((m) => String(m.ID) === String(mesaj.ID))) {
+      return;
+    }
+    state.messages = state.messages.concat([mesaj]);
+  },
+  prependChatMessages(state, messages) {
+    const mevcut = {};
+    state.messages.forEach((m) => {
+      mevcut[String(m.ID)] = true;
+    });
+    const yeni = (messages || []).filter((m) => !mevcut[String(m.ID)]);
+    state.messages = yeni.concat(state.messages);
+  },
+  setChatLoadingHistory(state, durum) {
+    state.loadingHistory = durum;
+  },
+  setChatDahaVar(state, durum) {
+    state.dahaVar = durum;
+  },
+  setChatOwnRead(state) {
+    const simdi = new Date().toISOString();
+    state.messages = state.messages.map((m) =>
+      m.OkunduTarihi ? m : { ...m, OkunduTarihi: simdi }
+    );
+  },
+  incrementChatUnread(state, userId) {
+    state.users = state.users.map((u) =>
+      Number(u.ID) === Number(userId)
+        ? { ...u, Okunmamis: (Number(u.Okunmamis) || 0) + 1 }
+        : u
+    );
+  },
+  clearChatUnread(state, userId) {
+    state.users = state.users.map((u) =>
+      Number(u.ID) === Number(userId) ? { ...u, Okunmamis: 0 } : u
+    );
+  },
+  setChatUserPreview(state, veri) {
+    state.users = state.users.map((u) =>
+      Number(u.ID) === Number(veri.userId)
+        ? { ...u, SonMesaj: veri.mesaj, SonMesajTarihi: veri.tarih }
+        : u
+    );
+  },
+  setChatPanelOpen(state, acik) {
+    state.panelOpen = !!acik;
+  },
+};
+
+const getters = {
+  getChatUsers(state) {
+    return state.users;
+  },
+  getChatOnline(state) {
+    return state.online;
+  },
+  getChatActiveUserId(state) {
+    return state.activeUserId;
+  },
+  getChatMessages(state) {
+    return state.messages;
+  },
+  getChatLoadingHistory(state) {
+    return state.loadingHistory;
+  },
+  getChatDahaVar(state) {
+    return state.dahaVar;
+  },
+  getChatReady(state) {
+    return state.ready;
+  },
+  getChatPanelOpen(state) {
+    return state.panelOpen;
+  },
+  getChatUnreadTotal(state) {
+    return state.users.reduce((acc, u) => acc + (Number(u.Okunmamis) || 0), 0);
+  },
+  /* Yalnizca listede gorunen kisiler sayilir: sohbet disi tutulan hesaplar
+     (api/sohbetHaric.js) online olsa bile sayaca girmemeli. */
+  getChatOnlineCount(state) {
+    return state.users.filter(
+      (u) => state.online.indexOf(Number(u.ID)) !== -1
+    ).length;
+  },
+};
+
+export default {
+  state,
+  actions,
+  mutations,
+  getters,
+};

@@ -4,6 +4,7 @@ import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
 import jwt from "jsonwebtoken";
 import AWS from "aws-sdk";
+import { sohbetHaricSql } from "./sohbetHaric";
 var cookieParser = require("cookie-parser");
 const JWT_SECRET = process.env.JWT_SECRET;
 const otpStore = new Map();
@@ -3355,6 +3356,253 @@ app.get("/container/unfollow/list", async (req, res) => {
     res.status(500).json({ unfollow: [], acenteHazir: false });
   }
 });
+/* --------------------------------------------------------------------------
+   Sirket ici sohbet - REST uclari
+   --------------------------------------------------------------------------
+   Anlik teslim ve online durumu socket sunucusunda (api/server.js, port 3001)
+   calisir. Buradaki uclar sayfa ilk acildiginda gereken verileri saglar:
+   kullanici listesi, yazisma gecmisi ve okunmamis sayaci.
+
+   Sema api/sql/SohbetMesajTB.sql ile kurulur. Script calistirilmadiysa
+   uclar bos liste ve ready:false dondurur, uygulama hata vermez.
+
+   Tum uclar authenticateToken'dan gectigi icin kullanici req.user.userId
+   uzerinden alinir; istemciden gelen bir kimlige ASLA guvenilmez.
+   -------------------------------------------------------------------------- */
+const SOHBET_SAKLAMA_GUN = 90;
+const SOHBET_GECMIS_LIMIT = 50;
+const SOHBET_TEMIZLIK_ARALIK_MS = 24 * 60 * 60 * 1000;
+const SOHBET_TEMIZLIK_BASLAMA_MS = 2 * 60 * 1000;
+
+let chatReadyCache = null;
+async function chatReady() {
+  if (chatReadyCache !== null) {
+    return chatReadyCache;
+  }
+  try {
+    const check = await mssql.query(`
+      select count(*) as tablo from sys.objects
+       where object_id = object_id(N'[dbo].[SohbetMesajTB]') and type = N'U'
+    `);
+    chatReadyCache = check.recordset[0].tablo > 0;
+  } catch (err) {
+    chatReadyCache = false;
+  }
+  return chatReadyCache;
+}
+/* bigint ID'ler JSON'da sayi olarak tasinirsa buyuk degerlerde hassasiyet
+   kaybi olur; istemci zaten yalnizca karsilastirma yapiyor, metin olarak
+   gonderilir. api/server.js de ayni bicimi kullanir. */
+function sohbetSatiri(row) {
+  return {
+    ID: String(row.ID),
+    GonderenID: row.GonderenID,
+    AliciID: row.AliciID,
+    Mesaj: row.Mesaj,
+    GonderimTarihi: row.GonderimTarihi,
+    OkunduTarihi: row.OkunduTarihi,
+  };
+}
+
+/* Sohbet edilebilecek kullanicilar: kendisi haric aktif kullanicilar.
+   Her satirda o kisiden gelen okunmamis sayisi ve son mesaj bilgisi doner,
+   boylece liste "en son yazisilan uste" siralanabilir. */
+app.get("/chat/users", async (req, res) => {
+  try {
+    const benId = Number(req.user.userId);
+    const hazir = await chatReady();
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, benId);
+    if (!hazir) {
+      const sade = await request.query(`
+        select ID, KullaniciAdi from KullaniciTB
+         where Aktif = 1 and ID <> @ben
+           and ID not in (${sohbetHaricSql()})
+         order by KullaniciAdi
+      `);
+      return res.status(200).json({
+        list: sade.recordset.map((x) => ({
+          ID: x.ID,
+          KullaniciAdi: x.KullaniciAdi,
+          Okunmamis: 0,
+          SonMesaj: null,
+          SonMesajTarihi: null,
+        })),
+        ready: false,
+      });
+    }
+    const sonuc = await request.query(`
+      select
+        k.ID,
+        k.KullaniciAdi,
+        isnull(o.Okunmamis, 0) as Okunmamis,
+        s.Mesaj as SonMesaj,
+        s.GonderimTarihi as SonMesajTarihi
+      from KullaniciTB k
+      outer apply (
+        select count(*) as Okunmamis
+          from SohbetMesajTB m
+         where m.GonderenID = k.ID
+           and m.AliciID = @ben
+           and m.OkunduTarihi is null
+      ) o
+      outer apply (
+        select top 1 m.Mesaj, m.GonderimTarihi
+          from SohbetMesajTB m
+         where (m.GonderenID = k.ID and m.AliciID = @ben)
+            or (m.GonderenID = @ben and m.AliciID = k.ID)
+         order by m.ID desc
+      ) s
+      where k.Aktif = 1
+        and k.ID <> @ben
+        /* Bolge/yer tutucu hesaplar sohbette listelenmez (api/sohbetHaric.js) */
+        and k.ID not in (${sohbetHaricSql()})
+      order by
+        case when s.GonderimTarihi is null then 1 else 0 end,
+        s.GonderimTarihi desc,
+        k.KullaniciAdi
+    `);
+    res.status(200).json({ list: sonuc.recordset, ready: true });
+  } catch (err) {
+    console.error("sohbet kullanici listesi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+
+/* Iki kisi arasindaki son mesajlar. beforeId verilirse daha eskiye gidilir
+   (yukari kaydirarak gecmis yukleme). Sonuc eskiden yeniye sirali doner. */
+app.get("/chat/history/:userId", async (req, res) => {
+  try {
+    if (!(await chatReady())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const benId = Number(req.user.userId);
+    const karsiId = parseInt(req.params.userId);
+    if (!karsiId || karsiId <= 0) {
+      return res.status(400).json({ list: [], ready: true, message: "Gecersiz kullanici." });
+    }
+    let limit = parseInt(req.query.limit) || SOHBET_GECMIS_LIMIT;
+    if (limit < 1) limit = 1;
+    if (limit > 200) limit = 200;
+    const beforeId = req.query.beforeId ? String(req.query.beforeId) : null;
+
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, benId);
+    request.input("karsi", mssql.Int, karsiId);
+    request.input("limit", mssql.Int, limit);
+    request.input("beforeId", mssql.BigInt, beforeId);
+    const sonuc = await request.query(`
+      select top (@limit)
+        m.ID, m.GonderenID, m.AliciID, m.Mesaj, m.GonderimTarihi, m.OkunduTarihi
+      from SohbetMesajTB m
+      where (
+              (m.GonderenID = @ben and m.AliciID = @karsi)
+           or (m.GonderenID = @karsi and m.AliciID = @ben)
+            )
+        and (@beforeId is null or m.ID < @beforeId)
+      order by m.ID desc
+    `);
+    /* Sorgu en yeniden geriye alir; ekranda eskiden yeniye gosterilir. */
+    const list = sonuc.recordset.map(sohbetSatiri).reverse();
+    res.status(200).json({
+      list: list,
+      ready: true,
+      dahaVar: sonuc.recordset.length === limit,
+    });
+  } catch (err) {
+    console.error("sohbet gecmisi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+
+/* Navbar rozeti icin toplam okunmamis. */
+app.get("/chat/unread", async (req, res) => {
+  try {
+    if (!(await chatReady())) {
+      return res.status(200).json({ total: 0, ready: false });
+    }
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, Number(req.user.userId));
+    const sonuc = await request.query(`
+      select count(*) as total from SohbetMesajTB
+       where AliciID = @ben and OkunduTarihi is null
+    `);
+    res.status(200).json({ total: sonuc.recordset[0].total, ready: true });
+  } catch (err) {
+    console.error("sohbet okunmamis sayisi hatasi:", err.message);
+    res.status(500).json({ total: 0, ready: false });
+  }
+});
+
+/* Socket kapali oldugunda da okundu isaretlenebilsin diye REST karsiligi. */
+app.post("/chat/read", async (req, res) => {
+  try {
+    if (!(await chatReady())) {
+      return res.status(200).json({ status: false, ready: false });
+    }
+    const karsiId = parseInt(req.body.karsiId);
+    if (!karsiId || karsiId <= 0) {
+      return res.status(400).json({ status: false, message: "Gecersiz kullanici." });
+    }
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, Number(req.user.userId));
+    request.input("karsi", mssql.Int, karsiId);
+    const sonuc = await request.query(`
+      update SohbetMesajTB set OkunduTarihi = getdate()
+       where AliciID = @ben and GonderenID = @karsi and OkunduTarihi is null
+    `);
+    res.status(200).json({ status: true, adet: sonuc.rowsAffected[0] || 0 });
+  } catch (err) {
+    console.error("sohbet okundu hatasi:", err.message);
+    res.status(500).json({ status: false });
+  }
+});
+
+/* --------------------------------------------------------------------------
+   90 gunluk saklama temizligi
+   --------------------------------------------------------------------------
+   Gunde bir kez calisir. Tablo buyudugunde tek seferde milyonlarca satir
+   silmemek icin partiler halinde ilerler. Zamanlayici kurallari Eta
+   hatirlatmasiyla ayni: PM2 cluster'da yalnizca ilk worker, dev modunda
+   HMR'de tekrar kurulmasin diye globalThis isareti. */
+async function sohbetTemizle() {
+  if (!dbReady || !(await chatReady())) {
+    return { silinen: 0, calisti: false };
+  }
+  try {
+    let silinen = 0;
+    for (let tur = 0; tur < 20; tur++) {
+      const request = new mssql.Request();
+      request.input("gun", mssql.Int, SOHBET_SAKLAMA_GUN);
+      const sonuc = await request.query(`
+        delete top (5000) from SohbetMesajTB
+         where GonderimTarihi < dateadd(day, -@gun, getdate())
+      `);
+      const adet = sonuc.rowsAffected[0] || 0;
+      silinen += adet;
+      if (adet === 0) {
+        break;
+      }
+    }
+    if (silinen > 0) {
+      console.log(
+        `Sohbet temizligi: ${SOHBET_SAKLAMA_GUN} gunden eski ${silinen} mesaj silindi.`
+      );
+    }
+    return { silinen: silinen, calisti: true };
+  } catch (err) {
+    console.error("sohbet temizlik hatasi:", err.message);
+    return { silinen: 0, calisti: false };
+  }
+}
+if (etaReminderWorkerAllowed() && !globalThis.__sohbetTemizlikKurulu) {
+  globalThis.__sohbetTemizlikKurulu = true;
+  setTimeout(() => {
+    sohbetTemizle();
+    setInterval(sohbetTemizle, SOHBET_TEMIZLIK_ARALIK_MS);
+  }, SOHBET_TEMIZLIK_BASLAMA_MS);
+}
+
 
 function containerInputResults(po, cb) {
   const sql = `select ID,FaturaNo,FirmaID from KonteynerDigerFaturalarKayitTB where FaturaNo='${po}'`;

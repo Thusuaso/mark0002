@@ -6,6 +6,9 @@
       style="margin-bottom: 5px"
     />
     <nuxt />
+    <!-- Sirket ici sohbet: sag altta duran panel. Layout'ta durur ki sayfa
+         gezintilerinde baglanti ve yazisma kopmasin. -->
+    <chatPanel v-if="$store.getters.isAuthenticated" />
   </div>
 </template>
 <script>
@@ -50,6 +53,16 @@ export default {
     this.$store.dispatch("setOrderKindOfDeliverySupplierList");
     this.$store.dispatch("setYearList");
     this.$store.dispatch("setMonthList");
+  },
+  mounted() {
+    /* Sohbet yalnizca istemcide ve oturum acikken kurulur. */
+    if (this.$store.getters.isAuthenticated) {
+      this.$store.dispatch("setChatConnection");
+      this.$store.dispatch("setChatUserList");
+    }
+  },
+  beforeDestroy() {
+    this.$store.dispatch("setChatDisconnect");
   },
 };
 </script>
