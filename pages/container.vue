@@ -78,7 +78,7 @@
           <div class="visual-bar">
             <div
               class="bar-fill"
-              :style="{ width: (usedLength / containerL) * 100 + '%' }"
+              :style="{ width: usedLengthPercent }"
             ></div>
           </div>
         </div>
@@ -149,7 +149,13 @@
                     <label>Üst Üste?</label>
                   </div>
                   <small
-                    v-if="newCrate.isStackable"
+                    v-if="calculatePreviewStack === 0"
+                    style="color: #dc2626; font-weight: bold"
+                  >
+                    Yükseklik sığmıyor
+                  </small>
+                  <small
+                    v-else-if="newCrate.isStackable"
                     style="color: green; font-weight: bold"
                   >
                     Hesaplanan: {{ calculatePreviewStack }} Kat
@@ -196,7 +202,7 @@
 
           <div
             class="container-frame"
-            :style="{ paddingBottom: (containerW / containerL) * 100 + '%' }"
+            :style="{ paddingBottom: frameRatioPercent }"
           >
             <div class="container-inner">
               <div class="door-label">KAPI</div>
@@ -204,7 +210,7 @@
               <div
                 v-if="items.length > 0"
                 class="measure-line"
-                :style="{ left: (usedLength / containerL) * 100 + '%' }"
+                :style="{ left: usedLengthPercent }"
               >
                 <div class="measure-arrow">
                   <span>&larr; {{ remainingLength }} cm &rarr;</span>
@@ -216,10 +222,10 @@
                 :key="index"
                 class="crate-box"
                 :style="{
-                  left: (box.x / containerL) * 100 + '%',
-                  top: (box.y / containerW) * 100 + '%',
-                  width: (box.l / containerL) * 100 + '%',
-                  height: (box.w / containerW) * 100 + '%',
+                  left: pct(box.x, containerL),
+                  top: pct(box.y, containerW),
+                  width: pct(box.l, containerL),
+                  height: pct(box.w, containerW),
                   backgroundColor: box.color,
                 }"
                 :title="
@@ -356,6 +362,13 @@
   </div>
 </template>
 <script>
+// --- Yerleştirme sabitleri ---
+// EPS: ölçü girişlerindeki ondalık/kayan nokta hatalarını tolere eder.
+// (örnek: 235.2 / 78.4 kayan noktada 2.9999... çıkar -> EPS olmadan 3 yerine 2 kat hesaplanırdı)
+const EPS = 0.1;
+const MAX_QTY_PER_ITEM = 5000; // tek kalemde izin verilen azami adet (tarayıcı kilitlenmesini önler)
+const MAX_PLACEMENTS = 4000; // çizilebilecek azami zemin noktası
+
 export default {
   name: "ContainerCalculator",
   data() {
@@ -427,8 +440,9 @@ export default {
       );
     },
     volumePercentage() {
+      if (this.containerVolume <= 0) return "0.0";
       const val = (this.totalVolume / this.containerVolume) * 100;
-      return isNaN(val) ? "0.0" : Math.min(val, 100).toFixed(1);
+      return isFinite(val) ? Math.min(val, 100).toFixed(1) : "0.0";
     },
     totalAreaUsed() {
       return (
@@ -436,13 +450,12 @@ export default {
       );
     },
     areaPercentage() {
+      if (this.containerArea <= 0) return "0.0";
       const val = (this.totalAreaUsed / this.containerArea) * 100;
-      return isNaN(val) ? "0.0" : Math.min(val, 100).toFixed(1);
+      return isFinite(val) ? Math.min(val, 100).toFixed(1) : "0.0";
     },
     calculatePreviewStack() {
-      const bH = Number(this.newCrate.height);
-      if (!bH || bH <= 0) return 1;
-      return Math.floor(this.containerH / bH);
+      return this.stackCapacityFor(this.newCrate);
     },
     usedLength() {
       if (this.placedBoxes.length === 0) return 0;
@@ -452,8 +465,36 @@ export default {
       const rem = this.containerL - this.usedLength;
       return Math.max(0, rem).toFixed(1);
     },
+    usedLengthPercent() {
+      return this.pct(this.usedLength, this.containerL);
+    },
+    frameRatioPercent() {
+      return this.pct(this.containerW, this.containerL);
+    },
   },
   methods: {
+    // Oransal stil değerleri için güvenli yüzde: payda 0/null ise NaN% üretmez.
+    pct(value, total) {
+      const v = Number(value) || 0;
+      const t = Number(total) || 0;
+      if (t <= 0) return "0%";
+      const r = (v / t) * 100;
+      if (!isFinite(r)) return "0%";
+      return Math.min(Math.max(r, 0), 100) + "%";
+    },
+
+    // Bir kalemin konteynır yüksekliğine göre kaç kat istiflenebileceği.
+    // EPS toleransı ondalıklı ölçülerdeki kayan nokta hatasını engeller.
+    stackCapacityFor(crate) {
+      const h = Number(crate.height);
+      const cH = this.containerH;
+      if (!(h > 0) || cH <= 0) return 0;
+      if (h > cH + EPS) return 0; // tek kat bile sığmıyor
+      if (!crate.isStackable) return 1;
+      const cap = Math.floor((cH + EPS) / h);
+      return cap < 1 ? 1 : cap;
+    },
+
     applyPreset() {
       if (this.selectedPreset) {
         this.container.width = this.selectedPreset.width;
@@ -472,9 +513,42 @@ export default {
         this.newCrate.forkliftSide = "standard";
       }
     },
-    generateColor() {
-      const h = Math.floor(Math.random() * 360);
-      return `hsl(${h}, 70%, 60%)`;
+    // Kasa tanımından türetilen kararlı renk: aynı tanım her zaman aynı
+    // rengi alır, farklı tanım farklı renk alır (rastgele renk yerine).
+    hashHue(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = (h * 31 + str.charCodeAt(i)) >>> 0;
+      }
+      return h % 360;
+    },
+    hueOf(color) {
+      const s = String(color || "");
+      if (s.slice(0, 4) !== "hsl(") return null;
+      const v = parseFloat(s.slice(4));
+      return isFinite(v) ? v : null;
+    },
+    colorForName(name) {
+      const key = (name || "").trim().toLocaleLowerCase("tr");
+      // Listede aynı tanım varsa onun rengini kullan.
+      const twin = this.items.find(
+        (i) => (i.name || "").trim().toLocaleLowerCase("tr") === key
+      );
+      if (twin && twin.color) return twin.color;
+
+      // Farklı tanımların tonları birbirine yakın düşmesin.
+      const used = this.items
+        .map((i) => this.hueOf(i.color))
+        .filter((h) => h !== null);
+      const tooClose = (h) =>
+        used.some((u) => {
+          const d = Math.abs(u - h);
+          return Math.min(d, 360 - d) < 25;
+        });
+
+      let hue = this.hashHue(key);
+      for (let i = 0; i < 36 && tooClose(hue); i++) hue = (hue + 37) % 360;
+      return `hsl(${hue}, 70%, 55%)`;
     },
     clearAlert() {
       this.alertState.type = null;
@@ -486,114 +560,137 @@ export default {
       return JSON.parse(JSON.stringify(list));
     },
 
+    // Girilen kasa ölçülerini doğrula. Hata varsa mesaj döner, yoksa null.
+    validateCrate(crate, qty) {
+      const w = Number(crate.width);
+      const l = Number(crate.length);
+      const h = Number(crate.height);
+      if (this.containerW <= 0 || this.containerL <= 0 || this.containerH <= 0)
+        return "Önce geçerli konteynır ölçülerini girin.";
+      if (!(w > 0) || !(l > 0) || !(h > 0))
+        return "Kasa ölçüleri sıfırdan büyük olmalı.";
+      if (!(qty >= 1)) return "Adet en az 1 olmalı.";
+      if (h > this.containerH + EPS)
+        return "Kasa yüksekliği konteynırdan büyük!";
+      // İki yönden de sığmıyorsa gerçekten sığmıyordur (sistem otomatik çevirebiliyor).
+      const fitsNormal =
+        l <= this.containerL + EPS && w <= this.containerW + EPS;
+      const fitsRotated =
+        w <= this.containerL + EPS && l <= this.containerW + EPS;
+      if (!fitsNormal && !fitsRotated)
+        return "Kasa taban ölçüleri konteynıra sığmıyor (çevirsek bile)!";
+      return null;
+    },
+
     tryAddCrate() {
       this.clearAlert();
-      const requestedQty = Number(this.newCrate.quantity);
+      let requestedQty = Math.floor(Number(this.newCrate.quantity) || 0);
       const boxW = Number(this.newCrate.width);
       const boxL = Number(this.newCrate.length);
       const boxH = Number(this.newCrate.height);
 
-      // --- Sığma Kontrolü (Seçili Yöne Göre) ---
-      let targetW, targetL;
-      if (this.newCrate.forkliftSide === "standard") {
-        // Standart: En -> Y (Genişlik), Boy -> X (Uzunluk)
-        targetW = boxW;
-        targetL = boxL;
-      } else {
-        // Rotated: En -> X (Uzunluk), Boy -> Y (Genişlik)
-        targetW = boxL;
-        targetL = boxW;
-      }
-
-      if (targetW > this.containerW || targetL > this.containerL) {
-        this.alertState = {
-          type: "error",
-          message: "Kasa ölçüleri (seçilen yönde) konteynıra sığmıyor!",
-        };
-        return;
-      }
-      if (boxH > this.containerH) {
-        this.alertState = {
-          type: "error",
-          message: "Kasa yüksekliği konteynırdan büyük!",
-        };
+      const err = this.validateCrate(this.newCrate, requestedQty);
+      if (err) {
+        this.alertState = { type: "error", message: err };
         return;
       }
 
-      let calcMaxStack = 1;
-      if (this.newCrate.isStackable && boxH > 0) {
-        calcMaxStack = Math.floor(this.containerH / boxH);
-        if (calcMaxStack < 1) calcMaxStack = 1;
+      if (requestedQty > MAX_QTY_PER_ITEM) {
+        requestedQty = MAX_QTY_PER_ITEM;
+        this.alertState = {
+          type: "warning",
+          message: `Tek kalemde en fazla ${MAX_QTY_PER_ITEM} adet hesaplanır.`,
+        };
       }
+
+      const crateName = (this.newCrate.name || "").trim() || "Kasa";
 
       const existingIndex = this.items.findIndex(
         (item) =>
-          Math.abs(Number(item.width) - boxW) < 0.1 &&
-          Math.abs(Number(item.height) - boxH) < 0.1 &&
-          Math.abs(Number(item.length) - boxL) < 0.1 &&
+          Math.abs(Number(item.width) - boxW) < 0.01 &&
+          Math.abs(Number(item.height) - boxH) < 0.01 &&
+          Math.abs(Number(item.length) - boxL) < 0.01 &&
           item.isStackable === this.newCrate.isStackable &&
-          item.forkliftSide === this.newCrate.forkliftSide
+          item.forkliftSide === this.newCrate.forkliftSide &&
+          (item.name || "") === crateName
       );
 
-      let candidateList = JSON.parse(JSON.stringify(this.items));
-      let currentItemRef = null;
+      const candidateList = JSON.parse(JSON.stringify(this.items));
+      let currentId = null;
 
       if (existingIndex !== -1) {
-        candidateList[existingIndex].requestedQty += requestedQty;
-        currentItemRef = candidateList[existingIndex];
+        const merged = candidateList[existingIndex];
+        merged.requestedQty = Math.min(
+          merged.requestedQty + requestedQty,
+          MAX_QTY_PER_ITEM
+        );
+        currentId = merged.id;
       } else {
         const newItem = {
           ...this.newCrate,
-          id: Date.now(),
-          color: this.generateColor(),
+          name: crateName,
+          id: this.nextItemId(),
+          color: this.colorForName(crateName),
           requestedQty: requestedQty,
           failedQty: 0,
-          calculatedMaxStack: calcMaxStack,
+          calculatedMaxStack: this.stackCapacityFor(this.newCrate),
           quantity: 0,
         };
         candidateList.push(newItem);
-        currentItemRef = newItem;
+        currentId = newItem.id;
       }
 
       const result = this.packItems(candidateList);
+      this.syncResults(candidateList, result);
 
-      let totalFittedForThisItem = 0;
-      result.placed.forEach((box) => {
-        if (box.groupId === currentItemRef.id)
-          totalFittedForThisItem += box.stackCount;
-      });
+      const current = candidateList.find((i) => i.id === currentId);
+      const totalFitted = current ? current.quantity : 0;
+      const totalRequested = current ? current.requestedQty : 0;
 
-      const totalRequested = currentItemRef.requestedQty;
-      const failed = totalRequested - totalFittedForThisItem;
-
-      if (totalFittedForThisItem === 0 && requestedQty > 0) {
-        this.alertState = { type: "error", message: `Hiçbir kasa sığmadı!` };
+      if (totalFitted === 0) {
+        this.alertState = { type: "error", message: "Hiçbir kasa sığmadı!" };
         return;
       }
-      if (failed > 0) {
+      if (totalRequested - totalFitted > 0 && !this.alertState.type) {
         this.alertState = {
           type: "warning",
-          message: `${totalRequested} istendi, ${totalFittedForThisItem} sığdı.`,
+          message: `${totalRequested} istendi, ${totalFitted} sığdı.`,
         };
       }
-
-      candidateList.forEach((item) => {
-        let fitCount = 0;
-        result.placed.forEach((box) => {
-          if (box.groupId === item.id) fitCount += box.stackCount;
-        });
-        item.quantity = fitCount;
-        item.failedQty = item.requestedQty - fitCount;
-      });
 
       this.items = candidateList;
       this.placedBoxes = result.placed;
       this.newCrate.quantity = 1;
-      this.newCrate.name = "";
+    },
+
+    // Date.now() aynı milisaniyede iki kalem eklenirse çakışabiliyordu.
+    nextItemId() {
+      const max = this.items.reduce(
+        (acc, i) => Math.max(acc, Number(i.id) || 0),
+        0
+      );
+      return max + 1;
+    },
+
+    // Paketleme sonucunu listeye yaz: sığan adet, kalan adet ve GÜNCEL kat sayısı.
+    // (kat sayısı eskiden sadece ekleme anında hesaplanıyordu; konteynır
+    //  yüksekliği değişince tabloda eski değer kalıyordu.)
+    syncResults(list, result) {
+      const fitted = {};
+      result.placed.forEach((box) => {
+        fitted[box.groupId] = (fitted[box.groupId] || 0) + box.stackCount;
+      });
+      list.forEach((item) => {
+        const count = fitted[item.id] || 0;
+        item.quantity = count;
+        item.failedQty = Math.max(0, item.requestedQty - count);
+        item.calculatedMaxStack = this.stackCapacityFor(item);
+      });
     },
 
     decreaseItem(index) {
       const item = this.items[index];
+      if (!item) return;
       if (item.requestedQty > 1) {
         item.requestedQty--;
         this.recalculateAll();
@@ -604,6 +701,7 @@ export default {
 
     removeItem(index) {
       this.items.splice(index, 1);
+      this.clearAlert();
       this.recalculateAll();
     },
     clearAll() {
@@ -613,121 +711,176 @@ export default {
     },
 
     recalculateAll() {
-      let candidateList = JSON.parse(JSON.stringify(this.items));
-      const result = this.packItems(candidateList);
-      this.items.forEach((item) => {
-        let fitCount = 0;
-        result.placed.forEach((box) => {
-          if (box.groupId === item.id) fitCount += box.stackCount;
-        });
-        item.quantity = fitCount;
-        item.failedQty = item.requestedQty - fitCount;
-      });
+      const result = this.packItems(this.items);
+      this.syncResults(this.items, result);
       this.placedBoxes = result.placed;
     },
-    packItems(itemList) {
-      const cLength = Number(this.container.length) || 0;
-      const cWidth = Number(this.container.width) || 0;
-      const cHeight = Number(this.container.height) || 0;
 
-      // Başlangıçta tüm konteynır tek bir boşluktur
-      let spaces = [{ x: 0, y: 0, w: cLength, h: cWidth }];
-      let placed = [];
-
-      itemList.forEach((group) => {
-        let remainingQty =
-          group.requestedQty !== undefined
-            ? group.requestedQty
-            : group.quantity;
-
-        let stackCap = 1;
-        const gHeight = Number(group.height);
-        if (group.isStackable && gHeight > 0) {
-          stackCap = Math.floor(cHeight / gHeight);
-          if (stackCap < 1) stackCap = 1;
-        }
-
-        const rawDim1 = Number(group.length);
-        const rawDim2 = Number(group.width);
-
-        let targetL, targetW;
-        let isRotated = false;
-
-        if (group.forkliftSide === "standard") {
-          targetL = rawDim1;
-          targetW = rawDim2;
-        } else {
-          targetL = rawDim2;
-          targetW = rawDim1;
-          isRotated = true;
-        }
-
-        while (remainingQty > 0) {
-          let currentStack = Math.min(remainingQty, stackCap);
-
-          // Boşlukları X (derinlik) ve sonra Y (genişlik) eksenine göre sıralıyoruz
-          spaces.sort((a, b) => {
-            if (Math.abs(a.x - b.x) > 0.1) return a.x - b.x;
-            return a.y - b.y;
-          });
-
-          let bestSpaceIndex = -1;
-          for (let i = 0; i < spaces.length; i++) {
-            const sp = spaces[i];
-            if (sp.w >= targetL - 0.1 && sp.h >= targetW - 0.1) {
-              bestSpaceIndex = i;
-              break;
-            }
-          }
-
-          if (bestSpaceIndex !== -1) {
-            let space = spaces[bestSpaceIndex];
-
-            placed.push({
-              x: space.x,
-              y: space.y,
-              l: targetL,
-              w: targetW,
-              color: group.color,
-              name: group.name,
-              stackCount: currentStack,
-              forkliftSide: isRotated ? "length" : "width",
-              groupId: group.id,
-              isRotated: isRotated,
-            });
-
-            // --- KRİTİK DÜZELTME BURADA ---
-
-            // 1. splitDown: Kutunun YANINDAKİ boşluk.
-            // Genişliği (w) kısıtlamıyoruz (space.w kullanıyoruz), böylece yanına daha uzun kasalar sığabiliyor.
-            let splitDown = {
-              x: space.x,
-              y: space.y + targetW,
-              w: space.w,
-              h: space.h - targetW,
-            };
-
-            // 2. splitRight: Kutunun ARKASINDAKİ (kapıya doğru) boşluk.
-            // Bu boşluk sadece o kutunun hizasında kalmalı.
-            let splitRight = {
-              x: space.x + targetL,
-              y: space.y,
-              w: space.w - targetL,
-              h: targetW,
-            };
-
-            spaces.splice(bestSpaceIndex, 1);
-
-            if (splitDown.h > 0.1 && splitDown.w > 0.1) spaces.push(splitDown);
-            if (splitRight.w > 0.1 && splitRight.h > 0.1)
-              spaces.push(splitRight);
-
-            remainingQty -= currentStack;
-          } else {
+    // --- Maximal-rectangles boşluk yönetimi ---
+    // Eski guillotine bölme, yerleştirilen kutunun yanındaki büyük boş alanı
+    // kaybediyordu: küçük bir kasa eklenince arkadaki metrelerce boşluğa
+    // büyük kasa artık sığmıyordu. Aşağıdaki bölme tüm maksimal boş
+    // dikdörtgenleri korur.
+    splitSpace(S, R) {
+      if (
+        R.x >= S.x + S.w - EPS ||
+        R.x + R.w <= S.x + EPS ||
+        R.y >= S.y + S.h - EPS ||
+        R.y + R.h <= S.y + EPS
+      )
+        return [S]; // kesişmiyor
+      const out = [];
+      if (R.x > S.x + EPS) out.push({ x: S.x, y: S.y, w: R.x - S.x, h: S.h });
+      if (R.x + R.w < S.x + S.w - EPS)
+        out.push({
+          x: R.x + R.w,
+          y: S.y,
+          w: S.x + S.w - (R.x + R.w),
+          h: S.h,
+        });
+      if (R.y > S.y + EPS) out.push({ x: S.x, y: S.y, w: S.w, h: R.y - S.y });
+      if (R.y + R.h < S.y + S.h - EPS)
+        out.push({
+          x: S.x,
+          y: R.y + R.h,
+          w: S.w,
+          h: S.y + S.h - (R.y + R.h),
+        });
+      return out;
+    },
+    spaceContains(a, b) {
+      return (
+        b.x >= a.x - EPS &&
+        b.y >= a.y - EPS &&
+        b.x + b.w <= a.x + a.w + EPS &&
+        b.y + b.h <= a.y + a.h + EPS
+      );
+    },
+    pruneSpaces(spaces) {
+      const kept = [];
+      for (let i = 0; i < spaces.length; i++) {
+        const s = spaces[i];
+        if (s.w <= EPS || s.h <= EPS) continue;
+        let covered = false;
+        for (let j = 0; j < spaces.length; j++) {
+          if (i === j) continue;
+          const o = spaces[j];
+          if (o.w <= EPS || o.h <= EPS) continue;
+          // Birebir aynı iki dikdörtgenden yalnızca birini tut.
+          if (this.spaceContains(o, s) && !(j > i && this.spaceContains(s, o))) {
+            covered = true;
             break;
           }
         }
+        if (!covered) kept.push(s);
+      }
+      return kept;
+    },
+    // Kapıdan en uzak (en küçük x), sonra en soldaki boşluk tercih edilir;
+    // böylece "kalan boş uzunluk" ölçüsü anlamlı kalır.
+    findSpot(spaces, L, W) {
+      let best = -1;
+      for (let i = 0; i < spaces.length; i++) {
+        const sp = spaces[i];
+        if (sp.w < L - EPS || sp.h < W - EPS) continue;
+        if (best === -1) {
+          best = i;
+          continue;
+        }
+        const b = spaces[best];
+        if (
+          sp.x < b.x - EPS ||
+          (Math.abs(sp.x - b.x) <= EPS && sp.y < b.y - EPS)
+        )
+          best = i;
+      }
+      return best;
+    },
+
+    packItems(itemList) {
+      const cL = this.containerL;
+      const cW = this.containerW;
+      const cH = this.containerH;
+      const placed = [];
+      if (cL <= 0 || cW <= 0 || cH <= 0) return { placed };
+
+      let spaces = [{ x: 0, y: 0, w: cL, h: cW }];
+
+      (itemList || []).forEach((group) => {
+        const gW = Number(group.width);
+        const gL = Number(group.length);
+        const gH = Number(group.height);
+
+        let qty = Math.floor(
+          Number(
+            group.requestedQty !== undefined
+              ? group.requestedQty
+              : group.quantity
+          ) || 0
+        );
+        qty = Math.min(Math.max(qty, 0), MAX_QTY_PER_ITEM);
+
+        // Geçersiz ölçü / adet: sessizce atla (eskiden sıfır ölçülü kasa
+        // binlerce kutu üretip tarayıcıyı kilitliyordu).
+        if (!(gW > 0) || !(gL > 0) || !(gH > 0) || qty <= 0) return;
+
+        const stackCap = this.stackCapacityFor(group);
+        if (stackCap < 1) return; // yüksekliği sığmıyor
+
+        // Tercih edilen forklift yönü önce denenir, sığmazsa 90° çevrilir.
+        const orientations =
+          group.forkliftSide === "standard"
+            ? [
+                { L: gL, W: gW, rot: false },
+                { L: gW, W: gL, rot: true },
+              ]
+            : [
+                { L: gW, W: gL, rot: true },
+                { L: gL, W: gW, rot: false },
+              ];
+
+        let remaining = qty;
+        while (remaining > 0) {
+          if (placed.length >= MAX_PLACEMENTS) break;
+
+          let idx = -1;
+          let chosen = null;
+          for (const o of orientations) {
+            if (o.L > cL + EPS || o.W > cW + EPS) continue;
+            const i = this.findSpot(spaces, o.L, o.W);
+            if (i !== -1) {
+              idx = i;
+              chosen = o;
+              break;
+            }
+          }
+          if (idx === -1) break;
+
+          const sp = spaces[idx];
+          const rect = { x: sp.x, y: sp.y, w: chosen.L, h: chosen.W };
+          const stack = Math.min(remaining, stackCap);
+
+          placed.push({
+            x: rect.x,
+            y: rect.y,
+            l: chosen.L,
+            w: chosen.W,
+            color: group.color,
+            name: group.name,
+            stackCount: stack,
+            forkliftSide: chosen.rot ? "length" : "width",
+            groupId: group.id,
+            isRotated: chosen.rot,
+          });
+
+          let next = [];
+          for (const s of spaces) next = next.concat(this.splitSpace(s, rect));
+          spaces = this.pruneSpaces(next);
+
+          remaining -= stack;
+        }
       });
+
       return { placed };
     },
   },
