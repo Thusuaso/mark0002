@@ -19,11 +19,24 @@
           <button class="chat-back" @click="closeThread" title="Listeye dön">
             <i class="pi pi-arrow-left"></i>
           </button>
-          <span class="chat-dot" :class="{ on: isOnline(activeUser.ID) }"></span>
+          <span class="chat-dot" :class="durumSinifi(activeUser)"></span>
           <div class="chat-head-text">
             <strong>{{ activeUser.KullaniciAdi }}</strong>
-            <small>{{ isOnline(activeUser.ID) ? "Çevrimiçi" : "Çevrimdışı" }}</small>
+            <small>{{ durumYazisi(activeUser) }}</small>
           </div>
+          <button
+            v-if="takipReady"
+            class="chat-star"
+            :class="{ on: isTakip(activeUser.ID) }"
+            :title="
+              isTakip(activeUser.ID)
+                ? 'Çevrimiçi olunca bildirme'
+                : 'Çevrimiçi olunca bildir'
+            "
+            @click="takipDegistir(activeUser.ID)"
+          >
+            <i :class="isTakip(activeUser.ID) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+          </button>
         </div>
         <div v-else class="chat-head-text">
           <strong>Sohbet</strong>
@@ -47,21 +60,38 @@
         <div v-if="filtrelenmisKisiler.length === 0" class="chat-empty">
           <p>Kişi bulunamadı.</p>
         </div>
-        <button
+        <div
           v-for="kisi in filtrelenmisKisiler"
           :key="kisi.ID"
           class="chat-row"
-          @click="openThread(kisi)"
         >
-          <span class="chat-dot" :class="{ on: isOnline(kisi.ID) }"></span>
-          <span class="chat-row-text">
-            <strong>{{ kisi.KullaniciAdi }}</strong>
-            <small>{{ kisi.SonMesaj ? kisaMesaj(kisi.SonMesaj) : "—" }}</small>
-          </span>
-          <span v-if="kisi.Okunmamis > 0" class="chat-count">
-            {{ kisi.Okunmamis }}
-          </span>
-        </button>
+          <button class="chat-row-main" @click="openThread(kisi)">
+            <span class="chat-dot" :class="durumSinifi(kisi)"></span>
+            <span class="chat-row-text">
+              <strong>{{ kisi.KullaniciAdi }}</strong>
+              <!-- Son mesaj yoksa durum/son gorulme gosterilir -->
+              <small>{{
+                kisi.SonMesaj ? kisaMesaj(kisi.SonMesaj) : durumYazisi(kisi)
+              }}</small>
+            </span>
+            <span v-if="kisi.Okunmamis > 0" class="chat-count">
+              {{ kisi.Okunmamis }}
+            </span>
+          </button>
+          <button
+            v-if="takipReady"
+            class="chat-star"
+            :class="{ on: isTakip(kisi.ID) }"
+            :title="
+              isTakip(kisi.ID)
+                ? 'Çevrimiçi olunca bildirme'
+                : 'Çevrimiçi olunca bildir'
+            "
+            @click="takipDegistir(kisi.ID)"
+          >
+            <i :class="isTakip(kisi.ID) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Yazisma -->
@@ -120,6 +150,9 @@
 import { mapGetters } from "vuex";
 
 const MESAJ_MAX = 4000; // SohbetMesajTB.Mesaj ile ayni
+/* Bu sureden uzun suredir etkileşim yoksa kullanici "cevrimici" degil
+   "X dakika once aktif" gorunur; sekmeyi acik birakip gidenler icin. */
+const BOSTA_ESIK_MS = 5 * 60 * 1000;
 
 export default {
   name: "ChatPanel",
@@ -129,7 +162,21 @@ export default {
       arama: "",
       gonderiliyor: false,
       MESAJ_MAX: MESAJ_MAX,
+      /* "3 dk once aktif" gibi goreli yazilarin kendi kendine tazelenmesi
+         icin dakikada bir guncellenen saat. */
+      simdi: Date.now(),
+      sayacZamanlayici: null,
     };
+  },
+  mounted() {
+    this.sayacZamanlayici = setInterval(() => {
+      this.simdi = Date.now();
+    }, 60 * 1000);
+  },
+  beforeDestroy() {
+    if (this.sayacZamanlayici) {
+      clearInterval(this.sayacZamanlayici);
+    }
   },
   computed: {
     ...mapGetters({
@@ -144,6 +191,9 @@ export default {
       unreadTotal: "getChatUnreadTotal",
       onlineCount: "getChatOnlineCount",
       benId: "getUserId",
+      aktiflik: "getChatAktiflik",
+      takip: "getChatTakip",
+      takipReady: "getChatTakipReady",
     }),
     activeUser() {
       if (!this.activeUserId) return null;
@@ -176,6 +226,54 @@ export default {
     },
     isOnline(id) {
       return this.online.indexOf(Number(id)) !== -1;
+    },
+    isTakip(id) {
+      return this.takip.indexOf(Number(id)) !== -1;
+    },
+    takipDegistir(id) {
+      this.$store.dispatch("setChatWatchToggle", id);
+    },
+    /* Son gercek etkileşim zamani: canli soket verisi varsa o, yoksa
+       veritabanindan gelen SonAktif kullanilir (cevrimdisi kisiler icin). */
+    sonAktifZamani(kisi) {
+      const canli = this.aktiflik[Number(kisi.ID)];
+      const kaynak = canli || kisi.SonAktif;
+      if (!kaynak) return null;
+      const t = new Date(kaynak).getTime();
+      return isNaN(t) ? null : t;
+    },
+    bostaMi(kisi) {
+      const t = this.sonAktifZamani(kisi);
+      if (t == null) return true;
+      return this.simdi - t > BOSTA_ESIK_MS;
+    },
+    durumSinifi(kisi) {
+      if (!this.isOnline(kisi.ID)) return {};
+      return this.bostaMi(kisi) ? { idle: true } : { on: true };
+    },
+    /* "Çevrimiçi" / "12 dk önce aktif" / "Son görülme: ..." */
+    durumYazisi(kisi) {
+      const t = this.sonAktifZamani(kisi);
+      if (this.isOnline(kisi.ID)) {
+        if (!this.bostaMi(kisi)) return "Çevrimiçi";
+        return this.goreliZaman(t) + " aktif";
+      }
+      if (t == null) return "Çevrimdışı";
+      return "Son görülme: " + this.goreliZaman(t);
+    },
+    goreliZaman(t) {
+      if (t == null) return "";
+      const fark = Math.max(0, this.simdi - t);
+      const dk = Math.floor(fark / 60000);
+      if (dk < 1) return "az önce";
+      if (dk < 60) return dk + " dk önce";
+      const saat = Math.floor(dk / 60);
+      if (saat < 24) return saat + " saat önce";
+      const gun = Math.floor(saat / 24);
+      if (gun < 7) return gun + " gün önce";
+      const d = new Date(t);
+      const iki = (n) => (n < 10 ? "0" + n : String(n));
+      return `${iki(d.getDate())}.${iki(d.getMonth() + 1)}.${d.getFullYear()}`;
     },
     benimMi(mesaj) {
       return Number(mesaj.GonderenID) === Number(this.benId);
@@ -326,6 +424,25 @@ export default {
 .chat-dot.on {
   background: #10b981;
 }
+/* Bagli ama bir suredir etkileşim yok */
+.chat-dot.idle {
+  background: #f59e0b;
+}
+.chat-star {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d1d5db;
+  padding: 0 8px;
+  flex: 0 0 auto;
+  font-size: 0.95rem;
+}
+.chat-star.on {
+  color: #f59e0b;
+}
+.chat-star:hover {
+  color: #f97316;
+}
 .chat-list {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -348,17 +465,24 @@ export default {
 .chat-row {
   display: flex;
   align-items: center;
-  gap: 9px;
   width: 100%;
-  padding: 9px 11px;
-  background: none;
-  border: none;
   border-bottom: 1px solid #f3f4f6;
-  cursor: pointer;
-  text-align: left;
 }
 .chat-row:hover {
   background: #f9fafb;
+}
+/* Satirin tiklanabilir kismi; yildiz dugmesi ayri kalir ki sohbeti acmasin */
+.chat-row-main {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 9px 4px 9px 11px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
 .chat-row-text {
   display: flex;

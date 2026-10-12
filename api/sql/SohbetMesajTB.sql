@@ -30,7 +30,7 @@ begin
     [AliciID]        int not null,            -- KullaniciTB.ID
     [Mesaj]          nvarchar(4000) not null,
     [GonderimTarihi] datetime not null
-      constraint DF_SohbetMesajTB_GonderimTarihi default (getdate()),
+      constraint DF_SohbetMesajTB_GonderimTarihi default (getutcdate()),
     [OkunduTarihi]   datetime null,           -- null = okunmadi
     constraint PK_SohbetMesajTB primary key clustered ([ID])
   );

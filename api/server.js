@@ -95,6 +95,7 @@ const io = new Server(server, {
    devam eder. */
 let pool = null;
 let sohbetTablosuVar = false;
+let aktiflikTablosuVar = false;
 
 async function veritabaniBaslat() {
   const eksik = ["DB_USER", "DB_PASSWORD", "DB_NAME", "DB_SERVER"].filter(
@@ -122,16 +123,27 @@ async function veritabaniBaslat() {
       pool: { max: 5, min: 0, idleTimeoutMillis: 30000 },
     }).connect();
     const kontrol = await pool.request().query(`
-      select count(*) as tablo from sys.objects
-       where object_id = object_id(N'[dbo].[SohbetMesajTB]') and type = N'U'
+      select
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[SohbetMesajTB]') and type = N'U') as mesaj,
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[KullaniciAktiflikTB]') and type = N'U') as aktiflik
     `);
-    sohbetTablosuVar = kontrol.recordset[0].tablo > 0;
+    sohbetTablosuVar = kontrol.recordset[0].mesaj > 0;
+    aktiflikTablosuVar = kontrol.recordset[0].aktiflik > 0;
     console.log(
       sohbetTablosuVar
         ? "✅ Socket veritabani baglantisi hazir, sohbet tablosu mevcut."
         : "⚠️  Baglanti var ama SohbetMesajTB yok. " +
             "node api/sql/run.cjs api/sql/SohbetMesajTB.sql"
     );
+    if (!aktiflikTablosuVar) {
+      console.log(
+        "⚠️  KullaniciAktiflikTB yok, son gorulme bilgisi tutulmayacak. " +
+          "node api/sql/run.cjs api/sql/KullaniciAktiflikTB.sql"
+      );
+    }
+    await aktiflikYukle();
   } catch (err) {
     console.error("❌ Socket veritabani baglanti hatasi:", err.message);
     pool = null;
@@ -170,6 +182,74 @@ function onlineCikar(userId, socketId) {
     return true; // son baglanti kapandi
   }
   return false;
+}
+/* --------------------------------------------------------------------------
+   Son aktiflik
+   --------------------------------------------------------------------------
+   Aktiflik = kullanicinin GERCEK etkileşimi (istemci fare/klavye/sekme odagi
+   olunca presence:ping gonderir). Yalnizca baglantinin acik olmasi aktiflik
+   saymaz; boylece sekmeyi acik birakip giden kullanici "cevrimici" degil
+   "X dakika once aktif" gorunur.
+
+   Hafizada anlik tutulur, veritabanina kisilmis sekilde yazilir: her ping'te
+   yazmak 36 kullanici icin gereksiz yuk olurdu. Baglanti kapanirken her
+   zaman yazilir ki sunucu yeniden baslasa da son deger kaybolmasin. */
+const AKTIFLIK_YAZMA_ARALIK_MS = 60 * 1000;
+const sonAktiflik = new Map(); // userId -> timestamp (ms)
+const sonYazim = new Map(); // userId -> timestamp (ms)
+
+async function aktiflikKaydet(userId, zorla) {
+  const simdi = Date.now();
+  sonAktiflik.set(userId, simdi);
+  if (!pool || !aktiflikTablosuVar) {
+    return;
+  }
+  const oncekiYazim = sonYazim.get(userId) || 0;
+  if (!zorla && simdi - oncekiYazim < AKTIFLIK_YAZMA_ARALIK_MS) {
+    return;
+  }
+  sonYazim.set(userId, simdi);
+  try {
+    await pool
+      .request()
+      .input("id", mssql.Int, userId)
+      .query(`
+        update KullaniciAktiflikTB set SonAktif = getutcdate() where KullaniciID = @id;
+        if @@rowcount = 0
+          insert into KullaniciAktiflikTB (KullaniciID, SonAktif) values (@id, getutcdate());
+      `);
+  } catch (err) {
+    console.error("aktiflik kaydi hatasi:", err.message);
+  }
+}
+/* Istemcilere gonderilen aktiflik haritasi: { userId: ISO tarih } */
+function aktiflikHaritasi() {
+  const harita = {};
+  for (const [userId, zaman] of sonAktiflik.entries()) {
+    harita[userId] = new Date(zaman).toISOString();
+  }
+  return harita;
+}
+/* Veritabanindaki son aktiflik degerleri hafizaya alinir; sunucu yeniden
+   baslatildiginda "son gorulme" bilgisi sifirlanmasin. */
+async function aktiflikYukle() {
+  if (!pool || !aktiflikTablosuVar) {
+    return;
+  }
+  try {
+    const sonuc = await pool
+      .request()
+      .query("select KullaniciID, SonAktif from KullaniciAktiflikTB");
+    for (const satir of sonuc.recordset) {
+      const zaman = new Date(satir.SonAktif).getTime();
+      if (!isNaN(zaman)) {
+        sonAktiflik.set(Number(satir.KullaniciID), zaman);
+      }
+    }
+    console.log(`Son aktiflik yuklendi: ${sonuc.recordset.length} kullanici`);
+  } catch (err) {
+    console.error("aktiflik yukleme hatasi:", err.message);
+  }
 }
 /* Kullanicinin tum sekmelerine gonderim icin oda kullanilir: "user:12" */
 function kullaniciOdasi(userId) {
@@ -250,13 +330,19 @@ io.on("connection", (socket) => {
   if (user) {
     socket.join(kullaniciOdasi(user.userId));
     const ilkBaglanti = onlineEkle(user.userId, socket.id);
+    /* Baglanmak etkileşim sayilir: sayfayi acan kisi o an aktiftir. */
+    aktiflikKaydet(user.userId, true);
     /* Yeni gelen once mevcut listeyi alir, sonra digerleri haberdar edilir. */
-    socket.emit("presence:list", { online: onlineIdListesi() });
+    socket.emit("presence:list", {
+      online: onlineIdListesi(),
+      aktiflik: aktiflikHaritasi(),
+    });
     if (ilkBaglanti) {
       socket.broadcast.emit("presence:update", {
         userId: user.userId,
         username: user.username,
         online: true,
+        sonAktif: new Date().toISOString(),
       });
     }
   }
@@ -265,7 +351,29 @@ io.on("connection", (socket) => {
     if (!user) {
       return;
     }
-    socket.emit("presence:list", { online: onlineIdListesi() });
+    socket.emit("presence:list", {
+      online: onlineIdListesi(),
+      aktiflik: aktiflikHaritasi(),
+    });
+  });
+
+  /* Istemci etkileşim bildirir (fare/klavye/sekme odagi). Istemci zaten
+     kisitli araliklarla gonderir; yine de sunucu tarafinda da yazma
+     kisitlanir. */
+  socket.on("presence:ping", async () => {
+    if (!user) {
+      return;
+    }
+    const onceki = sonYazim.get(user.userId) || 0;
+    await aktiflikKaydet(user.userId, false);
+    /* Yalnizca veritabanina yazildiysa (yani araliga girdiyse) digerlerine
+       haber verilir; her fare hareketinde yayin yapilmaz. */
+    if ((sonYazim.get(user.userId) || 0) !== onceki) {
+      socket.broadcast.emit("presence:activity", {
+        userId: user.userId,
+        sonAktif: new Date().toISOString(),
+      });
+    }
   });
 
   /* ---------------- Mesaj gonderme ---------------- */
@@ -302,6 +410,8 @@ io.on("connection", (socket) => {
         message: `Mesaj en fazla ${MESAJ_MAX_UZUNLUK} karakter olabilir.`,
       });
     }
+    /* Mesaj gondermek kesinlikle etkilesimdir. */
+    aktiflikKaydet(user.userId, false);
     if (mesajHiziAsildi(socket)) {
       return bitir({ status: false, message: "Çok hızlı mesaj gönderiyorsunuz." });
     }
@@ -362,12 +472,13 @@ io.on("connection", (socket) => {
     if (!karsiId || karsiId <= 0) {
       return bitir({ status: false });
     }
+    aktiflikKaydet(user.userId, false);
     try {
       const request = pool.request();
       request.input("AliciID", mssql.Int, user.userId);
       request.input("GonderenID", mssql.Int, karsiId);
       const sonuc = await request.query(`
-        update SohbetMesajTB set OkunduTarihi = getdate()
+        update SohbetMesajTB set OkunduTarihi = getutcdate()
          where AliciID = @AliciID
            and GonderenID = @GonderenID
            and OkunduTarihi is null
@@ -392,10 +503,16 @@ io.on("connection", (socket) => {
     if (user) {
       const sonBaglanti = onlineCikar(user.userId, socket.id);
       if (sonBaglanti) {
+        /* Son baglanti kapanirken deger mutlaka yazilir: sunucu yeniden
+           baslasa da "son gorulme" korunur. */
+        aktiflikKaydet(user.userId, true);
         socket.broadcast.emit("presence:update", {
           userId: user.userId,
           username: user.username,
           online: false,
+          sonAktif: new Date(
+            sonAktiflik.get(user.userId) || Date.now()
+          ).toISOString(),
         });
       }
       console.log(`Kullanici ayrildi: ${user.username} (${user.userId})`);
@@ -410,6 +527,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({
     status: true,
     sohbetTablosuVar: sohbetTablosuVar,
+    aktiflikTablosuVar: aktiflikTablosuVar,
     veritabani: !!pool,
     onlineKullanici: onlineKullanicilar.size,
     baglanti: io.engine.clientsCount,

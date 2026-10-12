@@ -13,6 +13,9 @@ const state = {
   socket: null,
   users: [],          // sohbet edilebilecek kullanicilar
   online: [],         // online kullanici ID'leri
+  aktiflik: {},       // { userId: ISO tarih } son gercek etkileşim
+  takip: [],          // online olunca bildirim istenen kisiler
+  takipReady: false,
   activeUserId: null, // acik olan yazisma
   messages: [],       // acik yazismanin mesajlari
   loadingHistory: false,
@@ -39,8 +42,20 @@ const actions = {
 
     socket.on("presence:list", (veri) => {
       vuexContext.commit("setChatOnline", (veri && veri.online) || []);
+      vuexContext.commit("setChatAktiflik", (veri && veri.aktiflik) || {});
     });
     socket.on("presence:update", (veri) => {
+      /* Toast yalnizca cevrimdisi -> cevrimici gecisinde cikar; ilk
+         baglantida gelen tam liste (presence:list) bildirim uretmez. */
+      const oncedenOnline = vuexContext.state.online.indexOf(
+        Number(veri && veri.userId)
+      ) !== -1;
+      vuexContext.commit("setChatPresence", veri);
+      if (veri && veri.online && !oncedenOnline) {
+        vuexContext.dispatch("chatOnlineBildirimi", veri);
+      }
+    });
+    socket.on("presence:activity", (veri) => {
       vuexContext.commit("setChatPresence", veri);
     });
     socket.on("chat:message", (mesaj) => {
@@ -197,6 +212,52 @@ const actions = {
     }
   },
 
+  /* Takip listesi: bu kisiler online olunca toast cikar. */
+  setChatWatchList(vuexContext) {
+    return this.$axios
+      .get("/chat/watch")
+      .then((response) => {
+        vuexContext.commit("setChatTakip", response.data.list || []);
+        vuexContext.commit("setChatTakipReady", response.data.ready !== false);
+      })
+      .catch(() => {
+        vuexContext.commit("setChatTakip", []);
+        vuexContext.commit("setChatTakipReady", false);
+      });
+  },
+
+  setChatWatchToggle(vuexContext, userId) {
+    const id = Number(userId);
+    const takipte = vuexContext.state.takip.indexOf(id) !== -1;
+    /* Once arayuzde degistir, hata olursa geri al. */
+    vuexContext.commit("setChatTakipTek", { userId: id, takip: !takipte });
+    return this.$axios
+      .post("/chat/watch", { userId: id, takip: !takipte })
+      .then((response) => {
+        if (!response.data.status) {
+          vuexContext.commit("setChatTakipTek", { userId: id, takip: takipte });
+          this.$toast.error(response.data.message || "Takip kaydedilemedi.");
+        }
+      })
+      .catch(() => {
+        vuexContext.commit("setChatTakipTek", { userId: id, takip: takipte });
+        this.$toast.error("Takip kaydedilemedi.");
+      });
+  },
+
+  /* Takip edilen kisi cevrimiciye gecince sag ustte toast. */
+  chatOnlineBildirimi(vuexContext, veri) {
+    const id = Number(veri.userId);
+    if (vuexContext.state.takip.indexOf(id) === -1) {
+      return;
+    }
+    const kisi = vuexContext.state.users.find((u) => Number(u.ID) === id);
+    const ad = (kisi && kisi.KullaniciAdi) || veri.username || "Kullanıcı";
+    if (this.$toast) {
+      this.$toast.info(`${ad} çevrimiçi oldu`);
+    }
+  },
+
   setChatPanelOpen(vuexContext, acik) {
     vuexContext.commit("setChatPanelOpen", acik);
   },
@@ -212,6 +273,7 @@ const mutations = {
     }
     state.socket = null;
     state.online = [];
+    state.aktiflik = {};
   },
   setChatUsers(state, users) {
     state.users = users;
@@ -222,11 +284,36 @@ const mutations = {
   setChatOnline(state, online) {
     state.online = (online || []).map((x) => Number(x));
   },
+  setChatAktiflik(state, harita) {
+    state.aktiflik = harita || {};
+  },
+  setChatTakip(state, takip) {
+    state.takip = (takip || []).map((x) => Number(x));
+  },
+  setChatTakipReady(state, durum) {
+    state.takipReady = !!durum;
+  },
+  setChatTakipTek(state, veri) {
+    const id = Number(veri.userId);
+    const varMi = state.takip.indexOf(id) !== -1;
+    if (veri.takip && !varMi) {
+      state.takip = state.takip.concat([id]);
+    } else if (!veri.takip && varMi) {
+      state.takip = state.takip.filter((x) => x !== id);
+    }
+  },
   setChatPresence(state, veri) {
     if (!veri) {
       return;
     }
     const id = Number(veri.userId);
+    if (veri.sonAktif) {
+      state.aktiflik = { ...state.aktiflik, [id]: veri.sonAktif };
+    }
+    /* presence:activity yalnizca aktiflik tasir, online durumunu degistirmez */
+    if (typeof veri.online !== "boolean") {
+      return;
+    }
     const varMi = state.online.indexOf(id) !== -1;
     if (veri.online && !varMi) {
       state.online = state.online.concat([id]);
@@ -297,6 +384,18 @@ const getters = {
   },
   getChatOnline(state) {
     return state.online;
+  },
+  getChatSocket(state) {
+    return state.socket;
+  },
+  getChatAktiflik(state) {
+    return state.aktiflik;
+  },
+  getChatTakip(state) {
+    return state.takip;
+  },
+  getChatTakipReady(state) {
+    return state.takipReady;
   },
   getChatActiveUserId(state) {
     return state.activeUserId;

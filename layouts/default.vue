@@ -25,7 +25,12 @@ export default {
     ...mapGetters(["getLoading"]),
   },
   data() {
-    return {};
+    return {
+      /* Aktiflik bildirimini kisitlamak icin son gonderim zamani */
+      sonAktiflikBildirimi: 0,
+      aktiflikEli: null,
+      gorunurlukEli: null,
+    };
   },
   created() {
     this.$store.dispatch("setCountryList");
@@ -59,10 +64,53 @@ export default {
     if (this.$store.getters.isAuthenticated) {
       this.$store.dispatch("setChatConnection");
       this.$store.dispatch("setChatUserList");
+      this.$store.dispatch("setChatWatchList");
+      this.aktiflikDinleyicileriniKur();
     }
   },
   beforeDestroy() {
+    this.aktiflikDinleyicileriniKaldir();
     this.$store.dispatch("setChatDisconnect");
+  },
+  methods: {
+    /* "Son aktiflik" gercek etkileşimden hesaplanir: sekmeyi acik birakip
+       giden kullanici cevrimici degil "X dakika once aktif" gorunsun.
+       Her harekette degil, en fazla ARALIK kadar sikligkla bildirilir. */
+    aktiflikBildir() {
+      const simdi = Date.now();
+      if (simdi - this.sonAktiflikBildirimi < 45 * 1000) {
+        return;
+      }
+      this.sonAktiflikBildirimi = simdi;
+      const chatSocket = this.$store.getters.getChatSocket;
+      if (chatSocket && chatSocket.connected) {
+        chatSocket.emit("presence:ping");
+      }
+    },
+    aktiflikDinleyicileriniKur() {
+      this.aktiflikEli = () => this.aktiflikBildir();
+      for (const olay of ["mousedown", "keydown", "wheel", "touchstart"]) {
+        window.addEventListener(olay, this.aktiflikEli, { passive: true });
+      }
+      this.gorunurlukEli = () => {
+        if (document.visibilityState === "visible") {
+          /* Sekmeye geri donmek etkileşimdir; kisitlamayi atla. */
+          this.sonAktiflikBildirimi = 0;
+          this.aktiflikBildir();
+        }
+      };
+      document.addEventListener("visibilitychange", this.gorunurlukEli);
+    },
+    aktiflikDinleyicileriniKaldir() {
+      if (this.aktiflikEli) {
+        for (const olay of ["mousedown", "keydown", "wheel", "touchstart"]) {
+          window.removeEventListener(olay, this.aktiflikEli);
+        }
+      }
+      if (this.gorunurlukEli) {
+        document.removeEventListener("visibilitychange", this.gorunurlukEli);
+      }
+    },
   },
 };
 </script>
