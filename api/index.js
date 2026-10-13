@@ -3,6 +3,7 @@ import mssql from "mssql";
 import nodemailer from "nodemailer";
 import currency from "../plugins/currency";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import AWS from "aws-sdk";
 import { sohbetHaricSql } from "./sohbetHaric";
 var cookieParser = require("cookie-parser");
@@ -404,8 +405,19 @@ app.use((req, res, next) => {
     "/users",
   ];
 
+  /* Kendi yetkisini kendi dogrulayan uclar.
+     <img src="..."> etiketi Authorization basligi gonderemez, yalnizca
+     cerez tasir; bu yuzden sohbet eki ucu token'i cerezden de okur ve
+     yetkiyi kendi icinde dogrular (bkz. sohbetDosyaKullanicisi). Burada
+     serbest birakilmasi yetki kaldirmak DEGIL, yetkiyi o uca devretmektir. */
+  const kendiYetkisiniDogrulayan = ["/chat/file/"];
+
   // Tarayıcının 'OPTIONS' yoklamalarını ve açık rotaları serbest bırak
-  if (req.method === "OPTIONS" || openRoutes.includes(req.path)) {
+  if (
+    req.method === "OPTIONS" ||
+    openRoutes.includes(req.path) ||
+    kendiYetkisiniDogrulayan.some((p) => req.path.startsWith(p))
+  ) {
     return next();
   }
 
@@ -3374,6 +3386,18 @@ const SOHBET_GECMIS_LIMIT = 50;
 const SOHBET_TEMIZLIK_ARALIK_MS = 24 * 60 * 60 * 1000;
 const SOHBET_TEMIZLIK_BASLAMA_MS = 2 * 60 * 1000;
 
+/* Goruntu eki sinirlari. Istemci de ayni sinirlari uygular (utils/chatDosya.js)
+   ama son soz sunucudadir: istemci kontrolleri atlanabilir. */
+const SOHBET_DOSYA_MAX_BAYT = 5 * 1024 * 1024;
+const SOHBET_DOSYA_TURLERI = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+};
+/* Imzali baglantilarin omru. Kisa tutulur: baglanti baskasina gitse bile
+   kisa surede olur, ancak bir goruntunun yuklenmesine fazlasiyla yeter. */
+const SOHBET_DOSYA_IMZA_SN = 300;
+
 let chatReadyCache = null;
 async function chatReady() {
   if (chatReadyCache !== null) {
@@ -3399,6 +3423,37 @@ async function chatReady() {
   }
   return chatReadyCache;
 }
+/* Goruntu eki alanlari api/sql/SohbetMesajEk.sql ile eklenir. Script
+   calistirilmadiysa ek gonderme kapalidir, metin sohbeti aynen calisir. */
+let chatDosyaReadyCache = null;
+async function chatDosyaReady() {
+  if (chatDosyaReadyCache !== null) {
+    return chatDosyaReadyCache;
+  }
+  try {
+    const check = await mssql.query(`
+      select count(*) as kolon from sys.columns
+       where object_id = object_id(N'[dbo].[SohbetMesajTB]')
+         and name = N'DosyaKey'
+    `);
+    chatDosyaReadyCache = check.recordset[0].kolon > 0;
+  } catch (err) {
+    chatDosyaReadyCache = false;
+  }
+  return chatDosyaReadyCache;
+}
+
+/* Spaces anahtari ve gizli bilgiler olmadan yukleme/goruntuleme yapilamaz;
+   eksikse ek gonderme kapali kalir, sohbet calismaya devam eder. */
+function spacesHazirMi() {
+  return !!(
+    SPACES_BUCKET &&
+    process.env.DO_SPACES_KEY &&
+    process.env.DO_SPACES_SECRET &&
+    process.env.DO_SPACES_ENDPOINT
+  );
+}
+
 /* bigint ID'ler JSON'da sayi olarak tasinirsa buyuk degerlerde hassasiyet
    kaybi olur; istemci zaten yalnizca karsilastirma yapiyor, metin olarak
    gonderilir. api/server.js de ayni bicimi kullanir. */
@@ -3410,6 +3465,16 @@ function sohbetSatiri(row) {
     Mesaj: row.Mesaj,
     GonderimTarihi: row.GonderimTarihi,
     OkunduTarihi: row.OkunduTarihi,
+    /* Spaces anahtari istemciye ASLA verilmez; goruntu korumali uctan
+       acilir, orada gonderen/alici kontrolu yapilir. */
+    Dosya: row.DosyaKey
+      ? {
+          Tur: row.DosyaTur,
+          Ad: row.DosyaAd,
+          Boyut: row.DosyaBoyut,
+          Url: `/api/chat/file/${row.ID}`,
+        }
+      : null,
   };
 }
 
@@ -3443,6 +3508,7 @@ app.get("/chat/users", async (req, res) => {
           Takip: false,
         })),
         ready: false,
+        dosya: false,
       });
     }
     const sonuc = await request.query(`
@@ -3484,10 +3550,16 @@ app.get("/chat/users", async (req, res) => {
         s.GonderimTarihi desc,
         k.KullaniciAdi
     `);
-    res.status(200).json({ list: sonuc.recordset, ready: true });
+    /* dosya: goruntu eki gonderilebilir mi (kolonlar + depo ayari).
+       Arayuz buna gore ataç/ekran goruntusu dugmelerini gosterir. */
+    res.status(200).json({
+      list: sonuc.recordset,
+      ready: true,
+      dosya: (await chatDosyaReady()) && spacesHazirMi(),
+    });
   } catch (err) {
     console.error("sohbet kullanici listesi hatasi:", err.message);
-    res.status(500).json({ list: [], ready: false });
+    res.status(500).json({ list: [], ready: false, dosya: false });
   }
 });
 
@@ -3507,6 +3579,11 @@ app.get("/chat/history/:userId", async (req, res) => {
     if (limit < 1) limit = 1;
     if (limit > 200) limit = 200;
     const beforeId = req.query.beforeId ? String(req.query.beforeId) : null;
+    /* Ek alanlari yoksa (SohbetMesajEk.sql calistirilmadiysa) o kolonlari
+       secmek sorguyu kirardi; bu durumda yalnizca metin alanlari gelir. */
+    const dosyaKolonlari = (await chatDosyaReady())
+      ? ", m.DosyaKey, m.DosyaTur, m.DosyaAd, m.DosyaBoyut"
+      : "";
 
     const request = new mssql.Request();
     request.input("ben", mssql.Int, benId);
@@ -3516,6 +3593,7 @@ app.get("/chat/history/:userId", async (req, res) => {
     const sonuc = await request.query(`
       select top (@limit)
         m.ID, m.GonderenID, m.AliciID, m.Mesaj, m.GonderimTarihi, m.OkunduTarihi
+        ${dosyaKolonlari}
       from SohbetMesajTB m
       where (
               (m.GonderenID = @ben and m.AliciID = @karsi)
@@ -3576,6 +3654,142 @@ app.post("/chat/read", async (req, res) => {
     res.status(200).json({ status: true, adet: sonuc.rowsAffected[0] || 0 });
   } catch (err) {
     console.error("sohbet okundu hatasi:", err.message);
+    res.status(500).json({ status: false });
+  }
+});
+
+/* --------------------------------------------------------------------------
+   Goruntu eki: yukleme izni
+   --------------------------------------------------------------------------
+   Dosya sunucudan GECMEZ: istemci imzali baglanti ile dogrudan Spaces'e
+   yukler, sonra mesaji socket uzerinden anahtarla birlikte gonderir
+   (api/server.js chat:send). Boylece buyuk goruntuler Nuxt process'ini
+   mesgul etmez.
+
+   Nesne adi BURADA uretilir. Istemciye birakilirsa ayni adli goruntuler
+   birbirini ezer ve kullanici baskasinin klasorune yazabilirdi; anahtar
+   her zaman chat/<kullaniciID>/ ile baslar ve socket tarafi bunu da ayrica
+   dogrular.
+
+   Nesneler public-read DEGIL (mevcut urun fotograflarindan farki budur):
+   yalnizca /chat/file/:id ucunun urettigi kisa omurlu imzali baglanti ile
+   okunabilirler. */
+app.post("/chat/upload-url", async (req, res) => {
+  try {
+    if (!(await chatDosyaReady())) {
+      return res.status(200).json({
+        status: false,
+        ready: false,
+        message: "Görüntü eki kurulumu tamamlanmamış.",
+      });
+    }
+    if (!spacesHazirMi()) {
+      return res.status(200).json({
+        status: false,
+        ready: false,
+        message: "Dosya deposu ayarlanmamış.",
+      });
+    }
+    const tur = String((req.body && req.body.contentType) || "").toLowerCase();
+    const uzanti = SOHBET_DOSYA_TURLERI[tur];
+    if (!uzanti) {
+      return res.status(400).json({
+        status: false,
+        message: "Yalnızca PNG, JPEG ve WEBP gönderilebilir.",
+      });
+    }
+    const boyut = parseInt((req.body && req.body.boyut) || 0, 10) || 0;
+    if (boyut <= 0 || boyut > SOHBET_DOSYA_MAX_BAYT) {
+      return res.status(400).json({
+        status: false,
+        message: `Görüntü en fazla ${Math.floor(
+          SOHBET_DOSYA_MAX_BAYT / (1024 * 1024)
+        )} MB olabilir.`,
+      });
+    }
+    const key = `chat/${Number(req.user.userId)}/${Date.now()}-${crypto
+      .randomBytes(8)
+      .toString("hex")}.${uzanti}`;
+    /* ACL verilmez: nesne varsayilan olarak gizli kalir. Istemci de
+       x-amz-acl basligi gondermemeli, yoksa imza uyusmaz. */
+    const url = spacesS3.getSignedUrl("putObject", {
+      Bucket: SPACES_BUCKET,
+      Key: key,
+      ContentType: tur,
+      Expires: SOHBET_DOSYA_IMZA_SN,
+    });
+    res.status(200).json({ status: true, key: key, url: url, tur: tur });
+  } catch (err) {
+    console.error("sohbet yukleme imzasi hatasi:", err.message);
+    res.status(500).json({ status: false, message: "İmza üretilemedi." });
+  }
+});
+
+/* --------------------------------------------------------------------------
+   Goruntu eki: korumali goruntuleme
+   --------------------------------------------------------------------------
+   <img src="/api/chat/file/<mesajID>"> ile kullanilir. Yalnizca mesajin
+   GONDERENI veya ALICISI acabilir; baskasi 404 alir (403 yerine 404: boyle
+   bir mesajin varligi bile sizdirilmaz).
+
+   Token: <img> etiketi Authorization basligi gonderemedigi icin baslik
+   yoksa "token" cerezine bakilir. Bu uc, yukarıdaki genel
+   authenticateToken'dan muaf tutulmustur ve yetkiyi kendi dogrular. */
+function sohbetDosyaKullanicisi(req) {
+  const authHeader = req.headers["authorization"];
+  const basliktan = authHeader && authHeader.split(" ")[1];
+  const token = basliktan || (req.cookies && req.cookies.token);
+  if (!token || !JWT_SECRET) {
+    return null;
+  }
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    return payload && payload.userId ? payload : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+app.get("/chat/file/:id", async (req, res) => {
+  const kullanici = sohbetDosyaKullanicisi(req);
+  if (!kullanici) {
+    return res
+      .status(401)
+      .json({ status: false, message: "Yetkisiz erişim." });
+  }
+  try {
+    if (!(await chatDosyaReady()) || !spacesHazirMi()) {
+      return res.status(404).json({ status: false });
+    }
+    const mesajId = String(req.params.id || "");
+    if (!/^[0-9]{1,19}$/.test(mesajId)) {
+      return res.status(400).json({ status: false });
+    }
+    const request = new mssql.Request();
+    request.input("id", mssql.BigInt, mesajId);
+    request.input("ben", mssql.Int, Number(kullanici.userId));
+    const sonuc = await request.query(`
+      select DosyaKey, DosyaTur, DosyaAd from SohbetMesajTB
+       where ID = @id
+         and DosyaKey is not null
+         and (GonderenID = @ben or AliciID = @ben)
+    `);
+    const satir = sonuc.recordset[0];
+    if (!satir) {
+      return res.status(404).json({ status: false });
+    }
+    const url = spacesS3.getSignedUrl("getObject", {
+      Bucket: SPACES_BUCKET,
+      Key: satir.DosyaKey,
+      Expires: SOHBET_DOSYA_IMZA_SN,
+      ResponseContentType: satir.DosyaTur || "image/png",
+    });
+    /* Yonlendirme onbellege alinmasin: imza kisa omurlu, bayat baglanti
+       403 dondururdu. Goruntunun kendisi Spaces'ten onbeleklenir. */
+    res.set("Cache-Control", "no-store");
+    res.redirect(302, url);
+  } catch (err) {
+    console.error("sohbet dosya acma hatasi:", err.message);
     res.status(500).json({ status: false });
   }
 });
@@ -3686,28 +3900,70 @@ app.post("/chat/watch", async (req, res) => {
    silmemek icin partiler halinde ilerler. Zamanlayici kurallari Eta
    hatirlatmasiyla ayni: PM2 cluster'da yalnizca ilk worker, dev modunda
    HMR'de tekrar kurulmasin diye globalThis isareti. */
+/* Silinen mesajlarin Spaces'teki goruntuleri de silinir; aksi halde mesaj
+   gider, goruntu depoda sonsuza kadar kalir ve fatura buyur. Tek tek degil
+   toplu (deleteObjects) silinir, en fazla 1000'lik partiler halinde. */
+async function sohbetDosyalariniSil(anahtarlar) {
+  if (!anahtarlar.length || !spacesHazirMi()) {
+    return 0;
+  }
+  let silinen = 0;
+  for (let i = 0; i < anahtarlar.length; i += 1000) {
+    const parti = anahtarlar.slice(i, i + 1000);
+    try {
+      await spacesS3
+        .deleteObjects({
+          Bucket: SPACES_BUCKET,
+          Delete: { Objects: parti.map((k) => ({ Key: k })), Quiet: true },
+        })
+        .promise();
+      silinen += parti.length;
+    } catch (err) {
+      /* Nesne silinemese de mesaj satiri silinmis olur: veritabani ile depo
+         arasinda artik kalabilir, ama temizlik bir sonraki gun devam eder. */
+      console.error("sohbet goruntu silme hatasi:", err.message);
+    }
+  }
+  return silinen;
+}
+
 async function sohbetTemizle() {
   if (!dbReady || !(await chatReady())) {
     return { silinen: 0, calisti: false };
   }
   try {
+    /* Ek alanlari varsa silinen satirlarin anahtarlari output ile toplanir;
+       yoksa (SohbetMesajEk.sql calistirilmadiysa) eski sade silme kullanilir. */
+    const dosyaVar = await chatDosyaReady();
     let silinen = 0;
+    let dosyaSilinen = 0;
     for (let tur = 0; tur < 20; tur++) {
       const request = new mssql.Request();
       request.input("gun", mssql.Int, SOHBET_SAKLAMA_GUN);
-      const sonuc = await request.query(`
-        delete top (5000) from SohbetMesajTB
-         where GonderimTarihi < dateadd(day, -@gun, getutcdate())
-      `);
+      const sonuc = await request.query(
+        dosyaVar
+          ? `delete top (5000) from SohbetMesajTB
+              output deleted.DosyaKey as DosyaKey
+              where GonderimTarihi < dateadd(day, -@gun, getutcdate())`
+          : `delete top (5000) from SohbetMesajTB
+              where GonderimTarihi < dateadd(day, -@gun, getutcdate())`
+      );
       const adet = sonuc.rowsAffected[0] || 0;
       silinen += adet;
+      if (dosyaVar) {
+        const anahtarlar = (sonuc.recordset || [])
+          .map((x) => x.DosyaKey)
+          .filter((k) => !!k);
+        dosyaSilinen += await sohbetDosyalariniSil(anahtarlar);
+      }
       if (adet === 0) {
         break;
       }
     }
     if (silinen > 0) {
       console.log(
-        `Sohbet temizligi: ${SOHBET_SAKLAMA_GUN} gunden eski ${silinen} mesaj silindi.`
+        `Sohbet temizligi: ${SOHBET_SAKLAMA_GUN} gunden eski ${silinen} mesaj` +
+          ` silindi (${dosyaSilinen} goruntu).`
       );
     }
     return { silinen: silinen, calisti: true };
