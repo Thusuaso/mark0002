@@ -64,7 +64,6 @@ export default {
     if (this.$store.getters.isAuthenticated) {
       this.$store.dispatch("setChatConnection");
       this.$store.dispatch("setChatUserList");
-      this.$store.dispatch("setChatWatchList");
       this.aktiflikDinleyicileriniKur();
     }
   },

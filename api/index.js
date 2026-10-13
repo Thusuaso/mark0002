@@ -3404,20 +3404,18 @@ async function chatReady() {
     return chatReadyCache;
   }
   try {
-    /* Asil kullanici listesi sorgusu KullaniciAktiflikTB ve SohbetTakipTB'ye
-       de join atar; ucu de kurulu olmadan o sorgu calismaz. Eksikse sade
-       listeye dusulur. */
+    /* Asil kullanici listesi sorgusu KullaniciAktiflikTB'ye de join atar;
+       ikisi de kurulu olmadan o sorgu calismaz. Eksikse sade listeye
+       dusulur. */
     const check = await mssql.query(`
       select
         (select count(*) from sys.objects
           where object_id = object_id(N'[dbo].[SohbetMesajTB]') and type = N'U') as mesaj,
         (select count(*) from sys.objects
-          where object_id = object_id(N'[dbo].[KullaniciAktiflikTB]') and type = N'U') as aktiflik,
-        (select count(*) from sys.objects
-          where object_id = object_id(N'[dbo].[SohbetTakipTB]') and type = N'U') as takip
+          where object_id = object_id(N'[dbo].[KullaniciAktiflikTB]') and type = N'U') as aktiflik
     `);
     const satir = check.recordset[0];
-    chatReadyCache = satir.mesaj > 0 && satir.aktiflik > 0 && satir.takip > 0;
+    chatReadyCache = satir.mesaj > 0 && satir.aktiflik > 0;
   } catch (err) {
     chatReadyCache = false;
   }
@@ -3505,7 +3503,6 @@ app.get("/chat/users", async (req, res) => {
           SonMesaj: null,
           SonMesajTarihi: null,
           SonAktif: null,
-          Takip: false,
         })),
         ready: false,
         dosya: false,
@@ -3518,15 +3515,11 @@ app.get("/chat/users", async (req, res) => {
         isnull(o.Okunmamis, 0) as Okunmamis,
         s.Mesaj as SonMesaj,
         s.GonderimTarihi as SonMesajTarihi,
-        akt.SonAktif,
-        cast(case when t.TakipEdilenID is null then 0 else 1 end as bit) as Takip
+        akt.SonAktif
       from KullaniciTB k
       /* Son aktiflik: kullanicinin son gercek etkileşimi. Tablo
          kurulmadiysa (api/sql/KullaniciAktiflikTB.sql) null gelir. */
       left join KullaniciAktiflikTB akt on akt.KullaniciID = k.ID
-      /* Takip: bu kisi online olunca bildirim istenmis mi */
-      left join SohbetTakipTB t
-             on t.KullaniciID = @ben and t.TakipEdilenID = k.ID
       outer apply (
         select count(*) as Okunmamis
           from SohbetMesajTB m
@@ -3794,105 +3787,6 @@ app.get("/chat/file/:id", async (req, res) => {
   }
 });
 
-/* --------------------------------------------------------------------------
-   Sohbet takip listesi ("online olunca haber ver")
-   --------------------------------------------------------------------------
-   Kullanici, sohbet listesindeki yildiz dugmesiyle istedigi kisileri takibe
-   alir; o kisi cevrimiciye gectiginde sag ustte toast bildirimi cikar.
-   Liste veritabaninda tutulur, baska bilgisayardan girildiginde de gecerli.
-
-   api/sql/SohbetTakipTB.sql calistirilmadiysa uclar ready:false doner ve
-   arayuzde yildiz dugmesi gorunmez.
-   -------------------------------------------------------------------------- */
-let chatTakipReadyCache = null;
-async function chatTakipReady() {
-  if (chatTakipReadyCache !== null) {
-    return chatTakipReadyCache;
-  }
-  try {
-    const check = await mssql.query(`
-      select count(*) as tablo from sys.objects
-       where object_id = object_id(N'[dbo].[SohbetTakipTB]') and type = N'U'
-    `);
-    chatTakipReadyCache = check.recordset[0].tablo > 0;
-  } catch (err) {
-    chatTakipReadyCache = false;
-  }
-  return chatTakipReadyCache;
-}
-
-app.get("/chat/watch", async (req, res) => {
-  try {
-    if (!(await chatTakipReady())) {
-      return res.status(200).json({ list: [], ready: false });
-    }
-    const request = new mssql.Request();
-    request.input("ben", mssql.Int, Number(req.user.userId));
-    const sonuc = await request.query(`
-      select TakipEdilenID from SohbetTakipTB where KullaniciID = @ben
-    `);
-    res.status(200).json({
-      list: sonuc.recordset.map((x) => x.TakipEdilenID),
-      ready: true,
-    });
-  } catch (err) {
-    console.error("sohbet takip listesi hatasi:", err.message);
-    res.status(500).json({ list: [], ready: false });
-  }
-});
-
-/* Takibi ac/kapat. takip=true ise eklenir, false ise cikarilir. */
-app.post("/chat/watch", async (req, res) => {
-  try {
-    if (!(await chatTakipReady())) {
-      return res.status(200).json({ status: false, ready: false });
-    }
-    const benId = Number(req.user.userId);
-    const hedefId = parseInt(req.body.userId);
-    const takip = req.body.takip === true || req.body.takip === "true";
-    if (!hedefId || hedefId <= 0 || hedefId === benId) {
-      return res.status(400).json({ status: false, message: "Gecersiz kullanici." });
-    }
-    const request = new mssql.Request();
-    request.input("ben", mssql.Int, benId);
-    request.input("hedef", mssql.Int, hedefId);
-    if (!takip) {
-      await request.query(`
-        delete from SohbetTakipTB
-         where KullaniciID = @ben and TakipEdilenID = @hedef
-      `);
-      return res.status(200).json({ status: true, takip: false });
-    }
-    /* Sohbet disi tutulan hesaplar takip edilemez. */
-    const sonuc = await request.query(`
-      if exists (
-        select 1 from KullaniciTB
-         where ID = @hedef and Aktif = 1
-           and ID not in (${sohbetHaricSql()})
-      )
-      begin
-        if not exists (
-          select 1 from SohbetTakipTB
-           where KullaniciID = @ben and TakipEdilenID = @hedef
-        )
-          insert into SohbetTakipTB (KullaniciID, TakipEdilenID)
-          values (@ben, @hedef);
-        select cast(1 as bit) as basarili;
-      end
-      else
-        select cast(0 as bit) as basarili;
-    `);
-    const basarili = !!sonuc.recordset[0].basarili;
-    res.status(200).json({
-      status: basarili,
-      takip: basarili,
-      message: basarili ? undefined : "Bu kullanici takip edilemez.",
-    });
-  } catch (err) {
-    console.error("sohbet takip kaydetme hatasi:", err.message);
-    res.status(500).json({ status: false });
-  }
-});
 /* --------------------------------------------------------------------------
    90 gunluk saklama temizligi
    --------------------------------------------------------------------------

@@ -31,19 +31,6 @@
             <strong>{{ activeUser.KullaniciAdi }}</strong>
             <small>{{ durumYazisi(activeUser) }}</small>
           </div>
-          <button
-            v-if="takipReady"
-            class="chat-star"
-            :class="{ on: isTakip(activeUser.ID) }"
-            :title="
-              isTakip(activeUser.ID)
-                ? 'Çevrimiçi olunca bildirme'
-                : 'Çevrimiçi olunca bildir'
-            "
-            @click="takipDegistir(activeUser.ID)"
-          >
-            <i :class="isTakip(activeUser.ID) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
-          </button>
         </div>
         <div v-else class="chat-head-text">
           <strong>Sohbet</strong>
@@ -84,19 +71,6 @@
             <span v-if="kisi.Okunmamis > 0" class="chat-count">
               {{ kisi.Okunmamis }}
             </span>
-          </button>
-          <button
-            v-if="takipReady"
-            class="chat-star"
-            :class="{ on: isTakip(kisi.ID) }"
-            :title="
-              isTakip(kisi.ID)
-                ? 'Çevrimiçi olunca bildirme'
-                : 'Çevrimiçi olunca bildir'
-            "
-            @click="takipDegistir(kisi.ID)"
-          >
-            <i :class="isTakip(kisi.ID) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
           </button>
         </div>
       </div>
@@ -323,8 +297,6 @@ export default {
       onlineCount: "getChatOnlineCount",
       benId: "getUserId",
       aktiflik: "getChatAktiflik",
-      takip: "getChatTakip",
-      takipReady: "getChatTakipReady",
       dosyaReady: "getChatDosyaReady",
     }),
     /* Ekran goruntusu yalnizca destekleyen tarayicilarda ve guvenli
@@ -382,12 +354,6 @@ export default {
     },
     isOnline(id) {
       return this.online.indexOf(Number(id)) !== -1;
-    },
-    isTakip(id) {
-      return this.takip.indexOf(Number(id)) !== -1;
-    },
-    takipDegistir(id) {
-      this.$store.dispatch("setChatWatchToggle", id);
     },
     /* Son gercek etkileşim zamani: canli soket verisi varsa o, yoksa
        veritabanindan gelen SonAktif kullanilir (cevrimdisi kisiler icin). */
@@ -733,21 +699,6 @@ export default {
 /* Bagli ama bir suredir etkileşim yok */
 .chat-dot.idle {
   background: #f59e0b;
-}
-.chat-star {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #d1d5db;
-  padding: 0 8px;
-  flex: 0 0 auto;
-  font-size: 0.95rem;
-}
-.chat-star.on {
-  color: #f59e0b;
-}
-.chat-star:hover {
-  color: #f97316;
 }
 .chat-list {
   flex: 1 1 auto;

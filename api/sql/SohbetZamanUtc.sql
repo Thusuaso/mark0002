@@ -34,8 +34,7 @@ declare duzelt cursor local fast_forward for
     from (
       values
         (N'SohbetMesajTB',      N'GonderimTarihi', N'DF_SohbetMesajTB_GonderimTarihi'),
-        (N'KullaniciAktiflikTB', N'SonAktif',      N'DF_KullaniciAktiflikTB_SonAktif'),
-        (N'SohbetTakipTB',      N'KayitTarihi',    N'DF_SohbetTakipTB_KayitTarihi')
+        (N'KullaniciAktiflikTB', N'SonAktif',      N'DF_KullaniciAktiflikTB_SonAktif')
     ) as t(ad, kolon, kisitAdi);
 
 open duzelt;
@@ -89,8 +88,7 @@ select
    and c.column_id = dc.parent_column_id
  where dc.parent_object_id in (
          object_id(N'[dbo].[SohbetMesajTB]'),
-         object_id(N'[dbo].[KullaniciAktiflikTB]'),
-         object_id(N'[dbo].[SohbetTakipTB]')
+         object_id(N'[dbo].[KullaniciAktiflikTB]')
        )
  order by Tablo, Kolon;
 go
