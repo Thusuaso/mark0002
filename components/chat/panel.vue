@@ -13,7 +13,14 @@
       </span>
     </button>
 
-    <div v-show="panelOpen" class="chat-panel">
+    <div
+      v-show="panelOpen"
+      class="chat-panel"
+      :class="{ 'is-drag': surukleniyor }"
+      @dragover.prevent="surukleGirdi"
+      @dragleave.prevent="surukleCikti"
+      @drop.prevent="birakildi"
+    >
       <div class="chat-head">
         <div v-if="activeUser" class="chat-head-user">
           <button class="chat-back" @click="closeThread" title="Listeye dön">
@@ -115,7 +122,18 @@
             :class="benimMi(mesaj) ? 'mine' : 'theirs'"
           >
             <div class="chat-bubble">
-              <span class="chat-text">{{ mesaj.Mesaj }}</span>
+              <!-- Goruntu eki: kaynak korumali uc, anahtar istemcide yok.
+                   @load ile akis en alta iner, yoksa resim yuklenince
+                   son mesaj gorus alaninin altinda kalirdi. -->
+              <img
+                v-if="mesaj.Dosya"
+                class="chat-img"
+                :src="mesaj.Dosya.Url"
+                :alt="mesaj.Dosya.Ad || 'görüntü'"
+                @click="resmiAc(mesaj)"
+                @load="enAltaIn"
+              />
+              <span v-if="mesaj.Mesaj" class="chat-text">{{ mesaj.Mesaj }}</span>
               <span class="chat-meta">
                 {{ saat(mesaj.GonderimTarihi) }}
                 <i
@@ -128,26 +146,124 @@
           </div>
         </div>
 
+        <!-- Gonderilmeyi bekleyen goruntu -->
+        <div v-if="ek" class="chat-ek">
+          <img :src="ekOnizleme" alt="" />
+          <div class="chat-ek-bilgi">
+            <strong>{{ ek.genislik }}&times;{{ ek.yukseklik }}</strong>
+            <small>{{ ekBoyut }}</small>
+            <div v-if="yukleniyor" class="chat-ek-bar">
+              <span :style="{ width: yuzde + '%' }"></span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="chat-ek-sil"
+            title="Kaldır"
+            :disabled="gonderiliyor"
+            @click="ekKaldir"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
         <form class="chat-form" @submit.prevent="gonder">
+          <!-- Telefonda ayni dugme kamerayi acar -->
+          <input
+            ref="dosyaGirisi"
+            type="file"
+            accept="image/*"
+            class="chat-gizli"
+            @change="dosyaSecildi"
+          />
+          <button
+            v-if="dosyaReady"
+            type="button"
+            class="chat-ikincil"
+            title="Görüntü ekle (Ctrl+V ile de yapıştırabilirsiniz)"
+            :disabled="gonderiliyor"
+            @click="dosyaSec"
+          >
+            <i class="pi pi-paperclip"></i>
+          </button>
+          <button
+            v-if="dosyaReady && ekranDestekli"
+            type="button"
+            class="chat-ikincil"
+            title="Ekran görüntüsü al"
+            :disabled="gonderiliyor"
+            @click="ekranAl"
+          >
+            <i class="pi pi-desktop"></i>
+          </button>
           <textarea
             ref="giris"
             v-model="metin"
             rows="1"
-            placeholder="Mesaj yazın…"
+            :placeholder="ek ? 'Alt yazı (isteğe bağlı)…' : 'Mesaj yazın…'"
             :maxlength="MESAJ_MAX"
             @keydown.enter.exact.prevent="gonder"
+            @paste="yapistir"
           ></textarea>
-          <button type="submit" :disabled="!metin.trim() || gonderiliyor">
+          <button type="submit" :disabled="!gonderilebilir || gonderiliyor">
             <i class="pi pi-send"></i>
           </button>
         </form>
       </template>
+    </div>
+
+    <!-- Goruntuye tiklayinca tam ekran -->
+    <div v-if="buyukResim" class="chat-lightbox" @click="buyukResim = null">
+      <img :src="buyukResim" alt="" @click.stop />
+      <a
+        class="chat-lightbox-link"
+        :href="buyukResim"
+        target="_blank"
+        rel="noopener"
+        @click.stop
+        >Yeni sekmede aç</a
+      >
+    </div>
+
+    <!-- Ekran goruntusu kirpma -->
+    <div v-if="kirpma" class="chat-kirp">
+      <div class="chat-kirp-ic">
+        <p class="chat-kirp-bilgi">
+          Fare ile göndermek istediğiniz alanı seçin. Seçim yapmazsanız
+          görüntünün tamamı gönderilir.
+        </p>
+        <div
+          ref="kirpKutu"
+          class="chat-kirp-tuval"
+          @mousedown="kirpBasla"
+          @mousemove="kirpSurukle"
+          @mouseup="kirpBitir"
+          @mouseleave="kirpBitir"
+        >
+          <img ref="kirpResim" :src="kirpma.url" alt="" draggable="false" />
+          <div v-if="secim" class="chat-kirp-secim" :style="secimStil"></div>
+        </div>
+        <div class="chat-kirp-dugmeler">
+          <button type="button" @click="kirpIptal">İptal</button>
+          <button type="button" v-if="secim" @click="secim = null">
+            Seçimi temizle
+          </button>
+          <button type="button" class="ana" @click="kirpOnayla">Ekle</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import {
+  panodanDosya,
+  resimHazirla,
+  ekranKaresiAl,
+  resmiKirp,
+  boyutYazisi,
+} from "~/utils/chatDosya";
 
 const MESAJ_MAX = 4000; // SohbetMesajTB.Mesaj ile ayni
 /* Bu sureden uzun suredir etkileşim yoksa kullanici "cevrimici" degil
@@ -166,6 +282,18 @@ export default {
          icin dakikada bir guncellenen saat. */
       simdi: Date.now(),
       sayacZamanlayici: null,
+      /* Gonderilmeyi bekleyen goruntu: resimHazirla sonucu. */
+      ek: null,
+      ekOnizleme: null,
+      yukleniyor: false,
+      yuzde: 0,
+      surukleniyor: false,
+      buyukResim: null,
+      /* Ekran goruntusu kirpma penceresi: { blob, url, genislik, yukseklik } */
+      kirpma: null,
+      /* Kirpma secimi, EKRANDA gorunen olcude px: { x, y, g, y2 } */
+      secim: null,
+      kirpBaslangic: null,
     };
   },
   mounted() {
@@ -177,6 +305,9 @@ export default {
     if (this.sayacZamanlayici) {
       clearInterval(this.sayacZamanlayici);
     }
+    /* Onizleme icin uretilen blob adresleri serbest birakilir. */
+    this.ekKaldir();
+    this.kirpmayiKapat();
   },
   computed: {
     ...mapGetters({
@@ -194,7 +325,32 @@ export default {
       aktiflik: "getChatAktiflik",
       takip: "getChatTakip",
       takipReady: "getChatTakipReady",
+      dosyaReady: "getChatDosyaReady",
     }),
+    /* Ekran goruntusu yalnizca destekleyen tarayicilarda ve guvenli
+       baglantida (https veya localhost) calisir; yoksa dugme gorunmez. */
+    ekranDestekli() {
+      return (
+        typeof navigator !== "undefined" &&
+        !!navigator.mediaDevices &&
+        !!navigator.mediaDevices.getDisplayMedia
+      );
+    },
+    gonderilebilir() {
+      return !!this.metin.trim() || !!this.ek;
+    },
+    ekBoyut() {
+      return this.ek ? boyutYazisi(this.ek.blob.size) : "";
+    },
+    secimStil() {
+      if (!this.secim) return {};
+      return {
+        left: this.secim.x + "px",
+        top: this.secim.y + "px",
+        width: this.secim.g + "px",
+        height: this.secim.y2 + "px",
+      };
+    },
     activeUser() {
       if (!this.activeUserId) return null;
       return (
@@ -315,15 +471,169 @@ export default {
     },
     gonder() {
       const metin = this.metin.trim();
-      if (!metin || this.gonderiliyor) return;
+      if ((!metin && !this.ek) || this.gonderiliyor) return;
       this.gonderiliyor = true;
-      this.$store.dispatch("setChatSend", metin).then((sonuc) => {
-        this.gonderiliyor = false;
-        if (sonuc && sonuc.status) {
-          this.metin = "";
-          this.$nextTick(this.enAltaIn);
-        }
+      this.yuzde = 0;
+      this.yukleniyor = !!this.ek;
+      this.$store
+        .dispatch("setChatSend", {
+          mesaj: metin,
+          dosya: this.ek,
+          ilerleme: (yuzde) => {
+            this.yuzde = yuzde;
+          },
+        })
+        .then((sonuc) => {
+          this.gonderiliyor = false;
+          this.yukleniyor = false;
+          if (sonuc && sonuc.status) {
+            this.metin = "";
+            this.ekKaldir();
+            this.$nextTick(this.enAltaIn);
+          }
+        });
+    },
+
+    /* ---------------- Goruntu eki ---------------- */
+    dosyaSec() {
+      if (this.$refs.dosyaGirisi) this.$refs.dosyaGirisi.click();
+    },
+    dosyaSecildi(olay) {
+      const dosya = olay.target.files && olay.target.files[0];
+      /* Ayni dosya ikinci kez secilebilsin diye alan sifirlanir. */
+      olay.target.value = "";
+      if (dosya) this.ekAyarla(dosya, "goruntu");
+    },
+    /* Win+Shift+S ile kesilen goruntu Ctrl+V ile buraya duser. Panoda
+       goruntu yoksa olaya karisilmaz, metin normal sekilde yapistirilir. */
+    yapistir(olay) {
+      if (!this.dosyaReady) return;
+      const dosya = panodanDosya(olay);
+      if (!dosya) return;
+      olay.preventDefault();
+      this.ekAyarla(dosya, "ekran-goruntusu");
+    },
+    surukleGirdi() {
+      if (this.dosyaReady && this.activeUser) this.surukleniyor = true;
+    },
+    surukleCikti() {
+      this.surukleniyor = false;
+    },
+    birakildi(olay) {
+      this.surukleniyor = false;
+      if (!this.dosyaReady || !this.activeUser) return;
+      const dosya =
+        olay.dataTransfer &&
+        olay.dataTransfer.files &&
+        olay.dataTransfer.files[0];
+      if (dosya) this.ekAyarla(dosya, "goruntu");
+    },
+    async ekAyarla(dosya, adOnEki) {
+      const sonuc = await resimHazirla(dosya, adOnEki);
+      if (sonuc.hata) {
+        this.$toast.error(sonuc.hata);
+        return;
+      }
+      this.ekKaldir();
+      this.ek = sonuc;
+      this.ekOnizleme = URL.createObjectURL(sonuc.blob);
+      this.$nextTick(() => {
+        if (this.$refs.giris) this.$refs.giris.focus();
       });
+    },
+    ekKaldir() {
+      if (this.ekOnizleme) {
+        URL.revokeObjectURL(this.ekOnizleme);
+      }
+      this.ekOnizleme = null;
+      this.ek = null;
+      this.yuzde = 0;
+      this.yukleniyor = false;
+    },
+    resmiAc(mesaj) {
+      if (mesaj && mesaj.Dosya) this.buyukResim = mesaj.Dosya.Url;
+    },
+
+    /* ---------------- Ekran goruntusu ---------------- */
+    async ekranAl() {
+      const sonuc = await ekranKaresiAl();
+      if (sonuc.hata) {
+        this.$toast.error(sonuc.hata);
+        return;
+      }
+      /* hata null ve blob yok => kullanici paylasimi iptal etti. */
+      if (!sonuc.blob) return;
+      this.kirpma = {
+        blob: sonuc.blob,
+        url: URL.createObjectURL(sonuc.blob),
+        genislik: sonuc.genislik,
+        yukseklik: sonuc.yukseklik,
+      };
+      this.secim = null;
+    },
+    kirpmayiKapat() {
+      if (this.kirpma && this.kirpma.url) {
+        URL.revokeObjectURL(this.kirpma.url);
+      }
+      this.kirpma = null;
+      this.secim = null;
+      this.kirpBaslangic = null;
+    },
+    kirpIptal() {
+      this.kirpmayiKapat();
+    },
+    kirpNoktasi(olay) {
+      const kutu = this.$refs.kirpResim.getBoundingClientRect();
+      return {
+        x: Math.min(Math.max(olay.clientX - kutu.left, 0), kutu.width),
+        y: Math.min(Math.max(olay.clientY - kutu.top, 0), kutu.height),
+      };
+    },
+    kirpBasla(olay) {
+      if (!this.$refs.kirpResim) return;
+      olay.preventDefault();
+      this.kirpBaslangic = this.kirpNoktasi(olay);
+      this.secim = null;
+    },
+    kirpSurukle(olay) {
+      if (!this.kirpBaslangic) return;
+      const nokta = this.kirpNoktasi(olay);
+      this.secim = {
+        x: Math.min(this.kirpBaslangic.x, nokta.x),
+        y: Math.min(this.kirpBaslangic.y, nokta.y),
+        g: Math.abs(nokta.x - this.kirpBaslangic.x),
+        y2: Math.abs(nokta.y - this.kirpBaslangic.y),
+      };
+    },
+    kirpBitir() {
+      this.kirpBaslangic = null;
+      /* Tiklama kadar kucuk secimler kaza eseridir, yok sayilir. */
+      if (this.secim && (this.secim.g < 8 || this.secim.y2 < 8)) {
+        this.secim = null;
+      }
+    },
+    async kirpOnayla() {
+      const kirpma = this.kirpma;
+      if (!kirpma) return;
+      let kaynak = kirpma.blob;
+      if (this.secim && this.$refs.kirpResim) {
+        /* Secim ekranda gorunen olcude; gercek piksellere cevrilir. */
+        const kutu = this.$refs.kirpResim.getBoundingClientRect();
+        const oran = kirpma.genislik / (kutu.width || kirpma.genislik);
+        const sonuc = await resmiKirp(kirpma.blob, {
+          x: this.secim.x * oran,
+          y: this.secim.y * oran,
+          g: this.secim.g * oran,
+          y2: this.secim.y2 * oran,
+        });
+        if (sonuc.hata) {
+          this.$toast.error(sonuc.hata);
+          return;
+        }
+        kaynak = sonuc.blob;
+      }
+      this.kirpmayiKapat();
+      await this.ekAyarla(kaynak, "ekran-goruntusu");
     },
   },
 };
@@ -607,5 +917,176 @@ export default {
   font-size: 0.76rem;
   padding: 4px 0 8px;
   cursor: pointer;
+}
+/* ---------------- Goruntu eki ---------------- */
+.chat-panel.is-drag {
+  outline: 2px dashed #f97316;
+  outline-offset: -4px;
+}
+.chat-gizli {
+  display: none;
+}
+/* Baloncuk icindeki goruntu: metin varsa ustunde durur. */
+.chat-img {
+  display: block;
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 6px;
+  cursor: zoom-in;
+  background: #f3f4f6;
+}
+.chat-img + .chat-text {
+  margin-top: 5px;
+}
+/* Gonderim oncesi onizleme seridi */
+.chat-ek {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  flex: 0 0 auto;
+}
+.chat-ek > img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  flex: 0 0 auto;
+}
+.chat-ek-bilgi {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.chat-ek-bilgi strong {
+  font-size: 0.78rem;
+  color: #374151;
+}
+.chat-ek-bilgi small {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+.chat-ek-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+.chat-ek-bar span {
+  display: block;
+  height: 100%;
+  background: #f97316;
+  transition: width 0.15s linear;
+}
+.chat-ek-sil {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  flex: 0 0 auto;
+  padding: 4px;
+}
+.chat-ek-sil:hover {
+  color: #dc2626;
+}
+/* Ataç ve ekran goruntusu dugmeleri: gonder dugmesinden ayirt edilsin. */
+.chat-form button.chat-ikincil {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.chat-form button.chat-ikincil:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #374151;
+}
+/* ---------------- Tam ekran goruntuleme ---------------- */
+.chat-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: zoom-out;
+}
+.chat-lightbox img {
+  max-width: 92vw;
+  max-height: 82vh;
+  border-radius: 6px;
+  cursor: default;
+}
+.chat-lightbox-link {
+  color: #fff;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+/* ---------------- Kirpma penceresi ---------------- */
+.chat-kirp {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chat-kirp-ic {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  max-width: 92vw;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chat-kirp-bilgi {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+.chat-kirp-tuval {
+  position: relative;
+  line-height: 0;
+  cursor: crosshair;
+  overflow: hidden;
+  user-select: none;
+}
+.chat-kirp-tuval img {
+  max-width: 86vw;
+  max-height: 68vh;
+  display: block;
+}
+.chat-kirp-secim {
+  position: absolute;
+  border: 2px solid #f97316;
+  background: rgba(249, 115, 22, 0.15);
+  pointer-events: none;
+}
+.chat-kirp-dugmeler {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.chat-kirp-dugmeler button {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.chat-kirp-dugmeler button.ana {
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
 }
 </style>

@@ -26,6 +26,7 @@ const state = {
   loadingHistory: false,
   dahaVar: false,
   ready: true,        // SohbetMesajTB kurulu mu
+  dosyaReady: false,  // goruntu eki gonderilebilir mi (kolonlar + depo)
   panelOpen: false,
 };
 
@@ -91,6 +92,7 @@ const actions = {
       .then((response) => {
         vuexContext.commit("setChatUsers", response.data.list || []);
         vuexContext.commit("setChatReady", response.data.ready !== false);
+        vuexContext.commit("setChatDosyaReady", response.data.dosya === true);
       })
       .catch(() => {
         vuexContext.commit("setChatUsers", []);
@@ -141,20 +143,95 @@ const actions = {
       });
   },
 
-  setChatSend(vuexContext, mesaj) {
+  /* Goruntuyu Spaces'e yukler, nesne anahtarini doner (hata olursa null).
+     Dosya sunucudan GECMEZ: imza alinir, yukleme dogrudan depoya gider.
+     ilerleme: yuzde bildiren islev (istege bagli). */
+  setChatDosyaYukle(vuexContext, veri) {
+    const dosya = veri && veri.dosya;
+    const ilerleme = veri && veri.ilerleme;
+    if (!dosya || !dosya.blob) {
+      return Promise.resolve(null);
+    }
+    return this.$axios
+      .post("/chat/upload-url", {
+        contentType: dosya.tur,
+        boyut: dosya.blob.size,
+      })
+      .then((response) => {
+        const veriler = response.data || {};
+        if (!veriler.status || !veriler.url || !veriler.key) {
+          this.$toast.error(veriler.message || "Görüntü yüklenemedi.");
+          return null;
+        }
+        return new Promise((resolve) => {
+          /* Yukleme yuzdesi icin XMLHttpRequest: axios'un tarayici
+             tarafinda ilerleme olayi var ama imzali PUT'u araya girmeden
+             gondermek gerekiyor (baslik eklenirse imza uyusmaz). */
+          const istek = new XMLHttpRequest();
+          istek.open("PUT", veriler.url, true);
+          istek.setRequestHeader("Content-Type", dosya.tur);
+          if (typeof ilerleme === "function") {
+            istek.upload.onprogress = (olay) => {
+              if (olay.lengthComputable) {
+                ilerleme(Math.round((olay.loaded / olay.total) * 100));
+              }
+            };
+          }
+          istek.onload = () => {
+            const tamam = istek.status >= 200 && istek.status < 300;
+            if (!tamam) {
+              console.error("sohbet goruntu yukleme hatasi:", istek.status);
+              this.$toast.error("Görüntü yüklenemedi.");
+            }
+            resolve(tamam ? veriler.key : null);
+          };
+          istek.onerror = () => {
+            this.$toast.error("Görüntü yüklenemedi.");
+            resolve(null);
+          };
+          istek.send(dosya.blob);
+        });
+      })
+      .catch(() => {
+        this.$toast.error("Görüntü yüklenemedi.");
+        return null;
+      });
+  },
+
+  /* veri: metin ("eski kullanim") veya { mesaj, dosya, ilerleme }.
+     dosya: utils/chatDosya.js resimHazirla sonucu ({ blob, tur, ad }). */
+  async setChatSend(vuexContext, veri) {
+    const girdi = typeof veri === "string" ? { mesaj: veri } : veri || {};
     const { socket, activeUserId } = vuexContext.state;
-    const metin = String(mesaj || "").trim();
-    if (!metin || !activeUserId) {
-      return Promise.resolve({ status: false });
+    const metin = String(girdi.mesaj || "").trim();
+    const dosya = girdi.dosya || null;
+    if ((!metin && !dosya) || !activeUserId) {
+      return { status: false };
     }
     if (!socket || !socket.connected) {
       this.$toast.error("Sohbet sunucusuna bağlanılamadı.");
-      return Promise.resolve({ status: false });
+      return { status: false };
+    }
+    /* Once yukleme, sonra mesaj: yukleme basarisizsa bos mesaj gitmesin. */
+    let dosyaKey = null;
+    if (dosya) {
+      dosyaKey = await vuexContext.dispatch("setChatDosyaYukle", {
+        dosya: dosya,
+        ilerleme: girdi.ilerleme,
+      });
+      if (!dosyaKey) {
+        return { status: false };
+      }
     }
     return new Promise((resolve) => {
       socket.emit(
         "chat:send",
-        { aliciId: activeUserId, mesaj: metin },
+        {
+          aliciId: activeUserId,
+          mesaj: metin,
+          dosyaKey: dosyaKey,
+          dosyaAd: dosya ? dosya.ad : null,
+        },
         (sonuc) => {
           if (!sonuc || !sonuc.status) {
             this.$toast.error(
@@ -301,6 +378,9 @@ const mutations = {
   setChatReady(state, ready) {
     state.ready = ready;
   },
+  setChatDosyaReady(state, durum) {
+    state.dosyaReady = !!durum;
+  },
   setChatOnline(state, online) {
     state.online = (online || []).map((x) => Number(x));
   },
@@ -431,6 +511,9 @@ const getters = {
   },
   getChatReady(state) {
     return state.ready;
+  },
+  getChatDosyaReady(state) {
+    return state.dosyaReady;
   },
   getChatPanelOpen(state) {
     return state.panelOpen;
