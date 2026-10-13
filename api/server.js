@@ -28,6 +28,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import mssql from "mssql";
+import AWS from "aws-sdk";
 import { sohbetHaricMi } from "./sohbetHaric.js";
 
 /* --------------------------------------------------------------------------
@@ -68,6 +69,10 @@ const MESAJ_MAX_UZUNLUK = 4000; // SohbetMesajTB.Mesaj ile ayni
 /* Kaza sonucu dongu veya kotu niyetli akisi sinirlar: 10 saniyede 20 mesaj. */
 const MESAJ_PENCERE_MS = 10 * 1000;
 const MESAJ_PENCERE_LIMIT = 20;
+/* Goruntu eki sinirlari. api/index.js ile ayni degerler; ikisi de istemciye
+   guvenmez, burada Spaces'teki nesnenin GERCEK boyutu/turu okunur. */
+const DOSYA_MAX_BAYT = 5 * 1024 * 1024;
+const DOSYA_TURLERI = ["image/png", "image/jpeg", "image/webp"];
 
 if (!JWT_SECRET) {
   console.warn(
@@ -96,6 +101,29 @@ const io = new Server(server, {
 let pool = null;
 let sohbetTablosuVar = false;
 let aktiflikTablosuVar = false;
+let dosyaKolonuVar = false;
+
+/* --------------------------------------------------------------------------
+   Dosya deposu (DigitalOcean Spaces)
+   --------------------------------------------------------------------------
+   Burada yalnizca DOGRULAMA yapilir: istemcinin bildirdigi anahtarin
+   gercekten var oldugu, boyutu ve turu okunur. Yukleme istemciden dogrudan
+   Spaces'e gider (imza api/index.js -> /chat/upload-url'den alinir).
+   Ayarlar eksikse ek gonderme kapalidir, metin sohbeti calismaya devam eder. */
+const SPACES_BUCKET = env.DO_SPACES_BUCKET;
+const spacesS3 =
+  env.DO_SPACES_ENDPOINT && env.DO_SPACES_KEY && env.DO_SPACES_SECRET && SPACES_BUCKET
+    ? new AWS.S3({
+        endpoint: new AWS.Endpoint(env.DO_SPACES_ENDPOINT),
+        accessKeyId: env.DO_SPACES_KEY,
+        secretAccessKey: env.DO_SPACES_SECRET,
+      })
+    : null;
+if (!spacesS3) {
+  console.warn(
+    "UYARI: Spaces ayarlari eksik (DO_SPACES_*). Sohbette goruntu eki kapali."
+  );
+}
 
 async function veritabaniBaslat() {
   const eksik = ["DB_USER", "DB_PASSWORD", "DB_NAME", "DB_SERVER"].filter(
@@ -127,10 +155,19 @@ async function veritabaniBaslat() {
         (select count(*) from sys.objects
           where object_id = object_id(N'[dbo].[SohbetMesajTB]') and type = N'U') as mesaj,
         (select count(*) from sys.objects
-          where object_id = object_id(N'[dbo].[KullaniciAktiflikTB]') and type = N'U') as aktiflik
+          where object_id = object_id(N'[dbo].[KullaniciAktiflikTB]') and type = N'U') as aktiflik,
+        (select count(*) from sys.columns
+          where object_id = object_id(N'[dbo].[SohbetMesajTB]') and name = N'DosyaKey') as dosya
     `);
     sohbetTablosuVar = kontrol.recordset[0].mesaj > 0;
     aktiflikTablosuVar = kontrol.recordset[0].aktiflik > 0;
+    dosyaKolonuVar = kontrol.recordset[0].dosya > 0;
+    if (sohbetTablosuVar && !dosyaKolonuVar) {
+      console.log(
+        "⚠️  Sohbette goruntu eki kapali, kolonlar yok. " +
+          "node api/sql/run.cjs api/sql/SohbetMesajEk.sql"
+      );
+    }
     console.log(
       sohbetTablosuVar
         ? "✅ Socket veritabani baglantisi hazir, sohbet tablosu mevcut."
@@ -295,6 +332,45 @@ io.use((socket, next) => {
   });
 });
 
+/* --------------------------------------------------------------------------
+   Goruntu eki dogrulamasi
+   --------------------------------------------------------------------------
+   Istemci yalnizca anahtar bildirir; boyut/tur bilgisine GUVENILMEZ, nesne
+   Spaces'ten okunur (headObject). Boylece:
+     - uydurma anahtarla kayit olusturulamaz,
+     - baskasinin klasorundeki nesne kendi mesajina eklenemez (anahtar
+       chat/<gonderenID>/ ile baslamak zorunda),
+     - imzayi alip buyuk dosya yukleyen biri sinirlari asamaz.
+   Doner: { key, tur, boyut } veya { hata: "..." } */
+async function dosyaEkiDogrula(userId, dosyaKey) {
+  if (!dosyaKolonuVar || !spacesS3) {
+    return { hata: "Görüntü eki kurulumu tamamlanmamış." };
+  }
+  const key = String(dosyaKey || "").trim();
+  const onEk = `chat/${userId}/`;
+  if (!key.startsWith(onEk) || key.includes("..") || key.length > 400) {
+    return { hata: "Görüntü bulunamadı." };
+  }
+  try {
+    const bilgi = await spacesS3
+      .headObject({ Bucket: SPACES_BUCKET, Key: key })
+      .promise();
+    const tur = String(bilgi.ContentType || "").toLowerCase();
+    const boyut = Number(bilgi.ContentLength) || 0;
+    if (DOSYA_TURLERI.indexOf(tur) === -1) {
+      return { hata: "Yalnızca PNG, JPEG ve WEBP gönderilebilir." };
+    }
+    if (boyut <= 0 || boyut > DOSYA_MAX_BAYT) {
+      return { hata: "Görüntü çok büyük." };
+    }
+    return { key: key, tur: tur, boyut: boyut };
+  } catch (err) {
+    /* Yukleme tamamlanmadan gonderilmis ya da anahtar hatali. */
+    console.error("dosya eki dogrulama hatasi:", err.message);
+    return { hata: "Görüntü bulunamadı." };
+  }
+}
+
 function mesajHiziAsildi(socket) {
   const simdi = Date.now();
   socket.data.mesajZamanlari = socket.data.mesajZamanlari.filter(
@@ -401,7 +477,18 @@ io.on("connection", (socket) => {
     if (sohbetHaricMi(aliciId)) {
       return bitir({ status: false, message: "Bu hesapla sohbet edilemez." });
     }
-    if (!mesaj) {
+    /* Goruntu eki varsa metin zorunlu degil (tek basina goruntu veya
+       goruntu + alt yazi). Ek, veritabanina yazilmadan once dogrulanir. */
+    let ek = null;
+    if (veri && veri.dosyaKey) {
+      const sonuc = await dosyaEkiDogrula(user.userId, veri.dosyaKey);
+      if (sonuc.hata) {
+        return bitir({ status: false, message: sonuc.hata });
+      }
+      ek = sonuc;
+      ek.ad = String((veri && veri.dosyaAd) || "goruntu.png").slice(0, 255);
+    }
+    if (!mesaj && !ek) {
       return bitir({ status: false, message: "Mesaj bos." });
     }
     if (mesaj.length > MESAJ_MAX_UZUNLUK) {
@@ -421,7 +508,23 @@ io.on("connection", (socket) => {
       const request = pool.request();
       request.input("GonderenID", mssql.Int, user.userId);
       request.input("AliciID", mssql.Int, aliciId);
-      request.input("Mesaj", mssql.NVarChar(MESAJ_MAX_UZUNLUK), mesaj);
+      /* Yalnizca goruntu gonderildiyse metin null yazilir (SohbetMesajEk.sql
+         Mesaj kolonunu null kabul eder hale getirir). */
+      request.input(
+        "Mesaj",
+        mssql.NVarChar(MESAJ_MAX_UZUNLUK),
+        mesaj ? mesaj : null
+      );
+      const dosyaKolon = ek ? ", DosyaKey, DosyaTur, DosyaAd, DosyaBoyut" : "";
+      const dosyaDeger = ek
+        ? ", @DosyaKey, @DosyaTur, @DosyaAd, @DosyaBoyut"
+        : "";
+      if (ek) {
+        request.input("DosyaKey", mssql.NVarChar(400), ek.key);
+        request.input("DosyaTur", mssql.NVarChar(100), ek.tur);
+        request.input("DosyaAd", mssql.NVarChar(255), ek.ad);
+        request.input("DosyaBoyut", mssql.Int, ek.boyut);
+      }
       const sonuc = await request.query(`
         if not exists (select 1 from KullaniciTB where ID = @AliciID and Aktif = 1)
         begin
@@ -430,9 +533,9 @@ io.on("connection", (socket) => {
         end
         else
         begin
-          insert into SohbetMesajTB (GonderenID, AliciID, Mesaj)
+          insert into SohbetMesajTB (GonderenID, AliciID, Mesaj${dosyaKolon})
           output cast(1 as bit) as basarili, inserted.ID, inserted.GonderimTarihi
-          values (@GonderenID, @AliciID, @Mesaj);
+          values (@GonderenID, @AliciID, @Mesaj${dosyaDeger});
         end
       `);
       const satir = sonuc.recordset[0];
@@ -444,9 +547,19 @@ io.on("connection", (socket) => {
         GonderenID: user.userId,
         GonderenAdi: user.username,
         AliciID: aliciId,
-        Mesaj: mesaj,
+        Mesaj: mesaj || null,
         GonderimTarihi: satir.GonderimTarihi,
         OkunduTarihi: null,
+        /* Anahtar istemciye verilmez; goruntu korumali uctan acilir.
+           Bicim api/index.js sohbetSatiri ile ayni olmak zorunda. */
+        Dosya: ek
+          ? {
+              Tur: ek.tur,
+              Ad: ek.ad,
+              Boyut: ek.boyut,
+              Url: `/api/chat/file/${satir.ID}`,
+            }
+          : null,
       };
       /* Aliciya ve gonderenin diger sekmelerine gonderilir. */
       io.to(kullaniciOdasi(aliciId)).emit("chat:message", paket);
@@ -528,6 +641,8 @@ app.get("/health", (req, res) => {
     status: true,
     sohbetTablosuVar: sohbetTablosuVar,
     aktiflikTablosuVar: aktiflikTablosuVar,
+    dosyaKolonuVar: dosyaKolonuVar,
+    dosyaDeposu: !!spacesS3,
     veritabani: !!pool,
     onlineKullanici: onlineKullanicilar.size,
     baglanti: io.engine.clientsCount,
