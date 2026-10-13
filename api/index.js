@@ -3972,11 +3972,76 @@ async function sohbetTemizle() {
     return { silinen: 0, calisti: false };
   }
 }
+/* --------------------------------------------------------------------------
+   Yetim goruntu temizligi
+   --------------------------------------------------------------------------
+   Kullanici goruntuyu secince dosya hemen Spaces'e yuklenir, ama mesaji
+   gondermeden paneli kapatabilir. O nesneye hicbir mesaj isaret etmez ve
+   hicbir zaman silinmezdi. Gunde bir kez chat/ onekindeki nesneler taranir;
+   24 saatten eski olup veritabaninda karsiligi olmayanlar silinir.
+
+   24 saat esigi, yuklemesi suren veya az once yuklenip gonderilmek uzere
+   olan nesnelerin yanlislikla silinmesini onler. */
+const SOHBET_YETIM_ESIK_MS = 24 * 60 * 60 * 1000;
+
+async function sohbetYetimDosyalariSil() {
+  if (!dbReady || !(await chatDosyaReady()) || !spacesHazirMi()) {
+    return { silinen: 0, calisti: false };
+  }
+  try {
+    const esik = Date.now() - SOHBET_YETIM_ESIK_MS;
+    let devamToken = null;
+    let silinen = 0;
+    do {
+      const liste = await spacesS3
+        .listObjectsV2({
+          Bucket: SPACES_BUCKET,
+          Prefix: "chat/",
+          MaxKeys: 1000,
+          ContinuationToken: devamToken || undefined,
+        })
+        .promise();
+      devamToken = liste.IsTruncated ? liste.NextContinuationToken : null;
+      const adaylar = (liste.Contents || []).filter(
+        (n) => new Date(n.LastModified).getTime() < esik
+      );
+      /* Sorgu parametresi sinirina takilmamak icin partiler halinde. */
+      for (let i = 0; i < adaylar.length; i += 500) {
+        const parti = adaylar.slice(i, i + 500);
+        const request = new mssql.Request();
+        parti.forEach((n, sira) => {
+          request.input("k" + sira, mssql.NVarChar(400), n.Key);
+        });
+        const sorgu = await request.query(`
+          select DosyaKey from SohbetMesajTB
+           where DosyaKey in (${parti.map((n, sira) => "@k" + sira).join(",")})
+        `);
+        const kullanilan = new Set(sorgu.recordset.map((x) => x.DosyaKey));
+        const yetimler = parti
+          .map((n) => n.Key)
+          .filter((k) => !kullanilan.has(k));
+        silinen += await sohbetDosyalariniSil(yetimler);
+      }
+    } while (devamToken);
+    if (silinen > 0) {
+      console.log(`Sohbet yetim goruntu temizligi: ${silinen} nesne silindi.`);
+    }
+    return { silinen: silinen, calisti: true };
+  } catch (err) {
+    console.error("sohbet yetim temizlik hatasi:", err.message);
+    return { silinen: 0, calisti: false };
+  }
+}
+
 if (etaReminderWorkerAllowed() && !globalThis.__sohbetTemizlikKurulu) {
   globalThis.__sohbetTemizlikKurulu = true;
+  const sohbetGunlukTemizlik = async () => {
+    await sohbetTemizle();
+    await sohbetYetimDosyalariSil();
+  };
   setTimeout(() => {
-    sohbetTemizle();
-    setInterval(sohbetTemizle, SOHBET_TEMIZLIK_ARALIK_MS);
+    sohbetGunlukTemizlik();
+    setInterval(sohbetGunlukTemizlik, SOHBET_TEMIZLIK_ARALIK_MS);
   }, SOHBET_TEMIZLIK_BASLAMA_MS);
 }
 
