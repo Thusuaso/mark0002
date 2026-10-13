@@ -138,10 +138,16 @@ export default {
   },
 
   // Socket sunucusunun adresi (api/server.js, "npm run socket").
-  // Eskiden store icinde "https://goz.mekmar.com" olarak sabitti; bu yuzden
-  // gelistirme ortami canli socket sunucusuna baglaniyordu.
+  //
+  // BOS BIRAKILIR. Adres istemcide sayfanin kendi adresinden turetilir
+  // (bkz. store/modules/socket.js -> socketUrl). Burada "localhost:3001"
+  // sabit yazilirsa canlida HER kullanicinin tarayicisi KENDI bilgisayarina
+  // baglanmaya calisir; sohbet ve online listesi yalnizca socket sunucusunu
+  // kendi makinesinde calistiran kiside (gelistiricide) calisir, digerleri
+  // ne cevrimici gorur ne mesaj gonderebilir.
+  // Zorunlu hallerde .env icine SOCKET_URL yazilabilir.
   publicRuntimeConfig: {
-    socketUrl: process.env.SOCKET_URL || "http://localhost:3001",
+    socketUrl: process.env.SOCKET_URL || "",
   },
   toast: {
     position: "top-right",

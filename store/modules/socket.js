@@ -15,12 +15,28 @@ export function tokenOku() {
   return bulunan ? bulunan.split("=")[1] : null;
 }
 
+/* Socket sunucusunun adresi.
+   .env icinde SOCKET_URL varsa o kullanilir. Yoksa adres sayfanin kendi
+   adresinden turetilir; cunku sabit bir "localhost:3001" degeri canlida
+   her kullanicinin tarayicisini KENDI bilgisayarina baglamaya calistirir.
+
+   - Sayfa 80/443'te (nginx arkasinda) ise ayni origin kullanilir; nginx
+     /socket.io/ yolunu socket sunucusuna (3001) yonlendirir.
+   - Gelistirmede sayfa 3000'de durur, socket sunucusu ayri process olarak
+     3001'de; bu durumda ayni makinenin 3001 portuna gidilir. */
 export function socketUrl(ctx) {
   const yapilandirma = ctx && ctx.$config;
   if (yapilandirma && yapilandirma.socketUrl) {
     return yapilandirma.socketUrl;
   }
-  return "http://localhost:3001";
+  if (typeof window === "undefined") {
+    return "http://localhost:3001";
+  }
+  const konum = window.location;
+  if (!konum.port || konum.port === "80" || konum.port === "443") {
+    return konum.origin;
+  }
+  return `${konum.protocol}//${konum.hostname}:3001`;
 }
 
 const state = {
