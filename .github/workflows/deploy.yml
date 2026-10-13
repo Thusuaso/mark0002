@@ -30,3 +30,18 @@ jobs:
 
             # 5. PM2'yu yeniden başlat (Uygulama adı 'goz' varsayıldı)
             pm2 restart nuxt-server --update-env
+
+            # 6. Socket sunucusunu da yeniden başlat (api/server.js, port 3001)
+            #
+            # ÖNEMLİ: Nuxt'u yenilemek yeterli DEĞİL. Şirket içi sohbet ve
+            # online durumu bu ayrı process'te çalışır; yeniden başlatılmazsa
+            # eski kodla ayakta kalır ve sohbet sessizce çalışmaz.
+            # Kayıtlı değilse ilk seferde oluşturulur (tek instance / fork:
+            # online listesi bu process'in hafızasında tutulur, bkz.
+            # ecosystem.config.js).
+            if pm2 describe socket-server > /dev/null 2>&1; then
+              pm2 restart socket-server --update-env
+            else
+              pm2 start ./api/server.js --name socket-server
+            fi
+            pm2 save
