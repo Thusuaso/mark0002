@@ -9,6 +9,11 @@ import { tokenOku, socketUrl } from "./socket";
    Sunucu ayni kullanicinin birden fazla baglantisini tek online kullanici
    sayar, bu yuzden iki baglanti online gostergesini bozmaz. */
 
+/* Cevrimici bildiriminin tekrarini engeller: { userId -> son bildirim ms }.
+   Vuex state'inde tutulmasi gerekmez, arayuzde gosterilmiyor. */
+const BILDIRIM_BEKLEME_MS = 5 * 60 * 1000;
+const sonBildirim = new Map();
+
 const state = {
   socket: null,
   users: [],          // sohbet edilebilecek kullanicilar
@@ -245,16 +250,31 @@ const actions = {
       });
   },
 
-  /* Takip edilen kisi cevrimiciye gecince sag ustte toast. */
+  /* Biri cevrimiciye gecince sag ustte toast (konum nuxt.config.js ->
+     toast.position). Bildirim HERKES icin cikar, yalnizca takip edilenler
+     icin degil.
+
+     Yalnizca sohbet listesinde gorunen kisiler bildirilir: bolge/yer tutucu
+     hesaplar (api/sohbetHaric.js) listeye girmedigi gibi bildirim de
+     uretmemeli. */
   chatOnlineBildirimi(vuexContext, veri) {
     const id = Number(veri.userId);
-    if (vuexContext.state.takip.indexOf(id) === -1) {
+    const kisi = vuexContext.state.users.find((u) => Number(u.ID) === id);
+    if (!kisi) {
       return;
     }
-    const kisi = vuexContext.state.users.find((u) => Number(u.ID) === id);
-    const ad = (kisi && kisi.KullaniciAdi) || veri.username || "Kullanıcı";
+    /* Sayfa yenilemek baglantiyi kopartip yeniden kurar; her F5'te ayni
+       kisi icin bildirim cikmasin diye ayni kisi kisa sure icinde tekrar
+       bildirilmez. Gercek "ise basladi" bildirimi etkilenmez. */
+    const simdi = Date.now();
+    const oncekiBildirim = sonBildirim.get(id) || 0;
+    if (simdi - oncekiBildirim < BILDIRIM_BEKLEME_MS) {
+      return;
+    }
+    sonBildirim.set(id, simdi);
+    const ad = kisi.KullaniciAdi || veri.username;
     if (this.$toast) {
-      this.$toast.info(`${ad} çevrimiçi oldu`);
+      this.$toast.info(`${ad} is now online`);
     }
   },
 
