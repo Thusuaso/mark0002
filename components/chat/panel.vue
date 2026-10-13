@@ -69,10 +69,10 @@
             <span class="chat-dot" :class="durumSinifi(kisi)"></span>
             <span class="chat-row-text">
               <strong>{{ kisi.KullaniciAdi }}</strong>
-              <!-- Son mesaj yoksa durum/son gorulme gosterilir -->
-              <small>{{
-                kisi.SonMesaj ? kisaMesaj(kisi.SonMesaj) : durumYazisi(kisi)
-              }}</small>
+              <!-- Isim altinda her zaman durum yazilir: "Çevrimiçi",
+                   "12 dk önce aktif" veya "Son görülme: ...". Eskiden son
+                   mesajin ozeti gosteriliyordu. -->
+              <small>{{ durumYazisi(kisi) }}</small>
             </span>
             <span v-if="kisi.Okunmamis > 0" class="chat-count">
               {{ kisi.Okunmamis }}
@@ -277,10 +277,6 @@ export default {
     },
     benimMi(mesaj) {
       return Number(mesaj.GonderenID) === Number(this.benId);
-    },
-    kisaMesaj(m) {
-      const t = String(m || "");
-      return t.length > 38 ? t.slice(0, 38) + "…" : t;
     },
     saat(tarih) {
       if (!tarih) return "";
