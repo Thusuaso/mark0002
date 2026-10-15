@@ -18,13 +18,20 @@
         </div>
       </div>
 
+      <!-- Ortak kasalar siparis listelerindeki gibi gruplanir: urun satirlari
+           ayri kalir, #/net/gross hucreleri kasa boyunca dikey birlesir
+           (rowspan). Gruplama alani Sira'dir: kasa basina tekil, grup
+           uyelerinde ayni (bkz. api kasaGruplariniUygula). -->
       <DataTable
         :value="list"
+        rowGroupMode="rowspan"
+        :groupRowsBy="['Sira']"
         filterDisplay="row"
         :filters.sync="filtersCheck"
+        :rowClass="crateGroupRowClass"
         @filter="checkFilters($event)"
       >
-        <Column field="Sira" header="#"></Column>
+        <Column field="Sira" header="#" bodyClass="crateGroupCell"></Column>
         <Column
           field="KasaNo"
           header="Crate No"
@@ -33,6 +40,9 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
+          <template #footer>
+            {{ total.crate | formatDecimal }}
+          </template>
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -84,9 +94,6 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
-          <template #footer>
-            {{ total.crate | formatDecimal }}
-          </template>
           <template #filter="{ filterModel, filterCallback }">
             <InputText
               type="text"
@@ -262,27 +269,34 @@
             />
           </template>
         </Column>
+        <!-- Net ve gross kasa basina tek degerdir, bu yuzden ikisi de Sira
+             uzerinden gruplanir (field="Sira") ve hucreleri kasa boyunca
+             birlesir; gosterilen deger body sablonundan gelir. Agirliga gore
+             filtreleme kaldirildi: deger artik satirin degil kasanin. -->
         <Column
-          field="Ton"
-          header="Ton"
-          :showFilterMenu="false"
-          :showClearButton="false"
+          field="Sira"
+          header="Net KG"
           headerClass="tableHeader"
-          bodyClass="tableBody"
+          bodyClass="crateGroupCell"
         >
           <template #body="slotProps">
-            {{ slotProps.data.Ton | formatDecimal }}
+            {{ crateGroupNet(slotProps.data) | formatDecimal }}
           </template>
           <template #footer>
             {{ total.ton | formatDecimal }}
           </template>
-          <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              type="text"
-              v-model="filterModel.value"
-              @input="filterCallback()"
-              class="p-column-filter"
-            />
+        </Column>
+        <Column
+          field="Sira"
+          header="Gross KG"
+          headerClass="tableHeader"
+          bodyClass="crateGroupCell"
+        >
+          <template #body="slotProps">
+            {{ (crateGroupNet(slotProps.data) + crateTare) | formatDecimal }}
+          </template>
+          <template #footer>
+            {{ grossTotal | formatDecimal }}
           </template>
         </Column>
         <Column field="KasaOlcusu" header="C.Size"></Column>
@@ -300,6 +314,11 @@ export default {
       "getOrderProductionPo",
       "getOrderProductionCustomer",
     ]),
+    /* Gross, kasa basina sabit dara ile hesaplanir; ortak kasalar tek kasa
+       sayildigi icin dara da grup basina bir kez eklenir. */
+    grossTotal() {
+      return (this.total.ton || 0) + (this.total.crate || 0) * this.crateTare;
+    },
   },
   props: {
     list: {
@@ -313,6 +332,8 @@ export default {
   },
   data() {
     return {
+      /* Ceki Excel'iyle ayni dara (bkz. socket/web.py ceki_listesi_excel). */
+      crateTare: 30,
       filtersCheck: {
         KasaNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         TedarikciAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -326,7 +347,6 @@ export default {
         KutuAdet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Adet: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        Ton: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
       },
       checkListFields: {
         Sıra: "Sira",
@@ -347,6 +367,16 @@ export default {
     };
   },
   methods: {
+    crateGroupRowClass(row) {
+      return row.Ortak ? "crateGroupRow" : null;
+    },
+    /* Gruplama kapaliysa (SQL script calistirilmadiysa) alanlar gelmez; her
+       satir kendi basina bir kasadir ve kendi degeri kullanilir. */
+    crateGroupNet(row) {
+      return row.GrupTon === undefined || row.GrupTon === null
+        ? row.Ton
+        : row.GrupTon;
+    },
     checkFilters(event) {
       this.$store.dispatch(
         "setOrderProductionCheckListTotal",
@@ -389,3 +419,15 @@ export default {
   },
 };
 </script>
+<style scoped>
+/* Ayni fiziksel kasayi paylasan satirlar listede birlikte duruyor; hafif
+   zemin hangi satirlarin tek kasa oldugunu bakista gosterir. */
+::v-deep .crateGroupRow {
+  background: #fff8e1;
+}
+/* Dikey birlesen hucreler (#, net, gross) icerigi ortada dursun. */
+::v-deep .crateGroupCell {
+  vertical-align: middle;
+  text-align: center;
+}
+</style>

@@ -1642,8 +1642,157 @@ app.put("/sales/representative/change", async (req, res) => {
 });
 
 /*Selection*/
-app.get("/selection/production/list", (req, res) => {
-  const sql = `select u.SqmMiktar,
+
+/* --------------------------------------------------------------------------
+   Ortak kasalar
+   --------------------------------------------------------------------------
+   Bir fiziksel kasaya birden fazla urun girdiginde her urun seleksiyonda
+   ayri KasaNo ile kaydediliyor. UretimTB.KasaGrupNo bu satirlari tek kasa
+   olarak baglar ve grubun en kucuk kasa numarasini tasir.
+
+   Kolon api/sql/UretimTBKasaGrup.sql ile eklenir. Script calistirilmadiysa
+   gruplama kapali kalir: form alani gorunmez, check listesi ve ceki Excel'i
+   eskisi gibi her satiri ayri kasa sayar. */
+let kasaGrupReadyCache = null;
+async function kasaGrupReady() {
+  if (kasaGrupReadyCache !== null) {
+    return kasaGrupReadyCache;
+  }
+  try {
+    const check = await mssql.query(`
+      select count(*) as kolon from sys.columns
+       where object_id = object_id(N'[dbo].[UretimTB]')
+         and name = N'KasaGrupNo'
+    `);
+    kasaGrupReadyCache = check.recordset[0].kolon > 0;
+  } catch (err) {
+    kasaGrupReadyCache = false;
+  }
+  return kasaGrupReadyCache;
+}
+
+/* Grubun ortak numarasi uyelerin en kucugudur. KasaNo nvarchar tutuldugu
+   icin tamamen rakamdan olusanlar sayisal, digerleri metin olarak
+   karsilastirilir; aksi halde "9" ile "10" yanlis siralanirdi. */
+function kasaNoEnKucuk(numaralar) {
+  const temiz = numaralar
+    .map((x) => String(x ?? "").trim())
+    .filter((x) => x.length > 0);
+  if (temiz.length === 0) {
+    return null;
+  }
+  if (temiz.every((x) => /^\d+$/.test(x))) {
+    return temiz.reduce((a, b) => (parseInt(b, 10) < parseInt(a, 10) ? b : a));
+  }
+  return temiz.slice().sort()[0];
+}
+
+/* Formdan gelen "Ortak Kasalar" listesi, o kasanin ortakligin TAMAMINI
+   tanimlar: listeden cikarilan kasa gruptan ayrilir. Tek uye kalan gruplar
+   null'a donduruldugu icin "grup" her zaman en az iki satir demektir. */
+async function kasaGrupKaydet(kasaNo, ortakNumaralar) {
+  if (!(await kasaGrupReady())) {
+    return;
+  }
+  const ana = String(kasaNo ?? "").trim();
+  if (!ana) {
+    return;
+  }
+
+  const yeni = new Set([ana]);
+  (Array.isArray(ortakNumaralar) ? ortakNumaralar : []).forEach((x) => {
+    const t = String(x ?? "").trim();
+    if (t && t !== ana) {
+      yeni.add(t);
+    }
+  });
+  const uyeler = [...yeni];
+  const uyeParam = (request) => {
+    uyeler.forEach((n, i) => request.input(`k${i}`, mssql.NVarChar, n));
+    return uyeler.map((_, i) => `@k${i}`).join(",");
+  };
+
+  /* Yeni uyelerin su anki gruplari: hem bu kasanin eski grubu hem de
+     eklenen kasalarin baska gruplari temizlige dahil olmali. */
+  const grupIstek = new mssql.Request();
+  const grupSorgu = await grupIstek.query(`
+    select distinct KasaGrupNo from UretimTB
+     where KasaGrupNo is not null and KasaNo in (${uyeParam(grupIstek)})
+  `);
+  const grupNo = kasaNoEnKucuk(uyeler);
+  const etkilenen = new Set(
+    grupSorgu.recordset.map((x) => String(x.KasaGrupNo).trim())
+  );
+  etkilenen.add(grupNo);
+  const grupListe = [...etkilenen];
+  const grupParam = (request) => {
+    grupListe.forEach((g, i) => request.input(`g${i}`, mssql.NVarChar, g));
+    return grupListe.map((_, i) => `@g${i}`).join(",");
+  };
+
+  /* 1) Artik ortak olmayanlari gruptan cikar. */
+  const birakIstek = new mssql.Request();
+  const birakGruplar = grupParam(birakIstek);
+  const birakUyeler = uyeParam(birakIstek);
+  await birakIstek.query(`
+    update UretimTB set KasaGrupNo = null
+     where KasaGrupNo in (${birakGruplar}) and KasaNo not in (${birakUyeler})
+  `);
+
+  /* 2) Yeni grubu yaz. */
+  const yazIstek = new mssql.Request();
+  const yazUyeler = uyeParam(yazIstek);
+  yazIstek.input("grup", mssql.NVarChar, grupNo);
+  await yazIstek.query(`
+    update UretimTB set KasaGrupNo = @grup where KasaNo in (${yazUyeler})
+  `);
+
+  /* 3) Tek uye kalan gruplari (ortaklik kaldirildiysa yenisi de dahil)
+        bosalt; grup her zaman en az iki satir demektir. */
+  const temizIstek = new mssql.Request();
+  const temizGruplar = grupParam(temizIstek);
+  await temizIstek.query(`
+    update u set KasaGrupNo = null
+      from UretimTB u
+     where u.KasaGrupNo in (${temizGruplar})
+       and (
+         select count(*) from UretimTB x where x.KasaGrupNo = u.KasaGrupNo
+       ) < 2
+  `);
+}
+
+/* Formdaki "Ortak Kasalar" alaninin secenekleri: seleksiyonda duran
+   (UrunDurumID=1) kasalar. Mevcut grup da buradan okunur, bu yuzden
+   KasaGrupNo birlikte doner. */
+app.get("/selection/production/crate/options", async (req, res) => {
+  try {
+    if (!(await kasaGrupReady())) {
+      return res.status(200).json({ hazir: false, list: [] });
+    }
+    /* KasaNo int; AutoComplete forceSelection alan degerinde trim() cagirdigi
+       icin metin olarak verilir. */
+    const sonuc = await mssql.query(`
+      select cast(u.KasaNo as nvarchar(50)) as KasaNo,
+             u.KasaGrupNo, u.SiparisAciklama,
+             dbo.Get_KategoriAdi(u.UrunKartID) as KategoriAdi,
+             dbo.Get_UrunAdi(u.UrunKartID)     as UrunAdi,
+             t.FirmaAdi                        as TedarikciAdi
+        from UretimTB u
+        inner join TedarikciTB t on t.ID = u.TedarikciID
+       where u.UrunDurumID = 1
+       order by u.KasaNo desc
+    `);
+    res.status(200).json({ hazir: true, list: sonuc.recordset });
+  } catch (err) {
+    console.error("/selection/production/crate/options HATA:", err.message);
+    res.status(500).json({ hazir: false, list: [] });
+  }
+});
+
+app.get("/selection/production/list", async (req, res) => {
+  /* Kolon yoksa sorguya eklenmez; gruplama kapaliyken liste aynen calisir. */
+  const grupKolon = (await kasaGrupReady()) ? "u.KasaGrupNo," : "";
+  const sql = `select ${grupKolon} u.SqmMiktar,
   u.Kutulama,
     u.Fason,
     u.Duzenleyen,u.Kasalayan,u.UrunKartId,urb.ID as UrunBirimId,urb.BirimAdi as UrunBirimAdi,u.UretimTurID,u.ID,u.Tarih,u.KasaNo,k.KategoriAdi,k.ID as KategoriID,uo.OcakAdi,uo.ID as OcakId,ur.UrunAdi,ur.ID as UrunId,yk.YuzeyIslemAdi,yk.ID as YuzeyId,ol.ID as OlcuId,ol.En,ol.Boy,ol.Kenar,u.KutuAdet,u.KutuIciAdet,u.Miktar,u.Kutu,u.Bagli,u.SiparisAciklama,u.Aciklama,u.TedarikciID,t.FirmaAdi,u.Bulunamadi,u.Disarda,u.Adet from UretimTB u inner join TedarikciTB t on t.ID = u.TedarikciID inner join UrunBirimTB ub on ub.ID = u.UrunBirimID inner join UrunOcakTB uo on uo.ID = u.UrunOcakID inner join UretimTurTB ut on ut.ID = u.UretimTurID inner join UrunKartTB uk on uk.ID = u.UrunKartID inner join KategoriTB k on k.ID = uk.KategoriID inner join UrunlerTB ur on ur.ID = uk.UrunID inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID inner join OlculerTB ol on ol.ID = uk.OlcuID inner join UrunBirimTB urb on urb.ID = u.UrunBirimID where UrunDurumID=1 order by KasaNo desc`;
@@ -1910,6 +2059,9 @@ app.post("/selection/production/save", async (req, res) => {
 
       crateNo = parseInt(crateNo) + 1;
     }
+    /* Ortaklik yalnizca formda girilen kasa icin kurulur; KasaKayıtAdedi > 1
+       ise ardindan uretilen numaralar ayri fiziksel kasalardir. */
+    await kasaGrupKaydet(req.body.KasaNo, req.body.OrtakKasalar);
     res.status(200).json({ status: true });
   } catch (err) {
     console.error("❌ /selection/production/save HATA:", err);
@@ -1966,6 +2118,8 @@ app.put("/selection/production/update", async (req, res) => {
       "update UretimTB SET Tarih=@Tarih,KutuAdet=@KutuAdet,KasaNo=@KasaNo,UrunKartID=@UrunKartID,TedarikciID=@TedarikciID,UrunBirimID=@UrunBirimID,UrunOcakID=@UrunOcakID,Adet=@Adet,Miktar=@Miktar,Aciklama=@Aciklama,UretimTurID=@UretimTurID,SiparisAciklama=@SiparisAciklama,Kutu=@Kutu,Duzenleyen=@Duzenleyen,Kasalayan=@Kasalayan,Disarda=@Disarda,KutuIciAdet=@KutuIciAdet,SqmMiktar=@SqmMiktar,Bagli=@Bagli,Bulunamadi=@Bulunamadi,Fason=@Fason,Kutulama=@Kutulama where ID=@ID"
     );
 
+    await kasaGrupKaydet(req.body.KasaNo, req.body.OrtakKasalar);
+
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
     console.error("❌ /selection/production/update HATA:", err);
@@ -1979,6 +2133,18 @@ app.delete("/selection/production/delete/:crateNo", async (req, res) => {
     const results = await request.query(
       "delete UretimTB where KasaNo=@crateNo"
     );
+    /* Silinen kasa bir gruptaysa geride tek uye kalmis olabilir; o zaman
+       grup anlamini yitirir ve bosaltilir. */
+    if (await kasaGrupReady()) {
+      await mssql.query(`
+        update u set KasaGrupNo = null
+          from UretimTB u
+         where u.KasaGrupNo is not null
+           and (
+             select count(*) from UretimTB x where x.KasaGrupNo = u.KasaGrupNo
+           ) < 2
+      `);
+    }
     res.status(201).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
     res.status(500).json({ status: false });
@@ -14684,8 +14850,64 @@ function firstWord(v) {
   return (v ?? "").toString().trim().split(" ")[0] || "";
 }
 
-app.get("/order/production/product/check/:po", (req, res) => {
+/* Ortak kasalari GRUPLAR (bkz. kasaGrupKaydet): satirlar ayri kalir, urun
+   bilgileri her satirda kendi degeriyle gorunur. Tek fiziksel kasa olduklarini
+   su uc sey anlatir:
+     - Sira (#) fiziksel kasa sayar ve grubun TUM uyelerinde ayni degerdir;
+       tablo bu alan uzerinden rowspan yapar (siparis listelerindeki gruplama
+       ile ayni), ceki Excel'i de ayni araligi dikey birlestirir. Deger kasa
+       basina tekil oldugu icin iki ayri kasa yanlislikla birlesmez,
+     - KasaNo her satirda satirin KENDI numarasidir, degistirilmez,
+     - net ve gross agirlik grup toplamidir ve yalnizca ilk satirda yazilir
+       (KasaGrupIlk / GrupTon); dara da kasa basina bir kez eklenir.
+   Grup uyeleri listede yan yana gelsin diye grubun ilk satirinin ardina
+   toplanir; gruplarin kendi arasindaki sira korunur.
+
+   Grup kolonu yoksa veya grubun bu siparişte tek uyesi varsa satir tekil kasa
+   olarak isaretlenir ve davranis eskisi gibidir. */
+function kasaGruplariniUygula(list) {
+  const anahtar = (x) => {
+    const grup = (x.KasaGrupNo ?? "").toString().trim();
+    return grup.length ? `g:${grup}` : `t:${(x.KasaNo ?? "").toString().trim()}`;
+  };
+
+  const sira = [];
+  const kovalar = new Map();
+  list.forEach((x) => {
+    const k = anahtar(x);
+    if (!kovalar.has(k)) {
+      kovalar.set(k, []);
+      sira.push(k);
+    }
+    kovalar.get(k).push(x);
+  });
+
+  const sonuc = [];
+  let kasaSira = 0;
+  sira.forEach((k) => {
+    const uyeler = kovalar.get(k);
+    const ortak = uyeler.length > 1 && k.startsWith("g:");
+    kasaSira += 1;
+    const net = Number(
+      uyeler.reduce((toplam, u) => toplam + safeNum(u.Ton), 0).toFixed(4)
+    );
+    uyeler.forEach((u, i) => {
+      sonuc.push({
+        ...u,
+        Sira: kasaSira,
+        Ortak: ortak,
+        KasaGrupIlk: i === 0,
+        GrupTon: net,
+      });
+    });
+  });
+  return sonuc;
+}
+
+app.get("/order/production/product/check/:po", async (req, res) => {
   const po = String(req.params.po).replace(/'/g, "''");
+  /* Kolon yoksa sorguya eklenmez; gruplama kapaliyken liste aynen calisir. */
+  const grupKolon = (await kasaGrupReady()) ? "u.KasaGrupNo," : "";
 
   const checkListSql = `
     select
@@ -14698,6 +14920,7 @@ app.get("/order/production/product/check/:po", (req, res) => {
       dbo.Get_Olcu_En(u.UrunKartID)       as En,
       dbo.Get_Olcu_Boy(u.UrunKartID)      as Boy,
       u.Adet, u.Miktar, b.BirimAdi, u.KutuAdet, u.ID, u.UrunKartID,
+      ${grupKolon}
       su.KasaOlcusu
     from UretimTB u
       inner join UrunBirimTB b on b.ID = u.UrunBirimID
@@ -14722,7 +14945,7 @@ app.get("/order/production/product/check/:po", (req, res) => {
         .json({ message: "Üretim listesi alınamadı", detail: err.message });
     }
     try {
-      const list = (check?.recordset || []).map((x, i) => ({
+      const satirlar = (check?.recordset || []).map((x, i) => ({
         ...x,
         Sira: i + 1,
         Ton: Number(
@@ -14734,6 +14957,8 @@ app.get("/order/production/product/check/:po", (req, res) => {
           ).toFixed(4)
         ),
       }));
+      /* Ortak kasalar tek kasa gibi gosterilir, Sira yeniden numaralanir. */
+      const list = kasaGruplariniUygula(satirlar);
       res.status(200).json({ list });
     } catch (e) {
       console.error("check/:po işleme hatası:", e.message);
@@ -14743,8 +14968,10 @@ app.get("/order/production/product/check/:po", (req, res) => {
     }
   });
 });
-app.get("/order/production/product/check/mekmer/:po", (req, res) => {
+app.get("/order/production/product/check/mekmer/:po", async (req, res) => {
   const po = String(req.params.po).replace(/'/g, "''");
+  /* Kolon yoksa sorguya eklenmez; gruplama kapaliyken liste aynen calisir. */
+  const grupKolon = (await kasaGrupReady()) ? "u.KasaGrupNo," : "";
 
   const checkListSql = `
     select
@@ -14757,6 +14984,7 @@ app.get("/order/production/product/check/mekmer/:po", (req, res) => {
       dbo.Get_Olcu_En(u.UrunKartID)       as En,
       dbo.Get_Olcu_Boy(u.UrunKartID)      as Boy,
       u.Adet, u.Miktar, b.BirimAdi, u.KutuAdet, u.ID, u.UrunKartID,
+      ${grupKolon}
       su.KasaOlcusu
     from UretimTB u
       inner join UrunBirimTB b on b.ID = u.UrunBirimID
@@ -14780,7 +15008,7 @@ app.get("/order/production/product/check/mekmer/:po", (req, res) => {
         .json({ message: "Üretim listesi alınamadı", detail: err.message });
     }
     try {
-      const list = (check?.recordset || []).map((x, i) => ({
+      const satirlar = (check?.recordset || []).map((x, i) => ({
         ...x,
         Sira: i + 1,
         Ton: Number(
@@ -14792,6 +15020,8 @@ app.get("/order/production/product/check/mekmer/:po", (req, res) => {
           ).toFixed(4)
         ),
       }));
+      /* Ortak kasalar tek kasa gibi gosterilir, Sira yeniden numaralanir. */
+      const list = kasaGruplariniUygula(satirlar);
       res.status(200).json({ list });
     } catch (e) {
       console.error("check/mekmer/:po işleme hatası:", e.message);

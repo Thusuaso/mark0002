@@ -85,7 +85,7 @@
             </span>
           </div>
         </div>
-        <div class="row">
+        <div class="row mb-4">
           <div class="col-6">
             <span class="p-float-label">
               <InputText id="organizer" type="text" v-model="organizer" />
@@ -97,6 +97,41 @@
               <InputText id="crateMan" type="text" v-model="crateman" />
               <label for="crateMan">Crated by</label>
             </span>
+          </div>
+        </div>
+        <!-- Ortak kasalar: ayni fiziksel kasayi paylasan diger kasa
+             numaralari. Grup kolonu yoksa (api/sql/UretimTBKasaGrup.sql
+             calistirilmadiysa) alan hic gosterilmez. -->
+        <div class="row mb-4" v-if="getProductionCrateGroupReady">
+          <div class="col-12">
+            <label for="common" class="d-block mb-1">Ortak Kasalar</label>
+            <AutoComplete
+              id="common"
+              class="w-100"
+              v-model="commonCrates"
+              :suggestions="filteredCrateOptions"
+              @complete="searchCrateOptions($event)"
+              field="KasaNo"
+              multiple
+              forceSelection
+            >
+              <!-- Kasa numarasi tek basina ayirt edici degil; icindeki urun
+                   ve tedarikci de gorunsun ki yanlis kasa secilmesin. Ic
+                   kasalar 5, dis kasalar 6 haneli; tedarikci adi hangisi
+                   oldugunu da belli eder. -->
+              <template #item="slotProps">
+                <span>{{ slotProps.item.KasaNo }}</span>
+                <small class="text-muted ms-2">
+                  {{ slotProps.item.TedarikciAdi }} /
+                  {{ slotProps.item.KategoriAdi }} /
+                  {{ slotProps.item.UrunAdi }} /
+                  {{ slotProps.item.SiparisAciklama }}
+                </small>
+              </template>
+            </AutoComplete>
+            <small class="text-muted" v-if="commonCrates.length">
+              Ceki listesinde ortak kasa no: {{ commonCrateNo }}
+            </small>
           </div>
         </div>
       </div>
@@ -349,7 +384,30 @@ import { io } from "socket.io-client";
 
 export default {
   computed: {
-    ...mapGetters(["getProductionCrateNo"]),
+    ...mapGetters([
+      "getProductionCrateNo",
+      "getProductionCrateOptions",
+      "getProductionCrateGroupReady",
+    ]),
+    /* Grup her zaman en kucuk kasa numarasiyla anilir; ceki listesi ve
+       Excel'de tum uyeler bu numarayi gosterir. */
+    commonCrateNo() {
+      const numaralar = [
+        this.getProductionCrateNo,
+        ...this.commonCrates.map((x) => x.KasaNo),
+      ]
+        .map((x) => String(x == null ? "" : x).trim())
+        .filter((x) => x.length > 0);
+      if (!numaralar.length) {
+        return null;
+      }
+      if (numaralar.every((x) => /^[0-9]+$/.test(x))) {
+        return numaralar.reduce((a, b) =>
+          parseInt(b, 10) < parseInt(a, 10) ? b : a
+        );
+      }
+      return numaralar.slice().sort()[0];
+    },
   },
   props: {
     suppliers: {
@@ -427,9 +485,14 @@ export default {
       productCardId: null,
       disabledOrders: true,
       product_cards_form_dialog: false,
+      commonCrates: [],
+      filteredCrateOptions: [],
     };
   },
-  created() {
+  async created() {
+    /* Ortak kasa secenekleri createdProcess'ten once gelmeli: duzenlemede
+       mevcut grup uyeleri bu listeden okunuyor. */
+    await this.$store.dispatch("setSelectionProductionCrateOptions");
     if (!this.buttonStatus) {
       this.createdProcess();
     } else {
@@ -620,9 +683,12 @@ export default {
         Fason: this.fasonStatus,
         Kutulama: this.kutulamaStatus,
         KullaniciID: Cookies.get("userId"),
+        OrtakKasalar: this.commonCrates.map((x) => x.KasaNo),
       };
 
       await this.$store.dispatch("setSelectionProductionSave", data);
+      /* Yeni kasa secenek listesinde de gorunsun. */
+      this.$store.dispatch("setSelectionProductionCrateOptions");
       this.$store.getters.getSocket.emit("update_production_emit");
 
       this.$store.dispatch("setSelectionProductionTotal");
@@ -671,8 +737,10 @@ export default {
         KasaKayıtAdedi: this.crateAmount,
         Fason: this.fasonStatus,
         Kutulama: this.kutulamaStatus,
+        OrtakKasalar: this.commonCrates.map((x) => x.KasaNo),
       };
       await this.$store.dispatch("setSelectionProductionUpdate", data);
+      this.$store.dispatch("setSelectionProductionCrateOptions");
       this.$store.getters.getSocket.emit("update_production_emit");
       this.$emit("selection_production_dialog_form", false);
     },
@@ -708,6 +776,8 @@ export default {
       this.selectedSupplier = null;
       this.fasonStatus = false;
       this.kutulamaStatus = false;
+      this.commonCrates = [];
+      this.filteredCrateOptions = [];
 
       this.$store.commit("setSelectionProductionCrateNo", null);
     },
@@ -744,6 +814,7 @@ export default {
         "x" +
         this.model.Kenar;
       this.$store.commit("setSelectionProductionCrateNo", this.model.KasaNo);
+      this.commonCratesLoad();
       this.selectedMine = this.mines.find((x) => x.ID == this.model.OcakId);
       this.crateman = this.model.Kasalayan;
       this.organizer = this.model.Duzenleyen;
@@ -767,6 +838,44 @@ export default {
       this.outStatus = this.__nullNoneTrueFalseControl(this.model.Disarda);
       this.stringStatus = this.__nullNoneTrueFalseControl(this.model.Bagli);
       this.boxStatus = this.__nullNoneTrueFalseControl(this.model.Kutu);
+    },
+    /* Secenekler seleksiyonda duran kasalar; kendi numarasi ve zaten secili
+       olanlar listeden dusurulur. */
+    searchCrateOptions(event) {
+      const aranan = (event.query || "").toString().trim().toLowerCase();
+      const kendi = String(
+        this.getProductionCrateNo == null ? "" : this.getProductionCrateNo
+      ).trim();
+      const secili = this.commonCrates.map((x) => String(x.KasaNo).trim());
+      this.filteredCrateOptions = this.getProductionCrateOptions
+        .filter((x) => {
+          const no = String(x.KasaNo == null ? "" : x.KasaNo).trim();
+          if (!no || no === kendi || secili.includes(no)) {
+            return false;
+          }
+          return !aranan || no.toLowerCase().startsWith(aranan);
+        })
+        .slice(0, 30);
+    },
+    /* Duzenlemede mevcut grup: ayni KasaGrupNo'ya sahip diger kasalar. */
+    commonCratesLoad() {
+      const grup = String(
+        this.model.KasaGrupNo == null ? "" : this.model.KasaGrupNo
+      ).trim();
+      if (!grup) {
+        this.commonCrates = [];
+        return;
+      }
+      const kendi = String(
+        this.model.KasaNo == null ? "" : this.model.KasaNo
+      ).trim();
+      this.commonCrates = this.getProductionCrateOptions.filter((x) => {
+        const no = String(x.KasaNo == null ? "" : x.KasaNo).trim();
+        return (
+          String(x.KasaGrupNo == null ? "" : x.KasaGrupNo).trim() === grup &&
+          no !== kendi
+        );
+      });
     },
     searchMine(event) {
       let results;

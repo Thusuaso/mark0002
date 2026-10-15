@@ -930,7 +930,12 @@ const mutations = {
       amount: 0,
       ton: 0,
     };
-    state.orderProductionCheckListTotal.crate += payload.length;
+    /* Ortak kasalar tek fiziksel kasadir: kasa adedi, grubun ilk satiri
+       olarak isaretlenmis satir sayisidir (bkz. api kasaGruplariniUygula).
+       Gruplama kapaliysa alan gelmez ve her satir sayilir. */
+    state.orderProductionCheckListTotal.crate += payload.filter((x) =>
+      x.KasaGrupIlk === undefined ? true : x.KasaGrupIlk
+    ).length;
     payload.forEach((x) => {
       state.orderProductionCheckListTotal.box += x.KutuAdet;
       state.orderProductionCheckListTotal.piece += x.Adet;

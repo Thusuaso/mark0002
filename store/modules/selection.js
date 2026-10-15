@@ -19,6 +19,10 @@ const state = {
   productionCrateSizeList: [],
   productionCrateSizeButtonStatus: false,
   filteredSelectionList: [],
+  /* Ortak kasa secimi: seleksiyonda duran kasalar ve kolonun hazir olup
+     olmadigi (api/sql/UretimTBKasaGrup.sql calistirilmadiysa alan gizlenir). */
+  productionCrateOptions: [],
+  productionCrateGroupReady: false,
 };
 const actions = {
   setSelectionProductFilteredList(vuexContext, payload) {
@@ -39,6 +43,16 @@ const actions = {
         );
         vuexContext.commit("setEndLoadingAction");
       }
+    });
+  },
+  /* Formdaki "Ortak Kasalar" alaninin secenekleri. Kolon yoksa hazir=false
+     doner ve alan hic gosterilmez. */
+  setSelectionProductionCrateOptions(vuexContext) {
+    return this.$axios.get("/selection/production/crate/options").then((response) => {
+      vuexContext.commit("setSelectionProductionCrateOptions", {
+        list: response.data.list || [],
+        hazir: !!response.data.hazir,
+      });
     });
   },
   setSelectionProductionTotal(vuexContext) {
@@ -319,6 +333,10 @@ const mutations = {
     state.productionDisMekmerButtonStatus = false;
     state.productionBulunamadiButtonStatus = true;
   },
+  setSelectionProductionCrateOptions(state, payload) {
+    state.productionCrateOptions = payload.list;
+    state.productionCrateGroupReady = payload.hazir;
+  },
   setSelectionProductionCrateSizeButtonStatus(state, status) {
     state.productionCrateSizeButtonStatus = status;
   },
@@ -347,6 +365,12 @@ const getters = {
   },
   getProductionCrateNo(state) {
     return state.productionCrateNo;
+  },
+  getProductionCrateOptions(state) {
+    return state.productionCrateOptions;
+  },
+  getProductionCrateGroupReady(state) {
+    return state.productionCrateGroupReady;
   },
   getProductionCrateSizeList(state) {
     return state.productionCrateSizeList;
