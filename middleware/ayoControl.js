@@ -1,4 +1,4 @@
-const AYO_USER_IDS = [13, 19, 47, 51, 57, 58, 59];
+const AYO_USER_IDS = [13, 19, 47, 51, 57, 58, 59, 65];
 
 export default function (context) {
   let userId = null;
