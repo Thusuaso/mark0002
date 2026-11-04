@@ -93,9 +93,13 @@ export default {
         currency: this.currency,
         year: this.year,
       };
-      this.$emit("cost_save_emit", data);
+      /* bkz. formc.vue: sonuc beklenmeden cevrilen butonlar, 403 sonrasi
+         satiri yalnizca Update'e mahkum ediyordu. */
       this.save_button_disabled = true;
-      this.update_button_disabled = false;
+      this.$emit("cost_save_emit", data, (basarili) => {
+        this.save_button_disabled = !!basarili;
+        if (basarili) this.update_button_disabled = false;
+      });
     },
     update() {
       const data = {

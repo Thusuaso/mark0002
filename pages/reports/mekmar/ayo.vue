@@ -178,7 +178,7 @@
             :usd="item.usd"
             :id="item.id"
             @credit_card_cost_list_updated_emit="creditCardCostListUpdated"
-            @cost_save_emit="creditCardCostSave($event)"
+            @cost_save_emit="creditCardCostSave"
             @cost_update_emit="creditCardCostUpdate($event)"
           />
         </Dialog>
@@ -207,7 +207,7 @@
             :usd="item.usd"
             :id="item.id"
             @credit_card_cost_list_updated_emit="travelCostListUpdated"
-            @cost_save_emit="travelCostSave($event)"
+            @cost_save_emit="travelCostSave"
             @cost_update_emit="travelCostUpdate($event)"
           />
         </Dialog>
@@ -232,7 +232,7 @@
             :usd="item.usd"
             :id="item.id"
             @credit_card_cost_list_updated_emit="wageCostListUpdated"
-            @cost_save_emit="wageCostSave($event)"
+            @cost_save_emit="wageCostSave"
             @cost_update_emit="wageCostUpdate($event)"
           />
         </Dialog>
@@ -243,7 +243,7 @@
           <creditCardForm style="margin-bottom:5px;" v-for="item in abroadCostList" :key="item" :month="item.month" :value="item.value"
           :month_id="item.month_id" :currency="item.currency" :year="selectedYear.Yil" :usd="item.usd" :id="item.id"
           @credit_card_cost_list_updated_emit="abroadCostListUpdated"
-          @cost_save_emit="abroadCostSave($event)"
+          @cost_save_emit="abroadCostSave"
           @cost_update_emit="abroadCostUpdate($event)"
           />
 
@@ -273,7 +273,7 @@
             :usd="item.usd"
             :id="item.id"
             @credit_card_cost_list_updated_emit="sampleCostListUpdated"
-            @cost_save_emit="sampleCostSave($event)"
+            @cost_save_emit="sampleCostSave"
             @cost_update_emit="sampleCostUpdate($event)"
           />
         </Dialog>
@@ -303,7 +303,7 @@
             :usd="item.usd"
             :id="item.id"
             @credit_card_cost_list_updated_emit="otherCostListUpdated"
-            @cost_save_emit="otherCostSave($event)"
+            @cost_save_emit="otherCostSave"
             @cost_update_emit="otherCostUpdate($event)"
           />
         </Dialog>
@@ -335,7 +335,7 @@
             :usd="item.usd"
             :id="item.id"
             @credit_card_cost_list_updated_emit="mekmerCostListUpdated"
-            @cost_save_emit="mekmerCostSave($event)"
+            @cost_save_emit="mekmerCostSave"
             @cost_update_emit="mekmerCostUpdate($event)"
           />
         </Dialog>
@@ -351,7 +351,7 @@
             :id="cur.id"
             :month_id="cur.month_id"
             :currency="cur.currency"
-            @cost_save_emit="saveCurrency($event)"
+            @cost_save_emit="saveCurrency"
             @cost_update_emit="updateCurrency($event)"
             :year="selectedYear.Yil"
           />
@@ -653,10 +653,15 @@ export default {
         this.$toast.success("Başarıyla Güncellendi.");
       });
     },
-    mekmerCostSave(event) {
+    mekmerCostSave(event, sonucBildir) {
       this.$axios.post("/reports/ayo/mekmer/cost/save", event).then((res) => {
         this.$toast.success("Başarıyla Kaydedildi.");
         this.mekmerCostListUpdated();
+        if (sonucBildir) sonucBildir(true);
+      })
+      .catch(() => {
+        /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+        if (sonucBildir) sonucBildir(false);
       });
     },
 
@@ -732,10 +737,15 @@ export default {
         this.$toast.success("Başarıyla Güncellendi.");
       });
     },
-    saveCurrency(event) {
+    saveCurrency(event, sonucBildir) {
       this.$axios.post("/reports/ayo/currency/save", event).then((res) => {
         this.updatedCurrencyList();
         this.$toast.success("Başarıyla Kaydedildi.");
+        if (sonucBildir) sonucBildir(true);
+      })
+      .catch(() => {
+        /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+        if (sonucBildir) sonucBildir(false);
       });
     },
     currency() {
@@ -789,10 +799,15 @@ export default {
         this.$toast.success("Başarıyla Güncellendi.");
       });
     },
-    otherCostSave(event) {
+    otherCostSave(event, sonucBildir) {
       this.$axios.post("/reports/ayo/other/cost/save", event).then((res) => {
         this.$toast.success("Başarıyla Kaydedildi.");
         this.otherCostListUpdated();
+        if (sonucBildir) sonucBildir(true);
+      })
+      .catch(() => {
+        /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+        if (sonucBildir) sonucBildir(false);
       });
     },
     otherCost() {
@@ -816,10 +831,15 @@ export default {
         this.$toast.success("Başarıyla Güncellendi.");
       });
     },
-    sampleCostSave(event) {
+    sampleCostSave(event, sonucBildir) {
       this.$axios.post("/reports/ayo/sample/cost/save", event).then((res) => {
         this.$toast.success("Başarıyla Kaydedildi.");
         this.sampleCostListUpdated();
+        if (sonucBildir) sonucBildir(true);
+      })
+      .catch(() => {
+        /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+        if (sonucBildir) sonucBildir(false);
       });
     },
     sampleCost() {
@@ -842,10 +862,15 @@ export default {
         this.$toast.success("Başarıyla Güncellendi.");
       });
     },
-    abroadCostSave(event) {
+    abroadCostSave(event, sonucBildir) {
       this.$axios.post("/reports/ayo/abroad/cost/save", event).then((res) => {
         this.$toast.success("Başarıyla Kaydedildi.");
         this.abroadCostListUpdated();
+        if (sonucBildir) sonucBildir(true);
+      })
+      .catch(() => {
+        /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+        if (sonucBildir) sonucBildir(false);
       });
     },
     abroadCost() {
@@ -862,11 +887,16 @@ export default {
         this.$toast.success("Başarıyla Güncellendi.");
       });
     },
-    wageCostSave(event) {
+    wageCostSave(event, sonucBildir) {
       this.$axios.post("/reports/ayo/wage/cost/save", event).then((res) => {
         this.wageCostList = res.data.list;
         this.$toast.success("Başarıyla Kaydedildi.");
         this.wageCostListUpdated();
+        if (sonucBildir) sonucBildir(true);
+      })
+      .catch(() => {
+        /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+        if (sonucBildir) sonucBildir(false);
       });
     },
     wageCostListUpdated() {
@@ -889,10 +919,15 @@ export default {
         this.$toast.success("Başarıyla Güncellendi.");
       });
     },
-    travelCostSave(event) {
+    travelCostSave(event, sonucBildir) {
       this.$axios.post("/reports/ayo/travel/cost/save", event).then((res) => {
         this.$toast.success("Başarıyla Kaydedildi.");
         this.travelCostListUpdated();
+        if (sonucBildir) sonucBildir(true);
+      })
+      .catch(() => {
+        /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+        if (sonucBildir) sonucBildir(false);
       });
     },
     creditCardCostUpdate(event) {
@@ -902,12 +937,17 @@ export default {
           this.$toast.success("Başarıyla Güncellendi.");
         });
     },
-    creditCardCostSave(event) {
+    creditCardCostSave(event, sonucBildir) {
       this.$axios
         .post("/reports/ayo/credit/card/cost/save", event)
         .then((res) => {
           this.$toast.success("Başarıyla Kaydedildi.");
           this.creditCardCostListUpdated();
+          if (sonucBildir) sonucBildir(true);
+        })
+        .catch(() => {
+          /* 403/hata: ebeveyn sonucu bildirmezse form butonu kilitli kalirdi */
+          if (sonucBildir) sonucBildir(false);
         });
     },
     travelCostListUpdated() {

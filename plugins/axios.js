@@ -21,6 +21,15 @@ export default function ({ $axios, app }) {
   });
 
   $axios.onError((error) => {
+    /* Store eylemlerinin neredeyse hicbirinde .catch yok; istek hata ile
+       dondugunde setEndLoadingAction calismiyor ve tam ekran (100vw/100vh,
+       z-index 99) yukleme ortusu acik kalip butun ekrani tikliyordu.
+       Burada her hatada ortuyu kapatiyoruz. */
+    if (process.client && app.store) {
+      app.store.dispatch("setEndLoadingAction");
+      app.store.dispatch("setEndLoadingDatatableAction");
+    }
+
     const code = parseInt(error.response && error.response.status);
     if (code === 401 || code === 403) {
       console.warn("Yetkisiz işlem veya token süresi doldu!");

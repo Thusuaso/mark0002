@@ -92,9 +92,16 @@ export default {
                 'year':this.year
 
             }
-            this.$emit('cost_save_emit',data);
+            /* Istegin sonucunu beklemeden butonlari cevirmek, kaydetme 403
+               ile donunce Save'i kalici olarak kilitliyordu; o satirda artik
+               sadece Update kalip "yetkiniz yok" doneriz. Bu yuzden cift
+               gonderimi onlemek icin Save'i gecici kapatip, sonucu ebeveynin
+               bildirmesini bekliyoruz. */
             this.save_button_disabled = true;
-            this.update_button_disabled = false;
+            this.$emit('cost_save_emit', data, (basarili) => {
+                this.save_button_disabled = !!basarili;
+                if (basarili) this.update_button_disabled = false;
+            });
         },
         update(){
             const data = {
