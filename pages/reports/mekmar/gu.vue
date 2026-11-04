@@ -113,7 +113,6 @@ export default {
       "getReportsMekmarGuLogsList",
       "getReportsMekmarGuForwList",
       "getReportsMekmarGuAyoList",
-      "getLocalUrl",
       "getReportsMekmarGuOrderList",
     ]),
   },
@@ -131,7 +130,8 @@ export default {
     this.$store.dispatch("setReportsMekmarGuList");
   },
   created() {
-    this.selectedYear = { Year: 2026 };
+    /* Sabit 2026 yazilmisti; yil degisince sayfa gecen yila bakiyordu. */
+    this.selectedYear = { Year: new Date().getFullYear() };
     this.$excelApi
       .get(`/maliyet/listeler/maliyetListesi/${this.selectedYear.Year}`)
       .then((res) => {
@@ -151,33 +151,60 @@ export default {
   },
 
   methods: {
-    forwarding_excel_output() {
-      this.$excelApi
-        .post("/reports/gu/forwarding", this.getReportsMekmarGuForwList)
-        .then((response) => {
-          if (response.status) {
-            const link = document.createElement("a");
-            link.href = this.getLocalUrl + "/reports/gu/forwarding";
+    /* Excel artik python sunucusunda degil tarayicida uretiliyor.
+       Eskiden liste /reports/gu/forwarding ucuna POST edilip, uretilen sabit
+       dosya ayni adresten geri indiriliyordu; sayfadaki yillar degisse de
+       dosyadaki basliklar sabit kaldigi icin 2026/2025 gelmiyordu. Simdi
+       sayfanin kendi verisini yaziyoruz, sayfa basligi ile sayfadaki yil
+       ayni kaynaktan (grup.year) geliyor. */
+    async __yillikOzetExcel(gruplar, dosyaAdi) {
+      const dolu = (gruplar || []).filter(
+        (g) => g && Array.isArray(g.data) && g.data.length > 0
+      );
 
-            link.setAttribute("download", "gu_excel.xlsx");
-            document.body.appendChild(link);
-            link.click();
-          }
+      if (dolu.length === 0) {
+        this.$toast.error("Aktarilacak kayit bulunamadi.");
+        return;
+      }
+
+      /* Ekranda kullanilan ay adlarinin aynisi (plugins/components.js) */
+      const ayAdi = this.$options.filters.monthToString;
+
+      const XLSX = await import("xlsx");
+      const workbook = XLSX.utils.book_new();
+
+      dolu.forEach((grup) => {
+        const rows = [...grup.data]
+          .sort((a, b) => a.Ay - b.Ay)
+          .map((x) => ({
+            Month: ayAdi ? ayAdi(x.Ay) : x.Ay,
+            Fob: x.Fob,
+            Ddp: x.Ddp,
+          }));
+
+        rows.push({ Month: "Total", Fob: grup.fob, Ddp: grup.ddp });
+
+        const worksheet = XLSX.utils.json_to_sheet(rows, {
+          header: ["Month", "Fob", "Ddp"],
         });
+        worksheet["!freeze"] = { xSplit: "0", ySplit: "1" };
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, String(grup.year));
+      });
+
+      XLSX.writeFile(workbook, dosyaAdi);
+    },
+    forwarding_excel_output() {
+      this.__yillikOzetExcel(
+        this.getReportsMekmarGuForwList,
+        "sevkiyat_ozeti_yillik.xlsx"
+      );
     },
     forwarding_excel_output_2() {
-      this.$excelApi
-        .post("/reports/gu/forwarding", this.getReportsMekmarGuOrderList)
-        .then((response) => {
-          if (response.status) {
-            const link = document.createElement("a");
-            link.href = this.getLocalUrl + "/reports/gu/forwarding";
-
-            link.setAttribute("download", "gu_excel.xlsx");
-            document.body.appendChild(link);
-            link.click();
-          }
-        });
+      this.__yillikOzetExcel(
+        this.getReportsMekmarGuOrderList,
+        "siparis_ozeti_yillik.xlsx"
+      );
     },
     yearSelected(event) {
       this.$store.dispatch("setReportsMekmarGuListYear", event.value.Year);
