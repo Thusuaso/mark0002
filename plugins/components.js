@@ -122,6 +122,7 @@ import financePoListMekmer from "~/components/reports/mekmer/finance/lists/po";
 import financePoFormMekmer from "~/components/reports/mekmer/finance/forms/po";
 import FinancePaidListMekmer from "~/components/reports/mekmer/finance/lists/paid";
 import loadingSpinner from "~/components/shared/loading";
+import mekmarLogo from "~/components/shared/mekmarLogo";
 
 import ordererOperation from "~/components/reports/mekmar/gu/ordererOperation";
 import shippedOperation from "~/components/reports/mekmar/gu/shippedOperation";
@@ -192,6 +193,7 @@ Vue.component("shippedOperation", shippedOperation);
 Vue.component("ordererOperation", ordererOperation);
 
 Vue.component("loadingSpinner", loadingSpinner);
+Vue.component("mekmarLogo", mekmarLogo);
 
 Vue.component("financeListMekmer", financeListMekmer);
 Vue.component("financeCollectionListMekmer", financeCollectionListMekmer);

@@ -914,6 +914,14 @@
         </PickList>
       </TabPanel>
       <TabPanel header="Test Report" v-if="productId != 0">
+        <!-- Teknik sartname / test raporu basligi -->
+        <div class="tr-letterhead">
+          <mekmarLogo class="tr-letterhead-logo" />
+          <div class="tr-letterhead-text">
+            <div class="tr-letterhead-title">Technical Specification</div>
+            <div class="tr-letterhead-sub">Test Report</div>
+          </div>
+        </div>
         <div class="row">
           <div class="col">
             <FileUpload
@@ -1520,6 +1528,36 @@ export default {
 };
 </script>
 <style scoped>
+.tr-letterhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+}
+.tr-letterhead-logo {
+  width: 240px;
+  max-width: 55%;
+  flex: 0 0 auto;
+}
+.tr-letterhead-text {
+  text-align: right;
+  line-height: 1.25;
+}
+.tr-letterhead-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #39307a;
+  letter-spacing: 0.3px;
+}
+.tr-letterhead-sub {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
 .header {
   font-size: 18px;
   text-align: center;
