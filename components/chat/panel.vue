@@ -609,7 +609,8 @@ export default {
 .chat-root {
   position: fixed;
   right: 18px;
-  bottom: 18px;
+  /* Balon sayfanin en altindaki ogelerin uzerine binmesin diye 100px yukarida */
+  bottom: 118px;
   z-index: 1200;
   font-family: sans-serif;
 }
