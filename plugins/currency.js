@@ -3,10 +3,23 @@ import xml2js, { parseString } from "xml2js";
 
 const api = axios.create({
   baseURL: "https://www.tcmb.gov.tr/kurlar/",
+  /*
+   * `"Content-Type": "application/json"` KALDIRILDI -- bu anahtar burada
+   * IKI KEZ tanimliydi. Nesne literalinde ikinci tanim geceri sayilir,
+   * yani gecerli deger ZATEN asagidaki x-www-form-urlencoded'di; silinen
+   * satir olu koddu. Davranis acisindan no-op, ama derleme her seferinde
+   *     [esbuild] Duplicate key "Content-Type" in object literal
+   * uyarisi basiyordu.
+   *
+   * Geri kalan basliklara DOKUNULMADI, hepsi anlamsiz olsa da: bunlar
+   * govdesi olmayan bir GET istegi (Content-Type yok sayilir), yanit XML
+   * oldugu halde Accept json istiyor, ve Access-Control-* basliklari
+   * YANITA ait olup istege konulmasi hicbir sey yapmiyor. Hicbiri zarar
+   * vermiyor; temizlemek ayri bir is.
+   */
   headers: {
     "Cache-Control": "no-cache",
     "Access-Control-Allow-Origin": "*",
-    "Content-Type": "application/json",
     "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, OPTIONS",
     "X-Requested-With": "XMLHttpRequest",
     Accept: "application/json",

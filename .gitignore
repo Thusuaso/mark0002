@@ -1,5 +1,6 @@
-.qodo
 node_modules
 .nuxt
-package-lock.json
+.output
+.data
+dist
 .env

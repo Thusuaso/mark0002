@@ -1,10 +1,16 @@
 import express from "express";
 import mssql from "mssql";
 import nodemailer from "nodemailer";
-import currency from "../plugins/currency";
+// .js uzantisi eklendi: webpack uzantisiz cozumluyordu, Nitro/Rollup ESM
+// kurallarina gore uzantiyi zorunlu tutuyor.
+import currency from "../plugins/currency.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import AWS from "aws-sdk";
-var cookieParser = require("cookie-parser");
+// ESM'de require yok (webpack CJS/ESM karisimini tolere ediyordu, Nitro etmiyor)
+import cookieParser from "cookie-parser";
+// .js uzantisi eklendi -- yukaridaki currency.js ile ayni gerekce.
+import { sohbetHaricSql } from "./sohbetHaric.js";
 const JWT_SECRET = process.env.JWT_SECRET;
 const otpStore = new Map();
 
@@ -388,8 +394,19 @@ app.use((req, res, next) => {
     "/users",
   ];
 
+  /* Kendi yetkisini kendi dogrulayan uclar.
+     <img src="..."> etiketi Authorization basligi gonderemez, yalnizca
+     cerez tasir; bu yuzden sohbet eki ucu token'i cerezden de okur ve
+     yetkiyi kendi icinde dogrular (bkz. sohbetDosyaKullanicisi). Burada
+     serbest birakilmasi yetki kaldirmak DEGIL, yetkiyi o uca devretmektir. */
+  const kendiYetkisiniDogrulayan = ["/chat/file/"];
+
   // Tarayıcının 'OPTIONS' yoklamalarını ve açık rotaları serbest bırak
-  if (req.method === "OPTIONS" || openRoutes.includes(req.path)) {
+  if (
+    req.method === "OPTIONS" ||
+    openRoutes.includes(req.path) ||
+    kendiYetkisiniDogrulayan.some((p) => req.path.startsWith(p))
+  ) {
     return next();
   }
 
@@ -1614,8 +1631,157 @@ app.put("/sales/representative/change", async (req, res) => {
 });
 
 /*Selection*/
-app.get("/selection/production/list", (req, res) => {
-  const sql = `select u.SqmMiktar,
+
+/* --------------------------------------------------------------------------
+   Ortak kasalar
+   --------------------------------------------------------------------------
+   Bir fiziksel kasaya birden fazla urun girdiginde her urun seleksiyonda
+   ayri KasaNo ile kaydediliyor. UretimTB.KasaGrupNo bu satirlari tek kasa
+   olarak baglar ve grubun en kucuk kasa numarasini tasir.
+
+   Kolon api/sql/UretimTBKasaGrup.sql ile eklenir. Script calistirilmadiysa
+   gruplama kapali kalir: form alani gorunmez, check listesi ve ceki Excel'i
+   eskisi gibi her satiri ayri kasa sayar. */
+let kasaGrupReadyCache = null;
+async function kasaGrupReady() {
+  if (kasaGrupReadyCache !== null) {
+    return kasaGrupReadyCache;
+  }
+  try {
+    const check = await mssql.query(`
+      select count(*) as kolon from sys.columns
+       where object_id = object_id(N'[dbo].[UretimTB]')
+         and name = N'KasaGrupNo'
+    `);
+    kasaGrupReadyCache = check.recordset[0].kolon > 0;
+  } catch (err) {
+    kasaGrupReadyCache = false;
+  }
+  return kasaGrupReadyCache;
+}
+
+/* Grubun ortak numarasi uyelerin en kucugudur. KasaNo nvarchar tutuldugu
+   icin tamamen rakamdan olusanlar sayisal, digerleri metin olarak
+   karsilastirilir; aksi halde "9" ile "10" yanlis siralanirdi. */
+function kasaNoEnKucuk(numaralar) {
+  const temiz = numaralar
+    .map((x) => String(x ?? "").trim())
+    .filter((x) => x.length > 0);
+  if (temiz.length === 0) {
+    return null;
+  }
+  if (temiz.every((x) => /^\d+$/.test(x))) {
+    return temiz.reduce((a, b) => (parseInt(b, 10) < parseInt(a, 10) ? b : a));
+  }
+  return temiz.slice().sort()[0];
+}
+
+/* Formdan gelen "Ortak Kasalar" listesi, o kasanin ortakligin TAMAMINI
+   tanimlar: listeden cikarilan kasa gruptan ayrilir. Tek uye kalan gruplar
+   null'a donduruldugu icin "grup" her zaman en az iki satir demektir. */
+async function kasaGrupKaydet(kasaNo, ortakNumaralar) {
+  if (!(await kasaGrupReady())) {
+    return;
+  }
+  const ana = String(kasaNo ?? "").trim();
+  if (!ana) {
+    return;
+  }
+
+  const yeni = new Set([ana]);
+  (Array.isArray(ortakNumaralar) ? ortakNumaralar : []).forEach((x) => {
+    const t = String(x ?? "").trim();
+    if (t && t !== ana) {
+      yeni.add(t);
+    }
+  });
+  const uyeler = [...yeni];
+  const uyeParam = (request) => {
+    uyeler.forEach((n, i) => request.input(`k${i}`, mssql.NVarChar, n));
+    return uyeler.map((_, i) => `@k${i}`).join(",");
+  };
+
+  /* Yeni uyelerin su anki gruplari: hem bu kasanin eski grubu hem de
+     eklenen kasalarin baska gruplari temizlige dahil olmali. */
+  const grupIstek = new mssql.Request();
+  const grupSorgu = await grupIstek.query(`
+    select distinct KasaGrupNo from UretimTB
+     where KasaGrupNo is not null and KasaNo in (${uyeParam(grupIstek)})
+  `);
+  const grupNo = kasaNoEnKucuk(uyeler);
+  const etkilenen = new Set(
+    grupSorgu.recordset.map((x) => String(x.KasaGrupNo).trim())
+  );
+  etkilenen.add(grupNo);
+  const grupListe = [...etkilenen];
+  const grupParam = (request) => {
+    grupListe.forEach((g, i) => request.input(`g${i}`, mssql.NVarChar, g));
+    return grupListe.map((_, i) => `@g${i}`).join(",");
+  };
+
+  /* 1) Artik ortak olmayanlari gruptan cikar. */
+  const birakIstek = new mssql.Request();
+  const birakGruplar = grupParam(birakIstek);
+  const birakUyeler = uyeParam(birakIstek);
+  await birakIstek.query(`
+    update UretimTB set KasaGrupNo = null
+     where KasaGrupNo in (${birakGruplar}) and KasaNo not in (${birakUyeler})
+  `);
+
+  /* 2) Yeni grubu yaz. */
+  const yazIstek = new mssql.Request();
+  const yazUyeler = uyeParam(yazIstek);
+  yazIstek.input("grup", mssql.NVarChar, grupNo);
+  await yazIstek.query(`
+    update UretimTB set KasaGrupNo = @grup where KasaNo in (${yazUyeler})
+  `);
+
+  /* 3) Tek uye kalan gruplari (ortaklik kaldirildiysa yenisi de dahil)
+        bosalt; grup her zaman en az iki satir demektir. */
+  const temizIstek = new mssql.Request();
+  const temizGruplar = grupParam(temizIstek);
+  await temizIstek.query(`
+    update u set KasaGrupNo = null
+      from UretimTB u
+     where u.KasaGrupNo in (${temizGruplar})
+       and (
+         select count(*) from UretimTB x where x.KasaGrupNo = u.KasaGrupNo
+       ) < 2
+  `);
+}
+
+/* Formdaki "Ortak Kasalar" alaninin secenekleri: seleksiyonda duran
+   (UrunDurumID=1) kasalar. Mevcut grup da buradan okunur, bu yuzden
+   KasaGrupNo birlikte doner. */
+app.get("/selection/production/crate/options", async (req, res) => {
+  try {
+    if (!(await kasaGrupReady())) {
+      return res.status(200).json({ hazir: false, list: [] });
+    }
+    /* KasaNo int; AutoComplete forceSelection alan degerinde trim() cagirdigi
+       icin metin olarak verilir. */
+    const sonuc = await mssql.query(`
+      select cast(u.KasaNo as nvarchar(50)) as KasaNo,
+             u.KasaGrupNo, u.SiparisAciklama,
+             dbo.Get_KategoriAdi(u.UrunKartID) as KategoriAdi,
+             dbo.Get_UrunAdi(u.UrunKartID)     as UrunAdi,
+             t.FirmaAdi                        as TedarikciAdi
+        from UretimTB u
+        inner join TedarikciTB t on t.ID = u.TedarikciID
+       where u.UrunDurumID = 1
+       order by u.KasaNo desc
+    `);
+    res.status(200).json({ hazir: true, list: sonuc.recordset });
+  } catch (err) {
+    console.error("/selection/production/crate/options HATA:", err.message);
+    res.status(500).json({ hazir: false, list: [] });
+  }
+});
+
+app.get("/selection/production/list", async (req, res) => {
+  /* Kolon yoksa sorguya eklenmez; gruplama kapaliyken liste aynen calisir. */
+  const grupKolon = (await kasaGrupReady()) ? "u.KasaGrupNo," : "";
+  const sql = `select ${grupKolon} u.SqmMiktar,
   u.Kutulama,
     u.Fason,
     u.Duzenleyen,u.Kasalayan,u.UrunKartId,urb.ID as UrunBirimId,urb.BirimAdi as UrunBirimAdi,u.UretimTurID,u.ID,u.Tarih,u.KasaNo,k.KategoriAdi,k.ID as KategoriID,uo.OcakAdi,uo.ID as OcakId,ur.UrunAdi,ur.ID as UrunId,yk.YuzeyIslemAdi,yk.ID as YuzeyId,ol.ID as OlcuId,ol.En,ol.Boy,ol.Kenar,u.KutuAdet,u.KutuIciAdet,u.Miktar,u.Kutu,u.Bagli,u.SiparisAciklama,u.Aciklama,u.TedarikciID,t.FirmaAdi,u.Bulunamadi,u.Disarda,u.Adet from UretimTB u inner join TedarikciTB t on t.ID = u.TedarikciID inner join UrunBirimTB ub on ub.ID = u.UrunBirimID inner join UrunOcakTB uo on uo.ID = u.UrunOcakID inner join UretimTurTB ut on ut.ID = u.UretimTurID inner join UrunKartTB uk on uk.ID = u.UrunKartID inner join KategoriTB k on k.ID = uk.KategoriID inner join UrunlerTB ur on ur.ID = uk.UrunID inner join YuzeyKenarTB yk on yk.ID = uk.YuzeyID inner join OlculerTB ol on ol.ID = uk.OlcuID inner join UrunBirimTB urb on urb.ID = u.UrunBirimID where UrunDurumID=1 order by KasaNo desc`;
@@ -1882,6 +2048,9 @@ app.post("/selection/production/save", async (req, res) => {
 
       crateNo = parseInt(crateNo) + 1;
     }
+    /* Ortaklik yalnizca formda girilen kasa icin kurulur; KasaKayıtAdedi > 1
+       ise ardindan uretilen numaralar ayri fiziksel kasalardir. */
+    await kasaGrupKaydet(req.body.KasaNo, req.body.OrtakKasalar);
     res.status(200).json({ status: true });
   } catch (err) {
     console.error("❌ /selection/production/save HATA:", err);
@@ -1938,6 +2107,8 @@ app.put("/selection/production/update", async (req, res) => {
       "update UretimTB SET Tarih=@Tarih,KutuAdet=@KutuAdet,KasaNo=@KasaNo,UrunKartID=@UrunKartID,TedarikciID=@TedarikciID,UrunBirimID=@UrunBirimID,UrunOcakID=@UrunOcakID,Adet=@Adet,Miktar=@Miktar,Aciklama=@Aciklama,UretimTurID=@UretimTurID,SiparisAciklama=@SiparisAciklama,Kutu=@Kutu,Duzenleyen=@Duzenleyen,Kasalayan=@Kasalayan,Disarda=@Disarda,KutuIciAdet=@KutuIciAdet,SqmMiktar=@SqmMiktar,Bagli=@Bagli,Bulunamadi=@Bulunamadi,Fason=@Fason,Kutulama=@Kutulama where ID=@ID"
     );
 
+    await kasaGrupKaydet(req.body.KasaNo, req.body.OrtakKasalar);
+
     res.status(200).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
     console.error("❌ /selection/production/update HATA:", err);
@@ -1951,6 +2122,18 @@ app.delete("/selection/production/delete/:crateNo", async (req, res) => {
     const results = await request.query(
       "delete UretimTB where KasaNo=@crateNo"
     );
+    /* Silinen kasa bir gruptaysa geride tek uye kalmis olabilir; o zaman
+       grup anlamini yitirir ve bosaltilir. */
+    if (await kasaGrupReady()) {
+      await mssql.query(`
+        update u set KasaGrupNo = null
+          from UretimTB u
+         where u.KasaGrupNo is not null
+           and (
+             select count(*) from UretimTB x where x.KasaGrupNo = u.KasaGrupNo
+           ) < 2
+      `);
+    }
     res.status(201).json({ status: results.rowsAffected[0] == 1 });
   } catch (err) {
     res.status(500).json({ status: false });
@@ -2590,8 +2773,19 @@ function documentColor(po, doc, cb) {
     cb(err, docModel);
   });
 }
+/* Shipment Form (uploadform) listesinde gosterilmeyen evraklar.
+   Yalnizca yukleme ekranini etkiler; siparis detayindaki Document sekmesi
+   eski kayitlari gosterebilmek icin bu filtreyi kullanmaz.
+     11  Dolasim Belgeleri (Eski)  -> yerine 75 ATR (Dolasim Belgesi) */
+const UPLOAD_FORM_HIDDEN_DOCS = [11];
+const UPLOAD_FORM_DOC_SQL = `
+  select ID, EvrakAdi
+    from YeniYuklemeEvraklarTB
+   where try_cast(ltrim(rtrim(ID)) as int) not in (${UPLOAD_FORM_HIDDEN_DOCS.join(", ")})
+      or try_cast(ltrim(rtrim(ID)) as int) is null
+`;
 app.get("/upload/document/:po", (req, res) => {
-  const sql = "select ID,EvrakAdi from YeniYuklemeEvraklarTB";
+  const sql = UPLOAD_FORM_DOC_SQL;
   mssql.query(sql).then((documentsModel) => {
     documentColor(
       req.params.po,
@@ -2605,7 +2799,7 @@ app.get("/upload/document/:po", (req, res) => {
   });
 });
 app.get("/upload/model", (req, res) => {
-  const sql = "select ID,EvrakAdi from YeniYuklemeEvraklarTB";
+  const sql = UPLOAD_FORM_DOC_SQL;
   mssql.query(sql).then((model) => {
     const modelData = [];
     model.recordset.forEach((x) => {
@@ -2657,9 +2851,311 @@ app.post("/upload/file", async (req, res) => {
   }
 });
 
+/*Eksik Zorunlu Yukleme Evraklari Bildirimi*/
+const MISSING_DOC_DEFAULT_DAY = 90;
+/* Bildirim iki migration'a dayanir, her ikisi de bir kez calistirilir:
+     api/sql/YeniYuklemeEvraklarTB_Zorunlu.sql  -> Zorunlu kolonu (yedek kume)
+     api/sql/YuklemeEvrakTeslimTurTB.sql        -> teslim turu basina kume
+   Biri eksikse bildirim sessizce bos doner, uygulama hata vermez. */
+let missingDocColumnReady = null;
+async function missingDocColumnExists() {
+  if (missingDocColumnReady !== null) {
+    return missingDocColumnReady;
+  }
+  try {
+    const check = await mssql.query(`
+      select
+        (select count(*) from sys.columns
+          where object_id = object_id(N'[dbo].[YeniYuklemeEvraklarTB]')
+            and name = N'Zorunlu') as kolon,
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[YuklemeEvrakTeslimTurTB]')
+            and type = N'U') as tablo
+    `);
+    const row = check.recordset[0];
+    missingDocColumnReady = row.kolon > 0 && row.tablo > 0;
+  } catch (err) {
+    missingDocColumnReady = false;
+  }
+  return missingDocColumnReady;
+}
+/* Ic Piyasa musterileri ihracat evraki uretmedigi icin bildirim kapsami
+   disindadir. Kullanan her sorgu @icPiyasa parametresini tanimlamak
+   zorundadir (MusterilerTB m alias'i ile). */
+const MISSING_DOC_SCOPE_CLAUSE = `isnull(ltrim(rtrim(m.Marketing)), '') <> @icPiyasa`;
+const MISSING_DOC_DOMESTIC = "İç Piyasa";
+/* Bir evragin ilgili siparis icin zorunlu olup olmadigini belirler.
+   Teslim turu icin eslesme tablosunda satir varsa yalnizca o kume gecerlidir;
+   yoksa YeniYuklemeEvraklarTB.Zorunlu yedege dusulur. */
+/* Bildirim kapsami disinda tutulan evraklar. Kume tablolarindan bagimsiz
+   KESIN dislamadir: bu evraklar icin hicbir teslim turunde eksik uyarisi
+   uretilmez (navbar sayaci, sidebar listesi, Shipment Form uyarisi,
+   Shipped PO detayi). Shipment Form listesinde gri olarak gorunmeye ve
+   yuklenebilmeye devam ederler.
+      4  Ceki Listesi            14  Packing Declarition
+      8  ISF vb Formlar          30  Tedarikci Faturalari
+     71  Ilaclama Notasi
+   Kalici cozum icin api/sql/YeniYuklemeEvraklarTB_Zorunlu.sql ve
+   api/sql/YuklemeEvrakTeslimTurTB.sql de ayni kumeyi dislar; bu liste
+   script'ler calistirilmasa da davranisi garanti eder. */
+const MISSING_DOC_EXCLUDED_DOCS = [4, 8, 14, 30, 71];
+const MISSING_DOC_REQUIRED_CLAUSE = `
+      try_cast(ltrim(rtrim(e.ID)) as int) not in (${MISSING_DOC_EXCLUDED_DOCS.join(
+        ", "
+      )})
+      and (
+        exists (
+          select 1 from YuklemeEvrakTeslimTurTB z
+          where z.TeslimTurID = s.TeslimTurID
+            and z.YuklemeEvrakID = try_cast(ltrim(rtrim(e.ID)) as int)
+        )
+        or (
+          e.Zorunlu = 1
+          and not exists (
+            select 1 from YuklemeEvrakTeslimTurTB z
+            where z.TeslimTurID = s.TeslimTurID
+          )
+        )
+      )`;
+function missingDocDay(value) {
+  const day = parseInt(value);
+  if (!day || day < 1) {
+    return MISSING_DOC_DEFAULT_DAY;
+  }
+  return day > 3650 ? 3650 : day;
+}
+/* Sevk edilmis siparislerde eksik kalan zorunlu evraklari PO bazinda gruplar.
+   YeniYuklemeEvraklarTB.ID nchar oldugu icin her karsilastirmada trim edilir. */
+async function missingDocumentOrders(day) {
+  const request = new mssql.Request();
+  request.input("gun", mssql.Int, day);
+  request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+  const result = await request.query(`
+    select
+      s.SiparisNo,
+      m.FirmaAdi as MusteriAdi,
+      s.YuklemeTarihi,
+      (select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as Sorumlu,
+      isnull(t.Aciklama, t.TeslimTur) as TeslimTur,
+      try_cast(ltrim(rtrim(e.ID)) as int) as EvrakID,
+      e.EvrakAdi
+    from SiparislerTB s
+    join MusterilerTB m on m.ID = s.MusteriID
+    left join SiparisTeslimTurTB t on t.ID = s.TeslimTurID
+    cross join YeniYuklemeEvraklarTB e
+    where s.SiparisDurumID = 3
+      and s.YuklemeTarihi >= dateadd(day, -@gun, cast(getdate() as date))
+      and ${MISSING_DOC_SCOPE_CLAUSE}
+      and ${MISSING_DOC_REQUIRED_CLAUSE}
+      and not exists (
+        select 1 from SiparisFaturaKayitTB f
+        where f.SiparisNo = s.SiparisNo
+          and f.YuklemeEvrakID = try_cast(ltrim(rtrim(e.ID)) as int)
+      )
+    order by s.YuklemeTarihi desc, s.SiparisNo, try_cast(ltrim(rtrim(e.ID)) as int)
+  `);
+  const orders = [];
+  for (const row of result.recordset) {
+    let order = orders.find((x) => x.SiparisNo === row.SiparisNo);
+    if (!order) {
+      order = {
+        SiparisNo: row.SiparisNo,
+        MusteriAdi: row.MusteriAdi,
+        YuklemeTarihi: row.YuklemeTarihi,
+        Sorumlu: row.Sorumlu,
+        TeslimTur: row.TeslimTur,
+        EksikEvraklar: [],
+        EksikSayi: 0,
+      };
+      orders.push(order);
+    }
+    order.EksikEvraklar.push({ ID: row.EvrakID, EvrakAdi: row.EvrakAdi });
+    order.EksikSayi = order.EksikEvraklar.length;
+  }
+  return orders;
+}
+app.get("/upload/document/missing/list", async (req, res) => {
+  try {
+    if (!(await missingDocColumnExists())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const list = await missingDocumentOrders(missingDocDay(req.query.gun));
+    res.status(200).json({ list: list, ready: true });
+  } catch (err) {
+    console.error("eksik evrak listesi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+app.get("/upload/document/missing/count", async (req, res) => {
+  try {
+    if (!(await missingDocColumnExists())) {
+      return res.status(200).json({ order: 0, document: 0, ready: false });
+    }
+    const list = await missingDocumentOrders(missingDocDay(req.query.gun));
+    res.status(200).json({
+      order: list.length,
+      document: list.reduce((total, x) => total + x.EksikSayi, 0),
+      ready: true,
+    });
+  } catch (err) {
+    console.error("eksik evrak sayisi hatasi:", err.message);
+    res.status(500).json({ order: 0, document: 0, ready: false });
+  }
+});
+/* Shipment Form'da PO secildiginde gosterilen uyari. Tarih penceresi ve
+   siparis durumu aranmaz; secilen PO ne olursa olsun kontrol edilir. */
+app.get("/upload/document/missing/:po", async (req, res) => {
+  try {
+    if (!(await missingDocColumnExists())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const request = new mssql.Request();
+    request.input("po", mssql.VarChar, req.params.po);
+    request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+    /* Kapsam disi PO'da uyari hic gosterilmez; aksi halde Ic Piyasa
+       siparislerinde yanlislikla "tamami yuklenmis" yazardi. */
+    const scope = await request.query(`
+      select case when exists (
+        select 1 from SiparislerTB s
+        join MusterilerTB m on m.ID = s.MusteriID
+        where s.SiparisNo = @po
+          and ${MISSING_DOC_SCOPE_CLAUSE}
+      ) then 0 else 1 end as kapsamDisi
+    `);
+    if (scope.recordset[0].kapsamDisi) {
+      return res
+        .status(200)
+        .json({ list: [], ready: true, kapsamDisi: true });
+    }
+    const result = await request.query(`
+      select
+        try_cast(ltrim(rtrim(e.ID)) as int) as ID,
+        e.EvrakAdi
+      from SiparislerTB s
+      join MusterilerTB m on m.ID = s.MusteriID
+      cross join YeniYuklemeEvraklarTB e
+      where s.SiparisNo = @po
+        and ${MISSING_DOC_SCOPE_CLAUSE}
+        and ${MISSING_DOC_REQUIRED_CLAUSE}
+        and not exists (
+          select 1 from SiparisFaturaKayitTB f
+          where f.SiparisNo = s.SiparisNo
+            and f.YuklemeEvrakID = try_cast(ltrim(rtrim(e.ID)) as int)
+        )
+      order by try_cast(ltrim(rtrim(e.ID)) as int)
+    `);
+    res
+      .status(200)
+      .json({ list: result.recordset, ready: true, kapsamDisi: false });
+  } catch (err) {
+    console.error("eksik evrak po hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+
 /*Container*/
-app.get("/container/follow/list", (req, res) => {
-  const sql = `
+/* --------------------------------------------------------------------------
+   Container Follow
+   --------------------------------------------------------------------------
+   Liste, son FOLLOW_WINDOW_DAY gun icinde yuklenmis sevk edilmis siparisleri
+   gosterir. Takip kolonu bit ve varsayilani NULL oldugu icin eskiden
+   "Takip = 1" filtresi kullaniliyordu; yeni siparisler NULL geldiginden ne
+   Follow ne de Unfollow listesinde gorunuyordu. Artik NULL "takip ediliyor"
+   sayilir, yalnizca ekranda bilinli olarak Unfollow isaretlenenler (Takip = 0)
+   listeden duser.
+   -------------------------------------------------------------------------- */
+const FOLLOW_WINDOW_DAY = 120;
+/* Marketing alani "Ic Piyasa" olan musteriler konteyner ile ihracat
+   yapmadigi icin takip listelerinde ve hatirlatma maillerinde yer almaz.
+   Kural ve metin eksik evrak bildirimiyle ayni; tek yerden gelsin diye
+   MISSING_DOC_DOMESTIC yeniden kullanilir. Kullanan her sorgu @icPiyasa
+   parametresini tanimlamak ve MusterilerTB'yi m alias'i ile baglamak
+   zorundadir. */
+const FOLLOW_SCOPE_SQL = `isnull(ltrim(rtrim(m.Marketing)), '') <> @icPiyasa`;
+/* Acente alani ve hatirlatma kaydi api/sql/AcenteTB.sql ile olusur. Script
+   calistirilmadiysa liste acente kolonlari bos donmeli, uygulama patlamamali. */
+let acenteTakipReadyCache = null;
+async function acenteTakipReady() {
+  if (acenteTakipReadyCache !== null) {
+    return acenteTakipReadyCache;
+  }
+  try {
+    const check = await mssql.query(`
+      select
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[AcenteTB]')
+            and type = N'U') as acenteTablo,
+        (select count(*) from sys.columns
+          where object_id = object_id(N'[dbo].[SiparislerTB]')
+            and name = N'AcenteID') as acenteKolon,
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[SiparisEtaHatirlatmaTB]')
+            and type = N'U') as hatirlatmaTablo
+    `);
+    const row = check.recordset[0];
+    acenteTakipReadyCache =
+      row.acenteTablo > 0 && row.acenteKolon > 0 && row.hatirlatmaTablo > 0;
+  } catch (err) {
+    acenteTakipReadyCache = false;
+  }
+  return acenteTakipReadyCache;
+}
+/* Takip adresindeki {KONTEYNER} yer tutucusunu doldurur. Yer tutucu yoksa
+   adres oldugu gibi kullanilir (acentenin genel sorgulama sayfasi). */
+function acenteTakipLinki(url, konteynerNo) {
+  if (!url) {
+    return null;
+  }
+  const no = safe(konteynerNo).trim();
+  if (url.indexOf("{KONTEYNER}") === -1) {
+    return url;
+  }
+  if (!no) {
+    return null;
+  }
+  return url.split("{KONTEYNER}").join(encodeURIComponent(no));
+}
+/* Eta kolonunda girilmemis kayitlar NULL yerine 1900-01-01 tutuluyor
+   (eski formlardan kalma yer tutucu). Son 120 gundeki 72 siparisin 71i
+   bu degerde. Tarih sayilirsa siralama bozulur ve "varisa 0 gun" gibi
+   yanlis bilgi cikar; bu yuzden her yerde bos kabul edilir. */
+const ETA_PLACEHOLDER = "1900-01-01";
+const ETA_VALID_SQL = `s.Eta is not null and s.Eta <> '${ETA_PLACEHOLDER}'`;
+function etaGecerli(eta) {
+  if (eta == null) {
+    return false;
+  }
+  const d = new Date(eta);
+  return !isNaN(d.getTime()) && d.getUTCFullYear() > 1900;
+}
+/* Mailde gosterilen gun/ay/yil bicimi. */
+function etaTarihYazisi(eta) {
+  if (eta == null) {
+    return "";
+  }
+  const d = new Date(eta);
+  if (isNaN(d.getTime())) {
+    return "";
+  }
+  const iki = (n) => (n < 10 ? "0" + n : String(n));
+  return `${iki(d.getDate())}.${iki(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+/* Eta'ya kalan gun. Eta 'date' kolonu oldugu icin saat farkinin bir gun
+   kaydirmamasi adina iki taraf da gun basina yuvarlanir. */
+function etaKalanGun(eta) {
+  if (!etaGecerli(eta)) {
+    return null;
+  }
+  const hedef = new Date(eta);
+  const bugun = new Date();
+  const a = Date.UTC(hedef.getFullYear(), hedef.getMonth(), hedef.getDate());
+  const b = Date.UTC(bugun.getFullYear(), bugun.getMonth(), bugun.getDate());
+  return Math.round((a - b) / 86400000);
+}
+/* Follow ve Unfollow listeleri ayni kolonlari dondurur (ayni Vue bileseni
+   kullanilir); yalnizca Takip kosulu ve tarih penceresi degisir. */
+function followListSql(acenteVar, takipKosulu, pencereVar) {
+  return `
                 select
                 s.ID,
                 s.SiparisNo,
@@ -2675,36 +3171,76 @@ app.get("/container/follow/list", (req, res) => {
                 s.KonsimentoDurum,
                 s.AktarmaLimanAdi,
                 s.Line,
-                s.Takip
-                from
-                SiparislerTB s,MusterilerTB m
-                where s.MusteriID=m.ID
-                and s.SiparisDurumID=3 and s.Takip=1
-                order by s.ID desc
+                s.Takip,
+                ${
+                  acenteVar
+                    ? "s.AcenteID, a.AcenteAdi, a.TakipUrl"
+                    : "null as AcenteID, null as AcenteAdi, null as TakipUrl"
+                }
+                from SiparislerTB s
+                join MusterilerTB m on m.ID = s.MusteriID
+                ${acenteVar ? "left join AcenteTB a on a.ID = s.AcenteID" : ""}
+                where s.SiparisDurumID = 3
+                and ${takipKosulu}
+                and ${FOLLOW_SCOPE_SQL}
+                ${
+                  pencereVar
+                    ? "and s.YuklemeTarihi >= dateadd(day, -@gun, cast(getdate() as date))"
+                    : ""
+                }
+                order by
+                  s.YuklemeTarihi desc,
+                  s.ID desc
               `;
-  mssql.query(sql).then((response) => {
+}
+app.get("/container/follow/list", async (req, res) => {
+  try {
+    const acenteVar = await acenteTakipReady();
+    const request = new mssql.Request();
+    request.input("gun", mssql.Int, FOLLOW_WINDOW_DAY);
+    request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+    const response = await request.query(
+      followListSql(acenteVar, "isnull(s.Takip, 1) = 1", true)
+    );
     const data = response.recordset;
     data.forEach((x) => {
-      if (x.Eta == null) {
-        x.Kalan = 0;
-      } else {
-        const today = new Date();
-        const date = new Date(x.Eta);
-        const reminderDate = Math.round((date - today) / 86400000);
-        if (reminderDate < 0) {
-          x.Kalan = 0;
-        } else {
-          x.Kalan = reminderDate;
-        }
+      /* Yer tutucu tarih istemciye hic gitmesin: liste bos hucre, form bos
+         takvim gosterir ve kayit sirasinda NULL olarak guncellenir. */
+      if (!etaGecerli(x.Eta)) {
+        x.Eta = null;
       }
+      const kalan = etaKalanGun(x.Eta);
+      x.Kalan = kalan == null || kalan < 0 ? 0 : kalan;
+      x.TakipLinki = acenteTakipLinki(x.TakipUrl, x.KonteynerNo);
     });
     res.status(200).json({
       follow: data,
+      gun: FOLLOW_WINDOW_DAY,
+      acenteHazir: acenteVar,
     });
-  });
+  } catch (err) {
+    console.error("container follow listesi hatasi:", err.message);
+    res.status(500).json({ follow: [], acenteHazir: false });
+  }
+});
+/* Agency dropdown'inin kaynagi. Script calistirilmadiysa bos liste doner. */
+app.get("/container/agency/list", async (req, res) => {
+  try {
+    if (!(await acenteTakipReady())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const response = await mssql.query(
+      "select ID, AcenteAdi, TakipUrl from AcenteTB where Aktif = 1 order by AcenteAdi"
+    );
+    res.status(200).json({ list: response.recordset, ready: true });
+  } catch (err) {
+    console.error("acente listesi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
 });
 app.post("/container/follow/save", async (req, res) => {
   try {
+    const acenteVar = await acenteTakipReady();
     const request = new mssql.Request();
     request.input("EtaTarihi", mssql.VarChar, req.body.EtaTarihi);
     request.input("KonteynırNo", mssql.NVarChar, req.body.KonteynırNo);
@@ -2712,44 +3248,911 @@ app.post("/container/follow/save", async (req, res) => {
     request.input("Line", mssql.NVarChar, req.body.Line);
     request.input("Takip", mssql.NVarChar, req.body.Takip);
     request.input("SiparisNo", mssql.NVarChar, req.body.SiparisNo);
+    let acenteSet = "";
+    if (acenteVar) {
+      const acenteId = parseInt(req.body.AcenteID);
+      request.input(
+        "AcenteID",
+        mssql.Int,
+        acenteId > 0 ? acenteId : null
+      );
+      acenteSet = ",AcenteID=@AcenteID";
+    }
     const response = await request.query(
-      "update SiparislerTB SET Eta=@EtaTarihi,KonteynerNo=@KonteynırNo,KonsimentoDurum=@KonsimentoDurum,Line=@Line,Takip=@Takip where SiparisNo=@SiparisNo"
+      `update SiparislerTB SET Eta=@EtaTarihi,KonteynerNo=@KonteynırNo,KonsimentoDurum=@KonsimentoDurum,Line=@Line,Takip=@Takip${acenteSet} where SiparisNo=@SiparisNo`
     );
     res.status(200).json({ status: response.rowsAffected[0] == 1 });
   } catch (err) {
+    console.error("container follow kaydetme hatasi:", err.message);
     res.status(500).json({ status: false });
   }
 });
-app.get("/container/unfollow/list", (req, res) => {
-  const sql = `
-            select
-            s.ID,
-            s.SiparisNo,
-            m.FirmaAdi as MusteriAdi,
-            s.Pesinat,
-            NavlunSatis + DetayTutar_1 + DetayTutar_2 + DetayTutar_3  as Navlun,
-            ( Select Sum(o.Tutar) from OdemelerTB o where o.SiparisNo=s.SiparisNo ) as Odemeler,
-            (Select Sum(u.SatisToplam) from SiparisUrunTB u where u.SiparisNo=s.SiparisNo) as MalBedeli,
-            (select k.KullaniciAdi from KullaniciTB k where k.ID=s.SiparisSahibi ) as Sorumlu,
-            s.Eta,
-            s.KonteynerNo,
-            s.YuklemeTarihi,
-            s.KonsimentoDurum,
-            s.AktarmaLimanAdi,
-            s.Line,
-            s.Takip
-            from
-            SiparislerTB s,MusterilerTB m
-            where s.MusteriID=m.ID
-            and s.SiparisDurumID=3 and s.Takip=0
-            order by s.ID desc
-        `;
-  mssql.query(sql).then((response) => {
+/* --------------------------------------------------------------------------
+   Eta hatirlatma mailleri
+   --------------------------------------------------------------------------
+   Estimated Date girilmis PO'lar icin varista 10 / 5 / 3 / 1 gun kalinca
+   operasyon adresine mail atar. Her esik icin tek mail gider; gonderilenler
+   SiparisEtaHatirlatmaTB'ye yazilir ve bir daha gonderilmez.
+
+   Neden kayit tablosu: ecosystem.config.js PM2'yi cluster + instances:'max'
+   ile calistiriyor, yani bu dosya her worker'da ayri ayri yuklenir.
+   Zamanlayici yalnizca ilk worker'da acilir (etaReminderWorkerAllowed) ve
+   buna ek olarak kayit tablosu mukerrer gonderimi veritabani seviyesinde
+   engeller: sunucu yeniden baslasa da ayni mail ikinci kez gitmez.
+   -------------------------------------------------------------------------- */
+const ETA_REMINDER_TO = "operasyon@mekmar.com";
+const ETA_REMINDER_FROM = "goz@mekmar.com";
+const ETA_REMINDER_THRESHOLDS = [10, 5, 3, 1];
+const ETA_REMINDER_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const ETA_REMINDER_START_DELAY_MS = 60 * 1000;
+
+/* Gonderilmeyi bekleyen hatirlatmalar: esige denk gelen ve daha once
+   gonderilmemis PO'lar. */
+async function etaReminderPending() {
+  const request = new mssql.Request();
+  request.input("gun", mssql.Int, FOLLOW_WINDOW_DAY);
+  request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+  const result = await request.query(`
+    select
+      s.SiparisNo,
+      m.FirmaAdi as MusteriAdi,
+      s.KonteynerNo,
+      s.Line,
+      s.Eta,
+      s.AktarmaLimanAdi,
+      a.AcenteAdi,
+      a.TakipUrl,
+      (select k.KullaniciAdi from KullaniciTB k where k.ID = s.SiparisSahibi) as Sorumlu,
+      datediff(day, cast(getdate() as date), s.Eta) as Kalan
+    from SiparislerTB s
+    join MusterilerTB m on m.ID = s.MusteriID
+    left join AcenteTB a on a.ID = s.AcenteID
+    where s.SiparisDurumID = 3
+      and isnull(s.Takip, 1) = 1
+      and ${FOLLOW_SCOPE_SQL}
+      and ${ETA_VALID_SQL}
+      and s.YuklemeTarihi >= dateadd(day, -@gun, cast(getdate() as date))
+      and datediff(day, cast(getdate() as date), s.Eta) in (${ETA_REMINDER_THRESHOLDS.join(
+        ", "
+      )})
+      and not exists (
+        select 1 from SiparisEtaHatirlatmaTB h
+        where h.SiparisNo = s.SiparisNo
+          and h.Esik = datediff(day, cast(getdate() as date), s.Eta)
+          and h.Eta = s.Eta
+      )
+    order by datediff(day, cast(getdate() as date), s.Eta), s.SiparisNo
+  `);
+  return result.recordset.map((x) => ({
+    ...x,
+    TakipLinki: acenteTakipLinki(x.TakipUrl, x.KonteynerNo),
+  }));
+}
+function etaReminderHtml(kalan, rows) {
+  const hucre = (v) =>
+    `<td style="padding:6px 10px;border:1px solid #ddd">${
+      __noneNullControl(v) || "-"
+    }</td>`;
+  const satirlar = rows
+    .map((x) => {
+      const takip = x.TakipLinki
+        ? `<a href="${x.TakipLinki}">${
+            __noneNullControl(x.AcenteAdi) || "Takip"
+          }</a>`
+        : __noneNullControl(x.AcenteAdi) || "-";
+      return `<tr>
+        ${hucre(x.SiparisNo)}
+        ${hucre(x.MusteriAdi)}
+        ${hucre(x.KonteynerNo)}
+        ${hucre(x.Line)}
+        ${hucre(etaTarihYazisi(x.Eta))}
+        ${hucre(x.AktarmaLimanAdi)}
+        <td style="padding:6px 10px;border:1px solid #ddd">${takip}</td>
+        ${hucre(x.Sorumlu)}
+      </tr>`;
+    })
+    .join("");
+  const baslik = [
+    "PO",
+    "Müşteri",
+    "Konteyner No",
+    "Line",
+    "Estimated Date",
+    "Liman",
+    "Acente / Takip",
+    "Sorumlu",
+  ]
+    .map(
+      (x) =>
+        `<th style="padding:6px 10px;border:1px solid #ddd;background:#f3f4f6;text-align:left">${x}</th>`
+    )
+    .join("");
+  return `
+    <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#111">
+      <p>Aşağıdaki konteynerlerin tahmini varışına <b>${kalan} gün</b> kaldı.</p>
+      <table style="border-collapse:collapse;border:1px solid #ddd">
+        <thead><tr>${baslik}</tr></thead>
+        <tbody>${satirlar}</tbody>
+      </table>
+      <p style="color:#666;font-size:11px">
+        Bu mail Container Follow ekranındaki Estimated Date alanına göre
+        otomatik gönderilmiştir (${ETA_REMINDER_THRESHOLDS.join(
+          " / "
+        )} gün kala).
+      </p>
+    </div>
+  `;
+}
+/* Gonderim kaydi. Benzersiz kisit nedeniyle ayni satir ikinci kez yazilamaz;
+   yarisma durumunda hata yutulur, cunku mail zaten gonderilmis demektir. */
+async function etaReminderLog(siparisNo, esik, eta) {
+  try {
+    const request = new mssql.Request();
+    request.input("SiparisNo", mssql.NVarChar, safe(siparisNo));
+    request.input("Esik", mssql.Int, esik);
+    request.input("Eta", mssql.Date, eta);
+    await request.query(`
+      insert into SiparisEtaHatirlatmaTB (SiparisNo, Esik, Eta)
+      select @SiparisNo, @Esik, @Eta
+      where not exists (
+        select 1 from SiparisEtaHatirlatmaTB
+        where SiparisNo = @SiparisNo and Esik = @Esik and Eta = @Eta
+      )
+    `);
+    return true;
+  } catch (err) {
+    console.error("eta hatirlatma kaydi hatasi:", err.message);
+    return false;
+  }
+}
+let etaReminderRunning = false;
+async function runEtaReminders() {
+  if (etaReminderRunning || !dbReady) {
+    return { gonderilen: 0, atlanan: 0, calisti: false };
+  }
+  etaReminderRunning = true;
+  try {
+    if (!(await acenteTakipReady())) {
+      return { gonderilen: 0, atlanan: 0, calisti: false };
+    }
+    const pending = await etaReminderPending();
+    if (pending.length === 0) {
+      return { gonderilen: 0, atlanan: 0, calisti: true };
+    }
+    let gonderilen = 0;
+    let atlanan = 0;
+    /* Esik basina tek mail: 10 gun kalanlar bir mailde, 5 gun kalanlar
+       digerinde. Mail gitmezse kayit yazilmaz, sonraki turda tekrar denenir. */
+    for (const esik of ETA_REMINDER_THRESHOLDS) {
+      const rows = pending.filter((x) => x.Kalan === esik);
+      if (rows.length === 0) {
+        continue;
+      }
+      const sonuc = await safeSendMail({
+        from: `"Mekmar Panel" <${ETA_REMINDER_FROM}>`,
+        to: ETA_REMINDER_TO,
+        subject: `Varışa ${esik} gün - ${rows.length} konteyner`,
+        html: etaReminderHtml(esik, rows),
+      });
+      if (!sonuc.status) {
+        atlanan += rows.length;
+        continue;
+      }
+      for (const row of rows) {
+        await etaReminderLog(row.SiparisNo, esik, row.Eta);
+      }
+      gonderilen += rows.length;
+      console.log(
+        `Eta hatirlatma gonderildi: ${esik} gun, ${rows.length} siparis`
+      );
+    }
+    return { gonderilen: gonderilen, atlanan: atlanan, calisti: true };
+  } catch (err) {
+    console.error("eta hatirlatma hatasi:", err.message);
+    return { gonderilen: 0, atlanan: 0, calisti: false };
+  } finally {
+    etaReminderRunning = false;
+  }
+}
+/* PM2 cluster'da yalnizca ilk worker zamanlayiciyi acar. Nuxt dev modunda
+   NODE_APP_INSTANCE tanimsizdir, orada da calisir. */
+function etaReminderWorkerAllowed() {
+  const instance = process.env.NODE_APP_INSTANCE;
+  return instance === undefined || instance === "" || instance === "0";
+}
+/* --------------------------------------------------------------------------
+   ETA HATIRLATMA MAILI PILOTTA VARSAYILAN OLARAK KAPALI
+   --------------------------------------------------------------------------
+   Bu zamanlayici GERCEK MAIL GONDERIYOR (operasyon@mekmar.com) ve pilot
+   URETIM VERITABANINA bagli. Yani pilot dev sunucusu her ayaga kalktiginda,
+   bir sure sonra uretim verisine bakip disariya mail atardi.
+
+   Somut risk: gelistirme sirasinda dev sunucusu gun icinde ONLARCA KEZ
+   yeniden baslatiliyor (bu gecis boyunca da oyle oldu). Her baslatma yeni
+   bir zamanlayici kuruyor; esik basina tekrari onleyen
+   SiparisEtaHatirlatmaTB kaydi "ayni maili iki kez atma"yi engelliyor ama
+   "pilot, uretim adina mail atmaya BASLADI" durumunu engellemiyor.
+   Mail bir kez gidince Nuxt 2 tarafi artik onu atmiyor -- yani pilot
+   farkinda olunmadan uretim bildirimlerinin SAHIBI oluyor.
+
+   Bu yuzden zamanlayici ACIKCA acilmadikca kurulmuyor:
+
+       ETA_REMINDER_ENABLED=1    (.env veya ortam degiskeni)
+
+   Uclar KAPALIYKEN DE CALISIR, cunku ikisi de elle tetikleniyor:
+       GET  /container/follow/reminder/preview   mail ATMADAN kontrol
+       POST /container/follow/reminder/send      elle gonderim
+   Yani ozellik denenebilir durumda; yalnizca OTOMATIK zamanlayici
+   kapali.
+
+   Pilot uretime alindiginda bu degiskenin 1 yapilmasi gerekiyor --
+   aksi halde hatirlatmalar sessizce hic gitmez.
+
+   NOT: Nuxt dev modunda bu dosya her degisiklikte yeniden yukleniyor
+   (HMR /api). Zamanlayici globalThis uzerinde isaretleniyor, aksi halde
+   her reload bir interval daha birakir ve ayni kontrol ust uste
+   calisirdi. */
+const ETA_REMINDER_ENABLED = process.env.ETA_REMINDER_ENABLED === "1";
+
+if (!ETA_REMINDER_ENABLED) {
+  console.warn(
+    "[eta] otomatik hatirlatma zamanlayicisi KAPALI " +
+      "(acmak icin ETA_REMINDER_ENABLED=1). " +
+      "preview/send uclari calismaya devam ediyor."
+  );
+}
+
+if (
+  ETA_REMINDER_ENABLED &&
+  etaReminderWorkerAllowed() &&
+  !globalThis.__etaReminderTimerKurulu
+) {
+  globalThis.__etaReminderTimerKurulu = true;
+  setTimeout(() => {
+    runEtaReminders();
+    setInterval(runEtaReminders, ETA_REMINDER_INTERVAL_MS);
+  }, ETA_REMINDER_START_DELAY_MS);
+}
+/* Mail atmadan kontrol: hangi PO'lar hangi esikte bekliyor. */
+app.get("/container/follow/reminder/preview", async (req, res) => {
+  try {
+    if (!(await acenteTakipReady())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const pending = await etaReminderPending();
     res.status(200).json({
-      unfollow: response.recordset,
+      list: pending,
+      ready: true,
+      alici: ETA_REMINDER_TO,
+      esikler: ETA_REMINDER_THRESHOLDS,
     });
-  });
+  } catch (err) {
+    console.error("eta hatirlatma onizleme hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
 });
+/* Zamanlayiciyi beklemeden elle tetikleme. */
+app.post("/container/follow/reminder/send", async (req, res) => {
+  const sonuc = await runEtaReminders();
+  res.status(200).json(sonuc);
+});
+/* Unfollow listesi: ekranda bilinli olarak takipten cikarilanlar. Burada
+   tarih penceresi uygulanmaz, gecmis kayitlar da gorunmeye devam eder. */
+app.get("/container/unfollow/list", async (req, res) => {
+  try {
+    const acenteVar = await acenteTakipReady();
+    const request = new mssql.Request();
+    request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
+    const response = await request.query(
+      followListSql(acenteVar, "isnull(s.Takip, 1) = 0", false)
+    );
+    const data = response.recordset;
+    data.forEach((x) => {
+      /* Yer tutucu tarih istemciye hic gitmesin: liste bos hucre, form bos
+         takvim gosterir ve kayit sirasinda NULL olarak guncellenir. */
+      if (!etaGecerli(x.Eta)) {
+        x.Eta = null;
+      }
+      const kalan = etaKalanGun(x.Eta);
+      x.Kalan = kalan == null || kalan < 0 ? 0 : kalan;
+      x.TakipLinki = acenteTakipLinki(x.TakipUrl, x.KonteynerNo);
+    });
+    res.status(200).json({
+      unfollow: data,
+      acenteHazir: acenteVar,
+    });
+  } catch (err) {
+    console.error("container unfollow listesi hatasi:", err.message);
+    res.status(500).json({ unfollow: [], acenteHazir: false });
+  }
+});
+/* --------------------------------------------------------------------------
+   Sirket ici sohbet - REST uclari
+   --------------------------------------------------------------------------
+   Anlik teslim ve online durumu socket sunucusunda (api/server.js, port 3001)
+   calisir. Buradaki uclar sayfa ilk acildiginda gereken verileri saglar:
+   kullanici listesi, yazisma gecmisi ve okunmamis sayaci.
+
+   Sema api/sql/SohbetMesajTB.sql ile kurulur. Script calistirilmadiysa
+   uclar bos liste ve ready:false dondurur, uygulama hata vermez.
+
+   Tum uclar authenticateToken'dan gectigi icin kullanici req.user.userId
+   uzerinden alinir; istemciden gelen bir kimlige ASLA guvenilmez.
+   -------------------------------------------------------------------------- */
+const SOHBET_SAKLAMA_GUN = 90;
+const SOHBET_GECMIS_LIMIT = 50;
+const SOHBET_TEMIZLIK_ARALIK_MS = 24 * 60 * 60 * 1000;
+const SOHBET_TEMIZLIK_BASLAMA_MS = 2 * 60 * 1000;
+
+/* Goruntu eki sinirlari. Istemci de ayni sinirlari uygular (utils/chatDosya.js)
+   ama son soz sunucudadir: istemci kontrolleri atlanabilir. */
+const SOHBET_DOSYA_MAX_BAYT = 5 * 1024 * 1024;
+const SOHBET_DOSYA_TURLERI = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+};
+/* Imzali baglantilarin omru. Kisa tutulur: baglanti baskasina gitse bile
+   kisa surede olur, ancak bir goruntunun yuklenmesine fazlasiyla yeter. */
+const SOHBET_DOSYA_IMZA_SN = 300;
+
+let chatReadyCache = null;
+async function chatReady() {
+  if (chatReadyCache !== null) {
+    return chatReadyCache;
+  }
+  try {
+    /* Asil kullanici listesi sorgusu KullaniciAktiflikTB'ye de join atar;
+       ikisi de kurulu olmadan o sorgu calismaz. Eksikse sade listeye
+       dusulur. */
+    const check = await mssql.query(`
+      select
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[SohbetMesajTB]') and type = N'U') as mesaj,
+        (select count(*) from sys.objects
+          where object_id = object_id(N'[dbo].[KullaniciAktiflikTB]') and type = N'U') as aktiflik
+    `);
+    const satir = check.recordset[0];
+    chatReadyCache = satir.mesaj > 0 && satir.aktiflik > 0;
+  } catch (err) {
+    chatReadyCache = false;
+  }
+  return chatReadyCache;
+}
+/* Goruntu eki alanlari api/sql/SohbetMesajEk.sql ile eklenir. Script
+   calistirilmadiysa ek gonderme kapalidir, metin sohbeti aynen calisir. */
+let chatDosyaReadyCache = null;
+async function chatDosyaReady() {
+  if (chatDosyaReadyCache !== null) {
+    return chatDosyaReadyCache;
+  }
+  try {
+    const check = await mssql.query(`
+      select count(*) as kolon from sys.columns
+       where object_id = object_id(N'[dbo].[SohbetMesajTB]')
+         and name = N'DosyaKey'
+    `);
+    chatDosyaReadyCache = check.recordset[0].kolon > 0;
+  } catch (err) {
+    chatDosyaReadyCache = false;
+  }
+  return chatDosyaReadyCache;
+}
+
+/* Spaces anahtari ve gizli bilgiler olmadan yukleme/goruntuleme yapilamaz;
+   eksikse ek gonderme kapali kalir, sohbet calismaya devam eder. */
+function spacesHazirMi() {
+  return !!(
+    SPACES_BUCKET &&
+    process.env.DO_SPACES_KEY &&
+    process.env.DO_SPACES_SECRET &&
+    process.env.DO_SPACES_ENDPOINT
+  );
+}
+
+/* bigint ID'ler JSON'da sayi olarak tasinirsa buyuk degerlerde hassasiyet
+   kaybi olur; istemci zaten yalnizca karsilastirma yapiyor, metin olarak
+   gonderilir. api/server.js de ayni bicimi kullanir. */
+function sohbetSatiri(row) {
+  return {
+    ID: String(row.ID),
+    GonderenID: row.GonderenID,
+    AliciID: row.AliciID,
+    Mesaj: row.Mesaj,
+    GonderimTarihi: row.GonderimTarihi,
+    OkunduTarihi: row.OkunduTarihi,
+    /* Spaces anahtari istemciye ASLA verilmez; goruntu korumali uctan
+       acilir, orada gonderen/alici kontrolu yapilir. */
+    Dosya: row.DosyaKey
+      ? {
+          Tur: row.DosyaTur,
+          Ad: row.DosyaAd,
+          Boyut: row.DosyaBoyut,
+          Url: `/api/chat/file/${row.ID}`,
+        }
+      : null,
+  };
+}
+
+/* Sohbet edilebilecek kullanicilar: kendisi haric aktif kullanicilar.
+   Her satirda o kisiden gelen okunmamis sayisi ve son mesaj bilgisi doner,
+   boylece liste "en son yazisilan uste" siralanabilir. */
+app.get("/chat/users", async (req, res) => {
+  try {
+    const benId = Number(req.user.userId);
+    const hazir = await chatReady();
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, benId);
+    if (!hazir) {
+      const sade = await request.query(`
+        /* Yedek sorgu: hicbir sohbet tablosuna bagimli OLMAMALI, cunku
+           tam tersi durumda (tablolar kurulmamisken) buraya dusuluyor. */
+        select k.ID, k.KullaniciAdi
+          from KullaniciTB k
+         where k.Aktif = 1 and k.ID <> @ben
+           and k.ID not in (${sohbetHaricSql()})
+         order by k.KullaniciAdi
+      `);
+      return res.status(200).json({
+        list: sade.recordset.map((x) => ({
+          ID: x.ID,
+          KullaniciAdi: x.KullaniciAdi,
+          Okunmamis: 0,
+          SonMesaj: null,
+          SonMesajTarihi: null,
+          SonAktif: null,
+        })),
+        ready: false,
+        dosya: false,
+      });
+    }
+    const sonuc = await request.query(`
+      select
+        k.ID,
+        k.KullaniciAdi,
+        isnull(o.Okunmamis, 0) as Okunmamis,
+        s.Mesaj as SonMesaj,
+        s.GonderimTarihi as SonMesajTarihi,
+        akt.SonAktif
+      from KullaniciTB k
+      /* Son aktiflik: kullanicinin son gercek etkileşimi. Tablo
+         kurulmadiysa (api/sql/KullaniciAktiflikTB.sql) null gelir. */
+      left join KullaniciAktiflikTB akt on akt.KullaniciID = k.ID
+      outer apply (
+        select count(*) as Okunmamis
+          from SohbetMesajTB m
+         where m.GonderenID = k.ID
+           and m.AliciID = @ben
+           and m.OkunduTarihi is null
+      ) o
+      outer apply (
+        select top 1 m.Mesaj, m.GonderimTarihi
+          from SohbetMesajTB m
+         where (m.GonderenID = k.ID and m.AliciID = @ben)
+            or (m.GonderenID = @ben and m.AliciID = k.ID)
+         order by m.ID desc
+      ) s
+      where k.Aktif = 1
+        and k.ID <> @ben
+        /* Bolge/yer tutucu hesaplar sohbette listelenmez (api/sohbetHaric.js) */
+        and k.ID not in (${sohbetHaricSql()})
+      order by
+        case when s.GonderimTarihi is null then 1 else 0 end,
+        s.GonderimTarihi desc,
+        k.KullaniciAdi
+    `);
+    /* dosya: goruntu eki gonderilebilir mi (kolonlar + depo ayari).
+       Arayuz buna gore ataç/ekran goruntusu dugmelerini gosterir. */
+    res.status(200).json({
+      list: sonuc.recordset,
+      ready: true,
+      dosya: (await chatDosyaReady()) && spacesHazirMi(),
+    });
+  } catch (err) {
+    console.error("sohbet kullanici listesi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false, dosya: false });
+  }
+});
+
+/* Iki kisi arasindaki son mesajlar. beforeId verilirse daha eskiye gidilir
+   (yukari kaydirarak gecmis yukleme). Sonuc eskiden yeniye sirali doner. */
+app.get("/chat/history/:userId", async (req, res) => {
+  try {
+    if (!(await chatReady())) {
+      return res.status(200).json({ list: [], ready: false });
+    }
+    const benId = Number(req.user.userId);
+    const karsiId = parseInt(req.params.userId);
+    if (!karsiId || karsiId <= 0) {
+      return res.status(400).json({ list: [], ready: true, message: "Gecersiz kullanici." });
+    }
+    let limit = parseInt(req.query.limit) || SOHBET_GECMIS_LIMIT;
+    if (limit < 1) limit = 1;
+    if (limit > 200) limit = 200;
+    const beforeId = req.query.beforeId ? String(req.query.beforeId) : null;
+    /* Ek alanlari yoksa (SohbetMesajEk.sql calistirilmadiysa) o kolonlari
+       secmek sorguyu kirardi; bu durumda yalnizca metin alanlari gelir. */
+    const dosyaKolonlari = (await chatDosyaReady())
+      ? ", m.DosyaKey, m.DosyaTur, m.DosyaAd, m.DosyaBoyut"
+      : "";
+
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, benId);
+    request.input("karsi", mssql.Int, karsiId);
+    request.input("limit", mssql.Int, limit);
+    request.input("beforeId", mssql.BigInt, beforeId);
+    const sonuc = await request.query(`
+      select top (@limit)
+        m.ID, m.GonderenID, m.AliciID, m.Mesaj, m.GonderimTarihi, m.OkunduTarihi
+        ${dosyaKolonlari}
+      from SohbetMesajTB m
+      where (
+              (m.GonderenID = @ben and m.AliciID = @karsi)
+           or (m.GonderenID = @karsi and m.AliciID = @ben)
+            )
+        and (@beforeId is null or m.ID < @beforeId)
+      order by m.ID desc
+    `);
+    /* Sorgu en yeniden geriye alir; ekranda eskiden yeniye gosterilir. */
+    const list = sonuc.recordset.map(sohbetSatiri).reverse();
+    res.status(200).json({
+      list: list,
+      ready: true,
+      dahaVar: sonuc.recordset.length === limit,
+    });
+  } catch (err) {
+    console.error("sohbet gecmisi hatasi:", err.message);
+    res.status(500).json({ list: [], ready: false });
+  }
+});
+
+/* Navbar rozeti icin toplam okunmamis. */
+app.get("/chat/unread", async (req, res) => {
+  try {
+    if (!(await chatReady())) {
+      return res.status(200).json({ total: 0, ready: false });
+    }
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, Number(req.user.userId));
+    const sonuc = await request.query(`
+      select count(*) as total from SohbetMesajTB
+       where AliciID = @ben and OkunduTarihi is null
+    `);
+    res.status(200).json({ total: sonuc.recordset[0].total, ready: true });
+  } catch (err) {
+    console.error("sohbet okunmamis sayisi hatasi:", err.message);
+    res.status(500).json({ total: 0, ready: false });
+  }
+});
+
+/* Socket kapali oldugunda da okundu isaretlenebilsin diye REST karsiligi. */
+app.post("/chat/read", async (req, res) => {
+  try {
+    if (!(await chatReady())) {
+      return res.status(200).json({ status: false, ready: false });
+    }
+    const karsiId = parseInt(req.body.karsiId);
+    if (!karsiId || karsiId <= 0) {
+      return res.status(400).json({ status: false, message: "Gecersiz kullanici." });
+    }
+    const request = new mssql.Request();
+    request.input("ben", mssql.Int, Number(req.user.userId));
+    request.input("karsi", mssql.Int, karsiId);
+    const sonuc = await request.query(`
+      update SohbetMesajTB set OkunduTarihi = getutcdate()
+       where AliciID = @ben and GonderenID = @karsi and OkunduTarihi is null
+    `);
+    res.status(200).json({ status: true, adet: sonuc.rowsAffected[0] || 0 });
+  } catch (err) {
+    console.error("sohbet okundu hatasi:", err.message);
+    res.status(500).json({ status: false });
+  }
+});
+
+/* --------------------------------------------------------------------------
+   Goruntu eki: yukleme izni
+   --------------------------------------------------------------------------
+   Dosya sunucudan GECMEZ: istemci imzali baglanti ile dogrudan Spaces'e
+   yukler, sonra mesaji socket uzerinden anahtarla birlikte gonderir
+   (api/server.js chat:send). Boylece buyuk goruntuler Nuxt process'ini
+   mesgul etmez.
+
+   Nesne adi BURADA uretilir. Istemciye birakilirsa ayni adli goruntuler
+   birbirini ezer ve kullanici baskasinin klasorune yazabilirdi; anahtar
+   her zaman chat/<kullaniciID>/ ile baslar ve socket tarafi bunu da ayrica
+   dogrular.
+
+   Nesneler public-read DEGIL (mevcut urun fotograflarindan farki budur):
+   yalnizca /chat/file/:id ucunun urettigi kisa omurlu imzali baglanti ile
+   okunabilirler. */
+app.post("/chat/upload-url", async (req, res) => {
+  try {
+    if (!(await chatDosyaReady())) {
+      return res.status(200).json({
+        status: false,
+        ready: false,
+        message: "Görüntü eki kurulumu tamamlanmamış.",
+      });
+    }
+    if (!spacesHazirMi()) {
+      return res.status(200).json({
+        status: false,
+        ready: false,
+        message: "Dosya deposu ayarlanmamış.",
+      });
+    }
+    const tur = String((req.body && req.body.contentType) || "").toLowerCase();
+    const uzanti = SOHBET_DOSYA_TURLERI[tur];
+    if (!uzanti) {
+      return res.status(400).json({
+        status: false,
+        message: "Yalnızca PNG, JPEG ve WEBP gönderilebilir.",
+      });
+    }
+    const boyut = parseInt((req.body && req.body.boyut) || 0, 10) || 0;
+    if (boyut <= 0 || boyut > SOHBET_DOSYA_MAX_BAYT) {
+      return res.status(400).json({
+        status: false,
+        message: `Görüntü en fazla ${Math.floor(
+          SOHBET_DOSYA_MAX_BAYT / (1024 * 1024)
+        )} MB olabilir.`,
+      });
+    }
+    const key = `chat/${Number(req.user.userId)}/${Date.now()}-${crypto
+      .randomBytes(8)
+      .toString("hex")}.${uzanti}`;
+    /* ACL verilmez: nesne varsayilan olarak gizli kalir. Istemci de
+       x-amz-acl basligi gondermemeli, yoksa imza uyusmaz. */
+    const url = spacesS3.getSignedUrl("putObject", {
+      Bucket: SPACES_BUCKET,
+      Key: key,
+      ContentType: tur,
+      Expires: SOHBET_DOSYA_IMZA_SN,
+    });
+    res.status(200).json({ status: true, key: key, url: url, tur: tur });
+  } catch (err) {
+    console.error("sohbet yukleme imzasi hatasi:", err.message);
+    res.status(500).json({ status: false, message: "İmza üretilemedi." });
+  }
+});
+
+/* --------------------------------------------------------------------------
+   Goruntu eki: korumali goruntuleme
+   --------------------------------------------------------------------------
+   <img src="/api/chat/file/<mesajID>"> ile kullanilir. Yalnizca mesajin
+   GONDERENI veya ALICISI acabilir; baskasi 404 alir (403 yerine 404: boyle
+   bir mesajin varligi bile sizdirilmaz).
+
+   Token: <img> etiketi Authorization basligi gonderemedigi icin baslik
+   yoksa "token" cerezine bakilir. Bu uc, yukarıdaki genel
+   authenticateToken'dan muaf tutulmustur ve yetkiyi kendi dogrular. */
+function sohbetDosyaKullanicisi(req) {
+  const authHeader = req.headers["authorization"];
+  const basliktan = authHeader && authHeader.split(" ")[1];
+  const token = basliktan || (req.cookies && req.cookies.token);
+  if (!token || !JWT_SECRET) {
+    return null;
+  }
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    return payload && payload.userId ? payload : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+app.get("/chat/file/:id", async (req, res) => {
+  const kullanici = sohbetDosyaKullanicisi(req);
+  if (!kullanici) {
+    return res
+      .status(401)
+      .json({ status: false, message: "Yetkisiz erişim." });
+  }
+  try {
+    if (!(await chatDosyaReady()) || !spacesHazirMi()) {
+      return res.status(404).json({ status: false });
+    }
+    const mesajId = String(req.params.id || "");
+    if (!/^[0-9]{1,19}$/.test(mesajId)) {
+      return res.status(400).json({ status: false });
+    }
+    const request = new mssql.Request();
+    request.input("id", mssql.BigInt, mesajId);
+    request.input("ben", mssql.Int, Number(kullanici.userId));
+    const sonuc = await request.query(`
+      select DosyaKey, DosyaTur, DosyaAd from SohbetMesajTB
+       where ID = @id
+         and DosyaKey is not null
+         and (GonderenID = @ben or AliciID = @ben)
+    `);
+    const satir = sonuc.recordset[0];
+    if (!satir) {
+      return res.status(404).json({ status: false });
+    }
+    const url = spacesS3.getSignedUrl("getObject", {
+      Bucket: SPACES_BUCKET,
+      Key: satir.DosyaKey,
+      Expires: SOHBET_DOSYA_IMZA_SN,
+      ResponseContentType: satir.DosyaTur || "image/png",
+    });
+    /* Yonlendirme onbellege alinmasin: imza kisa omurlu, bayat baglanti
+       403 dondururdu. Goruntunun kendisi Spaces'ten onbeleklenir. */
+    res.set("Cache-Control", "no-store");
+    res.redirect(302, url);
+  } catch (err) {
+    console.error("sohbet dosya acma hatasi:", err.message);
+    res.status(500).json({ status: false });
+  }
+});
+
+/* --------------------------------------------------------------------------
+   90 gunluk saklama temizligi
+   --------------------------------------------------------------------------
+   Gunde bir kez calisir. Tablo buyudugunde tek seferde milyonlarca satir
+   silmemek icin partiler halinde ilerler. Zamanlayici kurallari Eta
+   hatirlatmasiyla ayni: PM2 cluster'da yalnizca ilk worker, dev modunda
+   HMR'de tekrar kurulmasin diye globalThis isareti. */
+/* Silinen mesajlarin Spaces'teki goruntuleri de silinir; aksi halde mesaj
+   gider, goruntu depoda sonsuza kadar kalir ve fatura buyur. Tek tek degil
+   toplu (deleteObjects) silinir, en fazla 1000'lik partiler halinde. */
+async function sohbetDosyalariniSil(anahtarlar) {
+  if (!anahtarlar.length || !spacesHazirMi()) {
+    return 0;
+  }
+  let silinen = 0;
+  for (let i = 0; i < anahtarlar.length; i += 1000) {
+    const parti = anahtarlar.slice(i, i + 1000);
+    try {
+      await spacesS3
+        .deleteObjects({
+          Bucket: SPACES_BUCKET,
+          Delete: { Objects: parti.map((k) => ({ Key: k })), Quiet: true },
+        })
+        .promise();
+      silinen += parti.length;
+    } catch (err) {
+      /* Nesne silinemese de mesaj satiri silinmis olur: veritabani ile depo
+         arasinda artik kalabilir, ama temizlik bir sonraki gun devam eder. */
+      console.error("sohbet goruntu silme hatasi:", err.message);
+    }
+  }
+  return silinen;
+}
+
+async function sohbetTemizle() {
+  if (!dbReady || !(await chatReady())) {
+    return { silinen: 0, calisti: false };
+  }
+  try {
+    /* Ek alanlari varsa silinen satirlarin anahtarlari output ile toplanir;
+       yoksa (SohbetMesajEk.sql calistirilmadiysa) eski sade silme kullanilir. */
+    const dosyaVar = await chatDosyaReady();
+    let silinen = 0;
+    let dosyaSilinen = 0;
+    for (let tur = 0; tur < 20; tur++) {
+      const request = new mssql.Request();
+      request.input("gun", mssql.Int, SOHBET_SAKLAMA_GUN);
+      const sonuc = await request.query(
+        dosyaVar
+          ? `delete top (5000) from SohbetMesajTB
+              output deleted.DosyaKey as DosyaKey
+              where GonderimTarihi < dateadd(day, -@gun, getutcdate())`
+          : `delete top (5000) from SohbetMesajTB
+              where GonderimTarihi < dateadd(day, -@gun, getutcdate())`
+      );
+      const adet = sonuc.rowsAffected[0] || 0;
+      silinen += adet;
+      if (dosyaVar) {
+        const anahtarlar = (sonuc.recordset || [])
+          .map((x) => x.DosyaKey)
+          .filter((k) => !!k);
+        dosyaSilinen += await sohbetDosyalariniSil(anahtarlar);
+      }
+      if (adet === 0) {
+        break;
+      }
+    }
+    if (silinen > 0) {
+      console.log(
+        `Sohbet temizligi: ${SOHBET_SAKLAMA_GUN} gunden eski ${silinen} mesaj` +
+          ` silindi (${dosyaSilinen} goruntu).`
+      );
+    }
+    return { silinen: silinen, calisti: true };
+  } catch (err) {
+    console.error("sohbet temizlik hatasi:", err.message);
+    return { silinen: 0, calisti: false };
+  }
+}
+/* --------------------------------------------------------------------------
+   Yetim goruntu temizligi
+   --------------------------------------------------------------------------
+   Kullanici goruntuyu secince dosya hemen Spaces'e yuklenir, ama mesaji
+   gondermeden paneli kapatabilir. O nesneye hicbir mesaj isaret etmez ve
+   hicbir zaman silinmezdi. Gunde bir kez chat/ onekindeki nesneler taranir;
+   24 saatten eski olup veritabaninda karsiligi olmayanlar silinir.
+
+   24 saat esigi, yuklemesi suren veya az once yuklenip gonderilmek uzere
+   olan nesnelerin yanlislikla silinmesini onler. */
+const SOHBET_YETIM_ESIK_MS = 24 * 60 * 60 * 1000;
+
+async function sohbetYetimDosyalariSil() {
+  if (!dbReady || !(await chatDosyaReady()) || !spacesHazirMi()) {
+    return { silinen: 0, calisti: false };
+  }
+  try {
+    const esik = Date.now() - SOHBET_YETIM_ESIK_MS;
+    let devamToken = null;
+    let silinen = 0;
+    do {
+      const liste = await spacesS3
+        .listObjectsV2({
+          Bucket: SPACES_BUCKET,
+          Prefix: "chat/",
+          MaxKeys: 1000,
+          ContinuationToken: devamToken || undefined,
+        })
+        .promise();
+      devamToken = liste.IsTruncated ? liste.NextContinuationToken : null;
+      const adaylar = (liste.Contents || []).filter(
+        (n) => new Date(n.LastModified).getTime() < esik
+      );
+      /* Sorgu parametresi sinirina takilmamak icin partiler halinde. */
+      for (let i = 0; i < adaylar.length; i += 500) {
+        const parti = adaylar.slice(i, i + 500);
+        const request = new mssql.Request();
+        parti.forEach((n, sira) => {
+          request.input("k" + sira, mssql.NVarChar(400), n.Key);
+        });
+        const sorgu = await request.query(`
+          select DosyaKey from SohbetMesajTB
+           where DosyaKey in (${parti.map((n, sira) => "@k" + sira).join(",")})
+        `);
+        const kullanilan = new Set(sorgu.recordset.map((x) => x.DosyaKey));
+        const yetimler = parti
+          .map((n) => n.Key)
+          .filter((k) => !kullanilan.has(k));
+        silinen += await sohbetDosyalariniSil(yetimler);
+      }
+    } while (devamToken);
+    if (silinen > 0) {
+      console.log(`Sohbet yetim goruntu temizligi: ${silinen} nesne silindi.`);
+    }
+    return { silinen: silinen, calisti: true };
+  } catch (err) {
+    console.error("sohbet yetim temizlik hatasi:", err.message);
+    return { silinen: 0, calisti: false };
+  }
+}
+
+/* --------------------------------------------------------------------------
+   TEK ISCI KORUMASI -- TANIM ARTIK YUKARIDA
+   --------------------------------------------------------------------------
+   `etaReminderWorkerAllowed` sohbet tasinirken GECICI olarak buraya
+   kopyalanmisti: cagri sohbet yamasiyla gelmis, tanim ise Eta hatirlatma
+   commit'inde (f22fe601b) kalmisti ve o is o zaman pilota tasinmamisti.
+   Tanim olmadan modul yuklenirken ReferenceError atiyor, yani legacy
+   Express API'sinin TAMAMI dusuyordu.
+
+   Eta hatirlatma isi BU COMMIT'TE tasindi, yani fonksiyonun ASIL tanimi
+   artik yukarida (kendi baglaminda, runEtaReminders'in yaninda). Gecici
+   kopya KALDIRILDI -- iki ayni adli function bildirimi JS'te yasal
+   oldugu icin hata vermiyordu ama sessiz bir tekrardi ve ikisi ayrismaya
+   acikti.
+
+   Sohbet temizligi ayni korumayi kullanmaya devam ediyor. */
+if (etaReminderWorkerAllowed() && !globalThis.__sohbetTemizlikKurulu) {
+  globalThis.__sohbetTemizlikKurulu = true;
+  const sohbetGunlukTemizlik = async () => {
+    await sohbetTemizle();
+    await sohbetYetimDosyalariSil();
+  };
+  setTimeout(() => {
+    sohbetGunlukTemizlik();
+    setInterval(sohbetGunlukTemizlik, SOHBET_TEMIZLIK_ARALIK_MS);
+  }, SOHBET_TEMIZLIK_BASLAMA_MS);
+}
+
 
 function containerInputResults(po, cb) {
   const sql = `select ID,FaturaNo,FirmaID from KonteynerDigerFaturalarKayitTB where FaturaNo='${po}'`;
@@ -13315,7 +14718,15 @@ app.get("/order/production/product/document/:po", async (req, res) => {
       }
       if (x.YuklemeEvrakID == 75) {
         x.Link = `https://file-service.mekmar.com/file/download/75/${x.SiparisNo}`;
-        x.Evrak = "ATR";
+        x.Evrak = "ATR (Dolaşım Belgesi)";
+      }
+      if (x.YuklemeEvrakID == 78) {
+        x.Link = `https://file-service.mekmar.com/file/download/78/${x.SiparisNo}`;
+        x.Evrak = "Telex Release";
+      }
+      if (x.YuklemeEvrakID == 79) {
+        x.Link = `https://file-service.mekmar.com/file/download/79/${x.SiparisNo}`;
+        x.Evrak = "Türkçe Fatura";
       }
       if (x.YuklemeEvrakID == 76) {
         x.Link = `https://file-service.mekmar.com/file/download/76/${x.SiparisNo}`;
@@ -13475,7 +14886,8 @@ function __amount(amount, unit, w, h, t) {
     }
   }
 }
-const mssqlTypes = require("mssql");
+// ESM'de require yok; mssql dosyanin tepesinde zaten import edilmis durumda
+const mssqlTypes = mssql;
 // --- ortak yardımcılar ---
 function safeNum(v) {
   if (v === null || v === undefined) return 0;
@@ -13487,8 +14899,64 @@ function firstWord(v) {
   return (v ?? "").toString().trim().split(" ")[0] || "";
 }
 
-app.get("/order/production/product/check/:po", (req, res) => {
+/* Ortak kasalari GRUPLAR (bkz. kasaGrupKaydet): satirlar ayri kalir, urun
+   bilgileri her satirda kendi degeriyle gorunur. Tek fiziksel kasa olduklarini
+   su uc sey anlatir:
+     - Sira (#) fiziksel kasa sayar ve grubun TUM uyelerinde ayni degerdir;
+       tablo bu alan uzerinden rowspan yapar (siparis listelerindeki gruplama
+       ile ayni), ceki Excel'i de ayni araligi dikey birlestirir. Deger kasa
+       basina tekil oldugu icin iki ayri kasa yanlislikla birlesmez,
+     - KasaNo her satirda satirin KENDI numarasidir, degistirilmez,
+     - net ve gross agirlik grup toplamidir ve yalnizca ilk satirda yazilir
+       (KasaGrupIlk / GrupTon); dara da kasa basina bir kez eklenir.
+   Grup uyeleri listede yan yana gelsin diye grubun ilk satirinin ardina
+   toplanir; gruplarin kendi arasindaki sira korunur.
+
+   Grup kolonu yoksa veya grubun bu siparişte tek uyesi varsa satir tekil kasa
+   olarak isaretlenir ve davranis eskisi gibidir. */
+function kasaGruplariniUygula(list) {
+  const anahtar = (x) => {
+    const grup = (x.KasaGrupNo ?? "").toString().trim();
+    return grup.length ? `g:${grup}` : `t:${(x.KasaNo ?? "").toString().trim()}`;
+  };
+
+  const sira = [];
+  const kovalar = new Map();
+  list.forEach((x) => {
+    const k = anahtar(x);
+    if (!kovalar.has(k)) {
+      kovalar.set(k, []);
+      sira.push(k);
+    }
+    kovalar.get(k).push(x);
+  });
+
+  const sonuc = [];
+  let kasaSira = 0;
+  sira.forEach((k) => {
+    const uyeler = kovalar.get(k);
+    const ortak = uyeler.length > 1 && k.startsWith("g:");
+    kasaSira += 1;
+    const net = Number(
+      uyeler.reduce((toplam, u) => toplam + safeNum(u.Ton), 0).toFixed(4)
+    );
+    uyeler.forEach((u, i) => {
+      sonuc.push({
+        ...u,
+        Sira: kasaSira,
+        Ortak: ortak,
+        KasaGrupIlk: i === 0,
+        GrupTon: net,
+      });
+    });
+  });
+  return sonuc;
+}
+
+app.get("/order/production/product/check/:po", async (req, res) => {
   const po = String(req.params.po).replace(/'/g, "''");
+  /* Kolon yoksa sorguya eklenmez; gruplama kapaliyken liste aynen calisir. */
+  const grupKolon = (await kasaGrupReady()) ? "u.KasaGrupNo," : "";
 
   const checkListSql = `
     select
@@ -13501,6 +14969,7 @@ app.get("/order/production/product/check/:po", (req, res) => {
       dbo.Get_Olcu_En(u.UrunKartID)       as En,
       dbo.Get_Olcu_Boy(u.UrunKartID)      as Boy,
       u.Adet, u.Miktar, b.BirimAdi, u.KutuAdet, u.ID, u.UrunKartID,
+      ${grupKolon}
       su.KasaOlcusu
     from UretimTB u
       inner join UrunBirimTB b on b.ID = u.UrunBirimID
@@ -13525,7 +14994,7 @@ app.get("/order/production/product/check/:po", (req, res) => {
         .json({ message: "Üretim listesi alınamadı", detail: err.message });
     }
     try {
-      const list = (check?.recordset || []).map((x, i) => ({
+      const satirlar = (check?.recordset || []).map((x, i) => ({
         ...x,
         Sira: i + 1,
         Ton: Number(
@@ -13537,6 +15006,8 @@ app.get("/order/production/product/check/:po", (req, res) => {
           ).toFixed(4)
         ),
       }));
+      /* Ortak kasalar tek kasa gibi gosterilir, Sira yeniden numaralanir. */
+      const list = kasaGruplariniUygula(satirlar);
       res.status(200).json({ list });
     } catch (e) {
       console.error("check/:po işleme hatası:", e.message);
@@ -13546,8 +15017,10 @@ app.get("/order/production/product/check/:po", (req, res) => {
     }
   });
 });
-app.get("/order/production/product/check/mekmer/:po", (req, res) => {
+app.get("/order/production/product/check/mekmer/:po", async (req, res) => {
   const po = String(req.params.po).replace(/'/g, "''");
+  /* Kolon yoksa sorguya eklenmez; gruplama kapaliyken liste aynen calisir. */
+  const grupKolon = (await kasaGrupReady()) ? "u.KasaGrupNo," : "";
 
   const checkListSql = `
     select
@@ -13560,6 +15033,7 @@ app.get("/order/production/product/check/mekmer/:po", (req, res) => {
       dbo.Get_Olcu_En(u.UrunKartID)       as En,
       dbo.Get_Olcu_Boy(u.UrunKartID)      as Boy,
       u.Adet, u.Miktar, b.BirimAdi, u.KutuAdet, u.ID, u.UrunKartID,
+      ${grupKolon}
       su.KasaOlcusu
     from UretimTB u
       inner join UrunBirimTB b on b.ID = u.UrunBirimID
@@ -13583,7 +15057,7 @@ app.get("/order/production/product/check/mekmer/:po", (req, res) => {
         .json({ message: "Üretim listesi alınamadı", detail: err.message });
     }
     try {
-      const list = (check?.recordset || []).map((x, i) => ({
+      const satirlar = (check?.recordset || []).map((x, i) => ({
         ...x,
         Sira: i + 1,
         Ton: Number(
@@ -13595,6 +15069,8 @@ app.get("/order/production/product/check/mekmer/:po", (req, res) => {
           ).toFixed(4)
         ),
       }));
+      /* Ortak kasalar tek kasa gibi gosterilir, Sira yeniden numaralanir. */
+      const list = kasaGruplariniUygula(satirlar);
       res.status(200).json({ list });
     } catch (e) {
       console.error("check/mekmer/:po işleme hatası:", e.message);
@@ -14083,371 +15559,691 @@ where su.SiparisNo='${req.params.po}'
   });
 });
 
-app.post("/order/divide", async (req, res) => {
-  const orderInsertSqlGiden = `
-        insert into SiparislerTB(
-SiparisNo,
-SiparisTarihi,
-OdemeTurID,
-TeslimTurID,
-MusteriID,
-Pesinat,
-NavlunFirma,
-NavlunAlis,
-NavlunSatis,
-KayitTarihi,
-KullaniciID,
-SiparisDurumID,
-UretimAciklama,
-SevkiyatAciklama,
-FinansAciklama,
-OdemeAciklama,
-TahminiYuklemeTarihi,
-Ulke,
-Komisyon,
-DetayAciklama_1,
-DetayMekmarNot_1,
-DetayTutar_1,
-DetayAlis_1,
-DetayAciklama_2,
-DetayMekmarNot_2,
-DetayTutar_2,
-DetayAlis_2,
-DetayAciklama_3,
-DetayMekmarNot_3,
-DetayTutar_3,
-DetayAlis_3,
-SiparisSahibi,
-EvrakGideri,
-KonteynerAyrinti,
-UlkeId,
-depo_yukleme,
-DetayTutar_4,
-DetayAciklama_4,
-sigorta_Tutar,
-Operasyon,
-Finansman,
-Iade,
-MalBedeli,
-sigorta_tutar_satis,
-FaturaKesimTurID
-)
-VALUES(
-	'${req.body.order.siparisno_giden}',
-	'${req.body.order.siparisTarihi}',
-	'${req.body.order.odemeTurId}',
-	'${req.body.order.teslimTurId}',
-	'${req.body.order.musteriId}',
-	'${req.body.order.gidenPesinat}',
-	'${req.body.order.navlunFirma}',
-	'${req.body.order.gidenNavlunAlis}',
-	'${req.body.order.gidenNavlunSatis}',
-	'${req.body.order.kayitTarihi}',
-	'${req.body.order.kullaniciId}',
-	'${req.body.order.siparisDurumId}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.sevkiyatAciklama}',
-	'${req.body.order.finansAciklama}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.TahminiYuklemeTarihi}',
-	'${req.body.order.ulke}',
-	'${req.body.order.komisyon}',
-	'${req.body.order.detayAciklama_1}',
-	'${req.body.order.detayMekmarNot_1}',
-	'${req.body.order.gidenDetaySatis_1}',
-	'${req.body.order.gidenDetayAlis_1}',
-	'${req.body.order.detayAciklama_2}',
-	'${req.body.order.detayMekmarNot_2}',
-	'${req.body.order.gidenDetaySatis_2}',
-	'${req.body.order.gidenDetayAlis_2}',
-	'${req.body.order.detayAciklama_3}',
-	'${req.body.order.detayMekmarNot_3}',
-	'${req.body.order.gidenDetaySatis_3}',
-	'${req.body.order.gidenDetayAlis_3}',
-	'${req.body.order.siparisSahibi}',
-	'${req.body.order.evrakGideri}',
-	'${req.body.order.konteynerAyrinti}',
-	'${req.body.order.ulkeId}',
-	'${req.body.order.depo_yukleme}',
-	'${0}',
-	'${""}',
-	'${req.body.order.sigortaTutar}',
-	'${req.body.order.operasyon}',
-	'${req.body.order.finansman}',
-	'${req.body.order.iade}',
-	'${req.body.order.malBedeli}',
-	'${req.body.order.sigortaTutarSatis}',
-	'${req.body.order.faturaKesimTurId}'
-)
-    `;
+/*
+ * ===========================================================================
+ *  SIPARIS BOLME -- POST /order/divide
+ * ===========================================================================
+ *
+ * Bir siparisin bir kismi yuklenip kalani beklemeye birakildiginda siparis
+ * IKI kayda bolunur:
+ *
+ *     26VEIK36  ->  26VEIK36-1 (giden)  +  26VEIK36-2 (kalan)
+ *
+ * Kalan parca ILERIDE TEKRAR bolunebilir. O zaman giden parca KENDI
+ * numarasini korur, kalan yeni bir numara alir:
+ *
+ *     26VEIK36-2  ->  26VEIK36-2 (giden)  +  26VEIK36-3 (kalan)
+ *
+ * Urun bazinda: bir urunun tamami gidebilir, tamami kalabilir veya
+ * miktari ikiye bolunebilir. Bedeller (pesinat, navlun alis/satis,
+ * detay 1-3 alis/satis, mal bedeli) iki parca arasinda elle paylastirilir.
+ *
+ * ---------------------------------------------------------------------------
+ * BU UC NEDEN BASTAN YAZILDI -- ONCEKI SURUMDEKI HATALAR
+ * ---------------------------------------------------------------------------
+ *
+ * [1] YANIT N KEZ GONDERILIYORDU.  Urun dongusu `forEach` icinde her urun
+ *     icin `res.json(...)` cagiriyordu. Iki veya daha fazla urunlu her
+ *     bolmede ikinci cagri "Cannot set headers after they are sent"
+ *     firlatiyor; bu hata async callback'in icinde oldugu icin Express'in
+ *     hata yakalayicisina da ulasmiyor ve SUNUCUYU DUSURUYORDU
+ *     (ayni sinif hata: commit faee5b947). Tek urunlu siparislerde
+ *     calisip cok urunlulerde cokmesi, "bazen calisiyor" goruntusunun
+ *     ana kaynagi.
+ *
+ * [2] `await req.body.product.forEach(async (x) => ...)`  forEach async
+ *     callback'i BEKLEMEZ ve donus degeri undefined'dir; await hicbir sey
+ *     beklemiyordu. Urun sorgulari sirasiz baslatiliyor, bitmeden yanit
+ *     donuyordu. Araya giren bir hata sessizce kayboluyordu.
+ *
+ * [3] ISLEM (TRANSACTION) YOKTU.  Sira suydu: giden siparisi EKLE ->
+ *     kalan siparisi EKLE -> ORIJINAL SIPARISI SIL -> urunleri tasi.
+ *     Ortada herhangi bir adim patlarsa geri alma yok: orijinal kayit
+ *     silinmis, urunler hala eski (artik var olmayan) SiparisNo'da asili
+ *     kaliyordu. Veri kaybinin en olasi yolu buydu.
+ *
+ * [4] KOLON/DEGER HIZASI KAYMIsTI.  Kolon listesi
+ *         UretimAciklama, SevkiyatAciklama, FinansAciklama, OdemeAciklama
+ *     iken VALUES
+ *         odemeAciklama, sevkiyatAciklama, finansAciklama, odemeAciklama
+ *     veriyordu. Sonuc: UretimAciklama'ya ODEME aciklamasi yaziliyor,
+ *     uretim aciklamasi ise HER IKI PARCADA DA KAYBOLUYORDU.
+ *
+ * [5] MalBedeli'ne SIPARIS ID'si YAZILIYORDU.  Istemci
+ *         divideProductionModel.malBedeli = productionModel.SiparisId
+ *     yapiyordu (bkz. eski orders/production.vue:653). Yani para kolonuna
+ *     siparisin birincil anahtari giriyordu. Modelde zaten
+ *     kalanMalBedeli / gidenMalBedeli alanlari vardi ama HIC KULLANILMIYORDU.
+ *     Artik bedel de digerleri gibi paylastiriliyor.
+ *
+ * [6] Vade HIC TASINMIYORDU.  Istemci order.vade gonderiyor ama kolon
+ *     listesinde Vade yoktu -- bolunen her siparis vade tarihini
+ *     KAYBEDIYORDU. (SiparislerTB.Vade; api/index.js:9500 civarinda
+ *     GETDATE() ile karsilastiriliyor, yani gercekten kullanilan bir alan.)
+ *
+ * [7] PO NUMARASI CAKISABILIYORDU.  Kalan numara "icinde bulundugun
+ *     numara + 1" olarak hesaplaniyordu:
+ *         26VEIK36-2  ->  kalan 26VEIK36-3
+ *     Ama -3 ZATEN VAR OLABILIR (daha once -2 bolunmusse). Ikinci kez
+ *     bolundugunde var olan bir PO'yu yeniden uretiyordu. Dogrusu
+ *     "o siparisin TUM parcalari arasindaki en buyuk numara + 1" --
+ *     artik oyle (allocatePoPair). Ayrica numara artik YALNIZCA BURADA
+ *     uretiliyor: istemcideki uc ayri kopya kaldirildi, cakisma ihtimali
+ *     yapisal olarak kalmadi.
+ *
+ * [8] LISTEDE OLMAYAN URUNLER ORTADA KALIYORDU.  Istemci yalnizca
+ *     kullanicinin elle ekledigi urunleri gonderiyor; gonderilmeyen
+ *     urunler eski SiparisNo'da kaliyordu ve o kayit silindigi icin
+ *     hicbir siparise bagli olmayan satirlara donusuyorlardi. Artik
+ *     listede adi gecmeyen her urun KALAN siparise tasiniyor
+ *     ("gonderildigi soylenmediyse kalmistir") ve kac tanesinin boyle
+ *     tasindigi yanitta donuyor.
+ *
+ * [9] Tam giden / tam kalan urunlerde satir SILINIP YENIDEN EKLENIYORDU;
+ *     bu, SiparisUrunTB.ID'yi degistiriyordu. Artik yalnizca SiparisNo
+ *     guncelleniyor (UPDATE), ID korunuyor. Yalnizca gercekten ikiye
+ *     bolunen urunde yeni bir satir aciliyor.
+ *
+ * [10] Butun sorgular string birlestirmeyle kuruluyordu. Musteri
+ *      aciklamasindaki tek bir kesme isareti ('), sorguyu bozmaya
+ *      yetiyordu. Artik hepsi parametreli (mssql.Request.input).
+ *
+ * ---------------------------------------------------------------------------
+ * NOT -- PILOTTA YAZMA KILIDI
+ * ---------------------------------------------------------------------------
+ * Bu uc GERCEKTEN yazar. server/middleware/0.readonly-guard.ts pilotta
+ * POST'lari durdurdugu icin ekrandan denendiginde 403 doner. Denemek icin
+ * once TEST VERITABANINA gecilmeli -- guard'i kaldirmak tek basina
+ * yeterli ve guvenli DEGIL (uretim verisi).
+ */
 
-  const orderInsertSqlKalan = `
-        insert into SiparislerTB(
-SiparisNo,
-SiparisTarihi,
-OdemeTurID,
-TeslimTurID,
-MusteriID,
-Pesinat,
-NavlunFirma,
-NavlunAlis,
-NavlunSatis,
-KayitTarihi,
-KullaniciID,
-SiparisDurumID,
-UretimAciklama,
-SevkiyatAciklama,
-FinansAciklama,
-OdemeAciklama,
-TahminiYuklemeTarihi,
-Ulke,
-Komisyon,
-DetayAciklama_1,
-DetayMekmarNot_1,
-DetayTutar_1,
-DetayAlis_1,
-DetayAciklama_2,
-DetayMekmarNot_2,
-DetayTutar_2,
-DetayAlis_2,
-DetayAciklama_3,
-DetayMekmarNot_3,
-DetayTutar_3,
-DetayAlis_3,
-SiparisSahibi,
-EvrakGideri,
-KonteynerAyrinti,
-UlkeId,
-depo_yukleme,
-DetayTutar_4,
-DetayAciklama_4,
-sigorta_Tutar,
-Operasyon,
-Finansman,
-Iade,
-MalBedeli,
-sigorta_tutar_satis,
-FaturaKesimTurID
-)
-VALUES(
-	'${req.body.order.siparisno_kalan}',
-	'${req.body.order.siparisTarihi}',
-	'${req.body.order.odemeTurId}',
-	'${req.body.order.teslimTurId}',
-	'${req.body.order.musteriId}',
-	'${req.body.order.kalanPesinat}',
-	'${req.body.order.navlunFirma}',
-	'${req.body.order.kalanNavlunAlis}',
-	'${req.body.order.kalanNavlunSatis}',
-	'${req.body.order.kayitTarihi}',
-	'${req.body.order.kullaniciId}',
-	'${req.body.order.siparisDurumId}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.sevkiyatAciklama}',
-	'${req.body.order.finansAciklama}',
-	'${req.body.order.odemeAciklama}',
-	'${req.body.order.TahminiYuklemeTarihi}',
-	'${req.body.order.ulke}',
-	'${req.body.order.komisyon}',
-	'${req.body.order.detayAciklama_1}',
-	'${req.body.order.detayMekmarNot_1}',
-	'${req.body.order.kalanDetaySatis_1}',
-	'${req.body.order.kalanDetayAlis_1}',
-	'${req.body.order.detayAciklama_2}',
-	'${req.body.order.detayMekmarNot_2}',
-	'${req.body.order.kalanDetaySatis_2}',
-	'${req.body.order.kalanDetayAlis_2}',
-	'${req.body.order.detayAciklama_3}',
-	'${req.body.order.detayMekmarNot_3}',
-	'${req.body.order.kalanDetaySatis_3}',
-	'${req.body.order.kalanDetayAlis_3}',
-	'${req.body.order.siparisSahibi}',
-	'${req.body.order.evrakGideri}',
-	'${req.body.order.konteynerAyrinti}',
-	'${req.body.order.ulkeId}',
-	'${req.body.order.depo_yukleme}',
-	'${0}',
-	'${""}',
-	'${req.body.order.sigortaTutar}',
-	'${req.body.order.operasyon}',
-	'${req.body.order.finansman}',
-	'${req.body.order.iade}',
-	'${req.body.order.malBedeli}',
-	'${req.body.order.sigortaTutarSatis}',
-	'${req.body.order.faturaKesimTurId}'
-)
-    `;
+/* "26VEIK36-2" -> { base: "26VEIK36", suffix: 2 }   "26VEIK36" -> { base: "26VEIK36", suffix: null } */
+const parsePo = (po) => {
+  const text = safe(po).trim();
+  const match = /^(.*)-(\d+)$/.exec(text);
 
-  await mssql.query(orderInsertSqlGiden, async (err, giden) => {
-    if (giden.rowsAffected[0] == 1) {
-      await mssql.query(orderInsertSqlKalan, async (err, kalan) => {
-        if (kalan.rowsAffected[0] == 1) {
-          const sistemdeSiparisDeleteSql = `delete SiparislerTB where SiparisNo='${req.body.order.siparisno}'`;
-          await mssql.query(
-            sistemdeSiparisDeleteSql,
-            async (err, sistemdekiSiparis) => {
-              if (sistemdekiSiparis.rowsAffected[0] == 1) {
-                await req.body.product.forEach(async (x) => {
-                  if (x.kalan == 0) {
-                    const kalanSqlDelete = `delete SiparisUrunTB where ID='${x.id}'`;
-                    mssql.query(kalanSqlDelete, async (err, kalan) => {
-                      if (kalan.rowsAffected[0] == 1) {
-                        const gidenUrunSql = `
-                                                insert into SiparisUrunTB(
-                                            SiparisNo,
-                                            TedarikciID,
-                                            UrunKartID,
-                                            UrunBirimID,
-                                            Miktar,
-                                            OzelMiktar,
-                                            SatisFiyati,
-                                            SatisToplam,
-                                            UretimAciklama,
-                                            MusteriAciklama,
-                                            AlisFiyati,
-                                            SiraNo,
-                                            Ton,
-                                            Adet
-                                        ) VALUES(
-                                            '${x.giden_po}',
-                                            '${x.tedarikciId}',
-                                            '${x.urunKartId}',
-                                            '${x.urunBirimId}',
-                                            '${x.gonderilen}',
-                                            '${x.gonderilen}',
-                                            '${x.satisFiyat}',
-                                            '${x.gidenToplam}',
-                                            '${x.uretimAciklama}',
-                                            '${x.musteriAciklama}',
-                                            '${x.alisFiyati}',
-                                            '${x.siraNo}',
-                                            '${x.ton}',
-                                            '${x.adet}'
+  return match
+    ? { base: match[1], suffix: parseInt(match[2], 10) }
+    : { base: text, suffix: null };
+};
 
-                                        )
-                                                                            `;
-                        await mssql.query(gidenUrunSql, async (err, giden) => {
-                          if (giden.rowsAffected[0] == 1) {
-                            res.status(200).json({ status: true });
-                          } else {
-                            res.status(200).json({ status: false });
-                          }
-                        });
-                      } else {
-                        res.status(200).json({ status: false });
-                      }
-                    });
-                  } else if (x.gonderilen == 0) {
-                    const kalanSqlUpdate = `update SiparisUrunTB SET SiparisNo = '${x.kalan_po}' WHERE ID='${x.id}'`;
-                    mssql.query(kalanSqlUpdate, (err, kalan) => {
-                      if (kalan.rowsAffected[0] == 1) {
-                        res.status(200).json({ status: true });
-                      } else {
-                        res.status(200).json({ status: false });
-                      }
-                    });
-                  } else {
-                    const gidenUrunSql = `
-            insert into SiparisUrunTB(
-        SiparisNo,
-        TedarikciID,
-        UrunKartID,
-        UrunBirimID,
-        Miktar,
-        OzelMiktar,
-        SatisFiyati,
-        SatisToplam,
-        UretimAciklama,
-        MusteriAciklama,
-        AlisFiyati,
-        SiraNo,
-        Ton,
-        Adet
-    ) VALUES(
-        '${x.giden_po}',
-        '${x.tedarikciId}',
-        '${x.urunKartId}',
-        '${x.urunBirimId}',
-        '${x.gonderilen}',
-        '${x.gonderilen}',
-        '${x.satisFiyat}',
-        '${x.gidenToplam}',
-        '${x.uretimAciklama}',
-        '${x.musteriAciklama}',
-        '${x.alisFiyati}',
-        '${x.siraNo}',
-        '${x.ton}',
-        '${x.adet}'
+/*
+ * Bolunmeden sonraki iki PO numarasini uretir.
+ *
+ * Kural: numara, O SIPARISIN TUM PARCALARI arasindaki en buyuk ekten
+ * sonra gelir -- "bulundugun ek + 1" DEGIL. Ikisi yalnizca ilk bolmede
+ * ayni sonucu verir; ikinci bolmede "bulundugun ek + 1" var olan bir
+ * PO'yu yeniden uretir (bkz. yukarida [7]).
+ *
+ * Giden parca, zaten ekli bir PO bolunuyorsa KENDI numarasini korur;
+ * boylece daha once yuklenmis parcanin numarasi degismez.
+ */
+const allocatePoPair = async (transaction, po) => {
+  const { base, suffix } = parsePo(po);
 
-    )
-                                    `;
-                    const kalanUrunSql = `
-                        insert into SiparisUrunTB(
-                    SiparisNo,
-                    TedarikciID,
-                    UrunKartID,
-                    UrunBirimID,
-                    Miktar,
-                    OzelMiktar,
-                    SatisFiyati,
-                    SatisToplam,
-                    UretimAciklama,
-                    MusteriAciklama,
-                    AlisFiyati,
-                    SiraNo,
-                    Ton,
-                    Adet
-                ) VALUES(
-                    '${x.kalan_po}',
-                    '${x.tedarikciId}',
-                    '${x.urunKartId}',
-                    '${x.urunBirimId}',
-                    '${x.kalan}',
-                    '${x.kalan}',
-                    '${x.satisFiyat}',
-                    '${x.kalanToplam}',
-                    '${x.uretimAciklama}',
-                    '${x.musteriAciklama}',
-                    '${x.alisFiyati}',
-                    '${x.siraNo}',
-                    '${x.ton}',
-                    '${x.adet}'
+  /*
+   * transaction null gelebilir: onizleme ucu salt okuma yapiyor ve bir
+   * isleme ihtiyac duymuyor. new mssql.Request() global havuzu kullanir,
+   * new mssql.Request(transaction) ise o islemin baglantisini.
+   */
+  const request = transaction
+    ? new mssql.Request(transaction)
+    : new mssql.Request();
+  request.input("base", mssql.NVarChar, base);
 
-                )
-                                    `;
-                    const sistemUrunDeleteSql = `delete SiparisUrunTB where ID='${x.id}'`;
-                    mssql.query(sistemUrunDeleteSql, async (err, sistem) => {
-                      if (sistem.rowsAffected[0] == 1) {
-                        await mssql.query(gidenUrunSql, async (err, giden) => {
-                          if (giden.rowsAffected[0] == 1) {
-                            await mssql.query(kalanUrunSql, (err, kalan) => {
-                              if (kalan.rowsAffected[0] == 1) {
-                                res.status(200).json({ status: true });
-                              } else {
-                                res.status(200).json({ status: false });
-                              }
-                            });
-                          } else {
-                            res.status(200).json({ status: false });
-                          }
-                        });
-                      }
-                    });
-                  }
-                });
-              } else {
-                res.status(200).json({ status: false });
-              }
-            }
-          );
-        } else {
-          res.status(200).json({ status: false });
-        }
-      });
-    } else {
-      res.status(200).json({ status: false });
+  /* base'in kendisi + "base-<sayi>" olan butun kardes PO'lar */
+  const existing = await request.query(
+    `select SiparisNo from SiparislerTB
+      where SiparisNo = @base or SiparisNo like @base + '-%'`
+  );
+
+  let max = 0;
+  for (const row of existing.recordset) {
+    const parsed = parsePo(row.SiparisNo);
+    if (parsed.base === base && parsed.suffix !== null && parsed.suffix > max) {
+      max = parsed.suffix;
     }
-  });
+  }
+
+  /* Hic bolunmemis siparis: ilk parca -1, kalan -2 (max=0 iken). */
+  if (suffix === null) {
+    return { giden: `${base}-${max + 1}`, kalan: `${base}-${max + 2}` };
+  }
+
+  /* Zaten bir parca bolunuyor: giden numarasi sabit, kalan en buyuk + 1. */
+  return { giden: safe(po).trim(), kalan: `${base}-${max + 1}` };
+};
+
+const num = (value) => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
+/* Bos tarih '' olarak gonderilince date kolonu patliyor -> NULL gecilir. */
+const dateOrNull = (value) => {
+  const text = safe(value).trim();
+  return text === "" ? null : text;
+};
+
+/*
+ * Bolunmeden dogan bir siparis satirini ekler.
+ *
+ * `share` giden/kalan tarafin PAYLASTIRILMIS bedellerini tasir; geri kalan
+ * butun alanlar iki tarafta AYNIDIR ve order'dan gelir. Tek bir kolon
+ * listesi kullanilmasinin sebebi [4]: iki ayri SQL metni elle hizalandigi
+ * icin kayabiliyordu, burada kolon ve deger ayni nesneden uretiliyor.
+ */
+const insertDividedOrder = async (transaction, order, po, share) => {
+  const columns = {
+    SiparisNo: { type: mssql.NVarChar, value: po },
+    SiparisTarihi: { type: mssql.NVarChar, value: dateOrNull(order.siparisTarihi) },
+    OdemeTurID: { type: mssql.Int, value: safeInt(order.odemeTurId) },
+    TeslimTurID: { type: mssql.Int, value: safeInt(order.teslimTurId) },
+    MusteriID: { type: mssql.Int, value: safeInt(order.musteriId) },
+    Pesinat: { type: mssql.Float, value: num(share.pesinat) },
+    NavlunFirma: { type: mssql.NVarChar, value: safe(order.navlunFirma) },
+    NavlunAlis: { type: mssql.Float, value: num(share.navlunAlis) },
+    NavlunSatis: { type: mssql.Float, value: num(share.navlunSatis) },
+    KayitTarihi: { type: mssql.NVarChar, value: dateOrNull(order.kayitTarihi) },
+    KullaniciID: { type: mssql.Int, value: safeInt(order.kullaniciId) },
+    SiparisDurumID: { type: mssql.Int, value: safeInt(order.siparisDurumId) },
+
+    /* [4] Bu dort alan onceki surumde kaymisti. */
+    UretimAciklama: { type: mssql.NVarChar, value: safe(order.uretimAciklama) },
+    SevkiyatAciklama: { type: mssql.NVarChar, value: safe(order.sevkiyatAciklama) },
+    FinansAciklama: { type: mssql.NVarChar, value: safe(order.finansAciklama) },
+    OdemeAciklama: { type: mssql.NVarChar, value: safe(order.odemeAciklama) },
+
+    TahminiYuklemeTarihi: { type: mssql.NVarChar, value: dateOrNull(order.TahminiYuklemeTarihi) },
+
+    /* [6] Onceki surumde kolon listesinde HIC YOKTU. */
+    Vade: { type: mssql.NVarChar, value: dateOrNull(order.vade) },
+
+    Ulke: { type: mssql.NVarChar, value: safe(order.ulke) },
+    Komisyon: { type: mssql.Float, value: num(order.komisyon) },
+
+    DetayAciklama_1: { type: mssql.NVarChar, value: safe(order.detayAciklama_1) },
+    DetayMekmarNot_1: { type: mssql.NVarChar, value: safe(order.detayMekmarNot_1) },
+    DetayTutar_1: { type: mssql.Float, value: num(share.detaySatis_1) },
+    DetayAlis_1: { type: mssql.Float, value: num(share.detayAlis_1) },
+
+    DetayAciklama_2: { type: mssql.NVarChar, value: safe(order.detayAciklama_2) },
+    DetayMekmarNot_2: { type: mssql.NVarChar, value: safe(order.detayMekmarNot_2) },
+    DetayTutar_2: { type: mssql.Float, value: num(share.detaySatis_2) },
+    DetayAlis_2: { type: mssql.Float, value: num(share.detayAlis_2) },
+
+    DetayAciklama_3: { type: mssql.NVarChar, value: safe(order.detayAciklama_3) },
+    DetayMekmarNot_3: { type: mssql.NVarChar, value: safe(order.detayMekmarNot_3) },
+    DetayTutar_3: { type: mssql.Float, value: num(share.detaySatis_3) },
+    DetayAlis_3: { type: mssql.Float, value: num(share.detayAlis_3) },
+
+    SiparisSahibi: { type: mssql.Int, value: safeInt(order.siparisSahibi) },
+    EvrakGideri: { type: mssql.Float, value: num(order.evrakGideri) },
+    KonteynerAyrinti: { type: mssql.NVarChar, value: safe(order.konteynerAyrinti) },
+    UlkeId: { type: mssql.Int, value: safeInt(order.ulkeId) },
+    depo_yukleme: { type: mssql.Int, value: safeInt(order.depo_yukleme) },
+
+    /* Onceki surumde de sabit 0 / "" yaziliyordu; korundu. */
+    DetayTutar_4: { type: mssql.Float, value: 0 },
+    DetayAciklama_4: { type: mssql.NVarChar, value: "" },
+
+    sigorta_Tutar: { type: mssql.Float, value: num(order.sigortaTutar) },
+    Operasyon: { type: mssql.Int, value: safeInt(order.operasyon) },
+    Finansman: { type: mssql.Int, value: safeInt(order.finansman) },
+    Iade: { type: mssql.Int, value: safeInt(order.iade) },
+
+    /* [5] Onceki surumde buraya SiparisId yaziliyordu. */
+    MalBedeli: { type: mssql.Float, value: num(share.malBedeli) },
+
+    sigorta_tutar_satis: { type: mssql.Float, value: num(order.sigortaTutarSatis) },
+    FaturaKesimTurID: { type: mssql.Int, value: safeInt(order.faturaKesimTurId) },
+  };
+
+  const names = Object.keys(columns);
+  const request = new mssql.Request(transaction);
+  for (const name of names) {
+    request.input(name, columns[name].type, columns[name].value);
+  }
+
+  await request.query(
+    `insert into SiparislerTB(${names.join(",")})
+     values(${names.map((name) => `@${name}`).join(",")})`
+  );
+};
+
+/* Bir urun satirini baska bir PO'ya tasir (ID korunur -- bkz. [9]). */
+const moveProductToPo = async (transaction, id, po, miktar, toplam) => {
+  const request = new mssql.Request(transaction);
+  request.input("id", mssql.Int, safeInt(id));
+  request.input("po", mssql.NVarChar, po);
+  request.input("miktar", mssql.Float, num(miktar));
+  request.input("toplam", mssql.Float, num(toplam));
+
+  await request.query(
+    `update SiparisUrunTB
+        set SiparisNo = @po, Miktar = @miktar, OzelMiktar = @miktar, SatisToplam = @toplam
+      where ID = @id`
+  );
+};
+
+/*
+ * Ikiye bolunen urunun ikinci yarisi icin yeni satir.
+ *
+ * NEDEN "insert ... select" VE DINAMIK KOLON LISTESI:
+ * Onceki surum 14 kolonu ELLE sayiyordu. SiparisUrunTB'de bundan fazla
+ * kolon var (ornegin kalite/olcu/kontrol alanlari) ve elle sayilmayan her
+ * kolon, bolunen urunun KALAN yarisinda sessizce BOS kaliyordu -- urun
+ * tam gittiginde veya tam kaldiginda (UPDATE yolu) dolu, yarisi
+ * bolundugunde bos. "Bazilarinin yarisi gonderiliyor, belli olmuyor"
+ * tarifine birebir uyan bir fark.
+ *
+ * Satir artik kaynaktan oldugu gibi kopyalaniyor; yalnizca PO ve miktara
+ * bagli dort alan degistiriliyor. Kolon listesi INFORMATION_SCHEMA'dan
+ * okunuyor, kimlik (IDENTITY) ve hesaplanan kolonlar disarida birakiliyor
+ * -- onlara deger yazilamaz.
+ */
+const insertProductCopy = async (transaction, sourceId, po, miktar, toplam) => {
+  const overrides = {
+    SiparisNo: "@po",
+    Miktar: "@miktar",
+    OzelMiktar: "@miktar",
+    SatisToplam: "@toplam",
+  };
+
+  const schemaRequest = new mssql.Request(transaction);
+  const schema = await schemaRequest.query(
+    `select c.name
+       from sys.columns c
+      where c.object_id = object_id('SiparisUrunTB')
+        and c.is_identity = 0
+        and c.is_computed = 0
+      order by c.column_id`
+  );
+
+  const columns = schema.recordset.map((row) => row.name);
+  const selectList = columns.map((name) =>
+    Object.prototype.hasOwnProperty.call(overrides, name)
+      ? `${overrides[name]} as [${name}]`
+      : `[${name}]`
+  );
+
+  const request = new mssql.Request(transaction);
+  request.input("id", mssql.Int, safeInt(sourceId));
+  request.input("po", mssql.NVarChar, po);
+  request.input("miktar", mssql.Float, num(miktar));
+  request.input("toplam", mssql.Float, num(toplam));
+
+  await request.query(
+    `insert into SiparisUrunTB(${columns.map((name) => `[${name}]`).join(",")})
+     select ${selectList.join(",")} from SiparisUrunTB where ID = @id`
+  );
+};
+
+/*
+ * Bolunecek PO'nun iki parcasinin numarasini ONCEDEN gosterebilmek icin.
+ * Salt okuma -- GET oldugu icin pilotun yazma kilidinden de gecer, boylece
+ * diyalog numaralari yazmadan once ekranda gosterebiliyor.
+ */
+app.get("/order/divide/po-preview/:po", async (req, res) => {
+  try {
+    const pair = await allocatePoPair(null, req.params.po);
+    res.status(200).json({ status: true, ...pair });
+  } catch (err) {
+    console.error("po-preview basarisiz:", err);
+    res.status(200).json({ status: false, message: safe(err.message) });
+  }
+});
+
+/*
+ * ===========================================================================
+ *  BOLME ONCESI YEDEK -- SiparisDivideYedekTB
+ * ===========================================================================
+ *
+ * Bolme GERI ALINAMAZ: orijinal siparis satiri siliniyor, urunler baska
+ * PO'lara tasiniyor ve "undo" diye bir sey yok. Bu yuzden bolmeye
+ * baslamadan once, o MUSTERIYE ait siparis ve finans kayitlarinin JSON
+ * fotografi yedek tablosuna yaziliyor.
+ *
+ * YEDEK, BOLMEYLE AYNI ISLEM (TRANSACTION) ICINDE: yedek alinamazsa islem
+ * geri sariliyor ve BOLME HIC YAPILMIYOR. Yani "yedegi olmayan bolme"
+ * diye bir durum olusamaz. Bolme basarisiz olursa yedek de geri sarilir --
+ * zaten degisen bir sey olmadigi icin yedege de gerek kalmaz.
+ *
+ * NEDEN FINANS DA YEDEKLENIYOR: OdemelerTB satirlari siparise SiparisNo
+ * UZERINDEN bagli. Bolmede PO degistigi icin (26VEIK36 -> -1 / -2) eski
+ * numaraya yazilmis odeme satirlari artik var olmayan bir siparise
+ * isaret ediyor. Bolme bu satirlara DOKUNMUYOR (mevcut davranis boyleydi,
+ * degistirmedim) -- yedek, gerektiginde elle duzeltilebilmesi icin.
+ *
+ * KOLON ESLEMESI ELLE DEGIL: yedek tablosunun kolonlari sys.columns'dan
+ * okunuyor ve yalnizca tanidigim adlar doldurluyor (buyuk/kucuk harf
+ * farki onemsiz). Boylece tablonun kolon adlari tam olarak bilinmeden de
+ * calisiyor. Tanimadigim ve NOT NULL olan bir kolon varsa insert patlar,
+ * islem geri sarilir ve bolme yapilmaz -- sessizce eksik yedek almaktan
+ * iyidir; hata mesaji da hangi adimda oldugunu soyluyor.
+ */
+const backupBeforeDivide = async (transaction, order) => {
+  const musteriId = safeInt(order.musteriId);
+  const po = safe(order.siparisno).trim();
+  const now = new Date().toISOString();
+
+  /*
+   * Alt sorgular KOLONA atandigi icin JSON tek bir nvarchar(max) degeri
+   * olarak donuyor. Dogrudan "select ... for json path" yazilsa SQL Server
+   * sonucu 2033 karakterlik parcalara bolup her parcayi AYRI SATIR olarak
+   * dondurur; ilk satir alinirsa uzun yedekler sessizce KIRPILMIS olur.
+   *
+   * Siparis yedegi urunleri de icinde tasiyor (Urunler alani) -- bolmede
+   * tasinan sey tam olarak o satirlar.
+   */
+  const snapshot = new mssql.Request(transaction);
+  snapshot.input("musteriId", mssql.Int, musteriId);
+
+  const shot = await snapshot.query(`
+    select
+      (
+        select s.*,
+          (
+            select u.* from SiparisUrunTB u where u.SiparisNo = s.SiparisNo
+            for json path
+          ) as Urunler
+        from SiparislerTB s where s.MusteriID = @musteriId
+        for json path
+      ) as siparisJson,
+      (
+        select o.* from OdemelerTB o where o.MusteriID = @musteriId
+        for json path
+      ) as finansJson
+  `);
+
+  const row = shot.recordset[0] || {};
+  const siparisJson = row.siparisJson || "[]";
+  const finansJson = row.finansJson || "[]";
+
+  /* Tanidigim kolon adlari (hepsi kucuk harfe indirgenmis olarak aranir). */
+  const known = {
+    siparisjson: { type: mssql.NVarChar(mssql.MAX), value: siparisJson },
+    finansjson: { type: mssql.NVarChar(mssql.MAX), value: finansJson },
+    siparisno: { type: mssql.NVarChar, value: po },
+    musteriid: { type: mssql.Int, value: musteriId },
+    kullaniciid: { type: mssql.Int, value: safeInt(order.kullaniciId) },
+    tarih: { type: mssql.NVarChar, value: now },
+    kayittarihi: { type: mssql.NVarChar, value: now },
+    aciklama: {
+      type: mssql.NVarChar,
+      value: `Bolme oncesi otomatik yedek (${po})`,
+    },
+  };
+
+  const schemaRequest = new mssql.Request(transaction);
+  const schema = await schemaRequest.query(
+    `select c.name
+       from sys.columns c
+      where c.object_id = object_id('SiparisDivideYedekTB')
+        and c.is_identity = 0
+        and c.is_computed = 0
+      order by c.column_id`
+  );
+
+  if (!schema.recordset.length) {
+    throw new Error(
+      "SiparisDivideYedekTB bulunamadi (ya da hic yazilabilir kolonu yok). " +
+        "Yedek alinamadigi icin bolme yapilmadi."
+    );
+  }
+
+  const columns = schema.recordset
+    .map((item) => item.name)
+    .filter((name) =>
+      Object.prototype.hasOwnProperty.call(known, name.toLowerCase())
+    );
+
+  for (const required of ["siparisjson", "finansjson"]) {
+    const found = columns.some((name) => name.toLowerCase() === required);
+    if (!found) {
+      throw new Error(
+        `SiparisDivideYedekTB icinde "${required}" kolonu bulunamadi. ` +
+          "Yedek alinamadigi icin bolme yapilmadi."
+      );
+    }
+  }
+
+  const request = new mssql.Request(transaction);
+  for (const name of columns) {
+    const spec = known[name.toLowerCase()];
+    request.input(name, spec.type, spec.value);
+  }
+
+  await request.query(
+    `insert into SiparisDivideYedekTB(${columns.map((n) => `[${n}]`).join(",")})
+     values(${columns.map((n) => `@${n}`).join(",")})`
+  );
+
+  return {
+    yedeklenenKolonlar: columns,
+    siparisJsonUzunluk: siparisJson.length,
+    finansJsonUzunluk: finansJson.length,
+  };
+};
+
+app.post("/order/divide", async (req, res) => {
+  const order = req.body && req.body.order;
+  const products = (req.body && req.body.product) || [];
+
+  /*
+   * HATA MESAJLARI: her asama once `step`e yaziliyor, catch bloğu da onu
+   * aynen kullaniciya donduruyor. Boylece ekranda "Bölme başarısız" degil,
+   * "<hangi asama> sırasında hata: <sebep>" goruluyor -- urun tasima
+   * asamasinda hangi URUN oldugu da yaziyor.
+   */
+  let step = "istek dogrulama";
+
+  if (!order || !safe(order.siparisno).trim()) {
+    return res
+      .status(400)
+      .json({ status: false, step, message: `${step}: siparisno zorunlu.` });
+  }
+
+  /*
+   * Miktar DOGRULAMASI sunucuda da yapiliyor: istemci tarafi da kontrol
+   * ediyor ama tek savunma hatti olarak birakilamaz -- hatali bir istek
+   * urun miktarini sessizce artirip/azaltabilirdi.
+   */
+  step = "miktar dogrulamasi";
+  for (const [index, product] of products.entries()) {
+    const toplam = num(product.gonderilen) + num(product.kalan);
+    if (Math.abs(toplam - num(product.miktar)) > 0.001) {
+      const etiket =
+        safe(product.urunAdi) || `urun kart ${safe(product.urunKartId)}`;
+
+      return res.status(400).json({
+        status: false,
+        step,
+        satir: index + 1,
+        urun: etiket,
+        message:
+          `${step} -- ${index + 1}. satir (${etiket}): giden ` +
+          `(${num(product.gonderilen)}) + kalan (${num(product.kalan)}) = ` +
+          `${toplam}, siparis miktari ${num(product.miktar)} ile ayni degil.`,
+      });
+    }
+  }
+
+  const transaction = new mssql.Transaction();
+  let started = false;
+  let satir = null;
+  let urun = null;
+
+  try {
+    step = "islem baslatma";
+    await transaction.begin();
+    started = true;
+
+    step = "bolme oncesi yedek alma (SiparisDivideYedekTB)";
+    const yedek = await backupBeforeDivide(transaction, order);
+
+    step = "PO numarasi uretme";
+    const { giden: poGiden, kalan: poKalan } = await allocatePoPair(
+      transaction,
+      order.siparisno
+    );
+
+    step = `giden siparisi ekleme (${poGiden})`;
+    await insertDividedOrder(transaction, order, poGiden, {
+      pesinat: order.gidenPesinat,
+      navlunAlis: order.gidenNavlunAlis,
+      navlunSatis: order.gidenNavlunSatis,
+      detaySatis_1: order.gidenDetaySatis_1,
+      detayAlis_1: order.gidenDetayAlis_1,
+      detaySatis_2: order.gidenDetaySatis_2,
+      detayAlis_2: order.gidenDetayAlis_2,
+      detaySatis_3: order.gidenDetaySatis_3,
+      detayAlis_3: order.gidenDetayAlis_3,
+      malBedeli: order.gidenMalBedeli,
+    });
+
+    step = `kalan siparisi ekleme (${poKalan})`;
+    await insertDividedOrder(transaction, order, poKalan, {
+      pesinat: order.kalanPesinat,
+      navlunAlis: order.kalanNavlunAlis,
+      navlunSatis: order.kalanNavlunSatis,
+      detaySatis_1: order.kalanDetaySatis_1,
+      detayAlis_1: order.kalanDetayAlis_1,
+      detaySatis_2: order.kalanDetaySatis_2,
+      detayAlis_2: order.kalanDetayAlis_2,
+      detaySatis_3: order.kalanDetaySatis_3,
+      detayAlis_3: order.kalanDetayAlis_3,
+      malBedeli: order.kalanMalBedeli,
+    });
+
+    /*
+     * Urunler tasinmadan ONCE orijinal siparis satiri siliniyor; ayni
+     * islem icinde oldugu icin arada bir hata olursa hepsi geri alinir.
+     * (Onceki surumde islem yoktu: silme kalici oluyor, urun tasima
+     * yarida kalabiliyordu -- bkz. [3].)
+     */
+    step = `orijinal siparis satirini silme (${safe(order.siparisno).trim()})`;
+    const deleteOrder = new mssql.Request(transaction);
+    deleteOrder.input("po", mssql.NVarChar, safe(order.siparisno).trim());
+    await deleteOrder.query(`delete SiparislerTB where SiparisNo = @po`);
+
+    for (const [index, product] of products.entries()) {
+      const gonderilen = num(product.gonderilen);
+      const kalan = num(product.kalan);
+      const satisFiyat = num(product.satisFiyat);
+
+      satir = index + 1;
+      urun = safe(product.urunAdi) || `urun kart ${safe(product.urunKartId)}`;
+      step =
+        `urun tasima -- ${satir}. satir (${urun}): ` +
+        `giden ${gonderilen}, kalan ${kalan}`;
+
+      if (gonderilen > 0 && kalan > 0) {
+        /*
+         * Ikiye bolunuyor: mevcut satir gidene, yeni satir kalana.
+         * KOPYA ONCE alinir -- kaynak satirdan okudugu icin, orijinal
+         * guncellenmeden once kopyalanmasi okunan degerleri tartismasiz
+         * kilar.
+         */
+        await insertProductCopy(
+          transaction,
+          product.id,
+          poKalan,
+          kalan,
+          kalan * satisFiyat
+        );
+        await moveProductToPo(
+          transaction,
+          product.id,
+          poGiden,
+          gonderilen,
+          gonderilen * satisFiyat
+        );
+      } else if (gonderilen > 0) {
+        await moveProductToPo(
+          transaction,
+          product.id,
+          poGiden,
+          gonderilen,
+          gonderilen * satisFiyat
+        );
+      } else {
+        /*
+         * gonderilen == 0 -> tamami kaliyor. kalan da 0 ise miktar
+         * dogrulamasi miktar=0 demektir; satir yine kalana tasinir,
+         * SILINMEZ. (Onceki surumde kalan==0 dali satiri siliyordu ve
+         * gonderilen de 0 ise urun tamamen yok oluyordu.)
+         */
+        await moveProductToPo(
+          transaction,
+          product.id,
+          poKalan,
+          kalan,
+          kalan * satisFiyat
+        );
+      }
+    }
+
+    satir = null;
+    urun = null;
+
+    /*
+     * [8] Listede adi gecmeyen urunler: "gonderildigi soylenmediyse
+     * kalmistir" -> kalan siparise tasinir. Onceki surumde bunlar eski
+     * (silinmis) PO'da asili kaliyordu.
+     *
+     * Yukaridaki dongu islenen her urunu zaten yeni PO'suna tasidi, yani
+     * eski PO'da SADECE listeye hic girmeyenler kaldi; ayri bir "bunlari
+     * atla" kosulu gerekmiyor.
+     */
+    step = "listeye girmeyen urunleri kalan siparise tasima";
+    const leftovers = new mssql.Request(transaction);
+    leftovers.input("oldPo", mssql.NVarChar, safe(order.siparisno).trim());
+    leftovers.input("newPo", mssql.NVarChar, poKalan);
+
+    const moved = await leftovers.query(
+      `update SiparisUrunTB set SiparisNo = @newPo where SiparisNo = @oldPo`
+    );
+
+    step = "islemi kaydetme (commit)";
+    await transaction.commit();
+
+    res.status(200).json({
+      status: true,
+      siparisno_giden: poGiden,
+      siparisno_kalan: poKalan,
+      kalanaTasinanListeDisiUrun: moved.rowsAffected[0] || 0,
+      yedek,
+    });
+  } catch (err) {
+    const hataliAdim = step;
+
+    if (started) {
+      try {
+        await transaction.rollback();
+      } catch (rollbackErr) {
+        console.error("divide rollback basarisiz:", rollbackErr);
+      }
+    }
+
+    console.error(`divide basarisiz -- adim: ${hataliAdim}`, err);
+
+    res.status(200).json({
+      status: false,
+      step: hataliAdim,
+      satir,
+      urun,
+      detail: safe(err.message),
+      message: `${hataliAdim} sırasında hata: ${safe(err.message)}`,
+
+      /*
+       * Islem geri sarildigi icin veritabaninda HICBIR DEGISIKLIK yok.
+       * Kullaniciya bunu acikca soylemek onemli: aksi halde "yarisi oldu
+       * mu?" sorusuyla kaliyor ve ayni bolmeyi tekrar denemekten cekiniyor.
+       */
+      geriAlindi: started,
+    });
+  }
 });
 
 /*Mailler */
@@ -19624,7 +21420,14 @@ order by MONTH(s.YuklemeTarihi) desc
   }
 });
 
-module.exports = {
-  path: "/api",
-  handler: app,
-};
+/*
+ * Nuxt 2'de bu dosya serverMiddleware olarak { path, handler } seklinde
+ * export ediliyordu. Nitro/Rollup ESM bekliyor ve bu dosyanin tepesinde
+ * zaten `import` ifadeleri var -- ayni dosyada module.exports ile karisik
+ * kullanim ESM'de gecersiz. Mount islemi artik
+ * server/middleware/1.legacy-api.ts icinde yapiliyor; burada sadece
+ * Express uygulamasi disa veriliyor.
+ *
+ * Dosyanin geri kalan ~19.6k satirina DOKUNULMADI.
+ */
+export default app;

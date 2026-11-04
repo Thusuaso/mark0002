@@ -1,0 +1,255 @@
+/*
+ * layouts/default.vue'nun <style> blogu buraya tasinacakti, ama iceriginin
+ * neredeyse tamami PrimeVue 2 gorunumunu zorlamak icindi:
+ *
+ *   * { font-family: "Times New Roman"; font-size: 13px }
+ *   .p-column-header-content > .p-column-title { ... }
+ *   .p-datatable .p-datatable-tfoot > tr > td { font-size: 11px }
+ *
+ * Temanin eskisine benzemesi gerekmedigine karar verildigi icin TASINMADI.
+ * Ozellikle global `*` kurali Aura'nin tum tipografisini (buton, input,
+ * dialog, tablo) 13px Times New Roman'a zorluyordu.
+ *
+ * Ayrica o iki PrimeVue secicisi PrimeVue 4'te zaten hicbir seye uymuyor:
+ * sinif adlari p-datatable-column-title ve
+ * p-datatable-column-header-content oldu.
+ */
+
+:root {
+  /*
+   * DataTable govde yuksekligi -- TEK AYAR NOKTASI.
+   *
+   * Tablolar <DataTable scrollable scrollHeight="var(--app-table-height)">
+   * seklinde kullaniliyor. PrimeVue scrollHeight degerini govde
+   * kapsayicisina inline max-height olarak yazdigi icin CSS degiskeni
+   * burada calisiyor: 211 tablonun yuksekligi bu tek satirdan
+   * ayarlanabiliyor, her sablona sabit piksel gomulmuyor.
+   *
+   * Deger sabit bir piksel DEGIL -- calc ile ekran yuksekligine gore
+   * hesaplaniyor, yani tablo her zaman sayfayi dolduruyor. max() ile de
+   * 600px alt siniri var, boylece kucuk ekranlarda kullanilamaz hale
+   * gelmiyor:
+   *
+   *   1080p ekran -> 1080 - 176 = ~904px
+   *    900p ekran ->  900 - 176 = ~724px
+   *    768p ekran ->  768 - 176 = 592 -> alt sinir devreye girer: 600px
+   *
+   * Cikarilan 11rem (176px) pay: navbar + sayfa basligi/butonlar +
+   * kenar bosluklari. Tablo altinda gereksiz bosluk kaliyorsa bu sayi
+   * kucultulur; tablo sayfayi tasiriyorsa buyutulur.
+   */
+  --app-table-height: max(600px, calc(100vh - 11rem));
+
+  /*
+   * .table-fit-compact tablolarinin yazi boyutu -- TEK AYAR NOKTASI.
+   *
+   * 17 kolon ekrana sigdirildiginda her kolona ~80px dusuyor. Yazi boyutu
+   * oldugu gibi birakilirsa icerik sigmak yerine alt satira kayiyor ve
+   * satirlar cok yukseliyor; kucultmek, yatay kaydirmayi kaldirmanin
+   * bedelini odemenin en ucuz yolu.
+   *
+   * Cok kucuk geldiyse buyutun; wrap'i azaltmak icin daha da kucultun.
+   * Tamamen kapatmak icin: inherit
+   */
+  --app-table-fit-font: 0.8rem;
+
+  /*
+   * "#" (satir numarasi) kolonunun genisligi -- bkz. .col-rowno.
+   * Icerik 1-3 hane. Liste 4 haneye (1000+ satir) cikarsa buyutun.
+   *
+   * NEDEN YUZDE, px/rem DEGIL -- olculerek bulundu:
+   * `table-layout: fixed` altinda kolon genislikleri kaynaktan gelen
+   * satir ici YUZDELERDEN geliyor (orn. order/Table.vue: width:5%) ve o
+   * yuzdeler 100'e TAMAMLANMIYOR (17 kolonlu Waiting tablosunda toplam
+   * ~%73). Tarayici artan yeri yuzde OLMAYAN kolonlara veriyor; bu
+   * tablolarda yuzdesiz TEK kolon "#" oldugu icin artan %27'nin tamami
+   * ona gidiyordu:
+   *     "#" = 334px,  diger kolonlarin hepsi = 76px
+   * Sonuc: satir numarasi kolonu ekranin besde birini kapliyor, veri
+   * kolonlari ise basliklarini sigdiramayacak kadar dar kaliyor ve
+   * `overflow-wrap: anywhere` basliklari KELIME ORTASINDAN kiriyordu
+   * ("Ord er Date", "Catego ry", "Thickne ss").
+   *
+   * Deger yuzde olunca artik tum kolonlar yuzdeli oluyor, tarayici
+   * yuzdeleri 100'e NORMALIZE ediyor ve artan yer hepsine oranla
+   * dagiliyor: "#" 56px, digerleri ~94px, basliklar kirilmadan siguyor.
+   * Olculen degerler Chrome'da 1536px genislikte dogrulandi.
+   */
+  --app-table-rowno-width: 3%;
+}
+
+.tableBody {
+  font-size: 0.875rem;
+}
+
+/*
+ * TUM KOLONLAR EKRANA SIGSIN -- yatay kaydirma yok.
+ *
+ * ARTIK VARSAYILAN -- sinif gerekmiyor.
+ *
+ * Bu kurallar once `.table-fit-all` sinifiyla OPT-IN'di ve 107
+ * DataTable'dan yalnizca 4'une verilmisti; geri kalan 103 tablo saga
+ * kaydirmaya devam ediyordu. Kullanici "hepsini ekrana sigdiralim"
+ * dedigi icin seciciler sinifsiz hale getirildi, yani kural TUM
+ * tablolara uyguluyor. `table-fit-all` sinifi artik ETKISIZ; kalan
+ * kullanimlari kaldirildi.
+ *
+ * YAZI KUCULTMESI HALA OPT-IN (.table-fit-compact) -- gerekcesi
+ * o kuralin basinda.
+ *
+ * SORUN NEYDI: siparis tablolarinda 16-17 kolon var. PrimeVue'nun
+ * varsayilani `table-layout: auto`, yani tarayici her kolonu ICERIGINE
+ * gore genisletir ve tablo kapsayiciyi tasinca kapsayici yatay kaydirma
+ * cubugu acar. Sagdaki kolonlar (Supplier, Amount, Unit, Produced, Ton,
+ * Price, Total) ekranin disinda kalir; kullanici onlari gormek icin her
+ * seferinde saga kaydirmak zorunda kalir.
+ *
+ * `order/Table.vue`daki kolonlarin ustunde ZATEN `style="width: 5%"`
+ * gibi yuzdeler vardi -- ama `table-layout: auto` altinda yuzdeler
+ * yalnizca BIR ONERIDIR; icerik genisse tarayici onlari gormezden gelir.
+ * Bu yuzden o yuzdeler bugune kadar hicbir ise yaramiyordu.
+ *
+ * COZUM, UC PARCA -- ucu de gerekli:
+ *
+ * 1) table-layout: fixed + width: 100%
+ *    Tablo artik kapsayiciyi ASLA tasmaz. Kolon genislikleri tanimli
+ *    yuzdelerden gelir; tanimsiz olanlar kalan yeri esit paylasir.
+ *    Tek basina yeterli DEGIL: icinde bosluk olmayan uzun bir metin
+ *    (urun kodu, PO) hucreyi yine tasirir.
+ *
+ * 2) overflow-wrap: anywhere
+ *    Boslugu olmayan uzun dizgileri de kirar. `break-word` yetmiyor
+ *    cunku o, kirmadan sigdirma sansi varsa kirmaz.
+ *
+ * 3) white-space: normal
+ *    Tema bazi hucrelere nowrap verirse onu ezer; nowrap, fixed
+ *    layout'ta metni hucrenin disina tasirir.
+ *
+ * BEDELI -- bilerek kabul edildi: kolonlar daraldigi icin uzun metinler
+ * alt satira kayiyor, yani SATIRLAR DAHA YUKSEK olabiliyor. Yatay
+ * kaydirma yerine dikey kaydirma (tablonun kendi scroll'u,
+ * --app-table-height) tercih edildi: dikeyde kaydirmak, ekran disindaki
+ * kolonlari aramaktan iyi.
+ */
+.p-datatable-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/*
+ * DAR KAPSAYICIDAKI GENIS TABLOLAR -- "ekrana sigdir" kuralindan MUAFIYET.
+ *
+ * Varsayilan kural (yukarida) tabloyu kapsayiciya sigdiriyor. Bu, tam
+ * genislikte duran 16-17 kolonlu tablolarda dogru; ama kapsayici DAR
+ * oldugunda ayni kural okunamayacak bir sonuc veriyor.
+ *
+ * Gercek ornek: reports/mekmer/strips.vue -- UC tablo yan yana
+ * (`col-4`, ~480px) ve her birinde 14 kolon var, yani kolon basina ~35px.
+ * Basliklar "Tari / Irsa / Ted / Oca / Stri / Fatu..." diye kirpiliyor,
+ * hucre icerikleri de okunmuyordu (olculdu: tablo dogal genisligi
+ * 1824px, kapsayici 480px).
+ *
+ * Bu sinifla o tablolar DOGAL genisliklerine donuyor ve kendi
+ * kapsayicilari icinde yatay kaydiriliyor (PrimeVue'nun
+ * .p-datatable-table-container'i zaten overflow:auto). Nuxt 2'deki
+ * davranis da buydu (responsiveLayout="scroll").
+ */
+.table-scroll-x .p-datatable-table {
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
+}
+
+/*
+ * "#" (satir numarasi) kolonu -- TEK AYAR NOKTASI.
+ *
+ * Kullanim: <Column header="#" headerClass="col-rowno" bodyClass="col-rowno">
+ *
+ * IKI SORUNU BIRDEN COZUYOR:
+ *
+ * 1) GENISLIK. Onceden headerStyle="width:3rem" (48px) yaziliydi, UC
+ *    tabloda ayri ayri. Icerik 1-3 haneli bir sayi; 48px gereginden
+ *    fazlaydi ve `table-layout: fixed` ile bu artik GERCEKTEN uygulanan
+ *    bir genislik oldugu icin (eskiden `auto` altinda tarayici kolonu
+ *    icerige gore daraltiyordu) fazlalik gorunur hale geldi.
+ *    Yani yatay kaydirmayi kaldirmak bu kolonu farkedilir sekilde
+ *    genisletti -- bu kural onu geri daraltiyor.
+ *
+ * 2) YAZI BOYUTU. Shipped tablolarinda (T1 ve T4) bu kolonun
+ *    headerStyle'inda `font-size: 16px` vardi, AMA o tablolarin
+ *    DataTable kokunde satir ici `font-size: 70%` var. Sonuc: butun
+ *    basliklar ~10px iken yalnizca "#" 16px'te duruyordu -- neredeyse
+ *    iki kati, ve kolon basligi tablonun geri kalanina hic uymuyordu.
+ *    16px kaldirildi; "#" artik komsulariyla ayni boyutta.
+ *
+ * text-align: center -- sayi dar kolonda ortada daha duzgun duruyor.
+ */
+.col-rowno {
+  width: var(--app-table-rowno-width);
+  text-align: center;
+}
+
+/*
+ * Yazi boyutu kucultmesi AYRI bir sinif, cunku her tabloya uymuyor:
+ *
+ * order/Table.vue'daki Shipped tablolarinda satir ici
+ * style="font-size: 70%" (DataTable kokunde) ve kolonlarda
+ * bodyClass="tableBody" (0.875rem) ZATEN var. Font kurali .table-fit-all
+ * icine konulsa `.p-datatable-table` ustunden o 70%'i EZER ve o
+ * tablolarin BASLIKLARI istenmeden degisirdi -- govde hucreleri
+ * .tableBody yuzunden degismezdi, yani baslik/govde oranı bozulurdu.
+ *
+ * Bu yuzden yalnizca kendi font ayari OLMAYAN tabloya (Production /
+ * Waiting, 17 kolon) veriliyor.
+ */
+.table-fit-compact .p-datatable-table {
+  font-size: var(--app-table-fit-font);
+}
+
+.p-datatable-table > thead > tr > th,
+.p-datatable-table > tbody > tr > td,
+.p-datatable-table > tfoot > tr > td {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  padding: 0.2rem 0.3rem;
+}
+
+/*
+ * BASLIKLAR KELIME ORTASINDAN KIRILMASIN.
+ *
+ * Yukaridaki `overflow-wrap: anywhere` GOVDE icin dogru (bosluksuz uzun
+ * PO/urun kodlari kirilmazsa hucreyi tasirir), ama BASLIKLARA da
+ * uyguladigi icin ekranda soyle goruntuler cikiyordu:
+ *     "Catego ry"  "Thickne ss"  "Ord er Date"  "Box Amoun t"
+ * Kullanici bunu "goruntu bozuk" diye bildirdi.
+ *
+ * Kolon GENIS OLDUGUNDA bile kiriliyordu: baslik hucresi flex ve icinde
+ * siralama ikonu (p-datatable-sort-icon) var; ikon yer kapinca basligin
+ * kalan genisligi kisaliyor, `anywhere` de ilk firsatta kiriyor --
+ * oysa 95px'lik kolonda "Category" rahat siguyor (olculdu).
+ *
+ * `break-word`: yalnizca BASKA care yoksa kirar, yani once bosluktan
+ * sarkar ("Pcs in" / "Box"), kelimeyi bolmez. Baslik metnine de
+ * `normal` verildi -- kirilma karari ust kutuda alinsin.
+ */
+.p-datatable-table > thead > tr > th {
+  overflow-wrap: break-word;
+}
+
+.p-datatable-column-title {
+  overflow-wrap: normal;
+}
+
+/*
+ * Kolon filtresi kutulari (filterDisplay="row").
+ *
+ * `p-column-filter` PrimeVue'nun degil, BU PROJENIN kendi sinifi:
+ * order/Table.vue icinde 38 <InputText class="p-column-filter"> var.
+ * Varsayilan InputText genisligi dar kolonda hucreyi tasirdigi icin
+ * kolona sigdiriliyor -- yoksa yukaridaki (1) maddesi bosa cikardi.
+ */
+.p-column-filter {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
