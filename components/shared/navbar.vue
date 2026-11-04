@@ -463,7 +463,7 @@
                     to="/reports/mekmar/gu"
                     class="dropdown-item"
                     tag="a"
-                    >GU Reports</nuxt-link
+                    >Reports</nuxt-link
                   >
                 </li>
                 <li v-show="getAyoStatus">
@@ -471,7 +471,7 @@
                     to="/reports/mekmar/filter-finance"
                     class="dropdown-item"
                     tag="a"
-                    >GU Finance</nuxt-link
+                    >Finance</nuxt-link
                   >
                 </li>
                 <li v-show="getAyoStatus">
