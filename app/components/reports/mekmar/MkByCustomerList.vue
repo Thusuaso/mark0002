@@ -1,10 +1,34 @@
 <template>
   <div class="row m-auto mt-3">
     <div class="col">
+      <!--
+        `table-scroll-x` ZORUNLU -- SAYILAR RAKAM ORTASINDAN
+        BOLUNUYORDU.
+
+        Bu tabloda 16 kolon var ve ONUCU para degeri. Varsayilan kural
+        (app.css: table-layout fixed + overflow-wrap anywhere) tabloyu
+        ekrana sigdirmak icin kolonlari daraltiyor; para degerlerinde
+        bosluk olmadigi icin `anywhere` onlari RAKAM ORTASINDAN
+        kiriyordu:
+            "$5.268.926,26"  ->  "$5.268.926,"  /  "26"
+            "$152.377,10"    ->  "$152.377,1"   /  "0"
+        Bu yalnizca cirkin degil, YANLIS OKUNUR.
+
+        Ikincil etki de kullanicinin "veriler asagi kaymis" dedigi
+        goruntuydu: bir hucre iki satira cikinca satir yuksekligi
+        artiyor, tek satirlik komsu hucreler dikeyde ortalandigi icin
+        asagi kaymis gibi duruyordu. Yani kayma ayri bir hata degil,
+        bolunmenin sonucuydu.
+
+        Bu sinif tabloyu DOGAL genisligine birakip kendi kapsayicisi
+        icinde yatay kaydiriyor (app.css'te tanimli, ayni gerekceyle
+        strips.vue'da da kullaniliyor).
+      -->
       <DataTable
         :value="list"
         :filters="filters"
         filterDisplay="row"
+        class="table-scroll-x"
         style="font-size: 85%"
         :sortOrder="-1"
         sortField="Toplam"

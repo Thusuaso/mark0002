@@ -1063,6 +1063,38 @@ export default {
   background-color: #81fca0 !important;
 }
 
+/*
+ * =====================================================================
+ * AMOUNT / PIECE KUTULARI OKUNMAYACAK KADAR DARDI
+ * =====================================================================
+ * Kullanici "amount ve piece inputlari cok kucuk kalmis, bazi sayilar
+ * okunmuyor" dedi. Olculdu (1536px, siparis dialogu):
+ *
+ *   satir toplam genisligi      378px   (form dialogun `col-4`unde)
+ *   Unit kolonu                 230px
+ *   Amount kolonu                74px  -> input  48px
+ *   Piece kolonu                 74px  -> input  50px
+ *
+ * Yazi boyutu sorun DEGILDI (uc alanda da 16px); kutular dardi.
+ * Olcum `input.scrollWidth > clientWidth` ile dogruladi: Amount ve
+ * Piece'te "0.00" BILE tasiyordu.
+ *
+ * NEDENI: Bootstrap `.col` bir flex ogesi ve flex ogelerinin
+ * varsayilani `min-width: auto` -- yani ICERIGINDEN daha dar
+ * olamiyorlar. Unit kolonundaki Select'in icerigi genis oldugu icin o
+ * kolon 230px'e kadar buyuyup kardeslerinin payini yiyordu. `col`
+ * siniflari `flex: 1 0 0%` yazdigi halde esit bolusemiyorlardi.
+ *
+ * `min-width: 0` bu kilidi aciyor: uc kolon gercekten esit bolusuyor
+ * (378/3 = 126px), yani Amount ve Piece kutulari 48px'ten ~100px'e
+ * cikiyor. Unit hala acilir liste icin yeterli.
+ *
+ * Yazi boyutuna DOKUNULMADI -- sorun o degildi.
+ */
+.row > .col {
+  min-width: 0;
+}
+
 @media screen and (max-width: 576px) {
   .row .mt-3 {
     display: block;

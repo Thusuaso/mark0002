@@ -161,6 +161,34 @@
 }
 
 /*
+ * [!] KELIME KIRMAYI DA KAPATMAK ZORUNLU -- YOKSA USTTEKI KURAL
+ *     ISE YARAMIYOR.
+ *
+ * Varsayilan kural hucrelere `overflow-wrap: anywhere` veriyor.
+ * `width: max-content` ise "icerik kirilmadan ne kadar yer kaplar"
+ * sorusunun cevabi; metin HER KARAKTERDEN kirilabilir sayildiginda o
+ * cevap neredeyse TEK KARAKTER oluyor. Yani iki kural birbirini
+ * goturuyordu: tablo dogal genisligine cikmiyor, icerik yine
+ * bolunuyordu.
+ *
+ * Olculdu (reports/mekmar/mk -> Customers Reports, 16 kolonun 13'u
+ * para): yalnizca `table-scroll-x` eklendiginde degerler hala
+ * rakam ortasindan boluniyordu:
+ *     "$5.268.926,26" -> "$5.268.926," / "26"
+ *     "$152.377,10"   -> "$152.377,1"  / "0"
+ *
+ * `overflow-wrap: normal` + `white-space: nowrap` ile hucre metni
+ * butun kaliyor, tablo gercek dogal genisligine cikiyor ve kapsayici
+ * yatay kaydiriyor -- sinifin zaten amaci buydu.
+ */
+.table-scroll-x .p-datatable-table > thead > tr > th,
+.table-scroll-x .p-datatable-table > tbody > tr > td,
+.table-scroll-x .p-datatable-table > tfoot > tr > td {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+/*
  * "#" (satir numarasi) kolonu -- TEK AYAR NOKTASI.
  *
  * Kullanim: <Column header="#" headerClass="col-rowno" bodyClass="col-rowno">
@@ -212,6 +240,23 @@
   overflow-wrap: anywhere;
   white-space: normal;
   padding: 0.2rem 0.3rem;
+}
+
+/*
+ * TOPLAM SATIRI KALIN.
+ *
+ * Tablo altindaki <tfoot> toplam satiri govde satirlariyla AYNI
+ * agirlikta basiliyordu; uzun bir listenin sonunda goz onu
+ * siradan bir satirdan ayirt edemiyordu. Kalinlik, hizalama ya da
+ * renk eklemeden yalnizca o satiri one cikariyor.
+ *
+ * Secici `> tfoot > tr > td` -- yani yalnizca TABLONUN KENDI alt
+ * toplami. PrimeVue'nun ColumnGroup ile kurulan cok satirli
+ * toplamlari da ayni <tfoot> icinde oldugu icin onlar da kapsama
+ * giriyor (51 dosyada footer kullanimi var).
+ */
+.p-datatable-table > tfoot > tr > td {
+  font-weight: 700;
 }
 
 /*
