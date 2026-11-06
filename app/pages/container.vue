@@ -999,16 +999,27 @@ export default {
   gap: 20px;
   flex-wrap: wrap;
 }
+/*
+ * min-width: min(Npx, 100%)
+ *
+ * Kapsayici `.main-layout` zaten `flex-wrap: wrap`, yani dar ekranda
+ * iki panel ALT ALTA geciyor. Ama duz bir `min-width: 400px` panelin
+ * 400px'in ALTINA inmesini de engelliyordu: 360-390px'lik telefonlarda
+ * sag panel ekrani tasirip sayfayi yana kaydiriyordu.
+ *
+ * `min(400px, 100%)` genis ekranda eski davranisi aynen koruyor
+ * (400px), dar ekranda ise sinir kabin genisligine dusuyor.
+ */
 .left-panel {
   flex: 5;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  min-width: 350px;
+  min-width: min(350px, 100%);
 }
 .right-panel {
   flex: 7;
-  min-width: 400px;
+  min-width: min(400px, 100%);
 }
 
 /* --- FORM DÜZELTMELERİ (KRİTİK GÜNCELLEME) --- */

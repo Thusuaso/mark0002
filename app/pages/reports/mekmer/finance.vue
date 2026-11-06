@@ -190,7 +190,7 @@
       v-model:visible="finance_mekmar_form"
       header=""
       modal
-      contentStyle="width:1200px;height:700px"
+      contentStyle="max-width:1200px;width:90vw;max-height:700px"
     >
       <br />
       <br />

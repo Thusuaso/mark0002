@@ -10,7 +10,7 @@
         />
       </div>
       <div class="col-4 m-auto text-center">
-        <div class="m-auto text-center" style="width: 400px">
+        <div class="m-auto text-center" style="max-width: 400px; width: 100%">
           <div class="m-auto text-center">
             <div class="row mb-2 m-auto text-center">
               <div class="col-2">Supplier</div>

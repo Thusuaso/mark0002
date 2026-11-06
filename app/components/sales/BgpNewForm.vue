@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="row m-auto mt-4" style="height: 150px; width: 1000px">
+    <div
+      class="row m-auto mt-4"
+      style="max-width: 1000px; width: 100%; min-height: 150px"
+    >
       <div class="col">
         <div class="flex flex-column gap-2">
           <label for="projectname">Project Name</label>
