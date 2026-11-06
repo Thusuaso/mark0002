@@ -4,3 +4,7 @@ node_modules
 .data
 dist
 .env
+
+# Vercel derleme ciktisi (NITRO_PRESET=vercel ile uretiliyor).
+# Bir kez yanlislikla commitlendi: 91.849 dosya, 29.5M satir.
+.vercel
