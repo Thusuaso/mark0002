@@ -23,6 +23,22 @@
  * ESIK: 400px (en dar yaygin telefon 360-414 CSS px).
  *
  * ---------------------------------------------------------------------
+ * [!] DENENIP KALDIRILAN: "kapsayicisiz .row"
+ * ---------------------------------------------------------------------
+ * Bootstrap `.row` -12px kenar boslugu tasir ve dolgusuz bir ebeveyn
+ * icinde sayfayi 12px tasirir. Olculdu (503px):
+ *   operation/cost-control -> div.row sag kenari 515px, gorunum 503px
+ *
+ * Bunu statik olarak aramak DENENDI ve 196 bulgu uretti -- neredeyse
+ * tamami yanlis pozitif: ebeveynin OZEL bir sinifi olabiliyor ve o
+ * sinifin dolgusu olup olmadigini CSS'e bakmadan bilmek mumkun degil.
+ * Tarayicida olcum ayni taramada 26 sayfada yalnizca 2 gercek vaka
+ * buldu.
+ *
+ * Yani bu sinif, statik taramanin degil OLCUMUN isi. Kontrol
+ * kaldirildi; bulunan sayfalar tek tek duzeltildi.
+ *
+ * ---------------------------------------------------------------------
  * [!] BILEREK ARANMAYAN: "kaydirilamayan genis tablo"
  * ---------------------------------------------------------------------
  * Ilk surum, cok kolonlu DataTable'larda `scrollable` prop'u yoksa

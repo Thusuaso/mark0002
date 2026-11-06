@@ -1,5 +1,18 @@
 <template>
-  <div>
+  <!--
+    `container-fluid` ZORUNLU -- KOK <div> CIPLAK OLAMAZ.
+
+    Bootstrap'in `.row`'u negatif kenar boslugu tasir
+    (margin-inline: calc(-.5 * var(--bs-gutter-x)) = -12px) ve bunun
+    `.container` / `.container-fluid` dolgusuyla dengelenmesi gerekir.
+    Ciplak bir <div> icinde dengelenmiyordu: satir her iki yana 12px
+    tasip SAYFAYA yatay kaydirma cubugu aciyordu.
+
+    Olculdu (503px, mobil): gorunum alani 503px, `div.row` sag kenari
+    515px -- tam 12px tasma. Genis ekranda da tasma vardi, yalnizca
+    sayfa genis oldugu icin goze carpmiyordu.
+  -->
+  <div class="container-fluid">
     <div class="row">
       <div class="col">
         <Button
