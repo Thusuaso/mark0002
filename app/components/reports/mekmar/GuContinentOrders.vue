@@ -1,6 +1,27 @@
 <template>
     <div class="col">
-        <DataTable :value="values.data">
+        <!--
+          `table-scroll-x` ZORUNLU -- SAYILAR RAKAM ORTASINDAN
+          BOLUNUYORDU.
+
+          Bu bilesen her YIL icin bir kez basiliyor ve koku
+          `<div class="col">`; sayfa da hepsini tek bir `<div class="row">`
+          icine koyuyor (continent-order.vue). Yani yil sayisi kadar
+          kolon yan yana diziliyor ve her birine genisligin ancak
+          1/N'i dusuyor.
+
+          O dar kolonda varsayilan kural (app.css: table-layout fixed
+          + overflow-wrap anywhere) para degerlerini bosluk olmadigi
+          icin RAKAM ORTASINDAN kiriyor. Bir hucre iki satira cikinca
+          satir yuksekligi artiyor, tek satirlik komsu hucreler
+          dikeyde ortalandigi icin "asagi kaymis" goruluyor --
+          bildirilen belirti bu.
+
+          Kolon sayisi (3) degil, KOLON GENISLIGI sorun; o yuzden
+          cozum MkByCustomerList/SummaryDetailList ile ayni: tablo
+          dogal genisligine cikip kendi kabinda yatay kayiyor.
+        -->
+        <DataTable :value="values.data" class="table-scroll-x">
             <template #header>
                 <div class="text-center">
                     {{ values.year }}

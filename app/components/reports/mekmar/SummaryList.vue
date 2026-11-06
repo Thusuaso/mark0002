@@ -1,8 +1,24 @@
 <template>
   <div class="col">
+    <!--
+      `table-scroll-x` -- DAR KOLONDA SAYILAR BOLUNUYORDU.
+
+      Bu bilesen `v-for` ile bir `<div class="row">` icine
+      tekrar tekrar basiliyor ve koku `<div class="col">`; yani
+      kac ogе varsa o kadar kolon yan yana diziliyor ve her
+      birine genisligin 1/N'i dusuyor.
+
+      O dar kolonda varsayilan kural (app.css: table-layout fixed
+      + overflow-wrap anywhere) para degerlerini bosluk olmadigi
+      icin rakam ortasindan kiriyor; satir yuksekligi artinca tek
+      satirlik komsu hucreler "asagi kaymis" goruluyor.
+
+      Ayni kok neden ve ayni cozum: GuContinentOrders.vue,
+      MkByCustomerList.vue, SummaryDetailList.vue.
+    -->
     <DataTable
       :value="list"
-      class="p-datatable-sm"
+      class="p-datatable-sm table-scroll-x"
       v-model:selection="selectedOrderList"
       selectionMode="single"
       @row-click="$emit('order_selected_list_emit', $event.data)"
