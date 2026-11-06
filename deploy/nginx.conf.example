@@ -1,0 +1,82 @@
+# nginx ters vekil yapilandirmasi -- ORNEK
+#
+# /etc/nginx/sites-available/mark0002 olarak kopyalayip
+# sites-enabled'a baglayin, sonra: nginx -t && systemctl reload nginx
+#
+# Uygulama pm2 ile 127.0.0.1:3000'de calisiyor (ecosystem.config.cjs).
+
+upstream mark0002 {
+    server 127.0.0.1:3000;
+
+    # Tek surec oldugu icin tek upstream. Birden fazla eklenirse
+    # Socket.IO bozulur -- gerekcesi ecosystem.config.cjs icinde.
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name ORNEK.alan-adiniz.com;
+
+    # HTTPS'e yonlendirme (sertifika kurulduktan sonra acin)
+    # return 301 https://$host$request_uri;
+
+    # ------------------------------------------------------------------
+    # [!] SOCKET.IO -- UPGRADE BASLIKLARI ZORUNLU
+    # ------------------------------------------------------------------
+    # Bu blok OLMAZSA sohbet ve canli liste tazeleme CALISMAZ.
+    # Belirti aldatici olur: sayfa normal acilir, hicbir hata gorunmez,
+    # yalnizca mesajlar gitmez ve "cevrimici" listesi bos kalir.
+    # socket.io WebSocket'e yukseltemeyince polling'e duser ve
+    # surekli basarisiz istek uretir.
+    #
+    # `location` yolu socket.io istemcisindekiyle AYNI olmali:
+    # app/stores/socket.ts -> path: "/socket.io/"
+    location /socket.io/ {
+        proxy_pass http://mark0002;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket baglantisi uzun omurlu: varsayilan 60sn olan
+        # okuma zaman asimi baglantiyi surekli koparirdi.
+        proxy_read_timeout 7d;
+        proxy_send_timeout 7d;
+
+        # Gercek zamanli trafikte tamponlama gecikme yaratir.
+        proxy_buffering off;
+    }
+
+    # ------------------------------------------------------------------
+    # Uygulamanin geri kalani
+    # ------------------------------------------------------------------
+    location / {
+        proxy_pass http://mark0002;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Excel ciktilari tek istekte govdede donuyor
+        # (server/routes/excel-api/**). Buyuk raporlarda uretim
+        # uzun surebiliyor; varsayilan 60sn yetmeyebilir.
+        proxy_read_timeout 300s;
+    }
+
+    # Excel sablonlari ve urun gorselleri buyuk olabiliyor;
+    # yukleme siniri varsayilan 1M'de kalmasin.
+    client_max_body_size 50M;
+
+    # Metin yanitlarini sikistir (xlsx zaten sikistirilmis, listede yok).
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript
+               text/xml application/xml image/svg+xml;
+    gzip_min_length 1024;
+}

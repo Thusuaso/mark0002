@@ -1,4 +1,5 @@
-import { createRequire } from "node:module"
+import ExcelJS from "exceljs"
+import JSZip from "jszip"
 import type ExcelJSTypes from "exceljs"
 import type { H3Event } from "h3"
 
@@ -53,7 +54,36 @@ import type { H3Event } from "h3"
  * Paylasilan durum ve yaris durumu yok.
  */
 
-const ExcelJS: typeof ExcelJSTypes = createRequire(import.meta.url)("exceljs")
+/*
+ * =====================================================================
+ * [!] createRequire KULLANILMIYOR -- URETIM SUNUCUSUNU COKERTIYORDU
+ * =====================================================================
+ * Burada once `createRequire(import.meta.url)("exceljs")` vardi.
+ * Gerekcesi gelistirme ortamindaki bir Windows sorunuydu (exceljs
+ * disa alindiginda ESM yukleyici `c:\...` yollarini reddediyordu).
+ *
+ * Ama o cozum URETIMI TAMAMEN BOZUYORDU ve bu yalnizca `npm run build`
+ * SONRASI SUNUCU BASLATILINCA goruluyordu -- derleme basariyla
+ * geciyordu:
+ *
+ *   TypeError [ERR_INVALID_ARG_VALUE]: The argument 'filename' must be
+ *   a file URL object, file URL string, or absolute path string.
+ *   Received 'file:///_entry.js'
+ *       at createRequire (.output/server/chunks/_/nitro.mjs)
+ *
+ * Nitro paketlerken `import.meta.url` ifadesini
+ * `globalThis._importMeta_.url` ile degistiriyor ve o da sanal bir
+ * yol (`file:///_entry.js`) donuyor; createRequire bunu reddediyor.
+ * Yani sunucu HIC ACILMIYORDU.
+ *
+ * Ikinci bir zarar daha vardi: `createRequire` paketleyiciye
+ * GORUNMEZ oldugu icin exceljs ve jszip `.output/server/package.json`
+ * bagimlilik listesine HIC girmiyordu. Yalnizca `.output` klasoru
+ * kopyalanip orada `npm ci` yapilsaydi iki paket de eksik olurdu.
+ *
+ * Duz import ikisini de cozuyor: Nitro bagimliligi goruyor, dogru
+ * sekilde disa aliyor ve package.json'a yaziyor.
+ */
 
 /*
  * Sablonlar NITRO SERVER ASSET deposundan okunuyor.
@@ -138,7 +168,6 @@ async function templateOwnStyleCells(name: string, sheetName: string) {
    * sutun stiliyle birlestirdigi icin "kendi stili var mi" bilgisi
    * kayboluyor. Bu yuzden ham XML ayristiriliyor.
    */
-  const JSZip = createRequire(import.meta.url)("jszip")
   const zip = await JSZip.loadAsync(await loadTemplate(name))
 
   /* workbook.xml: sayfa adi -> dosya sirasi */
