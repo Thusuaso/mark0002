@@ -47,7 +47,21 @@ import { useSharedStore } from "~/stores/shared"
 export default {
   data() {
     return {
-      selectedYear: { Year: 2026 },
+      /*
+       * [!] ESKIDEN `{ Year: 2026 }` DIYE GOMULUYDU.
+       *
+       * Veri mounted() icinde `loadMkReports(new Date().getFullYear())`
+       * ile cekiliyor, yani her zaman ICINDE BULUNULAN yil. Secici ise
+       * sabit 2026 yaziyordu: bugun tesadufen ortusuyor, 2027'de
+       * secici 2026 gosterirken tablo 2027 verisini gosterecekti.
+       *
+       * Ayni sinif hata sample/finance sayfasinda GORUNUR haldeydi
+       * (secici 2024, veri 2026) ve oradan buraya bakildi.
+       *
+       * Deger artik veriyle AYNI kaynaktan geliyor; bugunku davranis
+       * birebir ayni.
+       */
+      selectedYear: { Year: new Date().getFullYear() },
     };
   },
   computed: {
