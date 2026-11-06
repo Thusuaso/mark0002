@@ -2014,7 +2014,44 @@ export default {
         )
         .then((res) => {
           this.moloz_list = res.data.list;
+
+          /*
+           * =============================================================
+           * [!] ARAMA LISTELERI DE BURADAN DOLDURULUYOR -- YARIS VARDI
+           * =============================================================
+           * Bu metot IKI ISTEGI PARALEL atiyor:
+           *   - /quarries/supplier/...  -> suppliers, strips, quarries
+           *   - /moloz/list/...         -> moloz_list
+           * Ikisi birbirini BEKLEMIYOR. Moloz yaniti once gelirse (ya da
+           * ustteki istek patlarsa -- .catch'i yalnizca log basiyor)
+           * tabloda satirlar gorunuyor ama `strips`/`quarries` HALA BOS
+           * oluyor.
+           *
+           * O anda bir moloz satirina tiklanirsa
+           * molozDatatableSelected icindeki
+           *   this.quarries.find(...) -> undefined
+           * ve dialog basligi `undefined.OcakAdi` uzerinde TypeError
+           * atiyordu; metot orada kesildigi icin dialog HIC ACILMIYORDU.
+           *
+           * Bu uc zaten ucunu de donduruyor (api/index.js:17324-17330) --
+           * ic ice cagri yapan __created() de boyle yapiyor
+           * (satir 1316-1319). Burada atlanmis.
+           *
+           * Basliktaki koruma da duruyor (orada ayrica aciklandi), ama
+           * asil cozum listelerin BOS KALMAMASI: aksi halde dialog
+           * acilsa bile ocak/serit secicileri bos gelirdi.
+           */
+          this.suppliers = res.data.suppliers;
+          this.strips = res.data.strips;
+          this.quarries = res.data.quarries;
+
           this.__molozSumTotal(res.data.list);
+        })
+        .catch((err) => {
+          /* .catch() YOKTU -- istek patlayinca liste ONCEKI ayda kaliyordu. */
+          console.error("moloz listesi alinamadi:", err);
+          this.moloz_list = [];
+          useAppToast().error("Moloz listesi alınamadı.");
         });
 
       this.nakliyeCalculate();
