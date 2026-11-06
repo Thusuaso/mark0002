@@ -807,6 +807,13 @@ export default {
   },
   data() {
     return {
+      /*
+       * En son islenen filtre sonucu -- yalnizca KARSILASTIRMA icin.
+       * Sablonda HIC okunmuyor, dolayisiyla buraya yazmak render
+       * tetiklemiyor. Gerekcesi reportsMekmarForwardingFiltered'da.
+       */
+      __sonFiltre: null,
+
       filterModel: {
         product_date: "",
         date: "",
@@ -1263,8 +1270,39 @@ export default {
       }
     },
 
+    /*
+     * FILTRE SONUCU DEGISMEDIYSE HICBIR SEY YAPMA.
+     *
+     * DataTable her render'da @filter yayiyor; bu metot da her
+     * seferinde store'a yaziyordu ve store yazmasi tablonun altligini
+     * besledigi icin render tekrar tetikleniyordu -- sayfayi
+     * kilitleyen dongunun ilk halkasi buydu (gerekcesi
+     * stores/reports.ts MUT_setReportsMekmarForwardingListTotal
+     * icinde ayrintili yaziyor).
+     *
+     * Store tarafindaki icerik karsilastirmasi tek basina dongunun
+     * yayilmasini durduruyor, ama bu koruma gereksiz tur basina
+     * N satirlik toplamayi da bastan engelliyor: 23 kolonlu ve binlerce
+     * satirli bu tabloda fark olculebilir.
+     *
+     * Kimlik karsilastirmasi guvenli: satir nesneleri store'da bir kez
+     * atanip bir daha uretilmiyor (MUT_setReportsMekmarForwardingList),
+     * yani ayni filtre sonucu ayni nesneleri dondurur.
+     * Ayni koruma order/ShippedList.vue filtersProduction'da da var.
+     */
     reportsMekmarForwardingFiltered(event) {
-      this.reportsStore.setReportsMekmarForwardingListTotal(event.filteredValue);
+      const next = event.filteredValue || [];
+      const current = this.__sonFiltre;
+
+      const degismedi =
+        Array.isArray(current) &&
+        current.length === next.length &&
+        current.every((row, i) => row === next[i]);
+
+      if (degismedi) return;
+
+      this.__sonFiltre = next;
+      this.reportsStore.setReportsMekmarForwardingListTotal(next);
     },
   },
 };

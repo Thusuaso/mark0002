@@ -1514,22 +1514,84 @@ export const useReportsStore = defineStore("reports", {
 
           this.reportsMekmarForwardingList = payload;
     },
+    /*
+     * TOPLAMA YEREL DEGISKENLERDE, STATE'E TEK SEFERDE YAZILIR.
+     *
+     * =================================================================
+     * [!] SAYFAYI KILITLEYEN SONSUZ RENDER DONGUSU BURADAYDI
+     * =================================================================
+     * Belirti: /reports/mekmar/forwarding acilista yukleme
+     * gostergesinde TAKILI kaliyordu. Gercekte "istek bitmedi" degil,
+     * TARAYICININ ANA IS PARCACIGI KILITLENIYORDU -- sayfadayken
+     * JavaScript calistirmak bile zaman asimina dusuyordu.
+     *
+     * Dongu suydu:
+     *   1) DataTable render edilir ve @filter olayini yayar
+     *   2) ForwardingList.reportsMekmarForwardingFiltered() bu
+     *      mutation'i cagirir
+     *   3) mutation reaktif state'e yazar
+     *   4) o state tablonun KENDI altliginda okunuyor
+     *      (total.crate / amount / box / piece / total)
+     *   5) tablo yeniden render edilir -> (1)'e don
+     *
+     * Dongunun durmamasinin sebebi eski kodun ilk satiriydi: her
+     * cagride once YENI bir nesne atiyordu. Vue ayni degeri yazmayi
+     * yok sayar ama yeni nesne her turda "degisti" sinyali uretiyordu.
+     * Ustelik `+=` satir basina calistigi icin tur basina 4 x N
+     * reaktif yazma oluyordu.
+     *
+     * Yerel degiskende toplayip SONUNDA tek kez atayinca ikinci turda
+     * degerler oncekiyle ayni oluyor; asagidaki icerik karsilastirmasi
+     * da nesne KIMLIGININ bosuna degismesini engelliyor, yani Vue
+     * degisim gormuyor ve dongu kendiliginden duruyor.
+     *
+     * AYNI DUZELTME daha once iki bilesende yapilmisti
+     * (order/ShippedList.vue __totalSum, order/Table2.vue); store
+     * tarafindaki bu kopya atlanmis.
+     *
+     * Toplama ifadeleri ve SIRASI birebir korundu -- kayan nokta
+     * sonucu degismiyor.
+     */
     MUT_setReportsMekmarForwardingListTotal(payload) {
+          const satirlar = payload || [];
+
+          let amount = 0;
+          let piece = 0;
+          let box = 0;
+          let total = 0;
+
+          satirlar.forEach((x) => {
+            amount += x.Miktar;
+            piece += x.Adet;
+            box += x.KutuAdet;
+            total += x.Toplam;
+          });
+
+          const onceki = this.reportsMekmarForwardingListTotal;
+
+          /*
+           * Degerler aynIysa HIC YAZMA. Yazmak yeni bir nesne kimligi
+           * uretir ve bu, degerler degismemis olsa bile bir render
+           * daha tetikler -- dongunun ikinci kaynagi buydu.
+           */
+          if (
+            onceki &&
+            onceki.crate === satirlar.length &&
+            onceki.amount === amount &&
+            onceki.piece === piece &&
+            onceki.box === box &&
+            onceki.total === total
+          ) {
+            return;
+          }
 
           this.reportsMekmarForwardingListTotal = {
-            crate: 0,
-            amount: 0,
-            box: 0,
-            piece: 0,
-            total: 0,
+            crate: satirlar.length,
+            amount,
+            box,
+            piece,
+            total,
           };
-          this.reportsMekmarForwardingListTotal.crate = payload.length;
-          payload.forEach((x) => {
-            this.reportsMekmarForwardingListTotal.amount += x.Miktar;
-            this.reportsMekmarForwardingListTotal.piece += x.Adet;
-            this.reportsMekmarForwardingListTotal.box += x.KutuAdet;
-            this.reportsMekmarForwardingListTotal.total += x.Toplam;
-          });
     },
     MUT_setReportsMekmarSummaryOrderList(payload) {
 
