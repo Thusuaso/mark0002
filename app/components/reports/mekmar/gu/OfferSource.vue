@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="source_data.data_1" scrollable scrollHeight="450px">
         <template #header>
           <div style="margin: 0px auto; text-align: center">{{ date }}</div>
@@ -18,7 +18,7 @@
         </Column>
       </DataTable>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="source_data.data_2" scrollable scrollHeight="450px">
         <template #header>
           <div style="margin: 0px auto; text-align: center">{{ date - 1 }}</div>
@@ -36,7 +36,7 @@
         </Column>
       </DataTable>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="source_data.data_3" scrollable scrollHeight="450px">
         <template #header>
           <div style="margin: 0px auto; text-align: center">{{ date - 2 }}</div>
@@ -54,7 +54,7 @@
         </Column>
       </DataTable>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="source_data.data_4" scrollable scrollHeight="450px">
         <template #header>
           <div style="margin: 0px auto; text-align: center">{{ date - 3 }}</div>

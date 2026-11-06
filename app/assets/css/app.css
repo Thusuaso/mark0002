@@ -253,3 +253,110 @@
   min-width: 0;
   box-sizing: border-box;
 }
+
+/*
+ * =====================================================================
+ * DAR EKRAN: TABLO SIKISTIRILMAZ, KAYDIRILIR
+ * =====================================================================
+ * Yukaridaki kural tum hucrelere `overflow-wrap: anywhere` +
+ * `white-space: normal` veriyor. Bu MASAUSTUNDE dogru: 17-23 kolonlu
+ * tablolar ekrana sigsin diye metin sarkitiliyor.
+ *
+ * MOBILDE AYNI KURAL TABLOYU KULLANILAMAZ HALE GETIRIYORDU. 503px'te
+ * olculdu:
+ *
+ *   orders/waiting   -> hucreler TEK HARFLIK sutunlara dusuyor,
+ *                       "Alien-Netherlands" dikey olarak
+ *                       A/l/i/e/n/-/N/e/t/... diye diziliyor
+ *   finance          -> baslik hucreleri ust uste biniyor
+ *                       ("Balance(Including Production)" ile
+ *                        "BalanceExcept For Due" ic ice giriyor)
+ *                       ve SAYILAR ortadan boluniyor:
+ *                       "$117.723,29" -> "$117.7" / "23,29"
+ *
+ * Sayinin ortadan bolunmesi yalnizca cirkin degil, YANLIS OKUNUR.
+ *
+ * Cozum: dar ekranda hucre metnini kirma. Tablo o zaman dogal
+ * genisligini alir ve PrimeVue'nun zaten var olan kaydirma kabi
+ * (.p-datatable-table-container, inline `overflow: auto` --
+ * primevue/datatable/style/index.mjs:146) devreye girer; tablo YATAY
+ * KAYDIRILIR. Sayfanin kendisi tasmaz, yalnizca tablo kayar.
+ *
+ * ESIK 991.98px: navbar'in hamburger'a dustugu Bootstrap `lg` noktasi.
+ * Ayni esik kullanilarak "mobil mod" tek bir yerden tanimlaniyor;
+ * tablet de dahil, cunku 17 kolonlu tablo 900px'te de okunmuyor.
+ */
+@media (max-width: 991.98px) {
+  /*
+   * `table-layout: fixed` DE GERI ALINIYOR -- yoksa nowrap tek basina
+   * durumu KOTULESTIRIYOR.
+   *
+   * Olculdu: yalnizca nowrap verildiginde tablo 502px'te kaliyor
+   * (tableLayout "fixed", width 501.6px) ve kolonlar icerige gore
+   * BUYUMUYOR; metin hucre kutusunun disina tasip komsu hucrenin
+   * uzerine biniyordu:
+   *   "07-A0-20...NtlbnlbGold Gold TuQeuRere1,2reekPatlAtsOuSqm"
+   *
+   * Masaustunde `fixed` BILEREK secilmis (gerekcesi yukarida, uzun
+   * uzun): 17 kolon 1536px'te kolon basina ~90px birakiyor ve yatay
+   * kaydirma yerine metin sarkitmasi tercih edilmis. 503px'te ayni
+   * tercih kolon basina ~30px birakiyor, yani okunmuyor. Esik asagi
+   * indikce denge tersine donuyor.
+   *
+   * `width: max-content` tabloyu icerigi kadar genisletir;
+   * `min-width: 100%` ise icerik dar oldugunda kabi doldurmasini
+   * saglar (aksi halde bes kolonluk tablo sola sikisirdi).
+   */
+  .p-datatable-table {
+    table-layout: auto;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .p-datatable-table > thead > tr > th,
+  .p-datatable-table > tbody > tr > td,
+  .p-datatable-table > tfoot > tr > td {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+
+  /*
+   * Baslik da kirilmasin: yukarida `break-word` veriliyordu, dar
+   * ekranda o da basligi iki satira bolup kolonu daraltiyor.
+   */
+  .p-datatable-table > thead > tr > th {
+    overflow-wrap: normal;
+  }
+
+  /*
+   * Filtre kutulari artik kolona gore DEGIL, okunur bir alt sinira
+   * gore genislesin. Kolonlar zaten kaydirildigi icin genislemeleri
+   * sorun degil; `width: 100%` + `min-width: 0` ile kaldiklarinda
+   * birkac piksellik kullanilamaz kutulara dusuyorlardi.
+   */
+  .p-column-filter {
+    min-width: 7rem;
+  }
+
+  /*
+   * FLOAT LABEL USTTEKI ALANIN ICINE GIRIYORDU.
+   *
+   * FloatLabel etiketi `position: absolute` ve kutunun USTUNE tasiyor.
+   * Masaustunde alanlar yan yana (`col-sm-6`) oldugu icin sorun yok;
+   * dar ekranda ayni kolonlar ALT ALTA geciyor ve aralarinda dikey
+   * bosluk olmadigi icin alttaki alanin etiketi usttekinin kutusuna
+   * biniyordu.
+   *
+   * Olculdu (503px, reports/mekmer/strips.vue):
+   *   "Year" alaninin alt kenari   : 137px
+   *   "Month" etiketinin ust kenari: 117px
+   * yani etiket kutunun 20px icinde -- ekranda "2026" yazisinin
+   * uzerine "Month" biniyordu.
+   *
+   * 1rem denendi, binisme 20px'ten 4px'e dustu ama BITMEDI;
+   * 1.5rem ile tamamen ayrildi (asagida yeniden olculdu).
+   */
+  .p-floatlabel {
+    margin-top: 1.5rem;
+  }
+}

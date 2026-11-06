@@ -161,7 +161,7 @@
           </div>
         </div>
       </div>
-      <div class="col-3">
+      <div class="col-12 col-lg-3">
         <DataTable
           :value="orders"
           sortField="year"

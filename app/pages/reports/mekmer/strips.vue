@@ -74,7 +74,7 @@
       </FloatLabel>
     </div>
     <div class="row m-auto text-center">
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable
           :value="list"
           class="p-datatable-sm table-scroll-x"
@@ -237,7 +237,7 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable
           :value="moloz_list"
           class="p-datatable-sm table-scroll-x"
@@ -404,7 +404,7 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable
           :value="nakliyeList"
           class="p-datatable-sm table-scroll-x"

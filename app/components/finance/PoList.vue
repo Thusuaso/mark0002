@@ -12,7 +12,7 @@
     <Button v-else type="button" severity="info" class="w-100" icon="pi pi-file-excel" label="Excel"
       @click="exportPoList" />
 
-    <div class="col-9">
+    <div class="col-12 col-lg-9">
       <DataTable :value="poList" scrollable scrollHeight="600px" v-model:selection="selectedPoList" selectionMode="single"
         @row-click="$emit('po_list_selected_emit', $event)" :rowClass="rowClass" :loading="loading">
         <Column field="SiparisNo" header="Purchase Order" headerClass="tableHeader" bodyClass="tableBody">
@@ -70,7 +70,7 @@
         </Column>
       </DataTable>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="paidList" scrollable scrollHeight="600px" v-model:selection="selectedPoPaidDetailList"
         selectionMode="single" @row-click="$emit('po_paid_detail_list_selected_emit', $event)" :loading="loading">
         <Column field="Tarih" header="Date">

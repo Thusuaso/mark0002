@@ -8,7 +8,7 @@
     />
 
     <div class="row">
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable :value="list_this_year" scrollable scrollHeight="500px">
           <template #header> {{ year }} Orders </template>
           <Column field="UlkeAdi" header="Country"></Column>
@@ -30,7 +30,7 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable :value="list_one_year_ago" scrollable scrollHeight="500px">
           <template #header> {{ year - 1 }} Orders </template>
           <Column field="UlkeAdi" header="Country"></Column>
@@ -52,7 +52,7 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable :value="list_two_year_ago" scrollable scrollHeight="500px">
           <template #header> {{ year - 2 }} Orders </template>
           <Column field="UlkeAdi" header="Country"></Column>
@@ -76,7 +76,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable :value="list_three_year_ago" scrollable scrollHeight="500px">
           <template #header> {{ year - 3 }} Orders </template>
           <Column field="UlkeAdi" header="Country"></Column>
@@ -98,7 +98,7 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable :value="list_four_year_ago" scrollable scrollHeight="500px">
           <template #header> {{ year - 4 }} Orders </template>
           <Column field="UlkeAdi" header="Country"></Column>
@@ -120,7 +120,7 @@
           </Column>
         </DataTable>
       </div>
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable :value="list_five_year_ago" scrollable scrollHeight="500px">
           <template #header> {{ year - 5 }} Orders </template>
           <Column field="UlkeAdi" header="Country"></Column>

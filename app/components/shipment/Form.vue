@@ -125,7 +125,7 @@
     </div>
 
     <div class="row mb-4">
-      <div class="col-4">
+      <div class="col-12 col-lg-4">
         <DataTable
           :value="shipmentStore.getShipmentProductionList"
           dataKey="ID"

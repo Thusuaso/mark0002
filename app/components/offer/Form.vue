@@ -1,6 +1,6 @@
 <template>
   <div class="row" style="padding: 0px 100px">
-    <div class="col-9">
+    <div class="col-12 col-lg-9">
       <div class="row">
         <div class="col mt-3">
           <FloatLabel class="mb-4">

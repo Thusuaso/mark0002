@@ -1,5 +1,5 @@
 <template>
-  <div class="col-3">
+  <div class="col-12 col-lg-3">
     <DataTable :value="list.data" >
       <template #header>
         {{ list.year }}

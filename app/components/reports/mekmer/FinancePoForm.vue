@@ -52,7 +52,7 @@
         </div>
       </div>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="poPaidList" v-model:selection="selectedPoPaidList" selectionMode="single"
         @row-click="poPaidListSelected($event)">
         <Column field="Tarih" header="Date">

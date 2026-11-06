@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-9">
+    <div class="col-12 col-lg-9">
       <DataTable :value="poList" scrollable scrollHeight="600px" v-model:selection="selectedPoList" selectionMode="single"
         @row-click="$emit('po_list_selected_emit', $event)"  :rowClass="rowClass">
         <Column field="siparisno" header="Purchase Order" headerClass="tableHeader" bodyClass="tableBody">
@@ -53,7 +53,7 @@
 
       </DataTable>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="paidList" scrollable scrollHeight="600px" 
       v-model:selection="selectedPaid"
       selectionMode="single"

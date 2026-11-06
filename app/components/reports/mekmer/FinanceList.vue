@@ -78,7 +78,7 @@
 
       </DataTable>
     </div>
-    <div class="col-3" v-if="status">
+    <div class="col-12 col-lg-3" v-if="status">
       <DataTable :value="expiry">
         <Column field="firmaAdi" header="Customer" headerClass="tableHeader" bodyClass="tableBody"></Column>
         <Column field="siparis_no" header="Po" headerClass="tableHeader" bodyClass="tableBody"></Column>

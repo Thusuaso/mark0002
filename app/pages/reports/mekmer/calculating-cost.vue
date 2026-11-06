@@ -38,7 +38,7 @@
     />
 
     <div class="row">
-      <div class="col-9">
+      <div class="col-12 col-lg-9">
         <DataTable
           :value="costs"
           v-model:selection="selectedCost"
@@ -165,7 +165,7 @@
         </DataTable>
       </div>
 
-      <div class="col-3">
+      <div class="col-12 col-lg-3">
         <DataTable
           :value="calculate_ratio_list"
           sortField="Oran"

@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-9">
+    <div class="col-12 col-lg-9">
       <DataTable
         :value="list"
         responsiveLayout="scroll"
@@ -107,7 +107,7 @@
         </Column>
       </DataTable>
     </div>
-    <div class="col-3">
+    <div class="col-12 col-lg-3">
       <DataTable :value="bank" >
         <Column
           field="Banka"
