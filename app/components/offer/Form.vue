@@ -705,7 +705,7 @@ export default {
       }
     },
     deleteProcess() {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         const data = {
           offer: this.model,
           customer: this.customerModel,
@@ -966,12 +966,15 @@ export default {
     },
     deleteProduct() {
       this.__saveLog(`in  ${this.__productSizeText()} cm ürününü sildi.`)
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         useOfferStore().setOfferDetailProductsDelete(this.modelProduct.Id)
         this.productReset()
       }
     },
     updateProduct() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.__saveLog(`in  ${this.__productSizeText()} cm ürününü güncelledi.`)
       useOfferStore().setOfferDetailProductsUpdate(this.modelProduct)
       this.productReset()

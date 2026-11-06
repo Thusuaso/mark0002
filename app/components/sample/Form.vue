@@ -466,7 +466,7 @@ export default {
       this.selectedUser = this.users.find((x) => x.ID == this.model.NumuneTemsilci);
     },
     deleteProcess() {
-      if(confirm('Are you sure you want to delete?')){
+      if(confirm("Are you sure you want to perform this action?")){
         const data = {
           id: this.model.ID,
           po: this.model.NumuneNo,
@@ -478,7 +478,7 @@ export default {
     process() {
 
 
-      
+
       this.model.NumuneTarihi = toIsoDate(this.input_date);
       if (this.output_date == null || this.output_date == " " || this.output_date == '1900-01-01' || this.output_date == undefined || this.output_date== '1900-01-01T00:00:00.000Z') {
         this.model.YuklemeTarihi = "";
@@ -488,7 +488,7 @@ export default {
       if(this.model.DhlTarihi == null || this.model.DhlTarihi == '1900-01-01' || this.model.DhlTarihi == undefined || this.model.DhlTarihi== '1900-01-01T00:00:00.000Z'){
         this.model.DhlTarihi = '';
       }
-      
+
       this.$emit("process", this.model);
     },
     backPhotoSelected(event) {

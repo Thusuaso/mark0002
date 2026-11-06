@@ -221,6 +221,9 @@ export default {
       })
     },
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.customerStore.setOfferCustomerDelete(this.model.Id)
       this.$emit("offer_customer_dialog_close")
     },

@@ -154,6 +154,9 @@ export default {
      * (saving), yani ust uste tiklama ile mukerrer istek gonderilemiyor.
      */
     async deleteTransport() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       const toast = useAppToast()
       this.saving = true
       this.sharedStore.beginLoading()
@@ -177,6 +180,9 @@ export default {
     },
 
     async updateTransport() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       const toast = useAppToast()
       this.saving = true
       this.sharedStore.beginLoading()

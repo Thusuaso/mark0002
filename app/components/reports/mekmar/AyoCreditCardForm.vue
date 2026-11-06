@@ -129,6 +129,9 @@ export default {
             this.update_button_disabled = false;
         },
         update(){
+          /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+          if (!confirmAction()) return
+          
             const data = {
                 'id':this.id,
                 'month':this.month_id,

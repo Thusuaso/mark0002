@@ -96,6 +96,9 @@ export default {
     },
 
     deleted() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.importantLinkStore.setImportantLinkListDeleteAction(this.model.ID)
       this.$emit("set_status_button")
     },

@@ -1373,7 +1373,7 @@ export default {
     },
 
     deleteEdge(id) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductEdgeDelete(id);
       }
     },
@@ -1391,7 +1391,7 @@ export default {
     },
 
     deleteMaterial(id) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductMaterialDelete(id);
       }
     },
@@ -1408,7 +1408,7 @@ export default {
       this.materialModel.MateryalRu = event.value.MateryalRu;
     },
     deleteStyle(id) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductStyleDelete(id);
       }
     },
@@ -1425,7 +1425,7 @@ export default {
       this.styleModel.StilRu = event.value.StilRu;
     },
     deleteType(id) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductTypeDelete(id);
       }
     },
@@ -1442,7 +1442,7 @@ export default {
       this.typeModel.TurRu = event.value.TurRu;
     },
     deleteArea(id) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductAreaDelete(id);
       }
     },
@@ -1459,7 +1459,7 @@ export default {
       this.areaModel.Areas_ru = event.value.Areas_ru;
     },
     deleteFinish(id) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductFinishDelete(id);
       }
     },
@@ -1475,7 +1475,7 @@ export default {
       this.finishModel.finish_ru = event.value.finish_ru;
     },
     deleteColor(event) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductColorDelete(event);
       }
     },
@@ -1495,7 +1495,7 @@ export default {
       this.panelStore.setPanelProductSizeUpdate(event.newData);
     },
     deleteSize(id) {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.panelStore.setPanelProductSizeDelete(id);
       }
     },
@@ -1572,7 +1572,7 @@ export default {
       this.model.keywords_ar = this.__noneNullControl(this.model.keywords_ar);
     },
     deleteForm() {
-      if (confirm("Are you sure you want to delete?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.$emit("delete_emit", this.model.urunid);
       }
     },

@@ -64,7 +64,7 @@ export default {
        * confirm() TARAYICI MODAL'I -- Nuxt 2'den birebir korundu.
        * Silme geri alinamaz oldugu icin onay adimi kaldirilmadi.
        */
-      if (confirm("Silme işlemini onaylıyor musunuz?")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         this.bgpStore.setBgpDelete(this.bgp.ID)
       }
     },

@@ -112,6 +112,9 @@ export default {
       this.$emit("supplier_dialog_close_emit")
     },
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.supplierStore.setSupplierDelete(this.model.ID)
       this.$emit("supplier_dialog_close_emit")
     },

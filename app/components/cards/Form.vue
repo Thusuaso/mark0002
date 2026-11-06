@@ -234,6 +234,9 @@ export default {
     },
 
     async deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       await this.cardsStore.setCardsDelete(this.model.ID)
       this.socketStore.emit("card_list_update_emit")
       this.$emit("card_dialog_form_emit", false)

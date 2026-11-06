@@ -489,7 +489,7 @@ export default {
       XLSX.writeFile(wb, "Finance.xlsx")
     },
     deletePoPaid() {
-      if (confirm("Are you sure you want to delete")) {
+      if (confirm("Are you sure you want to perform this action?")) {
         useLegacyApi()
           .delete(
             `/finance/mekmer/paid/detail/list/delete/${this.modelPaidPo.ID}`
@@ -504,6 +504,9 @@ export default {
       }
     },
     updatePoPaid() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       useLegacyApi()
         .put("/finance/mekmer/paid/detail/list/update", this.modelPaidPo)
         .then((res) => {

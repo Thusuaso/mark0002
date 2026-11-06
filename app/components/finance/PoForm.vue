@@ -126,7 +126,7 @@
 import { useFinanceStore } from "~/stores/finance"
 import { toIsoDate, fromIsoDate } from "~/utils/dates"
 
-export default {
+export default {
   computed: {
     financeStore() {
       return useFinanceStore()
@@ -161,6 +161,9 @@ export default {
       this.model.Tarih = toIsoDate(event);
     },
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.$emit("po_paid_delete_emit", {
         ...this.model,
       });

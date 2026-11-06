@@ -104,6 +104,9 @@ export default {
   },
   methods: {
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.$emit("po_paid_delete_emit", {
         ...this.model,
         Tarih: toIsoDate(this.paid_date),
@@ -111,7 +114,7 @@ export default {
       this.paid_date = null;
     },
     poPaidListSelected(event) {
-      
+
       this.financeStore.setFinancePoButtonStatus(false);
       this.paid_date = fromIsoDate(event.data.tarih);
       this.model.id = event.data.id;

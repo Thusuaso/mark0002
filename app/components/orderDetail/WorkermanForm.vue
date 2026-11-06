@@ -174,6 +174,9 @@ export default {
     },
 
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.deleted_button_disabled = true
       this.selectedSupplier = null
       this.workerman_date = null

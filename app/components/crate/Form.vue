@@ -51,7 +51,7 @@
 </template>
 <script>
 import { useSelectionStore } from "~/stores/selection"
-export default {
+export default {
   computed: {
     selectionStore() {
       return useSelectionStore()
@@ -95,7 +95,7 @@ export default {
       this.Ebat = this.model.Stone_Size;
       this.Adet = this.model.Piece;
 
-      
+
       this.thickness = this.model.Crate_Thickness;
       this.height = this.model.Crate_Height;
       this.width =  this.model.Crate_Width;
@@ -103,6 +103,9 @@ export default {
   },
   methods: {
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.selectionStore.setSelectionProductionCrateSizeDelete(this.model.ID);
       this.$emit("selection_production_crate_size_dialog_close");
     },

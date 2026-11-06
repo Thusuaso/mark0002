@@ -104,7 +104,7 @@
           type="button"
           severity="danger" class="w-100"
           label="Delete"
-          @click="$emit('fair_customer_delete_emit', model.ID)"
+          @click="confirmedDelete"
         />
       </div>
     </div>
@@ -142,6 +142,17 @@ export default {
     this.selectedCountry = this.country.find((x) => x.Id == this.model.Country);
   },
   methods: {
+    /*
+     * Dugme ONCE dogrudan $emit cagiriyordu. Onay sablondan
+     * sorulamiyor: Options API sablonu yalnizca bilesen ornegini
+     * gorur, Nuxt'un otomatik import ettigi confirmAction'i DEGIL.
+     * Davranis ayni, yalnizca onaydan sonra yayiliyor.
+     */
+    confirmedDelete() {
+      if (!confirmAction()) return
+      this.$emit("fair_customer_delete_emit", this.model.ID)
+    },
+
     /*
      * [TEL-1] phoneInput KALDIRILDI: tek isi
      * `event.formattedNumber`i model.Phone'a yazmakti ve o olay

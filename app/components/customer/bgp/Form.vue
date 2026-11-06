@@ -68,7 +68,7 @@
         <Button
           type="button"
           severity="danger" class="w-100"
-          @click="$emit('bgp_customer_delete_emit', model.ID)"
+          @click="confirmedDelete"
           label="Delete"
         />
       </div>
@@ -108,6 +108,17 @@ export default {
     }
   },
   methods: {
+    /*
+     * Dugme ONCE dogrudan $emit cagiriyordu. Onay sablondan
+     * sorulamiyor: Options API sablonu yalnizca bilesen ornegini
+     * gorur, Nuxt'un otomatik import ettigi confirmAction'i DEGIL.
+     * Davranis ayni, yalnizca onaydan sonra yayiliyor.
+     */
+    confirmedDelete() {
+      if (!confirmAction()) return
+      this.$emit("bgp_customer_delete_emit", this.model.ID)
+    },
+
     countrySelected(event) {
       this.model.UlkeAdi = event.value.UlkeAdi;
       this.model.UlkeId = event.value.Id;

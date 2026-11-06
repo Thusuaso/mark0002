@@ -404,6 +404,9 @@ export default {
      * kayboluyordu.
      */
     update() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       if (!this.selectedCompany || !this.selectedPo) {
         useAppToast().error("Firma ve PO seçilmelidir.")
         return
@@ -436,6 +439,9 @@ export default {
     },
 
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       const index = this.transportList.findIndex(
         (x) => x.id == this.selectedTransport.id,
       )

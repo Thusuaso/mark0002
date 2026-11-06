@@ -203,6 +203,9 @@ export default {
     },
 
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.todoStore.setTodoDelete(this.todo.ID)
       this.$emit("todo_form_dialog", false)
     },

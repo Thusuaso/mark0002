@@ -564,6 +564,9 @@ export default {
             }
         },
         deleteItem() {
+          /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+          if (!confirmAction()) return
+          
             const log = {
                 description:
                     this.po +
@@ -632,6 +635,9 @@ export default {
             this.orderStore.setOrderProductAdded(this.model);
         },
         update() {
+          /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+          if (!confirmAction()) return
+          
             const log = {
                 description:
                     this.po +

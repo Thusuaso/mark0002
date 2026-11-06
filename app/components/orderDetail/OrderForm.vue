@@ -797,6 +797,34 @@ export default {
       }
     },
     deleteItem() {
+      /*
+       * =================================================================
+       * [!] ONAY EN BASA ALINDI -- ONCEDEN SONDAYDI VE ETKISIZDI
+       * =================================================================
+       * Kaynakta onay metodun SONUNDAYDI. Ondan once su uc sey ZATEN
+       * yapilmis oluyordu:
+       *
+       *   1) this.$logs.save(log)  -- "... kalemi silindi" diyen bir
+       *      DENETIM KAYDI yaziliyordu. Kullanici iptal etse bile log
+       *      duruyordu, yani kayit YALAN soyluyordu.
+       *   2) form alanlari temizleniyordu (kategori, urun, tedarikci,
+       *      birim, secili urun...)
+       *   3) butonlar kilitleniyordu (product_form_disabled = true vb.)
+       *
+       * Yani "Iptal"e basmak kullaniciyi bos ve kilitli bir formla
+       * birakiyor, ustelik sisteme silinmemis bir kalemi silinmis gibi
+       * yazdiriyordu. Onay yalnizca GORUNUSTE vardi.
+       *
+       * Ozel metin korundu (yan etkiyi anlatiyor); gerekcesi asagida.
+       */
+      if (
+        !confirm(
+          "The crates for this product will be returned to stock. Continue?",
+        )
+      ) {
+        return
+      }
+
       const log = {
         description:
           this.po +
@@ -826,11 +854,16 @@ export default {
       this.update_button_disabled = true;
       this.delete_button_disabled = true;
       this.workerman_button_disabled = true;
-      if (
-        confirm("Bu ürüne ait kasalar stoğa alınacaktır, onaylıyor musunuz?")
-      ) {
-        this.orderStore.setOrderProductDeleted(this.model);
-      }
+      /*
+       * Onay yukarida alindi. Buraya gelindiyse kullanici onayladi.
+       *
+       * OZEL METIN KORUNDU -- genel onay metniyle degistirilmedi:
+       * kaynaktaki uyari bir YAN ETKIYI anlatiyor ("bu urune ait
+       * kasalar stoga alinacaktir"). Genel metne cevirmek, kullanicinin
+       * onay vermeden once bilmesi gereken bilgiyi silerdi. Yalnizca
+       * Ingilizce'ye cevrildi.
+       */
+      this.orderStore.setOrderProductDeleted(this.model);
     },
     add() {
       if (
@@ -885,6 +918,9 @@ export default {
       this.orderStore.setOrderProductAdded(this.model);
     },
     update() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       const log = {
         description:
           this.po +

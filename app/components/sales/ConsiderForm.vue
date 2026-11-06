@@ -21,7 +21,7 @@
           severity="danger"
           class="w-100"
           label="Delete"
-          @click="$emit('point_of_consider_delete_emit', model)"
+          @click="confirmedDelete"
         />
       </div>
     </div>
@@ -39,6 +39,23 @@ export default {
     status: {
       type: Boolean,
       required: true,
+    },
+  },
+
+  /*
+   * `methods` blogu YOKTU -- bilesen yalnizca prop aliyor ve silme
+   * dugmesi dogrudan `$emit` cagiriyordu.
+   *
+   * Onay sablondan sorulamiyor: Options API sablonu yalnizca bilesen
+   * ornegini gorur, Nuxt'un otomatik import ettigi `confirmAction`
+   * fonksiyonunu DEGIL (ayni tuzak Dashboard.vue'da da yasanmisti).
+   * Bu yuzden araya bu metot kondu; davranis ayni, yalnizca onaydan
+   * sonra yayiliyor.
+   */
+  methods: {
+    confirmedDelete() {
+      if (!confirmAction()) return
+      this.$emit("point_of_consider_delete_emit", this.model)
     },
   },
 }

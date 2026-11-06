@@ -644,6 +644,9 @@ export default {
       }
     },
     async deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       await this.selectionStore.setSelectionProductionDelete(this.model.KasaNo);
       this.socketStore.emit("update_production_emit")
       this.$emit("selection_production_dialog_form", false);

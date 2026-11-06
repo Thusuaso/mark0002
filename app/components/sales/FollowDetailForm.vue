@@ -135,6 +135,9 @@ export default {
     },
 
     deleteForm() {
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       this.salesStore.setFollowDetailDelete(this.followDetail.ID)
       this.$emit("closed_follow_dialog")
       this.reset()

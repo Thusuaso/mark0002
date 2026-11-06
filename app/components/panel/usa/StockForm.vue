@@ -480,15 +480,15 @@ export default {
   methods: {
     hashtagsInput(event){
       this.model.hashtags = event.trim();
-      
+
     },
     hashtagsInputFr(event){
       this.model.hashtags_fr = event.trim();
-      
+
     },
     hashtagsInputEs(event){
       this.model.hashtags_es = event.trim();
-      
+
     },
     usaReOrder(event) {
       let index = 1;
@@ -504,6 +504,9 @@ export default {
       this.panelStore.MUT_setpanelUsaStockPhotosList(data);
     },
     deletePhotos(event){
+      /* Yikici islem -- onay. Metin: app/utils/confirm.ts */
+      if (!confirmAction()) return
+
       /*
        * YOLDAKI `/api` ONEKI KASITLI -- SILINMEMELI. Uc api/index.js'te
        * literal olarak app.get("/api/usa/photo/delete/:id") diye

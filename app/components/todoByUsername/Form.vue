@@ -58,7 +58,7 @@
           severity="danger"
           class="w-full"
           label="Delete"
-          @click="$emit('deleteProcess', model)"
+          @click="confirmedDelete"
         />
       </div>
     </div>
@@ -98,6 +98,17 @@ export default {
     }
   },
   methods: {
+    /*
+     * Dugme ONCE dogrudan $emit cagiriyordu. Onay sablondan
+     * sorulamiyor: Options API sablonu yalnizca bilesen ornegini
+     * gorur, Nuxt'un otomatik import ettigi confirmAction'i DEGIL.
+     * Davranis ayni, yalnizca onaydan sonra yayiliyor.
+     */
+    confirmedDelete() {
+      if (!confirmAction()) return
+      this.$emit("deleteProcess", this.model)
+    },
+
     createdProcess() {
       this.selectedPriority = this.priorities.find(
         (x) => x.priority == this.model.YapilacakOncelik,
