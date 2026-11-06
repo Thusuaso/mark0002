@@ -1,0 +1,492 @@
+{
+  "version": 3,
+  "overrides": {},
+  "routes": [
+    {
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "src": "/_nuxt/builds/meta/(.*)"
+    },
+    {
+      "headers": {
+        "cache-control": "public, max-age=1, immutable"
+      },
+      "src": "/_nuxt/builds/(.*)"
+    },
+    {
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "src": "/_nuxt/(.*)"
+    },
+    {
+      "src": "/_nuxt/builds/meta(.*)",
+      "headers": {
+        "cache-control": "public,max-age=31536000,immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "/_nuxt/builds(.*)",
+      "headers": {
+        "cache-control": "public,max-age=31536000,immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "/_nuxt(.*)",
+      "headers": {
+        "cache-control": "public,max-age=31536000,immutable"
+      },
+      "continue": true
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "(?<__isr_route>/__nuxt_error)",
+      "dest": "/__fallback"
+    },
+    {
+      "src": "/selection/size",
+      "dest": "/selection/size"
+    },
+    {
+      "src": "/selection/input",
+      "dest": "/selection/input"
+    },
+    {
+      "src": "/sample/sample",
+      "dest": "/sample/sample"
+    },
+    {
+      "src": "/sample/finance",
+      "dest": "/sample/finance"
+    },
+    {
+      "src": "/sales/todo",
+      "dest": "/sales/todo"
+    },
+    {
+      "src": "/sales/representative",
+      "dest": "/sales/representative"
+    },
+    {
+      "src": "/sales/maintodo",
+      "dest": "/sales/maintodo"
+    },
+    {
+      "src": "/sales/important-links",
+      "dest": "/sales/important-links"
+    },
+    {
+      "src": "/sales/follow",
+      "dest": "/sales/follow"
+    },
+    {
+      "src": "/sales/consider",
+      "dest": "/sales/consider"
+    },
+    {
+      "src": "/sales/bgp",
+      "dest": "/sales/bgp"
+    },
+    {
+      "src": "/reports/mekmer/strips",
+      "dest": "/reports/mekmer/strips"
+    },
+    {
+      "src": "/reports/mekmer/stock",
+      "dest": "/reports/mekmer/stock"
+    },
+    {
+      "src": "/reports/mekmer/shipped",
+      "dest": "/reports/mekmer/shipped"
+    },
+    {
+      "src": "/reports/mekmer/productions",
+      "dest": "/reports/mekmer/productions"
+    },
+    {
+      "src": "/reports/mekmer/production",
+      "dest": "/reports/mekmer/production"
+    },
+    {
+      "src": "/reports/mekmer/onhold",
+      "dest": "/reports/mekmer/onhold"
+    },
+    {
+      "src": "/reports/mekmer/new-mekmer-finance",
+      "dest": "/reports/mekmer/new-mekmer-finance"
+    },
+    {
+      "src": "/reports/mekmer/mine",
+      "dest": "/reports/mekmer/mine"
+    },
+    {
+      "src": "/reports/mekmer/mekmer-stock-reports",
+      "dest": "/reports/mekmer/mekmer-stock-reports"
+    },
+    {
+      "src": "/reports/mekmer/finance",
+      "dest": "/reports/mekmer/finance"
+    },
+    {
+      "src": "/reports/mekmer/calculating-cost",
+      "dest": "/reports/mekmer/calculating-cost"
+    },
+    {
+      "src": "/reports/mekmer/by-buying-production",
+      "dest": "/reports/mekmer/by-buying-production"
+    },
+    {
+      "src": "/reports/mekmar/supplier-cost",
+      "dest": "/reports/mekmar/supplier-cost"
+    },
+    {
+      "src": "/reports/mekmar/summary",
+      "dest": "/reports/mekmar/summary"
+    },
+    {
+      "src": "/reports/mekmar/mk",
+      "dest": "/reports/mekmar/mk"
+    },
+    {
+      "src": "/reports/mekmar/loading",
+      "dest": "/reports/mekmar/loading"
+    },
+    {
+      "src": "/reports/mekmar/gu",
+      "dest": "/reports/mekmar/gu"
+    },
+    {
+      "src": "/reports/mekmar/forwarding",
+      "dest": "/reports/mekmar/forwarding"
+    },
+    {
+      "src": "/reports/mekmar/filter-finance",
+      "dest": "/reports/mekmar/filter-finance"
+    },
+    {
+      "src": "/reports/mekmar/country-order",
+      "dest": "/reports/mekmar/country-order"
+    },
+    {
+      "src": "/reports/mekmar/continent-order",
+      "dest": "/reports/mekmar/continent-order"
+    },
+    {
+      "src": "/reports/mekmar/ayo",
+      "dest": "/reports/mekmar/ayo"
+    },
+    {
+      "src": "/passwords",
+      "dest": "/passwords"
+    },
+    {
+      "src": "/panel/usa",
+      "dest": "/panel/usa"
+    },
+    {
+      "src": "/panel/project",
+      "dest": "/panel/project"
+    },
+    {
+      "src": "/panel/products/queue",
+      "dest": "/panel/products/queue"
+    },
+    {
+      "src": "/panel/products/published",
+      "dest": "/panel/products/published"
+    },
+    {
+      "src": "/panel/products/notpublished",
+      "dest": "/panel/products/notpublished"
+    },
+    {
+      "src": "/orders/waiting",
+      "dest": "/orders/waiting"
+    },
+    {
+      "src": "/orders/shipped",
+      "dest": "/orders/shipped"
+    },
+    {
+      "src": "/orders/production",
+      "dest": "/orders/production"
+    },
+    {
+      "src": "/operation/uploadform",
+      "dest": "/operation/uploadform"
+    },
+    {
+      "src": "/operation/unfollow",
+      "dest": "/operation/unfollow"
+    },
+    {
+      "src": "/operation/transportlist",
+      "dest": "/operation/transportlist"
+    },
+    {
+      "src": "/operation/transport",
+      "dest": "/operation/transport"
+    },
+    {
+      "src": "/operation/supplier",
+      "dest": "/operation/supplier"
+    },
+    {
+      "src": "/operation/shipment",
+      "dest": "/operation/shipment"
+    },
+    {
+      "src": "/operation/follow",
+      "dest": "/operation/follow"
+    },
+    {
+      "src": "/operation/cost-control",
+      "dest": "/operation/cost-control"
+    },
+    {
+      "src": "/operation/containerlist",
+      "dest": "/operation/containerlist"
+    },
+    {
+      "src": "/operation/container",
+      "dest": "/operation/container"
+    },
+    {
+      "src": "/operation/cards",
+      "dest": "/operation/cards"
+    },
+    {
+      "src": "/offers",
+      "dest": "/offers"
+    },
+    {
+      "src": "/mekmer/products/shipped",
+      "dest": "/mekmer/products/shipped"
+    },
+    {
+      "src": "/mekmer/products/production",
+      "dest": "/mekmer/products/production"
+    },
+    {
+      "src": "/finance-api/reports/test-filter",
+      "dest": "/finance-api/reports/test-filter"
+    },
+    {
+      "src": "/finance-api/reports/test",
+      "dest": "/finance-api/reports/test"
+    },
+    {
+      "src": "/finance-api/reports/mekmer-all",
+      "dest": "/finance-api/reports/mekmer-all"
+    },
+    {
+      "src": "/finance-api/mekmer/po-paid-save",
+      "dest": "/finance-api/mekmer/po-paid-save"
+    },
+    {
+      "src": "/finance-api/mekmar/po-paid-save",
+      "dest": "/finance-api/mekmar/po-paid-save"
+    },
+    {
+      "src": "/finance",
+      "dest": "/finance"
+    },
+    {
+      "src": "/excel-api/selection/output",
+      "dest": "/excel-api/selection/output"
+    },
+    {
+      "src": "/excel-api/selection/labels",
+      "dest": "/excel-api/selection/labels"
+    },
+    {
+      "src": "/excel-api/reports/supplier-cost",
+      "dest": "/excel-api/reports/supplier-cost"
+    },
+    {
+      "src": "/excel-api/reports/stock",
+      "dest": "/excel-api/reports/stock"
+    },
+    {
+      "src": "/excel-api/reports/production",
+      "dest": "/excel-api/reports/production"
+    },
+    {
+      "src": "/excel-api/reports/mk",
+      "dest": "/excel-api/reports/mk"
+    },
+    {
+      "src": "/excel-api/reports/mine",
+      "dest": "/excel-api/reports/mine"
+    },
+    {
+      "src": "/excel-api/reports/loading",
+      "dest": "/excel-api/reports/loading"
+    },
+    {
+      "src": "/excel-api/reports/forwarding",
+      "dest": "/excel-api/reports/forwarding"
+    },
+    {
+      "src": "/excel-api/reports/customer-mekmar",
+      "dest": "/excel-api/reports/customer-mekmar"
+    },
+    {
+      "src": "/excel-api/reports/continents",
+      "dest": "/excel-api/reports/continents"
+    },
+    {
+      "src": "/excel-api/reports/ayo-maliyet",
+      "dest": "/excel-api/reports/ayo-maliyet"
+    },
+    {
+      "src": "/excel-api/reports/ayo-cost",
+      "dest": "/excel-api/reports/ayo-cost"
+    },
+    {
+      "src": "/excel-api/orders/uretim",
+      "dest": "/excel-api/orders/uretim"
+    },
+    {
+      "src": "/excel-api/orders/labels",
+      "dest": "/excel-api/orders/labels"
+    },
+    {
+      "src": "/excel-api/orders/check-list",
+      "dest": "/excel-api/orders/check-list"
+    },
+    {
+      "src": "/excel-api/offer/proforma",
+      "dest": "/excel-api/offer/proforma"
+    },
+    {
+      "src": "/excel-api/mekmer/strips",
+      "dest": "/excel-api/mekmer/strips"
+    },
+    {
+      "src": "/excel-api/mekmer/nakliye",
+      "dest": "/excel-api/mekmer/nakliye"
+    },
+    {
+      "src": "/excel-api/mekmer/moloz",
+      "dest": "/excel-api/mekmer/moloz"
+    },
+    {
+      "src": "/excel-api/gu/operation-orders",
+      "dest": "/excel-api/gu/operation-orders"
+    },
+    {
+      "src": "/excel-api/gu/operation-forwarding",
+      "dest": "/excel-api/gu/operation-forwarding"
+    },
+    {
+      "src": "/excel-api/gu/forwarding",
+      "dest": "/excel-api/gu/forwarding"
+    },
+    {
+      "src": "/excel-api/finance/test-mekmer",
+      "dest": "/excel-api/finance/test-mekmer"
+    },
+    {
+      "src": "/excel-api/finance/test",
+      "dest": "/excel-api/finance/test"
+    },
+    {
+      "src": "/excel-api/finance/custom",
+      "dest": "/excel-api/finance/custom"
+    },
+    {
+      "src": "/customer/selection",
+      "dest": "/customer/selection"
+    },
+    {
+      "src": "/customer/offer",
+      "dest": "/customer/offer"
+    },
+    {
+      "src": "/customer/mekmar",
+      "dest": "/customer/mekmar"
+    },
+    {
+      "src": "/customer/fair",
+      "dest": "/customer/fair"
+    },
+    {
+      "src": "/customer/bgp",
+      "dest": "/customer/bgp"
+    },
+    {
+      "src": "/container",
+      "dest": "/container"
+    },
+    {
+      "src": "/auth/change-password",
+      "dest": "/auth/change-password"
+    },
+    {
+      "src": "/auth",
+      "dest": "/auth"
+    },
+    {
+      "src": "/__perf",
+      "dest": "/__perf"
+    },
+    {
+      "src": "/__nuxt_error",
+      "dest": "/__nuxt_error"
+    },
+    {
+      "src": "/",
+      "dest": "/index"
+    },
+    {
+      "src": "/tcmb-api/usd/(?<kind>[^/]+)/(?<year>[^/]+)/(?<month>[^/]+)/(?<day>[^/]+)",
+      "dest": "/tcmb-api/usd/[kind]/[year]/[month]/[day]"
+    },
+    {
+      "src": "/tcmb-api/usd-average/(?<year>[^/]+)/(?<month>[^/]+)/(?<day>[^/]+)",
+      "dest": "/tcmb-api/usd-average/[year]/[month]/[day]"
+    },
+    {
+      "src": "/mk-api/reports/(?<year>[^/]+)",
+      "dest": "/mk-api/reports/[year]"
+    },
+    {
+      "src": "/maliyet-api/yillik/(?<year>[^/]+)",
+      "dest": "/maliyet-api/yillik/[year]"
+    },
+    {
+      "src": "/maliyet-api/aylik/(?<year>[^/]+)/(?<month>[^/]+)",
+      "dest": "/maliyet-api/aylik/[year]/[month]"
+    },
+    {
+      "src": "/finance-api/mekmer/po-payments/(?<po>[^/]+)",
+      "dest": "/finance-api/mekmer/po-payments/[po]"
+    },
+    {
+      "src": "/finance-api/mekmer/monthly-orders/(?<month>[^/]+)",
+      "dest": "/finance-api/mekmer/monthly-orders/[month]"
+    },
+    {
+      "src": "/finance-api/mekmer/customer-orders/(?<customer>[^/]+)",
+      "dest": "/finance-api/mekmer/customer-orders/[customer]"
+    },
+    {
+      "src": "/tcmb-api/kurlar/?(?<path>.+)",
+      "dest": "/tcmb-api/kurlar/[...path]"
+    },
+    {
+      "src": "/__nuxt_island/(?:.*)",
+      "dest": "/__nuxt_island/[...]"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/__fallback"
+    }
+  ]
+}

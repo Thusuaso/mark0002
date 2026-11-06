@@ -1,0 +1,1 @@
+function e(e){return e.toString().length===1?`0${e}`:String(e)}function t(t){if(t==null)return``;let n=new Date(t);return`${n.getFullYear()}-${e(n.getMonth()+1)}-${e(n.getDate())}`}function n(e){if(e==null)return``;let[t,n,r]=e.split(`-`);return new Date(`${t}-${n}-${r}`)}export{t as n,n as t};

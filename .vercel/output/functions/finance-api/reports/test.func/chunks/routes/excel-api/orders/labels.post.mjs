@@ -1,0 +1,227 @@
+import { d as defineEventHandler, r as requireObject, e as readBody, f as fillTemplate, s as sendXlsxBuffer, n as nc, l as restyle, T as THIN } from '../../../_/nitro.mjs';
+import 'node:https';
+import 'node:crypto';
+import 'node:module';
+import 'node:http';
+import 'node:events';
+import 'node:buffer';
+import '@primevue/core/base/style';
+import '@primevue/core/basecomponent/style';
+import '@primeuix/styles/autocomplete';
+import '@primeuix/utils/object';
+import '@primeuix/styles/cascadeselect';
+import '@primeuix/styles/checkbox';
+import '@primeuix/styles/checkboxgroup';
+import '@primeuix/styles/colorpicker';
+import '@primeuix/styles/datepicker';
+import '@primeuix/styles/floatlabel';
+import '@primeuix/styles/iconfield';
+import '@primeuix/styles/iftalabel';
+import '@primeuix/styles/inputchips';
+import '@primeuix/styles/inputgroup';
+import '@primeuix/styles/inputnumber';
+import '@primeuix/styles/inputotp';
+import '@primeuix/styles/inputtext';
+import '@primeuix/styles/knob';
+import '@primeuix/styles/listbox';
+import '@primeuix/styles/multiselect';
+import '@primeuix/styles/password';
+import '@primeuix/styles/radiobutton';
+import '@primeuix/styles/radiobuttongroup';
+import '@primeuix/styles/rating';
+import '@primeuix/styles/select';
+import '@primeuix/styles/selectbutton';
+import '@primeuix/styles/slider';
+import '@primeuix/styles/textarea';
+import '@primeuix/styles/togglebutton';
+import '@primeuix/styles/toggleswitch';
+import '@primeuix/styles/treeselect';
+import '@primeuix/styles/button';
+import '@primeuix/styles/buttongroup';
+import '@primeuix/styles/speeddial';
+import '@primeuix/styles/splitbutton';
+import '@primeuix/styles/datatable';
+import '@primeuix/styles/dataview';
+import '@primeuix/styles/orderlist';
+import '@primeuix/styles/organizationchart';
+import '@primeuix/styles/paginator';
+import '@primeuix/styles/picklist';
+import '@primeuix/styles/tree';
+import '@primeuix/styles/treetable';
+import '@primeuix/styles/timeline';
+import '@primeuix/styles/virtualscroller';
+import '@primeuix/styles/accordion';
+import '@primeuix/styles/card';
+import '@primeuix/styles/divider';
+import '@primeuix/styles/fieldset';
+import '@primeuix/styles/panel';
+import '@primeuix/styles/scrollpanel';
+import '@primeuix/styles/splitter';
+import '@primeuix/styles/stepper';
+import '@primeuix/styles/tabview';
+import '@primeuix/styles/tabs';
+import '@primeuix/styles/toolbar';
+import '@primeuix/styles/confirmdialog';
+import '@primeuix/styles/confirmpopup';
+import '@primeuix/styles/dialog';
+import '@primeuix/styles/drawer';
+import '@primeuix/styles/popover';
+import '@primeuix/styles/fileupload';
+import '@primeuix/styles/breadcrumb';
+import '@primeuix/styles/contextmenu';
+import '@primeuix/styles/dock';
+import '@primeuix/styles/menu';
+import '@primeuix/styles/menubar';
+import '@primeuix/styles/megamenu';
+import '@primeuix/styles/panelmenu';
+import '@primeuix/styles/steps';
+import '@primeuix/styles/tabmenu';
+import '@primeuix/styles/tieredmenu';
+import '@primeuix/styles/message';
+import '@primeuix/styles/inlinemessage';
+import '@primeuix/styles/toast';
+import '@primeuix/styles/carousel';
+import '@primeuix/styles/galleria';
+import '@primeuix/styles/image';
+import '@primeuix/styles/imagecompare';
+import '@primeuix/styles/avatar';
+import '@primeuix/styles/badge';
+import '@primeuix/styles/blockui';
+import '@primeuix/styles/chip';
+import '@primeuix/styles/inplace';
+import '@primeuix/styles/metergroup';
+import '@primeuix/styles/overlaybadge';
+import '@primeuix/styles/scrolltop';
+import '@primeuix/styles/skeleton';
+import '@primeuix/styles/progressbar';
+import '@primeuix/styles/progressspinner';
+import '@primeuix/styles/tag';
+import '@primeuix/styles/terminal';
+import '@primevue/forms/form/style';
+import '@primevue/forms/formfield/style';
+import '@primeuix/styles/tooltip';
+import '@primeuix/styles/ripple';
+import '@primeuix/styled';
+import 'socket.io';
+import 'jsonwebtoken';
+import 'mssql';
+import 'aws-sdk';
+import 'body-parser';
+import 'express';
+import 'nodemailer';
+import 'axios';
+import 'xml2js';
+import 'crypto';
+import 'cookie-parser';
+import 'node:fs';
+import 'node:path';
+
+const F_HEADER = { bold: true, size: 10 };
+const F_TITLE = { bold: true, size: 18 };
+const F_SIRA = { bold: true, size: 40 };
+const F_WARN_TITLE = { bold: true, size: 8 };
+const F_SMALL = { size: 7.5 };
+const F_PRODUCT = { bold: true, size: 15 };
+const A_CENTER = { horizontal: "center", vertical: "middle", wrapText: true };
+const A_LEFT = { horizontal: "left", vertical: "middle" };
+const A_LEFT_TOP = { horizontal: "left", vertical: "top", wrapText: true };
+const ROWS_PER_LABEL = 12;
+const COLS_PER_LABEL = 10;
+const WARNING_TITLE = "WARNING - READ PRIOR TO INSTALLATION";
+const WARNING_BODY = "Natural stones are products of nature and are prone to variations in color, texture, shading and veining that may differ from displays. Variations are not considered flaws as no two pieces of stone are alike. Prior to installation, ensure enough material including waste is purchased for the entire project. Mix product from various cartons and lay out all tiles and coordinating pieces to ensure optimal blending prior to installation. Natural stone products should be sealed prior to grouting.";
+const NO_CLAIMS = "NO CLAIMS WILL BE ACCEPTED AFTER THE MATERIAL HAS BEEN INSTALLED";
+const labels_post = defineEventHandler(async (event) => {
+  var _a, _b, _c;
+  const body = requireObject(await readBody(event));
+  const items = (_a = body.list) != null ? _a : [];
+  const customer = ((_b = body.customer) != null ? _b : "").toUpperCase();
+  const po = (_c = body.po) != null ? _c : null;
+  const buffer = await fillTemplate(
+    /*
+     * Python `kitap.active` ile ILK sayfayi aliyor; sablonun tek
+     * sayfasi 'Sayfa1'.
+     */
+    { template: "etiket_sablon.xlsx", sheetName: "Sayfa1" },
+    (sheet) => {
+      items.forEach((item, index) => {
+        var _a2;
+        const page = Math.floor(index / 4);
+        const pos = index % 4;
+        const r = page * (ROWS_PER_LABEL * 2) + Math.floor(pos / 2) * ROWS_PER_LABEL + 1;
+        const c = pos % 2 * COLS_PER_LABEL + 1;
+        const cstmr = sheet.getCell(r, c);
+        cstmr.value = "CSTMR:";
+        cstmr.style = { font: F_HEADER, alignment: A_LEFT };
+        sheet.mergeCells(r, c + 1, r, c + 7);
+        const cust = sheet.getCell(r, c + 1);
+        cust.value = customer;
+        cust.style = { font: F_TITLE, alignment: A_CENTER };
+        sheet.mergeCells(r, c + 8, r, c + 9);
+        const dest = sheet.getCell(r, c + 8);
+        dest.value = "DESTINATION";
+        dest.style = { font: F_HEADER, alignment: A_CENTER };
+        const order = sheet.getCell(r + 1, c);
+        order.value = "ORDER:";
+        order.style = { font: F_HEADER, alignment: A_LEFT };
+        sheet.mergeCells(r + 1, c + 1, r + 1, c + 7);
+        const poCell = sheet.getCell(r + 1, c + 1);
+        poCell.value = po;
+        poCell.style = { font: F_TITLE, alignment: A_CENTER };
+        sheet.mergeCells(r + 1, c + 8, r + 1, c + 9);
+        sheet.mergeCells(r + 2, c, r + 5, c + 1);
+        const sira = sheet.getCell(r + 2, c);
+        sira.value = (_a2 = item.Sira) != null ? _a2 : null;
+        sira.style = { font: F_SIRA, alignment: A_CENTER };
+        sheet.mergeCells(r + 6, c, r + 6, c + 1);
+        const products = sheet.getCell(r + 6, c);
+        products.value = "PRODUCTS:";
+        products.style = { font: F_HEADER, alignment: A_CENTER };
+        const t = (v) => v == null ? "" : String(v);
+        const productInfo = `${t(item.KategoriAdi)} / ${t(item.UrunAdi)} / 
+${t(item.YuzeyIslem)} / ${t(item.En)} x ${t(item.Boy)} x ${t(item.Kenar)} cm / 
+${t(item.Adet)} pcs / ${t(item.Miktar)} ${t(item.BirimAdi)}`;
+        sheet.mergeCells(r + 2, c + 2, r + 6, c + 7);
+        const info = sheet.getCell(r + 2, c + 2);
+        info.value = productInfo;
+        info.style = { font: F_PRODUCT, alignment: A_CENTER };
+        sheet.mergeCells(r + 2, c + 8, r + 6, c + 9);
+        const pot = sheet.getCell(r + 2, c + 8);
+        pot.value = "PRODUCT\nOF\nTURKEY";
+        pot.style = { font: F_HEADER, alignment: A_CENTER };
+        sheet.mergeCells(r + 7, c, r + 7, c + 7);
+        const fragile = sheet.getCell(r + 7, c);
+        fragile.value = '"FRAGILE"';
+        fragile.style = { font: F_TITLE, alignment: A_CENTER };
+        sheet.mergeCells(r + 7, c + 8, r + 7, c + 9);
+        const kgs = sheet.getCell(r + 7, c + 8);
+        kgs.value = `${Math.trunc(nc(item.Ton))} KGS`;
+        kgs.style = { font: F_HEADER, alignment: A_CENTER };
+        sheet.mergeCells(r + 8, c, r + 8, c + 9);
+        const warnHead = sheet.getCell(r + 8, c);
+        warnHead.value = WARNING_TITLE;
+        warnHead.style = { font: F_WARN_TITLE, alignment: A_LEFT };
+        sheet.mergeCells(r + 9, c, r + 9, c + 9);
+        const warnBody = sheet.getCell(r + 9, c);
+        warnBody.value = WARNING_BODY;
+        warnBody.style = { font: F_SMALL, alignment: A_LEFT_TOP };
+        sheet.getRow(r + 9).height = 45;
+        sheet.mergeCells(r + 10, c, r + 10, c + 9);
+        const claims = sheet.getCell(r + 10, c);
+        claims.value = NO_CLAIMS;
+        claims.style = { font: F_HEADER, alignment: A_CENTER };
+        for (let rr = r; rr <= r + 10; rr++) {
+          for (let cc = c; cc <= c + 9; cc++) {
+            restyle(sheet.getCell(rr, cc), { border: THIN });
+          }
+        }
+      });
+      for (let col = 1; col <= COLS_PER_LABEL * 2; col++) {
+        sheet.getColumn(col).width = 11;
+      }
+    }
+  );
+  return sendXlsxBuffer(event, buffer, "kasa_etiketleri.xlsx");
+});
+
+export { labels_post as default };
+//# sourceMappingURL=labels.post.mjs.map

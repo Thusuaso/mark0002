@@ -1,0 +1,1 @@
+import{n as e,t}from"./CGDZ2bMq.js";function n(){let n=t(`token`);return e.create({baseURL:`/api`,onRequest({options:e}){n.value&&e.headers.set(`Authorization`,`Bearer ${n.value}`)},onResponseError({response:e}){(e.status===401||e.status===403)&&console.warn(`Yetkisiz işlem veya token süresi doldu!`)}})}export{n as t};

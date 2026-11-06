@@ -1,0 +1,1 @@
+import{c as e,u as t}from"./BfGtkTg9.js";import{t as n}from"./CGDZ2bMq.js";var r=[48,54,56,62],i=e(()=>{let e=n(`userId`);if(e.value&&r.includes(Number(e.value)))return t(`/`)});export{i as default};

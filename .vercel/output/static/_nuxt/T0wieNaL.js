@@ -1,0 +1,1 @@
+import{n as e}from"./CGDZ2bMq.js";function t(){async function t(t,n=`forex`){let r=new Date(t),i=r.getFullYear(),a=r.getMonth()+1,o=r.getDate();return await e(`/tcmb-api/usd/${n}/${i}/${a}/${o}`,{baseURL:`/`})}return{getUSDRate:t}}export{t};

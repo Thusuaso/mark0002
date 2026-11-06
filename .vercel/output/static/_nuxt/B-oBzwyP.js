@@ -1,0 +1,1 @@
+import{n as e}from"./hePW80VL.js";import{t}from"./CJFgjcHx.js";var n=e({default:()=>r}),r={name:`Row`,extends:t,inject:[`$rows`],mounted:function(){var e;(e=this.$rows)==null||e.add(this.$)},unmounted:function(){var e;(e=this.$rows)==null||e.delete(this.$)},render:function(){return null}};export{r as n,n as t};

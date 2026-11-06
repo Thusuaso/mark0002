@@ -1,0 +1,1 @@
+import{t as e}from"./DeOmzP9e.js";function t(t,n,r){e.emit(`add`,{severity:t,summary:n,detail:r,life:3e3})}function n(){return{success(e){t(`success`,`Başarılı`,e)},error(e){t(`error`,`Hata`,e)},warn(e){t(`warn`,`Uyarı`,e)},info(e){t(`info`,`Bilgi`,e)}}}export{n as t};

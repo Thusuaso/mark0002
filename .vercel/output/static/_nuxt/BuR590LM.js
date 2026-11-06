@@ -1,0 +1,1 @@
+import{U as e,p as t,y as n,z as r}from"./DUUoC_6G.js";import{t as i}from"#entry";import a from"./dLY2ZKVx.js";var o={};function s(i,o){let s=a;return r(),t(`div`,null,[n(s),e(i.$slots,`default`)])}var c=i(o,[[`render`,s]]);export{c as default};

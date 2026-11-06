@@ -1,0 +1,1 @@
+import{g as e,n as t}from"#entry";async function n(n,r,i={}){let a=t();await e(n,async()=>{let e=r.filter(([e])=>{if(i.force)return!0;let t=a.$state[e];return!Array.isArray(t)||t.length===0}).map(([,e])=>e());return await Promise.all(e),!0},{server:!1})}export{n as t};

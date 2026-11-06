@@ -1,0 +1,1 @@
+import{n as e}from"./hePW80VL.js";import{t}from"./BBCsvFkL.js";var n=e({default:()=>r}),r={name:`Dropdown`,extends:t,mounted:function(){console.warn(`Deprecated since v4. Use Select component instead.`)}};export{r as n,n as t};

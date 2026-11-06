@@ -1,0 +1,1 @@
+function e(e=`Are you sure you want to perform this action?`){return typeof window>`u`||window.confirm(e)}export{e as t};

@@ -1,0 +1,1 @@
+import{t as e}from"./DPYTaVWX.js";function t(e,t=200){return{data:e,status:t}}function n(){let n=e();async function r(e,r={}){return t(await n(e,r))}return{get:(e,t)=>r(e,{...t,method:`GET`}),post:(e,t,n)=>r(e,{...n,method:`POST`,body:t}),put:(e,t,n)=>r(e,{...n,method:`PUT`,body:t}),delete:(e,t)=>r(e,{...t,method:`DELETE`})}}export{n as t};
