@@ -308,13 +308,6 @@
                 </li>
                 <li>
                   <NuxtLink
-                    to="/reports/mekmer/atlanta"
-                    class="dropdown-item"
-                    >ATL</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
                     to="/reports/mekmer/productions"
                     class="dropdown-item"
                     >Production</NuxtLink

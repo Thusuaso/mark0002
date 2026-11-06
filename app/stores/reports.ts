@@ -117,7 +117,6 @@ export const useReportsStore = defineStore("reports", {
   reportsMekmarGuLogsList: [],
   reportsMekmarGuForwList: [],
   reportsMekmarGuOrderList: [],
-  reportsMekmerAtlantaList: [],
   reportsMekmarMkList: [],
   reportsMekmarGuAyoList: [],
   reportsMekmarGuOrdererThisYear: [],
@@ -258,7 +257,6 @@ export const useReportsStore = defineStore("reports", {
     getReportsMekmarGuMekusList: (state) => state.reportsMekmarGuMekusList,
     getReportsMekmarGuLogsList: (state) => state.reportsMekmarGuLogsList,
     getReportsMekmarGuForwList: (state) => state.reportsMekmarGuForwList,
-    getReportsMekmerAtlantaList: (state) => state.reportsMekmerAtlantaList,
     getReportsMekmarGuOrderList: (state) => state.reportsMekmarGuOrderList,
   },
 
@@ -1039,20 +1037,6 @@ export const useReportsStore = defineStore("reports", {
             this.MUT_setReportsMekmarGuList(response.data);
           });
     },
-    setReportsMekmerAtlantaList() {
-      const legacyApi = useLegacyApi()
-      const sharedStore = useSharedStore()
-
-          sharedStore.beginLoading();
-          legacyApi.get("/reports/mekmer/atlanta/list").then((response) => {
-            this.MUT_setReportsMekmerAtlantaList(response.data.list);
-            sharedStore.endLoading();
-          })
-            .catch((err) => {
-              console.error("setReportsMekmerAtlantaList basarisiz:", err)
-              sharedStore.endLoading()
-            });
-    },
 
     /* ---------- mutation'lar (MUT_ onekli) ---------- */
     MUT_setMekmarGuSelectedUser(payload) {
@@ -1678,10 +1662,6 @@ export const useReportsStore = defineStore("reports", {
           }
 
           this.reportsMekmarGuAyoList = payload.ayoList;
-    },
-    MUT_setReportsMekmerAtlantaList(payload) {
-
-          this.reportsMekmerAtlantaList = payload;
     },
     MUT_setReportsMekmarSummaryOrderListByRepresentative(payload) {
 
