@@ -661,6 +661,28 @@ export default {
       });
   },
   methods: {
+    /**
+     * Yil secili mi?
+     *
+     * Bu sayfadaki sekiz maliyet dialogu da adresini
+     * `this.selectedYear.Yil` uzerinden kuruyor. selectedYear null
+     * oldugunda eski kod TypeError atiyor, metot o satirda kesiliyor
+     * ve `..._form_visible = true` satirina HIC gelinmiyordu: dialog
+     * acilmiyor, kullaniciya da hicbir sey soylenmiyordu.
+     *
+     * selectedYear normalde yil listesi geldiginde izleyici tarafindan
+     * doluyor (yukarida), ama iki durumda null kalabiliyor:
+     *   - liste HENUZ gelmemisken kullanici butona basarsa,
+     *   - yil listesi BOS donerse.
+     *
+     * Artik sessiz patlamak yerine sebebi soyluyor.
+     */
+    requireYear() {
+      if (this.selectedYear?.Yil) return true;
+
+      useAppToast().warn("Please select a year first.");
+      return false;
+    },
     /*
      * YILLIK maliyet listesi. Artik EXCEL SUNUCUSUNDAN DEGIL, Nitro'dan:
      * server/routes/maliyet-api/yillik/[year].get.ts
@@ -728,6 +750,9 @@ export default {
 
     /* */
     mekmerCost() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/mekmer/cost/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -790,23 +815,37 @@ export default {
                                 meal: meal.data.list,
                               };
 
-                              useExcelApi()
-                                .post("/reports/mekmar/ayo/cost/excel", data)
-                                .then((response) => {
-                                  if (response.status) {
-                                    const link = document.createElement("a");
-                                    link.href =
-                                      this.getLocalUrl +
-                                      "reports/mekmar/ayo/cost/excel";
-
-                                    link.setAttribute(
-                                      "download",
-                                      "ayo_cost_excel.xlsx"
-                                    );
-                                    document.body.appendChild(link);
-                                    link.click();
-                                  }
-                                });
+                              /*
+                               * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+                               *   eski: POST + GET
+                               *         {excelServerBase}/reports/mekmar/ayo/cost/excel
+                               *   yeni: POST /excel-api/reports/ayo-cost  (tek istek)
+                               *         server/routes/excel-api/reports/ayo-cost.post.ts
+                               *
+                               * Cikti uretimdekiyle KARSILASTIRILDI: sablonun
+                               * ALTI sayfasinin (creditcard, travel, wage,
+                               * sample, fuil, meal) hepsinde deger, sayi
+                               * bicimi ve hucre stili farki 0.
+                               *
+                               * Elle <a> kurmak da dustu: adres tek yerden
+                               * geliyor ve olusturulan <a> DOM'dan
+                               * kaldiriliyor (eski kod kaldirmiyordu).
+                               *
+                               * `if (response.status)` DUSTU -- HTTP durumunu
+                               * (daima 200) okuyordu, govdedeki
+                               * {"status": false}'u DEGIL.
+                               */
+                              exportExcel(
+                                "/excel-api/reports/ayo-cost",
+                                data,
+                                "ayo_cost_excel.xlsx"
+                              ).catch((err) => {
+                                console.error(
+                                  "ayo maliyet excel ciktisi basarisiz:",
+                                  err
+                                );
+                                useAppToast().error("Excel olusturulamadi.");
+                              });
                             });
                         });
                     });
@@ -833,6 +872,9 @@ export default {
       });
     },
     currency() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/currency/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -890,6 +932,9 @@ export default {
       });
     },
     otherCost() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/other/cost/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -917,6 +962,9 @@ export default {
       });
     },
     sampleCost() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/sample/cost/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -943,6 +991,9 @@ export default {
       });
     },
     abroadCost() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/abroad/cost/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -971,6 +1022,9 @@ export default {
         });
     },
     wageCost() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/wage/cost/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -1019,6 +1073,9 @@ export default {
         });
     },
     travelCost() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/travel/cost/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -1027,6 +1084,9 @@ export default {
         });
     },
     creditCardToggle() {
+      /* Yil yoksa dialogu acmayi DENEME -- gerekcesi requireYear(). */
+      if (!this.requireYear()) return;
+
       useLegacyApi()
         .get(`/reports/ayo/credit/card/cost/list/${this.selectedYear.Yil}`)
         .then((res) => {
@@ -1263,20 +1323,31 @@ export default {
           });
       }
     },
-    excel_output() {
-      useExcelApi()
-        .post(
-          "/maliyet/dosyalar/maliyetRaporExcelListe",
-          this.reportsStore.getReportsMekmarAyoList
-        )
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "maliyet/dosyalar/maliyetRaporExcelListe",
-              "ayo_maliyet_listesi.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET
+     *         {excelServerBase}/maliyet/dosyalar/maliyetRaporExcelListe
+     *   yeni: POST /excel-api/reports/ayo-maliyet   (tek istek)
+     *         server/routes/excel-api/reports/ayo-maliyet.post.ts
+     *
+     * Cikti uretimdekiyle GERCEK VERIYLE karsilastirildi (44 satir x
+     * 30 sutun): deger, sayi bicimi, hucre stili, sutun genisligi ve
+     * 312 satir yuksekligi farki 0.
+     *
+     * `if (response.status)` DUSTU -- HTTP durumunu (daima 200)
+     * okuyordu, govdedeki {"status": false}'u DEGIL.
+     */
+    async excel_output() {
+      try {
+        await exportExcel(
+          "/excel-api/reports/ayo-maliyet",
+          this.reportsStore.getReportsMekmarAyoList,
+          "ayo_maliyet_listesi.xlsx"
+        );
+      } catch (err) {
+        console.error("ayo maliyet listesi ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     allAyoList(event) {
       if (this.checked) {
@@ -1391,7 +1462,24 @@ export default {
   },
   watch: {
     "reportsStore.getReportsMekmarAyoYearList"() {
-      this.selectedYear = this.reportsStore.getReportsMekmarAyoYearList[0];
+      /*
+       * [!] BOS LISTE KORUMASI.
+       *
+       * Eskiden burada dogrudan `[0]` alinip hemen `.Yil` okunuyordu.
+       * Yil listesi bos donerse (uc hata verir ya da gercekten kayit
+       * yoksa) `undefined.Yil` TypeError atiyor; izleyici yarida
+       * kesiliyor ve `selectedYear` undefined KALIYOR.
+       *
+       * Sonucu sayfanin her yerine yayiliyordu: sekiz maliyet
+       * dialogunun hepsi `this.selectedYear.Yil` okudugu icin
+       * butonlara basildiginda HICBIR SEY olmuyordu (dialog acilmiyor,
+       * uyari da cikmiyor).
+       */
+      this.selectedYear =
+        this.reportsStore.getReportsMekmarAyoYearList[0] ?? null;
+
+      if (!this.selectedYear) return;
+
       this.reportsStore.setReportsMekmarAyoMonthList(this.selectedYear.Yil);
     },
     "reportsStore.getReportsMekmarAyoMonthList"() {

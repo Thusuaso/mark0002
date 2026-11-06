@@ -277,21 +277,47 @@ export default {
       })
     },
 
-    excel_output_custom(){
+    async excel_output_custom(){
 
       const data =  {
         'po':this.poList,
         'paid':this.paidList
       }
 
-      useExcelApi().post("/finance/mekmar/excel/custom", data).then((response) => {
-        if (response.status) {
-          downloadFromExcelServer(
-              "finance/mekmar/excel/custom",
-              "finance_detail_custom.xlsx"
-            );
-        }
-      });
+      /*
+       * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+       *   eski: POST + GET {excelServerBase}/finance/mekmar/excel/custom
+       *   yeni: POST /excel-api/finance/custom   (tek istek)
+       *         server/routes/excel-api/finance/custom.post.ts
+       *
+       * Cikti uretimdekiyle KARSILASTIRILDI (iki sayfa da):
+       * deger, sayi bicimi, hucre stili, genislik farki 0.
+       *
+       * [!] BU UCTA URETIMDE CANLI BIR HATA VAR ve tasima onu
+       *     duzeltiyor: Python'daki _formatControl(None) Python 3'te
+       *     TypeError firlatiyor, yani govdede BOS BIR SAYI (orn.
+       *     Pesinat veya YuklemeTarihi null) oldugunda uc tamamen
+       *     dusuyor. Olculdu:
+       *       null'lu govde -> {"status": false}, GET 200 + 8714 bayt
+       *                        (= SABLONUN AYNISI, yani BOS DOSYA)
+       *       null'suz govde -> {"status": true},  GET 200 + 5697 bayt
+       *     Istemci govdedeki status'u kontrol etmedigi icin kullanici
+       *     bos sablonu "rapor" olarak indiriyordu. Nitro tarafinda
+       *     bos degerler 0 / "" sayiliyor ve rapor uretiliyor.
+       *
+       * `if (response.status)` DUSTU -- HTTP durumunu (daima 200)
+       * okuyordu, tam da yukaridaki sessiz basarisizligin sebebi.
+       */
+      try {
+        await exportExcel(
+          "/excel-api/finance/custom",
+          data,
+          "finance_detail_custom.xlsx",
+        );
+      } catch (err) {
+        console.error("finans detay excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     rowClass(event) {
       return event.MayaControl ? "red-row" : "";

@@ -19,11 +19,12 @@
  * truncate/drop/exec/merge izi YOK, gecici tablo YOK.
  *
  * ---------------------------------------------------------------------
- * ALTINCI ANAHTAR (byYuklemevSiparisler) DONULMUYOR
+ * YEDINCI ANAHTAR (byYuklemevSiparisler) -- ATILIP GERI KONDU
  * ---------------------------------------------------------------------
- * Python yedi anahtar donduruyordu. `byYuklemevSiparisler`
- * (mkRaporlarSevkSip, reports.py:265-314) istemcide HIC OKUNMUYOR --
- * tarama sifir referans buldu. Donulmedigi icin o sorgu da atildi.
+ * Bu ucun ilk surumunde `byYuklemevSiparisler` donulmuyordu ("istemcide
+ * hic okunmuyor"). Tarama dogruydu ama eksikti: anahtari EKRAN degil
+ * EXCEL CIKTISI okuyor (Sayfa5). Geri kondu; ayrintisi asagida 7.
+ * basligin altinda.
  *
  * ---------------------------------------------------------------------
  * PYTHON'UN 425 SATIRLIK DEV DALLANMASI VERIYE CEVRILDI
@@ -568,6 +569,133 @@ async function byCustomerOrder() {
 
 /* ==================================================================== */
 
+/* ====================================================================
+ * 7) byYuklemevSiparisler -- mkRaporlarSevkSip (reports.py:265)
+ *
+ * ---------------------------------------------------------------------
+ * [!] BU ANAHTAR ONCE BILEREK ATILMISTI -- GERI KONDU
+ * ---------------------------------------------------------------------
+ * Bu ucun ilk surumunde `byYuklemevSiparisler` donulmuyordu; gerekce
+ * "istemcide hic okunmuyor, tarama sifir referans buldu" idi. Tarama
+ * dogruydu ama EKSIKTI: anahtari EKRAN okumuyor, EXCEL CIKTISI
+ * okuyor.
+ *
+ * pages/reports/mekmar/mk.vue -> excel_output() govde olarak bu ucun
+ * TUM yanitini gonderiyor; Excel tarafi da ondan 'Sayfa5'i dolduruyor
+ * (component/excel.py:422-427 -> musteriadi / siparisfob /
+ *  yuklenenddp). Anahtar olmayinca Sayfa5 SESSIZCE BOS kaliyordu:
+ * ne hata, ne uyari -- yalnizca baslik satiri olan bir sayfa.
+ *
+ * Bu yuzden sorgu geri getirildi.
+ *
+ * ---------------------------------------------------------------------
+ * DONULEN ALANLAR
+ * ---------------------------------------------------------------------
+ * Python'un semasi (MkRaporlarSevkSipSchema, model/mk.py:54) on alan
+ * bildiriyor ama modelin (model/mk.py:66) yalnizca bir kismi
+ * dolduruluyor:
+ *   - po / tarih / teslimtur / siparisddp : model varsayilani olarak
+ *     SABIT bos kaliyor ("" ve 0), hicbir yerde okunmuyor
+ *   - siparistarihi / yuklemetarihi       : modelde HIC YOK, marshmallow
+ *     atliyor
+ *   - total                               : modelde var ama SEMADA YOK,
+ *     yani zaten serialize edilmiyor
+ * Geriye anlamli dort alan kaliyor; yalnizca onlar donuluyor.
+ * ==================================================================== */
+
+/*
+ * Python'un eski usul virgullu join'i (reports.py:272-276) acikca
+ * yazildi. Iliskili alt sorgular aynen korundu: musteri bazinda
+ * SIPARIS yili ve YUKLEME yili toplamlari.
+ *
+ * [!] Python ikisinde de SiparisDurumID filtresi KULLANMIYOR -- kardes
+ *     sorgularin aksine (orn. SQL_MK_YUKLEME `= 3` suzuyor). Bu bir
+ *     tutarsizlik ama davranis birebir korundu: suzgec eklemek Sayfa5
+ *     rakamlarini degistirirdi.
+ */
+const SQL_MK_SEVK_SIP = `
+select
+  m.FirmaAdi as FirmaAdi,
+  (
+    select sum(su.SatisToplam)
+    from SiparislerTB s
+      inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+    where s.MusteriID = m.ID and YEAR(s.SiparisTarihi) = @year
+  ) as BuYilSiparisler,
+  (
+    select sum(su.SatisToplam)
+    from SiparislerTB s
+      inner join SiparisUrunTB su on su.SiparisNo = s.SiparisNo
+    where s.MusteriID = m.ID and YEAR(s.YuklemeTarihi) = @year
+  ) as BuYilYuklenenler
+from MusterilerTB m
+where m.Marketing = 'Mekmar'
+`
+
+/* Python: yuklenenMusteriMasraf (reports.py:282-292). */
+const SQL_MK_SEVK_SIP_MASRAF = `
+select
+  m.FirmaAdi as FirmaAdi,
+  sum(s.NavlunSatis) + sum(s.DetayTutar_1) + sum(s.DetayTutar_2) + sum(s.DetayTutar_3) as NavlunvDiger
+from SiparislerTB s
+  inner join MusterilerTB m on m.ID = s.MusteriID
+where YEAR(s.YuklemeTarihi) = @year and m.Marketing = 'Mekmar'
+group by s.MusteriID, m.FirmaAdi
+`
+
+async function byYuklemevSiparisler(year: number) {
+  const [rows, masraf] = await dbAll([
+    dbQuery<{
+      FirmaAdi: string
+      BuYilSiparisler: number | null
+      BuYilYuklenenler: number | null
+    }>(SQL_MK_SEVK_SIP, { year }),
+    dbQuery<{ FirmaAdi: string; NavlunvDiger: number | null }>(
+      SQL_MK_SEVK_SIP_MASRAF,
+      { year },
+    ),
+  ])
+
+  /*
+   * Python __getYuklenenMasraf (reports.py:339) listeyi bastan tarayip
+   * ILK eslesmeyi donduruyor. Masraf sorgusu MusteriID'ye gore
+   * grupladigi icin AYNI FirmaAdi birden fazla satirda cikabilir
+   * (ayni unvanli iki musteri kaydi); o durumda Python ilkini alir.
+   * Map ilk degeri koruyarak ayni secimi yapiyor.
+   *
+   * Eslesme yoksa Python fonksiyonu ortulu olarak None doner ve
+   * __getNoneType onu 0'a cevirir -- burada `?? 0`.
+   */
+  const masrafByFirma = new Map<string, number>()
+  for (const item of masraf) {
+    if (masrafByFirma.has(item.FirmaAdi)) continue
+    masrafByFirma.set(item.FirmaAdi, num(item.NavlunvDiger))
+  }
+
+  return (
+    rows
+      /*
+       * Python: iki toplam da None ise satir ATLANIYOR (reports.py:295).
+       * Yani hic siparisi ve hic yuklemesi olmayan Mekmar musterileri
+       * listeye girmiyor. Biri doluysa satir KALIYOR.
+       */
+      .filter(
+        (item) =>
+          !(item.BuYilSiparisler === null && item.BuYilYuklenenler === null),
+      )
+      .map((item) => {
+        const yuklenenfob = num(item.BuYilYuklenenler)
+
+        return {
+          musteriadi: item.FirmaAdi,
+          siparisfob: num(item.BuYilSiparisler),
+          yuklenenfob,
+          yuklenenddp: yuklenenfob + (masrafByFirma.get(item.FirmaAdi) ?? 0),
+        }
+      })
+  )
+}
+
 export default defineEventHandler(async (event) => {
   const year = Number(getRouterParam(event, "year"))
 
@@ -583,16 +711,24 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  /* Python alti sorgu grubunu SIRAYLA calistiriyordu; bagimsizlar. */
-  const [po, customer, marketing, marketingYukleme, marketingDetail, customerOrder] =
-    await dbAll([
-      byPo(year),
-      byCustomer(year),
-      byMarketing(year),
-      byMarketingYukleme(year),
-      byMarketingDetail(year),
-      byCustomerOrder(),
-    ])
+  /* Python yedi sorgu grubunu SIRAYLA calistiriyordu; bagimsizlar. */
+  const [
+    po,
+    customer,
+    marketing,
+    marketingYukleme,
+    marketingDetail,
+    customerOrder,
+    sevkSip,
+  ] = await dbAll([
+    byPo(year),
+    byCustomer(year),
+    byMarketing(year),
+    byMarketingYukleme(year),
+    byMarketingDetail(year),
+    byCustomerOrder(),
+    byYuklemevSiparisler(year),
+  ])
 
   return {
     byPo: po,
@@ -601,5 +737,6 @@ export default defineEventHandler(async (event) => {
     byMarketingYukleme: marketingYukleme,
     byMarketingDetayYukleme: marketingDetail,
     byCustomerOrder: customerOrder,
+    byYuklemevSiparisler: sevkSip,
   }
 })

@@ -200,7 +200,7 @@ export default {
 
   [x] import date from "../../plugins/date.js"
          -> import { toIsoDate, fromIsoDate } from "~/utils/dates"
-      ACIK IMPORT ZORUNLU -- ciplak `dateToString` auto-import'ta
+      ACIK IMPORT ZORUNLU -- ciplak `dateToString` auto-import tarafinda
       utils/formatters.js'e (GOSTERIM bicimi "02-10-2026") coozuluyor,
       oysa bu degerler API'ye YAZILIYOR ("2026-10-02"). Ayrintisi
       Proforma.vue'nun alt notunda.

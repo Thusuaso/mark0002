@@ -123,7 +123,37 @@ export default {
     this.selectedYear = { Year: 2026 }
 
     const year = this.selectedYear.Year
-    const excelApi = useExcelApi()
+
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: GET {excelServerBase}/maliyet/listeler/maliyetListesi/{yil}
+     *   yeni: GET /maliyet-api/yillik/{yil}
+     *         (server/routes/maliyet-api/yillik/[year].get.ts)
+     *
+     * Ayni uc ayo.vue'da zaten Nitro'dan okunuyordu (ayo.vue:685); burada
+     * hala Python'a gidiyordu, yani AYNI RAPOR IKI AYRI KAYNAKTAN
+     * besleniyordu.
+     *
+     * IKI CIKTI KARSILASTIRILDI (2026, uretim verisi, 44 satir x 84 alan
+     * = 3696 hucre): 3678 hucre birebir ayni. Farkli olan 18 hucre, 3
+     * satirda ve yalnizca su 6 alanda:
+     *   dis_alim_evrak, dis_alim_evrak_sayisi, dis_alim_tedarikci,
+     *   dis_alim_tedarikci_sayisi, tedarikci_sayisi, tedarikci_sayisi_evrak
+     *
+     * Bu fark BEKLENEN: cost-report.ts'teki [FIX-1] -- Python'da evrak
+     * listeleri SINIF niteligi oldugu icin tum satirlar ayni listeyi
+     * paylasiyor ve sayilar KUMULATIF cikiyor (orn. tedarikci_sayisi 53,
+     * icinde ayni link onlarca kez). Nitro her satira kendi listesini
+     * veriyor. Yani Nitro tarafi DOGRU olan.
+     *
+     * Ustelik bu 6 alan ARAYUZDE HIC KULLANILMIYOR (tum app/ tarandi:
+     * sifir eslesme), dolayisiyla bu sayfada gorunur bir degisiklik yok.
+     *
+     * `.data` DUSTU: useExcelApi axios sozlesmesini taklit edip
+     * `{ data, status }` donduruyordu; $fetch govdenin KENDISINI
+     * donduruyor.
+     */
+    const costList = (y) => $fetch(`/maliyet-api/yillik/${y}`, { baseURL: "/" })
 
     /*
      * Uc yil PARALEL cekiliyor (kaynakta da ucu birbirini beklemiyordu).
@@ -131,18 +161,18 @@ export default {
      * kaynakta .catch YOKTU, patlayan istek ISLENMEMIS RET dusuruyordu.
      */
     const [bu, bir, iki] = await Promise.allSettled([
-      excelApi.get(`/maliyet/listeler/maliyetListesi/${year}`),
-      excelApi.get(`/maliyet/listeler/maliyetListesi/${year - 1}`),
-      excelApi.get(`/maliyet/listeler/maliyetListesi/${year - 2}`),
+      costList(year),
+      costList(year - 1),
+      costList(year - 2),
     ])
 
-    if (bu.status === "fulfilled") this.ayoListThisYear = bu.value.data ?? []
+    if (bu.status === "fulfilled") this.ayoListThisYear = bu.value ?? []
     else console.error("maliyetListesi (bu yil) cekilemedi:", bu.reason)
 
-    if (bir.status === "fulfilled") this.ayoListOneYearAgo = bir.value.data ?? []
+    if (bir.status === "fulfilled") this.ayoListOneYearAgo = bir.value ?? []
     else console.error("maliyetListesi (-1 yil) cekilemedi:", bir.reason)
 
-    if (iki.status === "fulfilled") this.ayoListTwoYearAgo = iki.value.data ?? []
+    if (iki.status === "fulfilled") this.ayoListTwoYearAgo = iki.value ?? []
     else console.error("maliyetListesi (-2 yil) cekilemedi:", iki.reason)
   },
 
@@ -154,24 +184,34 @@ export default {
       this.__forwardingExcel(this.reportsStore.getReportsMekmarGuOrderList)
     },
     /*
-     * Iki excel cikisi AYNI uca AYNI dosya adiyla gidiyordu; yalnizca
-     * gonderilen liste farkli. Tek yardimciya alindi.
+     * Iki excel cikisi AYNI uca AYNI dosya adiyla gidiyor; yalnizca
+     * gonderilen liste farkli. Tek yardimcida kaldi.
      *
-     * Elle <a> kurmak yerine downloadFromExcelServer(): yardimci yolu
-     * NORMALIZE ediyor -- kaynakta `getLocalUrl + "/reports/gu/forwarding"`
-     * yaziliydi ve getLocalUrl sonda egik cizgiyle bittigi icin CIFT
-     * EGIK CIZGI olusuyordu. Ayrica olusturdugu <a>'yi DOM'dan
-     * KALDIRIYOR; kaynak kaldirmiyordu, her indirmede body'ye bir olu
-     * link daha ekleniyordu.
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/gu/forwarding
+     *   yeni: POST /excel-api/gu/forwarding   (tek istek)
+     *         server/routes/excel-api/gu/forwarding.post.ts
+     *
+     * Cikti uretimdekiyle KARSILASTIRILDI: deger, sayi bicimi, hucre
+     * stili, sutun genisligi ve 11 birlestirme farki 0.
+     *
+     * [!] BU RAPORDA BILINEN BIR KUSUR VAR ve BILEREK TASINDI:
+     *     yil basliklari (2024..2014) Python'da SABIT yazili, veriden
+     *     turetilmiyor -- yani rapor hangi yillarla uretilirse
+     *     uretilsin basliklar ayni kaliyor. Govdede yil alani
+     *     olmadigi icin duzeltmek istemciyi de degistirmeyi
+     *     gerektiriyor; ayrinti uc dosyasinda.
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200)
+     * okuyordu, govdedeki {"status": false}'u DEGIL.
      */
-    __forwardingExcel(list) {
-      useExcelApi()
-        .post("/reports/gu/forwarding", list)
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer("reports/gu/forwarding", "gu_excel.xlsx")
-          }
-        })
+    async __forwardingExcel(list) {
+      try {
+        await exportExcel("/excel-api/gu/forwarding", list, "gu_excel.xlsx")
+      } catch (err) {
+        console.error("gu forwarding excel ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      }
     },
     yearSelected(event) {
       this.reportsStore.setReportsMekmarGuListYear(event.value.Year)

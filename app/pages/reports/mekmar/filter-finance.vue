@@ -286,17 +286,27 @@ export default {
         this.financeStore.setFinanceList();
       }
     },
-    excel_output() {
-      useExcelApi()
-        .post("/finance/reports/test/excel", this.financeStore.getfinanceList)
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "finance/reports/test/excel",
-              "finans_test_list.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN -- ayni uc, ayni cikti:
+     *   eski: POST + GET {excelServerBase}/finance/reports/test/excel
+     *   yeni: POST /excel-api/finance/test
+     *         server/routes/excel-api/finance/test.post.ts
+     *
+     * Gerekceler ve dogrulama notu app/pages/finance/index.vue'daki
+     * ayni metotta duruyor (cikti 192 hucre uzerinden birebir
+     * karsilastirildi, 0 fark).
+     */
+    async excel_output() {
+      try {
+        await exportExcel(
+          "/excel-api/finance/test",
+          this.financeStore.getfinanceList,
+          "finans_test_list.xlsx",
+        );
+      } catch (err) {
+        console.error("finans excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     poPaidDetailListSelected(event) {
       const data = {

@@ -1,6 +1,22 @@
 <template>
   <div class="container">
-    <ShipmentForm :orders="orderStore.getOrderProductionList" />
+    <!--
+      GETTER ADI DUZELTILDI: `getOrderProductionList` order store'da
+      TANIMLI DEGIL (bkz. app/stores/order.ts getters blogu); liste
+      getter'inin adi `getOrderList`.
+
+      Eski hali hata ATMIYORDU, sessizce `undefined` donuyordu: yani
+      ShipmentForm'a `orders` olarak undefined gidiyor ve "Orders"
+      autocomplete'i BOS kaliyordu. Sayfa veriyi zaten asagida
+      `setOrderProductionList()` ile cekiyor ve o action listeyi
+      `MUT_setOrderList` uzerinden `orderList`e yaziyor -- yani veri
+      vardi, yalnizca okundugu getter adi yanlisti.
+
+      Alt nottaki "mapGetters(['getOrderProductionList']) -> orderStore"
+      satiri Nuxt 2'deki ADI oldugu gibi tasimis; pilotta getter
+      `getOrderList` olarak duruyor.
+    -->
+    <ShipmentForm :orders="orderStore.getOrderList" />
   </div>
 </template>
 

@@ -348,7 +348,6 @@
 import { toIsoDate } from "~/utils/dates"
 import { useFinanceStore } from "~/stores/finance"
 import { useModelsStore } from "~/stores/models"
-import { useLocalStore } from "~/stores/local"
 import { useSharedStore } from "~/stores/shared"
 
 
@@ -359,9 +358,6 @@ export default {
         },
         modelsStore() {
           return useModelsStore()
-        },
-        localStore() {
-          return useLocalStore()
         },
         sharedStore() {
           return useSharedStore()
@@ -537,8 +533,26 @@ export default {
         });
     },
     saveFinanceMekmar() {
-      useExcelApi().post("/finance/mekmar/po/paid/save", this.model).then((res) => {
-        if (res) {
+      /*
+       * Artik Python'daki excel sunucusundan DEGIL, Nitro'dan:
+       * server/routes/finance-api/mekmar/po-paid-save.post.ts
+       *
+       * [x] `if (res)` -> `if (res.status)` DUZELTILDI.
+       *     `res` her zaman bir nesne oldugu icin eski kosul ASLA
+       *     yanlisa dusmuyordu: Python {"status": false} donse bile
+       *     kullaniciya "Success" gosteriliyor ve liste bosuna
+       *     yenileniyordu. Basarisiz kayit hic fark edilmiyordu.
+       */
+      /*
+       * $fetch + baseURL "/" KULLANILIYOR, useApi() DEGIL: useApi()'nin
+       * baseURL'i "/api" (legacy Express). Nitro rotalari kokte.
+       */
+      $fetch("/finance-api/mekmar/po-paid-save", {
+        baseURL: "/",
+        method: "POST",
+        body: this.model,
+      }).then((res) => {
+        if (res.status) {
           useAppToast().success("Success");
           /*
            * DUZELTILDI -- TOPLAMLAR SIFIRLANMIYORDU: burada liste
@@ -633,18 +647,37 @@ export default {
         this.financeStore.setFinanceList();
       }
     },
-    excel_output() {
-      useExcelApi()
-        .post("/finance/reports/test/excel/mekmer", this.financeStore.getFinanceListFilter)
-        .then((response) => {
-          if (response.status) {
-            const link = document.createElement("a");
-            link.href = this.localStore.getLocalUrl + "/finance/reports/test/excel/mekmer";
-            link.setAttribute("download", "finans_test_list.xlsx");
-            document.body.appendChild(link);
-            link.click();
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST {excelServerBase}/finance/reports/test/excel/mekmer (uret)
+     *       + GET  ayni adres                                          (indir)
+     *   yeni: POST /excel-api/finance/test-mekmer                      (tek istek)
+     *         server/routes/excel-api/finance/test-mekmer.post.ts
+     *
+     * ESKI AKISTAKI UC SORUN:
+     *   - `if (response.status)` HTTP durumunu (daima 200) okuyordu,
+     *     sunucunun govdede dondurdugu {"status": false}'u DEGIL; yani
+     *     uretim patlasa bile indirme tetikleniyordu.
+     *   - Indirme ayri bir GET oldugu icin, Python tarafinda bu uc ile
+     *     /finance/reports/test/excel ucu AYNI dosyayi paylasiyordu
+     *     (excel/dosyalar/finans_test_list.xlsx) -- Mekmar raporu alan
+     *     baska bir kullanici bu kullanicinin dosyasini EZIYORDU.
+     *   - Olusturulan <a> DOM'dan hic kaldirilmiyordu.
+     *
+     * localStore artik bu metot icin gerekmiyor (getLocalUrl'in tek
+     * kullanim yeri buydu).
+     */
+    async excel_output() {
+      try {
+        await exportExcel(
+          "/excel-api/finance/test-mekmer",
+          this.financeStore.getFinanceListFilter,
+          "finans_test_list.xlsx",
+        );
+      } catch (err) {
+        console.error("mekmer finans excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     poPaidDetailListSelected(event) {
       const data = {

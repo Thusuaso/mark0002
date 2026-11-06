@@ -57,6 +57,19 @@ export default defineNuxtConfig({
     },
   },
 
+  /*
+   * NOT: Excel uretecinin (server/utils/xlsx-template.ts) Windows'ta
+   * calismasi icin BURADA bir ayar YOK -- bir sure `nitro.externals.
+   * inline: ["exceljs"]` denendi ve Nitro worker'ini sonsuz yeniden
+   * baslatma dongusune soktu. Cozum o dosyanin icinde createRequire
+   * ile; gerekcesi orada ayrintili yazili.
+   *
+   * Excel SABLONLARI server/assets/excel-templates altinda duruyor;
+   * Nitro `server/assets/**`i kendiliginden `assets:server` deposuna
+   * bagladigi ve uretim paketine gomdugu icin onlar da ek ayar
+   * istemiyor.
+   */
+
   runtimeConfig: {
     public: {
       apiBase: "/api",
@@ -69,12 +82,11 @@ export default defineNuxtConfig({
        * gerekiyordu. Buraya tasindilar; NUXT_PUBLIC_* degiskenleriyle
        * ezilebilirler, varsayilanlar uretimdeki degerlerin aynisi.
        *
-       * excelServerBase: iki yerde AYRI AYRI gomuluydu --
-       * store/modules/local.js'te sonda egik cizgiyle, plugins/excelApi.js'te
-       * cizgisiz. Burada tek deger; kullanan taraf normalize ediyor
-       * (bkz. useExcelApi.ts icindeki excelServerOrigin).
+       * excelServerBase KALDIRILDI: Python'daki excel sunucusuna giden
+       * son cagri da Nitro'ya tasindi (server/routes/excel-api/** ve
+       * server/routes/finance-api/**), yani adresi tutmaya gerek yok.
+       * Onu okuyan useExcelApi.ts ve stores/local.ts de silindi.
        */
-      excelServerBase: "https://excel-server-mark0002.mekmar.com/",
 
       /*
        * BOS = SAYFANIN KENDI KOKENI.

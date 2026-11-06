@@ -139,6 +139,26 @@
 <script>
 import { FilterMatchMode } from "@primevue/core/api"
 
+/*
+ * useApi() BIR $fetch ORNEGI -- `.get` / `.post` / `.delete` METOTLARI YOK.
+ *
+ * useApi() govdesi `return $fetch.create({...})` (app/composables/useApi.ts).
+ * $fetch.create CAGRILABILIR bir fonksiyon dondurur; axios gibi metot
+ * tasiyan bir nesne DEGIL. Bu yuzden `useApi().get(url)` cagrisi
+ *     TypeError: (intermediate value)().get is not a function
+ * firlatiyordu -- sayfa acilisinda, mounted() icinde.
+ *
+ * Dogru kullanim:
+ *     useApi()(url)                               // GET
+ *     useApi()(url, { method: "POST", body })     // POST
+ *     useApi()(url, { method: "DELETE" })         // DELETE
+ *
+ * Yanit sekli DEGISMIYOR: $fetch govdeyi dogrudan donduruyor, yani
+ * cagri yerlerindeki `res.list` / `res.status` okumalari aynen gecerli.
+ * (useLegacyApi() ise axios'u taklit edip `{ data, status }` sariyor --
+ * bu sayfalar o sarmalayiciyi beklemiyor, dolayisiyla ona cevirmek
+ * `res.list` okumalarini bozardi.)
+ */
 export default {
   data() {
     return {
@@ -196,8 +216,10 @@ export default {
       this.finance_order_detail_header = event.data.SiparisNo
       this.finance_list_detail_order_total = 0
 
-      useApi()
-        .post("/mekmer/new/finance/detail/order", { Po: event.data.SiparisNo })
+      useApi()("/mekmer/new/finance/detail/order", {
+        method: "POST",
+        body: { Po: event.data.SiparisNo },
+      })
         .then((res) => {
           this.finance_list_order_detail = res.list
           res.list.forEach((x) => {
@@ -219,12 +241,14 @@ export default {
 
       this.paid_button_loading = true
 
-      useApi()
-        .post("/mekmer/new/finance/paid/status", {
+      useApi()("/mekmer/new/finance/paid/status", {
+        method: "POST",
+        body: {
           Tarih: toIsoDate(new Date()),
           KullaniciId: useCookie("userId").value,
           ...event,
-        })
+        },
+      })
         .then((res) => {
           if (!res.status) {
             useAppToast().error("Hata Oluştu.")
@@ -234,8 +258,7 @@ export default {
 
           useAppToast().success("Başarıyla Kaydedildi.")
 
-          return useApi()
-            .get(`/mekmer/new/finance/list/detail/${event.MusteriID}`)
+          return useApi()(`/mekmer/new/finance/list/detail/${event.MusteriID}`)
             .then((detail) => {
               this.finance_list_detail = detail.list
               this.fetchData()
@@ -260,8 +283,7 @@ export default {
     },
 
     financeSelection(event) {
-      useApi()
-        .get(`/mekmer/new/finance/list/detail/${event.data.ID}`)
+      useApi()(`/mekmer/new/finance/list/detail/${event.data.ID}`)
         .then((res) => {
           this.finance_list_detail = res.list
         })
@@ -275,8 +297,7 @@ export default {
         total: 0,
       }
 
-      useApi()
-        .get("/mekmer/new/finance/list")
+      useApi()("/mekmer/new/finance/list")
         .then((res) => {
           this.finance_list = res.list
           res.list.forEach((x) => {

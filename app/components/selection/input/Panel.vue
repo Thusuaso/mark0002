@@ -945,51 +945,87 @@ export default {
         }
       }
     },
-    ticket_click_excel() {
-      useExcelApi()
-        .post(
-          "/seleksiyon/etiket/excel",
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/seleksiyon/etiket/excel
+     *   yeni: POST /excel-api/selection/labels   (tek istek)
+     *         server/routes/excel-api/selection/labels.post.ts
+     *
+     * Cikti uretimdekiyle KARSILASTIRILDI: deger, sayi bicimi, hucre
+     * stili, 9 birlestirme, satir yuksekligi ve sutun genisligi
+     * farki 0.
+     *
+     * [!] Python bu ucta BOS BIR METIN ALANINDA (orn. KategoriAdi)
+     *     dizge birlestirmesi yuzunden TypeError firlatip tum raporu
+     *     dusuruyordu; bos SAYI alanlari ise etikete LITERAL "None"
+     *     olarak basiliyordu. Nitro tarafinda ikisi de bos dizge.
+     *
+     * `if (res.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL.
+     */
+    async ticket_click_excel() {
+      try {
+        await exportExcel(
+          "/excel-api/selection/labels",
           this.selectionStore.getFilteredSelectionList,
+          "seleksiyon_etiket.xlsx",
         )
-        .then((res) => {
-          if (res.status) {
-            downloadFromExcelServer(
-              "seleksiyon/etiket/excel",
-              "seleksiyon_etiket.xlsx",
-            )
-          }
-        })
+      } catch (err) {
+        console.error("seleksiyon etiket ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      }
     },
-    selection_click_excel() {
-      useExcelApi()
-        .post(
-          "/siparisler/dosyalar/seleksiyon/excel/output",
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET
+     *         {excelServerBase}/siparisler/dosyalar/seleksiyon/excel/output
+     *   yeni: POST /excel-api/selection/output   (tek istek)
+     *         server/routes/excel-api/selection/output.post.ts
+     *
+     * Cikti uretimdekiyle KARSILASTIRILDI: deger, sayi bicimi, hucre
+     * stili ve sutun genisligi farki 0.
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200)
+     * okuyordu, govdedeki {"status": false}'u DEGIL.
+     */
+    async selection_click_excel() {
+      try {
+        await exportExcel(
+          "/excel-api/selection/output",
           this.selectionStore.getProductList,
+          "selection.xlsx",
         )
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "siparisler/dosyalar/seleksiyon/excel/output",
-              "selection.xlsx",
-            )
-          }
-        })
+      } catch (err) {
+        console.error("seleksiyon excel ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      }
     },
 
-    orders_click_excel() {
-      useExcelApi()
-        .post(
-          "/siparisler/dosyalar/uretimExcelCikti",
+    async orders_click_excel() {
+      /*
+       * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+       *   eski: POST + GET
+       *         {excelServerBase}/siparisler/dosyalar/uretimExcelCikti
+       *   yeni: POST /excel-api/orders/uretim   (tek istek)
+       *         server/routes/excel-api/orders/uretim.post.ts
+       *
+       * Ayni uc alti yerden cagriliyor; govde tek yerde
+       * (server/utils/uretim-excel.ts) ve gercek veriyle uretimle
+       * karsilastirildi: fark 0.
+       *
+       * `if (response.status)` DUSTU -- HTTP durumunu (daima 200)
+       * okuyordu, govdedeki {"status": false}'u DEGIL.
+       */
+      try {
+        await exportExcel(
+          "/excel-api/orders/uretim",
           this.orderStore.getOrderList,
+          "Uretim_list.xlsx",
         )
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "siparisler/dosyalar/uretimExcelCikti",
-              "Uretim_list.xlsx",
-            )
-          }
-        })
+      } catch (err) {
+        console.error("uretim listesi ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      }
     },
     isDropDownChange(event) {
       this.code = event.value.code;
@@ -1011,9 +1047,9 @@ export default {
      * BICIM KORUNDU: global utils/formatters.js icindeki ayni adli
      * fonksiyon binlik ayrac + 2 ondalik uretiyor ("1.234,56"); bu
      * yerel surum yalnizca noktayi virgulle degistiriyor. Yereli
-     * silip global auto-import'a birakmak GORUNUR bir bicim
+     * silip global auto-import tarafina birakmak GORUNUR bir bicim
      * degisikligi olurdu, bu yuzden yerel metot korundu (Options
-     * API'de methods, auto-import'tan once gelir).
+     * API'de methods, auto-import tarafindan once gelir).
      */
     /*
      * Virgulden sonra IKI HANE (kullanici istegi, 2026-10-16).
@@ -1138,7 +1174,7 @@ export default {
 
   YEREL METOT SILINMEDI: pilotta global bir `formatDecimal` var
   (app/utils/formatters.js) ve o ayrica BINLIK AYRAC koyuyor
-  ("1.234,56"). Options API'de `methods` auto-import'tan once geldigi
+  ("1.234,56"). Options API'de `methods` auto-import tarafindan once geldigi
   icin yerel metot korunarak gruplama disarida tutuluyor.
 
   SONRADAN DEGISTI (2026-10-16, kullanici istegi): tasima sirasinda

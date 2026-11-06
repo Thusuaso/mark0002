@@ -331,6 +331,26 @@ const emptyProductRow = () => ({
   adet: 0,
 })
 
+/*
+ * useApi() BIR $fetch ORNEGI -- `.get` / `.post` / `.delete` METOTLARI YOK.
+ *
+ * useApi() govdesi `return $fetch.create({...})` (app/composables/useApi.ts).
+ * $fetch.create CAGRILABILIR bir fonksiyon dondurur; axios gibi metot
+ * tasiyan bir nesne DEGIL. Bu yuzden `useApi().get(url)` cagrisi
+ *     TypeError: (intermediate value)().get is not a function
+ * firlatiyordu -- sayfa acilisinda, mounted() icinde.
+ *
+ * Dogru kullanim:
+ *     useApi()(url)                               // GET
+ *     useApi()(url, { method: "POST", body })     // POST
+ *     useApi()(url, { method: "DELETE" })         // DELETE
+ *
+ * Yanit sekli DEGISMIYOR: $fetch govdeyi dogrudan donduruyor, yani
+ * cagri yerlerindeki `res.list` / `res.status` okumalari aynen gecerli.
+ * (useLegacyApi() ise axios'u taklit edip `{ data, status }` sariyor --
+ * bu sayfalar o sarmalayiciyi beklemiyor, dolayisiyla ona cevirmek
+ * `res.list` okumalarini bozardi.)
+ */
 export default {
   props: {
     visible: { type: Boolean, required: true },
@@ -485,8 +505,7 @@ export default {
     loadPoPreview() {
       this.poPreview = { giden: "", kalan: "" }
 
-      useApi()
-        .get(`/order/divide/po-preview/${this.productionModel.SiparisNo}`)
+      useApi()(`/order/divide/po-preview/${this.productionModel.SiparisNo}`)
         .then((res) => {
           if (res.status) {
             this.poPreview = { giden: res.giden, kalan: res.kalan }

@@ -617,25 +617,99 @@ export default {
      * Bu yuzden map-store-refs.mjs de adi cozemedi ve `$store.dispatch`
      * olarak biraktı -- iyi oldu, aksi halde sessizce gecip giderdi.
      */
+    /*
+     * DEGISIKLIK YOKSA HICBIR SEY YAZILMAZ -- dongunun ikinci kaynagi.
+     *
+     * __totalSum'daki yerel toplama tek basina yetmiyordu: bu metot
+     * ayrica `this.filteredList`e YENI BIR DIZI atiyor ve PrimeVue her
+     * filtrelemede yeni bir dizi uretiyor, yani KIMLIK her zaman
+     * degisiyor. `filteredList` ise `exportRows` computed'i uzerinden
+     * sablonda okunuyor (satir 49: "{{ exportRows.length }} kayıt"),
+     * dolayisiyla her atama bir render daha tetikliyor ve DataTable
+     * @filter'i yeniden yayiyor:
+     *     Maximum recursive updates exceeded in component <DataTable>
+     *
+     * Burada once ICERIK karsilastiriliyor (uzunluk + oge kimlikleri).
+     * Filtre sonucu gercekten degismediyse metot TAMAMEN sessiz kaliyor:
+     * ne filteredList'e ne toplamlara yazilmiyor, yani dongu daha ilk
+     * tekrarda duruyor.
+     *
+     * Satir nesneleri store'da Object.freeze'li ve yeniden
+     * olusturulmadigi icin oge kimligi karsilastirmasi guvenli
+     * (bkz. app/stores/order.ts MUT_setOrderList).
+     */
     filtersProduction(event) {
-      this.filteredList = event.filteredValue || [];
-      this.__totalSum(this.filteredList);
+      const next = event.filteredValue || [];
+      const current = this.filteredList;
+
+      const unchanged =
+        Array.isArray(current) &&
+        current.length === next.length &&
+        current.every((row, i) => row === next[i]);
+
+      if (unchanged) return;
+
+      this.filteredList = next;
+      this.__totalSum(next);
     },
+    /*
+     * TOPLAMA YEREL DEGISKENLERDE, REAKTIF ALANLARA TEK SEFERDE YAZILIR.
+     *
+     * ---------------------------------------------------------------------
+     * NEDEN -- SONSUZ RENDER DONGUSUNU BU KIRDI
+     * ---------------------------------------------------------------------
+     * Belirti (reports/mekmer/shipped sayfasinda):
+     *     Maximum recursive updates exceeded in component <DataTable>
+     *
+     * Dongu sumdu:
+     *   1) DataTable render edilir ve @filter olayini yayar
+     *   2) filtersProduction() -> __totalSum() cagrilir
+     *   3) __totalSum bu bileşenin REAKTIF alanlarina yazar
+     *      (totals, totalsPurchase, totalamount, totalton, totalbuying)
+     *   4) o alanlar DataTable'in KENDI sablonunda okunuyor
+     *      (satir 47 baslikta, 302 ve 327 altlikta)
+     *   5) dolayisiyla DataTable yeniden render edilir -> (1)'e don
+     *
+     * Dongunun ASLA DURULMAMASININ sebebi eski kodun ilk satirlariydi:
+     * her cagride `this.totals = 0` yapiliyordu. Vue bir reaktif alana
+     * AYNI deger yazilinca render tetiklemez; ama once 0'a sifirlanip
+     * sonra tekrar toplanmasi her turda "degisti" sinyali uretiyordu --
+     * yani degerler oturmus olsa bile dongu kendini besliyordu.
+     * Ustelik `+=` satir basina calistigi icin tur basina 5 x N reaktif
+     * yazma oluyordu.
+     *
+     * Yerel degiskende toplayip SONUNDA tek kez atayinca: ikinci turda
+     * atanan degerler oncekiyle AYNI oluyor, Vue degisim gormuyor,
+     * render tekrarlanmiyor ve dongu KENDILIGINDEN duruyor.
+     *
+     * Ayni duzeltme store tarafinda zaten yapilmisti
+     * (app/stores/order.ts MUT_setOrderProductionTotal -- "Toplama YEREL
+     * degiskende, state'te DEGIL"); bu bileşen-ici kopya atlanmisti.
+     *
+     * Toplama ifadeleri ve SIRASI birebir korundu, yani kayan nokta
+     * sonucu degismiyor.
+     */
     __totalSum(val) {
-      this.totals = 0;
-      this.totalsPurchase = 0;
-      this.totalamount = 0;
-      this.totalton = 0;
-      this.totalbuying = 0;
+      let totals = 0;
+      let totalsPurchase = 0;
+      let totalamount = 0;
+      let totalton = 0;
+      let totalbuying = 0;
+
       (val || []).forEach((x) => {
-        this.totals +=
-          this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
-        this.totalsPurchase +=
+        totals += this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
+        totalsPurchase +=
           this.__noneControl(x.SatisFiyati) * this.__noneControl(x.Miktar);
-        this.totalamount += this.__noneControl(x.Miktar);
-        this.totalton += this.__noneControl(x.Ton);
-        this.totalbuying += this.__noneControl(x.AlisFiyati);
+        totalamount += this.__noneControl(x.Miktar);
+        totalton += this.__noneControl(x.Ton);
+        totalbuying += this.__noneControl(x.AlisFiyati);
       });
+
+      this.totals = totals;
+      this.totalsPurchase = totalsPurchase;
+      this.totalamount = totalamount;
+      this.totalton = totalton;
+      this.totalbuying = totalbuying;
     },
     __noneControl(val) {
       if (val == null || val == undefined || val == "") {

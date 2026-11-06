@@ -400,7 +400,7 @@ export default {
       fark olmayabilirdi, ama dogru API bu.
 
   [x] import date from "../../../plugins/date" -> { toIsoDate }
-      ACIK IMPORT ZORUNLU: ciplak `dateToString` auto-import'ta
+      ACIK IMPORT ZORUNLU: ciplak `dateToString` auto-import tarafinda
       utils/formatters.js'e ("02-10-2026", GOSTERIM) cozuluyor, oysa
       `model.date` API'ye GIDEN bir deger ("2026-10-02") ve ustelik
       `canSave` da onu kontrol ediyor. Ayrinti offer/Form.vue'nun alt

@@ -125,15 +125,31 @@ export default {
     this.reportsStore.setReportsMekmarForwardingList();
   },
   methods: {
-    excel_output(){
-      useExcelApi().post("/reports/excel/forwarding", this.reportsStore.getreportsMekmarForwardingList).then((response) => {
-        if (response.status) {
-          downloadFromExcelServer(
-              "reports/excel/forwarding",
-              "mekamer_forwarding_excel.xlsx"
-            );
-        }
-      });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/excel/forwarding
+     *   yeni: POST /excel-api/reports/forwarding   (tek istek)
+     *         server/routes/excel-api/reports/forwarding.post.ts
+     *
+     * Cikti uretimdekiyle KARSILASTIRILDI (22 sutunluk ornek veriyle):
+     * deger, sayi bicimi, hucre stili, sutun genisligi ve birlestirme
+     * farki 0 -- yalnizca birlestirilmis alanin ICINDEKI gorunmez
+     * hucrelerde kayitli stil farki var (Excel onlari cizmiyor).
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200)
+     * okuyordu, govdedeki {"status": false}'u DEGIL.
+     */
+    async excel_output(){
+      try {
+        await exportExcel(
+          "/excel-api/reports/forwarding",
+          this.reportsStore.getreportsMekmarForwardingList,
+          "mekamer_forwarding_excel.xlsx",
+        );
+      } catch (err) {
+        console.error("forwarding excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     yearChange(event) {},
     formatDecimal(value) {

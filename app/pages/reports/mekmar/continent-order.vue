@@ -30,17 +30,26 @@ export default {
       });
   },
   methods: {
-    excel_output() {
-      useExcelApi()
-        .post("/maliyet/dosyalar/continent", this.list)
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "maliyet/dosyalar/continent",
-              "continents.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/maliyet/dosyalar/continent
+     *   yeni: POST /excel-api/reports/continents   (tek istek)
+     *         server/routes/excel-api/reports/continents.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0.
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL -- uretim patlasa bile
+     * indirme tetikleniyordu.
+     */
+    async excel_output() {
+      try {
+        await exportExcel("/excel-api/reports/continents", this.list, "continents.xlsx");
+      } catch (err) {
+        console.error("continents excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
   },
 };

@@ -529,8 +529,25 @@ export const useFinanceStore = defineStore("finance", {
       const toast = useAppToast()
       const modelsStore = useModelsStore()
 
-          useExcelApi()
-            .post("/finance/po/paid/mekmer/save", paid)
+          /*
+           * Artik Python'daki excel sunucusundan DEGIL, Nitro'dan:
+           * server/routes/finance-api/mekmer/po-paid-save.post.ts
+           *
+           * Yanit sekli AYNI ({"status": boolean}), bu yuzden
+           * asagidaki `if (response.status)` govdesine dokunulmadi.
+           */
+          /*
+           * $fetch + baseURL "/" KULLANILIYOR, useApi() DEGIL:
+           * useApi()'nin baseURL'i "/api", yani LEGACY Express
+           * uygulamasi. Nitro rotalari kokte duruyor; useApi() ile
+           * cagrilsaydi adres /api/finance-api/... olur ve 404 donerdi.
+           * (Ayni kalip: app/composables/useExcelExport.ts)
+           */
+          $fetch("/finance-api/mekmer/po-paid-save", {
+            baseURL: "/",
+            method: "POST",
+            body: paid,
+          })
             .then((response) => {
               if (response.status) {
                 toast.success("Ödeme Kaydedildi.");
@@ -585,9 +602,30 @@ export const useFinanceStore = defineStore("finance", {
     setFinancePoPaidList(po) {
       const legacyApi = useLegacyApi()
 
-          legacyApi.get(`/finance/po/paid/list/${po}`).then((response) => {
-            this.MUT_setFinancePoPaidList(response.data.list);
-          });
+      /*
+       * [x] .catch() EKLENDI -- YOKTU.
+       *
+       * Kardes fonksiyon setFinancePoPaidListMekmer'de bu duzeltme
+       * yapilmisti ama BURADA atlanmis; iki ayri hatasi vardi:
+       *
+       *   1. Istek patlayinca liste SESSIZCE eski PO'nun odemelerinde
+       *      kaliyordu -- kullanici baska bir siparise tikladigini
+       *      sanip YANLIS odemelere bakiyordu.
+       *   2. Reddedilen promise yakalanmadigi icin tarayici konsoluna
+       *      "Uncaught (in promise) FetchError" olarak dusuyordu;
+       *      kullaniciya hicbir sey soylenmiyordu.
+       */
+      legacyApi
+        .get(`/finance/po/paid/list/${po}`)
+        .then((response) => {
+          this.MUT_setFinancePoPaidList(response.data.list);
+        })
+        .catch((err) => {
+          console.error("po odeme listesi alinamadi:", err);
+          /* Yanlis listeye bakilmasin diye ONCE temizle. */
+          this.MUT_setFinancePoPaidList([]);
+          useAppToast().error("Ödeme listesi alınamadı.");
+        });
     },
     /*
      * Bir PO'nun odeme satirlari. Artik EXCEL SUNUCUSUNDAN DEGIL,

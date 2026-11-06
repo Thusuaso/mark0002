@@ -93,7 +93,7 @@
     <Dialog v-model:visible="finance_advanced_payment_form" header="" modal>
       <FinanceAdvancedPaymentForm
         :list="financeStore.getFinanceAdvancedPaymentList"
-        :model="financeStore.getFinancePaymentModel"
+        :model="modelsStore.getFinancePaymentModel"
         @advanced_payment_save_emit="advancesPaymentSave($event)"
       />
     </Dialog>
@@ -113,7 +113,7 @@
 
     <Dialog v-model:visible="finance_po_detail_form" header="" modal>
       <FinancePoForm
-        :model="financeStore.getFinancePoModel"
+        :model="modelsStore.getFinancePoModel"
         :po="finance_po_list_detail"
         :poPaidList="financeStore.getFinancePoPaidList"
         @po_paid_process_emit="poPaidProcess($event)"
@@ -130,6 +130,7 @@
 <script>
 import { toIsoDate } from "~/utils/dates"
 import { useFinanceStore } from "~/stores/finance"
+import { useModelsStore } from "~/stores/models"
 import { useSharedStore } from "~/stores/shared"
 import { useLogsStore } from "~/stores/logs"
 
@@ -137,6 +138,35 @@ export default {
   computed: {
     financeStore() {
       return useFinanceStore()
+    },
+
+    /*
+     * MODELS STORE EKLENDI -- DORT CAGRI YANLIS STORE'A GIDIYORDU.
+     *
+     * setFinancePoModel, setFinancePaymentModel, getFinancePoModel ve
+     * getFinancePaymentModel'in DORDU DE models store'unda tanimli
+     * (app/stores/models.ts), finance store'unda DEGIL. Bu dosya
+     * dordunu de `financeStore` uzerinden cagiriyordu.
+     *
+     * BELIRTI: "Finans > musteri satirina tiklayinca acilan listede PO
+     * satirina tiklandiginda detay dialogu ACILMIYOR" --
+     *     Uncaught TypeError: this.financeStore.setFinancePoModel
+     *                         is not a function
+     * poListSelected() ilk satirinda patliyordu, bu yuzden hemen
+     * altindaki `this.finance_po_detail_form = true` HIC CALISMIYOR ve
+     * dialog acilmiyordu. Hatanin kendisi konsolda kaliyordu, kullanici
+     * yalnizca "tiklama bir sey yapmiyor" goruyordu.
+     *
+     * Iki GETTER sessizce bozuktu: finance store'da olmadiklari icin
+     * `undefined` donuyorlardi, yani PO ve odeme formlarina `:model`
+     * olarak undefined gidiyordu (hata atmadan, bos form).
+     *
+     * NOT: app/stores/finance.ts bunlari ZATEN dogru sekilde
+     * `modelsStore.setFinancePoModel()` diye cagiriyor (satir 522, 655,
+     * 756) -- yani yanlis olan yalnizca bu bileşendi.
+     */
+    modelsStore() {
+      return useModelsStore()
     },
     sharedStore() {
       return useSharedStore()
@@ -196,17 +226,41 @@ export default {
         this.financeStore.setFinanceList()
       }
     },
-    excel_output() {
-      useExcelApi()
-        .post("/finance/reports/test/excel", this.financeStore.getfinanceList)
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "finance/reports/test/excel",
-              "finans_test_list.xlsx"
-            )
-          }
-        })
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST {excelServerBase}/finance/reports/test/excel  (uret)
+     *       + GET  {excelServerBase}/finance/reports/test/excel  (indir)
+     *   yeni: POST /excel-api/finance/test                       (tek istek)
+     *         server/routes/excel-api/finance/test.post.ts
+     *
+     * IKI ISTEK TEK ISTEGE INDI; gerekcesi (paylasilan dosya / yaris
+     * durumu ve hic kontrol edilmeyen `if (response.status)`)
+     * app/composables/useExcelExport.ts icinde.
+     *
+     * Cikti BIREBIR DOGRULANDI: ayni 22 satir hem uretimdeki Python
+     * ucuna hem bu uca gonderildi, iki dosya 24 satir x 8 sutun = 192
+     * hucre uzerinden karsilastirildi (degerler ve sayi bicimleri,
+     * `cellStyles: true` ile) -- 0 fark, sayfa adi da ayni.
+     *
+     * Dosya adi artik Content-Disposition'dan geliyor, elle verilmiyor.
+     */
+    async excel_output() {
+      try {
+        await exportExcel(
+          "/excel-api/finance/test",
+          this.financeStore.getfinanceList,
+          "finans_test_list.xlsx",
+        )
+      } catch (err) {
+        /*
+         * Eski kodda .catch YOKTU ve zaten hata gorunmuyordu: indirme
+         * ayri bir <a> tiklamasiyla oldugu icin uretim patlasa bile
+         * kullanici bos/eski dosya aliyordu. Artik basarisizlik
+         * gercekten gorunur.
+         */
+        console.error("finans excel ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      }
     },
     poPaidDetailListSelected(event) {
       const data = {
@@ -258,7 +312,7 @@ export default {
       )
     },
     poListSelected(event) {
-      this.financeStore.setFinancePoModel()
+      this.modelsStore.setFinancePoModel()
       this.finance_po_list_detail = event.data
       this.finance_po_detail_form = true
       this.financeStore.setFinancePoPaidList(event.data.SiparisNo)
@@ -273,7 +327,7 @@ export default {
     },
     advancedPayment() {
       this.financeStore.setFinanceAdvancedPaymentList()
-      this.financeStore.setFinancePaymentModel()
+      this.modelsStore.setFinancePaymentModel()
       this.finance_advanced_payment_form = true
     },
     collection() {
@@ -356,12 +410,12 @@ definePageMeta({ middleware: ["authority"] })
   [x] import date from "../../plugins/date" -> { toIsoDate }
       ACIK IMPORT ZORUNLU: `Tarih` degeri setPoPaidDetailList ile
       API'ye GIDIYOR ("2026-10-02"), ciplak `dateToString` ise
-      auto-import'ta utils/formatters.js'e ("02-10-2026", GOSTERIM)
+      auto-import tarafinda utils/formatters.js'e ("02-10-2026", GOSTERIM)
       cozuluyor. Ayrinti offer/Form.vue'nun alt notunda.
 
-  == EXCEL CIKISI: $excelApi + ELLE <a> -> useExcelApi + yardimci ==
+  == EXCEL CIKISI: EXCEL SUNUCUSU -> NITRO (tek istek) ==
 
-  Kaynak:
+  Nuxt 2 kaynagi:
       this.$excelApi.post("/finance/reports/test/excel", list).then(res => {
         if (res.status) {
           const link = document.createElement("a")
@@ -372,16 +426,26 @@ definePageMeta({ middleware: ["authority"] })
         }
       })
 
-  -> useExcelApi() + downloadFromExcelServer(). Yardimci, yolu
-  normalize ediyor (getLocalUrl sonda egik cizgiyle bittigi icin elle
-  birlestirmede CIFT EGIK CIZGI olusabiliyordu) ve olusturdugu <a>'yi
-  DOM'dan KALDIRIYOR -- kaynak kaldirmiyordu, her indirmede body'ye bir
-  olu link daha ekleniyordu. (reports/mekmar/country-order.vue ve
-  offer/Form.vue ile ayni karar.)
+  Ara adim (bu dosyanin onceki surumu) useExcelApi() +
+  downloadFromExcelServer() idi -- hala Python'daki excel sunucusuna
+  gidiyordu ve IKI ISTEK atiyordu (once "uret", sonra "indir").
 
-  `if (res.status)` KORUNDU: useExcelApi sarmalayicisi axios
-  sozlesmesini taklit ettigi icin `status` HTTP kodu (200) -- yani
-  kosul kaynaktaki gibi pratikte daima dogru.
+  SIMDI: exportExcel("/excel-api/finance/test", list, ad)
+         -> server/routes/excel-api/finance/test.post.ts
+
+  Neden tek istege indi (paylasilan dosya / yaris durumu ve hicbir sey
+  kontrol etmeyen `if (res.status)`): app/composables/useExcelExport.ts
+  ve server/utils/xlsx-response.ts.
+
+  `if (res.status)` DUSTU: o kosul HTTP durumunu (daima 200) okuyordu,
+  sunucunun govdede dondurdugu {"status": false}'u DEGIL -- yani uretim
+  patlasa bile indirme tetikleniyordu. Artik basarisizlik try/catch'e
+  dusuyor ve kullaniciya toast ile bildiriliyor.
+
+  Cikti DOGRULANDI: ayni 22 satir hem uretimdeki Python ucuna hem yeni
+  Nitro ucuna gonderildi; iki dosya 192 hucre uzerinden (deger, sayi
+  bicimi, hucre stili) ve sutun genisligi bazinda karsilastirildi --
+  0 fark.
 
   == KALDIRILAN OLU KOD ==
   [x] poPaidDetailListSelected() icindeki

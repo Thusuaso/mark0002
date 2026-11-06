@@ -299,7 +299,7 @@ export default {
        * XLSX.write + file-saver'in saveAs'i -> XLSX.writeFile.
        *
        * NEDEN: file-saver pilota KURULMADI (package.json'da yok) ve
-       * import'u derlemeyi dusuruyordu. XLSX.writeFile indirmeyi kendisi
+       * import islemi derlemeyi dusuruyordu. XLSX.writeFile indirmeyi kendisi
        * tetikliyor, yani ek bir bagimlilik gerekmiyor; ayni yontem
        * reports/mekmer/calculating-cost.vue ve reports/mekmer/finance.vue
        * icinde de kullaniliyor. Cikan dosya ayni.

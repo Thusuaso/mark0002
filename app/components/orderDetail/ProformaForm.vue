@@ -374,15 +374,11 @@
 <script>
 import { toIsoDate, fromIsoDate } from "~/utils/dates"
 import { useCostStore } from "~/stores/cost"
-import { useLocalStore } from "~/stores/local"
 import { useOrderStore } from "~/stores/order"
 export default {
   computed: {
     costStore() {
       return useCostStore()
-    },
-    localStore() {
-      return useLocalStore()
     },
     orderStore() {
       return useOrderStore()

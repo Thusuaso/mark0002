@@ -94,7 +94,6 @@
 import { useOrderStore } from "~/stores/order"
 import { useModelsStore } from "~/stores/models"
 import { useSharedStore } from "~/stores/shared"
-import { useLocalStore } from "~/stores/local"
 import { toIsoDate } from "~/utils/dates"
 export default {
   computed: {
@@ -106,9 +105,6 @@ export default {
     },
     sharedStore() {
       return useSharedStore()
-    },
-    localStore() {
-      return useLocalStore()
     },
   },
   data() {
@@ -152,13 +148,41 @@ export default {
      *     localStore.getLocalUrl ile elle birlestiriyordu; birinde
      *     sondaki egik cizgi yuzunden cift // olusuyordu.
      */
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET
+     *         {excelServerBase}/siparisler/dosyalar/uretimExcelCikti
+     *   yeni: POST /excel-api/orders/uretim   (tek istek)
+     *         server/routes/excel-api/orders/uretim.post.ts
+     *
+     * AYNI UC ALTI YERDEN CAGRILIYOR; govde tek yerde:
+     * server/utils/uretim-excel.ts
+     *
+     * Cikti uretimdekiyle GERCEK VERIYLE karsilastirildi (41 satir):
+     * deger, sayi bicimi, hucre stili, 37 birlestirme, satir
+     * yuksekligi ve sutun genisligi farki 0.
+     *
+     * [!] BU UC VERITABANINA GIDIYOR: alt bolum ("ÖZEL İŞÇİLİK
+     *     YAPILACAKLAR") govdeden degil, SiparisDurumID=2 kosullu bir
+     *     sorgudan geliyor.
+     *
+     * [!] BIRIM ESLEMESI `UrunBirimID` ILE: 1->M2, 2->Adet, 3->MT.
+     *     Tersine cozmede "Sqm->M2, Pcs->Adet" diye cikarilmisti ve
+     *     UCUNCU DAL (MT) kacirilmisti; kaynak bunu duzeltti.
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200)
+     * okuyordu, govdedeki {"status": false}'u DEGIL.
+     */
     async excel_output() {
-      const response = await useExcelApi().post(
-        "/siparisler/dosyalar/uretimExcelCikti",
-        this.orderStore.getOrderList,
-      )
-      if (response.status) {
-        downloadFromExcelServer("siparisler/dosyalar/uretimExcelCikti", "Uretim_list.xlsx")
+      try {
+        await exportExcel(
+          "/excel-api/orders/uretim",
+          this.orderStore.getOrderList,
+          "Uretim_list.xlsx",
+        )
+      } catch (err) {
+        console.error("uretim listesi ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
       }
     },
     marketingChange(event) {

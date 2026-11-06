@@ -323,7 +323,7 @@ definePageMeta({ middleware: ["authority"] })
   damgasi + ayni log nesnesi vardi -> __logStamp() + __saveLog().
   Log METINLERI birebir korundu. O uc metottaki yerel
   `const date = new Date()` adi `d` oldu (kaynakta `date` idi; bu
-  sayfada golgelenecek bir `date` import'u yoktu ama offer/Form.vue'da
+  sayfada golgelenecek bir `date` import islemi yoktu ama offer/Form.vue'da
   vardi -- ayni kalip).
 
   save() icindeki `.then(res => if/else)` IKI DALI AYNI oldugu icin

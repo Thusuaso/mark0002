@@ -180,27 +180,73 @@ export default {
       this.orderStore.setOrderProductionCheckListTotal(event.filteredValue)
     },
 
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/excel/check/list
+     *   yeni: POST /excel-api/orders/check-list   (tek istek)
+     *         server/routes/excel-api/orders/check-list.post.ts
+     *
+     * Cikti uretimdekiyle KARSILASTIRILDI: deger, sayi bicimi, hucre
+     * stili, 27 birlestirme, 209 satir yuksekligi ve sutun genisligi
+     * farki 0.
+     *
+     * [!] DOSYA ADI DUZELTILDI: bu metot ile excelLabels() AYNI adi
+     *     ("check_list.xlsx") kullaniyordu, oysa iki AYRI rapor.
+     *     Artik ad sunucudan (Content-Disposition) geliyor:
+     *       ceki listesi -> ceki_listesi.xlsx
+     *       etiketler    -> kasa_etiketleri.xlsx
+     *     Python'un GET uclarinin servis ettigi adlar da bunlardi;
+     *     yani yanlis olan yalnizca istemcinin yazdigi addi.
+     *
+     * `if (response)` DUSTU: sarmalayici NESNESI her zaman dogru
+     * oldugu icin o kosul ASLA yanlisa dusmuyordu -- uretim patlasa
+     * bile indirme tetikleniyordu.
+     */
     async excelCheckList() {
-      // [3] this.$excelApi -> useExcelApi()
-      const excelApi = useExcelApi()
-      const response = await excelApi.post("/excel/check/list", {
-        list: this.list,
-        po: this.orderStore.getOrderProductionPo,
-      })
-      if (response) {
-        downloadFromExcelServer("excel/check/list", "check_list.xlsx")
+      try {
+        await exportExcel(
+          "/excel-api/orders/check-list",
+          {
+            list: this.list,
+            po: this.orderStore.getOrderProductionPo,
+          },
+          "ceki_listesi.xlsx",
+        )
+      } catch (err) {
+        console.error("ceki listesi ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
       }
     },
 
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/excel/labels/list
+     *   yeni: POST /excel-api/orders/labels   (tek istek)
+     *         server/routes/excel-api/orders/labels.post.ts
+     *
+     * Cikti uretimdekiyle KARSILASTIRILDI: deger, sayi bicimi, hucre
+     * stili, 65 birlestirme, satir yuksekligi ve sutun genisligi
+     * farki 0.
+     *
+     * [!] Python bu ucta `data['customer'].upper()` ve
+     *     `int(item['Ton'])` cagiriyor; bos deger geldiginde uc
+     *     tamamen dusuyor ve kullanici BOS SABLONU indiriyordu.
+     *     Nitro tarafinda bos musteri "" , bos ton 0 sayiliyor.
+     */
     async excelLabels() {
-      const excelApi = useExcelApi()
-      const response = await excelApi.post("/excel/labels/list", {
-        list: this.list,
-        po: this.orderStore.getOrderProductionPo,
-        customer: this.orderStore.getOrderProductionCustomer,
-      })
-      if (response) {
-        downloadFromExcelServer("excel/labels/list", "check_list.xlsx")
+      try {
+        await exportExcel(
+          "/excel-api/orders/labels",
+          {
+            list: this.list,
+            po: this.orderStore.getOrderProductionPo,
+            customer: this.orderStore.getOrderProductionCustomer,
+          },
+          "kasa_etiketleri.xlsx",
+        )
+      } catch (err) {
+        console.error("kasa etiketleri ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
       }
     },
   },

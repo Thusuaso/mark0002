@@ -99,27 +99,37 @@ export default {
    * blogunda useAsyncData ile. Gerekcesi orada.
    */
   methods: {
-    excel_output() {
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/raporlar/listeler/stokRaporExcelListe
+     *   yeni: POST /excel-api/reports/stock   (tek istek)
+     *         server/routes/excel-api/reports/stock.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0.
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL.
+     *
+     * beginLoading/endLoading KORUNDU; endLoading artik finally'de,
+     * yani hata halinde de yukleme gostergesi kapaniyor (eski kodda
+     * .catch icinde ayrica yazilmasi gerekiyordu).
+     */
+    async excel_output() {
       this.sharedStore.beginLoading()
 
-      useExcelApi()
-        .post(
-          "/raporlar/listeler/stokRaporExcelListe",
+      try {
+        await exportExcel(
+          "/excel-api/reports/stock",
           this.reportsStore.getReportsMekmerStockList,
+          "Stok_listesi.xlsx",
         )
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "raporlar/listeler/stokRaporExcelListe",
-              "Stok_listesi.xlsx",
-            )
-          }
-          this.sharedStore.endLoading()
-        })
-        .catch((err) => {
-          console.error("excel_output basarisiz:", err)
-          this.sharedStore.endLoading()
-        })
+      } catch (err) {
+        console.error("excel_output basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      } finally {
+        this.sharedStore.endLoading()
+      }
     },
 
     reportsMekmerStockListSelected(event) {

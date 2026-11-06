@@ -57,15 +57,32 @@ export default {
         this.reportsStore.setLoadingListNotYear()
     },
     methods:{
-        excel_output(){
-            useExcelApi().post("/reports/excel/loading", this.reportsStore.getReportsMekmarLoadingList).then((response) => {
-                if (response.status) {
-                downloadFromExcelServer(
-              "reports/excel/loading",
-              "mekamer_loading_excel.xlsx"
-            );
-                }
-            });
+        /*
+         * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+         *   eski: POST + GET {excelServerBase}/reports/excel/loading
+         *   yeni: POST /excel-api/reports/loading   (tek istek)
+         *         server/routes/excel-api/reports/loading.post.ts
+         *
+         * Cikti uretimdekiyle KARSILASTIRILDI (ornek veriyle):
+         * deger, sayi bicimi, hucre stili, sutun genisligi ve
+         * birlestirme farki 0 -- yalnizca birlestirilmis alanin
+         * ICINDEKI gorunmez hucrelerde kayitli stil farki var
+         * (Excel o hucreleri cizmiyor; ayrinti uc dosyasinda).
+         *
+         * `if (response.status)` DUSTU: HTTP durumunu (daima 200)
+         * okuyordu, govdedeki {"status": false}'u DEGIL.
+         */
+        async excel_output(){
+            try {
+                await exportExcel(
+                    "/excel-api/reports/loading",
+                    this.reportsStore.getReportsMekmarLoadingList,
+                    "mekamer_loading_excel.xlsx",
+                );
+            } catch (err) {
+                console.error("loading excel ciktisi basarisiz:", err);
+                useAppToast().error("Excel olusturulamadi.");
+            }
         },
         byCustomerList(){
             const date = {

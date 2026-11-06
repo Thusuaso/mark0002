@@ -7,16 +7,44 @@
       mumkundu. Katman tum tiklamalari yakalar ve ekran okuyuculara
       aria-busy ile durumu bildirir.
     -->
-    <div
-      v-if="shared.isLoading"
-      class="app-loading-overlay"
-      role="status"
-      aria-busy="true"
-      aria-live="polite"
-    >
-      <ProgressSpinner strokeWidth="4" />
-      <span class="app-sr-only">Yükleniyor…</span>
-    </div>
+    <!--
+      ClientOnly ZORUNLU -- HYDRATION UYUSMAZLIGI VERIYORDU.
+
+      Yukleme katmaninin kosulu (`shared.isLoading || navigating`)
+      SUNUCUDA her zaman false: isLoading sayaci SSR'da hic kurulmuyor
+      ve `navigating` yalnizca istemcideki `page:loading:*` kancalariyla
+      doluyor. Sunucu bu yuzden bir YORUM dugumu basiyor, istemci ise
+      ilk render'da katmani ACMIS oluyor:
+
+        [Vue warn]: Hydration node mismatch:
+          - rendered on server: #comment
+          - expected on client: div
+            at <Transition name="app-loading-fade">
+
+      Eski kodda (Transition'siz, yalnizca isLoading) bu gorunmuyordu
+      cunku iki tarafta da false'ti; `navigating` eklenince ortaya
+      cikti. Katman zaten tamamen istemci isi, dolayisiyla dogru cozum
+      SSR'dan tamamen cikarmak.
+    -->
+    <ClientOnly>
+    <Transition name="app-loading-fade">
+      <div
+        v-if="shared.isLoading || navigating"
+        class="app-loading-overlay"
+        role="status"
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <!--
+          ProgressSpinner yerine goz: sistemin adi "Goz", yukleme
+          gostergesi de markaya ait bir isaret olsun.
+          Bilesen tamamen gorsel; durum bildirimi burada (role/aria).
+        -->
+        <SharedEyeLoader />
+        <span class="app-sr-only">Yükleniyor…</span>
+      </div>
+    </Transition>
+    </ClientOnly>
 
     <Toast />
 
@@ -44,9 +72,38 @@
 
 <script setup>
 // Nuxt 2'de <nuxt /> idi -> Nuxt 3+'ta <slot />
-// loadingSpinner componenti yerine PrimeVue ProgressSpinner
+//
+// Yukleme gostergesi: Nuxt 2'deki loadingSpinner -> (pilotta PrimeVue
+// ProgressSpinner) -> simdi components/shared/EyeLoader.vue (goz).
 const shared = useSharedStore()
 const auth = useAuthStore()
+
+/*
+ * SAYFALAR ARASI GECISTE DE GOZ.
+ *
+ * `shared.isLoading` yalnizca VERI islemlerini sayiyor
+ * (beginLoading/endLoading). Sayfa gezintisi ayri bir sure: Nuxt
+ * rotayi cozup yeni sayfanin useAsyncData'larini beklerken ekranda
+ * hicbir sey olmuyordu.
+ *
+ * Nuxt'un `page:loading:start` / `page:loading:end` kancalari tam bu
+ * araligi veriyor; ikisi birlestirilerek tek katman kullaniliyor.
+ *
+ * NEDEN useLoadingIndicator() DEGIL: o composable ekranin tepesinde
+ * ince bir cubuk icin tasarlanmis (ilerleme yuzdesi tutuyor) ve
+ * `isLoading` degeri gecis bitiminde bir sure daha true kaliyor --
+ * tam ekran katman icin istenmeyen bir gecikme. Kancalar dogrudan
+ * ve gecikmesiz.
+ */
+const navigating = ref(false)
+
+const nuxtApp = useNuxtApp()
+nuxtApp.hook("page:loading:start", () => {
+  navigating.value = true
+})
+nuxtApp.hook("page:loading:end", () => {
+  navigating.value = false
+})
 
 /*
  * Nuxt 2 layouts/default.vue acilista 25 liste action'i tetikliyordu
@@ -160,6 +217,36 @@ onBeforeUnmount(() => {
 
   background: rgb(0 0 0 / 25%);
   backdrop-filter: blur(1px);
+}
+
+/*
+ * Katmanin kendisi de yumusak giriyor/cikiyor.
+ *
+ * NEDEN: kisa suren isteklerde katman bir kare gorunup kayboluyor ve
+ * ekran "cakiyordu". Opaklik gecisi o cakmayi yumusatiyor.
+ *
+ * CIKIS GIRISTEN YAVAS (90ms -> 220ms): katman aniden kaybolursa goz
+ * yari kirpik haldeyken kesiliyor; yavas cikis kirpmanin tamamlanmasina
+ * firsat veriyor.
+ */
+.app-loading-fade-enter-active {
+  transition: opacity 90ms ease-out;
+}
+
+.app-loading-fade-leave-active {
+  transition: opacity 220ms ease-in;
+}
+
+.app-loading-fade-enter-from,
+.app-loading-fade-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loading-fade-enter-active,
+  .app-loading-fade-leave-active {
+    transition: none;
+  }
 }
 
 .app-sr-only {

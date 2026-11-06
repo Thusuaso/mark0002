@@ -711,7 +711,6 @@
 </template>
 <script>
 import { useReportsStore } from "~/stores/reports"
-import { useLocalStore } from "~/stores/local"
 import { useSharedStore } from "~/stores/shared"
 export default {
   computed: {
@@ -723,9 +722,6 @@ export default {
      */
     reportsStore() {
       return useReportsStore()
-    },
-    localStore() {
-      return useLocalStore()
     },
     sharedStore() {
       return useSharedStore()
@@ -800,7 +796,7 @@ export default {
     };
   },
   methods: {
-    excel_output(event) {
+    async excel_output(event) {
       const data = {
         thisYearSeller: this.reportsStore.getReportsMekmarGuOrdererThisYear,
         previousYearSeller: this.reportsStore.getReportsMekmarGuOrdererPreviousYear,
@@ -809,26 +805,33 @@ export default {
         previousYearOperation: this.reportsStore.getReportsMekmarGuOperationPreviousYear,
         twoYearAgoOperation: this.reportsStore.getReportsMekmarGuOperationTwoYearAgo,
       };
-      useExcelApi()
-        .post("/gu/reports/seller/operation/orders", data)
-        .then((response) => {
-          if (response.status) {
-            /*
-             * Elle <a> kurmak yerine downloadFromExcelServer(): yardimci
-             * yolu NORMALIZE ediyor (localStore.getLocalUrl sonda egik cizgiyle
-             * bittigi ve bu dosyadaki yol bastan egik cizgiyle basladigi
-             * icin elle birlestirmede CIFT EGIK CIZGI olusuyordu) ve
-             * olusturdugu <a>'yi DOM'dan KALDIRIYOR -- kaynak
-             * kaldirmiyordu, her indirmede body'ye bir olu link daha
-             * ekleniyordu.
-             */
-            downloadFromExcelServer(
-              "gu/reports/seller/operation/orders",
-              "gu_reports_summary.xlsx"
-            )
-            this.sharedStore.endLoading()
-          }
-        });
+      /*
+       * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+       *   eski: POST + GET {excelServerBase}/gu/reports/seller/operation/orders
+       *   yeni: POST /excel-api/gu/operation-orders   (tek istek)
+       *         server/routes/excel-api/gu/operation-orders.post.ts
+       *
+       * Cikti uretimdekiyle KARSILASTIRILDI: deger, sayi bicimi, hucre
+       * stili, sutun genisligi ve 6 birlestirme farki 0.
+       *
+       * UC SORUN DUZELTILDI:
+       *  - `if (response.status)` HTTP durumunu (daima 200) okuyordu,
+       *    govdedeki {"status": false}'u DEGIL.
+       *  - endLoading() O KOSULUN ICINDEYDI: uretim basarisiz oldugunda
+       *    yukleme gostergesi HIC KAPANMIYORDU. Artik finally'de.
+       *  - Python bu ucta bos bir FOB/DDP degerinde `+=` yuzunden
+       *    TypeError firlatip tum raporu dusuruyordu; olculdu --
+       *    null'lu govde {"status": false} + GET 200 + 9749 bayt
+       *    (= SABLONUN AYNISI, bos dosya). Nitro bos degeri 0 sayiyor.
+       */
+      try {
+        await exportExcel("/excel-api/gu/operation-orders", data, "gu_reports_summary.xlsx")
+      } catch (err) {
+        console.error("gu ozet excel ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      } finally {
+        this.sharedStore.endLoading()
+      }
     },
     twoYearAgoOperationSelectedForw(event) {
       const payload = {

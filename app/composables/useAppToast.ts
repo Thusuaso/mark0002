@@ -69,5 +69,27 @@ export function useAppToast() {
     warn(detail: string) {
       add("warn", "Uyarı", detail)
     },
+
+    /*
+     * EKLENDI -- CAGRILIYORDU AMA TANIMLI DEGILDI.
+     *
+     * app/stores/chat.ts:498 `useAppToast().info(...)` cagiriyordu ve
+     * sarmalayicida `info` YOKTU:
+     *     TypeError: useAppToast(...).info is not a function
+     *
+     * Belirti: bir kullanici cevrimici olduguna dair bildirim
+     * uretilirken hata atiliyordu. Hata presence olay isleyicisinin
+     * ICINDE oldugu icin o isleyicinin kalani calismiyordu; "X is now
+     * online" bildirimi hic gorunmuyordu.
+     *
+     * NEDEN .success()/.warn() DEGIL: mesaj ("<ad> is now online")
+     * bir basari ya da uyari degil, duz bilgi. Ustelik `add`
+     * fonksiyonunun severity tipi "info"yu ZATEN kabul ediyor
+     * (yukaridaki birlesim) -- yani eksik olan yalnizca disa acilan
+     * metottu. PrimeVue 4 de "info" severity'sini destekliyor.
+     */
+    info(detail: string) {
+      add("info", "Bilgi", detail)
+    },
   }
 }

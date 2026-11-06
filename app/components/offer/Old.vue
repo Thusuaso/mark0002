@@ -285,7 +285,7 @@ export default {
 
       /*
        * XLSX.write + file-saver'in saveAs'i -> XLSX.writeFile.
-       * file-saver pilota KURULMADI (package.json'da yok) ve import'u
+       * file-saver pilota KURULMADI (package.json'da yok) ve import islemi
        * derlemeyi dusuruyor. writeFile indirmeyi kendisi tetikliyor,
        * cikan dosya ayni. (reports/mekmar/country-order.vue ile ayni
        * karar.)

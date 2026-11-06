@@ -78,15 +78,32 @@ export default {
       this.mekmer_filtered_list = event
     },
 
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/excel/production
+     *   yeni: POST /excel-api/reports/production   (tek istek)
+     *         server/routes/excel-api/reports/production.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0
+     * (yalnizca A:J birlestirmesinin ICINDEKI gorunmez hucrelerde
+     * kayitli stil farki var -- Excel onlari cizmiyor).
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL.
+     */
     async excel_output() {
-      const response = await useExcelApi().post(
-        "/reports/excel/production",
-        this.is_filtered
-          ? this.mekmer_filtered_list
-          : this.reportsStore.getReportsMekmerProductionList,
-      )
-      if (response.status) {
-        downloadFromExcelServer("reports/excel/production", "mekamer_production_excel.xlsx")
+      try {
+        await exportExcel(
+          "/excel-api/reports/production",
+          this.is_filtered
+            ? this.mekmer_filtered_list
+            : this.reportsStore.getReportsMekmerProductionList,
+          "mekamer_production_excel.xlsx",
+        )
+      } catch (err) {
+        console.error("production excel ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
       }
     },
 

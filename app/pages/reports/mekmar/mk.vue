@@ -97,26 +97,43 @@ export default {
         });
     },
 
-    excel_output() {
+    /*
+     * MK raporlari Excel ciktisi. Artik Python'daki excel sunucusundan
+     * DEGIL, Nitro'dan: server/routes/excel-api/reports/mk.post.ts
+     *
+     * [x] IKI ADIMLI SOZLESME DUSTU (POST uret + GET indir). Eskisi
+     *     paylasilan diskteki tek bir dosyaya yaziyordu: iki kullanici
+     *     ayni anda ciktisini alirsa ikincinin POST'u birincinin
+     *     dosyasini ezer ve birinci BASKASININ raporunu indirirdi.
+     *     Tek istek, govdesinde dosya -> yaris yok.
+     *
+     * [x] `if (response.status)` DUSTU: HTTP durumunu (daima 200)
+     *     okuyordu, govdedeki {"status": false}'u DEGIL. Python bir
+     *     istisnada False donup 200 ile yanitladigi icin kosul yine
+     *     dogru oluyor ve istemci BOS SABLONU indiriyordu -- hatasiz,
+     *     sessiz. exportExcel artik HTTP hatasinda firlatiyor.
+     *
+     * [x] .catch() ICINDE endLoading() TEKRARI DUSTU -> finally.
+     *     Eskisinde basarili yolda endLoading() `if` BLOGUNUN ICINDE
+     *     idi: `response.status` false gelirse yukleme gostergesi hic
+     *     kapanmiyordu (sayac bir eksilmemis kalip o oturum boyunca
+     *     acik duruyordu).
+     */
+    async excel_output() {
       this.sharedStore.beginLoading();
-      useExcelApi()
-        .post(
-          "/raporlar/listeler/mkraporlari/excel",
-          this.reportsStore.getReportsMekmarMkList
-        )
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "raporlar/listeler/mkraporlari/excel",
-              "mkRaporlari.xlsx"
-            );
-            this.sharedStore.endLoading();
-          }
-        })
-        .catch((err) => {
-          console.error("excel_output basarisiz:", err)
-          this.sharedStore.endLoading()
-        });
+
+      try {
+        await exportExcel(
+          "/excel-api/reports/mk",
+          this.reportsStore.getReportsMekmarMkList,
+          "mkRaporlari.xlsx"
+        );
+      } catch (err) {
+        console.error("mk excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel oluşturulamadı.");
+      } finally {
+        this.sharedStore.endLoading();
+      }
     },
     yearSelected(event) {
       this.loadMkReports(event.value.Year);

@@ -119,17 +119,26 @@ export default {
     };
   },
   methods: {
-    customer_excel_output(){
-      useExcelApi()
-        .post("/customer/mekmar/excel", this.customerStore.getMekmarList)
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "customer/mekmar/excel",
-              "Customers.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/customer/mekmar/excel
+     *   yeni: POST /excel-api/reports/customer-mekmar   (tek istek)
+     *         server/routes/excel-api/reports/customer-mekmar.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0.
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL -- uretim patlasa bile
+     * indirme tetikleniyordu.
+     */
+    async customer_excel_output() {
+      try {
+        await exportExcel("/excel-api/reports/customer-mekmar", this.customerStore.getMekmarList, "Customers.xlsx");
+      } catch (err) {
+        console.error("customer-mekmar excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     customerOrderPoSelectedEmit(po) {
       this.customerStore.setMekmarDetailOrdersPoProductsList(po);

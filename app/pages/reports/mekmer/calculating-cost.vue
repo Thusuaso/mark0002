@@ -250,6 +250,26 @@ const emptyCostModel = () => ({
   Tarih: null,
 })
 
+/*
+ * useApi() BIR $fetch ORNEGI -- `.get` / `.post` / `.delete` METOTLARI YOK.
+ *
+ * useApi() govdesi `return $fetch.create({...})` (app/composables/useApi.ts).
+ * $fetch.create CAGRILABILIR bir fonksiyon dondurur; axios gibi metot
+ * tasiyan bir nesne DEGIL. Bu yuzden `useApi().get(url)` cagrisi
+ *     TypeError: (intermediate value)().get is not a function
+ * firlatiyordu -- sayfa acilisinda, mounted() icinde.
+ *
+ * Dogru kullanim:
+ *     useApi()(url)                               // GET
+ *     useApi()(url, { method: "POST", body })     // POST
+ *     useApi()(url, { method: "DELETE" })         // DELETE
+ *
+ * Yanit sekli DEGISMIYOR: $fetch govdeyi dogrudan donduruyor, yani
+ * cagri yerlerindeki `res.list` / `res.status` okumalari aynen gecerli.
+ * (useLegacyApi() ise axios'u taklit edip `{ data, status }` sariyor --
+ * bu sayfalar o sarmalayiciyi beklemiyor, dolayisiyla ona cevirmek
+ * `res.list` okumalarini bozardi.)
+ */
 export default {
   data() {
     return {
@@ -329,8 +349,7 @@ export default {
         ? `/reports/mekmer/calculating/cost/${year}/${month}`
         : `/reports/mekmer/calculating/cost/${year}`
 
-      return useApi()
-        .get(url)
+      return useApi()(url)
         .then((res) => {
           this.costs = res.list || []
           this.companies = res.companies || []
@@ -428,8 +447,9 @@ export default {
     deletePost(id, date) {
       if (!confirm("Silmek istediğinize emin misiniz?")) return
 
-      useApi()
-        .delete(`/reports/mekmer/calculating/cost/delete/${id}`)
+      useApi()(`/reports/mekmer/calculating/cost/delete/${id}`, {
+        method: "DELETE",
+      })
         .then((res) => {
           /*
            * Orijinalde `if (res)` vardi -- axios yanit nesnesi her zaman

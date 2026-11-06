@@ -579,7 +579,7 @@ export default {
         }
       }
     },
-    proforma_excel_output() {
+    async proforma_excel_output() {
       const toast = useAppToast()
 
       if (this.selectedShippedType == null) {
@@ -597,19 +597,33 @@ export default {
 
           /*
            * `api` TANIMSIZDI -- bkz. alt nottaki "TANIMSIZ api".
-           * Hedef excel sunucusu (indirme adresi getLocalUrl'den, yani
-           * excelServerBase'ten kuruluyordu), bu yuzden useExcelApi().
+           *
+           * Artik Python'daki excel sunucusundan DEGIL, Nitro'dan:
+           * server/routes/excel-api/offer/proforma.post.ts
+           *
+           * [x] IKI ADIMLI SOZLESME DUSTU (POST uret + GET indir).
+           *     Eskisi paylasilan diskteki TEK bir dosyaya yaziyordu:
+           *     iki satisci ayni anda proforma alirsa ikincinin POST'u
+           *     birincinin dosyasini ezer ve birinci MUSTERISININ
+           *     DEGIL, baskasinin faturasini indirirdi.
+           *
+           * [x] `if (res.status)` DUSTU: Python bir istisnada
+           *     {"status": false} + HTTP 200 donuyordu; bu kosul onu
+           *     yakaliyordu ama HICBIR SEY yapmiyordu -- ne hata, ne
+           *     uyari. Kullanici "indir"e basiyor ve hicbir sey
+           *     olmuyordu. Artik HTTP hatasinda firlatiyor ve
+           *     kullaniciya bildiriliyor.
            */
-          useExcelApi()
-            .post("/offer/proforma/output", data)
-            .then((res) => {
-              if (res.status) {
-                downloadFromExcelServer(
-                  "offer/proforma/output",
-                  "proforma_invoice.xlsx"
-                )
-              }
-            })
+          try {
+            await exportExcel(
+              "/excel-api/offer/proforma",
+              data,
+              "proforma_invoice.xlsx"
+            )
+          } catch (err) {
+            console.error("proforma ciktisi basarisiz:", err)
+            toast.error("Proforma could not be created.")
+          }
         }
       }
     },
@@ -1186,7 +1200,7 @@ export default {
   proforma_excel_output() su satiri iceriyordu:
       api.post("/offer/proforma/output", data).then(...)
   ama bu dosyada `api` diye bir sey IMPORT EDILMEMIS ve tanimlanmamis
-  (import'lar yalnizca: date, Cookies, fileService). Yani "Proforma
+  (import satirlari yalnizca: date, Cookies, fileService). Yani "Proforma
   Excel" butonuna her basista
       ReferenceError: api is not defined
   aliniyordu ve excel HIC uretilmiyordu.
@@ -1254,7 +1268,7 @@ export default {
   [x] FileUpload'a customUpload + :auto="false" (v4'te url'siz basic
       mode secimden sonra kendi kendine yuklemeye calisiyor)
   [x] import date from "plugins/date" -> { toIsoDate, fromIsoDate }
-      ACIK IMPORT ZORUNLU: ciplak `dateToString` auto-import'ta
+      ACIK IMPORT ZORUNLU: ciplak `dateToString` auto-import tarafinda
       utils/formatters.js'e ("02-10-2026", GOSTERIM) cozuluyor, oysa
       bu cagrilar API'ye YAZIYOR ("2026-10-02"). Ayrinti Proforma.vue'da.
       SABLONDAKI `dateToString` ise OLDUGU GIBI BIRAKILDI -- orada

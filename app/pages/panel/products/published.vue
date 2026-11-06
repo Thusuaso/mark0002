@@ -117,11 +117,42 @@ export default {
   },
 
   watch: {
-    /* Kategori listesi urun listesiyle AYNI yanittan geliyor
+    /*
+     * Kategori listesi urun listesiyle AYNI yanittan geliyor
      * (MUT_setPanelPublishedList hem payload.list hem payload.category
-     * yaziyor), ayri bir istek yok. */
-    "panelStore.getPanelCategoryList"() {
-      this.selectedCategory = this.panelStore.getPanelCategoryList[0]
+     * yaziyor), ayri bir istek yok.
+     *
+     * =================================================================
+     * [!] immediate: true ZORUNLU -- IZLEYICI HIC TETIKLENMIYORDU
+     * =================================================================
+     * Eskiden bu duz bir izleyiciydi ve `selectedCategory` HICBIR
+     * ZAMAN dolmuyordu. Nedeni sira:
+     *
+     *   1. <script setup> blogu `await useAsyncData(...)` iceriyor,
+     *      yani setup ASENKRON. Istek orada bekleniyor ve store
+     *      panelCategoryList'i o sirada dolduruyor.
+     *   2. Options API'nin `watch` secenekleri ise setup COZULDUKTEN
+     *      SONRA kuruluyor (applyOptions, finishComponentSetup icinde).
+     *
+     * Yani liste izleyici kurulmadan ONCE doluyor; izleyici bir daha
+     * degisiklik gormuyor ve `selectedCategory` null kaliyor.
+     *
+     * Bunun gorunur sonucu: ust taraftaki kategori Select'i BOS
+     * geliyordu ve satira tiklandiginda asagidaki metot
+     * `this.selectedCategory.Id` uzerinde TypeError atip DIALOGU HIC
+     * ACMIYORDU (konsol: "can't access property 'Id',
+     * this.selectedCategory is null").
+     *
+     * `immediate: true` izleyici kurulur kurulmaz bir kez calisir,
+     * yani ZATEN YUKLENMIS veriyi de okur. Sonraki degisiklikler icin
+     * davranis aynen devam ediyor.
+     */
+    "panelStore.getPanelCategoryList": {
+      immediate: true,
+      handler() {
+        /* Liste bos olabilir -> undefined yerine acikca null. */
+        this.selectedCategory = this.panelStore.getPanelCategoryList[0] ?? null
+      },
     },
   },
 
@@ -131,10 +162,24 @@ export default {
       this.panelStore.setPanelProductId(event.urunid)
       this.panelStore.setPanelId(event.Id)
 
-      this.panelStore.setPanelProductFiltersList({
-        productId: event.urunid,
-        categoryId: this.selectedCategory.Id,
-      })
+      /*
+       * KATEGORI YOKSA FILTRE ISTEGI ATLANIR -- DIALOG YINE ACILIR.
+       *
+       * Eskiden burada korumasiz `this.selectedCategory.Id` vardi.
+       * selectedCategory null oldugunda TypeError metodu KESIYOR ve
+       * asagidaki `panel_form_dialog = true` satirina HIC gelinmiyordu;
+       * kullanici satira tikliyor ve hicbir sey olmuyordu.
+       *
+       * Asil neden yukaridaki izleyicide duzeltildi (immediate), ama
+       * liste gercekten bos gelebilir. O durumda kaybedilen tek sey
+       * filtrelerin ONCEDEN yuklenmesi; dialog aciliyor.
+       */
+      if (this.selectedCategory) {
+        this.panelStore.setPanelProductFiltersList({
+          productId: event.urunid,
+          categoryId: this.selectedCategory.Id,
+        })
+      }
       this.panelStore.setPanelProductButtonStatus(false)
 
       this.model = event

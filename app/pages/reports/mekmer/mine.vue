@@ -25,14 +25,39 @@ export default {
    * blogunda useAsyncData ile. Gerekcesi orada.
    */
   methods: {
-    excel_output() {
-      useExcelApi()
-        .post("/reports/excel/mine", this.reportsStore.getReportsMekmerMineList)
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer("reports/excel/mine", "mekamer_mine_excel.xlsx")
-          }
-        })
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/excel/mine
+     *   yeni: POST /excel-api/reports/mine   (tek istek)
+     *         server/routes/excel-api/reports/mine.post.ts
+     *
+     * [!] BU RAPORDA GORUNUR BIR DUZELTME VAR: Python'un toplam
+     *     satirinda MT ve Piece toplamlari TERS sutunlarda yaziliyordu
+     *     (web.py:1536-1539). Uretimde olculup dogrulandi; Nitro
+     *     tarafinda her toplam kendi sutununda. Ayrinti ve olcum
+     *     kaydi uc dosyasinda.
+     *
+     * Geri kalan her sey birebir: basliklar, veri satirlari, kenarlik,
+     * toplam satirinin kalin 13 punto + defb00 zemini, sutun
+     * genislikleri (karsilastirildi: deger/bicim/stil farki 0,
+     * yalnizca duzeltilen 2 hucre farkli).
+     */
+    async excel_output() {
+      try {
+        await exportExcel(
+          "/excel-api/reports/mine",
+          this.reportsStore.getReportsMekmerMineList,
+          "mekamer_mine_excel.xlsx",
+        )
+      } catch (err) {
+        /*
+         * Eski kodda `if (response.status)` HTTP durumunu (daima 200)
+         * okuyordu, govdedeki {"status": false}'u DEGIL -- uretim
+         * patlasa bile indirme tetikleniyordu.
+         */
+        console.error("mine excel ciktisi basarisiz:", err)
+        useAppToast().error("Excel olusturulamadi.")
+      }
     },
   },
 }

@@ -517,7 +517,25 @@ export default {
 
       if (ok) {
         useAppToast().success("Başarıyla Sevk Edildi")
-        this.orderStore.setOrderList()
+
+        /*
+         * ACTION ADI DUZELTILDI: `setOrderList` order store'da TANIMLI
+         * DEGIL -- orada yalnizca `MUT_setOrderList(payload)` mutation'i
+         * ve `setOrderProductionList()` gibi yukleyici action'lar var.
+         *
+         * Eski hali TypeError firlatiyordu ve hata BU SATIRDA oldugu
+         * icin altindaki iki satir HIC CALISMIYORDU:
+         *   - save_button_disabled = false  -> "Sevk Et" butonu basarili
+         *     sevkiyattan sonra DEVRE DISI kaliyordu
+         *   - reset()                       -> form temizlenmiyordu
+         * Yani kullanici basarili bir sevkiyattan sonra sayfayi
+         * yenilemek zorunda kaliyordu.
+         *
+         * Dogru action, bu ekranin verisini yukleyen action'in aynisi:
+         * pages/operation/shipment.vue de `setOrderProductionList()`
+         * cagiriyor (order.ts:274) ve liste `orderList`e yaziliyor.
+         */
+        this.orderStore.setOrderProductionList()
         this.save_button_disabled = false
         this.reset()
       } else {

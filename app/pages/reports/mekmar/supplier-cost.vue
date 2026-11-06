@@ -39,17 +39,26 @@ export default {
   },
 
   methods: {
-    excel_output() {
-      useExcelApi()
-        .post("/reports/excel/supplier/cost", this.list)
-        .then((response) => {
-          if (response.status) {
-            downloadFromExcelServer(
-              "reports/excel/supplier/cost",
-              "mekamer_supplier_cost_excel.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/excel/supplier/cost
+     *   yeni: POST /excel-api/reports/supplier-cost   (tek istek)
+     *         server/routes/excel-api/reports/supplier-cost.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0.
+     *
+     * `if (response.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL -- uretim patlasa bile
+     * indirme tetikleniyordu.
+     */
+    async excel_output() {
+      try {
+        await exportExcel("/excel-api/reports/supplier-cost", this.list, "mekamer_supplier_cost_excel.xlsx");
+      } catch (err) {
+        console.error("supplier-cost excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
   },
 };

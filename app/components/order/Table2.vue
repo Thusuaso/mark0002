@@ -1121,13 +1121,36 @@ export default {
         return val;
       }
     },
+    /*
+     * TOPLAMA YEREL DEGISKENDE, REAKTIF ALANA TEK SEFERDE YAZILIR.
+     *
+     * Eski kod `this.totals = 0` yapip dongu icinde `+=` ile
+     * biriktiriyordu. `totals` bu bileşenin KENDI DataTable
+     * sablonlarinda okunuyor (satir 288, 310, 695, 717, 999, 1021),
+     * yani her yazma bir render daha tetikliyor ve DataTable @filter'i
+     * yeniden yayiyor:
+     *     Maximum recursive updates exceeded in component <DataTable>
+     *
+     * Dongunun durulmamasinin sebebi `= 0` sifirlamasiydi: degerler
+     * oturmus olsa bile her tur once 0 yazilip sonra tekrar toplandigi
+     * icin Vue her seferinde "degisti" goruyordu. Yerel degiskende
+     * toplayip sonunda tek kez atayinca ikinci turda deger AYNI oluyor,
+     * Vue degisim gormuyor ve dongu kendiliginden duruyor.
+     *
+     * AYNI HATA reports/mekmer/shipped sayfasinda CANLI OLARAK alindi
+     * (app/components/order/ShippedList.vue __totalSum). Bu bileşen
+     * birebir ayni kalipta oldugu icin birlikte duzeltildi.
+     *
+     * Toplama ifadesi ve sirasi birebir korundu.
+     */
     ordersFilter(event) {
       this.orderStore.setOrderProductionTotal(event.filteredValue);
-      this.totals = 0;
+
+      let totals = 0;
       event.filteredValue.forEach((x) => {
-        this.totals +=
-          this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
+        totals += this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
       });
+      this.totals = totals;
     },
     /*
      * Siparis sahibinin veya operasyon sorumlusunun kendi satirlarini

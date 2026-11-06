@@ -74,13 +74,41 @@ export default {
 
   watch: {
     /*
-     * Kategori listesi URUN LISTESIYLE AYNI yanittan geliyor
+     * Kategori listesi urun listesiyle AYNI yanittan geliyor
      * (MUT_setPanelPublishedList hem payload.list hem payload.category
-     * yaziyor), yani ayri bir istek yok. Liste dolunca ilk kategori
-     * secili hale getiriliyor.
+     * yaziyor), ayri bir istek yok.
+     *
+     * =================================================================
+     * [!] immediate: true ZORUNLU -- IZLEYICI HIC TETIKLENMIYORDU
+     * =================================================================
+     * Eskiden bu duz bir izleyiciydi ve `selectedCategory` HICBIR
+     * ZAMAN dolmuyordu. Nedeni sira:
+     *
+     *   1. <script setup> blogu `await useAsyncData(...)` iceriyor,
+     *      yani setup ASENKRON. Istek orada bekleniyor ve store
+     *      panelCategoryList'i o sirada dolduruyor.
+     *   2. Options API'nin `watch` secenekleri ise setup COZULDUKTEN
+     *      SONRA kuruluyor (applyOptions, finishComponentSetup icinde).
+     *
+     * Yani liste izleyici kurulmadan ONCE doluyor; izleyici bir daha
+     * degisiklik gormuyor ve `selectedCategory` null kaliyor.
+     *
+     * Bunun gorunur sonucu: ust taraftaki kategori Select'i BOS
+     * geliyordu ve satira tiklandiginda asagidaki metot
+     * `this.selectedCategory.Id` uzerinde TypeError atip DIALOGU HIC
+     * ACMIYORDU (konsol: "can't access property 'Id',
+     * this.selectedCategory is null").
+     *
+     * `immediate: true` izleyici kurulur kurulmaz bir kez calisir,
+     * yani ZATEN YUKLENMIS veriyi de okur. Sonraki degisiklikler icin
+     * davranis aynen devam ediyor.
      */
-    "panelStore.getPanelCategoryList"() {
-      this.selectedCategory = this.panelStore.getPanelCategoryList[0]
+    "panelStore.getPanelCategoryList": {
+      immediate: true,
+      handler() {
+        /* Liste bos olabilir -> undefined yerine acikca null. */
+        this.selectedCategory = this.panelStore.getPanelCategoryList[0] ?? null
+      },
     },
   },
 

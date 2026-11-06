@@ -50,7 +50,7 @@ export function fromIsoDate(value: string | null | undefined): Date | "" {
  * Burada `dateToString = toIsoDate` ve `stringToDate = fromIsoDate` diye
  * iki alias duruyordu. Hicbir yer onlari BU dosyadan import etmiyordu
  * (tum cagri yerleri toIsoDate / fromIsoDate kullaniyor), ama Nuxt'un
- * auto-import'u ayni adlari app/utils/formatters.js'te de buldugu icin
+ * auto-import islemi ayni adlari app/utils/formatters.js'te de buldugu icin
  * her derlemede su uyari cikiyordu:
  *
  *   Duplicated imports "dateToString", the one from

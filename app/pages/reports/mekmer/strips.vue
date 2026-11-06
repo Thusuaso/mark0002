@@ -1539,17 +1539,26 @@ export default {
     dateNakliyeSelected(event) {
       this.modelNakliye.date = toIsoDate(event);
     },
-    excel_strip_output_nakliye() {
-      useExcelApi()
-        .post("/reports/mekmer/nakliye/excel", this.nakliyeList)
-        .then((res) => {
-          if (res.status) {
-            downloadFromExcelServer(
-              "reports/mekmer/nakliye/excel",
-              "reports_mekmer_nakliye.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/mekmer/nakliye/excel
+     *   yeni: POST /excel-api/mekmer/nakliye   (tek istek)
+     *         server/routes/excel-api/mekmer/nakliye.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0.
+     *
+     * `if (res.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL -- uretim patlasa bile
+     * indirme tetikleniyordu.
+     */
+    async excel_strip_output_nakliye() {
+      try {
+        await exportExcel("/excel-api/mekmer/nakliye", this.nakliyeList, "reports_mekmer_nakliye.xlsx");
+      } catch (err) {
+        console.error("nakliye excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     newFormNakliye() {
       this.nakliyeReset();
@@ -1602,8 +1611,28 @@ export default {
       this.selectedStrip = this.strips.find((x) => {
         return x.ID == event.data.Strip;
       });
-      this.dialog_header_moloz =
-        this.selectedQuarry.OcakAdi + " - " + this.selectedStrip.Strips;
+      /*
+       * [!] BASLIK ARTIK DIALOGU ENGELLEYEMEZ.
+       *
+       * Yukaridaki uc `.find()` cagrisi ESLESME YOKSA undefined
+       * donuyor -- kaydin Quarry/Strip id'si listede bulunmadiginda
+       * (silinmis ocak/serit ya da liste henuz yuklenmemisken) olan
+       * tam olarak bu. Eski kod bu durumda
+       * `undefined.OcakAdi` uzerinde TypeError atiyor, metot orada
+       * kesiliyor ve bir ALT SATIRDAKI
+       * `cost_supplier_dialog_moloz = true` HIC calismiyordu:
+       * kullanici satira tikliyor, hicbir sey olmuyordu.
+       *
+       * Baslik yalnizca GORSEL bir bilgi; dialogun acilmasini
+       * engellememeli. Eksik parcalar artik bosluk olarak geciyor ve
+       * ikisi de yoksa baslik bos kaliyor.
+       */
+      this.dialog_header_moloz = [
+        this.selectedQuarry?.OcakAdi,
+        this.selectedStrip?.Strips,
+      ]
+        .filter(Boolean)
+        .join(" - ");
 
       this.cost_supplier_dialog_moloz = true;
     },
@@ -1795,17 +1824,26 @@ export default {
       this.reset();
       this.new_button_status_moloz = true;
     },
-    excel_strip_output_moloz() {
-      useExcelApi()
-        .post("/reports/mekmer/moloz/excel", this.moloz_list)
-        .then((res) => {
-          if (res.status) {
-            downloadFromExcelServer(
-              "reports/mekmer/moloz/excel",
-              "reports_mekmer_moloz.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/mekmer/moloz/excel
+     *   yeni: POST /excel-api/mekmer/moloz   (tek istek)
+     *         server/routes/excel-api/mekmer/moloz.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0.
+     *
+     * `if (res.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL -- uretim patlasa bile
+     * indirme tetikleniyordu.
+     */
+    async excel_strip_output_moloz() {
+      try {
+        await exportExcel("/excel-api/mekmer/moloz", this.moloz_list, "reports_mekmer_moloz.xlsx");
+      } catch (err) {
+        console.error("moloz excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     deleteProcess() {
       useLegacyApi()
@@ -1836,17 +1874,26 @@ export default {
         this.total.piece += x.StripPiece;
       });
     },
-    excel_strip_output() {
-      useExcelApi()
-        .post("/reports/mekmer/strips/excel", this.list)
-        .then((res) => {
-          if (res.status) {
-            downloadFromExcelServer(
-              "reports/mekmer/strips/excel",
-              "reports_mekmer_strips.xlsx"
-            );
-          }
-        });
+    /*
+     * ARTIK EXCEL SUNUCUSUNDAN DEGIL, NITRO'DAN:
+     *   eski: POST + GET {excelServerBase}/reports/mekmer/strips/excel
+     *   yeni: POST /excel-api/mekmer/strips   (tek istek)
+     *         server/routes/excel-api/mekmer/strips.post.ts
+     *
+     * Cikti uretimdekiyle ornek veriyle KARSILASTIRILDI: deger, sayi
+     * bicimi, hucre stili, sutun genisligi ve birlestirme farki 0.
+     *
+     * `if (res.status)` DUSTU: HTTP durumunu (daima 200) okuyordu,
+     * govdedeki {"status": false}'u DEGIL -- uretim patlasa bile
+     * indirme tetikleniyordu.
+     */
+    async excel_strip_output() {
+      try {
+        await exportExcel("/excel-api/mekmer/strips", this.list, "reports_mekmer_strips.xlsx");
+      } catch (err) {
+        console.error("strips excel ciktisi basarisiz:", err);
+        useAppToast().error("Excel olusturulamadi.");
+      }
     },
     stripDataSelected(event) {
       this.new_button_status = false;
@@ -2224,7 +2271,7 @@ export default {
   [x] plugins/date -> ~/utils/dates:
          date.dateToString -> toIsoDate   (4 yer)
          date.stringToDate -> fromIsoDate (2 yer)
-      DIKKAT: created() icinde `const date = new Date()` var ve import'u
+      DIKKAT: created() icinde `const date = new Date()` var ve import islemi
       GOLGELIYOR; o satirdaki date.getMonth() bu degisiklige dahil DEGIL.
       Ayrica utils/dates.ts'teki toIsoDate "2026-10-08" (API'ye yazma
       bicimi) uretir; sablondaki dateToString ise GOSTERIM icin
