@@ -523,11 +523,6 @@
                   >
                 </li>
                 <li>
-                  <NuxtLink to="/panel/users" class="dropdown-item"
-                    >Users</NuxtLink
-                  >
-                </li>
-                <li>
                   <NuxtLink to="/panel/usa" class="dropdown-item"
                     >USA Panel</NuxtLink
                   >

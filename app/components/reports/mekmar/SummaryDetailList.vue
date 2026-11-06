@@ -1,6 +1,21 @@
 <template>
   <div>
-    <DataTable :value="list" class="p-datatable-sm" >
+    <!--
+      `table-scroll-x` ZORUNLU -- SAYILAR RAKAM ORTASINDAN
+      BOLUNUYORDU.
+
+      11 kolonun YEDISI para degeri (Fob, Freight, Detail 1-4, Ddp).
+      Varsayilan kural (app.css: table-layout fixed + overflow-wrap
+      anywhere) tabloyu ekrana sigdirmak icin kolonlari daraltiyor;
+      para degerlerinde bosluk olmadigi icin `anywhere` onlari rakam
+      ortasindan kiriyor. Bir hucre iki satira cikinca satir
+      yuksekligi artiyor ve tek satirlik komsu hucreler dikeyde
+      ortalandigi icin "asagi kaymis" goruluyordu -- kullanicinin
+      bildirdigi belirti buydu.
+
+      Ayni kok neden ve ayni cozum: MkByCustomerList.vue.
+    -->
+    <DataTable :value="list" class="p-datatable-sm table-scroll-x">
       <Column
         field="SiparisTarihi"
         header="Date"

@@ -44,8 +44,6 @@ export const usePanelStore = defineStore("panel", {
     panelProjectInformation: [],
     panelProjectButtonStatus: false,
     panelProjectId: 0,
-    panelUsersList: [],
-    panelUsersButtonStatus:false,
     panelUsaStockList:[],
     panelUsaStockPhotosList:[],
     panelUsaStockButtonStatus:false,
@@ -77,8 +75,6 @@ export const usePanelStore = defineStore("panel", {
     getPanelProjectVideo: (state) => state.panelProjectVideo,
     getPanelProjectButtonStatus: (state) => state.panelProjectButtonStatus,
     getPanelProjectId: (state) => state.panelProjectId,
-    getPanelUsersList: (state) => state.panelUsersList,
-    getPanelUsersButtonStatus: (state) => state.panelUsersButtonStatus,
     getPanelUsaStockList: (state) => state.panelUsaStockList,
     getPanelUsaStockPhotosList: (state) => state.panelUsaStockPhotosList,
     getPanelUsaStockButtonStatus: (state) => state.panelUsaStockButtonStatus,
@@ -850,62 +846,6 @@ export const usePanelStore = defineStore("panel", {
 
       return legacyApi.put("/panel/products/queue/change", product)
     },
-    setPanelUsersList() {
-      const legacyApi = useLegacyApi()
-
-              legacyApi.get('/panel/users/list')
-                  .then(response => {
-                      this.MUT_setPanelUsersList(response.data.list); 
-                  });
-    },
-    setPanelUsersButtonStatus(status) {
-
-              this.MUT_setPanelUsersButtonStatus(status)
-    },
-    setPanelUsersSave(user) {
-      const legacyApi = useLegacyApi()
-      const toast = useAppToast()
-
-              legacyApi.post('/panel/user/save', user)
-                  .then(response => {
-                      if (response.data.status) {
-                          this.setPanelUsersList();
-                          toast.success('Kullanıcı Başarıyla Kaydedildi.');
-                      } else {
-                          toast.error('Kullanıcı Kaydedilemedi.');
-                      }
-                  });
-    },
-    setPanelUserDelete(id) {
-      const legacyApi = useLegacyApi()
-      const toast = useAppToast()
-
-              legacyApi.delete(`/panel/user/delete/${id}`)
-                  .then(response => {
-                      if (response.data.status) {
-                          this.setPanelUsersList();
-                          toast.success('Kullanıcı Başarıyla Silindi.');
-
-                      } else {
-                          toast.error('Kullanıcı Silme Başarısız ');
-                      }
-                  });
-    },
-    setPanelUserUpdate(user) {
-      const legacyApi = useLegacyApi()
-      const toast = useAppToast()
-
-              legacyApi.put('/panel/user/update', user)
-                  .then(response => {
-                      if (response.data.status) {
-                                              this.setPanelUsersList();
-
-                          toast.success('Kullanıcı Başarıyla Güncellendi.');
-                      } else {
-                          toast.error('Kullanıcı Güncelleme Başarısız.');
-                      }
-                  });
-    },
     setPanelUsaStockList() {
       const legacyApi = useLegacyApi()
 
@@ -1156,14 +1096,6 @@ export const usePanelStore = defineStore("panel", {
     MUT_setPanelProjectId(payload) {
 
               this.panelProjectId = payload;
-    },
-    MUT_setPanelUsersList(payload) {
-
-              this.panelUsersList = payload;
-    },
-    MUT_setPanelUsersButtonStatus(payload) {
-
-              this.panelUsersButtonStatus = payload;
     },
     MUT_setPanelUsaStockList(payload) {
 

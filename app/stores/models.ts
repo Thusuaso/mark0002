@@ -294,13 +294,6 @@ export const useModelsStore = defineStore("models", {
     ProjectInformation_Ru: "",
     ProjectInformation_Ar: "",
   },
-  panelUsersModel: {
-    id: 0,
-    adi: "",
-    kullaniciadi: "",
-    mailadres: "",
-    telefon: "",
-  },
   todoModel: {
     ID: 0,
     Yapilacak: "",
@@ -593,7 +586,6 @@ export const useModelsStore = defineStore("models", {
     getPanelProductEdgeModel: (state) => state.panelProductEdgeModel,
     getPanelProductProjectModel: (state) => state.panelProductProjectModel,
     getPanelProductProjectInformationModel: (state) => state.panelProductProjectInformationModel,
-    getPanelUsersModel: (state) => state.panelUsersModel,
     getTodoModel: (state) => state.todoModel,
     getFinancePaymentModel: (state) => state.financePaymentModel,
     getFinancePoModel: (state) => state.financePoModel,
@@ -962,17 +954,6 @@ export const useModelsStore = defineStore("models", {
           };
           this.MUT_setPanelProjectInformationModel(panelProductProjectInformationModel
           );
-    },
-    setPanelUsersModel() {
-
-          const panelUsersModel = {
-            id: 0,
-            adi: "",
-            kullaniciadi: "",
-            mailadres: "",
-            telefon: "",
-          };
-          this.MUT_setPanelUsersModel(panelUsersModel);
     },
     setToDoModel() {
 
@@ -1365,10 +1346,6 @@ export const useModelsStore = defineStore("models", {
     MUT_setPanelProjectInformationModel(payload) {
 
           this.panelProductProjectInformationModel = payload;
-    },
-    MUT_setPanelUsersModel(payload) {
-
-          this.panelUsersModel = payload;
     },
     MUT_setToDoModel(payload) {
 
