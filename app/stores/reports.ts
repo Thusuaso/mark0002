@@ -1597,7 +1597,24 @@ export const useReportsStore = defineStore("reports", {
 
           this.reportsMekmarSummaryOrderList = payload;
     },
+    /*
+     * [!] DIZI SIFIRLANMIYORDU -- HER CAGRIDA BUYUYORDU.
+     *
+     * Eski kod yalnizca push yapiyordu; state'te `[]` baslatiliyor ve
+     * baska hicbir yerde temizlenmiyor. Sayfa her acildiginda (store
+     * gezintiler arasinda yasiyor) ve yil degistiginde ayni dizinin
+     * SONUNA yeni girdiler ekleniyordu.
+     *
+     * Gorunur sonucu: summary sayfasi toplami `[index]` ile okuyor,
+     * yani ikinci yuklemeden sonra ESKI girdileri gosteriyordu --
+     * veri degistiyse (orn. baska yil) ekranda BAYAT toplam
+     * kaliyordu. Ayrica dizi sinirsiz buyuyordu.
+     *
+     * Yerelde kurulup TEK SEFERDE atiyor; toplama ifadeleri ve
+     * sirasi birebir korundu.
+     */
     MUT_setReportsMekmarSummaryOrderListTotal(payload) {
+          const liste = [];
 
           for (const item of payload) {
             let fob = 0;
@@ -1606,14 +1623,33 @@ export const useReportsStore = defineStore("reports", {
               fob += item2.FOB;
               ddp += item2.DDP;
             }
-            this.reportsMekmarSummaryOrderListTotal.push({ fob: fob, ddp: ddp });
+            liste.push({ fob: fob, ddp: ddp });
           }
+
+          this.reportsMekmarSummaryOrderListTotal = liste;
     },
     MUT_setReportsMekmarSummaryForwardingList(payload) {
 
           this.reportsMekmarSummaryForwardingList = payload;
     },
+    /*
+     * [!] DIZI SIFIRLANMIYORDU -- HER CAGRIDA BUYUYORDU.
+     *
+     * Eski kod yalnizca push yapiyordu; state'te `[]` baslatiliyor ve
+     * baska hicbir yerde temizlenmiyor. Sayfa her acildiginda (store
+     * gezintiler arasinda yasiyor) ve yil degistiginde ayni dizinin
+     * SONUNA yeni girdiler ekleniyordu.
+     *
+     * Gorunur sonucu: summary sayfasi toplami `[index]` ile okuyor,
+     * yani ikinci yuklemeden sonra ESKI girdileri gosteriyordu --
+     * veri degistiyse (orn. baska yil) ekranda BAYAT toplam
+     * kaliyordu. Ayrica dizi sinirsiz buyuyordu.
+     *
+     * Yerelde kurulup TEK SEFERDE atiyor; toplama ifadeleri ve
+     * sirasi birebir korundu.
+     */
     MUT_setReportsMekmarSummaryForwardingListTotal(payload) {
+          const liste = [];
 
           for (const item of payload) {
             let fob = 0;
@@ -1622,11 +1658,10 @@ export const useReportsStore = defineStore("reports", {
               fob += item2.FOB;
               ddp += item2.DDP;
             }
-            this.reportsMekmarSummaryForwardingListTotal.push({
-              fob: fob,
-              ddp: ddp,
-            });
+            liste.push({ fob: fob, ddp: ddp });
           }
+
+          this.reportsMekmarSummaryForwardingListTotal = liste;
     },
     MUT_setReportsMekmarSummaryOrderDetail(payload) {
 
@@ -1690,38 +1725,76 @@ export const useReportsStore = defineStore("reports", {
           this.reportsMekmarGuMekusList = payload.mekusList;
           this.reportsMekmarGuLogsList = payload.logsList;
 
+          /*
+           * =============================================================
+           * [!] IKI LISTE HIC SIFIRLANMIYORDU -- HER CAGRIDA BUYUYORDU
+           * =============================================================
+           * Eski kod `reportsMekmarGuForwList` ve
+           * `reportsMekmarGuOrderList` dizilerine yalnizca PUSH
+           * yapiyordu; state'te `[]` olarak baslatiliyorlar ve baska
+           * hicbir yerde temizlenmiyorlar (dosyadaki tum yazmalar
+           * push/+=).
+           *
+           * Bu mutation iki yerden cagriliyor: sayfa acilisinda
+           * (setReportsMekmarGuList) ve YIL DEGISTIRILDIGINDE
+           * (setReportsMekmarGuListYear). Store sayfa gezintileri
+           * arasinda yasadigi icin sayfaya her donulusunde de
+           * tekrarliyor.
+           *
+           * Iki ayri sonucu vardi:
+           *
+           *   1) SAYFA SISIYORDU. gu.vue bu dizileri `v-for` ile
+           *      basiyor (her girdi icin bir tablo). Ilk yuklemede 11
+           *      tablo, ikincisinde 22, ucuncusunde 33... Sonunda
+           *      sayfa yukleme gostergesinde takili kalmis gibi
+           *      goruluyordu.
+           *
+           *   2) TOPLAMLAR YANLISTI. `index` her cagride 0'dan
+           *      basladigi icin `+=` ONCEKI cagrinin girdilerinin
+           *      uzerine ekliyordu: ilk 11 yilin fob/ddp degerleri
+           *      ikiye, ucuncu cagrida uce katlaniyor ve `data`
+           *      dizilerine ayni satirlar tekrar tekrar giriyordu.
+           *      Yeni eklenen 11 girdi ise bos kaliyordu.
+           *
+           * Diziler artik YERELDE kuruluyor ve state'e TEK SEFERDE
+           * atiyor: hem birikme imkansiz, hem de satir basina reaktif
+           * yazma olmuyor.
+           *
+           * Toplama ifadeleri, siralama ve yil dongusu birebir
+           * korundu -- sonuc degerleri (dogru calistigi ILK cagrida
+           * ne ise) ayni.
+           */
+          const forwListe = [];
+          const orderListe = [];
+
           let date = new Date().getFullYear();
-          let index = 0;
           for (const x of Array(11).keys()) {
-            this.reportsMekmarGuForwList.push({
-              year: date,
-              data: [],
-              fob: 0,
-              ddp: 0,
-            });
-            this.reportsMekmarGuOrderList.push({
-              year: date,
-              data: [],
-              fob: 0,
-              ddp: 0,
-            });
+            const forwGirdi = { year: date, data: [], fob: 0, ddp: 0 };
+            const orderGirdi = { year: date, data: [], fob: 0, ddp: 0 };
+
             for (const y of payload.forwList) {
               if (y.Yil == date) {
-                this.reportsMekmarGuForwList[index].fob += y.Fob;
-                this.reportsMekmarGuForwList[index].ddp += y.Ddp;
-                this.reportsMekmarGuForwList[index].data.push(y);
+                forwGirdi.fob += y.Fob;
+                forwGirdi.ddp += y.Ddp;
+                forwGirdi.data.push(y);
               }
             }
             for (const y of payload.orderSummaryList) {
               if (y.Yil == date) {
-                this.reportsMekmarGuOrderList[index].fob += y.Fob;
-                this.reportsMekmarGuOrderList[index].ddp += y.Ddp;
-                this.reportsMekmarGuOrderList[index].data.push(y);
+                orderGirdi.fob += y.Fob;
+                orderGirdi.ddp += y.Ddp;
+                orderGirdi.data.push(y);
               }
             }
-            index += 1;
+
+            forwListe.push(forwGirdi);
+            orderListe.push(orderGirdi);
+
             date = date - 1;
           }
+
+          this.reportsMekmarGuForwList = forwListe;
+          this.reportsMekmarGuOrderList = orderListe;
 
           this.reportsMekmarGuAyoList = payload.ayoList;
     },
@@ -1729,7 +1802,24 @@ export const useReportsStore = defineStore("reports", {
 
           this.reportsMekmarSummaryOrderListByRepresentative = payload;
     },
+    /*
+     * [!] DIZI SIFIRLANMIYORDU -- HER CAGRIDA BUYUYORDU.
+     *
+     * Eski kod yalnizca push yapiyordu; state'te `[]` baslatiliyor ve
+     * baska hicbir yerde temizlenmiyor. Sayfa her acildiginda (store
+     * gezintiler arasinda yasiyor) ve yil degistiginde ayni dizinin
+     * SONUNA yeni girdiler ekleniyordu.
+     *
+     * Gorunur sonucu: summary sayfasi toplami `[index]` ile okuyor,
+     * yani ikinci yuklemeden sonra ESKI girdileri gosteriyordu --
+     * veri degistiyse (orn. baska yil) ekranda BAYAT toplam
+     * kaliyordu. Ayrica dizi sinirsiz buyuyordu.
+     *
+     * Yerelde kurulup TEK SEFERDE atiyor; toplama ifadeleri ve
+     * sirasi birebir korundu.
+     */
     MUT_setReportsMekmarSummaryOrderListByRepresentativeTotal(payload) {
+          const liste = [];
 
           for (const item of payload) {
             let fob = 0;
@@ -1738,11 +1828,13 @@ export const useReportsStore = defineStore("reports", {
               fob += item2.FOB;
               ddp += item2.DDP;
             }
-            this.reportsMekmarSummaryOrderListByRepresentativeTotal.push({
+            liste.push({
               fob: fob,
               ddp: ddp,
             });
           }
+
+          this.reportsMekmarSummaryOrderListByRepresentativeTotal = liste;
     },
   },
 })
