@@ -81,9 +81,26 @@
       </div>
       <div class="col-3">
         <FloatLabel>
+          <!--
+            `:model-value` ZORUNLU -- `:value` ILE ETIKET BINISIYORDU.
+
+            FloatLabel etiketi ancak alan DOLU sayildiginda yukari
+            kalkiyor. "Dolu" karari PrimeVue'da `$filled` computed'inden
+            geliyor ve o `d_value`'ya bakiyor
+            (@primevue/core/baseeditableholder/index.mjs:113), `d_value`
+            de `modelValue` prop'undan doluyor.
+
+            `:value` ise InputText'in prop'u DEGIL; native <input value>
+            niteligine dusuyor. Deger ekranda goruluyor ama `modelValue`
+            tanimsiz kaldigi icin `$filled` FALSE oluyor: etiket
+            kutunun ICINDE kaliyor ve yazinin uzerine biniyordu.
+            Kullanici bunu "input ici yazilar ic ice gecmis" diye
+            bildirdi -- ucu de disabled oldugu icin en cok burada
+            goze carpiyordu.
+          -->
           <InputText
             id="orderamount"
-            :value="shipmentStore.getShipmentAmount.order"
+            :model-value="shipmentStore.getShipmentAmount.order"
             disabled
           />
           <label for="orderamount">Order</label>
@@ -93,7 +110,7 @@
         <FloatLabel>
           <InputText
             id="forwardamount"
-            :value="shipmentStore.getShipmentAmount.production"
+            :model-value="shipmentStore.getShipmentAmount.production"
             disabled
           />
           <label for="forwardamount">Shipped</label>
@@ -103,7 +120,7 @@
         <FloatLabel>
           <InputText
             id="remainderamount"
-            :value="shipmentStore.getShipmentAmount.remainder"
+            :model-value="shipmentStore.getShipmentAmount.remainder"
             disabled
           />
           <label for="remainderamount">Remained</label>
@@ -575,13 +592,47 @@ export default {
       this.__getPriceControl(event.value)
     },
 
+    /*
+     * =================================================================
+     * [!] AYNI PO DEFALARCA LISTELENIYORDU
+     * =================================================================
+     * `orders` prop'u /order/production/list ucundan geliyor ve o
+     * sorgu `from SiparisUrunTB su` ile basliyor (api/index.js:11669),
+     * yani SIPARIS BASINA DEGIL SIPARIS SATIRI (urun) BASINA bir
+     * kayit donuyor. 20 urunlu bir PO listede 20 kez yer aliyor.
+     *
+     * Autocomplete `optionLabel="SiparisNo"` gosterdigi icin kullanici
+     * ayni PO numarasini arka arkaya 20 kez goruyordu ("26" yazinca
+     * ayni PO'dan bir surdu sonuc").
+     *
+     * Secim zaten yalnizca SiparisNo'yu kullaniyor
+     * (@item-select -> ordersSelected($event.value.SiparisNo)), yani
+     * hangi satirin secildigi fark etmiyor; her PO'dan ILK satir
+     * yeterli.
+     */
+    __benzersizSiparisler() {
+      const gorulen = new Set()
+      const liste = []
+
+      for (const o of this.orders ?? []) {
+        const no = o?.SiparisNo
+        if (!no || gorulen.has(no)) continue
+        gorulen.add(no)
+        liste.push(o)
+      }
+
+      return liste
+    },
+
     searchOrders(event) {
+      const benzersiz = this.__benzersizSiparisler()
+
       if (event.query.length == 0) {
-        this.filteredOrders = this.orders
+        this.filteredOrders = benzersiz
         return
       }
 
-      this.filteredOrders = this.orders.filter((x) =>
+      this.filteredOrders = benzersiz.filter((x) =>
         x.SiparisNo.toLowerCase().startsWith(event.query.toLowerCase()),
       )
     },

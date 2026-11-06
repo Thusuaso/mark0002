@@ -132,18 +132,52 @@ export const useShipmentStore = defineStore("shipment", {
       try {
         const api = useApi()
         const res = await api<{
-          order: number
-          production: number
-          remainder: number
+          /* Hepsi SUM'dan geliyor, yani NULL olabilir. */
+          order: number | null
+          production: number | null
+          remainder: number | null
           productionList: ShipmentProduct[]
         }>(
           `/shipment/product/amount/${product.SiparisNo}/${product.ID}/${product.UrunKartId}/${product.TedarikciID}`,
         )
 
+        /*
+         * =============================================================
+         * [!] NULL/NaN KORUMASI -- ESKI KOD BURADA PATLIYORDU
+         * =============================================================
+         * Uc alan da SQL `sum(Miktar)`'dan geliyor
+         * (api/index.js:2661). Secilen urunun HENUZ URETIMI YOKSA
+         * SUM, 0 degil NULL doner:
+         *     production: null
+         * ve sunucu remainder'i `parseFloat(order) - parseFloat(null)`
+         * ile hesapladigi icin o da NaN olur (api/index.js:2633).
+         *
+         * Eski kod dogrudan `res.production.toFixed(4)` cagiriyordu:
+         *     TypeError: can't access property "toFixed",
+         *                res.production is null
+         * Hata asagidaki catch'e dusuyor ve `shipmentAmount` HIC
+         * GUNCELLENMIYORDU -- yani ekranda BIR ONCEKI urunun
+         * rakamlari kaliyordu. Konsol hatasindan kotusu: kullanici
+         * yanlis sayilara bakip sevk miktarina karar veriyordu.
+         *
+         * remainder sunucudan NaN gelebildigi icin GUVENILMIYOR:
+         * sonlu degilse order-production'dan yeniden hesaplaniyor.
+         */
+        const sayi = (v: unknown) => {
+          const n = typeof v === "number" ? v : Number(v)
+          return Number.isFinite(n) ? n : 0
+        }
+
+        const order = sayi(res.order)
+        const production = sayi(res.production)
+        const remainder = Number.isFinite(Number(res.remainder))
+          ? Number(res.remainder)
+          : order - production
+
         this.shipmentAmount = {
-          order: res.order.toFixed(4),
-          production: res.production.toFixed(4),
-          remainder: res.remainder.toFixed(4),
+          order: order.toFixed(4),
+          production: production.toFixed(4),
+          remainder: remainder.toFixed(4),
         }
         this.shipmentProductionList = res.productionList ?? []
       } catch (err) {
