@@ -1460,7 +1460,16 @@ app.put("/sales/todos/update", async (req, res) => {
       req.body.YapilacakOncelik
     );
     request.input("OrtakGorev", mssql.NVarChar, req.body.OrtakGorev);
-    request.input("Acil", mssql.NVarChar, req.body.Acil);
+    /*
+     * Acil kolonu BIT. Burada NVarChar olarak baglanmisti ve
+     * SalesTodoForm'daki <Checkbox :binary="true"> alani BOOLEAN yaptigi
+     * icin SQL'e 'true' dizgesi gidiyordu:
+     *   Conversion failed when converting the nvarchar value 'true' to bit
+     * Bu da catch'e dusup PUT /api/sales/todos/update -> 500 veriyordu.
+     * Ayni tablonun diger iki ucu (todo/by/username save+update) zaten
+     * mssql.Bit kullaniyor -- sapma yalnizca bu satirdaydi.
+     */
+    request.input("Acil", mssql.Bit, req.body.Acil);
     request.input("ID", mssql.Int, req.body.ID);
     const results = await request.query(
       "update Yapilacaklar SET Yapilacak=@CustomYapilacak,YapilacakOncelik=@YapilacakOncelik,OrtakGorev=@OrtakGorev,Acil=@Acil WHERE ID=@ID"
@@ -1471,6 +1480,8 @@ app.put("/sales/todos/update", async (req, res) => {
       res.status(200).json({ status: false });
     }
   } catch (err) {
+    /* Hata yutuluyordu; 500'un sebebi loga yazilmadan bulunamiyor. */
+    console.error("sales/todos/update hatasi:", err);
     res.status(500).json({ status: false });
   }
 });
