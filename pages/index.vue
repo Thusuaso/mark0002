@@ -1,17 +1,20 @@
 <template>
   <div class="container">
+    <new-version-banner />
     <home :home="home" />
   </div>
 </template>
 
 <script>
+import NewVersionBanner from "~/components/home/newVersionBanner.vue";
+
 export default {
   computed: {
     home() {
       return this.$store.getters.getHomeList;
     },
   },
-  components: {},
+  components: { NewVersionBanner },
   data() {
     return {};
   },
