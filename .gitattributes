@@ -1,0 +1,11 @@
+# Kabuk betikleri HER ZAMAN LF ile.
+#
+# Bu depo Windows'ta gelistiriliyor ve core.autocrlf=true: git, metin
+# dosyalarini checkout'ta CRLF'e cevirir. Bir .sh dosyasi CRLF ile
+# commit edilirse Linux sunucuda calistirilamaz --
+#   bad interpreter: /usr/bin/env bash^M
+# shebang satirinin sonundaki \r yorumlayici adina dahil edilir.
+*.sh text eol=lf
+
+# nginx/systemd ornekleri de Linux'ta okunuyor.
+*.conf text eol=lf
