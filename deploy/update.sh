@@ -22,6 +22,25 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 APP="mark0002-pilot"
 
+# ------------------------------------------------------------------
+# [!] AYNI ANDA IKI KEZ CALISTIRILAMAZ -- KILIDI KALDIRMAYIN
+# ------------------------------------------------------------------
+# `npm ci` node_modules'i BASTAN SILER. Iki calisma cakisirsa birinin
+# npm ci'si, otekinin build'i surerken agaci siliyor ve Nitro'nun dosya
+# izleyicisi (@vercel/nft) yarisi yok olmus agacta patliyor:
+#   Error: File /var/www/mark0002/node_modules/socket.io/wrapper.mjs
+#          does not exist.
+# Hata aldatici: socket.io'da bir sorun yok, dosya o anda silinmis.
+# Ikinci calisma beklemek yerine hemen cikar (-n): deploy kuyruga
+# girmemeli, cunku ikisi de ayni origin/<dal> ucunu kuruyor -- biri
+# yeterli.
+exec 9>/tmp/mark0002-deploy.lock
+if ! flock -n 9; then
+  echo "HATA: baska bir update.sh calisiyor. Onun bitmesini bekleyin." >&2
+  echo "      (Ayni anda iki build node_modules'i birbirine kirar.)" >&2
+  exit 1
+fi
+
 echo "==> Mevcut surum: $(git rev-parse --short HEAD)"
 
 # ------------------------------------------------------------------
