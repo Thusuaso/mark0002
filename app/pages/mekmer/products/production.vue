@@ -18,7 +18,25 @@
         />
       </div>
     </div>
+    <!--
+      GORUNUM SECICI -- kart / tablo. Kart VARSAYILAN, tablo
+      KALDIRILMADI: kolon bazli filtreler yalnizca tabloda var. Iki
+      gorunum ayni sozlesmeyi kullaniyor, yani satira tiklayinca acilan
+      detay diyalogu ikisinde de ayni. (Gerekcesinin tamami:
+      components/order/PoCards.vue)
+    -->
+    <OrderViewToggle v-model="view" storage-key="mekmer:products:production:view" />
+
+    <OrderPoCards
+      v-if="view === 'cards'"
+      :list="orderStore.getOrderList"
+      @production_selected_emit="productionSelected($event)"
+      :status="'Production'"
+      :total="orderStore.getOrderProductionTotal"
+      :variant="'mekmer'"
+    />
     <OrderTable2
+      v-else
       :list="orderStore.getOrderList"
       @production_selected_emit="productionSelected($event)"
       :status="'Production'"
@@ -109,6 +127,8 @@ export default {
   },
   data() {
     return {
+      /* Varsayilan KART; tercih <OrderViewToggle> tarafindan okunuyor. */
+      view: "cards",
       production_detail_form: false,
       productionModel: {},
       productModel: {},
