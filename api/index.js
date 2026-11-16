@@ -3594,15 +3594,25 @@ app.post("/container/follow/reminder/send", async (req, res) => {
   const sonuc = await runEtaReminders();
   res.status(200).json(sonuc);
 });
-/* Unfollow listesi: ekranda bilinli olarak takipten cikarilanlar. Burada
-   tarih penceresi uygulanmaz, gecmis kayitlar da gorunmeye devam eder. */
+/* Unfollow listesi: ekranda bilinli olarak takipten cikarilanlar.
+   PENCERE FOLLOW ILE AYNI (FOLLOW_WINDOW_DAY). Eskiden burada tarih
+   penceresi uygulanmiyordu ve ekranda 2024 yukleme tarihli siparisler
+   duruyordu: Takip = 0 bir daha kendiliginden degismedigi icin takipten
+   cikarilan her kayit listede SONSUZA KADAR kaliyor, liste yillar
+   gectikce buyuyordu. Iki ekran ayni tabloyu ayni kolonlarla gosterdigi
+   halde kapsamlari farkliydi -- bir satir Follow'da 120 gunluk
+   pencerenin disina dusup gorunmez olurken Unfollow'da gorunmeye devam
+   ediyordu.
+   Not: pencere kosulu followListSql icinde @gun parametresini kullanir,
+   bu yuzden asagida tanimlanmak ZORUNDA (yoksa sorgu patlar). */
 app.get("/container/unfollow/list", async (req, res) => {
   try {
     const acenteVar = await acenteTakipReady();
     const request = new mssql.Request();
+    request.input("gun", mssql.Int, FOLLOW_WINDOW_DAY);
     request.input("icPiyasa", mssql.NVarChar, MISSING_DOC_DOMESTIC);
     const response = await request.query(
-      followListSql(acenteVar, "isnull(s.Takip, 1) = 0", false)
+      followListSql(acenteVar, "isnull(s.Takip, 1) = 0", true)
     );
     const data = response.recordset;
     data.forEach((x) => {
@@ -3617,6 +3627,7 @@ app.get("/container/unfollow/list", async (req, res) => {
     });
     res.status(200).json({
       unfollow: data,
+      gun: FOLLOW_WINDOW_DAY,
       acenteHazir: acenteVar,
     });
   } catch (err) {
