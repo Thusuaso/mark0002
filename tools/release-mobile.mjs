@@ -40,14 +40,20 @@ console.log(`[yayin] surum ${surum}  (versionCode ${kod})`)
 /* --- build.gradle'a yaz ---------------------------------------------- */
 const gradlePath = join(kok, "mobile/android/app/build.gradle")
 let gradle = readFileSync(gradlePath, "utf8")
-const onceki = gradle
-gradle = gradle
-  .replace(/versionCode\s+\d+/, `versionCode ${kod}`)
-  .replace(/versionName\s+"[^"]*"/, `versionName "${surum}"`)
-if (gradle === onceki) {
+
+/*
+ * Kontrol "icerik degisti mi" DEGIL, "alanlar var mi" uzerinden.
+ * Ayni surumu yeniden derlemek gecerli bir durum (derleme hatasi
+ * sonrasi tekrar denemek gibi) ve o zaman dosya zaten dogru degerde
+ * oluyor; degisime bakan bir kontrol bunu hata sanip duruyordu.
+ */
+if (!/versionCode\s+\d+/.test(gradle) || !/versionName\s+"[^"]*"/.test(gradle)) {
   console.error("HATA: build.gradle icinde versionCode/versionName bulunamadi.")
   process.exit(1)
 }
+gradle = gradle
+  .replace(/versionCode\s+\d+/, `versionCode ${kod}`)
+  .replace(/versionName\s+"[^"]*"/, `versionName "${surum}"`)
 writeFileSync(gradlePath, gradle)
 console.log("[yayin] build.gradle guncellendi")
 
@@ -74,8 +80,22 @@ if (!process.env.JAVA_HOME && existsSync(jbr)) {
   console.log("[yayin] JAVA_HOME -> Android Studio JDK")
 }
 
-const gradlew = process.platform === "win32" ? "gradlew.bat" : "./gradlew"
-kos(gradlew, ["assembleDebug"], join(kok, "mobile/android"))
+/*
+ * Gradle sarmalayicisinin TAM YOLU, path.join ile kuruluyor.
+ *
+ * Duz "gradlew.bat" CALISMIYOR: cmd.exe betigi gecerli dizinde aramiyor
+ * (NoDefaultCurrentDirectoryInExePath) ve "is not recognized" veriyor.
+ * Basina ters egik cizgi yazmak da kirilgan -- kaynak kodundaki kacis
+ * seviyesini yanlis saymak kolay ve hata ancak calistirinca ortaya
+ * cikiyor. Tam yol ikisini birden cozuyor; tirnak sart, cunku yolda
+ * bosluk var ("Masaustu 05-11-2026").
+ */
+const androidDir = join(kok, "mobile/android")
+const gradlew =
+  process.platform === "win32"
+    ? `"${join(androidDir, "gradlew.bat")}"`
+    : "./gradlew"
+kos(gradlew, ["assembleDebug"], androidDir)
 
 /* --- surumlu kopya ---------------------------------------------------- */
 const apk = join(kok, "mobile/android/app/build/outputs/apk/debug/app-debug.apk")
