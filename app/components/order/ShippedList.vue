@@ -127,7 +127,7 @@
               -->
               <a
                 :href="
-                  'https://file-service.mekmar.com/file/download/2/' +
+                  '/api/file/pi/' +
                   slotProps.data.SiparisNo
                 "
               >
@@ -505,7 +505,7 @@ export default {
               r: aoa.length - 1,
               c: 4,
               target:
-                "https://file-service.mekmar.com/file/download/2/" +
+                "/api/file/pi/" +
                 x.SiparisNo,
             });
           }

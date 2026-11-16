@@ -107,7 +107,7 @@
             <div v-if="slotProps.data.EvrakDurum > 0">
               <a
                 :href="
-                  'https://file-service.mekmar.com/file/download/2/' +
+                  '/api/file/pi/' +
                   slotProps.data.SiparisNo
                 "
               >
@@ -405,7 +405,7 @@
             <div v-if="slotProps.data.EvrakDurum > 0">
               <a
                 :href="
-                  'https://file-service.mekmar.com/file/download/2/' +
+                  '/api/file/pi/' +
                   slotProps.data.SiparisNo
                 "
               >
@@ -824,7 +824,7 @@
           <div v-if="slotProps.data.EvrakDurum > 0">
             <a
               :href="
-                'https://file-service.mekmar.com/file/download/2/' +
+                '/api/file/pi/' +
                 slotProps.data.SiparisNo
               "
             >

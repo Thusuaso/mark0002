@@ -75,7 +75,26 @@
           </button>
 
           <span class="poc-customer">{{ po.customer }}</span>
-          <span v-if="po.pi" class="poc-chip">PI {{ po.pi }}</span>
+          <!--
+            PI = EVRAK INDIRME, metin degil. Tablolarda bu kolon hicbir
+            zaman PI degerini yazmaz, yalnizca EvrakDurum > 0 iken bir
+            indirme ikonu gosterir. Kartlarin ilk surumunde yanlislikla
+            metin rozetine cevrilmisti; tablodaki davranisa donduruldu.
+
+            Adres /api/file/pi/ -- dosya servisine DOGRUDAN degil, kendi
+            vekil ucumuz uzerinden (gerekcesi api/index.js icinde: capraz
+            kaynakta tarayici indirmek yerine o adrese gidiyordu).
+          -->
+          <a
+            v-if="po.hasPi"
+            class="poc-pi"
+            :href="'/api/file/pi/' + po.no"
+            :title="'PI evrakini indir -- ' + po.no"
+            @click.stop
+          >
+            <i class="pi pi-download" aria-hidden="true" />
+            <span>PI</span>
+          </a>
           <span class="poc-date">{{ dateLabel }} {{ dateToString(po.date) }}</span>
 
           <span v-if="po.behind" class="poc-flag">
@@ -343,6 +362,9 @@ export default {
             no: raw.SiparisNo,
             customer: raw.FirmaAdi,
             pi: raw.PI,
+            /* Tablodaki kosulun aynisi: evrak yoksa indirilecek bir sey
+               de yok, link hic gosterilmiyor (tabloda olu bir <a> vardi). */
+            hasPi: this.num(raw.EvrakDurum) > 0,
             date: raw[this.dateField],
             mine:
               raw.SiparisSahibi == this.userId || raw.Operasyon == this.userId,
@@ -661,13 +683,29 @@ export default {
   font-weight: 600;
 }
 
-.poc-chip {
-  padding: 2px 7px;
+.poc-pi {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+
+  padding: 2px 8px;
+
   font-size: 11px;
   font-weight: 600;
-  color: #374151;
+  color: #1d4ed8;
+  text-decoration: none;
+
   background: #eef1f5;
   border-radius: 5px;
+}
+
+.poc-pi:hover {
+  color: #1e3a8a;
+  background: #e2e7ef;
+}
+
+.poc-pi .pi {
+  font-size: 11px;
 }
 
 .poc-date {

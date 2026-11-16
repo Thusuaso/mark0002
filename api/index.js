@@ -399,7 +399,7 @@ app.use((req, res, next) => {
      cerez tasir; bu yuzden sohbet eki ucu token'i cerezden de okur ve
      yetkiyi kendi icinde dogrular (bkz. sohbetDosyaKullanicisi). Burada
      serbest birakilmasi yetki kaldirmak DEGIL, yetkiyi o uca devretmektir. */
-  const kendiYetkisiniDogrulayan = ["/chat/file/"];
+  const kendiYetkisiniDogrulayan = ["/chat/file/", "/file/pi/"];
 
   // Tarayıcının 'OPTIONS' yoklamalarını ve açık rotaları serbest bırak
   if (
@@ -3064,6 +3064,68 @@ app.get("/upload/document/missing/:po", async (req, res) => {
   }
 });
 
+/* --------------------------------------------------------------------------
+   PI evraki indirme -- VEKIL UC
+   --------------------------------------------------------------------------
+   Siparis ekranlarindaki PI ikonu eskiden DOGRUDAN
+   https://file-service.mekmar.com/file/download/2/<SiparisNo> adresine
+   baglaniyordu. Tiklayinca dosya inmiyor, tarayici o adrese GIDIYORDU:
+   PDF'i kendi goruntuleyicisinde aciyor, uygulamadan cikiyordunuz.
+
+   [!] <a download> BU ISI COZMEZ -- capraz kaynakta YOK SAYILIR.
+   Sayfa gozv2.mekmar.com, dosya file-service.mekmar.com; farkli kaynak
+   oldugu icin tarayici `download` niteligini gormezden gelir ve yine
+   gezinir. Spesifikasyon boyle; kodda bir eksik degil.
+
+   Bu yuzden indirme KENDI SUNUCUMUZ uzerinden geciyor: ayni kaynak
+   oldugu icin `download` calisiyor, ustelik Content-Disposition'i biz
+   koyduğumuz icin dosya servisinin baslik gondermesine de bagli degiliz.
+
+   YETKIYI KENDI DOGRULUYOR: bir <a href> tiklamasi Authorization basligi
+   GONDEREMEZ, yalnizca cerez tasir -- sohbet eki ucuyla ayni kisit, ayni
+   cozum (bkz. sohbetDosyaKullanicisi ve kendiYetkisiniDogrulayan).
+
+   Govde akitilmak yerine bellege aliniyor: PI evraklari birkac yuz KB'lik
+   PDF'ler ve fetch'in web akisini Node yanitina baglamak bu surumde
+   ek kod gerektiriyor. Buyuk dosya beklenirse akitmaya gecilmeli.
+   -------------------------------------------------------------------------- */
+const FILE_SERVICE_BASE = (
+  process.env.FILE_SERVICE_BASE || "https://file-service.mekmar.com"
+).replace(/\/+$/, "");
+
+app.get("/file/pi/:siparisNo", async (req, res) => {
+  const kullanici = sohbetDosyaKullanicisi(req);
+  if (!kullanici) {
+    return res.status(401).json({ status: false });
+  }
+  const siparisNo = String(req.params.siparisNo || "").trim();
+  /* Siparis numarasi adrese giriyor; beklenmeyen karakter gelirse istek
+     hic kurulmasin. */
+  if (!siparisNo || !/^[A-Za-z0-9._-]+$/.test(siparisNo)) {
+    return res.status(400).json({ status: false });
+  }
+  try {
+    const upstream = await fetch(
+      `${FILE_SERVICE_BASE}/file/download/2/${encodeURIComponent(siparisNo)}`
+    );
+    if (!upstream.ok) {
+      return res
+        .status(upstream.status === 404 ? 404 : 502)
+        .json({ status: false });
+    }
+    const tip = upstream.headers.get("content-type") || "application/octet-stream";
+    const uzanti = tip.includes("pdf") ? ".pdf" : "";
+    res.setHeader("Content-Type", tip);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="PI-${siparisNo}${uzanti}"`
+    );
+    res.end(Buffer.from(await upstream.arrayBuffer()));
+  } catch (err) {
+    console.error("PI indirme hatasi:", err);
+    res.status(502).json({ status: false });
+  }
+});
 /*Container*/
 /* --------------------------------------------------------------------------
    Container Follow
