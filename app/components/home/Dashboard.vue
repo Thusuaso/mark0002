@@ -310,8 +310,25 @@
       </p>
     </header>
 
-    <section class="dash-grid dash-grid--2">
-      <Card class="dash-card dash-card--wide">
+    <!--
+      GRAFIK KENDI SATIRINDA, TAM GENISLIKTE.
+
+      Eskiden grafik ve uc tablo TEK bir iki kolonlu izgaradaydi, yani
+      ≥900px'te duzen soyle dagiliyordu:
+
+        [ grafik ][ Monthly production ]
+        [ Mekmer monthly shipment ][ Mekmer current stock ]
+
+      Uc tablo ayni seyin farkli kesitleri oldugu halde iki ayri satira
+      bolunuyor ve karsilastirmak icin goz asagi kayiyordu. Ustelik
+      grafigin tasidigi `dash-card--wide` sinifinin CSS KARSILIGI HIC
+      YOKTU (tum dosyada tek gectigi yer o satirdi): isim genis bir kart
+      vaat ediyordu ama hicbir sey yapmiyordu, grafik de sade bir hucre
+      olarak duruyordu. Olu sinif kaldirildi; grafik artik gercekten
+      tam genislikte, cunku kendi tek kolonlu bolumunde.
+    -->
+    <section class="dash-grid">
+      <Card class="dash-card">
           <template #header>
             <h2 class="dash-card__title">Monthly production</h2>
           </template>
@@ -324,6 +341,15 @@
             />
           </template>
       </Card>
+    </section>
+
+    <!--
+      UC TABLO YAN YANA. dash-grid--3 zaten bu panelde kullaniliyor
+      (yukaridaki genis gorunumun stok bolumu) ve 1100px'in altinda
+      kendiliginden tek kolona iniyor, yani dar ekranda tablolar
+      sikismiyor.
+    -->
+    <section class="dash-grid dash-grid--3">
       <Card class="dash-card">
           <template #header>
             <h2 class="dash-card__title">Monthly production</h2>
