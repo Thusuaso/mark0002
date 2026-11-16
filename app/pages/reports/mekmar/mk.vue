@@ -98,7 +98,7 @@ export default {
     loadMkReports(year) {
       this.sharedStore.beginLoading();
 
-      $fetch(`/mk-api/reports/${year}`, { baseURL: "/" })
+      $fetch(`/mk-api/reports/${year}`, { baseURL: siteBase() })
         .then((data) => {
           this.reportsStore.setReportsMekmarMkList(data);
         })

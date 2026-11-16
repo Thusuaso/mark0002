@@ -29,6 +29,15 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.1",
+    date: "2026-11-16",
+    notes: [
+      "Finance sayfasında veriler gelmiyordu, düzeltildi.",
+      "Aynı sorundan etkilenen diğer rapor ekranları da düzeltildi: AYO, MK, GU, Mekmer Finans ve döviz kuru alanları.",
+      "Excel çıktısı uygulamadan da alınabiliyor.",
+    ],
+  },
+  {
     version: "1.0.0",
     date: "2026-11-16",
     notes: [

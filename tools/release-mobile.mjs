@@ -109,7 +109,26 @@ const hedef = join(distDir, `goz-${surum}.apk`)
 copyFileSync(apk, hedef)
 
 console.log(`\n[yayin] HAZIR: mobile/dist/goz-${surum}.apk`)
-console.log("[yayin] Sunucuya atmak icin:")
-console.log(
-  `        scp mobile/dist/goz-${surum}.apk deploy@138.68.95.219:/var/www/mark0002-downloads/`
-)
+
+/* --- sunucuya yukleme (istege bagli) ---------------------------------- */
+/*
+ * Yukleme VARSAYILAN DEGIL, --upload ile isteniyor: derlemek yerel bir
+ * is, sunucuya dosya atmak ise disariya cikan bir islem. Birini
+ * yaparken otekinin sessizce olmasi istenmez -- ornegin yarim kalmis
+ * bir surumu denemek icin derleyen biri onu yanlislikla yayinlamis
+ * olurdu.
+ */
+const SUNUCU = process.env.MOBILE_UPLOAD_TARGET
+  || "deploy@138.68.95.219:/var/www/mark0002-downloads/"
+
+if (process.argv.includes("--upload")) {
+  console.log(`[yayin] yukleniyor -> ${SUNUCU}`)
+  /* Yol TIRNAK ICINDE olmak zorunda: kabukta calistigi icin
+     "Masaustu 05-11-2026" bosluktan bolunuyor ve scp yolun yalnizca ilk
+     parcasini goruyor ("No such file or directory"). */
+  kos("scp", ["-o", "BatchMode=yes", `"${hedef.replace(/\\/g, "/")}"`, SUNUCU], kok)
+  console.log(`[yayin] YAYINDA: https://gozv2.mekmar.com/downloads/goz-${surum}.apk`)
+  console.log("[yayin] Surum notlari: https://gozv2.mekmar.com/app")
+} else {
+  console.log("[yayin] Sunucuya atmak icin:  npm run release:mobile -- --upload")
+}

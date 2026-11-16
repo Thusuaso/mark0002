@@ -153,7 +153,7 @@ export default {
      * `{ data, status }` donduruyordu; $fetch govdenin KENDISINI
      * donduruyor.
      */
-    const costList = (y) => $fetch(`/maliyet-api/yillik/${y}`, { baseURL: "/" })
+    const costList = (y) => $fetch(`/maliyet-api/yillik/${y}`, { baseURL: siteBase() })
 
     /*
      * Uc yil PARALEL cekiliyor (kaynakta da ucu birbirini beklemiyordu).

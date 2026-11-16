@@ -117,7 +117,7 @@ export const useFinanceStore = defineStore("finance", {
      *     REDDEDER, yani oraya hic girilmezdi -- else dali olu koddu.
      */
     setFinanceAllListMekmer() {
-      return $fetch("/finance-api/reports/mekmer-all", { baseURL: "/" })
+      return $fetch("/finance-api/reports/mekmer-all", { baseURL: siteBase() })
         .then((data) => {
           this.MUT_setFinanceListFilter(data.financeList);
           this.MUT_setFinanceTotalList(data.financeList);
@@ -146,7 +146,7 @@ export const useFinanceStore = defineStore("finance", {
 
       sharedStore.beginLoading();
 
-      $fetch("/finance-api/reports/test", { baseURL: "/" })
+      $fetch("/finance-api/reports/test", { baseURL: siteBase() })
         .then((data) => {
           this.MUT_setFinanceList(data);
           this.MUT_setFinanceTotalList(data.financeList);
@@ -170,7 +170,7 @@ export const useFinanceStore = defineStore("finance", {
 
       sharedStore.beginLoading();
 
-      $fetch("/finance-api/reports/test-filter", { baseURL: "/" })
+      $fetch("/finance-api/reports/test-filter", { baseURL: siteBase() })
         .then((data) => {
           this.MUT_setFinanceListFilter(data.financeList);
           this.MUT_setFinanceTotalListMekmer(data.financeList);
@@ -449,7 +449,7 @@ export const useFinanceStore = defineStore("finance", {
       sharedStore.beginLoading();
 
       $fetch(`/finance-api/mekmer/customer-orders/${customerId}`, {
-        baseURL: "/",
+        baseURL: siteBase(),
       })
         .then((data) => {
           this.MUT_setFinancePoListMekmer(data);
@@ -544,7 +544,7 @@ export const useFinanceStore = defineStore("finance", {
            * (Ayni kalip: app/composables/useExcelExport.ts)
            */
           $fetch("/finance-api/mekmer/po-paid-save", {
-            baseURL: "/",
+            baseURL: siteBase(),
             method: "POST",
             body: paid,
           })
@@ -642,7 +642,7 @@ export const useFinanceStore = defineStore("finance", {
      */
     setFinancePoPaidListMekmer(po) {
       $fetch(`/finance-api/mekmer/po-payments/${encodeURIComponent(po)}`, {
-        baseURL: "/",
+        baseURL: siteBase(),
       })
         .then(({ liste }) => {
           this.MUT_setFinancePoPaidListMekmer(liste);

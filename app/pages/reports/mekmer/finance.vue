@@ -551,7 +551,7 @@ export default {
        * baseURL'i "/api" (legacy Express). Nitro rotalari kokte.
        */
       $fetch("/finance-api/mekmar/po-paid-save", {
-        baseURL: "/",
+        baseURL: siteBase(),
         method: "POST",
         body: this.model,
       }).then((res) => {
@@ -622,7 +622,7 @@ export default {
       this.mekmarListTotal.labour = 0;
       this.mekmarListTotal.balanced = 0;
 
-      $fetch(`/finance-api/mekmer/monthly-orders/${month}`, { baseURL: "/" })
+      $fetch(`/finance-api/mekmer/monthly-orders/${month}`, { baseURL: siteBase() })
         .then(({ list }) => {
           this.monthly_mekmar_finance_list = list;
 

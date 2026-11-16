@@ -56,7 +56,7 @@ export async function exportExcel(
   let filename = fallbackFilename
 
   const blob = await $fetch<Blob>(path, {
-    baseURL: "/",
+    baseURL: siteBase(),
     method: "POST",
     body,
     responseType: "blob",

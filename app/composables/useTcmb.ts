@@ -99,7 +99,7 @@ export function useTcmb() {
 
     return await $fetch<TcmbRate>(
       `/tcmb-api/usd/${kind}/${year}/${month}/${day}`,
-      { baseURL: "/" },
+      { baseURL: siteBase() },
     )
   }
 

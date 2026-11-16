@@ -150,7 +150,7 @@ export default {
       const days = date.getDate();
 
       $fetch(`/tcmb-api/usd-average/${this.year}/${month_}/${days}`, {
-        baseURL: "/",
+        baseURL: siteBase(),
       })
         .then((response) => {
           this.currencyValue = response.average;

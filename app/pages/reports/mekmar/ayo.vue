@@ -704,7 +704,7 @@ export default {
      *     cagri govdeleri calisip endLoading()'i yine cagiriyor.
      */
     fetchYearCost(year) {
-      return $fetch(`/maliyet-api/yillik/${year}`, { baseURL: "/" })
+      return $fetch(`/maliyet-api/yillik/${year}`, { baseURL: siteBase() })
         .then((data) => ({ data }))
         .catch((err) => {
           console.error("yillik maliyet listesi alinamadi:", err)
@@ -732,7 +732,7 @@ export default {
      * (shared store'da SAYAC) bir eksilmemis kalirdi.
      */
     fetchMonthCost(year, month) {
-      return $fetch(`/maliyet-api/aylik/${year}/${month}`, { baseURL: "/" })
+      return $fetch(`/maliyet-api/aylik/${year}/${month}`, { baseURL: siteBase() })
         .then((data) => ({ data }))
         .catch((err) => {
           console.error("aylik maliyet listesi alinamadi:", err)
