@@ -70,7 +70,31 @@
         />
       </div>
     </div>
+    <!--
+      GORUNUM SECICI -- kart / tablo.
+
+      Kart gorunumu (OrderPoCards) VARSAYILAN, ama tablo KALDIRILMADI:
+      kolon bazli filtreler (filterDisplay="row") yalnizca tabloda var ve
+      gunluk kullanimda birinin ona bagli olmasi mumkun. Secim tarayicida
+      hatirlaniyor, yani kullanici bir kez sectikten sonra her girisinde
+      ayni gorunumle aciliyor.
+
+      Ikisi de AYNI veriyi ve AYNI sozlesmeyi kullaniyor (list / status /
+      total / loading + production_selected_emit), yani satira tiklayinca
+      acilan detay diyalogu iki gorunumde de ayni.
+    -->
+    <OrderViewToggle v-model="view" storage-key="orders:production:view" />
+
+    <OrderPoCards
+      v-if="view === 'cards'"
+      :list="orderStore.getOrderList"
+      @production_selected_emit="productionSelected($event)"
+      :status="'Production'"
+      :total="orderStore.getOrderProductionTotal"
+      :loading="sharedStore.isLoadingDatatable"
+    />
     <OrderTable
+      v-else
       :list="orderStore.getOrderList"
       @production_selected_emit="productionSelected($event)"
       :status="'Production'"
@@ -171,6 +195,7 @@ export default {
   },
 
   computed: {
+
     orderStore() {
       return useOrderStore()
     },
@@ -189,6 +214,8 @@ export default {
   },
   data() {
     return {
+      /* Varsayilan KART; tercih <OrderViewToggle> tarafindan okunuyor. */
+      view: "cards",
       oldOrderPayload: {},
       /*
        * [x] KALDIRILDI: selectedDivideOrder / selectedProduct -- ikisi de

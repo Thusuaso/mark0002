@@ -9,7 +9,21 @@
                 <Button severity="warn" class="w-100" label="Excel" @click="excel_output" />
             </div>
         </div>
-        <OrderTable2 :list="orderStore.getOrderList" @production_selected_emit="productionSelected($event)" :loading="sharedStore.isLoading"
+    <!--
+      GORUNUM SECICI -- kart / tablo. Kart VARSAYILAN, tablo
+      KALDIRILMADI: kolon bazli filtreler yalnizca tabloda var. Iki
+      gorunum ayni sozlesmeyi kullaniyor, yani satira tiklayinca acilan
+      detay diyalogu ikisinde de ayni. (Gerekcesinin tamami:
+      components/order/PoCards.vue)
+    -->
+        <OrderViewToggle v-model="view" storage-key="mekmer:onhold:view" />
+
+        <OrderPoCards
+          v-if="view === 'cards'" :list="orderStore.getOrderList" @production_selected_emit="productionSelected($event)" :loading="sharedStore.isLoading"
+            :status="'Production'" :total="orderStore.getOrderProductionTotal"   :variant="'mekmer'"
+        />
+        <OrderTable2
+          v-else :list="orderStore.getOrderList" @production_selected_emit="productionSelected($event)" :loading="sharedStore.isLoading"
             :status="'Production'" :total="orderStore.getOrderProductionTotal" />
         <Dialog v-model:visible="production_detail_form" header="" modal :style="{ width: '100%' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :closeOnEscape="false" :closable="false"
@@ -63,6 +77,8 @@ export default {
     },
     data() {
         return {
+            /* Varsayilan KART; tercih <OrderViewToggle> tarafindan okunuyor. */
+            view: "cards",
             production_detail_form: false,
             productionModel: {},
             productModel: {},
