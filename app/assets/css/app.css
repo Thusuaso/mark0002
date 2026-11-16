@@ -76,6 +76,34 @@
    * Olculen degerler Chrome'da 1536px genislikte dogrulandi.
    */
   --app-table-rowno-width: 3%;
+
+  /*
+   * .table-dense hucre dolgusu -- TEK AYAR NOKTASI.
+   *
+   * PrimeVue'nun `p-datatable-sm`i dolguyu zaten kisiyor ama siparis
+   * tablolarinda yetmiyor: bir PO birden cok urun satiri tuttugu icin
+   * (rowGroupMode="rowspan") ekranda gorunen PO sayisi dolguyla DOGRUDAN
+   * azaliyor. Yazi boyutuna dokunulmadi; o tablolarda zaten 70%
+   * (~11px) ve daha kucultmek okunurlugu bozar. Kazanc dolgudan
+   * cikariliyor.
+   *
+   * Daha sik isteniyorsa dusurun, nefes isteniyorsa yukseltin.
+   */
+  --app-table-dense-pad-y: 0.15rem;
+  --app-table-dense-pad-x: 0.35rem;
+
+  /*
+   * PO ayirici cizgisinin kalinligi ve rengi -- bkz. .po-anchor.
+   *
+   * [!] SATIR CERCEVESINDEN KALIN OLMAK ZORUNDA. order/Table.vue'daki
+   * rowClass2 HER satira 2px cerceve veriyor (.row-accessories /
+   * .row-accessories-border). `border-collapse` catisan kenarliklarda
+   * EN KALIN olani secer -- onem (!important) degil, KALINLIK kazanir.
+   * Bu deger 2px'e esit ya da altina dusurulurse PO cizgisi diger
+   * satirlarla ayni gorunur ve ayirici ozelligini KAYBEDER.
+   */
+  --app-po-divider-width: 3px;
+  --app-po-divider-color: #111827;
 }
 
 .tableBody {
@@ -331,6 +359,83 @@
  * Ayni esik kullanilarak "mobil mod" tek bir yerden tanimlaniyor;
  * tablet de dahil, cunku 17 kolonlu tablo 900px'te de okunmuyor.
  */
+/*
+ * SIPARIS TABLOLARINDA SIK DUZEN  (.table-dense)
+ *
+ * Kullanim: <DataTable class="p-datatable-sm table-dense">
+ *
+ * Yalnizca dolguyu kisar, yazi boyutuna DOKUNMAZ -- order/Table.vue'daki
+ * tablolarin kendi font ayari var (satir ici 70%, ya da
+ * .table-fit-compact uzerinden --app-table-fit-font) ve buradan font
+ * vermek o ayarlari ezip baslik/govde oranini bozardi; ayni tuzak
+ * .table-fit-compact kuralinin basinda da anlatiliyor.
+ */
+.table-dense .p-datatable-table > thead > tr > th,
+.table-dense .p-datatable-table > tbody > tr > td,
+.table-dense .p-datatable-table > tfoot > tr > td {
+  padding-block: var(--app-table-dense-pad-y);
+  padding-inline: var(--app-table-dense-pad-x);
+  line-height: 1.25;
+}
+
+/*
+ * Filtre satirindaki kutular da kuculsun, yoksa baslik satiri govdenin
+ * iki kati yuksekligde kalir ve sikligin yarisi orada yenir.
+ */
+.table-dense .p-datatable-table > thead .p-inputtext {
+  padding-block: var(--app-table-dense-pad-y);
+  padding-inline: var(--app-table-dense-pad-x);
+}
+
+/*
+ * PO'LAR ARASI AYIRICI CIZGI
+ * ---------------------------------------------------------------------
+ * SORUN: siparis tablolari rowGroupMode="rowspan" kullaniyor, yani bir
+ * PO urun sayisi kadar satir tutuyor. Ustelik rowClass2 HER satira 2px
+ * cerceve veriyordu; butun cizgiler ayni agirlikta oldugu icin "bu satir
+ * hala onceki PO'ya mi ait, yoksa yenisi mi basladi" gozle ayrilamiyordu.
+ *
+ * COZUM: yeni PO'nun BASLADIGI satirin ust kenarina daha kalin ve koyu
+ * bir cizgi.
+ *
+ * O satiri nasil biliyoruz -- JS GEREKMEDI: PrimeVue rowspan modunda
+ * gruplanan hucreyi YALNIZCA deger degistiginde basiyor
+ * (shouldRenderBodyCell: `currentRowFieldData !== previousRowFieldData`),
+ * devam satirlarinda o <td> hic render edilmiyor. Po kolonuna
+ * bodyClass="po-anchor" verildi; dolayisiyla `td.po-anchor` iceren satir
+ * TAM OLARAK her PO'nun ilk satiri.
+ *
+ * NEDEN :has() -- cocuguna gore ebeveyn secmenin tek CSS yolu. Baseline
+ * widely available (2023 sonundan beri tum ana tarayicilarda), yedek
+ * gerekmiyor. Alternatifi satir indeksini JS'te hesaplamakti; PrimeVue
+ * rowClass'a yalnizca satir VERISINI geciriyor (index yok), ustelik
+ * siralama/filtre/sayfalama sirayi degistirdigi icin onceden hesaplanmis
+ * bir liste yanlis satiri isaretlerdi. Bu secici ise her zaman tablonun
+ * O ANKI duzenine bakar.
+ *
+ * NEDEN :first-child DEGIL -- gruplanan ilk kolon Po degil Load Date; bir
+ * yukleme tarihi birden cok PO'yu kapsayabiliyor, yani satirin ilk
+ * hucresi her PO'da yeniden basilmiyor.
+ *
+ * Cizgi <td>'lere veriliyor, <tr>'ye degil: `border-collapse` altinda
+ * catisan kenarliklardan EN KALIN olan kazanir, bu yuzden hucre kenarligi
+ * rowClass2'nin satir cercevesini (2px) gecmek zorunda -- gerekcesi
+ * --app-po-divider-width tanimida.
+ */
+.table-dense .p-datatable-table > tbody > tr:has(> td.po-anchor) > td {
+  border-block-start: var(--app-po-divider-width) solid
+    var(--app-po-divider-color);
+}
+
+/*
+ * Po hucresinin kendisi de biraz one ciksin: ayni kalinlikta cizgi dort
+ * yandan degil, yalnizca yaziyi koyulastirarak. Cizgi zaten yukarida.
+ */
+.table-dense .p-datatable-table > tbody > td.po-anchor,
+.table-dense .p-datatable-table > tbody > tr > td.po-anchor {
+  font-weight: 700;
+}
+
 @media (max-width: 991.98px) {
   /*
    * `table-layout: fixed` DE GERI ALINIYOR -- yoksa nowrap tek basina

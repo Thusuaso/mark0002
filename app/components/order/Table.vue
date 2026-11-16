@@ -8,7 +8,7 @@
         v-model:selection="selectedProduction"
         selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)"
-        class="p-datatable-sm customShipped"
+        class="p-datatable-sm table-dense customShipped"
         :paginator="true"
         :rows="25"
         style="font-size: 70%; border: 2px solid gray"
@@ -90,7 +90,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           headerClass="tableHeader"
-          bodyClass="tableBody"
+          bodyClass="tableBody po-anchor"
         >
           <template #filter="{ filterModel }">
             <InputText
@@ -313,7 +313,7 @@
         v-model:selection="selectedProduction"
         selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)"
-        class="p-datatable-sm customShipped2"
+        class="p-datatable-sm table-dense customShipped2"
         :paginator="true"
         :rows="25"
         style="font-size: 70%; border: 2px solid gray"
@@ -388,7 +388,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           headerClass="tableHeader"
-          bodyClass="tableBody"
+          bodyClass="tableBody po-anchor"
         >
           <template #filter="{ filterModel }">
             <InputText
@@ -608,7 +608,7 @@
         v-model:selection="selectedProduction"
         selectionMode="multiple"
         @row-click="$emit('production_selected_emit', $event.data)"
-        class="p-datatable-sm table-fit-compact"
+        class="p-datatable-sm table-dense table-fit-compact"
         filterDisplay="row"
         v-model:filters="filtersOrders"
         :rowClass="rowClass2"
@@ -667,6 +667,7 @@
           header="Po"
           :showFilterMenu="false"
           :showClearButton="false"
+          bodyClass="po-anchor"
           style="width: 5%"
         >
           <template #filter="{ filterModel, filterCallback }">
@@ -903,7 +904,7 @@
       v-model:selection="selectedProduction"
       selectionMode="multiple"
       @row-click="$emit('production_selected_emit', $event.data)"
-      class="p-datatable-sm"
+      class="p-datatable-sm table-dense"
       :paginator="true"
       :rows="25"
       style="font-size: 70%; border: 2px solid gray"
@@ -983,7 +984,7 @@
         :showFilterMenu="false"
         :showClearButton="false"
         headerClass="tableHeader"
-        bodyClass="tableBody"
+        bodyClass="tableBody po-anchor"
       >
         <template #filter="{ filterModel, filterCallback }">
           <InputText
