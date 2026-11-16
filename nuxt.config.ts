@@ -103,6 +103,16 @@ export default defineNuxtConfig({
       socketUrl: "",
 
       fileServiceBase: "https://file-service.mekmar.com",
+
+      /*
+       * API'nin MUTLAK adresi. Web'de BOS kalir: istekler ayni origin'e,
+       * "/api/..." olarak gider ve bugunku davranis hic degismez.
+       *
+       * Android kabugunda (Capacitor) sayfa https://localhost'tan servis
+       * ediliyor, API ise uretim sunucusunda; orada bu deger
+       * NUXT_PUBLIC_API_BASE=https://gozv2.mekmar.com ile veriliyor.
+       */
+      apiBase: "",
     },
   },
 })

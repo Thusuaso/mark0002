@@ -81,16 +81,17 @@
             indirme ikonu gosterir. Kartlarin ilk surumunde yanlislikla
             metin rozetine cevrilmisti; tablodaki davranisa donduruldu.
 
-            Adres /api/file/pi/ -- dosya servisine DOGRUDAN degil, kendi
-            vekil ucumuz uzerinden (gerekcesi api/index.js icinde: capraz
-            kaynakta tarayici indirmek yerine o adrese gidiyordu).
+            Indirme kendi vekil ucumuzden geciyor ve adresi kisa omurlu
+            bir bilet tasiyor -- gerekcesi app/composables/usePiDownload.ts
+            icinde (ozetle: gezinme Authorization basligi gonderemez ve
+            Android kabugunda cerez de gitmez).
           -->
           <a
             v-if="po.hasPi"
             class="poc-pi"
-            :href="'/api/file/pi/' + po.no"
+            href="#"
             :title="'PI evrakini indir -- ' + po.no"
-            @click.stop
+            @click.stop.prevent="piDownload(po.no)"
           >
             <i class="pi pi-download" aria-hidden="true" />
             <span>PI</span>
@@ -266,6 +267,11 @@ import { useOrderStore } from "~/stores/order"
  * var; kartlarda tek bir arama kutusu (PO / musteri / urun) duruyor.
  */
 export default {
+  /* PI indirme: cerez yerine kisa omurlu bilet (bkz. usePiDownload.ts). */
+  setup() {
+    return { piDownload: usePiDownload() }
+  },
+
   props: {
     list: { type: Array, required: false, default: () => [] },
     status: { type: String, required: true },

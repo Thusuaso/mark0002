@@ -126,10 +126,7 @@
                 order/Table.vue'daki (list.vue) dogru hali esas alindi.
               -->
               <a
-                :href="
-                  '/api/file/pi/' +
-                  slotProps.data.SiparisNo
-                "
+                href="#" @click.prevent="piDownload(slotProps.data.SiparisNo)"
               >
                 <i class="pi pi-download" />
               </a>
@@ -335,6 +332,12 @@
 import { useOrderStore } from "~/stores/order"
 import { FilterMatchMode } from "@primevue/core/api";
 export default {
+  /* PI indirme: cerez yerine kisa omurlu bilet kullaniyor
+     (gerekcesi app/composables/usePiDownload.ts icinde). */
+  setup() {
+    return { piDownload: usePiDownload() }
+  },
+
   props: {
     list: {
       type: Array,
@@ -501,11 +504,23 @@ export default {
           ]);
 
           if (x.EvrakDurum > 0 && x.SiparisNo) {
+            /*
+             * EXCEL ICINDEKI BAGLANTI -- ekrandaki PI dugmesinden FARKLI
+             * olmak ZORUNDA, bilerek dosya servisine dogrudan gidiyor:
+             *
+             *  - Gomulu baglantiya tiklayan Excel'dir, tarayici degil;
+             *    GORELI bir adres ("/api/...") orada hicbir yere gitmez,
+             *    mutlak olmali.
+             *  - Kisa omurlu bilet de ise yaramaz: indirilen tablo gunler
+             *    sonra aciliyor, bilet 120 saniyede oluyor.
+             *
+             * Yani buradaki adres ekrandaki ile ayni olamaz.
+             */
             links.push({
               r: aoa.length - 1,
               c: 4,
               target:
-                "/api/file/pi/" +
+                "https://file-service.mekmar.com/file/download/2/" +
                 x.SiparisNo,
             });
           }

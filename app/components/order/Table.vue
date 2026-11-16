@@ -111,10 +111,7 @@
           <template #body="slotProps">
             <div v-if="slotProps.data.EvrakDurum > 0">
               <a
-                :href="
-                  '/api/file/pi/' +
-                  slotProps.data.SiparisNo
-                "
+                href="#" @click.prevent="piDownload(slotProps.data.SiparisNo)"
               >
                 <i class="pi pi-download" />
               </a>
@@ -410,10 +407,7 @@
           <template #body="slotProps">
             <div v-if="slotProps.data.EvrakDurum > 0">
               <a
-                :href="
-                  '/api/file/pi/' +
-                  slotProps.data.SiparisNo
-                "
+                href="#" @click.prevent="piDownload(slotProps.data.SiparisNo)"
               >
                 <i class="pi pi-download" />
               </a>
@@ -683,10 +677,7 @@
           <template #body="slotProps">
             <div v-if="slotProps.data.EvrakDurum > 0">
               <a
-                :href="
-                  '/api/file/pi/' +
-                  slotProps.data.SiparisNo
-                "
+                href="#" @click.prevent="piDownload(slotProps.data.SiparisNo)"
               >
                 <i class="pi pi-download" />
               </a>
@@ -1004,10 +995,7 @@
         <template #body="slotProps">
           <div v-if="slotProps.data.EvrakDurum > 0">
             <a
-              :href="
-                '/api/file/pi/' +
-                slotProps.data.SiparisNo
-              "
+              href="#" @click.prevent="piDownload(slotProps.data.SiparisNo)"
             >
               <i class="pi pi-download" />
             </a>
@@ -1190,6 +1178,17 @@ import { useOrderStore } from "~/stores/order"
 
 export default {
   emits: ["production_selected_emit"],
+
+  /* PI indirme: cerez yerine kisa omurlu bilet kullaniyor
+
+     (gerekcesi app/composables/usePiDownload.ts icinde). */
+
+  setup() {
+
+    return { piDownload: usePiDownload() }
+
+  },
+
 
   props: {
     list: {

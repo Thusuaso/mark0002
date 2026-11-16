@@ -19,8 +19,16 @@
 export function useApi() {
   const token = useCookie<string | null>("token")
 
+  /*
+   * apiBase web'de BOS, yani baseURL eskisi gibi "/api" -- davranis
+   * degismiyor. Android kabugunda sayfa https://localhost'tan geldigi icin
+   * "/api" yanlis yere gider; orada NUXT_PUBLIC_API_BASE uretim adresini
+   * veriyor ve baseURL "https://gozv2.mekmar.com/api" oluyor.
+   */
+  const apiBase = useRuntimeConfig().public.apiBase || ""
+
   return $fetch.create({
-    baseURL: "/api",
+    baseURL: `${apiBase}/api`,
 
     onRequest({ options }) {
       if (token.value) {

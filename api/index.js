@@ -3093,16 +3093,62 @@ const FILE_SERVICE_BASE = (
   process.env.FILE_SERVICE_BASE || "https://file-service.mekmar.com"
 ).replace(/\/+$/, "");
 
-app.get("/file/pi/:siparisNo", async (req, res) => {
-  const kullanici = sohbetDosyaKullanicisi(req);
-  if (!kullanici) {
-    return res.status(401).json({ status: false });
-  }
+/* PI biletinin omru. Kullanici dugmeye basar basmaz indirme basladigi
+   icin saniyeler yetiyor; adres gecmiste kalsa bile kisa surede oluyor. */
+const PI_BILET_SN = 120;
+
+/* Bilet ucu: NORMAL yetkiyle (Authorization: Bearer) cagriliyor ve yalnizca
+   kisa omurlu bir adres uretiyor. Yolu bilerek /file/pi/ ALTINDA DEGIL --
+   o onek kendi yetkisini dogrulayanlar listesinde, yani global
+   authenticateToken'dan muaf; bilet ucunun ise tam yetki kontrolunden
+   gecmesi gerekiyor. */
+app.get("/pi-ticket/:siparisNo", (req, res) => {
   const siparisNo = String(req.params.siparisNo || "").trim();
-  /* Siparis numarasi adrese giriyor; beklenmeyen karakter gelirse istek
-     hic kurulmasin. */
   if (!siparisNo || !/^[A-Za-z0-9._-]+$/.test(siparisNo)) {
     return res.status(400).json({ status: false });
+  }
+  if (!JWT_SECRET) {
+    return res.status(500).json({ status: false });
+  }
+  const bilet = jwt.sign({ typ: "pi", pi: siparisNo }, JWT_SECRET, {
+    expiresIn: PI_BILET_SN,
+  });
+  res.status(200).json({
+    status: true,
+    url: `/api/file/pi/${encodeURIComponent(siparisNo)}?t=${encodeURIComponent(bilet)}`,
+  });
+});
+
+/* Adresteki biletin bu siparis icin ve suresi icinde olup olmadigi. */
+function piBiletGecerli(req, siparisNo) {
+  const bilet = req.query && req.query.t;
+  if (!bilet || !JWT_SECRET) {
+    return false;
+  }
+  try {
+    const p = jwt.verify(String(bilet), JWT_SECRET);
+    return !!p && p.typ === "pi" && p.pi === siparisNo;
+  } catch (err) {
+    return false;
+  }
+}
+
+app.get("/file/pi/:siparisNo", async (req, res) => {
+  const siparisNo = String(req.params.siparisNo || "").trim();
+  /* Siparis numarasi hem bilet karsilastirmasina hem de dis adrese giriyor;
+     once bicim kontrolu, sonra yetki. */
+  if (!siparisNo || !/^[A-Za-z0-9._-]+$/.test(siparisNo)) {
+    return res.status(400).json({ status: false });
+  }
+  /*
+   * IKI YOL DA KABUL:
+   *   1) adresteki kisa omurlu bilet -- CEREZ GEREKTIRMEZ, bu yuzden
+   *      Android kabugunda (farkli origin, cerez gitmez) calisan yol budur
+   *   2) cerez/baslik token'i        -- web'de daha once uretilmis dogrudan
+   *      adresler ve elle acilan baglantilar icin calismaya devam ediyor
+   */
+  if (!piBiletGecerli(req, siparisNo) && !sohbetDosyaKullanicisi(req)) {
+    return res.status(401).json({ status: false });
   }
   try {
     const upstream = await fetch(
