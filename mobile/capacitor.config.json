@@ -1,0 +1,11 @@
+{
+  "appId": "com.mekmar.goz",
+  "appName": "Göz",
+  "webDir": "../.output/public",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,17 @@
+# Capacitor'un her sync'te web paketini kopyaladigi yer -- uretilen dosya,
+# kaynak degil. Kaynagi depo kokundeki `npm run build:mobile`.
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+
+# Gradle ciktilari ve yerel makineye ozel ayarlar
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+android/captures/
+android/.idea/
+*.apk
+*.aab
+
+node_modules/

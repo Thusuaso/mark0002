@@ -13,6 +13,50 @@ export default defineNuxtConfig({
   modules: ["@primevue/nuxt-module", "@pinia/nuxt"],
 
   /*
+   * MOBIL DERLEME -- Android kabugu icin SSR KAPALI.
+   *
+   * Kabukta sunucu YOK: dosyalar APK'nin icinden (https://localhost)
+   * servis ediliyor, veri uretim sunucusundan geliyor. Bu yuzden mobil
+   * derleme saf SPA olmali; `nuxt generate` statik bir paket uretiyor.
+   *
+   * Web derlemesi ETKILENMIYOR: MOBILE_BUILD verilmedigi surece ssr true
+   * ve bugunku davranis birebir ayni. (Uygulamanin zaten neredeyse tamami
+   * istemcide ciziliyor -- sayfalar useAsyncData'yi `server: false` ile
+   * cagiriyor, cunku legacy Express API SSR'in ic yolunda calismiyor;
+   * bkz. server/middleware/1.legacy-api.ts. Yani SSR'i kapatmak veri
+   * cekme davranisini degistirmiyor.)
+   *
+   * Kullanimi: mobile/README.md
+   */
+  ssr: process.env.MOBILE_BUILD !== "1",
+
+  /*
+   * MOBIL DERLEMEDE LEGACY API ARA KATMANI DISARIDA BIRAKILIYOR.
+   *
+   * [!] Bu bir iyilestirme degil, derlemeyi BITIREN sey -- yoksa
+   * `nuxt generate` ASILI KALIYOR.
+   *
+   * Olculdu: cikti (.output/public, index.html + 200.html + rota
+   * sayfalari) 90 saniyede tamamlaniyor, ama surec 20 dakika sonra bile
+   * CIKMIYOR ve CPU kullanmiyordu. Sebep: server/middleware/1.legacy-api.ts
+   * `api/index.js`i EN UST SEVIYEDE import ediyor; o dosya yuklenir
+   * yuklenmez setInterval baslatiyor (satir 17, ayrica Eta hatirlatma ve
+   * sohbet temizligi zamanlayicilari) ve MSSQL havuzunu aciyor. Nitro
+   * on-uretim icin sunucuyu ayaga kaldirdigi icin bu acik tutamaclar
+   * Node'un cikmasini engelliyor.
+   *
+   * Mobil pakette o ara katmanin zaten HICBIR islevi yok: APK'nin
+   * icinde sunucu calismiyor, istekler dogrudan uretim sunucusuna
+   * gidiyor. Disarida birakmak islev kaybi degil.
+   *
+   * Web derlemesi ETKILENMIYOR -- kosul yalnizca MOBILE_BUILD=1 icin.
+   */
+  nitro:
+    process.env.MOBILE_BUILD === "1"
+      ? { ignore: ["middleware/1.legacy-api.ts"] }
+      : {},
+
+  /*
    * Sira orijinal nuxt.config.js ile ayni: primeflex once, bootstrap sonra.
    * primeflex ATLANMISTI -- flex / flex-column / gap-3 / w-full /
    * justify-content-end gibi tum yerlesim siniflari calismiyordu, formlar

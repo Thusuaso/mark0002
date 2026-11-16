@@ -120,6 +120,52 @@ function __noneNullControl(value) {
   return value;
 }
 app.use(cookieParser());
+
+/* --------------------------------------------------------------------------
+   CORS -- YALNIZCA ANDROID KABUGU ICIN
+   --------------------------------------------------------------------------
+   Web arayuzu API ile AYNI origin'den konusuyor, bu yuzden bugune kadar
+   hicbir CORS basligi gerekmedi ve yoktu. Capacitor kabugunda sayfa
+   https://localhost'tan servis ediliyor, API ise gozv2.mekmar.com'da;
+   tarayici icin bu capraz kaynak istegi ve baslik olmadan ENGELLENIR.
+
+   Liste DAR tutuldu: yildiz (*) degil, yalnizca kabugun kullandigi uc
+   origin ve her biri tek tek yankilanıyor.
+
+   [!] Access-Control-Allow-Credentials VERILMIYOR, bilerek: kabuk yetkiyi
+   Authorization basligiyla tasiyor, cerezle degil. Kimlik bilgisi izni
+   vermek cerezleri capraz kaynaga acardi ve buna ihtiyac yok.
+
+   Yetki hala her istekte ayrica dogrulaniyor -- CORS bir yetki mekanizmasi
+   DEGIL, yalnizca tarayiciya "bu origin okuyabilir" demektir.
+   -------------------------------------------------------------------------- */
+const MOBIL_ORIGINLER = new Set([
+  "https://localhost",
+  "capacitor://localhost",
+  /* Capacitor'un canli yeniden yukleme kipi (cap run --live-reload) */
+  "http://localhost",
+]);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && MOBIL_ORIGINLER.has(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    /* Yanit origin'e gore degisiyor; ara bellekler karistirmasin. */
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+    res.setHeader("Access-Control-Max-Age", "600");
+    /* On yoklamayi burada bitir; asagidaki rotalara hic inmesin.
+       Yalnizca IZIN VERILEN origin icin -- digerleri icin OPTIONS
+       davranisi eskisi gibi kaliyor. */
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(204);
+    }
+  }
+  next();
+});
 app.use((req, res, next) => {
   console.log();
   // Sadece SİLME (DELETE) ve GÜNCELLEME (PUT, PATCH) isteklerini yakala
