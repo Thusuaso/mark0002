@@ -21223,11 +21223,17 @@ app.delete("/mekmar/panel/faq/video/delete/:id", async (req, res) => {
 
 app.get("/reports/mekmer/stocks/list", async (req, res) => {
   const year = req.params.year;
+  /* ORDER BY EKLENDI -- Monthly production tablosu KARISIK SIRALIYDI.
+     group by tek basina siralama VAAT ETMEZ: sira SQL Server'in o anda
+     sectigi topla(ma) planina gore degisir (hash aggregate'te ay
+     numaralari rastgele cikar). Istemci listeyi geldigi gibi bastigi
+     icin ekranda aylar 7, 3, 11... diye goruluyordu. */
   const monthly_stock_sql = `
   select MONTH(Tarih) as MONTH,SUM(SqmMiktar)as SqmMiktar,SUM(Miktar) as Miktar, COUNT(ID) as KasaAdedi from UretimTB where 
 YEAR(Tarih) = YEAR(GETDATE())  and TedarikciID=1
 
 group by MONTH(Tarih)
+order by MONTH(Tarih)
 
   `;
   const current_stock_sql = `
