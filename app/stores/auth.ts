@@ -61,22 +61,38 @@ export const useAuthStore = defineStore("auth", () => {
    * DIKKAT: bu cagri kayitli adrese GERCEK e-posta gonderir.
    * Sifre KASITLI olarak istemcide dogrulanmiyor (bkz. pages/auth.vue). */
   async function requestOtp(payload: { username: string; password: string }) {
-    return await $fetch<{ status: boolean; step?: string; message?: string }>(
-      "/api/login",
-      { method: "POST", body: payload, timeout: REQUEST_TIMEOUT_MS },
-    )
+    /*
+     * useApi() KULLANILMAK ZORUNDA, duz $fetch("/api/login") DEGIL.
+     *
+     * Goreli "/api/..." yalnizca sayfa ile API ayni origin'deyse dogru.
+     * Android kabugunda sayfa https://localhost'tan servis ediliyor,
+     * yani goreli adres APK'nin KENDI icine gidiyor ve orada sunucu yok:
+     * istek basarisiz oluyor, auth.vue de bunu "Giris bilgileri hatali
+     * veya sunucu reddetti" diye gosteriyordu -- yaniltici, cunku
+     * bilgiler dogruydu ve sunucuya hic ULASILMAMISTI.
+     *
+     * useApi() baseURL'i apiOrigin + apiBase ile kuruyor, yani web'de
+     * "/api", kabukta mutlak adres. Token henuz yok; useApi yalnizca
+     * cerez varsa Authorization ekliyor, giriste eklemiyor.
+     */
+    return await useApi()<{
+      status: boolean
+      step?: string
+      message?: string
+    }>("/login", { method: "POST", body: payload, timeout: REQUEST_TIMEOUT_MS })
   }
 
   /* 2. adim: OTP kodu -> token */
   async function verifyOtp(payload: { username: string; code: string }) {
-    const res = await $fetch<{
+    /* Gerekcesi requestOtp'un ustunde: goreli adres kabukta kirilir. */
+    const res = await useApi()<{
       status: boolean
       message?: string
       token?: string
       userId?: number
       username?: string
       mail?: string
-    }>("/api/verify-otp", {
+    }>("/verify-otp", {
       method: "POST",
       body: payload,
       timeout: REQUEST_TIMEOUT_MS,

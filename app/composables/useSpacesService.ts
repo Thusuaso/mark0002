@@ -48,7 +48,10 @@ function extOf(name: string): string {
 }
 
 export function useSpacesService() {
-  const apiBase = useRuntimeConfig().public.apiBase
+  /* apiOrigin kabukta mutlak adresi veriyor; web'de bos, yani sonuc
+     eskisi gibi yalnizca apiBase ("/api"). */
+  const cfg = useRuntimeConfig().public
+  const apiBase = `${cfg.apiOrigin || ""}${cfg.apiBase}`
 
   async function postJson(
     path: string,

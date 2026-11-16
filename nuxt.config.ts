@@ -149,14 +149,18 @@ export default defineNuxtConfig({
       fileServiceBase: "https://file-service.mekmar.com",
 
       /*
-       * API'nin MUTLAK adresi. Web'de BOS kalir: istekler ayni origin'e,
-       * "/api/..." olarak gider ve bugunku davranis hic degismez.
+       * API'nin ORIGIN'i -- yol degil, yalnizca sema+host.
        *
-       * Android kabugunda (Capacitor) sayfa https://localhost'tan servis
-       * ediliyor, API ise uretim sunucusunda; orada bu deger
-       * NUXT_PUBLIC_API_BASE=https://gozv2.mekmar.com ile veriliyor.
+       * [!] apiBase ILE KARISTIRMA. apiBase yukarida "/api" ve YOL;
+       * ikisi birlestiriliyor: apiOrigin + apiBase. Web'de apiOrigin BOS
+       * kaldigi icin sonuc "/api", yani bugunku davranis birebir ayni.
+       *
+       * Android kabugunda sayfa https://localhost'tan servis ediliyor,
+       * API ise uretim sunucusunda; orada
+       * NUXT_PUBLIC_API_ORIGIN=https://gozv2.mekmar.com veriliyor ve
+       * sonuc "https://gozv2.mekmar.com/api" oluyor.
        */
-      apiBase: "",
+      apiOrigin: "",
     },
   },
 })

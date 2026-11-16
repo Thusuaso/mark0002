@@ -16,7 +16,7 @@
  */
 export function usePiDownload() {
   const api = useApi()
-  const apiBase = useRuntimeConfig().public.apiBase || ""
+  const apiOrigin = useRuntimeConfig().public.apiOrigin || ""
 
   return async function piDownload(siparisNo: string) {
     if (!siparisNo) return
@@ -33,7 +33,7 @@ export function usePiDownload() {
      * bilir). Web'de oldugu gibi kullanilir; kabukta basina mutlak taban
      * gelmeli, yoksa https://localhost/api/... olur ve hicbir yere gitmez.
      */
-    const url = `${apiBase}${res.url}`
+    const url = `${apiOrigin}${res.url}`
 
     /*
      * Indirmeyi Content-Disposition: attachment basligi zorluyor (uc onu

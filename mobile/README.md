@@ -19,7 +19,7 @@ servis ediliyor. Bunun üç sonucu var ve üçü de koda yansıdı:
 | Sonuç | Çözüm | Yer |
 |---|---|---|
 | SSR çalışamaz | `MOBILE_BUILD=1` ile `ssr: false` | `nuxt.config.ts` |
-| `/api` yanlış yere gider | `NUXT_PUBLIC_API_BASE` mutlak adres verir | `app/composables/useApi.ts` |
+| `/api` yanlış yere gider | `NUXT_PUBLIC_API_ORIGIN` mutlak adres verir | `app/composables/useApi.ts` |
 | Çapraz kaynak isteği engellenir | Dar CORS listesi | `api/index.js` |
 
 Dördüncüsü PI indirmeydi: çerez çapraz kaynağa gitmediği için kısa ömürlü
@@ -94,7 +94,7 @@ SDK Manager → "Android SDK Platform 36" tek seçenekti.
 ## Sunucu adresini değiştirmek
 
 `package.json` içindeki `build:mobile` betiğinde duruyor. Test sunucusuna
-bağlamak için `NUXT_PUBLIC_API_BASE` ve `NUXT_PUBLIC_SOCKET_URL`
+bağlamak için `NUXT_PUBLIC_API_ORIGIN` ve `NUXT_PUBLIC_SOCKET_URL`
 değerlerini değiştirip yeniden derlemek yeterli — kod değişmiyor.
 
 > **[!] Adresi değiştirirsen CORS listesini de güncelle.**
@@ -108,3 +108,19 @@ değerlerini değiştirip yeniden derlemek yeterli — kod değişmiyor.
 - **Bildirim yok.** Native push ayrı bir iş (Faz 4).
 - **Çevrimdışı çalışmaz.** Veri her zaman sunucudan geliyor.
 - **Mağazada değil.** Şimdilik yalnızca doğrudan kurulan APK.
+
+## Göreli adres kullanan yerler — kabukta kırılırlar
+
+Kabukta sayfa `https://localhost`'tan servis edildiği için **göreli her
+adres APK'nın içine gider** ve orada sunucu yoktur. `useApi()` üzerinden
+giden her şey sorunsuz (mutlak adres kuruyor), ama bunlar ayrı:
+
+| Yer | Durum |
+|---|---|
+| `app/stores/auth.ts` | **düzeltildi** — `useApi()`'ye geçirildi |
+| `app/composables/useTcmb.ts` | `baseURL: "/"` → Nitro rotası, kabukta **çalışmaz** |
+| `app/composables/useExcelExport.ts` | `baseURL: "/"` → Nitro rotası, kabukta **çalışmaz** |
+
+Son ikisi Express değil **Nitro sunucu rotaları**; APK'da Nitro de yok.
+Kapsamdaki ekranlar bunları kullanmıyorsa sorun değil, kullanıyorsa o
+rotaların da üretim sunucusuna yönlendirilmesi gerekir.

@@ -13,7 +13,7 @@
  */
 import { spawnSync } from "node:child_process"
 
-const API = process.env.NUXT_PUBLIC_API_BASE || "https://gozv2.mekmar.com"
+const API = process.env.NUXT_PUBLIC_API_ORIGIN || "https://gozv2.mekmar.com"
 const SOCKET = process.env.NUXT_PUBLIC_SOCKET_URL || API
 
 console.log(`[mobil] API    : ${API}`)
@@ -28,7 +28,7 @@ const r = spawnSync("npx", ["nuxt", "generate"], {
   env: {
     ...process.env,
     MOBILE_BUILD: "1",
-    NUXT_PUBLIC_API_BASE: API,
+    NUXT_PUBLIC_API_ORIGIN: API,
     NUXT_PUBLIC_SOCKET_URL: SOCKET,
   },
 })
