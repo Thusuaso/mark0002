@@ -3252,29 +3252,76 @@ app.get("/container/agency/list", async (req, res) => {
 app.post("/container/follow/save", async (req, res) => {
   try {
     const acenteVar = await acenteTakipReady();
+    if (!safe(req.body.SiparisNo).trim()) {
+      return res.status(400).json({ status: false });
+    }
     const request = new mssql.Request();
-    request.input("EtaTarihi", mssql.VarChar, req.body.EtaTarihi);
-    request.input("KonteynırNo", mssql.NVarChar, req.body.KonteynırNo);
-    request.input("KonsimentoDurum", mssql.NVarChar, req.body.KonsimentoDurum);
-    request.input("Line", mssql.NVarChar, req.body.Line);
-    request.input("Takip", mssql.NVarChar, req.body.Takip);
     request.input("SiparisNo", mssql.NVarChar, req.body.SiparisNo);
-    let acenteSet = "";
+    /*
+     * KISMI KAYIT -- formdaki ALANLARIN TAMAMI DOLU OLMAK ZORUNDA DEGIL.
+     * Eskiden SET listesi sabitti: govdede olmayan alanin kolonuna da
+     * undefined (yani NULL) yaziliyordu. Artik SET listesi govdede
+     * GELEN alanlardan kuruluyor; gelmeyen alanin kolonu hic
+     * dokunulmaz, yani yalnizca girilen bilgiler kaydedilir.
+     *
+     * BOS DIZGE -> NULL: '' bir date kolonuna yazilirsa SQL Server onu
+     * sessizce 1900-01-01'e cevirir, yani Eta yer tutucusunu (bkz.
+     * ETA_PLACEHOLDER) geri getirirdi. Metin kolonlarinda da bos hucre
+     * ile bos dizge ayni anlama geliyor.
+     *
+     * ACIK NULL YAZILIR: Clear dugmesi ve isaretin kaldirilmasi bilerek
+     * temizleme demek; istemci o alanlari acikca null gonderiyor.
+     */
+    const alanlar = [
+      /* Eta bir date kolonu; 'YYYY-MM-DD' dizgesi ortulu cevrilir. */
+      { kolon: "Eta", param: "EtaTarihi", tip: mssql.VarChar },
+      /* Sunucu alan adi TURKCE 'ı' iceriyor -- istemciyle birebir. */
+      { kolon: "KonteynerNo", param: "KonteynırNo", tip: mssql.NVarChar },
+      /*
+       * KonsimentoDurum ve Takip kolonlari BIT. Ikisi de NVarChar olarak
+       * baglanmisti ve FollowForm'daki <Checkbox :binary="true"> alanlari
+       * BOOLEAN yaptigi icin SQL'e 'true' dizgesi gidiyordu:
+       *   Conversion failed when converting the nvarchar value 'true' to bit
+       * Bu da catch'e dusup POST /api/container/follow/save -> 500
+       * veriyordu, yani bu ekrandan HICBIR kayit yapilamiyordu.
+       */
+      { kolon: "KonsimentoDurum", param: "KonsimentoDurum", tip: mssql.Bit },
+      { kolon: "Line", param: "Line", tip: mssql.NVarChar },
+      { kolon: "Takip", param: "Takip", tip: mssql.Bit },
+    ];
+    /* AcenteID yalnizca api/sql/AcenteTB.sql calistirildiysa var. */
     if (acenteVar) {
-      const acenteId = parseInt(req.body.AcenteID);
-      request.input(
-        "AcenteID",
-        mssql.Int,
-        acenteId > 0 ? acenteId : null
-      );
-      acenteSet = ",AcenteID=@AcenteID";
+      alanlar.push({ kolon: "AcenteID", param: "AcenteID", tip: mssql.Int });
+    }
+    const set = [];
+    for (const alan of alanlar) {
+      if (!(alan.param in req.body)) {
+        continue;
+      }
+      let deger = req.body[alan.param];
+      if (typeof deger === "string" && deger.trim() === "") {
+        deger = null;
+      }
+      if (alan.tip === mssql.Int && deger != null) {
+        const sayi = parseInt(deger);
+        deger = sayi > 0 ? sayi : null;
+      }
+      request.input(alan.param, alan.tip, deger);
+      set.push(`${alan.kolon}=@${alan.param}`);
+    }
+    /* Govdede SiparisNo disinda hicbir alan yoksa yazacak bir sey yok;
+       bos SET ile sorgu kurmak sozdizimi hatasi olurdu. */
+    if (!set.length) {
+      return res.status(200).json({ status: true });
     }
     const response = await request.query(
-      `update SiparislerTB SET Eta=@EtaTarihi,KonteynerNo=@KonteynırNo,KonsimentoDurum=@KonsimentoDurum,Line=@Line,Takip=@Takip${acenteSet} where SiparisNo=@SiparisNo`
+      `update SiparislerTB SET ${set.join(",")} where SiparisNo=@SiparisNo`
     );
-    res.status(200).json({ status: response.rowsAffected[0] == 1 });
+    res.status(200).json({ status: response.rowsAffected[0] > 0 });
   } catch (err) {
-    console.error("container follow kaydetme hatasi:", err.message);
+    /* Eskiden yalnizca err.message yaziliyordu; bagli parametre
+       dogrulama hatalarinda asil sebep yiginda duruyor. */
+    console.error("container follow kaydetme hatasi:", err);
     res.status(500).json({ status: false });
   }
 });

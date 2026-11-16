@@ -53,6 +53,9 @@ export interface ContainerFollowSave {
   /* Sunucu alan adi TURKCE 'ı' iceriyor -- birebir korundu. */
   KonteynırNo: string | null
   SiparisNo: string
+  /* FollowForm bu alani bastan beri gonderiyordu ama arayuzde yoktu.
+     Sunucu AcenteID'yi yalnizca AcenteTB kuruluysa dikkate alir. */
+  AcenteID?: number | null
 }
 
 /*
