@@ -161,6 +161,19 @@ export default defineNuxtConfig({
        * sonuc "https://gozv2.mekmar.com/api" oluyor.
        */
       apiOrigin: "",
+
+      /*
+       * Android kabugunda mi calisiyoruz?
+       *
+       * DERLEME ZAMANINDA belirleniyor, tarayici kimliginden (user agent)
+       * DEGIL: kabuk icin ayri bir paket zaten uretiliyor, dolayisiyla
+       * kesin bilgi burada. UA ayristirmak hem yanilabilir hem de dar
+       * ekranda acilan masaustu tarayicisini yanlislikla kisitlardi.
+       *
+       * Ne yapiyor: menuyu MobileNav'a cevirip ekran kapsamini
+       * app/utils/mobileRoutes.ts ile sinirliyor.
+       */
+      isMobile: process.env.MOBILE_BUILD === "1",
     },
   },
 })

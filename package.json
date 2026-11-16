@@ -7,6 +7,7 @@
     "dev": "nuxt dev --port 3100",
     "build": "nuxt build",
     "build:mobile": "node tools/build-mobile.mjs",
+    "release:mobile": "node tools/release-mobile.mjs",
     "preview": "nuxt preview"
   },
   "dependencies": {

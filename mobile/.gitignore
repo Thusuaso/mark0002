@@ -14,4 +14,7 @@ android/.idea/
 *.apk
 *.aab
 
+# Surumlu APK kopyalari -- 13 MB'lik ikililer git gecmisine girmesin.
+dist/
+
 node_modules/

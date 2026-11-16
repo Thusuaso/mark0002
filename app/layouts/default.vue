@@ -55,7 +55,23 @@
       Vue bunu yalnizca konsola uyari olarak basar, sayfa hatasiz
       render edilir, navbar sessizce YOK olur.
     -->
-    <SharedNavbar v-show="auth.isAuthenticated" style="margin-bottom: 5px" />
+    <!--
+      ANDROID KABUGUNDA FARKLI MENU.
+
+      SharedNavbar 1100+ satirlik, coklu seviyeli bir dropdown agaci ve
+      ~60 baglanti tasiyor; telefonda ic ice acilan dropdown'lar
+      kullanilabilir degil ve gosterilecek ekran da 11. Kabukta onun
+      yerine duz, tek seviyeli SharedMobileNav aciliyor.
+
+      Kosul derleme zamanindan geliyor (isMobile), tarayici kimliginden
+      degil -- gerekcesi nuxt.config.ts icinde.
+    -->
+    <SharedMobileNav v-if="isMobile && auth.isAuthenticated" />
+    <SharedNavbar
+      v-else
+      v-show="auth.isAuthenticated"
+      style="margin-bottom: 5px"
+    />
 
     <slot />
 
@@ -77,6 +93,7 @@
 // ProgressSpinner) -> simdi components/shared/EyeLoader.vue (goz).
 const shared = useSharedStore()
 const auth = useAuthStore()
+const isMobile = useRuntimeConfig().public.isMobile
 
 /*
  * SAYFALAR ARASI GECISTE DE GOZ.

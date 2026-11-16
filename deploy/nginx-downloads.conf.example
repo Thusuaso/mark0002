@@ -1,0 +1,46 @@
+# APK indirme dizini
+#
+# gozv2.mekmar.com sunucu blogunun ICINE eklenir (deploy/nginx.conf.example
+# icindeki location'larin yanina). Amac: /app sayfasindaki indirme
+# dugmesinin isaret ettigi /downloads/goz-<surum>.apk dosyasini servis
+# etmek.
+#
+# NEDEN NUXT'IN public/ KLASORU DEGIL: orasi her derlemede yeniden
+# uretiliyor, yani APK'yi oraya koymak onu depoya commit etmek demekti --
+# her yayinda 13 MB'lik bir ikili git gecmisine eklenirdi. Dosya
+# sunucuda, surum kontrolunun disinda duruyor.
+#
+# Kurulum (sunucuda, bir kez):
+#   sudo mkdir -p /var/www/mark0002-downloads
+#   sudo chown deploy:deploy /var/www/mark0002-downloads
+#   # asagidaki location'i sunucu bloguna ekleyip:
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# Her yayinda (gelistirme makinesinde):
+#   npm run release:mobile
+#   scp mobile/dist/goz-<surum>.apk deploy@138.68.95.219:/var/www/mark0002-downloads/
+
+location /downloads/ {
+    alias /var/www/mark0002-downloads/;
+
+    # [!] Dizin listelemesi KAPALI kalsin: acik birakilirsa sunucudaki
+    # tum surumler disaridan goruluyor.
+    autoindex off;
+
+    # Taryicinin dosyayi ACMAK yerine INDIRMESI icin. APK'da normalde
+    # sorun olmaz ama baslik acikca verilince davranis tarayiciya
+    # birakilmamis oluyor.
+    add_header Content-Disposition "attachment";
+
+    # Dosya adi surumu tasidigi icin (goz-1.0.0.apk) ayni ad asla
+    # farkli bir icerige isaret etmiyor; uzun onbellek guvenli.
+    expires 30d;
+    add_header Cache-Control "public, immutable";
+
+    # 13 MB'lik dosya; varsayilan sinir yetiyor ama zaman asimi
+    # yavas mobil baglantilarda isine yarar.
+    send_timeout 300s;
+
+    types { application/vnd.android.package-archive apk; }
+    default_type application/vnd.android.package-archive;
+}
