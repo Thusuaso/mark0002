@@ -88,12 +88,6 @@
         </template>
       </Column>
 
-      <Column
-        field="Line"
-        header="Line"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
-      />
 
       <Column
         field="Eta"

@@ -14,12 +14,6 @@
       </div>
       <div class="col">
         <FloatLabel>
-          <InputText class="w-100" id="line" type="text" v-model="line" />
-          <label for="line">Line</label>
-        </FloatLabel>
-      </div>
-      <div class="col">
-        <FloatLabel>
           <DatePicker
             class="w-100"
             v-model="eta_date"
@@ -156,7 +150,6 @@ export default {
       eta_date: null,
       checkedSendingForm: false,
       checkedFollowForm: false,
-      line: null,
       containerNo: null,
       selectedAgency: null,
     }
@@ -164,7 +157,6 @@ export default {
 
   created() {
     this.containerNo = this.model.KonteynerNo
-    this.line = this.model.Line
 
     /*
      * DUZELTILDI -- TAKVIME DIZGE VERILIYORDU.
@@ -227,7 +219,6 @@ export default {
         EtaTarihi: this.eta_date == null ? null : toIsoDate(this.eta_date),
         KonsimentoDurum: this.checkedSendingForm,
         Takip: this.checkedFollowForm,
-        Line: this.line,
         /* Sunucu alan adi TURKCE 'ı' iceriyor -- birebir korundu. */
         KonteynırNo: this.containerNo,
         SiparisNo: this.model.SiparisNo,

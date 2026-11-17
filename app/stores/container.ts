@@ -24,6 +24,9 @@ export interface ContainerFollow {
   MusteriAdi: string
   YuklemeTarihi: string | null
   KonteynerNo: string | null
+  /* API hala donduruyor; ekranda GOSTERILMIYOR (Line kolonu
+     kaldirildi). Alani silmek sunucu yanitini yanlis tarif etmek
+     olurdu. */
   Line: string | null
   Eta: string | null
   Kalan: string | number | null
@@ -49,7 +52,12 @@ export interface ContainerFollowSave {
   EtaTarihi: string | null
   KonsimentoDurum: boolean
   Takip: boolean
-  Line: string | null
+  /*
+   * Line KALDIRILDI -- form artik bu alani gondermiyor.
+   * Sunucu ucu hala kabul ediyor (api/index.js), ama kismi kayit
+   * sayesinde GONDERILMEYEN alanin kolonuna DOKUNULMUYOR: mevcut
+   * degerler oldugu gibi kaliyor, yenisi yazilmiyor.
+   */
   /* Sunucu alan adi TURKCE 'ı' iceriyor -- birebir korundu. */
   KonteynırNo: string | null
   SiparisNo: string
