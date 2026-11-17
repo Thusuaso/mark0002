@@ -1,537 +1,66 @@
 <template>
-  <div v-if="isLoggedIn">
-    <nav
-      class="navbar navbar-expand-lg bg-body-tertiary"
-      style="font-size: 100%"
-      data-bs-theme="blue"
-      v-if="!getAuthorityStatus"
-    >
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">GOZ</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item" v-show="getAuthorityStatus">
-              <NuxtLink to="/selection/input" class="nav-link"
-                >SELECTION</NuxtLink
-              >
-            </li>
+  <header v-if="isLoggedIn" class="gnav" :class="{ 'gnav--open': mobilAcik }">
+    <div class="gnav__bar">
+      <!-- Marka -->
+      <NuxtLink to="/" class="gnav__brand" @click="hepsiniKapat">
+        <span class="gnav__mark" aria-hidden="true" />
+        <span class="gnav__word">GÖZ</span>
+      </NuxtLink>
 
-            <li class="nav-item" v-show="!getAuthorityStatus">
-              <NuxtLink to="/" class="nav-link">HOME</NuxtLink>
-            </li>
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                ORDERS
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink
-                    to="/orders/production"
-                    class="dropdown-item"
-                    >Production</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/orders/shipped" class="dropdown-item"
-                    >Shipped</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/orders/waiting" class="dropdown-item"
-                    >On Hold</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
+      <!--
+        MASAUSTU MENUSU. Ogeler app/utils/navMenu.ts'ten geliyor ve
+        hangi listenin kullanilacagini `menu` computed'i seciyor --
+        eskiden ayni menu sablonda UC KEZ elle yaziliydi.
+      -->
+      <nav class="gnav__menu" aria-label="Ana menü">
+        <template v-for="(g, i) in menu" :key="g.label + i">
+          <template v-if="gorunur(g)">
+            <!-- Tek baslina baglanti -->
+            <NuxtLink
+              v-if="g.to"
+              :to="g.to"
+              class="gnav__top"
+              :class="{ 'gnav__top--active': aktifYol(g.to) }"
+            >
+              {{ g.label }}
+            </NuxtLink>
 
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
+            <!-- Acilir grup -->
+            <div v-else class="gnav__grp">
+              <button
+                type="button"
+                class="gnav__top gnav__top--btn"
+                :class="{
+                  'gnav__top--active': grupAktif(g),
+                  'gnav__top--open': acikGrup === i,
+                }"
+                :aria-expanded="String(acikGrup === i)"
+                aria-haspopup="true"
+                @click="grupAc(i)"
               >
-                SALES
-              </a>
-              <ul class="dropdown-menu">
-                <!-- <li>
-                  <NuxtLink to="/sales/maintodo" class="dropdown-item"
-                    >Main To Do</NuxtLink
-                  >
-                </li> -->
-                <li>
-                  <NuxtLink to="/sales/todo" class="dropdown-item"
-                    >To Do</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/sales/representative"
-                    class="dropdown-item"
-                    >Sales & Operation</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/sales/follow" class="dropdown-item"
-                    >Customer Notes</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/sales/bgp" class="dropdown-item"
-                    >BGP Projects</NuxtLink
-                  >
-                </li>
+                {{ g.label }}
+                <i class="pi pi-chevron-down gnav__chev" aria-hidden="true" />
+              </button>
 
-                <li>
-                  <NuxtLink to="/sales/consider" class="dropdown-item"
-                    >Points to Consider</NuxtLink
-                  >
-                </li>
-                <li v-if="canSeePasswords">
-                  <NuxtLink to="/passwords" class="dropdown-item"
-                    >Passwords</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/sales/important-links"
-                    class="dropdown-item"
-                    >Important Links</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
+              <div v-show="acikGrup === i" class="gnav__panel">
+                <NuxtLink
+                  v-for="it in gorunenler(g)"
+                  :key="it.to + it.label"
+                  :to="it.to"
+                  class="gnav__item"
+                  :class="{ 'gnav__item--active': aktifYol(it.to) }"
+                  @click="hepsiniKapat"
+                >
+                  {{ it.label }}
+                </NuxtLink>
+              </div>
+            </div>
+          </template>
+        </template>
+      </nav>
 
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                SELECTION
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink to="/selection/input" class="dropdown-item"
-                    >Entry</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/selection/size" class="dropdown-item"
-                    >Crate Size</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/container" class="dropdown-item"
-                    >Container Calculator</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item" v-show="!getAuthorityStatus">
-              <NuxtLink to="/finance" class="nav-link"
-                >FINANCE</NuxtLink
-              >
-            </li>
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                OPERATION
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink to="/operation/cards" class="dropdown-item"
-                    >Product Data</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/supplier"
-                    class="dropdown-item"
-                    >Suppliers</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/shipment"
-                    class="dropdown-item"
-                    >Dispatch</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/uploadform"
-                    class="dropdown-item"
-                    >Shipment Form</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/follow"
-                    class="dropdown-item"
-                    >Container Tracking</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/unfollow"
-                    class="dropdown-item"
-                    >Shipped Containers</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/transport"
-                    class="dropdown-item"
-                    >Shipment Costs</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/transportlist"
-                    class="dropdown-item"
-                    >Shipment Invoices</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/container"
-                    class="dropdown-item"
-                    >FOB Costs</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/operation/containerlist"
-                    class="dropdown-item"
-                    >FOB Invoices</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                CUSTOMERS
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink to="/customer/mekmar" class="dropdown-item"
-                    >Sale Customers</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/customer/offer" class="dropdown-item"
-                    >Quote Customers</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/customer/bgp" class="dropdown-item"
-                    >BGP Customer</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/customer/fair" class="dropdown-item"
-                    >Expo Customers</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/customer/selection"
-                    class="dropdown-item"
-                    >Selection</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                MEKMER
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/production"
-                    class="dropdown-item"
-                    >Production Crates</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/stock"
-                    class="dropdown-item"
-                    >Stock Report</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/mine"
-                    class="dropdown-item"
-                    >Quarry Info</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/productions"
-                    class="dropdown-item"
-                    >Production</NuxtLink
-                  >
-                </li>
-
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/shipped"
-                    class="dropdown-item"
-                    >Shipped</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/onhold"
-                    class="dropdown-item"
-                    >On Hold</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/finance"
-                    class="dropdown-item"
-                    >Finance</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/new-mekmer-finance"
-                    class="dropdown-item"
-                    >Mekmer Alış Finans</NuxtLink
-                  >
-                </li>
-                <li v-show="getAuthorityStatus">
-                  <NuxtLink
-                    to="/reports/mekmer/by-buying-production"
-                    class="dropdown-item"
-                    >Product Purchase</NuxtLink
-                  >
-                </li>
-
-                <li v-show="getAuthorityStatus">
-                  <NuxtLink
-                    to="/reports/mekmar/forwarding"
-                    class="dropdown-item"
-                    >Shipped Crates</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/strips"
-                    class="dropdown-item"
-                    >Stripler</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/calculating-cost"
-                    class="dropdown-item"
-                    >Muhasebe</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                MEKMAR REPORTS
-              </a>
-              <ul class="dropdown-menu">
-                <li v-show="getAyoStatus">
-                  <NuxtLink
-                    to="/reports/mekmar/ayo"
-                    class="dropdown-item"
-                    >AYO</NuxtLink
-                  >
-                </li>
-
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmar/loading"
-                    class="dropdown-item"
-                    >List of Shipments</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmar/forwarding"
-                    class="dropdown-item"
-                    >Shipped Crates</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmar/summary"
-                    class="dropdown-item"
-                    >Order Summary</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmar/mk"
-                    class="dropdown-item"
-                    >MK Reports</NuxtLink
-                  >
-                </li>
-                <li v-show="getAyoStatus">
-                  <NuxtLink
-                    to="/reports/mekmar/gu"
-                    class="dropdown-item"
-                    >Reports</NuxtLink
-                  >
-                </li>
-                <li v-show="getAyoStatus">
-                  <NuxtLink
-                    to="/reports/mekmar/filter-finance"
-                    class="dropdown-item"
-                    >Finance</NuxtLink
-                  >
-                </li>
-                <li v-show="getAyoStatus">
-                  <NuxtLink
-                    to="/reports/mekmar/country-order"
-                    class="dropdown-item"
-                    >Country Orders</NuxtLink
-                  >
-                </li>
-                <li v-show="getAyoStatus">
-                  <NuxtLink
-                    to="/reports/mekmar/supplier-cost"
-                    class="dropdown-item"
-                    >Supplier Cost</NuxtLink
-                  >
-                </li>
-                <li v-show="getAyoStatus">
-                  <NuxtLink
-                    to="/reports/mekmar/continent-order"
-                    class="dropdown-item"
-                    >Continent Orders</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                SAMPLE
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink to="/sample/sample" class="dropdown-item"
-                    >Sample List</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/sample/finance" class="dropdown-item"
-                    >Sample Finance</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item" v-show="!getAuthorityStatus">
-              <NuxtLink to="/offers" class="nav-link"
-                >QUOTES</NuxtLink
-              >
-            </li>
-            <li class="nav-item dropdown" v-show="!getAuthorityStatus">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                W. PANEL
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink
-                    to="/panel/products/published"
-                    class="dropdown-item"
-                    >Products (Published)</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/panel/products/notpublished"
-                    class="dropdown-item"
-                    >Products (Unpublished)</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/panel/project" class="dropdown-item"
-                    >Projects</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/panel/products/queue"
-                    class="dropdown-item"
-                    >Product Queue</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/panel/usa" class="dropdown-item"
-                    >USA Panel</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-        <div class="d-flex" v-show="!getAuthorityStatus">
+      <!-- Sag eylemler: icerigi DEGISMEDI, yalnizca yeri -->
+      <div class="gnav__actions">
           <div>
             <Button
               severity="danger" class="mr-5"
@@ -601,225 +130,70 @@
               @missing_document_selected_emit="missingDocumentSelected($event)"
             />
           </Drawer>
-        </div>
       </div>
-    </nav>
 
-    <nav
-      class="navbar navbar-expand-lg bg-body-tertiary"
-      style="font-size: 100%"
-      data-bs-theme="blue"
-      v-else
-    >
-      <div class="container-fluid" v-if="getUserId == 62">
-        <a class="navbar-brand" href="/">GOZ</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Yükleme
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/shipped"
-                    class="dropdown-item"
-                    >Yüklenen</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmar/forwarding"
-                    class="dropdown-item"
-                    >Yükleme Raporu</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="container-fluid" v-else>
-        <a class="navbar-brand" href="/">GOZ</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Mekmar Siparişler
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink
-                    to="/orders/production"
-                    class="dropdown-item"
-                    >Production</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/orders/shipped" class="dropdown-item"
-                    >Shipped</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink to="/orders/waiting" class="dropdown-item"
-                    >On Hold</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <NuxtLink
-                to="/reports/mekmer/productions"
-                class="nav-link"
-                >Siparişler</NuxtLink
-              >
-            </li>
-            <li class="nav-item">
-              <NuxtLink
-                to="/reports/mekmer/production"
-                class="nav-link"
-                >Üretim Raporu</NuxtLink
-              >
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Seleksiyon
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink to="/selection/input" class="dropdown-item"
-                    >Stok</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/stock"
-                    class="dropdown-item"
-                    >Stok Raporu</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Yükleme
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmer/shipped"
-                    class="dropdown-item"
-                    >Yüklenen</NuxtLink
-                  >
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/reports/mekmar/forwarding"
-                    class="dropdown-item"
-                    >Yükleme Raporu</NuxtLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <NuxtLink to="/reports/mekmer/finance" class="nav-link"
-                >Cari (Finans)</NuxtLink
-              >
-            </li>
-            <li class="nav-item">
-              <NuxtLink
-                to="/reports/mekmer/by-buying-production"
-                class="nav-link"
-                >Kasa Satış Fiyatı</NuxtLink
-              >
-            </li>
-            <li class="nav-item">
-              <NuxtLink
-                to="/reports/mekmer/calculating-cost"
-                class="nav-link"
-                >Muhasebe</NuxtLink
-              >
-            </li>
-            <li class="nav-item">
-              <NuxtLink to="/reports/mekmer/strips" class="nav-link"
-                >Strip & Moloz</NuxtLink
-              >
-            </li>
-            <li class="nav-item">
-              <NuxtLink to="/operation/shipment" class="nav-link"
-                >Sevk Et</NuxtLink
-              >
-            </li>
+      <!-- Dar ekran: menuyu acan dugme -->
+      <button
+        type="button"
+        class="gnav__burger"
+        :aria-expanded="String(mobilAcik)"
+        aria-controls="gnav-drawer"
+        aria-label="Menü"
+        @click="mobilAcik = !mobilAcik"
+      >
+        <i class="pi" :class="mobilAcik ? 'pi-times' : 'pi-bars'" aria-hidden="true" />
+      </button>
+    </div>
 
-            <li class="nav-item">
-              <NuxtLink
-                to="/reports/mekmer/new-mekmer-finance"
-                class="nav-link"
-                >Mekmer Finans</NuxtLink
-              >
-            </li>
+    <!--
+      DAR EKRAN MENUSU -- acilir panel yerine KATLANIR BOLUMLER.
+      Ust uste acilan dropdown'lar dar ekranda kullanilabilir degil;
+      burada her grup yerinde aciliyor ve liste dikeyde akiyor.
+    -->
+    <div v-show="mobilAcik" id="gnav-drawer" class="gnav__drawer">
+      <template v-for="(g, i) in menu" :key="'m' + g.label + i">
+        <template v-if="gorunur(g)">
+          <NuxtLink
+            v-if="g.to"
+            :to="g.to"
+            class="gnav__dlink"
+            :class="{ 'gnav__dlink--active': aktifYol(g.to) }"
+            @click="hepsiniKapat"
+          >
+            {{ g.label }}
+          </NuxtLink>
 
-            <li class="nav-item">
-              <NuxtLink to="/operation/cards" class="nav-link"
-                >Product Data</NuxtLink
+          <div v-else class="gnav__dgrp">
+            <button
+              type="button"
+              class="gnav__dhead"
+              :aria-expanded="String(acikMobil === i)"
+              @click="acikMobil = acikMobil === i ? null : i"
+            >
+              <span>{{ g.label }}</span>
+              <i
+                class="pi"
+                :class="acikMobil === i ? 'pi-chevron-down' : 'pi-chevron-right'"
+                aria-hidden="true"
+              />
+            </button>
+            <div v-show="acikMobil === i" class="gnav__dlist">
+              <NuxtLink
+                v-for="it in gorunenler(g)"
+                :key="'m' + it.to + it.label"
+                :to="it.to"
+                class="gnav__dlink gnav__dlink--sub"
+                :class="{ 'gnav__dlink--active': aktifYol(it.to) }"
+                @click="hepsiniKapat"
               >
-            </li>
-            <li class="nav-item">
-              <NuxtLink to="/customer/mekmar" class="nav-link"
-                >Sale Customers</NuxtLink
-              >
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </div>
+                {{ it.label }}
+              </NuxtLink>
+            </div>
+          </div>
+        </template>
+      </template>
+    </div>
+  </header>
 </template>
 <script>
 import { useAuthStore } from "~/stores/auth"
@@ -827,6 +201,7 @@ import { useAuthorityStore } from "~/stores/authority"
 import { useSharedStore } from "~/stores/shared"
 import { useTodoStore } from "~/stores/todo"
 import { useUploadStore } from "~/stores/upload"
+import { NAV_FULL, NAV_62, NAV_RESTRICTED } from "~/utils/navMenu"
 
 export default {
   /*
@@ -871,6 +246,28 @@ export default {
    *   (useCookie). localStorage kopyasi kullanilmadigi icin yazilmiyor da.
    */
   computed: {
+    /*
+     * HANGI MENU -- eski sablondaki uc ayri navbar'in karsiligi:
+     *   !getAuthorityStatus            -> tam menu
+     *   getAuthorityStatus & id == 62  -> yalnizca Yukleme
+     *   getAuthorityStatus & digerleri -> kisitli liste
+     * Kosullar birebir korundu.
+     */
+    menu() {
+      if (!this.getAuthorityStatus) return NAV_FULL
+      return String(this.getUserId) === "62" ? NAV_62 : NAV_RESTRICTED
+    },
+
+    /* Oge bazli kosullarin cozumu. Sablonda string olarak duruyor
+       (navMenu.ts `when`), karsiligi burada. */
+    kosullar() {
+      return {
+        canSeePasswords: this.canSeePasswords,
+        getAyoStatus: this.getAyoStatus,
+        getAuthorityStatus: this.getAuthorityStatus,
+        "!getAuthorityStatus": !this.getAuthorityStatus,
+      }
+    },
     auth() {
       return useAuthStore()
     },
@@ -936,6 +333,10 @@ export default {
 
   data() {
     return {
+      /* Acik olan masaustu grubu / mobil bolum; null = kapali. */
+      acikGrup: null,
+      acikMobil: null,
+      mobilAcik: false,
       userId: null,
       visibleRight: false,
       missing_document_visible: false,
@@ -949,6 +350,24 @@ export default {
   },
 
   mounted() {
+    /*
+     * Acilir menuyu DISARI TIKLAYINCA ve Escape ile kapat.
+     *
+     * Bootstrap'in dropdown'u kullanilmiyor artik: o, CDN'den gelen
+     * bootstrap.bundle betigine bagliydi ve menunun davranisi bizim
+     * elimizde degildi (ic ice panel, klavye, aktif durum). Kendi
+     * mantigimiz 15 satir ve tamamen denetimimizde.
+     */
+    this.__disariTikla = (e) => {
+      if (!this.$el || this.$el.contains(e.target)) return
+      this.acikGrup = null
+    }
+    this.__escKapat = (e) => {
+      if (e.key === "Escape") this.hepsiniKapat()
+    }
+    document.addEventListener("click", this.__disariTikla)
+    document.addEventListener("keydown", this.__escKapat)
+
     /*
      * Todo listesi SSR'DA DEGIL, yalnizca client'ta cekiliyor.
      *
@@ -981,6 +400,13 @@ export default {
    * cekiyor. Giris sayfasi da kendi tarafinda cagiriyor (app/pages/auth.vue);
    * ikisi birbirinin yedegi, mukerrer cagri zararsiz.
    */
+  beforeUnmount() {
+    /* Dinleyiciler GLOBAL: kaldirilmazsa her gezintide bir kopya daha
+       birikir ve kaldirilmis bilesene referans tutar. */
+    document.removeEventListener("click", this.__disariTikla)
+    document.removeEventListener("keydown", this.__escKapat)
+  },
+
   watch: {
     isLoggedIn(loggedIn) {
       if (!loggedIn) return
@@ -990,6 +416,33 @@ export default {
   },
 
   methods: {
+    /* navMenu.ts'teki `when` -> gercek deger. Kosulsuz oge daima acik. */
+    gorunur(x) {
+      return x.when === undefined ? true : !!this.kosullar[x.when]
+    },
+
+    gorunenler(g) {
+      return (g.items || []).filter((it) => this.gorunur(it))
+    },
+
+    aktifYol(yol) {
+      return this.$route.path === yol
+    },
+
+    /* Grup basligi, icindeki ogelerden biri aciksa vurgulanir. */
+    grupAktif(g) {
+      return (g.items || []).some((it) => this.aktifYol(it.to))
+    },
+
+    grupAc(i) {
+      this.acikGrup = this.acikGrup === i ? null : i
+    },
+
+    hepsiniKapat() {
+      this.acikGrup = null
+      this.mobilAcik = false
+    },
+
     /* Kullanici adi cerezi okunabiliyorsa todo listesini ceker. */
     loadTodoList() {
       if (!this.isLoggedIn) return
@@ -1109,55 +562,320 @@ export default {
 </script>
 
 <style scoped>
-.navbar-brand {
-  color: #108dcf;
-  animation: color 5s linear 0s infinite alternate;
-  font-weight: bold;
+/*
+ * ANA MENU -- gorunum.
+ *
+ * Bootstrap'in `navbar` bilesenleri BIRAKILDI: dropdown'lari CDN'den
+ * gelen bootstrap.bundle betigine bagliydi, yani menunun davranisi
+ * (ic ice panel, klavye, aktif durum) bizim elimizde degildi.
+ * Yerlesim burada, davranis bilesende.
+ *
+ * Olculer tek yerden: yukseklik, renkler ve kenarlar asagidaki
+ * degiskenlerde.
+ */
+.gnav {
+  --g-h: 56px;
+  --g-ink: #0f172a;
+  --g-muted: #64748b;
+  --g-line: #e2e8f0;
+  --g-surface: #ffffff;
+  --g-accent: #1d4ed8;
+  --g-accent-soft: #eef2ff;
+
+  position: sticky;
+  top: 0;
+  z-index: 1040;
+
+  background: var(--g-surface);
+  border-bottom: 1px solid var(--g-line);
 }
 
-@keyframes color {
-  10% { color: #108dcf; }
-  20% { color: #64b22f; }
-  30% { color: #108dcf; }
-  40% { color: #64b22f; }
-  50% { color: #108dcf; }
-  60% { color: #64b22f; }
-  70% { color: #108dcf; }
-  80% { color: #64b22f; }
-  90% { color: #108dcf; }
-  100% { color: #64b22f; }
+.gnav__bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  min-height: var(--g-h);
+  padding: 0 16px;
 }
 
-.nav-link {
-  font-size: 15px;
-  font-weight: bold;
-}
+/* ---------- marka ---------- */
 
-.dropdown-item {
-  font-size: 13px;
+.gnav__brand {
+  display: inline-flex;
+  flex: none;
+  gap: 9px;
+  align-items: center;
+
+  margin-right: 6px;
+
+  text-decoration: none;
 }
 
 /*
- * Orijinaldeki bos "@media (min-width: 576px) {}" blogu kaldirildi.
- * Kalan kademeler aynen korundu.
+ * Marka isareti. Eskiden "GOZ" yazisi 5 saniyede bir mavi/yesil
+ * arasinda RENK DEGISTIRIYORDU (sonsuz animasyon); hareketli bir oge
+ * surekli goz cekiyor ve profesyonel durmuyordu. Yerine sabit bir
+ * isaret.
  */
-@media (min-width: 768px) {
-  .nav-link { font-size: 9px; }
-  .dropdown-item { font-size: 7px; }
+.gnav__mark {
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(140deg, #1d4ed8, #0f766e);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 25%);
 }
 
-@media (min-width: 992px) {
-  .nav-link { font-size: 11px; }
-  .dropdown-item { font-size: 9px; }
+.gnav__word {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--g-ink);
 }
 
-@media (min-width: 1200px) {
-  .nav-link { font-size: 13px; }
-  .dropdown-item { font-size: 11px; }
+/* ---------- masaustu menusu ---------- */
+
+.gnav__menu {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  gap: 2px;
+  align-items: center;
+  min-width: 0;
 }
 
-@media (min-width: 1400px) {
-  .nav-link { font-size: 15px; }
-  .dropdown-item { font-size: 13px; }
+.gnav__grp {
+  position: relative;
+}
+
+.gnav__top {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+
+  height: 34px;
+  padding: 0 10px;
+
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--g-muted);
+  text-decoration: none;
+  white-space: nowrap;
+
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.gnav__top:hover {
+  color: var(--g-ink);
+  background: #f1f5f9;
+}
+
+/* Acik grup ile AKTIF sayfa farkli: biri gecici, oteki konum. */
+.gnav__top--open {
+  color: var(--g-ink);
+  background: #f1f5f9;
+}
+
+.gnav__top--active {
+  color: var(--g-accent);
+  background: var(--g-accent-soft);
+}
+
+.gnav__chev {
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+/* ---------- acilir panel ---------- */
+
+.gnav__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 6px;
+
+  background: var(--g-surface);
+  border: 1px solid var(--g-line);
+  border-radius: 12px;
+  box-shadow:
+    0 12px 28px -12px rgb(15 23 42 / 25%),
+    0 2px 6px -2px rgb(15 23 42 / 8%);
+}
+
+.gnav__item {
+  padding: 8px 10px;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  white-space: nowrap;
+
+  border-radius: 7px;
+}
+
+.gnav__item:hover {
+  color: var(--g-ink);
+  background: #f1f5f9;
+}
+
+.gnav__item--active {
+  font-weight: 650;
+  color: var(--g-accent);
+  background: var(--g-accent-soft);
+}
+
+/* ---------- sag eylemler ---------- */
+
+.gnav__actions {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* Eski sablondaki satir ici olculer (2rem ikon, mr-5) yerine
+   hizalanmis bir serit. */
+.gnav__actions :deep(.pi) {
+  font-size: 1.25rem !important;
+}
+
+.gnav__actions :deep(.p-button) {
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+/* ---------- dar ekran ---------- */
+
+.gnav__burger {
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  color: var(--g-ink);
+
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.gnav__burger:hover {
+  background: #f1f5f9;
+}
+
+.gnav__drawer {
+  display: none;
+}
+
+/*
+ * 1200px: menude 13 ust seviye baslik var; bunun altinda yatay sira
+ * tasiyor ve basliklar ikinci satira dusup cubugu iki kata cikariyor.
+ * Esik genis tutuldu, cunku tasma baslamadan once gecmek gerekiyor.
+ */
+@media (max-width: 1199.98px) {
+  .gnav__menu {
+    display: none;
+  }
+
+  .gnav__burger {
+    display: grid;
+    place-items: center;
+  }
+
+  .gnav__actions {
+    margin-left: auto;
+  }
+
+  .gnav--open .gnav__drawer {
+    display: flex;
+    flex-direction: column;
+
+    /* Cubugun altindan ekran sonuna kadar; uzun menu kendi icinde kayar. */
+    max-height: calc(100dvh - var(--g-h));
+    padding: 8px 10px 16px;
+    overflow-y: auto;
+
+    border-top: 1px solid var(--g-line);
+  }
+}
+
+.gnav__dlink {
+  display: block;
+
+  /* 44px dokunma hedefi. */
+  padding: 12px 12px;
+
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #334155;
+  text-decoration: none;
+
+  border-radius: 9px;
+}
+
+.gnav__dlink--sub {
+  padding-left: 24px;
+  font-weight: 500;
+  color: var(--g-muted);
+}
+
+.gnav__dlink--active {
+  color: var(--g-accent);
+  background: var(--g-accent-soft);
+}
+
+.gnav__dhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #334155;
+  text-align: left;
+
+  background: none;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.gnav__dhead:hover {
+  background: #f1f5f9;
+}
+
+.gnav__dhead .pi {
+  font-size: 11px;
+  color: var(--g-muted);
+}
+
+.gnav__dlist {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 4px;
 }
 </style>

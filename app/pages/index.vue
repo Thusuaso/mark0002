@@ -1,22 +1,16 @@
 <template>
   <div class="container">
-    <HomeDashboard
-      :home="homeStore.getHomeList"
-      :stocks="homeStore.getMekmerStocks"
-      :total-supplier-cost="homeStore.getTotalSupplierCost"
-    />
-
     <!--
-      ANDROID UYGULAMASI -- panelin ALTINDA.
+      ANDROID UYGULAMASI -- sayfanin USTUNDE, navbar'in hemen altinda.
 
       Once navbar'daydi: orada ~190px yer kapliyor ve sagdaki Logout
       ile takvim simgesini ekran disina itiyordu. Menude yeri de yoktu
       zaten -- bir ekran degil, bir indirme.
 
-      Ana sayfanin altinda duruyor cunku bir kez yapilan bir is:
-      kullanici her gun gormek zorunda degil, ama aradiginda nerede
-      oldugunu bilecegi bir yer gerekiyor. Panelin isini bitirdigi
-      yerde, kendi serisi olarak.
+      Ustte duruyor cunku panelin altinda kaydirmadan goruluyordu:
+      ana sayfa uzun (KPI kartlari + grafikler + tablolar) ve serit
+      ancak sonuna kadar inince ortaya cikiyordu. Uygulamadan haberi
+      olmayan kisi oraya hic inmez.
 
       Kabukta GOSTERILMIYOR (v-if): uygulamanin icinde "uygulamayi
       indir" demek anlamsiz.
@@ -39,6 +33,13 @@
         Download Android App
       </NuxtLink>
     </section>
+
+    <HomeDashboard
+      :home="homeStore.getHomeList"
+      :stocks="homeStore.getMekmerStocks"
+      :total-supplier-cost="homeStore.getTotalSupplierCost"
+    />
+
   </div>
 </template>
 
