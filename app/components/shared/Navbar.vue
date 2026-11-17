@@ -8,21 +8,6 @@
     >
       <div class="container-fluid">
         <a class="navbar-brand" href="/">GOZ</a>
-
-        <!--
-          ANDROID UYGULAMASI. Ucu de ayni: navbar UC KEZ yaziliyor
-          (tam menu, userId 62, ve kisitli kullanicilar) ve her birinde
-          ayri bir marka satiri var. Baglanti marka ile menunun ARASINDA
-          duruyor; menu ogelerinin arasina girmiyor, cunku bir ekran
-          degil bir indirme.
-
-          getAuthorityStatus ile GIZLENMIYOR -- kisitli kullanicilar
-          (saha tarafi) uygulamaya en cok ihtiyaci olanlar.
-        -->
-        <NuxtLink to="/app" class="android-link">
-          <i class="pi pi-android" aria-hidden="true" />
-          <span>Download Android App</span>
-        </NuxtLink>
         <button
           class="navbar-toggler"
           type="button"
@@ -544,6 +529,27 @@
                 </li>
               </ul>
             </li>
+            <!--
+              ANDROID UYGULAMASI -- menu listesinin SONUNDA.
+
+              Once marka ile menunun arasindaydi; orada ~190px yer
+              kapliyor ve sagdaki Logout ile takvim simgesini ekran
+              disina itiyordu. Listenin icinde oldugu icin artik dar
+              ekranda menuyle BIRLIKTE katlaniyor ve kimsenin yerini
+              almiyor.
+
+              Ucu de ayni: navbar bu bilesende UC KEZ yaziliyor (tam
+              menu, userId 62, kisitli kullanicilar) ve her birinin
+              kendi listesi var. getAuthorityStatus ile gizlenmiyor --
+              kisitli kullanicilar saha tarafi, uygulamaya en cok
+              ihtiyaci olanlar onlar.
+            -->
+            <li class="nav-item">
+              <NuxtLink to="/app" class="android-link">
+                <i class="pi pi-android" aria-hidden="true" />
+                <span>Download Android App</span>
+              </NuxtLink>
+            </li>
           </ul>
         </div>
         <div class="d-flex" v-show="!getAuthorityStatus">
@@ -628,21 +634,6 @@
     >
       <div class="container-fluid" v-if="getUserId == 62">
         <a class="navbar-brand" href="/">GOZ</a>
-
-        <!--
-          ANDROID UYGULAMASI. Ucu de ayni: navbar UC KEZ yaziliyor
-          (tam menu, userId 62, ve kisitli kullanicilar) ve her birinde
-          ayri bir marka satiri var. Baglanti marka ile menunun ARASINDA
-          duruyor; menu ogelerinin arasina girmiyor, cunku bir ekran
-          degil bir indirme.
-
-          getAuthorityStatus ile GIZLENMIYOR -- kisitli kullanicilar
-          (saha tarafi) uygulamaya en cok ihtiyaci olanlar.
-        -->
-        <NuxtLink to="/app" class="android-link">
-          <i class="pi pi-android" aria-hidden="true" />
-          <span>Download Android App</span>
-        </NuxtLink>
         <button
           class="navbar-toggler"
           type="button"
@@ -683,26 +674,32 @@
                 </li>
               </ul>
             </li>
+            <!--
+              ANDROID UYGULAMASI -- menu listesinin SONUNDA.
+
+              Once marka ile menunun arasindaydi; orada ~190px yer
+              kapliyor ve sagdaki Logout ile takvim simgesini ekran
+              disina itiyordu. Listenin icinde oldugu icin artik dar
+              ekranda menuyle BIRLIKTE katlaniyor ve kimsenin yerini
+              almiyor.
+
+              Ucu de ayni: navbar bu bilesende UC KEZ yaziliyor (tam
+              menu, userId 62, kisitli kullanicilar) ve her birinin
+              kendi listesi var. getAuthorityStatus ile gizlenmiyor --
+              kisitli kullanicilar saha tarafi, uygulamaya en cok
+              ihtiyaci olanlar onlar.
+            -->
+            <li class="nav-item">
+              <NuxtLink to="/app" class="android-link">
+                <i class="pi pi-android" aria-hidden="true" />
+                <span>Download Android App</span>
+              </NuxtLink>
+            </li>
           </ul>
         </div>
       </div>
       <div class="container-fluid" v-else>
         <a class="navbar-brand" href="/">GOZ</a>
-
-        <!--
-          ANDROID UYGULAMASI. Ucu de ayni: navbar UC KEZ yaziliyor
-          (tam menu, userId 62, ve kisitli kullanicilar) ve her birinde
-          ayri bir marka satiri var. Baglanti marka ile menunun ARASINDA
-          duruyor; menu ogelerinin arasina girmiyor, cunku bir ekran
-          degil bir indirme.
-
-          getAuthorityStatus ile GIZLENMIYOR -- kisitli kullanicilar
-          (saha tarafi) uygulamaya en cok ihtiyaci olanlar.
-        -->
-        <NuxtLink to="/app" class="android-link">
-          <i class="pi pi-android" aria-hidden="true" />
-          <span>Download Android App</span>
-        </NuxtLink>
         <button
           class="navbar-toggler"
           type="button"
@@ -859,6 +856,27 @@
               <NuxtLink to="/customer/mekmar" class="nav-link"
                 >Sale Customers</NuxtLink
               >
+            </li>
+            <!--
+              ANDROID UYGULAMASI -- menu listesinin SONUNDA.
+
+              Once marka ile menunun arasindaydi; orada ~190px yer
+              kapliyor ve sagdaki Logout ile takvim simgesini ekran
+              disina itiyordu. Listenin icinde oldugu icin artik dar
+              ekranda menuyle BIRLIKTE katlaniyor ve kimsenin yerini
+              almiyor.
+
+              Ucu de ayni: navbar bu bilesende UC KEZ yaziliyor (tam
+              menu, userId 62, kisitli kullanicilar) ve her birinin
+              kendi listesi var. getAuthorityStatus ile gizlenmiyor --
+              kisitli kullanicilar saha tarafi, uygulamaya en cok
+              ihtiyaci olanlar onlar.
+            -->
+            <li class="nav-item">
+              <NuxtLink to="/app" class="android-link">
+                <i class="pi pi-android" aria-hidden="true" />
+                <span>Download Android App</span>
+              </NuxtLink>
             </li>
           </ul>
         </div>
@@ -1155,8 +1173,9 @@ export default {
 
 <style scoped>
 /*
- * Android indirme baglantisi: markanin yaninda, menuden once.
- * Dikkat cekmeli ama menuyle yarismamali -- bu yuzden dolgulu bir
+ * Android indirme baglantisi -- menu listesinin SON ogesi.
+ *
+ * Dikkat cekmeli ama menu baglantilariyla yarismamali: dolgulu bir
  * dugme degil, ince cerceveli bir hap.
  */
 .android-link {
@@ -1165,7 +1184,6 @@ export default {
   align-items: center;
 
   padding: 5px 12px;
-  margin-left: 14px;
 
   font-size: 13px;
   font-weight: 600;
@@ -1191,16 +1209,31 @@ export default {
   font-size: 14px;
 }
 
-/* Dar ekranda yazi dusuyor, ikon kaliyor: marka ve menu dugmesiyle
-   ayni satirda yer kalmiyor. */
-@media (max-width: 575.98px) {
-  .android-link span {
-    display: none;
-  }
-
+/*
+ * GENIS EKRAN: menu YATAY. Hap son baglantiya yapismasin diye solunda
+ * bosluk, ve dikeyde ortalansin diye kucuk bir ust bosluk.
+ *
+ * 992px: navbar-expand-lg'nin kirilma noktasi -- bunun ustunde menu
+ * yatay, altinda katlanip dikey oluyor.
+ */
+@media (min-width: 992px) {
   .android-link {
-    padding: 5px 9px;
-    margin-left: 8px;
+    margin-top: 2px;
+    margin-left: 10px;
+  }
+}
+
+/*
+ * DAR EKRAN: menu katlanmis, ogeler alt alta. Hap kendi satirinda,
+ * icerige gore genis -- `inline-flex` zaten bunu veriyor, yalnizca
+ * ustunde biraz nefes ve solda menu ogeleriyle ayni hiza gerekiyor.
+ *
+ * Yazi GIZLENMIYOR: katlanmis menude genislik sorunu yok, ikonu tek
+ * basina birakmak ne oldugunu anlamsizlastirirdi.
+ */
+@media (max-width: 991.98px) {
+  .android-link {
+    margin-top: 8px;
   }
 }
 
