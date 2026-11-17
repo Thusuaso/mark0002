@@ -29,6 +29,16 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.2",
+    date: "2026-11-17",
+    notes: [
+      "Stock Report telefon için yeniden tasarlandı: sekiz kolonluk tablo yerine kart listesi — solda ürün, kategori, yüzey ve ebat, sağda m² ve kasa sayısı.",
+      "Liste türü (Only Stock, External, Mekmer…) yedi radyo düğmesi yerine tek seçiciye indi.",
+      "Üstte sabit arama kutusu: ürün, kategori veya yüzeye göre.",
+      "Uzun listeler parça parça yükleniyor; sayfa numaraları arasında gidip gelmek yok.",
+    ],
+  },
+  {
     version: "1.0.1",
     date: "2026-11-16",
     notes: [

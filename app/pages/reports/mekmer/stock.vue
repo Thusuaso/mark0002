@@ -1,6 +1,27 @@
 <template>
   <div class="container">
-    <div class="flex flex-wrap gap-3 mb-3 ml-3">
+    <!--
+      MOBIL: yedi radyo dugmesi yerine tek secici.
+      Telefonda yan yana yedi secenek sikisiyor ve dokunma hedefleri
+      birbirine giriyor; native <select> hem tek satir hem de isletim
+      sisteminin kendi secicisini aciyor.
+    -->
+    <div v-if="isMobile" class="st-mbar">
+      <label for="st-kind" class="st-mbar__label">Liste</label>
+      <select
+        id="st-kind"
+        class="st-mbar__select"
+        :value="ingredient"
+        @change="mobilTurDegisti($event)"
+      >
+        <option v-for="o in STOCK_OPTIONS" :key="o.value" :value="o.value">
+          {{ o.label }}
+        </option>
+      </select>
+      <Button severity="success" label="Excel" @click="excel_output" />
+    </div>
+
+    <div v-else class="flex flex-wrap gap-3 mb-3 ml-3">
       <div class="flex align-items-center">
         <RadioButton v-model="ingredient" inputId="stockKind_stock" value="Stock" @change="statusSelect($event)" />
         <label for="stockKind_stock" class="ml-2">Only Stock</label>
@@ -34,7 +55,14 @@
       </div>
     </div>
 
+    <ReportsMekmerStockCards
+      v-if="isMobile"
+      :list="reportsStore.getReportsMekmerStockList"
+      :total="reportsStore.getReportsMekmerStockListTotal"
+      @reports_mekmer_stock_list_selected_emit="reportsMekmerStockListSelected($event)"
+    />
     <ReportsMekmerStockList
+      v-else
       :list="reportsStore.getReportsMekmerStockList"
       :total="reportsStore.getReportsMekmerStockListTotal"
       @reports_mekmer_stock_list_selected_emit="reportsMekmerStockListSelected($event)"
@@ -65,6 +93,22 @@ import { useSharedStore } from "~/stores/shared"
  * Esleme Nuxt 2'deki iki zincirden BIREBIR cikarildi; hicbir secenek
  * eklenmedi veya cikarilmadi.
  */
+/*
+ * Mobil secicinin secenekleri. Etiketler masaustundeki radyo
+ * etiketlerinden BIREBIR alindi; sira da ayni. Anahtarlar
+ * STOCK_KINDS ile ortusmek ZORUNDA -- asagidaki kontrol bunu
+ * derleme sirasinda degil ama ilk yuklemede yakaliyor.
+ */
+const STOCK_OPTIONS = [
+  { value: "Stock", label: "Only Stock" },
+  { value: "Outer", label: "External" },
+  { value: "Mekmer", label: "Ext. Crates in Mekmer" },
+  { value: "MekmerIn", label: "Mekmer" },
+  { value: "MekmerOnlyStocks", label: "Mekmer (Only Stocks)" },
+  { value: "Mek-Moz", label: "Mek-Moz" },
+  { value: "All", label: "All" },
+]
+
 const STOCK_KINDS = {
   All: { list: "setReportsMekmerStockList", detail: "setReportsAllStockListDetail" },
   Stock: { list: "setReportsMekmerStockListStock", detail: "setReportsStockStockListDetail" },
@@ -91,6 +135,9 @@ export default {
     return {
       reports_mekmer_stock_dialog: false,
       ingredient: "All",
+      /* Sablonun erisebilmesi icin: modul duzeyindeki sabitler
+         Options API sablonlarindan gorunmuyor. */
+      STOCK_OPTIONS,
     }
   },
 
@@ -142,6 +189,13 @@ export default {
       const kind = STOCK_KINDS[this.ingredient]
       if (kind) this.reportsStore[kind.list]()
     },
+
+    /* Mobil <select> -- radyo dugmeleriyle AYNI yolu kullaniyor:
+       once secimi yaz, sonra listeyi cek. */
+    mobilTurDegisti(event) {
+      this.ingredient = event.target.value
+      this.statusSelect()
+    },
   },
 }
 </script>
@@ -157,6 +211,9 @@ export default {
  * server: false ZORUNLU -- legacy Express API'si SSR'in IC fetch yolunda
  * calismiyor (bkz. server/middleware/1.legacy-api.ts).
  */
+/* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+const isMobile = useRuntimeConfig().public.isMobile
+
 const reportsStore = useReportsStore()
 
 await useAsyncData(
@@ -168,6 +225,41 @@ await useAsyncData(
   { server: false },
 )
 </script>
+
+<style scoped>
+/* Mobil ust cubuk: liste turu + Excel, tek satirda. */
+.st-mbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px 0;
+}
+
+.st-mbar__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4b5563;
+}
+
+.st-mbar__select {
+  flex-grow: 1;
+  min-width: 0;
+  /* 44px dokunma hedefi; 16px yazi iOS'un kendiliginden
+     yakinlastirmasini engelliyor. */
+  min-height: 44px;
+  padding: 0 10px;
+
+  font-family: inherit;
+  font-size: 16px;
+  color: #111827;
+
+  background: #ffffff;
+  border: 1px solid #d6dae1;
+  border-radius: 10px;
+}
+</style>
 
 <!--
   pages/reports/mekmer/stock.vue
