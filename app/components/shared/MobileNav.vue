@@ -43,7 +43,7 @@
       </template>
 
       <NuxtLink to="/app" class="mnav__version" @click="open = false">
-        Sürüm {{ surum }} · yenilikler
+        Version {{ surum }} · what's new
       </NuxtLink>
     </nav>
   </header>

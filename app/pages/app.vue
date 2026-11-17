@@ -6,27 +6,27 @@
       </div>
       <div>
         <p class="apk__eyebrow">GOZ · Android</p>
-        <h1 class="apk__title">Uygulamayı indir</h1>
+        <h1 class="apk__title">Download the app</h1>
       </div>
-      <span class="apk__badge">Sürüm {{ guncel.version }}</span>
+      <span class="apk__badge">Version {{ guncel.version }}</span>
     </header>
 
     <section class="apk__dl">
       <a class="apk__btn" :href="apkUrl" download>
         <i class="pi pi-download" aria-hidden="true" />
-        APK indir · {{ guncel.version }}
+        Download APK · {{ guncel.version }}
       </a>
       <p class="apk__hint">
-        Telefonda bu sayfayı açıp indir. Kurulum sırasında Android
-        “bilinmeyen kaynak” uyarısı verirse, bu uygulama mağazada
-        olmadığı içindir — izin verip devam et. Güncelleme çıktığında
-        aynı adresten yeni sürümü indirip üstüne kur, verilerin
-        etkilenmez.
+        Open this page on your phone and tap download. If Android warns
+        about an “unknown source”, that is because the app is not on the
+        Play Store — allow it and carry on. When a new version comes out,
+        download it from the same address and install it over the old
+        one; your data is not affected.
       </p>
     </section>
 
     <section>
-      <h2 class="apk__h2">Sürüm notları</h2>
+      <h2 class="apk__h2">Release notes</h2>
 
       <article v-for="(r, i) in releases" :key="r.version" class="apk__rel">
         <div class="apk__rel-head">
@@ -34,7 +34,7 @@
             {{ r.version }}
           </span>
           <span class="apk__rel-date">{{ tarih(r.date) }}</span>
-          <span v-if="i === 0" class="apk__rel-tag">güncel</span>
+          <span v-if="i === 0" class="apk__rel-tag">latest</span>
         </div>
         <ul class="apk__notes">
           <li v-for="(n, j) in r.notes" :key="j">{{ n }}</li>
@@ -75,7 +75,7 @@ function tarih(iso) {
   return `${iki(d.getDate())}.${iki(d.getMonth() + 1)}.${d.getFullYear()}`
 }
 
-useHead({ title: "GOZ · Android uygulaması" })
+useHead({ title: "GOZ · Android app" })
 </script>
 
 <style scoped>
