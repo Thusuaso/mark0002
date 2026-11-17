@@ -29,6 +29,15 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.3",
+    date: "2026-11-17",
+    notes: [
+      "Sale Customers telefon için yeniden tasarlandı: firma adı başlıkta, ülke bayrağıyla birlikte; adres iki satırda kısaltılıyor, temsilci ve satışçı altta. Devir/Özel işaretleri her satırda ✓/X yerine yalnızca geçerliyse rozet olarak çıkıyor.",
+      "Selection › Entry telefon için yeniden tasarlandı: kart başlığı kasa numarası, altında ürün ve ebat, en altta miktar / kutu / kutuda sayıları tek şerit halinde.",
+      "Her iki ekranda da üstte sabit arama kutusu ve parçalı yükleme var.",
+    ],
+  },
+  {
     version: "1.0.2",
     date: "2026-11-17",
     notes: [

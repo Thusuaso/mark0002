@@ -5,7 +5,14 @@
       @products_status_selected="productsStatusSelected($event)"
       @selection_production_dialog="selection_production_dialog_form = true"
     />
+    <SelectionInputCards
+      v-if="isMobile"
+      :products="selectionStore.getProductList"
+      :total="selectionStore.getProductionSumTotal"
+      @product_selected_emit="productSelectedEmit($event)"
+    />
     <SelectionInputList
+      v-else
       :products="selectionStore.getProductList"
       :total="selectionStore.getProductionSumTotal"
       @product_selected_emit="productSelectedEmit($event)"
@@ -103,6 +110,9 @@ export default {
 </script>
 
 <script setup>
+/* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+const isMobile = useRuntimeConfig().public.isMobile
+
 /*
  * CANLI TAZELEME -- kaynaktaki hali UC YERDEN YANLISTI:
  *

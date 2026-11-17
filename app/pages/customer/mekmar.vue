@@ -12,7 +12,13 @@
       </div>
 
       </div>
+    <CustomerMekmarCards
+      v-if="isMobile"
+      :list="customerStore.getMekmarList"
+      @customer_mekmar_selected_emit="customerMekmarSelected($event)"
+    />
     <CustomerMekmarList
+      v-else
       :list="customerStore.getMekmarList"
       @customer_mekmar_selected_emit="customerMekmarSelected($event)"
     />
@@ -163,6 +169,9 @@ export default {
 };
 </script>
 <script setup>
+/* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+const isMobile = useRuntimeConfig().public.isMobile
+
 /*
  * definePageMeta yalnizca <script setup> icinde cagrilabilir -> Options
  * API sayfalarinda ikinci bir script blogu gerekiyor.
