@@ -7,24 +7,30 @@
  * etkilenmiyor. Kosulu kaldirmak masaustunu bozar.
  *
  * NEDEN GLOBAL BIR KATMAN, NEDEN HER DIALOG TEK TEK DEGIL:
- * Kapsamdaki 11 ekranda 20 dialog var ve hepsi ayni uc seyden
- * kiriliyordu -- sabit genislik, ic icerigin masaustu izgarasinda
- * kalmasi, ve ic tablolarin tasmasi. Yirmi bileseni tek tek duzeltmek
- * hem ayni degisikligi yirmi kez yazmak hem de yenisi eklendiginde
- * yine kirik baslamak demekti.
+ * Kapsamdaki 11 ekranda 20 dialog var ve hepsi ayni kaliplari
+ * kullaniyor -- yan yana form alanlari, uzerine yuzen etiketler, genis
+ * tablolar. Yirmi bileseni tek tek duzeltmek hem ayni degisikligi
+ * yirmi kez yazmak hem de yenisi eklendiginde yine kirik baslamak
+ * demekti. Dialoglarin telefonda nasil gorundugu tek yerden
+ * belirleniyor.
  */
 
+:root {
+  --mdlg-ink: #111827;
+  --mdlg-muted: #4b5563;
+  --mdlg-line: #e2e5ea;
+  --mdlg-ground: #f6f7f9;
+  --mdlg-accent: #1d4ed8;
+}
+
 /* ==========================================================================
-   DIALOG
+   DIALOG CERCEVESI
    ========================================================================== */
 
 /*
- * TAM EKRAN. PrimeVue dialog'u varsayilan olarak icerige gore
- * buyuyor; sayfalar ayrica :style="{width:'100%'}" ve breakpoints
- * veriyor. Telefonda sonuc, kenarlardan birkac piksel bosluk birakan
- * ama icerigi yine sikistiran bir kutu oluyordu. Tam ekran hem o
- * bosluklari geri kazaniyor hem de "ayri bir sayfadayim" hissi veriyor
- * -- dar ekranda dogru olan bu.
+ * TAM EKRAN. Varsayilan dialog icerige gore buyuyor ve kenarlardan
+ * birkac piksel bosluk birakip icerigi yine sikistiriyordu. Dar
+ * ekranda dogru olan "ayri bir sayfa" hissi.
  */
 .p-dialog {
   width: 100vw !important;
@@ -33,6 +39,7 @@
   max-height: 100dvh !important;
   margin: 0 !important;
 
+  border: none !important;
   border-radius: 0 !important;
 }
 
@@ -41,40 +48,54 @@
 }
 
 /*
- * Baslik ustte SABIT kalsin: uzun formlarda kapatma dugmesi ekranin
- * disinda kaliyordu ve kullanici geri donmek icin sonuna kadar
- * kaydirmak zorundaydi.
+ * Baslik SABIT. Uzun formlarda kapatma dugmesi ekranin disinda
+ * kaliyordu; geri donmek icin sonuna kadar kaydirmak gerekiyordu.
+ *
+ * Dialoglarin cogu header="" ile aciliyor, yani baslik metni YOK --
+ * bu yuzden cubuk ince tutuldu, bos bir seride donusmesin.
  */
 .p-dialog .p-dialog-header {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
 
-  padding: 10px 12px;
-
+  min-height: 52px;
+  padding: 8px 10px;
   /* Centikli ekranlarda durum cubugunun altina girmesin. */
-  padding-top: max(10px, env(safe-area-inset-top));
+  padding-top: max(8px, env(safe-area-inset-top));
 
-  border-bottom: 1px solid #e2e5ea;
+  background: #ffffff;
+  border-bottom: 1px solid var(--mdlg-line);
 }
 
 .p-dialog .p-dialog-title {
   font-size: 15px;
+  font-weight: 650;
+  color: var(--mdlg-ink);
 }
 
-/* Kapatma dugmesi parmakla isabet edecek olcude. */
+/* Kapatma dugmesi parmakla isabet edecek olcude VE gorunur: bos
+   baslikta tek basina duruyor, silik olursa aranan sey oluyor. */
 .p-dialog .p-dialog-header-actions .p-button,
 .p-dialog .p-dialog-close-button {
-  width: 44px;
-  height: 44px;
+  width: 44px !important;
+  height: 44px !important;
+  color: var(--mdlg-ink) !important;
+  background: #f1f3f6 !important;
+  border-radius: 10px !important;
 }
 
+/*
+ * Govde ZEMINI gri, alanlar beyaz: bir bolumun nerede basladigi ve
+ * bittigi boylece goruluyor. Her sey beyazken 20 alan tek bir blok
+ * gibi akiyordu.
+ */
 .p-dialog .p-dialog-content {
-  /* Dikey kaydirma dialog'un KENDI icinde; arkadaki sayfa kaymasin. */
   flex: 1 1 auto;
   padding: 12px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  background: var(--mdlg-ground);
 }
 
 .p-dialog .p-dialog-footer {
@@ -88,80 +109,163 @@
   padding: 10px 12px;
   padding-bottom: max(10px, env(safe-area-inset-bottom));
 
-  border-top: 1px solid #e2e5ea;
+  background: #ffffff;
+  border-top: 1px solid var(--mdlg-line);
+}
+
+.p-dialog .p-dialog-footer .p-button {
+  flex: 1 1 140px;
+  justify-content: center;
+  min-height: 46px;
 }
 
 /* ==========================================================================
-   DIALOG ICERIGI -- masaustu izgaralari dar ekranda alt alta
+   DIALOG ICERIGI
    ========================================================================== */
 
 /*
- * Formlarin coğu Bootstrap `row > col-*` ya da PrimeFlex ile yan yana
- * diziliyor. 390px'te uc kolonluk bir satir, her alana ~120px birakiyor
- * ve etiketler kutularin ustune biniyordu. Dialog ICINDE hepsi tam
- * genislige geciyor.
- *
- * Yalnizca dialog icinde: sayfa govdesindeki izgaralar kendi mobil
- * duzenlerini zaten kuruyor (kart gorunumleri), onlara dokunulmuyor.
+ * Masaustu izgaralari alt alta. 390px'te uc kolonluk bir satir her
+ * alana ~120px birakiyor ve etiketler kutularin ustune biniyordu.
+ * Yalnizca dialog icinde -- sayfa govdesindeki kart gorunumleri kendi
+ * duzenlerini kuruyor.
  */
+.p-dialog-content .row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 !important;
+}
+
 .p-dialog-content .row > [class*="col"] {
   flex: 0 0 100% !important;
   width: 100% !important;
   max-width: 100% !important;
-  margin-bottom: 10px;
-}
-
-/* FloatLabel mutlak konumlu; alanlar alt alta gelince ustteki kutunun
-   icine giriyordu (ayni tuzak app.css icinde dar ekran icin anlatildi). */
-.p-dialog-content .p-floatlabel {
-  margin-top: 1.25rem;
 }
 
 /*
- * Girdiler tam genislik, 44px dokunma hedefi ve 16px yazi.
+ * Satir ici yan bosluk eziliyor: siparis detay dialogunun kokunde
+ * padding 0 50px var ve 390px ekranda icerige 290px birakiyordu.
+ * important GEREKLI -- satir ici stili yenen tek sey odur.
+ */
+.p-dialog-content > .row,
+.p-dialog-content > div > .row {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* ---------- ETIKETLER: alanin USTUNDE, sabit ---------- */
+
+/*
+ * [!] BU KATMANIN EN ONEMLI PARCASI.
+ *
+ * PrimeVue FloatLabel etiketi `position: absolute` ile kutunun UZERINE
+ * koyuyor ve alan dolunca yukari kaydiriyor (-1.25rem). Masaustunde
+ * zarif; telefonda iki sorun cikariyor:
+ *   - yukari kayan etiket USTTEKI alanin kutusuna giriyor
+ *   - uzun bir formda dolu alanlarin ne oldugu okunmuyor, cunku
+ *     etiket hem kuculuyor hem soluyor
+ *
+ * Telefonda etiket SABIT ve alanin USTUNDE.
+ *
+ * `order: -1` kullaniliyor, `column-reverse` DEGIL: bazi formlarda
+ * etiket DOM'da inputtan ONCE yazilmis, ters cevirmek onlari alta
+ * atardi. `order` iki yazimda da dogru sonucu veriyor.
+ */
+.p-dialog-content .p-floatlabel {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 0;
+}
+
+.p-dialog-content .p-floatlabel label {
+  position: static !important;
+  top: auto !important;
+  order: -1;
+  transform: none !important;
+
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--mdlg-muted) !important;
+  pointer-events: auto;
+}
+
+/* Etiketin yuzmesi icin acilan ic dolgu artik gereksiz. */
+.p-dialog-content .p-floatlabel-in .p-inputtext,
+.p-dialog-content .p-floatlabel-in .p-textarea,
+.p-dialog-content .p-floatlabel-in .p-select-label {
+  padding-block-start: 0.5rem;
+  padding-block-end: 0.5rem;
+}
+
+/* ---------- girdiler ---------- */
+
+/*
+ * 48px yukseklik, 16px yazi.
  * 16px ZORUNLU: iOS daha kucuk yazili bir girdiye odaklanildiginda
- * sayfayi KENDILIGINDEN yakinlastiriyor ve kullanici elle geri
- * uzaklastirmak zorunda kaliyor.
+ * sayfayi KENDILIGINDEN yakinlastiriyor.
  */
 .p-dialog-content .p-inputtext,
 .p-dialog-content .p-select,
 .p-dialog-content .p-datepicker-input,
 .p-dialog-content .p-inputnumber-input,
 .p-dialog-content .p-textarea,
+.p-dialog-content .p-autocomplete-input,
 .p-dialog-content input[type="text"],
 .p-dialog-content input[type="number"],
 .p-dialog-content input[type="date"],
 .p-dialog-content select,
 .p-dialog-content textarea {
   width: 100%;
-  min-height: 44px;
+  min-height: 48px;
   font-size: 16px;
+
+  background: #ffffff;
+  border-color: #d6dae1;
+  border-radius: 10px;
 }
 
 .p-dialog-content .p-textarea,
 .p-dialog-content textarea {
-  min-height: 88px;
+  min-height: 96px;
 }
 
-/* Dugme siralari sarsin; tasan dugme ekran disinda kaliyordu. */
+/* Odak halkasi gorunur: dar ekranda hangi alanda oldugunu bilmek
+   masaustundekinden daha onemli. */
+.p-dialog-content .p-inputtext:focus,
+.p-dialog-content textarea:focus,
+.p-dialog-content select:focus {
+  outline: 2px solid var(--mdlg-accent);
+  outline-offset: 1px;
+}
+
+/* ---------- dugmeler ---------- */
+
 .p-dialog-content .flex,
 .p-dialog-content .d-flex {
   flex-wrap: wrap;
 }
 
 .p-dialog-content .p-button {
-  min-height: 42px;
+  min-height: 44px;
 }
 
+/* Govdede tek basina duran tam genislikli dugmeler (kaynakta
+   w-100 sinifi) parmakla rahat basilsin. */
+.p-dialog-content .p-button.w-100 {
+  justify-content: center;
+  min-height: 48px;
+}
+
+/* ---------- tablolar ---------- */
+
 /*
- * DIALOG ICINDEKI TABLOLAR.
- *
- * Bunlar kart gorunumune cevrilmedi -- cogu detay dialoglarinda duran
- * kucuk, okunur tablolar. Ama app.css'teki varsayilan kural
- * (table-layout: fixed + overflow-wrap: anywhere) onlari ekrana
- * SIGDIRMAYA calisiyor ve 10 kolonu 390px'e sikistirinca her hucre
- * harf harf kiriliyordu. Dialog icinde tablo DOGAL genisligine
- * donuyor ve kendi kutusunda yatay kayiyor: okunur kaliyor.
+ * Dialog icindeki tablolar kart gorunumune CEVRILMEDI -- cogu detay
+ * dialoglarinda duran kucuk, okunur tablolar. Ama app.css'teki
+ * varsayilan kural (table-layout: fixed + overflow-wrap: anywhere)
+ * onlari ekrana SIGDIRMAYA calisiyor ve 10 kolonu 390px'e sikistirinca
+ * her hucre harf harf kiriliyordu. Dialog icinde tablo DOGAL
+ * genisligine donuyor ve kendi kutusunda yatay kayiyor.
  */
 .p-dialog-content .p-datatable-table {
   table-layout: auto;
@@ -176,44 +280,38 @@
   white-space: nowrap;
 }
 
-/* Kaydirmanin mumkun oldugunu gosteren kenar. */
 .p-dialog-content .p-datatable-table-container {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/*
- * SATIR ICI YAN BOSLUK. Siparis detay dialogunun kokunde
- * `style="padding: 0px 50px"` var; 390px'lik bir ekranda bu, icerige
- * 290px birakiyor -- formun en genis alani bile sigmiyor.
- *
- * `!important` BURADA GEREKLI: satir ici stil normalde stylesheet'i
- * yener, tek istisnasi important bildirimidir. Bileseni duzenlemek
- * yerine burada ezmek, ayni kaliptaki diger dialoglari da kapsiyor.
- */
-.p-dialog-content > .row,
-.p-dialog-content > div > .row {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+/* Tablo beyaz bir kutuda: gri zeminde sinirlari belli olsun. */
+.p-dialog-content .p-datatable {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--mdlg-line);
+  border-radius: 12px;
 }
 
+/* ---------- sekmeler ---------- */
+
 /*
- * SEKMELER. Siparis detayinda alti sekme var (Order, Proforma, Cost,
- * Supplier, Document, Check) ve dar ekranda yan yana sigmadiklari icin
- * alt satira tasip basligi uc kata cikariyorlardi. Artik tek satirda
- * YATAY KAYIYORLAR.
+ * Siparis detayinda alti sekme var (Order, Proforma, Cost, Supplier,
+ * Document, Check); dar ekranda yan yana sigmadiklari icin alt satira
+ * tasip basligi uc kata cikariyorlardi. Artik tek satirda yatay
+ * kayiyorlar.
  *
- * Iki ad da yaziliyor: v4'un `p-tablist-*` siniflari ve bu dialogun
- * hala kullandigi eski `TabView`in `p-tabview-nav` sinifi (konsolda
- * "Deprecated since v4" uyarisini veren bilesen).
+ * Iki ad da yaziliyor: v4'un p-tablist-* siniflari ve bu dialogun hala
+ * kullandigi eski TabView'in p-tabview-nav sinifi.
  */
 .p-dialog-content .p-tablist-tab-list,
 .p-dialog-content .p-tabview-nav {
   flex-wrap: nowrap;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+
+  background: #ffffff;
+  border-radius: 10px;
 }
 
 .p-dialog-content .p-tablist-tab-list > *,
@@ -223,7 +321,15 @@
 
 .p-dialog-content .p-tabview-nav a,
 .p-dialog-content .p-tab {
+  min-height: 46px;
+  font-size: 13.5px;
   white-space: nowrap;
+}
+
+.p-dialog-content .p-tabview-panels,
+.p-dialog-content .p-tabpanels {
+  padding: 12px 0 0;
+  background: transparent;
 }
 
 /* ==========================================================================

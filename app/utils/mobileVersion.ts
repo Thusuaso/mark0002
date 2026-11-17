@@ -32,8 +32,14 @@ export const MOBILE_RELEASES: MobileRelease[] = [
     version: "1.0.6",
     date: "2026-11-17",
     notes: [
+      "Dialogs redesigned for the phone. Labels now sit above their fields and stay there, instead of floating over the box and shrinking once you type — on a long form you can finally see what each filled field is.",
+      "Dialog body on a light background with white fields, so you can see where one section ends and the next begins.",
+      "Inputs are taller and easier to hit, with a visible focus ring; the close button is a proper 44px target.",
+      "Buttons at the bottom stay in place while the content scrolls.",
+      "Tables inside dialogs sit in their own white box and scroll sideways instead of breaking mid-word.",
       "The app is now called GOZ everywhere, including the icon on your home screen.",
       "Redesigned menu: a fixed top bar, collapsible sections and a clear marker on the page you are on.",
+      "Release notes are in English from now on.",
     ],
   },
   {
