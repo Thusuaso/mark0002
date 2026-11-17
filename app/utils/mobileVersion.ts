@@ -29,6 +29,16 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.8",
+    date: "2026-11-17",
+    notes: [
+      "Container Tracking added to the phone.",
+      "Days to arrival is now the biggest thing on the card — it is the one question this screen answers. On the desktop it was one column among thirteen.",
+      "The colour shifts as arrival gets closer (3 days or less, 10 days or less), but the number carries the meaning on its own.",
+      "The agency tracking link opens in one tap, and the B/L is flagged only when it has not been sent — the case that needs work.",
+    ],
+  },
+  {
     version: "1.0.7",
     date: "2026-11-17",
     notes: [

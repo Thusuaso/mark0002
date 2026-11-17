@@ -1,6 +1,12 @@
 <template>
   <div class="container">
+    <ContainerFollowCards
+      v-if="isMobile"
+      :list="containerStore.getContainerFollowList"
+      @follow-selected-dialog-emit="followSelectedDialogEmit($event)"
+    />
     <ContainerFollowList
+      v-else
       :list="containerStore.getContainerFollowList"
       @follow-selected-dialog-emit="followSelectedDialogEmit($event)"
     />
@@ -48,6 +54,9 @@ export default {
 </script>
 
 <script setup>
+/* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+const isMobile = useRuntimeConfig().public.isMobile
+
 /*
  * definePageMeta yalnizca <script setup> icinde cagrilabilir ->
  * Options API sayfalarinda ikinci bir script blogu gerekiyor. Options
