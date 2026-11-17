@@ -5,6 +5,40 @@
       :stocks="homeStore.getMekmerStocks"
       :total-supplier-cost="homeStore.getTotalSupplierCost"
     />
+
+    <!--
+      ANDROID UYGULAMASI -- panelin ALTINDA.
+
+      Once navbar'daydi: orada ~190px yer kapliyor ve sagdaki Logout
+      ile takvim simgesini ekran disina itiyordu. Menude yeri de yoktu
+      zaten -- bir ekran degil, bir indirme.
+
+      Ana sayfanin altinda duruyor cunku bir kez yapilan bir is:
+      kullanici her gun gormek zorunda degil, ama aradiginda nerede
+      oldugunu bilecegi bir yer gerekiyor. Panelin isini bitirdigi
+      yerde, kendi serisi olarak.
+
+      Kabukta GOSTERILMIYOR (v-if): uygulamanin icinde "uygulamayi
+      indir" demek anlamsiz.
+    -->
+    <section v-if="!isMobile" class="appcta">
+      <div class="appcta__mark" aria-hidden="true">
+        <i class="pi pi-android" />
+      </div>
+
+      <div class="appcta__text">
+        <h2 class="appcta__title">Göz on your phone</h2>
+        <p class="appcta__desc">
+          Orders, container tracking and stock reports, built for the
+          screen in your pocket.
+        </p>
+      </div>
+
+      <NuxtLink to="/app" class="appcta__btn">
+        <i class="pi pi-download" aria-hidden="true" />
+        Download Android App
+      </NuxtLink>
+    </section>
   </div>
 </template>
 
@@ -26,6 +60,9 @@ export default {
 </script>
 
 <script setup>
+/* Kabukta gizlemek icin -- gerekcesi nuxt.config.ts (derleme zamani). */
+const isMobile = useRuntimeConfig().public.isMobile
+
 /*
  * Veri cekimi NEDEN created() icinde degil: SSR created() icindeki async
  * isi BEKLEMEZ -- govde BOS serialize edilir, client hydration onu
@@ -87,3 +124,94 @@ await useAsyncData(
       satiri. Islevi belirsiz ve created() icinde yorumlu duruyordu;
       pilota tasinmadi. Geri gerekirse Nuxt 2 deposunda duruyor.
 -->
+
+<style scoped>
+/*
+ * Android indirme seridi. Panelin altinda, kendi basina duran tek bir
+ * serit: dikkat cekiyor ama panelin verileriyle yarismiyor.
+ */
+.appcta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+
+  padding: 18px 20px;
+  margin: 8px 0 40px;
+
+  background: #ffffff;
+  border: 1px solid #e2e5ea;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgb(17 24 39 / 5%);
+}
+
+.appcta__mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+
+  width: 44px;
+  height: 44px;
+
+  font-size: 20px;
+  color: #ffffff;
+
+  background: linear-gradient(140deg, #1d4ed8, #0f766e);
+  border-radius: 12px;
+}
+
+.appcta__text {
+  flex-grow: 1;
+  min-width: 220px;
+}
+
+.appcta__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: #111827;
+}
+
+.appcta__desc {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #4b5563;
+}
+
+.appcta__btn {
+  display: inline-flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+
+  /* 44px: dokunma hedefi, dar ekranda da gecerli. */
+  min-height: 44px;
+  padding: 0 18px;
+
+  font-size: 14px;
+  font-weight: 650;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+
+  background: #111827;
+  border-radius: 10px;
+  transition: background-color 150ms ease;
+}
+
+.appcta__btn:hover,
+.appcta__btn:focus-visible {
+  color: #ffffff;
+  background: #1d4ed8;
+}
+
+/* Dar ekranda dugme kendi satirinda ve tam genislikte. */
+@media (max-width: 575.98px) {
+  .appcta__btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>

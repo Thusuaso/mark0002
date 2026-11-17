@@ -529,27 +529,6 @@
                 </li>
               </ul>
             </li>
-            <!--
-              ANDROID UYGULAMASI -- menu listesinin SONUNDA.
-
-              Once marka ile menunun arasindaydi; orada ~190px yer
-              kapliyor ve sagdaki Logout ile takvim simgesini ekran
-              disina itiyordu. Listenin icinde oldugu icin artik dar
-              ekranda menuyle BIRLIKTE katlaniyor ve kimsenin yerini
-              almiyor.
-
-              Ucu de ayni: navbar bu bilesende UC KEZ yaziliyor (tam
-              menu, userId 62, kisitli kullanicilar) ve her birinin
-              kendi listesi var. getAuthorityStatus ile gizlenmiyor --
-              kisitli kullanicilar saha tarafi, uygulamaya en cok
-              ihtiyaci olanlar onlar.
-            -->
-            <li class="nav-item">
-              <NuxtLink to="/app" class="android-link">
-                <i class="pi pi-android" aria-hidden="true" />
-                <span>Download Android App</span>
-              </NuxtLink>
-            </li>
           </ul>
         </div>
         <div class="d-flex" v-show="!getAuthorityStatus">
@@ -673,27 +652,6 @@
                   >
                 </li>
               </ul>
-            </li>
-            <!--
-              ANDROID UYGULAMASI -- menu listesinin SONUNDA.
-
-              Once marka ile menunun arasindaydi; orada ~190px yer
-              kapliyor ve sagdaki Logout ile takvim simgesini ekran
-              disina itiyordu. Listenin icinde oldugu icin artik dar
-              ekranda menuyle BIRLIKTE katlaniyor ve kimsenin yerini
-              almiyor.
-
-              Ucu de ayni: navbar bu bilesende UC KEZ yaziliyor (tam
-              menu, userId 62, kisitli kullanicilar) ve her birinin
-              kendi listesi var. getAuthorityStatus ile gizlenmiyor --
-              kisitli kullanicilar saha tarafi, uygulamaya en cok
-              ihtiyaci olanlar onlar.
-            -->
-            <li class="nav-item">
-              <NuxtLink to="/app" class="android-link">
-                <i class="pi pi-android" aria-hidden="true" />
-                <span>Download Android App</span>
-              </NuxtLink>
             </li>
           </ul>
         </div>
@@ -856,27 +814,6 @@
               <NuxtLink to="/customer/mekmar" class="nav-link"
                 >Sale Customers</NuxtLink
               >
-            </li>
-            <!--
-              ANDROID UYGULAMASI -- menu listesinin SONUNDA.
-
-              Once marka ile menunun arasindaydi; orada ~190px yer
-              kapliyor ve sagdaki Logout ile takvim simgesini ekran
-              disina itiyordu. Listenin icinde oldugu icin artik dar
-              ekranda menuyle BIRLIKTE katlaniyor ve kimsenin yerini
-              almiyor.
-
-              Ucu de ayni: navbar bu bilesende UC KEZ yaziliyor (tam
-              menu, userId 62, kisitli kullanicilar) ve her birinin
-              kendi listesi var. getAuthorityStatus ile gizlenmiyor --
-              kisitli kullanicilar saha tarafi, uygulamaya en cok
-              ihtiyaci olanlar onlar.
-            -->
-            <li class="nav-item">
-              <NuxtLink to="/app" class="android-link">
-                <i class="pi pi-android" aria-hidden="true" />
-                <span>Download Android App</span>
-              </NuxtLink>
             </li>
           </ul>
         </div>
@@ -1172,71 +1109,6 @@ export default {
 </script>
 
 <style scoped>
-/*
- * Android indirme baglantisi -- menu listesinin SON ogesi.
- *
- * Dikkat cekmeli ama menu baglantilariyla yarismamali: dolgulu bir
- * dugme degil, ince cerceveli bir hap.
- */
-.android-link {
-  display: inline-flex;
-  gap: 7px;
-  align-items: center;
-
-  padding: 5px 12px;
-
-  font-size: 13px;
-  font-weight: 600;
-  color: #108dcf;
-  text-decoration: none;
-  white-space: nowrap;
-
-  border: 1px solid #108dcf;
-  border-radius: 999px;
-
-  transition:
-    color 150ms ease,
-    background-color 150ms ease;
-}
-
-.android-link:hover,
-.android-link:focus-visible {
-  color: #ffffff;
-  background: #108dcf;
-}
-
-.android-link .pi {
-  font-size: 14px;
-}
-
-/*
- * GENIS EKRAN: menu YATAY. Hap son baglantiya yapismasin diye solunda
- * bosluk, ve dikeyde ortalansin diye kucuk bir ust bosluk.
- *
- * 992px: navbar-expand-lg'nin kirilma noktasi -- bunun ustunde menu
- * yatay, altinda katlanip dikey oluyor.
- */
-@media (min-width: 992px) {
-  .android-link {
-    margin-top: 2px;
-    margin-left: 10px;
-  }
-}
-
-/*
- * DAR EKRAN: menu katlanmis, ogeler alt alta. Hap kendi satirinda,
- * icerige gore genis -- `inline-flex` zaten bunu veriyor, yalnizca
- * ustunde biraz nefes ve solda menu ogeleriyle ayni hiza gerekiyor.
- *
- * Yazi GIZLENMIYOR: katlanmis menude genislik sorunu yok, ikonu tek
- * basina birakmak ne oldugunu anlamsizlastirirdi.
- */
-@media (max-width: 991.98px) {
-  .android-link {
-    margin-top: 8px;
-  }
-}
-
 .navbar-brand {
   color: #108dcf;
   animation: color 5s linear 0s infinite alternate;
