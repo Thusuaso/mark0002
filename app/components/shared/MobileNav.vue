@@ -12,7 +12,7 @@
         <i class="pi" :class="open ? 'pi-times' : 'pi-bars'" aria-hidden="true" />
       </button>
 
-      <NuxtLink to="/" class="mnav__brand" @click="open = false">GÖZ</NuxtLink>
+      <NuxtLink to="/" class="mnav__brand" @click="open = false">GOZ</NuxtLink>
 
       <button type="button" class="mnav__exit" @click="logout">
         <i class="pi pi-sign-out" aria-hidden="true" />

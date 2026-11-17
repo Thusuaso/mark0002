@@ -2,7 +2,7 @@
   "name": "mark0002-mobile",
   "version": "1.0.0",
   "private": true,
-  "description": "Göz'ün Android kabuğu. Web uygulaması SPA olarak derlenip buraya gömülür; ayrı bir kod tabanı yoktur. Ayrıntı: README.md",
+  "description": "GOZ'un Android kabuğu. Web uygulaması SPA olarak derlenip buraya gömülür; ayrı bir kod tabanı yoktur. Ayrıntı: README.md",
   "scripts": {
     "sync": "cap sync android",
     "open": "cap open android"

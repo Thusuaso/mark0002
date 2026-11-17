@@ -21,7 +21,7 @@
       </div>
 
       <div class="appcta__text">
-        <h2 class="appcta__title">Göz on your phone</h2>
+        <h2 class="appcta__title">GOZ on your phone</h2>
         <p class="appcta__desc">
           Orders, container tracking and stock reports, built for the
           screen in your pocket.

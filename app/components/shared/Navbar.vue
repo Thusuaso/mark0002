@@ -4,7 +4,7 @@
       <!-- Marka -->
       <NuxtLink to="/" class="gnav__brand" @click="hepsiniKapat">
         <span class="gnav__mark" aria-hidden="true" />
-        <span class="gnav__word">GÖZ</span>
+        <span class="gnav__word">GOZ</span>
       </NuxtLink>
 
       <!--

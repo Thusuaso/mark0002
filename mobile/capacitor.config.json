@@ -1,6 +1,6 @@
 {
   "appId": "com.mekmar.goz",
-  "appName": "Göz",
+  "appName": "GOZ",
   "webDir": "../.output/public",
   "android": {
     "allowMixedContent": false

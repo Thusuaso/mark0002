@@ -29,6 +29,14 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.6",
+    date: "2026-11-17",
+    notes: [
+      "Uygulama adı her yerde GOZ oldu (telefon ana ekranındaki simge dahil).",
+      "Menü yeniden tasarlandı: sabit üst çubuk, katlanır bölümler, açık olan sayfa belirgin.",
+    ],
+  },
+  {
     version: "1.0.5",
     date: "2026-11-17",
     notes: [

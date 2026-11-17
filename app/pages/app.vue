@@ -5,7 +5,7 @@
         <i class="pi pi-mobile" />
       </div>
       <div>
-        <p class="apk__eyebrow">Göz · Android</p>
+        <p class="apk__eyebrow">GOZ · Android</p>
         <h1 class="apk__title">Uygulamayı indir</h1>
       </div>
       <span class="apk__badge">Sürüm {{ guncel.version }}</span>
@@ -75,7 +75,7 @@ function tarih(iso) {
   return `${iki(d.getDate())}.${iki(d.getMonth() + 1)}.${d.getFullYear()}`
 }
 
-useHead({ title: "Göz · Android uygulaması" })
+useHead({ title: "GOZ · Android uygulaması" })
 </script>
 
 <style scoped>
