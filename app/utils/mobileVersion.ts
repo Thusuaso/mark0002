@@ -29,6 +29,16 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.5",
+    date: "2026-11-17",
+    notes: [
+      "Production Crates telefon için yeniden tasarlandı — kapsamdaki son ekran. 17 kolonluk tablo yerine kart: başlıkta kasa no ve tarih, altında ürün, ebat ve tedarikçi, en altta miktar ile adet.",
+      "Fason ve Kutulama bilgisi rozet olarak gösteriliyor; \"değil\" durumu da korundu ama soluk.",
+      "Tarih aralığı seçici tam genişlikte, Ara / Temizle / Excel düğmeleri altında.",
+      "Telefonda arama yapıp Excel alındığında çıktı artık ekranda görüneni içeriyor, tüm listeyi değil.",
+    ],
+  },
+  {
     version: "1.0.4",
     date: "2026-11-17",
     notes: [

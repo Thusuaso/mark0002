@@ -102,6 +102,17 @@ const props = defineProps({
   onSelect: { type: Function, default: null },
 })
 
+/*
+ * Suzulmus liste DISARIYA da bildiriliyor.
+ *
+ * Gerekcesi: bazi ekranlarda Excel ciktisi EKRANDA GORUNENI aliyor
+ * (masaustunde DataTable'in @filter olayindan besleniyor). Kartlarda o
+ * olay yok; arama sonucu disariya verilmezse telefonda arama yapip
+ * Excel alan kullanici TUM listeyi indirir ve bunu ancak dosyayi
+ * acinca fark eder.
+ */
+const emit = defineEmits(["filtered"])
+
 const query = ref("")
 const limit = ref(props.pageSize)
 
@@ -127,6 +138,17 @@ const visible = computed(() => filtered.value.slice(0, limit.value))
 watch(query, () => {
   limit.value = props.pageSize
 })
+
+/*
+ * `filtered` bir computed; items degisince de tetiklenir. Ikinci
+ * arguman arama kutusunun BOS olup olmadigi -- dinleyen ekran
+ * "suzuldu mu yoksa tam liste mi" ayrimini buradan yapiyor.
+ */
+watch(
+  filtered,
+  (val) => emit("filtered", val, query.value.trim() !== ""),
+  { immediate: true },
+)
 
 function keyOf(item, i) {
   return props.itemKey && item?.[props.itemKey] != null

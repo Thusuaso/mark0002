@@ -1,6 +1,27 @@
 <template>
   <div>
-    <div class="container row">
+    <!--
+      MOBIL ARAC CUBUGU: tarih araligi tam genislikte, uc dugme altinda
+      sarmalanan bir serit. Masaustunde dordu esit sutunda duruyor ve
+      390px'te tarih secici bir kelimeye sigmiyordu.
+    -->
+    <div v-if="isMobile" class="pr-mbar">
+      <DatePicker
+        v-model="selectedDates"
+        selectionMode="range"
+        :manualInput="false"
+        placeholder="Tarih aralığı seç"
+        class="w-100"
+        dateFormat="dd/mm/yy"
+      />
+      <div class="pr-mbar__dugmeler">
+        <Button size="small" severity="success" label="Ara" @click="searchDateList" />
+        <Button size="small" severity="secondary" label="Temizle" @click="selectedDates = null" />
+        <Button size="small" label="Excel" @click="excel_output" />
+      </div>
+    </div>
+
+    <div v-else class="container row">
       <div class="col">
         <DatePicker
           v-model="selectedDates"
@@ -35,7 +56,16 @@
       </div>
     </div>
 
+    <ReportsMekmerProductionCards
+      v-if="isMobile"
+      :list="reportsStore.getReportsMekmerProductionList"
+      :total="reportsStore.getReportsMekmerProductionListTotal"
+      :dates="selectedDates"
+      @mekmer_filtered_production_list_emit="mekmerFilteredProductionList($event)"
+      @mekmer_production_filter_cleared_emit="is_filtered = false"
+    />
     <ReportsMekmerProductionList
+      v-else
       :list="reportsStore.getReportsMekmerProductionList"
       :total="reportsStore.getReportsMekmerProductionListTotal"
       :dates="selectedDates"
@@ -130,6 +160,9 @@ export default {
 </script>
 
 <script setup>
+/* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+const isMobile = useRuntimeConfig().public.isMobile
+
 /*
  * Veri cekimi NEDEN created() icinde degil: SSR created() icindeki async
  * isi BEKLEMEZ -- liste BOS serialize edilir, client hydration onu
@@ -158,6 +191,31 @@ await useAsyncData(
   { server: false },
 )
 </script>
+
+<style scoped>
+.pr-mbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 0;
+}
+
+.pr-mbar__dugmeler {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pr-mbar :deep(.p-button) {
+  min-height: 40px;
+}
+
+/* Tarih secicinin girdisi de 44px / 16px -- iOS yakinlastirmasin. */
+.pr-mbar :deep(.p-datepicker-input) {
+  min-height: 44px;
+  font-size: 16px;
+}
+</style>
 
 <!--
   pages/reports/mekmer/production.vue
