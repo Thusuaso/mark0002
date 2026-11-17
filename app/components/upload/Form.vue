@@ -182,15 +182,42 @@ const DOCUMENT_IDS = {
  * konuyor (34 anahtar, cakisma yok -- olculdu) ve arama da iki
  * yontemi birden deniyor.
  */
+/*
+ * [!] UNICODE NORMALLESTIRME -- GORUNMEYEN AMA ESLESMEYI BOZAN FARK.
+ *
+ * "Çeki Listesi.pdf" iki ayri sekilde kodlanabiliyor ve ikisi ekranda
+ * BIREBIR AYNI gorunuyor:
+ *
+ *   NFC: "Ç" tek karakter            U+00C7            (16 karakter)
+ *   NFD: "C" + birlesen cengel       U+0043 U+0327     (17 karakter)
+ *
+ * Dizge olarak esit DEGILLER ve kucuk harfe indirmek bunu duzeltmiyor.
+ * Isletim sistemi ve tarayiciya gore dosya adi NFD gelebiliyor; bu
+ * yuzden kullanici "ama isim ayni" diyor ve hakli -- goz icin ayni.
+ *
+ * Ayni sinifta ikinci tuzak: kirilmaz bosluk (U+00A0) ve ust uste
+ * bosluklar. Onlar da normal bosluga indiriliyor.
+ *
+ * Normallestirme HER IKI tarafa da uygulanıyor: hem tablodaki adlara
+ * hem gelen dosya adina. Yalnizca birine uygulamak sorunu tasir.
+ */
+function normalleştir(ad) {
+  return String(ad ?? "")
+    .normalize("NFC")
+    /* NBSP ve diger bosluk turleri -> tek normal bosluk */
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
 const DOCUMENT_IDS_LOWER = new Map()
 for (const [ad, id] of Object.entries(DOCUMENT_IDS)) {
-  DOCUMENT_IDS_LOWER.set(ad.toLocaleLowerCase("tr-TR"), id)
-  DOCUMENT_IDS_LOWER.set(ad.toLowerCase(), id)
+  const n = normalleştir(ad)
+  DOCUMENT_IDS_LOWER.set(n.toLocaleLowerCase("tr-TR"), id)
+  DOCUMENT_IDS_LOWER.set(n.toLowerCase(), id)
 }
 
 function documentIdOf(dosyaAdi) {
-  const temiz = String(dosyaAdi ?? "")
-    .trim()
+  const temiz = normalleştir(dosyaAdi)
     /* "Konşimento (1).pdf" -> "Konşimento.pdf" */
     .replace(/\s*\(\d+\)(\.[^.]+)$/, "$1")
 
