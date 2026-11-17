@@ -8,6 +8,21 @@
     >
       <div class="container-fluid">
         <a class="navbar-brand" href="/">GOZ</a>
+
+        <!--
+          ANDROID UYGULAMASI. Ucu de ayni: navbar UC KEZ yaziliyor
+          (tam menu, userId 62, ve kisitli kullanicilar) ve her birinde
+          ayri bir marka satiri var. Baglanti marka ile menunun ARASINDA
+          duruyor; menu ogelerinin arasina girmiyor, cunku bir ekran
+          degil bir indirme.
+
+          getAuthorityStatus ile GIZLENMIYOR -- kisitli kullanicilar
+          (saha tarafi) uygulamaya en cok ihtiyaci olanlar.
+        -->
+        <NuxtLink to="/app" class="android-link">
+          <i class="pi pi-android" aria-hidden="true" />
+          <span>Download Android App</span>
+        </NuxtLink>
         <button
           class="navbar-toggler"
           type="button"
@@ -613,6 +628,21 @@
     >
       <div class="container-fluid" v-if="getUserId == 62">
         <a class="navbar-brand" href="/">GOZ</a>
+
+        <!--
+          ANDROID UYGULAMASI. Ucu de ayni: navbar UC KEZ yaziliyor
+          (tam menu, userId 62, ve kisitli kullanicilar) ve her birinde
+          ayri bir marka satiri var. Baglanti marka ile menunun ARASINDA
+          duruyor; menu ogelerinin arasina girmiyor, cunku bir ekran
+          degil bir indirme.
+
+          getAuthorityStatus ile GIZLENMIYOR -- kisitli kullanicilar
+          (saha tarafi) uygulamaya en cok ihtiyaci olanlar.
+        -->
+        <NuxtLink to="/app" class="android-link">
+          <i class="pi pi-android" aria-hidden="true" />
+          <span>Download Android App</span>
+        </NuxtLink>
         <button
           class="navbar-toggler"
           type="button"
@@ -658,6 +688,21 @@
       </div>
       <div class="container-fluid" v-else>
         <a class="navbar-brand" href="/">GOZ</a>
+
+        <!--
+          ANDROID UYGULAMASI. Ucu de ayni: navbar UC KEZ yaziliyor
+          (tam menu, userId 62, ve kisitli kullanicilar) ve her birinde
+          ayri bir marka satiri var. Baglanti marka ile menunun ARASINDA
+          duruyor; menu ogelerinin arasina girmiyor, cunku bir ekran
+          degil bir indirme.
+
+          getAuthorityStatus ile GIZLENMIYOR -- kisitli kullanicilar
+          (saha tarafi) uygulamaya en cok ihtiyaci olanlar.
+        -->
+        <NuxtLink to="/app" class="android-link">
+          <i class="pi pi-android" aria-hidden="true" />
+          <span>Download Android App</span>
+        </NuxtLink>
         <button
           class="navbar-toggler"
           type="button"
@@ -1109,6 +1154,56 @@ export default {
 </script>
 
 <style scoped>
+/*
+ * Android indirme baglantisi: markanin yaninda, menuden once.
+ * Dikkat cekmeli ama menuyle yarismamali -- bu yuzden dolgulu bir
+ * dugme degil, ince cerceveli bir hap.
+ */
+.android-link {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+
+  padding: 5px 12px;
+  margin-left: 14px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #108dcf;
+  text-decoration: none;
+  white-space: nowrap;
+
+  border: 1px solid #108dcf;
+  border-radius: 999px;
+
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.android-link:hover,
+.android-link:focus-visible {
+  color: #ffffff;
+  background: #108dcf;
+}
+
+.android-link .pi {
+  font-size: 14px;
+}
+
+/* Dar ekranda yazi dusuyor, ikon kaliyor: marka ve menu dugmesiyle
+   ayni satirda yer kalmiyor. */
+@media (max-width: 575.98px) {
+  .android-link span {
+    display: none;
+  }
+
+  .android-link {
+    padding: 5px 9px;
+    margin-left: 8px;
+  }
+}
+
 .navbar-brand {
   color: #108dcf;
   animation: color 5s linear 0s infinite alternate;
