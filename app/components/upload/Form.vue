@@ -148,6 +148,58 @@ const DOCUMENT_IDS = {
   "Draft.pdf": 99,
 }
 
+/*
+ * DOSYA ADI ESLESTIRME -- tam esitlikten biraz TOLERANSLI.
+ *
+ * Eskiden `DOCUMENT_IDS[item.name]` birebir esitlik ariyordu ve
+ * eslesmeyen dosya SESSIZCE atlaniyordu. Gercek hayatta eslesmeyi
+ * bozan sey dosyanin farkli olmasi degil, iki zararsiz ayrinti oluyor:
+ *
+ *   "Konşimento (1).pdf"  tarayici ayni dosyayi ikinci kez indirince
+ *   "KONŞIMENTO.pdf"      buyuk/kucuk harf
+ *
+ * Ikisi de ayni evrak. Bu yuzden karsilastirma once kirpiliyor,
+ * sonundaki " (n)" ekini atiyor ve kucuk harfe indiriyor.
+ *
+ * DAHA FAZLA TOLERANS VERILMEDI (orn. Turkce karakterleri ASCII'ye
+ * cevirmek): "Konsimento.pdf" ile "Konşimento.pdf"yi ayni saymak,
+ * birbirine benzeyen iki evrak adini karistirma riski demek. Yanlis
+ * evrak turune yazmak, hic yazmamaktan kotu.
+ *
+ * Kucuk harfe indirgemek GUVENLI: 28 girdinin kucuk harfli hali 27
+ * benzersiz anahtar veriyor ve tek tekrar (ATR.pdf / atr.pdf) zaten
+ * AYNI ID'ye gidiyor -- yani hicbir evrak baskasiyla cakismiyor.
+ *
+ * [!] IKI AYRI KUCULTME, TURKCE "I" YUZUNDEN -- biri yetmiyor:
+ *
+ *   "KONŞİMENTO.pdf"  (Turkce buyuk I)  tr-TR ile -> konşimento ✓
+ *                                       invariant ile -> konşi̇mento ✗
+ *   "KONŞIMENTO.pdf"  (ASCII buyuk I)   tr-TR ile -> konşımento  ✗
+ *                                       invariant ile -> konşimento ✓
+ *
+ * Yani Turkce klavyeden ve ASCII'den gelen ayni dosya farkli
+ * kuculuyor. Tablodaki 28 adin HER IKI kucuk hali de haritaya
+ * konuyor (34 anahtar, cakisma yok -- olculdu) ve arama da iki
+ * yontemi birden deniyor.
+ */
+const DOCUMENT_IDS_LOWER = new Map()
+for (const [ad, id] of Object.entries(DOCUMENT_IDS)) {
+  DOCUMENT_IDS_LOWER.set(ad.toLocaleLowerCase("tr-TR"), id)
+  DOCUMENT_IDS_LOWER.set(ad.toLowerCase(), id)
+}
+
+function documentIdOf(dosyaAdi) {
+  const temiz = String(dosyaAdi ?? "")
+    .trim()
+    /* "Konşimento (1).pdf" -> "Konşimento.pdf" */
+    .replace(/\s*\(\d+\)(\.[^.]+)$/, "$1")
+
+  return (
+    DOCUMENT_IDS_LOWER.get(temiz.toLocaleLowerCase("tr-TR")) ??
+    DOCUMENT_IDS_LOWER.get(temiz.toLowerCase())
+  )
+}
+
 export default {
   props: {
     orders: {
@@ -230,11 +282,16 @@ export default {
       const tarih = toIsoDate(new Date())
       const pendingSaves = []
 
+      /* Taninmayan adlar TOPLANIYOR: eskiden sessizce atlaniyordu ve
+         kullanici "Kayit Basarili." gorup dosyanin gittigini saniyordu. */
+      const taninmayan = []
+
       for (const item of event.files) {
-        const id = DOCUMENT_IDS[item.name]
-        /* Tabloda olmayan dosya adi sessizce atlanir -- gerekcesi
-         * dosya basindaki "TANINMAYAN DOSYA ADI" notunda. */
-        if (id === undefined) continue
+        const id = documentIdOf(item.name)
+        if (id === undefined) {
+          taninmayan.push(item.name)
+          continue
+        }
 
         /* Dosya yuklemesi BEKLENMIYOR: kaynak da beklemiyordu, yani
          * yukleme basarisiz olsa bile veritabanina kayit dusuyor.
@@ -254,21 +311,53 @@ export default {
         )
       }
 
-      /* Bildirim kaynakta oldugu gibi KOSULSUZ ve BEKLEMEDEN --
-       * gerekcesi dosya basindaki nottta. */
-      useAppToast().success("Kayıt Başarılı.")
+      /*
+       * BILDIRIM ARTIK DURUMA GORE. Eskiden kosulsuzdu: hicbir dosya
+       * taninmasa bile "Kayit Basarili." cikiyor ve kullanici evragin
+       * gittigini saniyordu -- bu ekranla ilgili sikayetin kaynagi
+       * buydu.
+       */
+      const toast = useAppToast()
+
+      if (taninmayan.length) {
+        toast.error(
+          `Bu dosyalar KAYDEDILMEDI, adlari tanınmıyor: ${taninmayan.join(", ")}`,
+        )
+      }
+
+      if (pendingSaves.length) {
+        toast.success(
+          taninmayan.length
+            ? `${pendingSaves.length} evrak kaydedildi.`
+            : "Kayıt Başarılı.",
+        )
+      }
 
       await Promise.all(pendingSaves)
       await this.uploadStore.setDocumentList(po)
       await this.$refs.missingPanel?.refresh()
     },
 
+    /*
+     * Yukleme hatasi ARTIK GORUNUR. Eskiden yalnizca console.error'a
+     * yaziliyordu, yani kullanici icin hicbir sey olmamis gibiydi:
+     * kayit veritabanina dusuyor, evrak "var" gorunuyor ama dosya
+     * sunucuda yok.
+     *
+     * Cagri hala BEKLENMIYOR (onUpload icinde await yok) -- o sira
+     * kaynaktan beri boyle ve degistirmek kayit/bildirim akisini
+     * kaydirirdi. Burada yalnizca sessizlik kaldirildi.
+     */
     async sendServer(item, id, po) {
       try {
         const response = await useFileService().sendInvoice(item, id, po)
-        if (!response) console.error("evrak yuklenemedi:", item.name)
+        if (!response) {
+          console.error("evrak yuklenemedi:", item.name)
+          useAppToast().error(`Dosya yüklenemedi: ${item.name}`)
+        }
       } catch (err) {
         console.error("evrak yuklenemedi:", item.name, err)
+        useAppToast().error(`Dosya yüklenemedi: ${item.name}`)
       }
     },
   },
