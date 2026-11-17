@@ -29,6 +29,15 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.7",
+    date: "2026-11-17",
+    notes: [
+      "Two more screens on the phone: Quote Customers, and Order Summary under Mekmar Reports.",
+      "On Quote Customers the phone number and email are tappable — one tap calls or opens a new mail, instead of copying the number out by hand.",
+      "Order Summary is one card per year with the months listed inside it; on the desktop these sit side by side in columns, which does not fit a phone. Tapping a month opens the same detail as before.",
+    ],
+  },
+  {
     version: "1.0.6",
     date: "2026-11-17",
     notes: [

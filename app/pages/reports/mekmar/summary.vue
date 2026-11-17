@@ -1,18 +1,40 @@
 <template>
   <div class="container">
     <div class="row">
-      <ReportsMekmarSummaryList v-for="(item, index) of reportsStore.getReportsMekmarSummaryOrderList" :key="item.Month" :list="item"
+      <template v-if="isMobile">
+        <ReportsMekmarSummaryCards v-for="(item, index) of reportsStore.getReportsMekmarSummaryOrderList" :key="item.Month" :list="item"
         :year="new Date().getFullYear() - index" :total="reportsStore.getReportsMekmarSummaryOrderListTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, true)" :status="'Order'" />
-      <ReportsMekmarSummaryList v-for="(item, index) of reportsStore.getReportsMekmarSummaryOrderListByRepresentative"
+      </template>
+      <template v-else>
+        <ReportsMekmarSummaryList v-for="(item, index) of reportsStore.getReportsMekmarSummaryOrderList" :key="item.Month" :list="item"
+        :year="new Date().getFullYear() - index" :total="reportsStore.getReportsMekmarSummaryOrderListTotal[index]"
+        @order_selected_list_emit="orderSelectedList($event, true)" :status="'Order'" />
+      </template>
+      <template v-if="isMobile">
+        <ReportsMekmarSummaryCards v-for="(item, index) of reportsStore.getReportsMekmarSummaryOrderListByRepresentative"
         :key="item.Month" :list="item" :year="new Date().getFullYear() - index"
         :total="reportsStore.getReportsMekmarSummaryOrderListByRepresentativeTotal[index]"
         @order_selected_list_emit="orderSelectedListOrderer($event, true)" :status="'Seller'" />
+      </template>
+      <template v-else>
+        <ReportsMekmarSummaryList v-for="(item, index) of reportsStore.getReportsMekmarSummaryOrderListByRepresentative"
+        :key="item.Month" :list="item" :year="new Date().getFullYear() - index"
+        :total="reportsStore.getReportsMekmarSummaryOrderListByRepresentativeTotal[index]"
+        @order_selected_list_emit="orderSelectedListOrderer($event, true)" :status="'Seller'" />
+      </template>
     </div>
     <div class="row">
-      <ReportsMekmarSummaryList v-for="(item, index) of reportsStore.getReportsMekmarSummaryForwardingList" :key="item.Month"
+      <template v-if="isMobile">
+        <ReportsMekmarSummaryCards v-for="(item, index) of reportsStore.getReportsMekmarSummaryForwardingList" :key="item.Month"
         :list="item" :year="new Date().getFullYear() - index" :total="reportsStore.getReportsMekmarSummaryForwardingListTotal[index]"
         @order_selected_list_emit="orderSelectedList($event, false)" :status="'Shipment'" />
+      </template>
+      <template v-else>
+        <ReportsMekmarSummaryList v-for="(item, index) of reportsStore.getReportsMekmarSummaryForwardingList" :key="item.Month"
+        :list="item" :year="new Date().getFullYear() - index" :total="reportsStore.getReportsMekmarSummaryForwardingListTotal[index]"
+        @order_selected_list_emit="orderSelectedList($event, false)" :status="'Shipment'" />
+      </template>
     </div>
     <Dialog v-model:visible="reports_mekmar_summary_list_detail_dialog" header="" modal>
       <ReportsMekmarSummaryDetailList :list="reportsStore.getReportsMekmarSummaryOrderDetail"
@@ -24,6 +46,11 @@
 import { useReportsStore } from "~/stores/reports"
 export default {
   computed: {
+    /* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+    isMobile() {
+      return useRuntimeConfig().public.isMobile
+    },
+
     reportsStore() {
       return useReportsStore()
     },

@@ -38,6 +38,8 @@ export const MOBILE_ROUTES: MobileRoute[] = [
   { path: "/selection/input", label: "Entry", icon: "pi-pencil", group: "Selection" },
   { path: "/finance", label: "Finance", icon: "pi-wallet", group: "" },
   { path: "/customer/mekmar", label: "Sale Customers", icon: "pi-users", group: "" },
+  { path: "/customer/offer", label: "Quote Customers", icon: "pi-id-card", group: "" },
+  { path: "/reports/mekmar/summary", label: "Order Summary", icon: "pi-chart-line", group: "" },
 ]
 
 /*
