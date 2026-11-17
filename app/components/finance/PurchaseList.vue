@@ -1,6 +1,40 @@
 <template>
   <div class="container">
+    <!--
+      MOBIL: ayni veri, ayni secim, ayni diyalog -- yalnizca gorunum
+      farkli. Ayri bir bilesen yapilmadi cunku bu bilesen kendi
+      verisini cekiyor (mounted) ve detay diyalogunu kendi tasiyor;
+      ayirmak o mantigi ikiye bolerdi.
+    -->
+    <MobileList
+      v-if="isMobile"
+      :items="purchaseList"
+      :search-keys="['FirmaAdi', 'SiparisNo']"
+      search-placeholder="Firma veya sipariş no ara…"
+      :on-select="(item) => purchaseSelected({ data: item })"
+    >
+      <template #totals>
+        <div class="fp-total">
+          <span class="fp-total__k">Kalan</span>
+          <span class="fp-total__v">{{ formatCurrency(total) }}</span>
+        </div>
+      </template>
+
+      <template #default="{ item }">
+        <div class="fp-head">
+          <p class="fp-firma">{{ item.FirmaAdi || "—" }}</p>
+          <span class="fp-tutar">{{ formatCurrency(item.KalanTutar) }}</span>
+        </div>
+        <p class="fp-alt">
+          <span class="fp-po">PO {{ item.SiparisNo }}</span>
+          <span v-if="item.SiparisTarihi"> · Sipariş {{ formatDate(item.SiparisTarihi) }}</span>
+          <span v-if="item.YuklemeTarihi"> · Yükleme {{ formatDate(item.YuklemeTarihi) }}</span>
+        </p>
+      </template>
+    </MobileList>
+
     <DataTable
+      v-else
       :value="purchaseList"
       v-model:filters="filters"
       filterDisplay="row"
@@ -140,6 +174,11 @@ export default {
   },
 
   computed: {
+    /* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+    isMobile() {
+      return useRuntimeConfig().public.isMobile
+    },
+
     financeStore() {
       return useFinanceStore()
     },
@@ -272,3 +311,60 @@ export default {
      selectionMode="single" ile PrimeVue bos nesneyi "secim yok" gibi
      ele aliyor; kaynaktaki hali korundu.
 -->
+
+<style scoped>
+.fp-total {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.fp-total__k {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4b5563;
+}
+
+.fp-total__v {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-head {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.fp-firma {
+  flex-grow: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: #111827;
+}
+
+.fp-tutar {
+  flex: none;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #b45309;
+}
+
+.fp-alt {
+  margin: 5px 0 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #6b7280;
+}
+
+.fp-po {
+  font-weight: 600;
+  color: #374151;
+}
+</style>

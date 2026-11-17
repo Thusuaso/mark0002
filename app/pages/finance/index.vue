@@ -1,6 +1,32 @@
 <template>
   <div>
-    <div class="container">
+    <!--
+      MOBIL ARAC CUBUGU: bes dugme masaustunde bes esit sutunda; dar
+      ekranda her biri bir kelimeye sigmayacak kadar daraliyordu.
+      Burada sarmalanan bir serit halinde ve dokunma hedefleri tam.
+    -->
+    <div v-if="isMobile" class="fin-mbar">
+      <Button size="small" severity="primary" label="Tahsilat" @click="collection" />
+      <Button size="small" severity="secondary" label="Ön ödeme" @click="advancedPayment" />
+      <Button size="small" severity="warn" label="Excel" @click="excel_output" />
+      <Button
+        size="small"
+        severity="warn"
+        :label="buttonAllStatus ? 'Ödenmemiş PO' : 'Tümü'"
+        @click="buttonAllStatus = !buttonAllStatus"
+      />
+      <div class="fin-mbar__check">
+        <Checkbox
+          id="mobil-mekmar-mekmer"
+          v-model="mekmarMekmerList"
+          :binary="true"
+          @change="checkedMekmarMekmer($event)"
+        />
+        <label for="mobil-mekmar-mekmer">{{ checked }}</label>
+      </div>
+    </div>
+
+    <div v-else class="container">
       <div class="row">
         <div class="col">
           <Button
@@ -61,7 +87,20 @@
       </div>
     </div>
 
+    <FinanceCards
+      v-if="isMobile"
+      :list="financeStore.getfinanceList"
+      :total="financeStore.getFinanceListTotal"
+      :expiry="financeStore.getFinanceExpiryList"
+      :allStatus="buttonAllStatus"
+      :allList="financeStore.getFinanceListAll"
+      :maya="financeStore.getFinanceListMaya"
+      :status="true"
+      :expiryTotal="financeStore.getFinanceExpiryListTotal"
+      @finance_list_selected_emit="financeListSelected($event)"
+    />
     <FinanceList
+      v-else
       :list="financeStore.getfinanceList"
       :total="financeStore.getFinanceListTotal"
       :expiry="financeStore.getFinanceExpiryList"
@@ -339,6 +378,9 @@ export default {
 </script>
 
 <script setup>
+/* Kabuk mu tarayici mi -- gerekcesi nuxt.config.ts (derleme zamani). */
+const isMobile = useRuntimeConfig().public.isMobile
+
 /*
  * definePageMeta yalnizca <script setup> icinde cagrilabilir -> Options
  * API sayfalarinda ikinci bir script blogu gerekiyor.
@@ -363,6 +405,30 @@ definePageMeta({ middleware: ["authority"] })
     display: block;
     width: 100%;
   }
+}
+</style>
+
+<style scoped>
+/* Mobil arac cubugu: sarmalanan serit, dokunma hedefleri tam. */
+.fin-mbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px 0;
+}
+
+.fin-mbar :deep(.p-button) {
+  min-height: 40px;
+}
+
+.fin-mbar__check {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 40px;
+  font-size: 13px;
+  color: #374151;
 }
 </style>
 
