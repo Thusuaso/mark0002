@@ -29,6 +29,18 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.4",
+    date: "2026-11-17",
+    notes: [
+      "Dialoglar telefonda düzeldi: artık tam ekran açılıyorlar, başlık ve alt düğmeler sabit kalıyor, içerik kendi içinde kayıyor.",
+      "Dialog içindeki form alanları alt alta diziliyor; daha önce yan yana sıkışıp etiketler kutuların üstüne biniyordu.",
+      "Sipariş detayındaki altı sekme (Order, Proforma, Cost, Supplier, Document, Check) tek satırda yatay kayıyor.",
+      "Dialog içindeki tablolar harf harf kırılmak yerine doğal genişliğinde, kendi kutusunda yatay kayıyor.",
+      "Finance telefon için yeniden tasarlandı: bakiye kartın başlığında, diğer tutarlar altında iki sütun halinde. Vadeler ayrı ve kapalı bir bölümde.",
+      "Container Follow ekranından Line alanı kaldırıldı (liste, form ve kayıt).",
+    ],
+  },
+  {
     version: "1.0.3",
     date: "2026-11-17",
     notes: [

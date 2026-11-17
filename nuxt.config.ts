@@ -67,6 +67,15 @@ export default defineNuxtConfig({
     "primeicons/primeicons.css",
     "~/assets/css/bootstrap.min.css",
     "~/assets/css/app.css",
+
+    /*
+     * Kabuga ozel katman -- EN SONDA olmali ki app.css'teki varsayilan
+     * tablo kurallarini ezebilsin (ayni ozgulluk, sonraki kazanir).
+     *
+     * Yalnizca mobil derlemeye giriyor: web paketine HIC dahil
+     * edilmiyor, dolayisiyla tarayici gorunumu etkilenmiyor.
+     */
+    ...(process.env.MOBILE_BUILD === "1" ? ["~/assets/css/mobile.css"] : []),
   ],
 
   /*
