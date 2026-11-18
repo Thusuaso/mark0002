@@ -401,10 +401,23 @@
 </template>
 <script>
 import { useOrderStore } from "~/stores/order"
+import { useLogsStore } from "~/stores/logs"
 import { useModelsStore } from "~/stores/models"
 import { useSharedStore } from "~/stores/shared"
 export default {
   computed: {
+    /*
+     * [x] this.$logs.save(log) -> logsStore.setLogs(log)
+     *
+     * Nuxt 2'de inject('logs') ile gelen $logs YOK; cagri calisma
+     * aninda "this.$logs is undefined" veriyordu. Tasimada diger
+     * dosyalarda yapilan donusum (container/InputForm, offer/Form,
+     * transport/InputForm) BU IKI DOSYADA ATLANMIS.
+     */
+    logsStore() {
+      return useLogsStore()
+    },
+
     orderStore() {
       return useOrderStore()
     },
@@ -838,7 +851,7 @@ export default {
         po: this.po,
         color: "#ffec31",
       };
-      this.$logs.save(log);
+      this.logsStore.setLogs(log);
 
       this.categoryName = null;
       this.productName = null;
@@ -895,7 +908,7 @@ export default {
         po: this.po,
         color: "#ffec31",
       };
-      this.$logs.save(log);
+      this.logsStore.setLogs(log);
 
       this.categoryName = null;
       this.productName = null;
@@ -934,7 +947,7 @@ export default {
         po: this.po,
         color: "#ffec31",
       };
-      this.$logs.save(log);
+      this.logsStore.setLogs(log);
       this.categoryName = null;
       this.productName = null;
       this.surfaceName = null;

@@ -347,12 +347,22 @@
 <script>
 import { toIsoDate } from "~/utils/dates"
 import { useFinanceStore } from "~/stores/finance"
+import { useLogsStore } from "~/stores/logs"
 import { useModelsStore } from "~/stores/models"
 import { useSharedStore } from "~/stores/shared"
 
 
 export default {
   computed: {
+    /*
+     * [x] this.$logs.save(data) -> logsStore.setLogs(data)
+     * Nuxt 2'deki inject('logs') YOK; cagri calisma aninda
+     * "this.$logs is undefined" veriyordu. Tasimada atlanmis.
+     */
+    logsStore() {
+      return useLogsStore()
+    },
+
     financeStore() {
           return useFinanceStore()
         },
@@ -708,7 +718,7 @@ export default {
           po: event.siparisno,
           color: "#ffec31",
         };
-        this.$logs.save(data);
+        this.logsStore.setLogs(data);
       }
     },
     poPaidProcess(event) {
@@ -735,7 +745,7 @@ export default {
         po: event.siparisno,
         color: "#ffec31",
       };
-      this.$logs.save(data);
+      this.logsStore.setLogs(data);
     },
     update(event) {
       this.financeStore.setPoPaidUpdateMekmer(event);
@@ -754,7 +764,7 @@ export default {
         po: event.siparisno,
         color: "#ffec31",
       };
-      this.$logs.save(data);
+      this.logsStore.setLogs(data);
     },
     poListSelected(event) {
       this.finance_po_list_detail = event.data;

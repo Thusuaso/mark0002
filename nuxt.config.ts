@@ -31,6 +31,28 @@ export default defineNuxtConfig({
   ssr: process.env.MOBILE_BUILD !== "1",
 
   /*
+   * DEPLOY SONRASI ACIK KALAN SEKME KENDINI YENILESIN.
+   *
+   * Her derlemede _nuxt/*.js parcalarinin adlari degisiyor. Deploy
+   * aninda acik duran bir sekme hala ESKI adlari istiyor; o dosyalar
+   * artik yok, sunucu 404 + JSON donuyor ve tarayici "disallowed MIME
+   * type (application/json)" diyerek modulu engelliyor. Kullanici
+   * icin belirti yaniltici: sayfa yarim calisiyor, konsol MIME'dan
+   * sikayet ediyor ama sorun MIME degil, DOSYANIN OLMAMASI.
+   *
+   * 'automatic-immediate': parca yuklenemedigi anda sayfa yeniden
+   * yukleniyor ve yeni adlari aliyor. Varsayilan 'automatic' yalnizca
+   * rota gecisinde devreye giriyor, yani sekme ayni sayfada duruyorsa
+   * kirik kalmaya devam ediyor.
+   *
+   * Gercek bir vakada ortaya cikti (goz.mekmar.com'a tasinma gunu,
+   * ust uste deploy'lar).
+   */
+  experimental: {
+    emitRouteChunkError: "automatic-immediate",
+  },
+
+  /*
    * MOBIL DERLEMEDE LEGACY API ARA KATMANI DISARIDA BIRAKILIYOR.
    *
    * [!] Bu bir iyilestirme degil, derlemeyi BITIREN sey -- yoksa

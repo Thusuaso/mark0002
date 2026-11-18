@@ -187,6 +187,7 @@
 </template>
 <script>
 import { useSharedStore } from "~/stores/shared"
+import { useLogsStore } from "~/stores/logs"
 import { useModelsStore } from "~/stores/models"
 import { useFinanceStore } from "~/stores/finance"
 import { toIsoDate, fromIsoDate } from "~/utils/dates"
@@ -200,6 +201,15 @@ export default {
    * sessizce kalkar -- bu sayfada oyle olmustu.
    */
   computed: {
+    /*
+     * [x] this.$logs.save(data) -> logsStore.setLogs(data)
+     * Nuxt 2'deki inject('logs') YOK; cagri calisma aninda
+     * "this.$logs is undefined" veriyordu. Tasimada atlanmis.
+     */
+    logsStore() {
+      return useLogsStore()
+    },
+
     financeStore() {
       return useFinanceStore()
     },
@@ -334,7 +344,7 @@ export default {
           po: event.SiparisNo,
           color: "#ffec31",
         };
-        this.$logs.save(data);
+        this.logsStore.setLogs(data);
       }
     },
     poPaidProcess(event) {
@@ -361,7 +371,7 @@ export default {
         po: event.SiparisNo,
         color: "#ffec31",
       };
-      this.$logs.save(data);
+      this.logsStore.setLogs(data);
     },
     update(event) {
       this.financeStore.setPoPaidUpdate(event);
@@ -380,7 +390,7 @@ export default {
         po: event.SiparisNo,
         color: "#ffec31",
       };
-      this.$logs.save(data);
+      this.logsStore.setLogs(data);
     },
     poListSelected(event) {
       this.finance_po_list_detail = event.data;
