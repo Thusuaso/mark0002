@@ -5,7 +5,7 @@
  * Indirme adresi bir <a href> ile aciliyor ve bir gezinme Authorization
  * basligi GONDEREMEZ, yalnizca cerez tasir. Web'de cerez vardi ve is
  * goruyordu; Android kabugunda sayfa https://localhost'tan, API ise
- * gozv2.mekmar.com'dan geldigi icin o cerez GITMEZ -- yani cereze dayanan
+ * goz.mekmar.com'dan geldigi icin o cerez GITMEZ -- yani cereze dayanan
  * cozum uygulamada sessizce 401 verirdi.
  *
  * Bu yuzden once NORMAL yetkiyle (Bearer) kisa omurlu bir bilet aliniyor

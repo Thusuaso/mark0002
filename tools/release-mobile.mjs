@@ -127,8 +127,8 @@ if (process.argv.includes("--upload")) {
      "Masaustu 05-11-2026" bosluktan bolunuyor ve scp yolun yalnizca ilk
      parcasini goruyor ("No such file or directory"). */
   kos("scp", ["-o", "BatchMode=yes", `"${hedef.replace(/\\/g, "/")}"`, SUNUCU], kok)
-  console.log(`[yayin] YAYINDA: https://gozv2.mekmar.com/downloads/goz-${surum}.apk`)
-  console.log("[yayin] Surum notlari: https://gozv2.mekmar.com/app")
+  console.log(`[yayin] YAYINDA: https://goz.mekmar.com/downloads/goz-${surum}.apk`)
+  console.log("[yayin] Surum notlari: https://goz.mekmar.com/app")
 } else {
   console.log("[yayin] Sunucuya atmak icin:  npm run release:mobile -- --upload")
 }

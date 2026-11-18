@@ -166,8 +166,8 @@ export default defineNuxtConfig({
        *
        * Android kabugunda sayfa https://localhost'tan servis ediliyor,
        * API ise uretim sunucusunda; orada
-       * NUXT_PUBLIC_API_ORIGIN=https://gozv2.mekmar.com veriliyor ve
-       * sonuc "https://gozv2.mekmar.com/api" oluyor.
+       * NUXT_PUBLIC_API_ORIGIN=https://goz.mekmar.com veriliyor ve
+       * sonuc "https://goz.mekmar.com/api" oluyor.
        */
       apiOrigin: "",
 

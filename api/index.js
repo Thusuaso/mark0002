@@ -126,7 +126,7 @@ app.use(cookieParser());
    --------------------------------------------------------------------------
    Web arayuzu API ile AYNI origin'den konusuyor, bu yuzden bugune kadar
    hicbir CORS basligi gerekmedi ve yoktu. Capacitor kabugunda sayfa
-   https://localhost'tan servis ediliyor, API ise gozv2.mekmar.com'da;
+   https://localhost'tan servis ediliyor, API ise goz.mekmar.com'da;
    tarayici icin bu capraz kaynak istegi ve baslik olmadan ENGELLENIR.
 
    Liste DAR tutuldu: yildiz (*) degil, yalnizca kabugun kullandigi uc
@@ -3119,7 +3119,7 @@ app.get("/upload/document/missing/:po", async (req, res) => {
    PDF'i kendi goruntuleyicisinde aciyor, uygulamadan cikiyordunuz.
 
    [!] <a download> BU ISI COZMEZ -- capraz kaynakta YOK SAYILIR.
-   Sayfa gozv2.mekmar.com, dosya file-service.mekmar.com; farkli kaynak
+   Sayfa goz.mekmar.com, dosya file-service.mekmar.com; farkli kaynak
    oldugu icin tarayici `download` niteligini gormezden gelir ve yine
    gezinir. Spesifikasyon boyle; kodda bir eksik degil.
 

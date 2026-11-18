@@ -5,10 +5,10 @@ yok**: `app/` altındaki Nuxt uygulaması SPA olarak derlenip APK'ya
 gömülüyor, veri üretim sunucusundan geliyor.
 
 ```
-app/  +  api/        ->  gozv2.mekmar.com   (bugünkü web, değişmiyor)
+app/  +  api/        ->  goz.mekmar.com   (bugünkü web, değişmiyor)
 app/          ->  SPA  ->  APK              (bu klasör)
                             |
-                            +-- veri --> https://gozv2.mekmar.com/api
+                            +-- veri --> https://goz.mekmar.com/api
 ```
 
 ## Neden böyle

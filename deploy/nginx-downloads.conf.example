@@ -1,6 +1,6 @@
 # APK indirme dizini
 #
-# gozv2.mekmar.com sunucu blogunun ICINE eklenir (deploy/nginx.conf.example
+# goz.mekmar.com sunucu blogunun ICINE eklenir (deploy/nginx.conf.example
 # icindeki location'larin yanina). Amac: /app sayfasindaki indirme
 # dugmesinin isaret ettigi /downloads/goz-<surum>.apk dosyasini servis
 # etmek.

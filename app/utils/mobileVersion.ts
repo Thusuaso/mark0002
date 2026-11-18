@@ -29,6 +29,14 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.0.9",
+    date: "2026-11-18",
+    notes: [
+      "The site has moved to goz.mekmar.com and the app now talks to the new address.",
+      "[!] You must install this version. The old address no longer exists, so any earlier build can no longer reach the server — it will look like a network problem.",
+    ],
+  },
+  {
     version: "1.0.8",
     date: "2026-11-17",
     notes: [
