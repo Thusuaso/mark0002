@@ -15,14 +15,35 @@
       Kabukta GOSTERILMIYOR (v-if): uygulamanin icinde "uygulamayi
       indir" demek anlamsiz.
     -->
-    <section v-if="!isMobile" class="appcta">
+    <section v-if="!isMobile" class="appcta" :class="{ 'appcta--yeni': yeniSurum }">
       <div class="appcta__mark" aria-hidden="true">
         <i class="pi pi-android" />
       </div>
 
       <div class="appcta__text">
-        <h2 class="appcta__title">GOZ on your phone</h2>
-        <p class="appcta__desc">
+        <h2 class="appcta__title">
+          GOZ on your phone
+          <!--
+            YENI SURUM ROZETI. Yalnizca son yayin TAZE ise cikiyor
+            (bkz. yeniSurum); surekli duran bir "yeni" etiketi birkac
+            gun sonra gorulmez oluyor ve anlamini yitiriyor.
+          -->
+          <span v-if="yeniSurum" class="appcta__yeni">NEW</span>
+        </h2>
+
+        <!--
+          Taze yayin varsa ACIKLAMA YERINE o yayinin ilk notu
+          gosteriliyor: "indir" demek icin bir SEBEP veriyor. Sayfa
+          kullanicinin telefonunda hangi surumun kurulu oldugunu
+          BILEMEZ, bu yuzden "guncelleme var" degil "su tarihte su
+          surum cikti" deniyor -- bildigimiz sey bu.
+        -->
+        <p v-if="yeniSurum" class="appcta__desc">
+          <strong>v{{ guncelSurum.version }}</strong>
+          · {{ tarihYazisi(guncelSurum.date) }} —
+          {{ guncelSurum.notes[0] }}
+        </p>
+        <p v-else class="appcta__desc">
           Orders, container tracking and stock reports, built for the
           screen in your pocket.
         </p>
@@ -30,7 +51,7 @@
 
       <NuxtLink to="/app" class="appcta__btn">
         <i class="pi pi-download" aria-hidden="true" />
-        Download Android App
+        {{ yeniSurum ? `Get v${guncelSurum.version}` : "Download Android App" }}
       </NuxtLink>
     </section>
 
@@ -61,8 +82,35 @@ export default {
 </script>
 
 <script setup>
+import { MOBILE_RELEASES } from "~/utils/mobileVersion"
+
 /* Kabukta gizlemek icin -- gerekcesi nuxt.config.ts (derleme zamani). */
 const isMobile = useRuntimeConfig().public.isMobile
+
+/*
+ * YENI SURUM VURGUSU.
+ *
+ * Sayfa, kullanicinin telefonunda hangi surumun kurulu oldugunu
+ * BILEMEZ -- bunu ogrenmenin bir yolu yok. O yuzden "guncelleme var"
+ * DEMIYORUZ; yalnizca son yayinin TAZE oldugunu soyluyoruz. Soyledigi
+ * sey dogru: "su tarihte su surum cikti".
+ *
+ * 14 GUN: rozet kalici olursa birkac gun sonra gorulmez hale geliyor
+ * ve "yeni" kelimesi anlamini yitiriyor. Suresi dolunca serit sakin
+ * haline donuyor.
+ */
+const guncelSurum = MOBILE_RELEASES[0]
+
+const yeniSurum = computed(() => {
+  const g = (Date.now() - new Date(guncelSurum.date).getTime()) / 86400000
+  return g >= 0 && g <= 14
+})
+
+function tarihYazisi(iso) {
+  const d = new Date(iso)
+  const iki = (n) => (n < 10 ? "0" + n : String(n))
+  return `${iki(d.getDate())}.${iki(d.getMonth() + 1)}.${d.getFullYear()}`
+}
 
 /*
  * Veri cekimi NEDEN created() icinde degil: SSR created() icindeki async
@@ -214,5 +262,61 @@ await useAsyncData(
     justify-content: center;
     width: 100%;
   }
+}
+
+/* ---------- taze yayin: serit renkleniyor ---------- */
+
+/*
+ * Yeni surum varken serit sakin beyazdan cikip renkleniyor: panelin
+ * ustunde, sayfanin ilk gordugu yerde durdugu icin bu kadari dikkat
+ * cekmeye yetiyor. Renk 14 gun sonra kendiliginden sonuyor
+ * (bkz. yeniSurum) -- kalici bir vurgu birkac gun sonra gorulmez
+ * hale geliyor.
+ */
+.appcta--yeni {
+  background: linear-gradient(135deg, #eff4ff 0%, #ecfdf7 100%);
+  border-color: #bfd3fb;
+  box-shadow: 0 2px 10px -4px rgb(29 78 216 / 22%);
+}
+
+.appcta--yeni .appcta__mark {
+  /* Isaret de canlansin; serit ile ayni iki renk. */
+  box-shadow: 0 0 0 4px rgb(29 78 216 / 10%);
+}
+
+.appcta--yeni .appcta__btn {
+  background: #1d4ed8;
+}
+
+.appcta--yeni .appcta__btn:hover,
+.appcta--yeni .appcta__btn:focus-visible {
+  background: #1e3a8a;
+}
+
+/*
+ * "NEW" rozeti. Basligin yaninda, kucuk ve yuksek karsitlikli.
+ * Animasyon YOK: surekli hareket eden bir oge okumayi zorlastiriyor
+ * ve panelin verisiyle yarisiyor; renk ve konum zaten yetiyor.
+ */
+.appcta__yeni {
+  display: inline-block;
+  vertical-align: middle;
+
+  margin-left: 8px;
+  padding: 2px 8px;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+
+  background: #0f766e;
+  border-radius: 999px;
+}
+
+.appcta--yeni .appcta__desc strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #1d4ed8;
 }
 </style>
