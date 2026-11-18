@@ -112,6 +112,17 @@
     </div>
 
     <DataTable :value="orders">
+      <!--
+        BOS DURUM METNI. Bu tablo karta ait siparisleri gosteriyor
+        (su.UrunKartID = kart ID). Cogu kartin hic siparisi yok ve o
+        zaman tablo tamamen BOS bir alan olarak kaliyordu -- kullanici
+        "hicbir sey cikmiyor" diye bildirdi, cunku "veri yok" ile
+        "yuklenemedi" ayirt edilemiyordu.
+      -->
+      <template #empty>
+        Bu ürün kartına ait sipariş bulunmuyor.
+      </template>
+
       <Column field="FirmaAdi" header="Customer" />
       <Column field="SiparisNo" header="Po" />
       <Column field="SatisFiyati" header="Price">

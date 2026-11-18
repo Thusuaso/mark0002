@@ -136,7 +136,15 @@ export const useCardsStore = defineStore("cards", {
         )
         this.cardsOrderList = res?.list ?? []
       } catch (err) {
+        /*
+         * HATA ARTIK GORUNUR. Eskiden yalnizca console.error vardi ve
+         * liste bosaltiliyordu; ekranda sonuc "bu kartin siparisi yok"
+         * ile BIREBIR AYNI goruluyordu. Sunucu ucu de hata halinde
+         * 200 degil 500 ama govdesi yine { list: [] } donduruyor, yani
+         * iki durum istemcide ayrilamiyordu.
+         */
         console.error("setCardsOrderList basarisiz:", err)
+        useAppToast().error("Kartın sipariş listesi yüklenemedi.")
         this.cardsOrderList = []
       }
     },
