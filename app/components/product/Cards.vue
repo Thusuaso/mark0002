@@ -70,6 +70,36 @@ export default {
      */
     const shared = useSharedStore()
     useRealtime("card_list_update_on", () => shared.setCardList())
+
+    /*
+     * [!] KENDI VERISINI KENDI CEKIYOR -- eskiden cekmiyordu.
+     *
+     * Bu bilesen listeyi shared.getCardList'ten OKUYOR ama doldurmak
+     * cagiran tarafa birakilmisti. Uc kullanim yeri var ve yalnizca
+     * ikisi dolduruyordu:
+     *
+     *   pages/operation/cards.vue        useAsyncData icinde cekiyor  OK
+     *   orderDetail/OrderForm.vue        card_selected_list() once
+     *                                    setCardList() cagirip sonra
+     *                                    dialogu aciyor               OK
+     *   orderDetail/OrderForm2.vue       dialogu DOGRUDAN aciyor      YOK
+     *
+     * Sonuc: Mekmer ekranlarinda bir siparis acilip "@" dugmesine
+     * basildiginda urun karti listesi BOS geliyordu. Hata vermiyordu,
+     * yalnizca bos bir tablo -- sebebi gorunmuyordu.
+     *
+     * Duzeltme cagiran tarafa degil BURAYA yapildi: dugmeye bir cagri
+     * eklemek bu kullanim yerini duzeltir ama bir sonraki kullanim
+     * yerinde ayni tuzak tekrar kurulurdu. Bilesen artik kendi
+     * kendine yetiyor.
+     *
+     * YALNIZCA BOSSA cekiliyor: /operation/cards sayfasi listeyi zaten
+     * yukluyor, kosulsuz cagri orada ikinci bir istek demek olurdu.
+     * Liste tazeligini useRealtime aboneligi koruyor.
+     */
+    onMounted(() => {
+      if (!shared.getCardList?.length) shared.setCardList()
+    })
   },
 
   computed: {
