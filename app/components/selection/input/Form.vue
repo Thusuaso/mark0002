@@ -542,6 +542,42 @@ export default {
       }
     },
 
+    /*
+     * SAYIYA CEVIR, OLMUYORSA null.
+     *
+     * Formdaki olcu/adet alanlari <InputText>, yani degerler METIN ve
+     * ondalik ayirici virgul olabiliyor. Alan TEMIZLENDIGINDE deger ""
+     * oluyor ve eski kod onu dogrudan hesaba sokuyordu:
+     *   parseInt("") -> NaN -> (en * boy * NaN) / 10000 -> "NaN"
+     * Amount ve Sqm kutularinda yazi olarak "NaN" goruluyordu. Burada
+     * "sayi yok" durumu NaN ile karismayan tek bir deger (null) ile
+     * temsil ediliyor; cagiran taraf ona bakip 0 yaziyor.
+     */
+    __sayi(value) {
+      if (value === null || value === undefined) return null;
+      const n = parseFloat(String(value).replace(",", "."));
+      return Number.isFinite(n) ? n : null;
+    },
+
+    /*
+     * en * boy * adet / 10000  ->  m2 metni.
+     *
+     * Parcalardan biri sayi degilse -- alan bos ya da olcu "ANT",
+     * "Slab" gibi bir metin -- sonuc 0. (Metin olculer icin cagiran
+     * taraf zaten erken donuyor; bu yalnizca son savunma.)
+     *
+     * Math.trunc: eski kod adedi parseInt ile okuyordu, yani "10,5"
+     * 10 sayiliyordu. Adet tam sayi oldugu icin pratikte fark etmiyor
+     * ama davranis bilerek korundu.
+     */
+    __m2(event) {
+      const width = this.__sayi(this.width);
+      const height = this.__sayi(this.height);
+      const adet = this.__sayi(event);
+      if (width === null || height === null || adet === null) return 0;
+      return ((width * height * Math.trunc(adet)) / 10000).toFixed(2);
+    },
+
     calculateTotalAmountM2(event) {
       if (this.selectedAmountStatus === "Sqm") {
         if (
@@ -564,20 +600,10 @@ export default {
           this.amount = 0;
         } else {
           if (this.selectedAmountStatus == "Sqm") {
-            const width = parseFloat(this.width.replace(",", "."));
-            const height = parseFloat(this.height.replace(",", "."));
-            this.amount = (
-              (width * height * parseInt(event.replace(",", "."))) /
-              10000
-            ).toFixed(2);
+            this.amount = this.__m2(event);
             this.speacialAmount = this.amount;
           } else {
-            const width = parseFloat(this.width.replace(",", "."));
-            const height = parseFloat(this.height.replace(",", "."));
-            this.speacialAmount = (
-              (width * height * parseInt(event.replace(",", "."))) /
-              10000
-            ).toFixed(2);
+            this.speacialAmount = this.__m2(event);
             this.amount = event;
           }
         }
@@ -602,45 +628,57 @@ export default {
           this.amount = event;
         } else {
           if (this.selectedAmountStatus == "Sqm") {
-            const width = parseFloat(this.width.replace(",", "."));
-            const height = parseFloat(this.height.replace(",", "."));
-            this.amount = (
-              (width * height * parseInt(event.replace(",", "."))) /
-              10000
-            ).toFixed(2);
+            this.amount = this.__m2(event);
             this.speacialAmount = this.amount;
           } else {
-            const width = parseFloat(this.width.replace(",", "."));
-            const height = parseFloat(this.height.replace(",", "."));
-            this.speacialAmount = (
-              (width * height * parseInt(event.replace(",", "."))) /
-              10000
-            ).toFixed(2);
+            this.speacialAmount = this.__m2(event);
             this.amount = event;
           }
         }
       }
     },
+    /*
+     * Kutudaki adet x kutu sayisi.
+     *
+     * Eskiden yalnizca `if (this.boxamount)` vardi; bos birakilan
+     * ALANIN kendisi (event) kontrol edilmiyordu ve +"" * +"abc" gibi
+     * durumlar NaN'i toplama yaziyordu. Artik iki taraftan biri sayi
+     * degilse toplam 0.
+     */
     calculateTotalAmount(event) {
-      if (this.boxamount) {
-        this.totalamount = +event * +this.boxamount;
-      }
+      const kutu = this.__sayi(this.boxamount);
+      const adet = this.__sayi(event);
+      this.totalamount = kutu === null || adet === null ? 0 : adet * kutu;
     },
     calculateM2Box(event) {
       let boxM2 = 0.74346;
       let setM2 = 0.494875;
 
-      if (event) {
-        if (
-          (this.height == "Set" || this.height == "SET") &&
-          this.width == "20,3"
-        ) {
-          this.amount = (setM2 * event).toFixed(2);
-          this.speacialAmount = this.amount;
-        } else {
-          this.amount = (boxM2 * event).toFixed(2);
-          this.speacialAmount = this.amount;
-        }
+      /*
+       * Alan temizlendi (ya da sayi degil): 0 yaz ve cik.
+       *
+       * Eski `if (event)` kontrolu bos degeri atlıyordu, yani ekranda
+       * ONCEKI hesap duruyordu -- kutu sayisi silinmis ama m2 hala
+       * yaziyordu. Sayi olmayan bir metin ise NaN uretiyordu.
+       */
+      const kutuSayisi = this.__sayi(event);
+      if (kutuSayisi === null) {
+        this.amount = 0;
+        this.speacialAmount = this.amount;
+        return;
+      }
+
+      /* Carpan artik METIN degil sayi: "5,5" gibi virgullu bir deger
+         eskiden sessizce NaN veriyordu. */
+      if (
+        (this.height == "Set" || this.height == "SET") &&
+        this.width == "20,3"
+      ) {
+        this.amount = (setM2 * kutuSayisi).toFixed(2);
+        this.speacialAmount = this.amount;
+      } else {
+        this.amount = (boxM2 * kutuSayisi).toFixed(2);
+        this.speacialAmount = this.amount;
       }
     },
     async deleteForm() {
