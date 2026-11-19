@@ -178,7 +178,7 @@
                 type="text"
                 v-model="boxamount"
                 class="w-100"
-                @input="calculateM2Box($event)"
+                @input="calculateM2Box($event.target.value)"
               />
               <label for="boxamount">Box Amount</label>
             </FloatLabel>
@@ -190,7 +190,7 @@
                 type="text"
                 v-model="boxinamount"
                 class="w-100"
-                @input="calculateTotalAmount($event)"
+                @input="calculateTotalAmount($event.target.value)"
               />
               <label for="boxinamount">Pcs in Box</label>
             </FloatLabel>
@@ -202,7 +202,7 @@
                 type="text"
                 v-model="totalamount"
                 class="w-100"
-                @input="calculateTotalAmountM2($event)"
+                @input="calculateTotalAmountM2($event.target.value)"
               />
               <label for="totalamount">Total Pieces</label>
             </FloatLabel>
@@ -216,7 +216,7 @@
                 type="text"
                 v-model="amount"
                 class="w-100"
-                @input="amountInput($event)"
+                @input="amountInput($event.target.value)"
               />
               <label for="amount">Amount</label>
             </FloatLabel>
@@ -227,7 +227,7 @@
                 id="speacialamount"
                 type="text"
                 v-model="speacialAmount"
-                @input="speacialAmount = $event.replace(',', '.')"
+                @input="speacialAmount = $event.target.value.replace(',', '.')"
                 class="w-100"
               />
               <label for="speacialamount">Sqm</label>
@@ -1214,4 +1214,35 @@ onBeforeUnmount(() => socket.disconnect())
      no'yu sifirliyor) ve bu bileşen SSR'da HIC mount edilmiyor --
      tek kullanicisi pages/selection/input.vue icindeki, v-model:visible
      false ile baslayan <Dialog>.
+
+  == OTOMATIK SQM HESABI CALISMIYORDU -- VUE 2 -> VUE 3 TUZAGI ==
+
+  Bes girdinin @input isleyicisi $event'i DEGER sanıyordu:
+      calculateTotalAmountM2 / amountInput -> event.replace(",", ".")
+      calculateTotalAmount                 -> +event * +this.boxamount
+      calculateM2Box                       -> boxM2 * event
+      (ve satir ici speacialAmount atamasi)
+
+  VUE 2'DE DOGRUYDU: orada <InputText @input="..."> bilesenin OZEL
+  input olayina baglaniyordu ve o olay v-model sozlesmesi geregi
+  DEGERI tasiyordu.
+
+  VUE 3 + PrimeVue 4'TE DEGIL: InputText `input` olayini emit
+  ETMIYOR (emits listesinde yok; kendi onInput'u writeValue cagirip
+  update:modelValue atiyor). Dolayisiyla @input ATTRIBUTE FALLTHROUGH
+  ile kok <input> ogesinin NATIVE olayina baglaniyor ve $event bir
+  InputEvent oluyor.
+
+  Sonuc: event.replace(...) TypeError atiyor, +event ve boxM2*event
+  NaN uretiyor -- yani Sqm alani hic dolmuyordu. Hata konsolda
+  goruluyor ama ekranda yalnizca "hesaplamiyor" gibi duruyordu.
+
+  Duzeltme SABLONDA: $event yerine $event.target.value. Isleyiciler
+  birebir korundu; imzalari zaten degeri bekliyordu.
+
+  [!] AYNI KALIP DEPONUN BASKA YERLERINDE DE VAR (olculdu: 46 kullanim
+  yeri, hicbiri $event.target.value kullanmiyor). Hepsi bozuk DEGIL --
+  bir kismi argumani hic kullanmiyor. order/Table.vue icindeki
+  globalSearchFilterInput notu bu tuzagi zaten tarif ediyor. Taranmasi
+  ayri bir is.
 -->
