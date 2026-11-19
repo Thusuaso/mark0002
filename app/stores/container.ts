@@ -24,6 +24,8 @@ export interface ContainerFollow {
   MusteriAdi: string
   YuklemeTarihi: string | null
   KonteynerNo: string | null
+  /* Geminin limandan kalkis gunu -- ekranda "Departure Date". */
+  GemiKalkisTarihi: string | null
   /* API hala donduruyor; ekranda GOSTERILMIYOR (Line kolonu
      kaldirildi). Alani silmek sunucu yanitini yanlis tarif etmek
      olurdu. */
@@ -50,6 +52,8 @@ export interface ContainerInput {
 
 export interface ContainerFollowSave {
   EtaTarihi: string | null
+  /* 'YYYY-MM-DD' ya da null; Eta ile ayni bicim. */
+  GemiKalkisTarihi: string | null
   KonsimentoDurum: boolean
   Takip: boolean
   /*

@@ -29,6 +29,16 @@ export interface MobileRelease {
 
 export const MOBILE_RELEASES: MobileRelease[] = [
   {
+    version: "1.1.0",
+    date: "2026-11-19",
+    notes: [
+      "Container Tracking now shows the vessel departure date, next to the loading date — together they answer when the goods actually left.",
+      "You can set it from the edit dialog.",
+      "Fixed: the automatic square-metre calculation on Selection › Entry had stopped working.",
+      "Fixed: the product card list opened with the @ button on an order was empty.",
+    ],
+  },
+  {
     version: "1.0.9",
     date: "2026-11-18",
     notes: [

@@ -3333,6 +3333,10 @@ function followListSql(acenteVar, takipKosulu, pencereVar) {
                 s.Eta,
                 s.KonteynerNo,
                 s.YuklemeTarihi,
+                /* Geminin limandan kalkis gunu -- ekranda "Departure Date".
+                   Kolon SiparislerTB'de zaten vardi, koda yeni baglandi
+                   (bkz. api/sql/SiparislerTB_GemiKalkisTarihi.sql). */
+                s.GemiKalkisTarihi,
                 s.KonsimentoDurum,
                 s.AktarmaLimanAdi,
                 s.Line,
@@ -3429,6 +3433,14 @@ app.post("/container/follow/save", async (req, res) => {
     const alanlar = [
       /* Eta bir date kolonu; 'YYYY-MM-DD' dizgesi ortulu cevrilir. */
       { kolon: "Eta", param: "EtaTarihi", tip: mssql.VarChar },
+      /* Gemi kalkis tarihi -- Eta ile ayni kalip: date kolonu, dizge
+         olarak baglanip ortulu cevriliyor. Bos dizge asagida NULL'a
+         ceviriliyor, yoksa SQL Server onu 1900-01-01 yapardi. */
+      {
+        kolon: "GemiKalkisTarihi",
+        param: "GemiKalkisTarihi",
+        tip: mssql.VarChar,
+      },
       /* Sunucu alan adi TURKCE 'ı' iceriyor -- istemciyle birebir. */
       { kolon: "KonteynerNo", param: "KonteynırNo", tip: mssql.NVarChar },
       /*

@@ -90,6 +90,17 @@
 
 
       <Column
+        field="GemiKalkisTarihi"
+        header="Departure Date"
+        headerClass="tableHeader"
+        bodyClass="tableBody"
+      >
+        <template #body="slotProps">
+          {{ dateToString(slotProps.data.GemiKalkisTarihi) }}
+        </template>
+      </Column>
+
+      <Column
         field="Eta"
         header="Est. Date"
         headerClass="tableHeader"

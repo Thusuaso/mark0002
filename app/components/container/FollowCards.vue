@@ -45,6 +45,16 @@
           <dt>Yükleme</dt>
           <dd>{{ dateToString(item.YuklemeTarihi) || "—" }}</dd>
         </div>
+        <!--
+          Gemi kalkisi. Yuklemenin hemen yaninda duruyor cunku ikisi
+          birlikte "mal ne zaman yola cikti" sorusunu cevapliyor;
+          varis tarihi ayri bir soru ve zaten basliktaki gun sayisi
+          onu tasiyor.
+        -->
+        <div>
+          <dt>Gemi kalkışı</dt>
+          <dd>{{ dateToString(item.GemiKalkisTarihi) || "—" }}</dd>
+        </div>
         <div>
           <dt>Tahmini varış</dt>
           <dd>{{ etaVar(item) ? dateToString(item.Eta) : "—" }}</dd>

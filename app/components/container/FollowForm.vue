@@ -16,6 +16,18 @@
         <FloatLabel>
           <DatePicker
             class="w-100"
+            v-model="departure_date"
+            inputId="departure_date"
+            style="z-index: 99"
+            dateFormat="dd/mm/yy"
+          />
+          <label for="departure_date">Departure Date</label>
+        </FloatLabel>
+      </div>
+      <div class="col">
+        <FloatLabel>
+          <DatePicker
+            class="w-100"
             v-model="eta_date"
             inputId="eta_date"
             style="z-index: 99"
@@ -148,6 +160,7 @@ export default {
   data() {
     return {
       eta_date: null,
+      departure_date: null,
       checkedSendingForm: false,
       checkedFollowForm: false,
       containerNo: null,
@@ -172,6 +185,14 @@ export default {
      * yon (toIsoDate) kullaniliyor; cift zaten boyle eslesiyor.
      */
     this.eta_date = fromIsoDate(this.model.Eta)
+
+    /*
+     * Gemi kalkis tarihi. Eta ile AYNI yol: ISO dizge -> Date, cunku
+     * DatePicker Date nesnesi bekliyor. Eta'daki 1900-01-01 yer
+     * tutucusu bu kolonda YOK (bastan null kullaniliyor), bu yuzden
+     * ayrica gecerlilik kontrolu gerekmiyor.
+     */
+    this.departure_date = fromIsoDate(this.model.GemiKalkisTarihi)
 
     this.checkedSendingForm =
       this.model.KonsimentoDurum == null || !this.model.KonsimentoDurum
@@ -217,6 +238,8 @@ export default {
     save() {
       this.containerStore.setContainerFollowSave({
         EtaTarihi: this.eta_date == null ? null : toIsoDate(this.eta_date),
+        GemiKalkisTarihi:
+          this.departure_date == null ? null : toIsoDate(this.departure_date),
         KonsimentoDurum: this.checkedSendingForm,
         Takip: this.checkedFollowForm,
         /* Sunucu alan adi TURKCE 'ı' iceriyor -- birebir korundu. */

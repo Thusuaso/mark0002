@@ -6,10 +6,15 @@
    Container Follow ekranina (operation/follow) "Departure Date" alanini
    ekler: listede bir kolon, duzenleme formunda bir takvim.
 
-   [!] SCRIPT CALISTIRILMADAN KOD YAYINLANMAMALI. Liste sorgusu kolonu
-   dogrudan seciyor (acente alanindaki gibi bir "var mi" kontrolu YOK,
-   cunku bu kolon opsiyonel bir ozellik degil ekranin parcasi). Kolon
-   yoksa Container Follow listesi 500 doner.
+   NOT: uretim veritabaninda kolon ZATEN VARDI (eski sistemden kalma);
+   bu betik orada "zaten mevcut" deyip gecer. Sifirdan kurulan bir
+   veritabani icin ve kolonun ne ise yaradigini kayit altina almak
+   icin duruyor.
+
+   [!] Liste sorgusu kolonu DOGRUDAN seciyor (acente alanindaki gibi
+   bir "var mi" kontrolu YOK, cunku bu kolon opsiyonel bir ozellik
+   degil ekranin parcasi). Kolon olmayan bir veritabaninda Container
+   Follow listesi 500 doner -- yeni kurulumda betik once calistirilir.
 
    Calistirma: SSMS'te ya da
      sqlcmd -S <sunucu> -d <veritabani> -U <kullanici> -P <sifre> \
