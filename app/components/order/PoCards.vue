@@ -351,11 +351,11 @@ export default {
     },
 
     /*
-     * Duz urun satirlarini PO'lara topluyor.
+     * Duz urun satirlarini PO'lara topluyor, sonra TARIHE gore siraliyor
+     * (gerekcesi asagida, out.sort'un basinda).
      *
-     * GELEN SIRA KORUNUYOR: sunucu siralamasi ne ise kartlarin sirasi da o.
-     * Map ekleme sirasini hatirladigi icin ayrica siralamaya gerek yok --
-     * tabloda da ayni sira gecerliydi.
+     * PO ICINDEKI satirlarin sirasi gelen sira: sunucu su.SiraNo'ya gore
+     * veriyor, tabloda da o gecerliydi.
      */
     groups() {
       const map = new Map()
@@ -413,6 +413,37 @@ export default {
         po.behind = this.dateField === "SiparisTarihi" && po.pct < 50
         out.push(po)
       }
+
+      /*
+       * TARIHE GORE SIRALA -- sunucudan gelen sira YETMIYOR.
+       *
+       * /order/shipped/mekmer2/list IKI sorgunun ARDI ARDINA EKLENMIS
+       * halini donduruyor: once Mekmer, sonra Mekmar
+       * (api/index.js, `resultList.concat`). Her blok kendi icinde
+       * tarihe gore sirali ama liste GENELINDE degil. Sayfa basina 25
+       * PO oldugu icin Mekmar siparisleri arka sayfalara dusuyor ve
+       * ekranda "yalnizca Mekmer var" gibi goruluyordu.
+       *
+       * Tablo gorunumunde bu sorun HIC OLMADI, cunku DataTable gelen
+       * siraya bakmiyor, kendi siralamasini uyguluyor ve iki blogu
+       * birbirine karistiriyor (ShippedList.vue ve Table2.vue:
+       * sortField="YuklemeTarihi" | "SiparisTarihi", :sortOrder="-1").
+       * Kartlar ayni kurali uyguluyor; iki gorunum artik ayni sirada.
+       *
+       * Tarihi olmayan PO EN SONA: "bilinmiyor", "en yeni" demek degil.
+       */
+      const zaman = (po) => {
+        const t = po.date ? new Date(po.date).getTime() : NaN
+        return Number.isFinite(t) ? t : -Infinity
+      }
+      out.sort((a, b) => {
+        const ta = zaman(a)
+        const tb = zaman(b)
+        /* Ikisi de tarihsizse 0: NaN donduren bir karsilastirma
+           siralamayi tanimsiz hale getirirdi (tb - ta = Inf - Inf). */
+        return ta === tb ? 0 : tb - ta
+      })
+
       return out
     },
 
