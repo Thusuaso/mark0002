@@ -7,6 +7,7 @@
     />
     <ContainerFollowList
       v-else
+      :shipment-date="false"
       :list="containerStore.getContainerFollowList"
       @follow-selected-dialog-emit="followSelectedDialogEmit($event)"
     />

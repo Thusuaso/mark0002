@@ -46,9 +46,23 @@
         </template>
       </Column>
 
-      <!-- Liste sunucudan yukleme tarihine gore (yeniden eskiye) gelir;
-           baslik tiklanarak yon degistirilebilir. -->
+      <!--
+        Liste sunucudan yukleme tarihine gore (yeniden eskiye) gelir;
+        baslik tiklanarak yon degistirilebilir.
+
+        [!] BU BILESEN IKI EKRANDA KULLANILIYOR: Container Tracking
+        (operation/follow) ve Shipped Containers (operation/unfollow).
+        Takip ekraninda yukleme tarihi istenmiyor, ama sevk edilmis
+        konteynerlerde en anlamli alan o -- bu yuzden kolon
+        SILINMEDI, yalnizca takip ekraninda gizleniyor
+        (shipmentDate prop'u).
+
+        SIRALAMA ETKILENMIYOR: sira sunucudan geliyor
+        (followListSql ... order by s.YuklemeTarihi desc), kolonun
+        gorunur olmasina bagli degil.
+      -->
       <Column
+        v-if="shipmentDate"
         field="YuklemeTarihi"
         header="Shipment Date"
         :sortable="true"
@@ -209,6 +223,13 @@ export default {
       type: Array,
       required: false,
       default: () => [],
+    },
+
+    /* Shipment Date kolonu gorunsun mu. Varsayilan true: Shipped
+       Containers ekrani bu kolona ihtiyac duyuyor ve prop vermiyor. */
+    shipmentDate: {
+      type: Boolean,
+      default: true,
     },
   },
 
