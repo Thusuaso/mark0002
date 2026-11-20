@@ -311,46 +311,20 @@
     </header>
 
     <!--
-      GRAFIK KENDI SATIRINDA, TAM GENISLIKTE.
-
-      Eskiden grafik ve uc tablo TEK bir iki kolonlu izgaradaydi, yani
-      ≥900px'te duzen soyle dagiliyordu:
-
-        [ grafik ][ Monthly production ]
-        [ Mekmer monthly shipment ][ Mekmer current stock ]
-
-      Uc tablo ayni seyin farkli kesitleri oldugu halde iki ayri satira
-      bolunuyor ve karsilastirmak icin goz asagi kayiyordu. Ustelik
-      grafigin tasidigi `dash-card--wide` sinifinin CSS KARSILIGI HIC
-      YOKTU (tum dosyada tek gectigi yer o satirdi): isim genis bir kart
-      vaat ediyordu ama hicbir sey yapmiyordu, grafik de sade bir hucre
-      olarak duruyordu. Olu sinif kaldirildi; grafik artik gercekten
-      tam genislikte, cunku kendi tek kolonlu bolumunde.
-    -->
-    <section class="dash-grid">
-      <Card class="dash-card">
-          <template #header>
-            <h2 class="dash-card__title">Monthly production</h2>
-          </template>
-          <template #content>
-            <Chart
-              type="bar"
-              :data="chartProduction"
-              :options="vizStackedBarOptions"
-              class="dash-chart"
-            />
-          </template>
-      </Card>
-    </section>
-
-    <!--
-      YIL KARSILASTIRMASI -- KENDI SATIRINDA, TAM GENISLIKTE.
+      YIL KARSILASTIRMASI -- PANELIN ILK BOLUMU, TAM GENISLIKTE.
 
       Yedi kolonu (ay + uc birim x iki yil) ve iki katli basligi var;
       asagidaki uclu izgaraya girse sutun basina ~65px dusup okunmaz
-      hale gelirdi. Grafigin hemen altinda duruyor cunku ikisi ayni
-      soruyu farkli cozunurlukte cevapliyor: grafik egilimi, tablo
-      sayiyi veriyor.
+      hale gelirdi.
+
+      [x] USTUNDEKI "Monthly production" GRAFIGI BU PANELDEN KALDIRILDI.
+      Grafik aylik uretimi TEK yil ve TEK birim uzerinden gosteriyordu;
+      bu tablo ayni veriyi iki yil ve uc birimde, sayiyla veriyor. Ikisi
+      ust uste durunca panelin tepesinde ayni basligi tasiyan
+      ("Monthly production") iki kart oluyordu.
+
+      chartProduction computed'i KORUNDU: genis panel (userId != 48)
+      ayni grafigi kullanmaya devam ediyor.
     -->
     <section class="dash-grid">
       <Card class="dash-card">
