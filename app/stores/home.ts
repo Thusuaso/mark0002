@@ -57,6 +57,29 @@ export interface MekmerStocks {
 }
 
 /*
+ * GET /home/production/year-comparison
+ *
+ * Duz satirlar: her (yil, ay) icin uc birimde toplam uretim. 12 satirlik
+ * karsilastirma tablosunu bilesen kuruyor (HomeProductionComparison).
+ *
+ * Birim kolonu UrunBirimID (1=m2, 2=Pcs, 3=Mt) -- UretimTurID DEGIL;
+ * ayrim api/index.js'teki ucun basinda aciklandi.
+ */
+export interface ProductionYearRow {
+  Yil: number
+  Ay: number
+  M2: number
+  Piece: number
+  Mt: number
+}
+
+export interface ProductionComparison {
+  list: ProductionYearRow[]
+  currentYear: number
+  previousYear: number
+}
+
+/*
  * Baslangic degerleri NEDEN BOS NESNE DEGIL:
  *
  * Orijinal state `homeList: {}` idi ve sablon `home.chartOne` diye
@@ -100,15 +123,27 @@ function emptyStocks(): MekmerStocks {
   return { monthly_stock: [], current_stock: [], mekmer_shipped: [] }
 }
 
+/*
+ * Yillar 0 ile basliyor ve baslikta YAZDIRILMIYOR (bilesen 0 iken
+ * basligi bos birakiyor): tahmini bir yil yazip sonra duzeltmek, bir
+ * an icin YANLIS yil gostermek olurdu.
+ */
+function emptyComparison(): ProductionComparison {
+  return { list: [], currentYear: 0, previousYear: 0 }
+}
+
 export const useHomeStore = defineStore("home", {
   state: () => ({
     homeList: emptyHome() as HomeData,
     mekmerStocks: emptyStocks() as MekmerStocks,
+    productionComparison: emptyComparison() as ProductionComparison,
   }),
 
   getters: {
     getHomeList: (state) => state.homeList,
     getMekmerStocks: (state) => state.mekmerStocks,
+
+    getProductionComparison: (state) => state.productionComparison,
 
     /*
      * Orijinalde bu toplam bilesenin icinde, `watch: { home() { ... } }`
@@ -148,6 +183,18 @@ export const useHomeStore = defineStore("home", {
         "/reports/mekmer/stocks/list",
       )
       this.mekmerStocks = response.data
+    },
+
+    /*
+     * Yalnizca userId 48 panelinde kullaniliyor, bu yuzden pages/index.vue
+     * onu KOSULLU cagiriyor -- diger kullanicilar icin bos bir SQL
+     * sorgusu calistirmanin anlami yok.
+     */
+    async getProductionComparisonList() {
+      const response = await useLegacyApi().get<ProductionComparison>(
+        "/home/production/year-comparison",
+      )
+      this.productionComparison = response.data
     },
   },
 })

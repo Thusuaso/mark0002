@@ -21427,6 +21427,83 @@ order by MONTH(Tarih)
   });
 });
 
+/*
+ * AYLIK URETIM -- BU YIL / GECEN YIL KARSILASTIRMASI  (ana sayfa, userId 48)
+ *
+ * [!] BIRIM KOLONU `UrunBirimID`, `UretimTurID` DEGIL.
+ *
+ * Istek "UretimTurId 1 ise m2, 2 ise piece, 3 ise mt" diye geldi ama
+ * UretimTB'de o iki kolon BASKA seyler:
+ *
+ *   UretimTurID  -> uretimin SEBEBI: 1 = Stok, 2 = Siparis
+ *                   (selection/input/Form.vue: kinds = [Stok, Siparis]
+ *                    -> UretimTurID; ayrica stok raporlari
+ *                    "UretimTurID = 1" ile STOK uretimini suzuyor)
+ *   UrunBirimID  -> MIKTARIN BIRIMI: 1 = Sqm(m2), 2 = Pcs, 3 = Mt,
+ *                   4 = Ton (ayni dosya: selectedAmountStatus -> birimId)
+ *
+ * Tarif edilen sey (1=m2, 2=piece, 3=mt ve Miktar alani) UrunBirimID'nin
+ * tanimi; UretimTurID kullanilsaydi tablo "Stok uretimi / Siparis
+ * uretimi" ikilisini m2-piece-mt diye ETIKETLEYIP yanlis okuturdu.
+ *
+ * BIRIM 4 (TON) BILEREK YOK: istekte uc birim sayildi. Ton'lu uretim
+ * varsa bu tabloda GORUNMEZ -- gerekirse buraya bir `Ton` kolonu
+ * eklemek yeterli (istemcide de bir kolon).
+ *
+ * TedarikciID = 1: ustteki "Monthly production" karti da oyle suzuyor
+ * (monthly_stock_sql). Yeni kart onun yanina geldigi icin ayni evreni
+ * gostermesi gerekiyor; ikisi farkli suzulurse ayni ayin "uretim"
+ * sayisi iki kartta farkli cikar.
+ *
+ * YILLAR SABIT DEGIL: GETDATE() uzerinden hesaplaniyor, yani 1 Ocak'ta
+ * tablo kendiliginden kayiyor (2026/2025 -> 2027/2026). Istek de boyleydi.
+ *
+ * Govde DUZ satirlar donuyor (yil + ay + uc birim); 12 satirlik tabloyu
+ * istemci kuruyor. Sunucuda pivot etmek ay/yil kombinasyonu icin bos
+ * satir uretmeyi de gerektirirdi -- o is gorunum tarafina ait.
+ */
+app.get("/home/production/year-comparison", async (req, res) => {
+  try {
+    const sql = `
+      select
+        YEAR(Tarih)  as Yil,
+        MONTH(Tarih) as Ay,
+        sum(case when UrunBirimID = 1 then Miktar else 0 end) as M2,
+        sum(case when UrunBirimID = 2 then Miktar else 0 end) as Piece,
+        sum(case when UrunBirimID = 3 then Miktar else 0 end) as Mt
+      from UretimTB
+      where TedarikciID = 1
+        and YEAR(Tarih) in (YEAR(GETDATE()), YEAR(GETDATE()) - 1)
+      group by YEAR(Tarih), MONTH(Tarih)
+      order by MONTH(Tarih), YEAR(Tarih)
+    `;
+
+    const list = (await mssql.query(sql)).recordset;
+
+    /*
+     * Yillar da GOVDEDE ve VERITABANINDAN: istemci kendi saatinden
+     * hesaplarsa yil donumunde suzgecle ayrisabilir. Node'un saati de
+     * dogru kaynak DEGIL -- suzgec GETDATE() ile, yani SQL Server'in
+     * saatiyle calisiyor; baslik tam olarak suzulen yillari yazsin.
+     */
+    const yil = (
+      await mssql.query("select YEAR(GETDATE()) as Yil")
+    ).recordset[0];
+    const currentYear = yil.Yil;
+
+    res.status(200).json({
+      list,
+      currentYear,
+      previousYear: currentYear - 1,
+    });
+  } catch (error) {
+    console.error("/home/production/year-comparison API Hatasi:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Uretim karsilastirmasi alinamadi." });
+  }
+});
+
 app.get("/reports/mekmar/cost/control/list", async (req, res) => {
   try {
     const listSql = `

@@ -59,6 +59,7 @@
       :home="homeStore.getHomeList"
       :stocks="homeStore.getMekmerStocks"
       :total-supplier-cost="homeStore.getTotalSupplierCost"
+      :comparison="homeStore.getProductionComparison"
     />
 
   </div>
@@ -129,12 +130,27 @@ function tarihYazisi(iso) {
  */
 const homeStore = useHomeStore()
 
+/*
+ * YIL KARSILASTIRMASI YALNIZCA userId 48 PANELINDE var
+ * (components/home/Dashboard.vue'daki `v-else-if="userId == 48"`), bu
+ * yuzden istek de kosullu: digerlerinde hic cizilmeyecek bir tablo
+ * icin UretimTB'de iki yillik tarama yapmanin anlami yok.
+ *
+ * Cerez DOGRUDAN okunuyor, auth store uzerinden degil: Dashboard da
+ * ayni degeri kullaniyor ve o bir CEREZ degeri, yani STRING "48" --
+ * karsilastirma `==` ile (bkz. Dashboard.vue'daki ayni not).
+ */
+const uretimKarsilastirmasiGerekli = useCookie("userId").value == 48
+
 await useAsyncData(
   "home",
   async () => {
     await Promise.all([
       homeStore.getHome(),
       homeStore.getMekmerStocksList(),
+      ...(uretimKarsilastirmasiGerekli
+        ? [homeStore.getProductionComparisonList()]
+        : []),
     ])
     return true
   },

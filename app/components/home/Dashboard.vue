@@ -344,6 +344,28 @@
     </section>
 
     <!--
+      YIL KARSILASTIRMASI -- KENDI SATIRINDA, TAM GENISLIKTE.
+
+      Yedi kolonu (ay + uc birim x iki yil) ve iki katli basligi var;
+      asagidaki uclu izgaraya girse sutun basina ~65px dusup okunmaz
+      hale gelirdi. Grafigin hemen altinda duruyor cunku ikisi ayni
+      soruyu farkli cozunurlukte cevapliyor: grafik egilimi, tablo
+      sayiyi veriyor.
+    -->
+    <section class="dash-grid">
+      <Card class="dash-card">
+        <template #header>
+          <h2 class="dash-card__title">
+            Monthly production — year comparison
+          </h2>
+        </template>
+        <template #content>
+          <HomeProductionComparison :data="comparison" />
+        </template>
+      </Card>
+    </section>
+
+    <!--
       UC TABLO YAN YANA. dash-grid--3 zaten bu panelde kullaniliyor
       (yukaridaki genis gorunumun stok bolumu) ve 1100px'in altinda
       kendiliginden tek kolona iniyor, yani dar ekranda tablolar
@@ -440,6 +462,17 @@ export default {
     totalSupplierCost: {
       type: Number,
       default: 0,
+    },
+
+    /*
+     * Aylik uretim, bu yil / gecen yil. YALNIZCA userId 48 panelinde
+     * gosteriliyor ve pages/index.vue onu KOSULLU cekiyor, bu yuzden
+     * required DEGIL: diger kullanicilarda bos govde geliyor ve tablo
+     * hic render edilmiyor.
+     */
+    comparison: {
+      type: Object,
+      default: () => ({ list: [], currentYear: 0, previousYear: 0 }),
     },
   },
 
