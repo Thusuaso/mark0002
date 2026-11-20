@@ -1,18 +1,42 @@
 <template>
-  <div class="surface-card p-4 shadow-2 border-round">
+  <div class="mc-form surface-card p-4 shadow-2 border-round">
     <div class="text-900 font-medium text-xl mb-4">
       <i class="pi pi-wallet mr-2 text-blue-500"></i>Yeni Maliyet Girişi
     </div>
 
-    <div class="p-fluid grid formgrid">
-      <div class="field col-12 md:col-4">
-        <TcmbCurrency
-          @dateSelectedEmit="dateSelected($event)"
-          @rateFetchedEmit="rateFetched($event)"
-        />
-      </div>
+    <!--
+      ADIM 1 -- KUR. Kendi basina bir satir: bileşen kendi basligini
+      ("TCMB Dolar Kuru Sorgulama"), tarih seciciyi, bir dugmeyi ve sonuc
+      kutusunu birden tasiyor; ucte bir sutuna sikistirilinca yanindaki
+      tek satirlik alanlarla hizasi tutmuyordu. Ustelik sirada da ONCE
+      geliyor: kur gelmeden asagidaki alanlarin hepsi pasif.
+    -->
+    <div class="mc-step">
+      <TcmbCurrency
+        @dateSelectedEmit="dateSelected($event)"
+        @rateFetchedEmit="rateFetched($event)"
+      />
+    </div>
 
-      <div class="field col-12 md:col-4">
+    <!--
+      ADIM 2 -- ALANLAR.  BOOTSTRAP izgarasi, PrimeFlex DEGIL.
+
+      Burada `grid formgrid` + `col-12 md:col-4` yaziliydi ve alanlar
+      YAN YANA DIZILMIYORDU. Nedeni: iki izgara cakisiyor. PrimeFlex ile
+      Bootstrap'in ikisi de `.col-12` tanimliyor, Bootstrap SONRA
+      yukleniyor (nuxt.config.ts: "primeflex once, bootstrap sonra") ve
+      esit ozgulluklu kurallarda SONRAKI kazaniyor. Yani her alan
+      Bootstrap'in `.col-12 { width: 100% }` kuralini aliyor; PrimeFlex'in
+      `md:col-4` kurali bir medya sorgusu icinde oldugu ve medya sorgusu
+      OZGULLUK EKLEMEDIGI icin onu geri alamiyor. Sonuc: alanlar tek
+      sutun halinde alt alta.
+
+      `p-fluid` de ise yaramiyordu: o sinif PrimeVue 3'un kendi
+      CSS'indendi ve PrimeVue 4'te KALDIRILDI (PrimeFlex'te hic yok).
+      Girdilerin tam genislige yayilmasi artik asagidaki <style> blogunda.
+    -->
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
         <FloatLabel>
           <AutoComplete
             v-model="selectedCostType"
@@ -30,7 +54,7 @@
         </FloatLabel>
       </div>
 
-      <div class="field col-12">
+      <div class="col-12 col-md-6">
         <FloatLabel>
           <AutoComplete
             v-model="selectedCompany"
@@ -47,7 +71,7 @@
         </FloatLabel>
       </div>
 
-      <div class="field col-12 md:col-4">
+      <div class="col-12 col-md-6 col-xl-3">
         <FloatLabel>
           <IconField>
             <InputIcon class="pi pi-hashtag" />
@@ -63,7 +87,7 @@
         </FloatLabel>
       </div>
 
-      <div class="field col-12 md:col-4">
+      <div class="col-12 col-md-6 col-xl-3">
         <FloatLabel>
           <InputNumber
             :inputId="ids.totalTl"
@@ -81,7 +105,7 @@
         </FloatLabel>
       </div>
 
-      <div class="field col-12 md:col-4">
+      <div class="col-12 col-md-6 col-xl-3">
         <FloatLabel>
           <InputNumber
             :inputId="ids.rate"
@@ -97,7 +121,7 @@
         </FloatLabel>
       </div>
 
-      <div class="field col-12 md:col-4">
+      <div class="col-12 col-md-6 col-xl-3">
         <FloatLabel>
           <InputNumber
             :inputId="ids.price"
@@ -405,10 +429,59 @@ export default {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-/* Inputların arasındaki boşlukları düzenle */
-.field {
-  margin-bottom: 1.5rem;
+/*
+ * GIRDILER SUTUNU DOLDURUYOR.
+ *
+ * Eskiden bunu `p-fluid` yapiyordu ama o sinif PrimeVue 3'un kendi
+ * CSS'indeydi ve PrimeVue 4'te KALDIRILDI; sablonda duruyor olmasi
+ * yanlis bir guven veriyordu. Girdiler kendi dogal genisliklerinde
+ * duruyor, yani ayni satirdaki iki alan farkli boyda goruluyordu.
+ *
+ * SARMALAYICILAR DA GEREKLI, sadece .p-inputtext yetmez: AutoComplete,
+ * InputNumber ve IconField girdinin etrafina kendi kabini koyuyor;
+ * yalnizca ic girdi %100 yapilirsa kap dar kalir ve girdi onu tasar.
+ * FloatLabel de blok olmak zorunda, yoksa etiket yuzdugu kutu kayar.
+ */
+.mc-form :deep(.p-floatlabel),
+.mc-form :deep(.p-autocomplete),
+.mc-form :deep(.p-inputnumber),
+.mc-form :deep(.p-iconfield),
+.mc-form :deep(.p-inputtext),
+.mc-form :deep(.p-datepicker) {
+  width: 100%;
 }
+
+/*
+ * Adim 1 (kur sorgusu) gorsel olarak AYRILIYOR.
+ *
+ * Bileşenin kendi basligi var; alt alta gelen alanlarin arasinda
+ * basliksiz bir blok gibi duruyordu. Hafif zemin + kenarlik, "once
+ * burayi doldur" sirasini gosteriyor -- asagidaki alanlarin hepsi
+ * :disabled="!model.Kur" ile buraya bagli.
+ */
+.mc-step {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+/* TCMB bileşeninin kendi basligi kart basligiyla yarismasin. */
+.mc-step :deep(h3) {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/*
+ * Satir arasi dikey bosluk Bootstrap'in `g-3`undan geliyor
+ * (`.row > * { padding-top: var(--bs-gutter-y) }`). Buraya bir
+ * `padding-top` YAZMAYIN: daha ozgul bir secici o kurali ezer ve
+ * satirlar birbirine girer -- FloatLabel'in yuzen etiketi de ustteki
+ * alanin kenarligina deger.
+ */
 
 /*
   Readonly olan inputun arka planini ayirt et.

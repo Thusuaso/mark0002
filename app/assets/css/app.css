@@ -78,6 +78,22 @@
   --app-table-rowno-width: 3%;
 
   /*
+   * "Details" kolonunun genisligi -- bkz. .col-details.
+   *
+   * Siparis tablolarindaki UrunUretimAciklama alani SERBEST METIN:
+   * "Dört kenar pah kırılacak, 2 kasa rezerve" gibi cumleler giriyor.
+   * Diger 16 kolon sayi, tarih ya da kisa kod tasiyor, yani hepsinin
+   * esit yer paylasmasi bu kolona yaramiyordu: `table-layout: fixed`
+   * altinda yuzdesiz kolonlar kalan yeri ESIT bolusuyor (~%6) ve
+   * aciklama her satirda 4-5 satira sarkiyordu.
+   *
+   * ~Iki buçuk kat: 16 kolonlu bir tabloda diger kolonlar ~%5,5'e
+   * dusuyor ama onlar zaten kisa icerikli. Uzun aciklamalar daha az
+   * sarkti = satirlar kisaldi = ekranda daha fazla PO goruluyor.
+   */
+  --app-table-details-width: 14%;
+
+  /*
    * .table-dense hucre dolgusu -- TEK AYAR NOKTASI.
    *
    * PrimeVue'nun `p-datatable-sm`i dolguyu zaten kisiyor ama siparis
@@ -101,8 +117,15 @@
    * EN KALIN olani secer -- onem (!important) degil, KALINLIK kazanir.
    * Bu deger 2px'e esit ya da altina dusurulurse PO cizgisi diger
    * satirlarla ayni gorunur ve ayirici ozelligini KAYBEDER.
+   *
+   * 3px -> 5px: 3px CALISIYORDU ama yetmiyordu. O tablolarda HER satir
+   * zaten 2px koyu cerceveli (yukaridaki rowClass2), yani ekran bastan
+   * sona kutulardan olusuyor; 1px'lik fark goz tarayarak PO sinirini
+   * bulmaya yetmiyordu. Kullanici "po lari ayirmak icin cizgiyi
+   * belirgin hale getirelim" dedi. 5px, satir cercevesinin iki buçuk
+   * kati -- bakmadan farkediliyor.
    */
-  --app-po-divider-width: 3px;
+  --app-po-divider-width: 5px;
   --app-po-divider-color: #111827;
 }
 
@@ -243,6 +266,26 @@
 .col-rowno {
   width: var(--app-table-rowno-width);
   text-align: center;
+}
+
+/*
+ * "Details" (UrunUretimAciklama) kolonu -- TEK AYAR NOKTASI.
+ *
+ * Kullanim:
+ *   <Column field="UrunUretimAciklama" header="Details"
+ *           headerClass="tableHeader col-details"
+ *           bodyClass="tableBody col-details">
+ *
+ * GENISLIK NEDEN BASLIK HUCRESINDEN GELIYOR: `table-layout: fixed`
+ * (yukarida, varsayilan) kolon genisliklerini TABLONUN ILK SATIRINDAN
+ * okuyor. Yani ise yarayan sinif headerClass'taki; bodyClass'a da
+ * verilmesi hizalama/okunurluk kurallari icin (ve iki yeri ayirmamak
+ * icin).
+ *
+ * Deger --app-table-details-width'te; gerekcesi orada.
+ */
+.col-details {
+  width: var(--app-table-details-width);
 }
 
 /*

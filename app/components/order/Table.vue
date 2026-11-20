@@ -144,8 +144,8 @@
         <Column
           field="UrunUretimAciklama"
           header="Details"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+          headerClass="tableHeader col-details"
+          bodyClass="tableBody col-details"
         >
         </Column>
         <Column
@@ -441,8 +441,8 @@
         <Column
           field="UrunUretimAciklama"
           header="Details"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+          headerClass="tableHeader col-details"
+          bodyClass="tableBody col-details"
         >
         </Column>
         <Column
@@ -718,7 +718,17 @@
             </div>
           </template>
         </Column>
-        <Column field="UrunUretimAciklama" header="Details" style="width: 5%">
+        <!--
+          style="width: 5%" KALDIRILDI: bu kolon serbest metin tasiyor ve
+          %5 tablonun EN DAR kolonlarindan biriydi. Genislik artik tek
+          yerden geliyor (app.css: .col-details).
+        -->
+        <Column
+          field="UrunUretimAciklama"
+          header="Details"
+          headerClass="col-details"
+          bodyClass="col-details"
+        >
         </Column>
         <Column
           field="En"
@@ -1027,8 +1037,8 @@
       <Column
         field="UrunUretimAciklama"
         header="Details"
-        headerClass="tableHeader"
-        bodyClass="tableBody"
+        headerClass="tableHeader col-details"
+        bodyClass="tableBody col-details"
       >
       </Column>
       <Column

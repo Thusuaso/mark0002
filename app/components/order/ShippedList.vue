@@ -12,7 +12,7 @@
         v-model:selection="selectedProduction"
         :selectionMode="userId != 48 ? 'multiple' : ''"
         @row-click="$emit('production_selected_emit', $event.data)"
-        class="p-datatable-sm"
+        class="p-datatable-sm table-dense"
         :paginator="true"
         :rows="25"
         style="font-size: 70%; border: 2px solid gray; cursor: pointer"
@@ -97,7 +97,7 @@
           :showFilterMenu="false"
           :showClearButton="false"
           headerClass="tableHeader"
-          bodyClass="tableBody"
+          bodyClass="tableBody po-anchor"
         >
           <template #filter="{ filterModel, filterCallback }">
             <InputText
@@ -158,8 +158,8 @@
         <Column
           field="UrunUretimAciklama"
           header="Details"
-          headerClass="tableHeader"
-          bodyClass="tableBody"
+          headerClass="tableHeader col-details"
+          bodyClass="tableBody col-details"
         >
         </Column>
         <Column

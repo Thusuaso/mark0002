@@ -1,52 +1,12 @@
 <template>
   <div class="row mt-4 m-auto ml-2 mr-2">
-    <div class="row m-auto text-center">
-      <div class="col-sm-3">
-        <Button
-          severity="success" class="w-100 mb-5"
-          type="button"
-          label="Yeni Strip"
-          @click="newForm"
-        />
-      </div>
-      <div class="col-sm-1">
-        <Button
-          severity="info" class="mb-5 pi pi-file-excel"
-          type="button"
-          @click="excel_strip_output"
-        />
-      </div>
-      <div class="col-sm-3">
-        <Button
-          severity="success" class="w-100 mb-5"
-          type="button"
-          label="Yeni Moloz"
-          @click="newFormMoloz"
-        />
-      </div>
-      <div class="col-sm-1">
-        <Button
-          severity="info" class="pi pi-file-excel mb-5"
-          type="button"
-          @click="excel_strip_output_moloz"
-        />
-      </div>
-      <div class="col-sm-3">
-        <Button
-          severity="success" class="w-100 mb-5"
-          type="button"
-          label="Yeni Nakliye"
-          @click="newFormNakliye"
-        />
-      </div>
-      <div class="col-sm-1">
-        <Button
-          severity="info" class="pi pi-file-excel mb-5"
-          type="button"
-          @click="excel_strip_output_nakliye"
-        />
-      </div>
-    </div>
+    <!--
+      [x] ALTI DUGMELIK UST SATIR KALDIRILDI.
+      "Yeni Strip / Yeni Moloz / Yeni Nakliye" ve uc Excel dugmesi
+      yan yana duruyordu; hangi dugmenin hangi tabloya ait oldugu
+      ancak siradan anlasiliyordu. Her ciftin yeri artik kendi
+      sekmesinin ustu (asagida .st-bar).
+    -->
     <div class="col-sm-6">
       <FloatLabel>
         <Select
@@ -73,11 +33,67 @@
         <label for="month">Month</label>
       </FloatLabel>
     </div>
-    <div class="row m-auto text-center">
-      <div class="col-12 col-lg-4">
+    <!--
+      UC TABLO -> UC SEKME, HER BIRI TAM GENISLIKTE.
+
+      ONCESI: uclu `col-lg-4` izgarasi. Her tabloda 14 kolon var ve
+      1536px'lik ekranda sutuna ~480px dusuyordu, yani kolon basina
+      ~34px. Tablolar `table-scroll-x` ile dogal genisliklerine
+      (~1800px) cikip kendi iclerinde YATAY KAYDIRILIYORDU: bir anda
+      yalnizca 4-5 kolon goruluyor, geri kalani icin her satirda saga
+      kaydirmak gerekiyordu. Uc tabloyu "ayni anda gormek" de aslinda
+      uc tablonun ilk dort kolonunu gormek demekti.
+
+      SONRASI: aktif tablo ekranin tamamini kullaniyor (~110px/kolon),
+      yani 14 kolon YATAY KAYDIRMA OLMADAN siguyor
+      (`table-scroll-x` kaldirildi -- app.css'teki varsayilan
+      "ekrana sigdir" kurali devrede). Yukseklik de 500px'ten
+      --app-table-height'a cikti, yani iki kattan fazla satir.
+
+      Sekme basliklarinda kayit sayisi duruyor: digerine gecmeden
+      "orada veri var mi" sorusu cevaplaniyor.
+
+      Dugmeler de her sekmenin kendi ustune tasindi (.st-bar); ustteki
+      alti dugmeli satirda hangi dugme hangi tabloya ait belli
+      olmuyordu. Yil/Ay secicileri UCUNE DE uygulandigi icin yukarida,
+      sekmelerin disinda kaldi.
+    -->
+    <Tabs value="0" class="st-tabs col-12 mt-3">
+      <TabList>
+        <Tab value="0">
+          STRIPLER
+          <span class="st-adet">{{ (list || []).length }}</span>
+        </Tab>
+        <Tab value="1">
+          MOLOZLAR
+          <span class="st-adet">{{ (moloz_list || []).length }}</span>
+        </Tab>
+        <Tab value="2">
+          NAKLİYE
+          <span class="st-adet">{{ (nakliyeList || []).length }}</span>
+        </Tab>
+      </TabList>
+
+      <TabPanels>
+      <TabPanel value="0">
+        <div class="st-bar">
+          <Button
+            severity="success"
+            type="button"
+            label="Yeni Strip"
+            @click="newForm"
+          />
+          <Button
+            severity="info"
+            class="pi pi-file-excel"
+            type="button"
+            v-tooltip.bottom="'Excel\'e aktar'"
+            @click="excel_strip_output"
+          />
+        </div>
         <DataTable
           :value="list"
-          class="p-datatable-sm table-scroll-x"
+          class="p-datatable-sm table-dense table-fit-compact"
           :resizableColumns="true"
           columnResizeMode="fit"
           showGridlines
@@ -88,9 +104,8 @@
           filterDisplay="row"
           @filter="stripsFiltered($event)"
           scrollable
-          scrollHeight="500px"
+          scrollHeight="var(--app-table-height)"
         >
-          <template #header>STRIPLER</template>
           <Column
             field="Date"
             header="Tarih"
@@ -236,11 +251,27 @@
             </template>
           </Column>
         </DataTable>
-      </div>
-      <div class="col-12 col-lg-4">
+      </TabPanel>
+
+      <TabPanel value="1">
+        <div class="st-bar">
+          <Button
+            severity="success"
+            type="button"
+            label="Yeni Moloz"
+            @click="newFormMoloz"
+          />
+          <Button
+            severity="info"
+            class="pi pi-file-excel"
+            type="button"
+            v-tooltip.bottom="'Excel\'e aktar'"
+            @click="excel_strip_output_moloz"
+          />
+        </div>
         <DataTable
           :value="moloz_list"
-          class="p-datatable-sm table-scroll-x"
+          class="p-datatable-sm table-dense table-fit-compact"
           :resizableColumns="true"
           columnResizeMode="fit"
           showGridlines
@@ -251,9 +282,8 @@
           filterDisplay="row"
           @filter="molozFiltered($event)"
           scrollable
-          scrollHeight="500px"
+          scrollHeight="var(--app-table-height)"
         >
-          <template #header>MOLOZLAR</template>
           <Column
             field="Date"
             header="Tarih"
@@ -403,11 +433,27 @@
             </template>
           </Column>
         </DataTable>
-      </div>
-      <div class="col-12 col-lg-4">
+      </TabPanel>
+
+      <TabPanel value="2">
+        <div class="st-bar">
+          <Button
+            severity="success"
+            type="button"
+            label="Yeni Nakliye"
+            @click="newFormNakliye"
+          />
+          <Button
+            severity="info"
+            class="pi pi-file-excel"
+            type="button"
+            v-tooltip.bottom="'Excel\'e aktar'"
+            @click="excel_strip_output_nakliye"
+          />
+        </div>
         <DataTable
           :value="nakliyeList"
-          class="p-datatable-sm table-scroll-x"
+          class="p-datatable-sm table-dense table-fit-compact"
           :resizableColumns="true"
           columnResizeMode="fit"
           showGridlines
@@ -418,9 +464,8 @@
           filterDisplay="row"
           @filter="nakliyeFiltered($event)"
           scrollable
-          scrollHeight="500px"
+          scrollHeight="var(--app-table-height)"
         >
-          <template #header>Nakliye</template>
           <Column
             field="Tarih"
             header="Tarih"
@@ -570,8 +615,9 @@
             </template>
           </Column>
         </DataTable>
-      </div>
-    </div>
+      </TabPanel>
+      </TabPanels>
+    </Tabs>
     <Dialog
       :header="dialog_header"
       v-model:visible="cost_supplier_dialog"
@@ -2257,6 +2303,45 @@ export default {
   watch: {},
 };
 </script>
+
+<style scoped>
+/*
+ * Sekme govdesinin yan dolgusu SIFIR: PrimeVue TabPanel'e 1.25rem
+ * yan dolgu veriyor, tablo da zaten tam genislige sigdirilmis
+ * durumda -- ikisi ustuste gelince tablo kapsayicinin icinde
+ * daralip yeniden yatay kaydirmaya basliyordu. Dikey dolgu kaliyor.
+ */
+.st-tabs :deep(.p-tabpanels) {
+  padding-inline: 0;
+}
+
+/* Sekme basligindaki kayit sayisi. */
+.st-adet {
+  display: inline-block;
+  min-width: 1.5rem;
+  padding: 0.05rem 0.4rem;
+  margin-inline-start: 0.4rem;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #374151;
+
+  background: #eef1f5;
+  border-radius: 999px;
+}
+
+/*
+ * Sekmenin kendi arac cubugu: "Yeni ..." + Excel.
+ * Saga yasli -- goz once tabloya, sonra eyleme gitsin.
+ */
+.st-bar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+</style>
 
 <!--
   pages/reports/mekmer/strips.vue

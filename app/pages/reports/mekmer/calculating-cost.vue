@@ -40,6 +40,7 @@
     <div class="row">
       <div class="col-12 col-lg-9">
         <DataTable
+          class="p-datatable-sm table-dense table-fit-compact"
           :value="costs"
           v-model:selection="selectedCost"
           selectionMode="single"
@@ -167,6 +168,7 @@
 
       <div class="col-12 col-lg-3">
         <DataTable
+          class="p-datatable-sm table-dense table-fit-compact"
           :value="calculate_ratio_list"
           sortField="Oran"
           :sortOrder="-1"
@@ -206,6 +208,8 @@
       modal
       blockScroll
       focusOnShow
+      :style="{ width: '56rem' }"
+      :breakpoints="{ '991px': '90vw' }"
     >
       <ReportsMekmerCalculatingCostForm
         :status="status"
