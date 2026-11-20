@@ -174,17 +174,36 @@
         <small class="pf-not">Adet × En × Boy ÷ 10.000</small>
       </div>
 
+      <!--
+        [x] KULLANILDI KUTUSU FORMDAN KALDIRILDI.
+
+        Kural: sifirdan girilen palet HER ZAMAN "kullanilmadi" baslar;
+        durum yalnizca LISTEDEKI "Durum" kolonuna tiklayarak degisir.
+        Formda bir kutu daha olmasi iki yerde iki ayri yol demekti --
+        ustelik yeni kayitta isaretlenebiliyor olmasi "sifirdan
+        girildiginde kullanilmadi" kuralini bozuyordu.
+
+        Yeni kayitta durum yaziyor (degistirilemez), duzenlemede mevcut
+        durum + nereden degistirilecegi.
+      -->
       <div class="col-12 col-md-8 d-flex align-items-center">
-        <div class="pf-kullanildi">
-          <Checkbox
-            :inputId="ids.kullanildi"
-            v-model="model.Kullanildi"
-            :binary="true"
+        <p class="pf-durum">
+          <i
+            class="pi"
+            :class="model.Kullanildi ? 'pi-check-square' : 'pi-stop'"
+            aria-hidden="true"
           />
-          <label :for="ids.kullanildi">
+          <span class="pf-durum__ad">
             {{ model.Kullanildi ? "Kullanıldı" : "Kullanılmadı" }}
-          </label>
-        </div>
+          </span>
+          <span class="pf-durum__not">
+            {{
+              model.ID
+                ? "— değiştirmek için listedeki Durum kolonuna tıkla"
+                : "— yeni palet kullanılmadı olarak girilir"
+            }}
+          </span>
+        </p>
       </div>
     </div>
 
@@ -562,17 +581,28 @@ export default {
   color: #6b7280;
 }
 
-.pf-kullanildi {
+/* Durum: salt BILGI (eylem listede). O yuzden dugme gibi degil, yazi
+   gibi duruyor -- tiklanabilir izlenimi vermesin. */
+.pf-durum {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   align-items: center;
+
   min-height: 42px;
+  margin: 0;
+
+  font-size: 0.9rem;
+  color: #374151;
 }
 
-.pf-kullanildi label {
-  margin: 0;
-  font-weight: 600;
-  cursor: pointer;
+.pf-durum__ad {
+  font-weight: 700;
+}
+
+.pf-durum__not {
+  font-size: 0.78rem;
+  color: #6b7280;
 }
 
 /* Hesaplanan alan: kapali oldugu belli olsun ama "bozuk" gorunmesin. */

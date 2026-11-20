@@ -21750,6 +21750,10 @@ order by MONTH(s.YuklemeTarihi) desc
      POST   /palet/save           yeni palet
      PUT    /palet/update         mevcut palet
      PUT    /palet/used           kullanildi/kullanilmadi isaretle
+                                  [!] Kullanildi kolonunu YAZAN TEK UC.
+                                  /palet/save onu hic yazmiyor (tablo
+                                  DEFAULT 0), /palet/update'in SET
+                                  listesinde de yok.
      DELETE /palet/:id            palet sil
    ========================================================================== */
 
@@ -21993,7 +21997,6 @@ async function paletGovdeCoz(body) {
     urunId,
     adet: Math.trunc(adet),
     m2: await paletM2(enId, boyId, adet),
-    kullanildi: body.Kullanildi === true || body.Kullanildi === 1 ? 1 : 0,
   };
 }
 
@@ -22011,19 +22014,26 @@ app.post("/palet/save", async (req, res) => {
     r.input("UrunId", mssql.Int, v.urunId);
     r.input("Adet", mssql.Int, v.adet);
     r.input("M2", mssql.Decimal(18, 2), v.m2);
-    r.input("Kullanildi", mssql.Bit, v.kullanildi);
     r.input("KullaniciID", mssql.Int, parseInt(req.body.KullaniciID) || null);
 
-    /* PaletNo hesaplanan kolon -- INSERT'e YAZILMAZ, OUTPUT ile geri
-       okunuyor; ekran "P0007 kaydedildi" diyebilsin. */
+    /*
+     * [!] Kullanildi INSERT'E YAZILMIYOR -- tablonun DEFAULT 0'i
+     * devrede. Kural: "sifirdan girilen palet kullanilmadi olarak
+     * girer". Istemciden gelen bir deger okunsaydi, ileride forma bir
+     * kutu geri eklenirse ya da istek elle atilirsa kural sessizce
+     * delinirdi. Durumu degistiren TEK yer /palet/used.
+     *
+     * PaletNo da yazilmiyor (hesaplanan kolon), OUTPUT ile geri
+     * okunuyor; ekran "P0007 kaydedildi" diyebilsin.
+     */
     const ins = await r.query(`
       insert into PaletTB
         (Tarih, FirmaId, EnId, BoyId, KalinlikId, UrunId, Adet, M2,
-         Kullanildi, KullaniciID)
+         KullaniciID)
       output inserted.ID, inserted.PaletNo
       values
         (@Tarih, @FirmaId, @EnId, @BoyId, @KalinlikId, @UrunId, @Adet, @M2,
-         @Kullanildi, @KullaniciID)
+         @KullaniciID)
     `);
 
     res.status(200).json({
@@ -22057,8 +22067,18 @@ app.put("/palet/update", async (req, res) => {
     r.input("UrunId", mssql.Int, v.urunId);
     r.input("Adet", mssql.Int, v.adet);
     r.input("M2", mssql.Decimal(18, 2), v.m2);
-    r.input("Kullanildi", mssql.Bit, v.kullanildi);
 
+    /*
+     * [!] Kullanildi BU UCUN SET LISTESINDE YOK -- bilerek.
+     *
+     * Formda o alan yok (durum listeden degisiyor), yani govdede de
+     * gelmiyor. SET listesinde kalsaydi gelmeyen deger 0 olarak
+     * yazilir ve KULLANILMIS BIR PALETI duzenlemek onu sessizce
+     * "kullanilmadi"ya dondururdu -- tarihini duzeltmek isteyen
+     * kullanici farkinda olmadan isareti siler.
+     *
+     * Durumu degistiren tek yer: /palet/used
+     */
     await r.query(`
       update PaletTB set
         Tarih      = @Tarih,
@@ -22068,8 +22088,7 @@ app.put("/palet/update", async (req, res) => {
         KalinlikId = @KalinlikId,
         UrunId     = @UrunId,
         Adet       = @Adet,
-        M2         = @M2,
-        Kullanildi = @Kullanildi
+        M2         = @M2
       where ID = @ID
     `);
 

@@ -281,8 +281,13 @@ await useAsyncData(
     - Urun bilgisi AutoComplete      -> ayni
     - Adet                           -> Form
     - M2 otomatik (adet, en, boy)    -> Form m2Hesapla (anlik) + paletM2 (kayitli)
-    - Kullanildi / Kullanilmadi yazisi ve isaretlenebilir
-                                     -> List "Durum" kolonu (yazi + kutu, tiklanabilir)
+    - Yeni palet HER ZAMAN "kullanilmadi" girer
+                                     -> PaletTB DEFAULT 0; /palet/save o kolonu
+                                        hic yazmiyor, formda da kutu YOK
+    - Kullanildi / Kullanilmadi yazisi, tiklanarak degisiyor
+                                     -> List "Durum" kolonu (yazi + kutu tek
+                                        dugmede) -> /palet/used, durumu
+                                        degistiren TEK yol
     - Ust kisimda Tumu / Kullanilan / Kullanilmayan
                                      -> bu sayfa, .pp-suzgec (suzme SUNUCUDA)
 -->
