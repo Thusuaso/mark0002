@@ -186,9 +186,9 @@ export const useHomeStore = defineStore("home", {
     },
 
     /*
-     * Yalnizca userId 48 panelinde kullaniliyor, bu yuzden pages/index.vue
-     * onu KOSULLU cagiriyor -- diger kullanicilar icin bos bir SQL
-     * sorgusu calistirmanin anlami yok.
+     * Ana sayfanin IKI panelinde de kullaniliyor (userId 48'de en ustte,
+     * digerlerinde en altta), bu yuzden pages/index.vue onu kosulsuz
+     * cagiriyor.
      */
     async getProductionComparisonList() {
       const response = await useLegacyApi().get<ProductionComparison>(

@@ -131,26 +131,22 @@ function tarihYazisi(iso) {
 const homeStore = useHomeStore()
 
 /*
- * YIL KARSILASTIRMASI YALNIZCA userId 48 PANELINDE var
- * (components/home/Dashboard.vue'daki `v-else-if="userId == 48"`), bu
- * yuzden istek de kosullu: digerlerinde hic cizilmeyecek bir tablo
- * icin UretimTB'de iki yillik tarama yapmanin anlami yok.
+ * [x] YIL KARSILASTIRMASI ARTIK KOSULSUZ CEKILIYOR.
  *
- * Cerez DOGRUDAN okunuyor, auth store uzerinden degil: Dashboard da
- * ayni degeri kullaniyor ve o bir CEREZ degeri, yani STRING "48" --
- * karsilastirma `==` ile (bkz. Dashboard.vue'daki ayni not).
+ * Ilk surumde istek yalnizca userId 48 icin atiliyordu, cunku tablo
+ * yalnizca o panelde vardi. Simdi IKI PANELDE de var (48'de en ustte,
+ * digerlerinde en altta), yani kosul her zaman dogru olacakti --
+ * duran bir `userId == 48` kontrolu ileride "bu neden burada?"
+ * sorusuna donusur ve yanlis tarafa dusen bir degisiklikte tabloyu
+ * sessizce bos birakir.
  */
-const uretimKarsilastirmasiGerekli = useCookie("userId").value == 48
-
 await useAsyncData(
   "home",
   async () => {
     await Promise.all([
       homeStore.getHome(),
       homeStore.getMekmerStocksList(),
-      ...(uretimKarsilastirmasiGerekli
-        ? [homeStore.getProductionComparisonList()]
-        : []),
+      homeStore.getProductionComparisonList(),
     ])
     return true
   },

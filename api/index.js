@@ -21428,7 +21428,7 @@ order by MONTH(Tarih)
 });
 
 /*
- * AYLIK URETIM -- BU YIL / GECEN YIL KARSILASTIRMASI  (ana sayfa, userId 48)
+ * AYLIK URETIM -- BU YIL / GECEN YIL KARSILASTIRMASI  (ana sayfa, iki panel)
  *
  * [!] BIRIM KOLONU `UrunBirimID`, `UretimTurID` DEGIL.
  *

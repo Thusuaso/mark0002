@@ -276,6 +276,33 @@
           </template>
       </Card>
     </section>
+
+    <!--
+      YIL KARSILASTIRMASI -- GENIS PANELIN EN ALTI.
+
+      userId 48 panelinde en USTTE duruyor (orada panelin tek konusu
+      uretim); burada en ALTTA, cunku bu panelin tepesi para akisina
+      ait (FOB siparis / DDP yukleme bantlari).
+
+      Kart ve bileşen IKI PANELDE AYNI ve veri de ayni store alanindan
+      geliyor, yani iki yerde iki farkli sayi cikmasi mumkun degil.
+
+      Tam genislikte kendi bolumu: yedi kolonu (ay + uc birim x iki yil)
+      ve iki katli basligi var; ustteki ikili/uclu izgaralara girse
+      sutun basina ~65px dusup okunmaz hale gelirdi.
+    -->
+    <section class="dash-grid">
+      <Card class="dash-card">
+        <template #header>
+          <h2 class="dash-card__title">
+            Monthly production — year comparison
+          </h2>
+        </template>
+        <template #content>
+          <HomeProductionComparison :data="comparison" />
+        </template>
+      </Card>
+    </section>
   </div>
 
   <!--
@@ -439,10 +466,14 @@ export default {
     },
 
     /*
-     * Aylik uretim, bu yil / gecen yil. YALNIZCA userId 48 panelinde
-     * gosteriliyor ve pages/index.vue onu KOSULLU cekiyor, bu yuzden
-     * required DEGIL: diger kullanicilarda bos govde geliyor ve tablo
-     * hic render edilmiyor.
+     * Aylik uretim, bu yil / gecen yil. IKI PANELDE de gosteriliyor:
+     * userId 48'de en ustte, digerlerinde en altta.
+     *
+     * required DEGIL, default BOS GOVDE: veri gelmeden once de bir
+     * render oluyor (useAsyncData server:false) ve tablo o karede
+     * `data.list` okuyor -- prop zorunlu olsa uyari basar, undefined
+     * olsa alt bileşen patlardi. Bos govde ile ilk render dogru
+     * iskelette (12 satir, hepsi "—") cizilyor.
      */
     comparison: {
       type: Object,

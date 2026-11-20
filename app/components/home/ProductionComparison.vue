@@ -92,7 +92,8 @@
 /*
  * components/home/ProductionComparison.vue  --  <HomeProductionComparison>
  *
- * Ana sayfanin userId 48 panelinde: aylik uretim, BU YIL ve GECEN YIL
+ * Ana sayfanin IKI panelinde de (userId 48'de en ustte, digerlerinde
+ * en altta): aylik uretim, BU YIL ve GECEN YIL
  * yan yana, uc birimde (m2 / piece / mt).
  *
  * [!] BIRIM KOLONU `UrunBirimID`, `UretimTurID` DEGIL -- ikisinin
