@@ -21738,6 +21738,401 @@ order by MONTH(s.YuklemeTarihi) desc
   }
 });
 
+/* ==========================================================================
+   PALET TAKIBI  --  /palet/*
+   --------------------------------------------------------------------------
+   Tablolar ve tasarim gerekceleri: api/sql/PaletTB.sql
+   Ekran: app/pages/operation/palet.vue
+
+   DORT UC:
+     GET    /palet/lookups        AutoComplete listeleri (bes liste)
+     GET    /palet/list           paletler (?durum=tumu|kullanilan|kullanilmayan)
+     POST   /palet/save           yeni palet
+     PUT    /palet/update         mevcut palet
+     PUT    /palet/used           kullanildi/kullanilmadi isaretle
+     DELETE /palet/:id            palet sil
+   ========================================================================== */
+
+/*
+ * BES LISTE TABLOSU, TEK TANIM.
+ *
+ * Firma / En / Boy / Kalinlik / Urun ayni kurali paylasiyor: ekranda
+ * AutoComplete, yazilan deger listede yoksa KAYDEDILIYOR. Bes ayri
+ * kopya yazmak yerine tablo+kolon+tip burada bir kez tanimlandi;
+ * hem liste ucu hem kayit ucu bu tanimdan okuyor.
+ *
+ * `sayisal`: En/Boy/Kalinlik degerleri decimal(9,2). Istemciden virgullu
+ * metin gelebilir ("20,3"); noktaya cevirip Number'a indirgiyoruz.
+ */
+const PALET_LISTELERI = {
+  firma: { tablo: "PaletFirmaTB", kolon: "FirmaAdi", tip: mssql.NVarChar, sayisal: false },
+  en: { tablo: "PaletEnTB", kolon: "Deger", tip: mssql.Decimal(9, 2), sayisal: true },
+  boy: { tablo: "PaletBoyTB", kolon: "Deger", tip: mssql.Decimal(9, 2), sayisal: true },
+  kalinlik: { tablo: "PaletKalinlikTB", kolon: "Deger", tip: mssql.Decimal(9, 2), sayisal: true },
+  urun: { tablo: "PaletUrunTB", kolon: "UrunBilgisi", tip: mssql.NVarChar, sayisal: false },
+};
+
+/* "20,3" -> 20.3 ; sayiya cevrilemiyorsa null (bos alan ile 0'i ayirmak
+   icin: 0 gecerli bir kalinlik olabilir, bos degil). */
+function paletSayi(deger) {
+  if (deger === null || deger === undefined || deger === "") return null;
+  const n = parseFloat(String(deger).replace(",", "."));
+  return Number.isFinite(n) ? n : null;
+}
+
+/*
+ * LISTE DEGERININ ID'SINI BUL, YOKSA OLUSTUR.
+ *
+ * Istemci ya mevcut bir kaydi secer (id gelir) ya da yeni bir deger
+ * yazar (yalnizca metin gelir). Ikinci durumda kayit BURADA aciliyor --
+ * MekmerMaliyetTurTB'de de ayni kalip var (/reports/mekmer/calculating/
+ * cost/save).
+ *
+ * [!] ONCE SELECT, SONRA INSERT: istemci "bu deger yeni" dese bile
+ * baskasi araya girip ayni degeri eklemis olabilir. O durumda dogrudan
+ * INSERT, UNIQUE kisitina carpip 2627 hatasi verirdi; ustelik iki
+ * kullanici ayni firmayi ayni anda yazarsa ikisinin de istemci kontrolu
+ * "yok" der. Select-insert-select sirasi bu yarisi da kapatiyor:
+ * INSERT patlarsa (2627) deger araya girmis demektir, tekrar okunuyor.
+ */
+async function paletListeId(anahtar, id, metin) {
+  const tanim = PALET_LISTELERI[anahtar];
+  if (!tanim) throw new Error(`Bilinmeyen palet listesi: ${anahtar}`);
+
+  const mevcutId = parseInt(id);
+  if (Number.isFinite(mevcutId) && mevcutId > 0) return mevcutId;
+
+  const deger = tanim.sayisal ? paletSayi(metin) : String(metin ?? "").trim();
+  if (deger === null || deger === "") return null;
+
+  const oku = async () => {
+    const r = new mssql.Request();
+    r.input("deger", tanim.tip, deger);
+    const s = await r.query(
+      `select ID from ${tanim.tablo} where ${tanim.kolon} = @deger`
+    );
+    return s.recordset.length ? s.recordset[0].ID : null;
+  };
+
+  const bulunan = await oku();
+  if (bulunan) return bulunan;
+
+  try {
+    const r = new mssql.Request();
+    r.input("deger", tanim.tip, deger);
+    const ins = await r.query(
+      `insert into ${tanim.tablo} (${tanim.kolon})
+       output inserted.ID values (@deger)`
+    );
+    return ins.recordset[0].ID;
+  } catch (err) {
+    /* 2627 / 2601 = UNIQUE kisiti: araya giren baska bir kayit ayni
+       degeri eklemis. Hata degil, yaris -- degeri okuyup devam. */
+    if (err.number === 2627 || err.number === 2601) return await oku();
+    throw err;
+  }
+}
+
+/*
+ * M2 = Adet x En x Boy / 10000  (cm x cm -> m2)
+ *
+ * SUNUCUDA HESAPLANIYOR, ISTEMCIDEN GELEN M2 KULLANILMIYOR: ekranda
+ * anlik gosterilen deger bir kolaylik, kayitli deger ise kaydin
+ * kendisi. Ikisi ayrismasin diye tek kaynak burasi.
+ *
+ * En/Boy degerleri LISTE TABLOLARINDAN okunuyor, istemciden gelenden
+ * degil -- istemci id gonderdiginde metin alanlari bos olabiliyor.
+ */
+async function paletM2(enId, boyId, adet) {
+  const r = new mssql.Request();
+  r.input("enId", mssql.Int, enId);
+  r.input("boyId", mssql.Int, boyId);
+  const s = await r.query(`
+    select
+      (select Deger from PaletEnTB  where ID = @enId)  as En,
+      (select Deger from PaletBoyTB where ID = @boyId) as Boy
+  `);
+
+  const en = paletSayi(s.recordset[0]?.En);
+  const boy = paletSayi(s.recordset[0]?.Boy);
+  const sayi = paletSayi(adet);
+  if (en === null || boy === null || sayi === null) return 0;
+
+  return (en * boy * sayi) / 10000;
+}
+
+/* Liste sorgusu -- iki uc (liste ve kayit sonrasi yenileme) ayni
+   govdeyi dondursun diye tek yerde. */
+const PALET_LISTE_SQL = `
+  select
+    p.ID,
+    p.PaletNo,
+    p.Tarih,
+    p.FirmaId,   f.FirmaAdi,
+    p.EnId,      e.Deger as En,
+    p.BoyId,     b.Deger as Boy,
+    p.KalinlikId, k.Deger as Kalinlik,
+    p.UrunId,    u.UrunBilgisi,
+    p.Adet,
+    p.M2,
+    p.Kullanildi,
+    p.KayitTarihi
+  from PaletTB p
+  inner join PaletFirmaTB f on f.ID = p.FirmaId
+  inner join PaletEnTB    e on e.ID = p.EnId
+  inner join PaletBoyTB   b on b.ID = p.BoyId
+  inner join PaletUrunTB  u on u.ID = p.UrunId
+  /*
+   * [!] KALINLIK LEFT JOIN: tek nullable yabanci anahtar
+   * (api/sql/PaletTB.sql, karar [6]). inner join olsaydi kalinligi
+   * girilmemis paletler listede HIC GORUNMEZDI -- sessiz veri kaybi.
+   */
+  left join PaletKalinlikTB k on k.ID = p.KalinlikId
+`;
+
+app.get("/palet/lookups", async (req, res) => {
+  try {
+    const [firma, en, boy, kalinlik, urun] = await Promise.all([
+      mssql.query("select ID, FirmaAdi from PaletFirmaTB order by FirmaAdi"),
+      mssql.query("select ID, Deger from PaletEnTB order by Deger"),
+      mssql.query("select ID, Deger from PaletBoyTB order by Deger"),
+      mssql.query("select ID, Deger from PaletKalinlikTB order by Deger"),
+      mssql.query("select ID, UrunBilgisi from PaletUrunTB order by UrunBilgisi"),
+    ]);
+
+    res.status(200).json({
+      firma: firma.recordset,
+      en: en.recordset,
+      boy: boy.recordset,
+      kalinlik: kalinlik.recordset,
+      urun: urun.recordset,
+    });
+  } catch (error) {
+    console.error("/palet/lookups API Hatasi:", error);
+    res.status(500).json({ status: false, message: "Listeler alinamadi." });
+  }
+});
+
+app.get("/palet/list", async (req, res) => {
+  try {
+    /*
+     * Suzgec SUNUCUDA: "Tumu / Kullanilan / Kullanilmayan" istemcide de
+     * suzulebilirdi ama o zaman her zaman TUM paletler indirilirdi.
+     * Deger beyaz listeden geciyor; req.query dogrudan SQL'e girmiyor.
+     */
+    const durum = String(req.query.durum || "tumu");
+    const kosul =
+      durum === "kullanilan"
+        ? "where p.Kullanildi = 1"
+        : durum === "kullanilmayan"
+          ? "where p.Kullanildi = 0"
+          : "";
+
+    const sql = `
+      ${PALET_LISTE_SQL}
+      ${kosul}
+      order by p.Tarih desc, p.ID desc
+    `;
+
+    const liste = (await mssql.query(sql)).recordset;
+
+    /* Sayilar her istekte geliyor: ust kisimdaki uc secenek rozetinde
+       "Kullanilan (12)" yazabilmek icin. Suzgec uygulanmis listeden
+       hesaplanamaz -- suzulen liste zaten tek durumu tasiyor. */
+    const sayim = (
+      await mssql.query(`
+        select
+          count(*)                                        as tumu,
+          sum(case when Kullanildi = 1 then 1 else 0 end) as kullanilan,
+          sum(case when Kullanildi = 0 then 1 else 0 end) as kullanilmayan
+        from PaletTB
+      `)
+    ).recordset[0];
+
+    res.status(200).json({ list: liste, sayim, durum });
+  } catch (error) {
+    console.error("/palet/list API Hatasi:", error);
+    res.status(500).json({ status: false, message: "Palet listesi alinamadi." });
+  }
+});
+
+/* Kayit ve guncelleme govdeleri ayni dogrulamayi paylasiyor. */
+async function paletGovdeCoz(body) {
+  const tarih = body.Tarih ? new Date(body.Tarih) : null;
+  if (!tarih || isNaN(tarih.getTime())) {
+    return { hata: "Tarih gecersiz." };
+  }
+
+  const adet = paletSayi(body.Adet);
+  if (adet === null || adet <= 0) {
+    return { hata: "Adet 0'dan buyuk olmali." };
+  }
+
+  const firmaId = await paletListeId("firma", body.FirmaId, body.FirmaAdi);
+  const enId = await paletListeId("en", body.EnId, body.En);
+  const boyId = await paletListeId("boy", body.BoyId, body.Boy);
+  const urunId = await paletListeId("urun", body.UrunId, body.UrunBilgisi);
+  /* Kalinlik tek opsiyonel alan -- bos gelirse null kaliyor. */
+  const kalinlikId = await paletListeId("kalinlik", body.KalinlikId, body.Kalinlik);
+
+  const eksik = [];
+  if (!firmaId) eksik.push("Firma");
+  if (!enId) eksik.push("En");
+  if (!boyId) eksik.push("Boy");
+  if (!urunId) eksik.push("Ürün bilgisi");
+  if (eksik.length) {
+    return { hata: `Zorunlu alan(lar) eksik: ${eksik.join(", ")}` };
+  }
+
+  return {
+    tarih,
+    firmaId,
+    enId,
+    boyId,
+    kalinlikId,
+    urunId,
+    adet: Math.trunc(adet),
+    m2: await paletM2(enId, boyId, adet),
+    kullanildi: body.Kullanildi === true || body.Kullanildi === 1 ? 1 : 0,
+  };
+}
+
+app.post("/palet/save", async (req, res) => {
+  try {
+    const v = await paletGovdeCoz(req.body);
+    if (v.hata) return res.status(400).json({ status: false, message: v.hata });
+
+    const r = new mssql.Request();
+    r.input("Tarih", mssql.Date, v.tarih);
+    r.input("FirmaId", mssql.Int, v.firmaId);
+    r.input("EnId", mssql.Int, v.enId);
+    r.input("BoyId", mssql.Int, v.boyId);
+    r.input("KalinlikId", mssql.Int, v.kalinlikId);
+    r.input("UrunId", mssql.Int, v.urunId);
+    r.input("Adet", mssql.Int, v.adet);
+    r.input("M2", mssql.Decimal(18, 2), v.m2);
+    r.input("Kullanildi", mssql.Bit, v.kullanildi);
+    r.input("KullaniciID", mssql.Int, parseInt(req.body.KullaniciID) || null);
+
+    /* PaletNo hesaplanan kolon -- INSERT'e YAZILMAZ, OUTPUT ile geri
+       okunuyor; ekran "P0007 kaydedildi" diyebilsin. */
+    const ins = await r.query(`
+      insert into PaletTB
+        (Tarih, FirmaId, EnId, BoyId, KalinlikId, UrunId, Adet, M2,
+         Kullanildi, KullaniciID)
+      output inserted.ID, inserted.PaletNo
+      values
+        (@Tarih, @FirmaId, @EnId, @BoyId, @KalinlikId, @UrunId, @Adet, @M2,
+         @Kullanildi, @KullaniciID)
+    `);
+
+    res.status(200).json({
+      status: true,
+      id: ins.recordset[0].ID,
+      paletNo: ins.recordset[0].PaletNo,
+    });
+  } catch (error) {
+    console.error("/palet/save API Hatasi:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+app.put("/palet/update", async (req, res) => {
+  try {
+    const id = parseInt(req.body.ID);
+    if (!Number.isFinite(id) || id <= 0) {
+      return res.status(400).json({ status: false, message: "ID gecersiz." });
+    }
+
+    const v = await paletGovdeCoz(req.body);
+    if (v.hata) return res.status(400).json({ status: false, message: v.hata });
+
+    const r = new mssql.Request();
+    r.input("ID", mssql.Int, id);
+    r.input("Tarih", mssql.Date, v.tarih);
+    r.input("FirmaId", mssql.Int, v.firmaId);
+    r.input("EnId", mssql.Int, v.enId);
+    r.input("BoyId", mssql.Int, v.boyId);
+    r.input("KalinlikId", mssql.Int, v.kalinlikId);
+    r.input("UrunId", mssql.Int, v.urunId);
+    r.input("Adet", mssql.Int, v.adet);
+    r.input("M2", mssql.Decimal(18, 2), v.m2);
+    r.input("Kullanildi", mssql.Bit, v.kullanildi);
+
+    await r.query(`
+      update PaletTB set
+        Tarih      = @Tarih,
+        FirmaId    = @FirmaId,
+        EnId       = @EnId,
+        BoyId      = @BoyId,
+        KalinlikId = @KalinlikId,
+        UrunId     = @UrunId,
+        Adet       = @Adet,
+        M2         = @M2,
+        Kullanildi = @Kullanildi
+      where ID = @ID
+    `);
+
+    res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("/palet/update API Hatasi:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+/*
+ * KULLANILDI ISARETI AYRI UC.
+ *
+ * Listede tek tiklamayla isaretlenebiliyor; o is icin tum formu
+ * (tarih, olculer, urun) geri gondermek gerekmesin. Ayrica /palet/update
+ * zorunlu alanlari dogruluyor -- eski bir kayitta eksik bir alan varsa
+ * yalnizca isareti degistirmek isteyen kullanici dogrulama hatasi
+ * alirdi.
+ */
+app.put("/palet/used", async (req, res) => {
+  try {
+    const id = parseInt(req.body.ID);
+    if (!Number.isFinite(id) || id <= 0) {
+      return res.status(400).json({ status: false, message: "ID gecersiz." });
+    }
+
+    const r = new mssql.Request();
+    r.input("ID", mssql.Int, id);
+    r.input(
+      "Kullanildi",
+      mssql.Bit,
+      req.body.Kullanildi === true || req.body.Kullanildi === 1 ? 1 : 0
+    );
+    await r.query("update PaletTB set Kullanildi = @Kullanildi where ID = @ID");
+
+    res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("/palet/used API Hatasi:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+app.delete("/palet/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (!Number.isFinite(id) || id <= 0) {
+      return res.status(400).json({ status: false, message: "ID gecersiz." });
+    }
+
+    const r = new mssql.Request();
+    r.input("ID", mssql.Int, id);
+    await r.query("delete from PaletTB where ID = @ID");
+
+    /* Liste tablolarindaki deger SILINMIYOR: baska paletler onu
+       kullaniyor olabilir ve kullanmasa bile AutoComplete onerisi
+       olarak degerli. */
+    res.status(200).json({ status: true });
+  } catch (error) {
+    console.error("/palet/:id DELETE API Hatasi:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
 /*
  * Nuxt 2'de bu dosya serverMiddleware olarak { path, handler } seklinde
  * export ediliyordu. Nitro/Rollup ESM bekliyor ve bu dosyanin tepesinde

@@ -89,6 +89,7 @@ export const NAV_FULL: NavGroup[] = [
       { label: "Shipment Invoices", to: "/operation/transportlist" },
       { label: "FOB Costs", to: "/operation/container" },
       { label: "FOB Invoices", to: "/operation/containerlist" },
+      { label: "Palet Takibi", to: "/operation/palet" },
     ],
   },
   {
