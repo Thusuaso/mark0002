@@ -353,7 +353,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -370,7 +370,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -387,7 +387,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -425,7 +425,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -462,7 +462,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -480,7 +480,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -497,7 +497,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -534,7 +534,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -554,7 +554,7 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterCallback()"
+              @input="filterApplyDebounced(filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -769,7 +769,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -786,7 +786,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -803,7 +803,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -841,7 +841,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -865,7 +865,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -883,7 +883,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -900,7 +900,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -917,7 +917,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -937,7 +937,7 @@
           <InputText
             v-model="filterModel.value"
             type="text"
-            @input="filterCallback()"
+            @input="filterApplyDebounced(filterCallback)"
             class="p-column-filter"
           />
         </template>
@@ -1056,6 +1056,8 @@ export default {
 
   data() {
     return {
+      /* setTimeout kimligi -- filterApplyDebounced kullaniyor. */
+      __filterTimer: null,
       totals: 0,
       /*
        * ESLESME KIPI -- metin alanlari CONTAINS, olcu/tarih STARTS_WITH.
@@ -1126,7 +1128,57 @@ export default {
         this.__noneControl(x.AlisFiyati) * this.__noneControl(x.Miktar);
     });
   },
+  beforeUnmount() {
+    /* Bekleyen suzme, bilesen gittikten sonra calismasin. */
+    clearTimeout(this.__filterTimer)
+  },
+
   methods: {
+    /*
+     * SUZMEYI YAZMA BITINCE CALISTIR -- her tus vurusunda DEGIL.
+     *
+     * Eskiden @input dogrudan filterCallback() cagiriyordu, yani her tus
+     * vurusu DataTable'in processedData computed'ini bastan hesaplatiyordu:
+     *   1) filter(): TUM satirlar icin removeAccents + toLocaleLowerCase
+     *   2) sortSingle(): eslesen satirlari localeComparator ile siralama,
+     *      yani Intl.Collator.compare ile n log n karsilastirma
+     * Bu sayfa (reports/mekmer/shipped) yil filtresi olmadan butun
+     * yuklenmis siparisleri URUN SATIRI bazinda cektigi icin kume buyuk.
+     *
+     * OLCUM (Node/V8, sentetik veri -- tools disinda tutuldu):
+     *   n=60.000  -> STARTS_WITH 30ms | CONTAINS 80ms
+     *   n=120.000 -> STARTS_WITH 57ms | CONTAINS 163ms
+     * Maliyetin neredeyse tamami (2), yani Intl siralamasi. CONTAINS'e
+     * gecildiginde ilk harf neredeyse TUM satirlari tuttugu icin her tus
+     * vurusunda tam kume yeniden siralaniyor; STARTS_WITH iken tek harf
+     * kumeyi kucuk bir alt kumeye indirdigi icin siralama ucuzdu.
+     *
+     * [!] DIKKAT -- bu bir ILAC, kanitlanmis TEK sebep DEGIL. Kullanici
+     * Firefox'un "yazar yazmaz dondugunu" bildirdi; yukaridaki olcum
+     * V8'de yapildi ve 163ms tek basina donma demek degil. Sonsuz render
+     * dongusu ARANDI ve BULUNAMADI: PrimeVue'nun filter()/sortSingle()
+     * yollari dizileri kopyalayarak calisiyor, clearEditingMetaData
+     * editMode olmadan hic yazmiyor, ve @filter -> __totalSum yazmasinin
+     * computed'i yeniden tetiklemedigi Vue reaktivitesiyle birebir
+     * denenerek dogrulandi (Vue calisan effect'i kendi yazmasiyla
+     * tetiklemiyor). Yani kalan en guclu aciklama Firefox'ta tus basina
+     * tekrarlanan bu maliyet -- Intl.Collator SpiderMonkey'de V8'den
+     * belirgin yavas. Donma bundan sonra da surerse suclu BASKA yerde
+     * ve profil almak gerekiyor.
+     *
+     * NEDEN GUVENLI: InputText'in v-model'i `filterModel.value`a, yani
+     * DataTable'in IC kopyasi d_filters'a yaziyor; ama filter()
+     * `this.filters` PROP'unu okuyor ve prop ancak filterCallback() ->
+     * update:filters ile guncelleniyor. Yani geciken sey yalnizca
+     * SUZME, kutuya yazilan metin ANINDA gorunuyor.
+     *
+     * PrimeVue 4'te hazir bir filterDelay prop'u YOK (BaseDataTable.vue
+     * icinde boyle bir prop bulunmuyor), bu yuzden elle.
+     */
+    filterApplyDebounced(filterCallback) {
+      clearTimeout(this.__filterTimer)
+      this.__filterTimer = setTimeout(() => filterCallback(), 350)
+    },
     __amountControl(val) {
       if (
         val == 0 ||
