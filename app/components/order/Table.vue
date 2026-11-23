@@ -1228,32 +1228,56 @@ export default {
 
   data() {
     return {
+      /*
+       * ESLESME KIPI -- metin alanlari CONTAINS, olcu/tarih STARTS_WITH.
+       *
+       * Hepsi STARTS_WITH'ti. PrimeVue'nun startsWith'i KESIN ON EK
+       * karsilastirmasi yapiyor:
+       *     stringValue.slice(0, filterValue.length) === filterValue
+       * Tarih, En/Boy/Kenar ve Miktar'da sorun degil -- insan zaten
+       * bastan yaziyor. Ama Customer / Supplier / Product / Po uzun
+       * adlar ve kodlar: kullanici ortadan bir kelime yaziyor ve 0 kayit
+       * donuyordu (veri "Imperial Homes Ltd", yazilan "homes").
+       *
+       * Turkce karakter bu isin icinde DEGIL: FilterService iki tarafa da
+       * removeAccents uyguluyor (I->I, C->C, S->S), yani aksan farki
+       * zaten eriyor.
+       *
+       * DIKKAT -- bu yalnizca ISTEMCI TARAFI filtreleri kapsiyor, yani
+       * #filter sablonunda filterCallback() cagiran tablolari. Ayni
+       * dosyada filterSet/filterApply ile SUNUCUYA giden tablolar var
+       * (orders/shipped); oradaki esleme api/index.js icinde
+       *     m.FirmaAdi Like '<deger>' + '%'
+       * ile hala ON EK. Iki ekranda ayni aramanin farkli sonuc vermesi
+       * buradan geliyor; duzeltmek SQL degisikligi gerektiriyor ve ayrica
+       * karar verilmeli.
+       */
       filtersShipped: {
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FirmaAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        SiparisNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        UrunAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
         En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        BirimAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
       },
       globalSearch: null,
       selectedProduction: null,
       filtersOrders: {
         SiparisTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        FirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        SiparisNo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        UrunAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        FirmaAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        SiparisNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        UrunAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
         En: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Boy: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         Kenar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        UrunFirmaAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
         Miktar: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        BirimAdi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        BirimAdi: { value: null, matchMode: FilterMatchMode.CONTAINS },
       },
       filterModel: {
         loaddate: "",
