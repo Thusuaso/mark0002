@@ -120,7 +120,11 @@
           />
           <label :for="ids.en">En (cm)</label>
         </FloatLabel>
-        <small v-if="uyari.en" class="pf-uyari">Bu en değeri zaten var.</small>
+        <small v-if="okunan.en" class="pf-uyari">
+          <i class="pi pi-info-circle" aria-hidden="true" />
+          <strong>{{ okunan.en }}</strong> olarak okunacak
+        </small>
+        <small v-else-if="uyari.en" class="pf-uyari">Bu en değeri zaten var.</small>
         <small v-else-if="yeni.en" class="pf-yeni">Yeni en değeri kaydedilecek.</small>
       </div>
 
@@ -138,7 +142,11 @@
           />
           <label :for="ids.boy">Boy (cm)</label>
         </FloatLabel>
-        <small v-if="uyari.boy" class="pf-uyari">Bu boy değeri zaten var.</small>
+        <small v-if="okunan.boy" class="pf-uyari">
+          <i class="pi pi-info-circle" aria-hidden="true" />
+          <strong>{{ okunan.boy }}</strong> olarak okunacak
+        </small>
+        <small v-else-if="uyari.boy" class="pf-uyari">Bu boy değeri zaten var.</small>
         <small v-else-if="yeni.boy" class="pf-yeni">Yeni boy değeri kaydedilecek.</small>
       </div>
 
@@ -156,7 +164,11 @@
           />
           <label :for="ids.kalinlik">Kalınlık (cm)</label>
         </FloatLabel>
-        <small v-if="uyari.kalinlik" class="pf-uyari">Bu kalınlık zaten var.</small>
+        <small v-if="okunan.kalinlik" class="pf-uyari">
+          <i class="pi pi-info-circle" aria-hidden="true" />
+          <strong>{{ okunan.kalinlik }}</strong> olarak okunacak
+        </small>
+        <small v-else-if="uyari.kalinlik" class="pf-uyari">Bu kalınlık zaten var.</small>
         <small v-else-if="yeni.kalinlik" class="pf-yeni">
           Yeni kalınlık kaydedilecek.
         </small>
@@ -327,6 +339,25 @@ export default {
 
       /* "Zaten var" ve "yeni kaydedilecek" ipuclari alan basina. */
       uyari: { firma: false, urun: false, en: false, boy: false, kalinlik: false },
+      /*
+       * SAYISAL ALANDA "NE ANLADIM" GERI BILDIRIMI.
+       *
+       * En/Boy/Kalinlik serbest metin kutusu; ondalik ayirici olarak
+       * nokta da virgul de kabul ediliyor (ikisi ayni: sayi() virgulu
+       * noktaya ceviriyor). Sorun BINLIK ayiricida: "1.250" ile "1,25"
+       * ayni sayiya cozuluyor ve hangisinin kastedildigi KURALLA
+       * ANLASILAMAZ -- tek ayirici var, ikisi de gecerli bir yazim.
+       * Tahmin etmek yanlis: 1,250 mm kalinlik da gercek bir deger.
+       *
+       * Bu yuzden reddetmek ya da tahmin etmek yerine ANLADIGI DEGER
+       * aninda gosteriliyor: "1.250" yazan kullanici altinda
+       * "1,25 olarak okunacak" gorup hatayi fark ediyor. Sessiz veri
+       * bozulmasini onleyen sey bu -- kural degil, gorunurluk.
+       *
+       * Yalnizca yazilan metinle okunan deger AYRISTIGINDA doluyor,
+       * yani dogru yazimda hic gorunmuyor.
+       */
+      okunan: { en: "", boy: "", kalinlik: "" },
       yeni: { firma: false, urun: false, en: false, boy: false, kalinlik: false },
 
       kaydediyor: false,
@@ -355,6 +386,51 @@ export default {
     metin(event) {
       if (typeof event === "string") return event
       return (event && event.target && event.target.value) || ""
+    },
+
+    /*
+     * Yazilan metin ile okunan sayi ayrisiyorsa ipucunu doldur.
+     *
+     * Karsilastirma AYIRICI FARKINI YOK SAYIYOR: once virgul noktaya
+     * cevriliyor, sonra okunan sayinin metni ile kiyaslaniyor. Boylece
+     * nokta/virgul tercihi ipucu URETMIYOR ("20.3" ve "20,3" ikisi de
+     * sessiz), ama anlam degistiren her sey uretiyor:
+     *     "1.250" -> 1,25      (binlik ayirici sanilan sey)
+     *     "1.234,5" -> 1,234   (iki ayirici, ikincisi atiliyor)
+     *     "20cm" -> 20         (parseFloat sondaki metni yok sayiyor)
+     */
+    okunanGuncelle(alan, yazi) {
+      const ham = String(yazi ?? "").trim()
+      if (!ham) {
+        this.okunan[alan] = ""
+        return
+      }
+
+      const n = this.sayi(ham)
+      if (n === null) {
+        this.okunan[alan] = ""
+        return
+      }
+
+      const hamNokta = ham.replace(",", ".")
+      this.okunan[alan] = hamNokta === String(n) ? "" : this.sayiBicimle(n)
+    },
+
+    /* Ekranda virgullu gosteriliyor -- form genelindeki yazim bu. */
+    sayiBicimle(n) {
+      return String(n).replace(".", ",")
+    },
+
+    /*
+     * IKI AYIRICI = CELISKILI GIRDI.
+     * "1.234,5" ya da "1,234,5" gibi girdilerde ikinci ayirici ve
+     * sonrasi sessizce ATILIYOR (parseFloat). Burada tespit edilip
+     * reddediliyor; tek ayiricili "1.250" ise kuralla anlasilamadigi
+     * icin reddedilmiyor, okunan deger gosteriliyor (bkz. `okunan`).
+     */
+    belirsizMi(yazi) {
+      const ham = String(yazi ?? "").trim()
+      return (ham.match(/[.,]/g) || []).length > 1
     },
 
     sayi(deger) {
@@ -391,6 +467,8 @@ export default {
       this.model[tanim.metinAlani] = event.value.deger
       this.uyari[alan] = false
       this.yeni[alan] = false
+      /* Listeden secilen degerde yazim belirsizligi YOK. */
+      if (tanim.sayisal) this.okunan[alan] = ""
       if (alan === "en" || alan === "boy") this.m2Hesapla()
     },
 
@@ -411,6 +489,8 @@ export default {
 
       this.model[tanim.idAlani] = null
       this.model[tanim.metinAlani] = yazi
+
+      if (tanim.sayisal) this.okunanGuncelle(alan, yazi)
 
       if (!yazi.trim()) {
         this.uyari[alan] = false
@@ -461,6 +541,9 @@ export default {
 
     formuDoldur() {
       const k = this.kayit || {}
+
+      /* Kayit forma yerlesirken eski ipuclari kalmasin. */
+      this.okunan = { en: "", boy: "", kalinlik: "" }
 
       this.model = {
         ID: k.ID || 0,
@@ -518,6 +601,28 @@ export default {
       if (this.model.ID && !String(this.model.PaletNo || "").trim()) {
         eksik.push("Palet No")
       }
+      /*
+       * CELISKILI SAYI YAZIMI -- iki ayirici.
+       * "1.234,5" gibi girdilerde ikinci ayirici ve sonrasi sessizce
+       * atilirdi. Sunucu da ayni kontrolu yapiyor (son soz onun), ama
+       * burada yakalamak hangi alanin sorunlu oldugunu soyluyor.
+       */
+      const celiskili = [
+        ["En", this.model.En, this.model.EnId],
+        ["Boy", this.model.Boy, this.model.BoyId],
+        ["Kalınlık", this.model.Kalinlik, this.model.KalinlikId],
+      ]
+        .filter(([, yazi, id]) => !id && this.belirsizMi(yazi))
+        .map(([ad]) => ad)
+
+      if (celiskili.length) {
+        useAppToast().warn(
+          `${celiskili.join(", ")} alanında iki ayırıcı var. ` +
+            `Ondalık için tek nokta ya da virgül kullanın, binlik ayırıcı kullanmayın.`,
+        )
+        return
+      }
+
       if (!this.model.FirmaAdi && !this.model.FirmaId) eksik.push("Firma")
       if (!this.model.UrunBilgisi && !this.model.UrunId) eksik.push("Ürün bilgisi")
       if (this.sayi(this.model.En) === null) eksik.push("En")

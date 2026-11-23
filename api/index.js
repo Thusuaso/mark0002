@@ -21894,6 +21894,28 @@ function paletSayi(deger) {
 }
 
 /*
+ * IKI AYIRICI = CELISKILI GIRDI, REDDEDILIYOR.
+ *
+ * paletSayi yalnizca ILK virgulu noktaya ceviriyor ve parseFloat ikinci
+ * ayiricidan sonrasini SESSIZCE atiyor:
+ *     "1.234,5" -> 1.234     "1,234.5" -> 1.234
+ * Yani kullanici bin iki yuz otuz dort bucuk yazdigini sanirken 1,234
+ * kaydediliyordu. Bu bir yazim hatasi degil, ANLAM KAYBI -- o yuzden
+ * kabul edilmiyor.
+ *
+ * TEK ayiricili "1.250" REDDEDILMIYOR: orada 1250 mi 1,25 mi
+ * kastedildigi KURALLA anlasilamaz (1,250 mm kalinlik da gercek bir
+ * deger). Onun cozumu formda: okunan deger aninda gosteriliyor
+ * ("1,25 olarak okunacak"), yani kullanici farki goruyor. Tahmin etmek
+ * yanlis cevap olurdu.
+ */
+function paletSayiCeliskili(deger) {
+  if (deger === null || deger === undefined) return false;
+  const ham = String(deger).trim();
+  return (ham.match(/[.,]/g) || []).length > 1;
+}
+
+/*
  * LISTE DEGERININ ID'SINI BUL, YOKSA OLUSTUR.
  *
  * Istemci ya mevcut bir kaydi secer (id gelir) ya da yeni bir deger
@@ -22079,6 +22101,30 @@ async function paletGovdeCoz(body) {
   const adet = paletSayi(body.Adet);
   if (adet === null || adet <= 0) {
     return { hata: "Adet 0'dan buyuk olmali." };
+  }
+
+  /*
+   * Yazim kontrolu, ID GELMEYEN alanlarda. Istemci listeden bir deger
+   * sectiyse metin degil ID kullaniliyor, yani yaziminin onemi yok.
+   */
+  const celiskili = [
+    ["En", body.EnId, body.En],
+    ["Boy", body.BoyId, body.Boy],
+    ["Kalinlik", body.KalinlikId, body.Kalinlik],
+  ]
+    .filter(([, id, metin]) => {
+      const mevcut = parseInt(id);
+      if (Number.isFinite(mevcut) && mevcut > 0) return false;
+      return paletSayiCeliskili(metin);
+    })
+    .map(([ad]) => ad);
+
+  if (celiskili.length) {
+    return {
+      hata:
+        `${celiskili.join(", ")} alaninda iki ayirici var. Ondalik icin ` +
+        `tek nokta ya da virgul kullanin, binlik ayirici kullanmayin.`,
+    };
   }
 
   const firmaId = await paletListeId("firma", body.FirmaId, body.FirmaAdi);
