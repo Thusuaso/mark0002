@@ -18,12 +18,15 @@
         PALET NO GIRILMIYOR, GOSTERILIYOR.
         Numara veritabaninda ID'den uretiliyor (api/sql/PaletTB.sql,
         karar [5]), yani yeni kayitta daha BELLI DEGIL. Alan bu yuzden
-        salt okunur: yeni kayitta "kayıtta verilecek", duzenlemede
-        mevcut numara.
+        salt okunur: yeni kayitta BOS, duzenlemede mevcut numara.
+
+        [x] "kayıtta verilecek" yazisi KALDIRILDI (istek). Kutu yeni
+        kayitta artik bos duruyor; ustundeki FloatLabel etiketi alanin ne
+        oldugunu zaten soyluyor.
       -->
       <div class="col-12 col-md-4">
         <FloatLabel>
-          <InputText :id="ids.paletNo" :value="paletNoYazisi" disabled />
+          <InputText :id="ids.paletNo" :value="model.PaletNo || ''" disabled />
           <label :for="ids.paletNo">Palet No</label>
         </FloatLabel>
       </div>
@@ -321,12 +324,6 @@ export default {
     }
   },
 
-  computed: {
-    paletNoYazisi() {
-      return this.model.PaletNo || "kayıtta verilecek"
-    },
-  },
-
   /*
    * created() DEGIL mounted(): yalnizca mevcut kaydi forma yerlestiriyor,
    * sunucuda calismasina gerek yok. (Form her zaman bir <Dialog> icinde,
@@ -538,6 +535,30 @@ export default {
 </script>
 
 <style scoped>
+/*
+ * USTTEN BOSLUK -- FloatLabel ETIKETI KIRPILMASIN.
+ *
+ * Belirti: "Adet" kutusuna gelince ustundeki yazi kayboluyordu.
+ * Sebebi FloatLabel'in calisma bicimi: etiket odaklanmadan once kutunun
+ * ICINDE duruyor, odaklanildiginda (ya da deger girildiginde) kutunun
+ * USTUNE cikiyor -- yani negatif konuma, kendi satirinin disina. Form
+ * Dialog govdesinin en ustunde basladigi icin ilk satirin etiketleri
+ * govdenin ust kenarinin disina tasiyor ve kirpiliyordu.
+ *
+ * Bosluk Dialog'a DEGIL forma veriliyor: Dialog paylasilan bir bilesen,
+ * ona dokunmak palet disindaki butun diyaloglari etkilerdi. Burada
+ * durmasi ayni zamanda dogru yer -- kirpilmanin sebebi formun ilk
+ * satirindaki FloatLabel'lar.
+ *
+ * 0.75rem: etiket kucultulmus haliyle yaklasik 0.65rem yukseklikte
+ * (PrimeVue etiketi 0.85 oraninda kuculttup -0.9rem kaydiriyor), yani
+ * bu bosluk tasma payini tam kapatiyor ve formda gereksiz bir aralik
+ * birakmiyor.
+ */
+.pf {
+  padding-top: 0.75rem;
+}
+
 /*
  * Girdiler sutunu DOLDURUYOR.
  * `p-fluid` KULLANILMIYOR: o sinif PrimeVue 3'un kendi CSS'indeydi ve
