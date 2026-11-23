@@ -192,6 +192,8 @@ export const NAV_62: NavGroup[] = [
       { label: "Yükleme Raporu", to: "/reports/mekmar/forwarding" },
     ],
   },
+
+  { label: "Palet Takibi", to: "/operation/palet" },
 ]
 
 /* ---------------------------------------------------------------- *
@@ -230,6 +232,7 @@ export const NAV_RESTRICTED: NavGroup[] = [
   { label: "Muhasebe", to: "/reports/mekmer/calculating-cost" },
   { label: "Strip & Moloz", to: "/reports/mekmer/strips" },
   { label: "Sevk Et", to: "/operation/shipment" },
+  { label: "Palet Takibi", to: "/operation/palet" },
   { label: "Mekmer Finans", to: "/reports/mekmer/new-mekmer-finance" },
   { label: "Product Data", to: "/operation/cards" },
   { label: "Sale Customers", to: "/customer/mekmar" },
