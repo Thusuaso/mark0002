@@ -29,13 +29,17 @@
       >
         <template #header>
           <div class="flex justify-content-between align-items-center">
-            <DatePicker
-              v-model="selectedYear"
-              view="year"
-              dateFormat="yy"
-              showIcon
-              @date-select="yearSelected($event)"
-            />
+            <!--
+              YIL SECICI KALDIRILDI -- liste artik HER ZAMAN tum yillari
+              tutuyor. Gerekcesi: secici tek yonluydu (showClear yok), bir
+              kez dokununca uc `YEAR(s.YuklemeTarihi) = <yil>` ile yalnizca
+              o yili cekiyordu ve UI'da "tum yillar"a donmenin yolu yoktu --
+              sayfa yenilenmeden eski hale donulemiyordu. Kullanici yil
+              secmek istemedigini soyledi; aramalar tam kumede calisiyor.
+            -->
+            <span style="font-size: 90%; opacity: 0.7">
+              Filtrelemek için kolon kutusuna yazıp <strong>Enter</strong>'a basın
+            </span>
             <Button
               severity="success" class="p-button-sm ml-2"
               icon="pi pi-file-excel"
@@ -69,7 +73,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -86,7 +91,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -103,7 +109,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -150,7 +157,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -174,7 +182,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -192,7 +201,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -209,7 +219,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -226,7 +237,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -246,7 +258,8 @@
             <InputText
               v-model="filterModel.value"
               type="text"
-              @input="filterApplyDebounced(filterCallback)"
+              @keyup.enter="filterCallback()"
+              @input="filterResetIfEmpty(filterModel, filterCallback)"
               class="p-column-filter"
             />
           </template>
@@ -354,12 +367,9 @@ export default {
   },
   data() {
     return {
-      /* setTimeout kimligi -- filterApplyDebounced kullaniyor. */
-      __filterTimer: null,
       isRendering: true,
       excelLoading: false,
       filteredList: null,
-      selectedYear: null,
       totalbuying: 0,
       totalton: 0,
       totalamount: 0,
@@ -443,56 +453,35 @@ export default {
     this.__totalSum(this.list);
     this.userId = useCookie("userId").value;
   },
-  beforeUnmount() {
-    /* Bekleyen suzme, bilesen gittikten sonra calismasin. */
-    clearTimeout(this.__filterTimer)
-  },
-
   methods: {
     /*
-     * SUZMEYI YAZMA BITINCE CALISTIR -- her tus vurusunda DEGIL.
+     * SUZME YAZARKEN DEGIL, ENTER'DA CALISIR -- bu sayfaya OZEL.
      *
-     * Eskiden @input dogrudan filterCallback() cagiriyordu, yani her tus
-     * vurusu DataTable'in processedData computed'ini bastan hesaplatiyordu:
-     *   1) filter(): TUM satirlar icin removeAccents + toLocaleLowerCase
-     *   2) sortSingle(): eslesen satirlari localeComparator ile siralama,
-     *      yani Intl.Collator.compare ile n log n karsilastirma
-     * Bu sayfa (reports/mekmer/shipped) yil filtresi olmadan butun
-     * yuklenmis siparisleri URUN SATIRI bazinda cektigi icin kume buyuk.
+     * Kullanicinin istegi: "ben yazdigim zaman cikmasin, yazip enter
+     * bastiktan sonra sonuclari cikarsin, sadece o sayfa icin."
+     * Kardes tablolar (order/Table.vue, order/Table2.vue) yazarken
+     * suzmeye devam ediyor; orada gecikmeli (filterApplyDebounced).
      *
-     * OLCUM (Node/V8, sentetik veri -- tools disinda tutuldu):
-     *   n=60.000  -> STARTS_WITH 30ms | CONTAINS 80ms
-     *   n=120.000 -> STARTS_WITH 57ms | CONTAINS 163ms
-     * Maliyetin neredeyse tamami (2), yani Intl siralamasi. CONTAINS'e
-     * gecildiginde ilk harf neredeyse TUM satirlari tuttugu icin her tus
-     * vurusunda tam kume yeniden siralaniyor; STARTS_WITH iken tek harf
-     * kumeyi kucuk bir alt kumeye indirdigi icin siralama ucuzdu.
-     *
-     * [!] DIKKAT -- bu bir ILAC, kanitlanmis TEK sebep DEGIL. Kullanici
-     * Firefox'un "yazar yazmaz dondugunu" bildirdi; yukaridaki olcum
-     * V8'de yapildi ve 163ms tek basina donma demek degil. Sonsuz render
-     * dongusu ARANDI ve BULUNAMADI: PrimeVue'nun filter()/sortSingle()
-     * yollari dizileri kopyalayarak calisiyor, clearEditingMetaData
-     * editMode olmadan hic yazmiyor, ve @filter -> __totalSum yazmasinin
-     * computed'i yeniden tetiklemedigi Vue reaktivitesiyle birebir
-     * denenerek dogrulandi (Vue calisan effect'i kendi yazmasiyla
-     * tetiklemiyor). Yani kalan en guclu aciklama Firefox'ta tus basina
-     * tekrarlanan bu maliyet -- Intl.Collator SpiderMonkey'de V8'den
-     * belirgin yavas. Donma bundan sonra da surerse suclu BASKA yerde
-     * ve profil almak gerekiyor.
-     *
-     * NEDEN GUVENLI: InputText'in v-model'i `filterModel.value`a, yani
-     * DataTable'in IC kopyasi d_filters'a yaziyor; ama filter()
-     * `this.filters` PROP'unu okuyor ve prop ancak filterCallback() ->
-     * update:filters ile guncelleniyor. Yani geciken sey yalnizca
-     * SUZME, kutuya yazilan metin ANINDA gorunuyor.
-     *
-     * PrimeVue 4'te hazir bir filterDelay prop'u YOK (BaseDataTable.vue
-     * icinde boyle bir prop bulunmuyor), bu yuzden elle.
+     * NEDEN ISE YARIYOR -- PrimeVue'nun ic isleyisi: InputText'in
+     * v-model'i `filterModel.value`a, yani DataTable'in IC kopyasi
+     * d_filters'a yaziyor. Ama suzmeyi yapan filter() `this.filters`
+     * PROP'unu okuyor ve prop ancak filterCallback() -> update:filters
+     * ile guncelleniyor. Yani filterCallback'i cagirmadigimiz surece
+     * yazilan metin kutuda GORUNUR ama tablo SUZULMEZ.
      */
-    filterApplyDebounced(filterCallback) {
-      clearTimeout(this.__filterTimer)
-      this.__filterTimer = setTimeout(() => filterCallback(), 350)
+
+    /*
+     * Kutu BOSALTILINCA aninda uygula.
+     *
+     * Enter sarti olmasa bu tuzak olurdu: metni silip Enter'a basmayan
+     * kullanicida ONCEKI suzme sonucu ekranda kalir ve tam listeye
+     * donmenin yolu kalmaz. Yalnizca bosalma durumunda calistigi icin
+     * yazarken hicbir pahali is tetiklenmiyor.
+     */
+    filterResetIfEmpty(filterModel, filterCallback) {
+      if (filterModel.value === null || filterModel.value === "") {
+        filterCallback()
+      }
     },
     /* ---------------- EXCEL ---------------- */
     async excelOutput() {
@@ -651,11 +640,13 @@ export default {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Shipped");
 
-        const yil = this.selectedYear
-          ? new Date(this.selectedYear).getFullYear()
-          : new Date().getFullYear();
+        /*
+         * Dosya adindan YIL cikarildi: yil secici kaldirildi ve liste
+         * artik tum yillari tutuyor, yani "shipped_2026.xlsx" YANILTICI
+         * olurdu -- icinde 2026 disi kayitlar da var.
+         */
         const suffix = this.isFiltered ? "_filtreli" : "";
-        XLSX.writeFile(wb, `shipped_${yil}${suffix}.xlsx`);
+        XLSX.writeFile(wb, `shipped${suffix}.xlsx`);
 
         useAppToast().success(`${sorted.length} kayıt Excel'e aktarıldı.`);
       } catch (e) {
@@ -690,11 +681,6 @@ export default {
     },
     /* --------------- /EXCEL ---------------- */
 
-    yearSelected(event) {
-      const date = new Date(event);
-      const year = date.getFullYear();
-      this.orderStore.setOrderShippedMekmer2ListYears(year);
-    },
     /*
      * KALDIRILDI: shippedFiltered(event)
      *
@@ -895,13 +881,18 @@ export default {
   Mekanik donusumler:
   [1] 1x  import ... "primevue/api" -> "@primevue/core/api"
   [2] 2x  :x + @update:x -> v-model:x
-  [3] 1x  <Calendar> -> <DatePicker>
+  [3] 1x  <Calendar> -> <DatePicker>  (SONRADAN KALDIRILDI -- yil
+          secici artik yok, gerekcesi #header slotundaki notta)
   [4] 1x  p-button-* -> severity
   [5] 7x  dispatch -> Pinia action
   [6] store computed'i EKLENDI (mapGetters yoktu, yalnizca dispatch vardi)
 
   ELLE:
   [7] 2x Cookies.get -> useCookie
+      SONRADAN: rowClass2'deki cagri KALDIRILDI -- rowClass her satir
+      icin calisiyor ve useCookie her cagride kapanmayan bir
+      BroadcastChannel birakiyordu (Firefox'ta sekme kilitleniyordu).
+      Cerez artik created() icinde bir kez okunuyor.
   [8] this.$toast -> useAppToast()
       `.warning(...)` -> `.warn(...)`: PrimeVue 4'te seviye adi "warn".
       Ayrica `this.$toast && this.$toast.x(...)` savunma kontrolleri
