@@ -22,7 +22,6 @@
         sortField="YuklemeTarihi"
         :sortOrder="-1"
         :rowClass="rowClass2"
-        @filter="filtersProduction($event)"
         columnResizeMode="fit"
         showGridlines
         responsiveLayout="scroll"
@@ -69,12 +68,12 @@
           <template #body="slotProps">
             {{ dateToString(slotProps.data.YuklemeTarihi) }}
           </template>
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('loaddate', filterModel.value)"
+              @input="filterSet('loaddate', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -87,12 +86,12 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('company', filterModel.value)"
+              @input="filterSet('company', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -105,12 +104,12 @@
           headerClass="tableHeader"
           bodyClass="tableBody po-anchor"
         >
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('po', filterModel.value)"
+              @input="filterSet('po', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -153,12 +152,12 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('product', filterModel.value)"
+              @input="filterSet('product', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -178,12 +177,12 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('width', filterModel.value)"
+              @input="filterSet('width', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -197,12 +196,12 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('height', filterModel.value)"
+              @input="filterSet('height', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -215,12 +214,12 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('edge', filterModel.value)"
+              @input="filterSet('edge', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -233,12 +232,12 @@
           headerClass="tableHeader"
           bodyClass="tableBody"
         >
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('supplier', filterModel.value)"
+              @input="filterSet('supplier', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -254,12 +253,12 @@
           <template #body="slotProps">
             {{ formatDecimal(slotProps.data.Miktar) }}
           </template>
-          <template #filter="{ filterModel, filterCallback }">
+          <template #filter="{ filterModel }">
             <InputText
               v-model="filterModel.value"
               type="text"
-              @keyup.enter="filterCallback()"
-              @input="filterResetIfEmpty(filterModel, filterCallback)"
+              @keyup.enter="filterApply('amount', filterModel.value)"
+              @input="filterSet('amount', filterModel.value)"
               class="p-column-filter"
             />
           </template>
@@ -369,7 +368,26 @@ export default {
     return {
       isRendering: true,
       excelLoading: false,
-      filteredList: null,
+      /*
+       * SUNUCUYA GIDEN filtre modeli -- PrimeVue'nun `filtersShipped`i ile
+       * KARISTIRILMAMALI. filtersShipped artik yalnizca filtre SATIRINI
+       * ciziyor (filterDisplay="row" bunu istiyor); icindeki matchMode
+       * degerleri HICBIR SEY YAPMIYOR, cunku filterCallback() hic
+       * cagrilmiyor ve DataTable suzmeyi `filters` PROP'undan okuyor --
+       * prop ise hep bos kaliyor. Suzmeyi bu model + sunucu yapiyor.
+       * Ayni ayrim order/Table.vue icinde de var.
+       */
+      filterModel: {
+        loaddate: "",
+        company: "",
+        po: "",
+        product: "",
+        width: "",
+        height: "",
+        edge: "",
+        supplier: "",
+        amount: "",
+      },
       totalbuying: 0,
       totalton: 0,
       totalamount: 0,
@@ -377,28 +395,25 @@ export default {
       totalsPurchase: 0,
       totals: 0,
       /*
-       * ESLESME KIPI -- metin alanlari CONTAINS, olcu/tarih STARTS_WITH.
+       * [!] BU NESNE ARTIK SUZMUYOR -- yalnizca filtre SATIRINI ciziyor.
        *
-       * Hepsi STARTS_WITH'ti. PrimeVue'nun startsWith'i KESIN ON EK
-       * karsilastirmasi yapiyor:
-       *     stringValue.slice(0, filterValue.length) === filterValue
-       * Tarih, En/Boy/Kenar ve Miktar'da sorun degil -- insan zaten
-       * bastan yaziyor. Ama Customer / Supplier / Product / Po uzun
-       * adlar ve kodlar: kullanici ortadan bir kelime yaziyor ve 0 kayit
-       * donuyordu (veri "Imperial Homes Ltd", yazilan "homes").
+       * filterDisplay="row" bir `filters` nesnesi istiyor, yoksa kolon
+       * basliklarinin altindaki kutu satiri hic render edilmiyor. Ama
+       * suzme SUNUCUDA yapiliyor (filterSet/filterApply -> filterModel ->
+       * POST /order/shipped/mekmer2/list/filter), dolayisiyla asagidaki
+       * matchMode degerlerinin HICBIR ETKISI YOK:
        *
-       * Turkce karakter bu isin icinde DEGIL: FilterService iki tarafa da
-       * removeAccents uyguluyor (I->I, C->C, S->S), yani aksan farki
-       * zaten eriyor.
+       *   - DataTable suzmeyi `filters` PROP'undan okuyor (filter() icinde
+       *     `getActiveFilters(this.filters)`),
+       *   - prop ancak filterCallback() -> update:filters ile guncelleniyor,
+       *   - ve filterCallback() bu dosyada HIC cagrilmiyor.
        *
-       * DIKKAT -- bu yalnizca ISTEMCI TARAFI filtreleri kapsiyor, yani
-       * #filter sablonunda filterCallback() cagiran tablolari. Ayni
-       * dosyada filterSet/filterApply ile SUNUCUYA giden tablolar var
-       * (orders/shipped); oradaki esleme api/index.js icinde
-       *     m.FirmaAdi Like '<deger>' + '%'
-       * ile hala ON EK. Iki ekranda ayni aramanin farkli sonuc vermesi
-       * buradan geliyor; duzeltmek SQL degisikligi gerektiriyor ve ayrica
-       * karar verilmeli.
+       * Yani prop hep bos kaliyor ve istemci tarafi suzme devreye girmiyor.
+       * Anahtarlar yine de DURMALI: PrimeVue filtre kutusunu ancak
+       * `filters[field]` varsa ciziyor. Ayni ayrim order/Table.vue'nun
+       * 'Shipped' tablolarinda da var.
+       *
+       * Gercek esleme kipi SQL'de: LIKE '%deger%' (icinde gecen).
        */
       filtersShipped: {
         YuklemeTarihi: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -432,21 +447,32 @@ export default {
       return useOrderStore()
     },
     isFiltered() {
-      return Object.values(this.filtersShipped).some(
-        (f) => f && f.value !== null && f.value !== ""
-      );
+      return !this.isFilterEmpty();
     },
+    /*
+     * Excel ve kayit sayaci icin satirlar.
+     *
+     * Artik DOGRUDAN `list`: suzme sunucuda yapildigi icin store'daki
+     * liste ZATEN suzulmus sonuc. Eskiden burada `filteredList` vardi --
+     * PrimeVue'nun @filter olayindan gelen istemci tarafi sonuc; o yol
+     * tamamen kalkti.
+     */
     exportRows() {
-      if (this.isFiltered && Array.isArray(this.filteredList)) {
-        return this.filteredList;
-      }
       return this.list || [];
     },
   },
   watch: {
-    list() {
-      // Yeni veri geldiğinde eski filtre sonucu geçersiz
-      this.filteredList = null;
+    /*
+     * Toplamlar listeyle birlikte yenilenir.
+     *
+     * Eskiden bunu DataTable'in @filter olayi yapiyordu; o olay kalktigi
+     * icin tek tetikleyici burasi. created() ilk degeri hesapliyor, ama
+     * veri CLIENT'ta geldigi icin (useAsyncData server:false) created
+     * aninda liste genelde BOS -- yani bu izleyici olmadan baslik
+     * "Alis Fiyati - $0.00" olarak kalirdi.
+     */
+    list(val) {
+      this.__totalSum(val);
     },
   },
   created() {
@@ -455,33 +481,52 @@ export default {
   },
   methods: {
     /*
-     * SUZME YAZARKEN DEGIL, ENTER'DA CALISIR -- bu sayfaya OZEL.
+     * SUZME SUNUCUDA, ENTER'DA -- orders/shipped ile AYNI KALIP.
      *
-     * Kullanicinin istegi: "ben yazdigim zaman cikmasin, yazip enter
-     * bastiktan sonra sonuclari cikarsin, sadece o sayfa icin."
-     * Kardes tablolar (order/Table.vue, order/Table2.vue) yazarken
-     * suzmeye devam ediyor; orada gecikmeli (filterApplyDebounced).
+     * NEDEN: bu sayfa butun yuklenmis siparisleri urun satiri bazinda
+     * tarayiciya indirip suzmeyi PrimeVue ile ISTEMCIDE yapiyordu ve
+     * Firefox'ta filtre kutusuna yazilinca sekme kilitleniyordu. Enter'a
+     * baglamak YETMEDI -- tek bir suzme gecisi bile donduruyordu. Yani
+     * sorun "tus basina tekrarlanan is" degil, tarayicinin o kadar veriyi
+     * tutup her seferinde bastan filtreleyip siralayip yeniden render
+     * etmesi. orders/shipped ayni isi yillardir sorunsuz yapiyor, cunku
+     * suzmeyi SUNUCUYA birakiyor; bu dosya artik ayni yolu kullaniyor.
      *
-     * NEDEN ISE YARIYOR -- PrimeVue'nun ic isleyisi: InputText'in
-     * v-model'i `filterModel.value`a, yani DataTable'in IC kopyasi
-     * d_filters'a yaziyor. Ama suzmeyi yapan filter() `this.filters`
-     * PROP'unu okuyor ve prop ancak filterCallback() -> update:filters
-     * ile guncelleniyor. Yani filterCallback'i cagirmadigimiz surece
-     * yazilan metin kutuda GORUNUR ama tablo SUZULMEZ.
+     * Sunucuya giden uc: POST /order/shipped/mekmer2/list/filter
+     * (store: filterShipmentMekmer2). Kosullari mekmer2 LISTE ucuyla
+     * birebir ayni, yani sonuc her zaman o listenin alt kumesi.
+     *
+     * PrimeVue'nun kendi suzmesi artik DEVRE DISI: filterCallback() hic
+     * cagrilmiyor, dolayisiyla `update:filters` yayilmiyor ve DataTable'in
+     * okudugu `filters` PROP'u hep bos kaliyor. Kutuya yazilan metin
+     * gorunur (v-model DataTable'in IC kopyasina yaziyor) ama tablo
+     * istemcide SUZULMUYOR -- suzmeyi sunucu yapiyor.
      */
 
+    /* Her tus vurusunda YALNIZCA yerel modeli gunceller, istek YOK. */
+    filterSet(field, value) {
+      this.filterModel[field] = value == null ? "" : value;
+    },
+
     /*
-     * Kutu BOSALTILINCA aninda uygula.
+     * Enter -> sunucuya git.
      *
-     * Enter sarti olmasa bu tuzak olurdu: metni silip Enter'a basmayan
-     * kullanicida ONCEKI suzme sonucu ekranda kalir ve tam listeye
-     * donmenin yolu kalmaz. Yalnizca bosalma durumunda calistigi icin
-     * yazarken hicbir pahali is tetiklenmiyor.
+     * Tum kutular bossa suzulmus liste yerine TAM listeyi geri cekiyor;
+     * yoksa kullanici metni silip Enter'a bastiginda ekranda son suzme
+     * sonucu kalir ve tam listeye donmenin yolu olmazdi.
      */
-    filterResetIfEmpty(filterModel, filterCallback) {
-      if (filterModel.value === null || filterModel.value === "") {
-        filterCallback()
+    filterApply(field, value) {
+      this.filterSet(field, value);
+
+      if (this.isFilterEmpty()) {
+        this.orderStore.setOrderShippedMekmer2List();
+      } else {
+        this.orderStore.filterShipmentMekmer2(this.filterModel);
       }
+    },
+
+    isFilterEmpty() {
+      return Object.values(this.filterModel).every((v) => v === "");
     },
     /* ---------------- EXCEL ---------------- */
     async excelOutput() {
@@ -695,73 +740,40 @@ export default {
      * olarak biraktı -- iyi oldu, aksi halde sessizce gecip giderdi.
      */
     /*
-     * DEGISIKLIK YOKSA HICBIR SEY YAZILMAZ -- dongunun ikinci kaynagi.
+     * KALDIRILDI: filtersProduction(event)  (DataTable @filter dinleyicisi)
      *
-     * __totalSum'daki yerel toplama tek basina yetmiyordu: bu metot
-     * ayrica `this.filteredList`e YENI BIR DIZI atiyor ve PrimeVue her
-     * filtrelemede yeni bir dizi uretiyor, yani KIMLIK her zaman
-     * degisiyor. `filteredList` ise `exportRows` computed'i uzerinden
-     * sablonda okunuyor (satir 49: "{{ exportRows.length }} kayıt"),
-     * dolayisiyla her atama bir render daha tetikliyor ve DataTable
-     * @filter'i yeniden yayiyor:
-     *     Maximum recursive updates exceeded in component <DataTable>
+     * PrimeVue'nun istemci tarafi suzme sonucunu alip `filteredList`e
+     * yaziyor ve toplamlari oradan hesapliyordu. Suzme sunucuya tasindigi
+     * icin o olay artik dinlenmiyor; store'daki liste ZATEN suzulmus
+     * sonuc, toplamlari da `list` izleyicisi hesapliyor.
      *
-     * Burada once ICERIK karsilastiriliyor (uzunluk + oge kimlikleri).
-     * Filtre sonucu gercekten degismediyse metot TAMAMEN sessiz kaliyor:
-     * ne filteredList'e ne toplamlara yazilmiyor, yani dongu daha ilk
-     * tekrarda duruyor.
-     *
-     * Satir nesneleri store'da Object.freeze'li ve yeniden
-     * olusturulmadigi icin oge kimligi karsilastirmasi guvenli
-     * (bkz. app/stores/order.ts MUT_setOrderList).
+     * Birlikte giden kirilganlik: o metot bir COMPUTED degerlendirmesi
+     * SIRASINDA (DataTable'in processedData'si icinden) reaktif alanlara
+     * yaziyordu -- "Maximum recursive updates exceeded" uyarisinin
+     * kaynagi buydu ve icerik karsilastirmasiyla bastirilmasi
+     * gerekiyordu. O yol tamamen kalktigi icin bastirmaya da gerek yok.
      */
-    filtersProduction(event) {
-      const next = event.filteredValue || [];
-      const current = this.filteredList;
-
-      const unchanged =
-        Array.isArray(current) &&
-        current.length === next.length &&
-        current.every((row, i) => row === next[i]);
-
-      if (unchanged) return;
-
-      this.filteredList = next;
-      this.__totalSum(next);
-    },
     /*
      * TOPLAMA YEREL DEGISKENLERDE, REAKTIF ALANLARA TEK SEFERDE YAZILIR.
      *
-     * ---------------------------------------------------------------------
-     * NEDEN -- SONSUZ RENDER DONGUSUNU BU KIRDI
-     * ---------------------------------------------------------------------
-     * Belirti (reports/mekmer/shipped sayfasinda):
+     * TARIHCE -- bu bicim bir SONSUZ RENDER DONGUSUNU kirmak icindi:
      *     Maximum recursive updates exceeded in component <DataTable>
+     * Dongu sudur: DataTable @filter yayar -> filtersProduction() ->
+     * __totalSum() bu bilesenin REAKTIF alanlarina yazar (totals,
+     * totalsPurchase, totalamount, totalton, totalbuying) -> o alanlar
+     * DataTable'in kendi baslik/altlik sablonunda okunuyor -> DataTable
+     * yeniden render edilir -> basa don. Eski kod her cagride
+     * `this.totals = 0` yaptigi icin degerler oturmus olsa bile her tur
+     * "degisti" sinyali uretiyordu.
      *
-     * Dongu sumdu:
-     *   1) DataTable render edilir ve @filter olayini yayar
-     *   2) filtersProduction() -> __totalSum() cagrilir
-     *   3) __totalSum bu bileşenin REAKTIF alanlarina yazar
-     *      (totals, totalsPurchase, totalamount, totalton, totalbuying)
-     *   4) o alanlar DataTable'in KENDI sablonunda okunuyor
-     *      (satir 47 baslikta, 302 ve 327 altlikta)
-     *   5) dolayisiyla DataTable yeniden render edilir -> (1)'e don
-     *
-     * Dongunun ASLA DURULMAMASININ sebebi eski kodun ilk satirlariydi:
-     * her cagride `this.totals = 0` yapiliyordu. Vue bir reaktif alana
-     * AYNI deger yazilinca render tetiklemez; ama once 0'a sifirlanip
-     * sonra tekrar toplanmasi her turda "degisti" sinyali uretiyordu --
-     * yani degerler oturmus olsa bile dongu kendini besliyordu.
-     * Ustelik `+=` satir basina calistigi icin tur basina 5 x N reaktif
-     * yazma oluyordu.
-     *
-     * Yerel degiskende toplayip SONUNDA tek kez atayinca: ikinci turda
-     * atanan degerler oncekiyle AYNI oluyor, Vue degisim gormuyor,
-     * render tekrarlanmiyor ve dongu KENDILIGINDEN duruyor.
-     *
-     * Ayni duzeltme store tarafinda zaten yapilmisti
-     * (app/stores/order.ts MUT_setOrderProductionTotal -- "Toplama YEREL
-     * degiskende, state'te DEGIL"); bu bileşen-ici kopya atlanmisti.
+     * O TETIKLEYICI ARTIK YOK: suzme sunucuya tasindi, @filter dinlenmiyor
+     * ve __totalSum yalnizca created() ile `list` izleyicisinden
+     * cagriliyor -- yani bir computed degerlendirmesi sirasinda DEGIL.
+     * Buna ragmen bicim KORUNUYOR: yerel degiskende toplayip sonunda tek
+     * kez atamak, ayni degerler yeniden hesaplandiginda Vue'ya gereksiz
+     * render yaptirmiyor (`+=` ise satir basina 5 x N reaktif yazma
+     * demekti). Ayni duzeltme store tarafinda da var
+     * (app/stores/order.ts MUT_setOrderProductionTotal).
      *
      * Toplama ifadeleri ve SIRASI birebir korundu, yani kayan nokta
      * sonucu degismiyor.
@@ -836,9 +848,14 @@ export default {
      * filterApply / isFilterEmpty'ye indirmistim -- ama o da yine olu
      * kod olurdu, sadece daha azi. Tamami kaldirildi.
      *
-     * `filterModel` data alani da birlikte gitti: yalnizca o metotlar
-     * okuyordu. DIKKAT -- sablondaki `filterModel` AYNI SEY DEGIL:
-     *     <template #filter="{ filterModel, filterCallback }">
+     * SONRADAN GERI GELDI: suzme sunucuya tasinirken filterSet /
+     * filterApply / isFilterEmpty ve `filterModel` data alani YENIDEN
+     * yazildi -- bu kez sablona BAGLI ve canli (bkz. filterSet'in
+     * ustundeki not). Yani asagidaki "filterModel gitti" cumlesi yalnizca
+     * o ara donem icin gecerliydi.
+     *
+     * DIKKAT -- sablondaki `filterModel` AYNI SEY DEGIL:
+     *     <template #filter="{ filterModel }">
      * orada PrimeVue'nun Column'a verdigi SLOT PROP'u destructure
      * ediliyor ve component data'sini golgeliyor. Bu yuzden data alani
      * kullanilmiyor gorunmesine ragmen sablon calismaya devam ediyor.

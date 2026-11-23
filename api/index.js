@@ -13548,6 +13548,115 @@ order by YEAR(s.SiparisTarihi) desc
   });
 });
 
+/*
+ * reports/mekmer/shipped -- SUNUCU TARAFI FILTRE.
+ *
+ * NEDEN VAR: o sayfa butun yuklenmis siparisleri URUN SATIRI bazinda
+ * tarayiciya indiriyor ve suzmeyi PrimeVue ile ISTEMCIDE yapiyordu;
+ * Firefox'ta filtre kutusuna yazilinca sekme kilitleniyordu. orders/shipped
+ * ekrani ayni isi YILLARDIR sorunsuz yapiyor, cunku suzmeyi SUNUCUYA
+ * birakiyor (POST /order/shipped/list/filter). Bu uc, o kalibin mekmer2
+ * kumesi icin karsiligi.
+ *
+ * O UCU DOGRUDAN KULLANAMIYORUZ: /order/shipped/list/filter sorgusu
+ * `m.Marketing = 'Mekmar'` ile sinirli, mekmer2 ise IKI kumenin birlesimi
+ * (Mekmer/Ic Piyasa/Imperial Homes + TedarikciID 1,123 olan Mekmar).
+ * Kosullar /order/shipped/mekmer2/list ile BIREBIR ayni tutuldu, yani bu
+ * ucun donduru her zaman o listenin bir ALT KUMESI.
+ *
+ * IKI FARK, ikisi de bilerek:
+ *
+ *  1) ESLESME "ICINDE GECEN" -- LIKE '%deger%'. Eski uc LIKE 'deger%' ile
+ *     ON EK ariyor; kullanici uzun firma adlarinin ortasindan kelime
+ *     yazdigi icin sonuc donmuyordu (bkz. commit 1f73b7f37).
+ *
+ *  2) PARAMETRELI SORGU -- degerler @p0, @p1... olarak gidiyor, SQL'e
+ *     metin olarak GOMULMUYOR. Eski uc `'${company}'` seklinde
+ *     interpolasyon yapiyor; filtre kutusuna tek tirnak yazmak orada
+ *     sorguyu bozuyor. Yeni kodda ayni hatayi tekrarlamanin sebebi yok.
+ *     (api/index.js genelinde 756 yerde new mssql.Request().input(...)
+ *     kalibi zaten kullaniliyor.)
+ *
+ * Tarih kutusu EKRANDAKI bicimle karsilastiriliyor: tablo
+ * formatters.dateToString ile "02-10-2026" basiyor, SQL style 105 de
+ * dd-mm-yyyy uretiyor. Boylece kullanici gordugu seyi yazabiliyor --
+ * "2026" yazmak o yilin tamamini, "02-10-2026" tek gunu suzuyor.
+ * Sayisal kolonlar (En/Boy/Kenar/Miktar) LIKE icin varchar'a cevriliyor;
+ * implicit donusume guvenmek bicimi veritabani diline birakir.
+ */
+app.post("/order/shipped/mekmer2/list/filter", async (req, res) => {
+  try {
+    const body = req.body || {};
+
+    /* Istemcideki filterModel anahtari -> SQL ifadesi. */
+    const COLUMNS = {
+      loaddate: "CONVERT(varchar(10), s.YuklemeTarihi, 105)",
+      company: "m.FirmaAdi",
+      po: "s.SiparisNo",
+      product: "urun.UrunAdi",
+      width: "CONVERT(varchar(32), ol.En)",
+      height: "CONVERT(varchar(32), ol.Boy)",
+      edge: "CONVERT(varchar(32), ol.Kenar)",
+      supplier: "t.FirmaAdi",
+      amount: "CONVERT(varchar(32), su.Miktar)",
+    };
+
+    const predicates = [];
+    const values = [];
+
+    for (const [key, expr] of Object.entries(COLUMNS)) {
+      const raw = body[key];
+      if (raw === undefined || raw === null || String(raw).trim() === "") continue;
+      predicates.push(`${expr} LIKE @p${values.length}`);
+      values.push(`%${String(raw).trim()}%`);
+    }
+
+    const extra = predicates.length ? " AND " + predicates.join(" AND ") : "";
+
+    /*
+     * Her sorgu KENDI Request'ini aliyor: bir mssql Request ayni anda tek
+     * sorgu calistirabiliyor, Promise.all icinde paylasilamaz.
+     */
+    const buildRequest = () => {
+      const request = new mssql.Request();
+      values.forEach((value, i) => request.input(`p${i}`, mssql.NVarChar, value));
+      return request;
+    };
+
+    const ordersListSqlMekmer =
+      getBaseShippedOrderSql() +
+      `
+      WHERE s.SiparisDurumID = 3 AND m.Marketing IN ('Mekmer','İç Piyasa','Imperial Homes')${extra}
+      ORDER BY s.SiparisTarihi DESC, s.SiparisNo DESC, su.SiraNo ASC
+    `;
+
+    const ordersListSqlMekmar =
+      getBaseShippedOrderSql() +
+      `
+      WHERE s.SiparisDurumID = 3 AND su.TedarikciID IN (1,123) AND m.Marketing = 'Mekmar'${extra}
+      ORDER BY s.SiparisTarihi DESC, s.SiparisNo DESC, su.SiraNo ASC
+    `;
+
+    const [ordersMekmer, ordersMekmar] = await Promise.all([
+      buildRequest().query(ordersListSqlMekmer),
+      buildRequest().query(ordersListSqlMekmar),
+    ]);
+
+    let resultList = [];
+    if (ordersMekmer && ordersMekmer.recordset)
+      resultList = resultList.concat(ordersMekmer.recordset);
+    if (ordersMekmar && ordersMekmar.recordset)
+      resultList = resultList.concat(ordersMekmar.recordset);
+
+    res.status(200).json({ list: resultList });
+  } catch (error) {
+    console.error("/order/shipped/mekmer2/list/filter API Hatasi:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Veriler suzulurken hata olustu." });
+  }
+});
+
 app.post("/order/shipped/list/filter", async (req, res) => {
   const company =
     req.body.company.charAt(0).toUpperCase() + req.body.company.slice(1);

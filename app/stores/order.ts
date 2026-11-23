@@ -413,6 +413,41 @@ export const useOrderStore = defineStore("order", {
             }
           });
     },
+    /*
+     * reports/mekmer/shipped -- SUNUCU TARAFI SUZME.
+     *
+     * filterShipment ile AYNI isi yapiyor ama mekmer2 ucuna gidiyor:
+     * /order/shipped/list/filter sorgusu `m.Marketing='Mekmar'` ile
+     * sinirli, o sayfanin kumesi ise IKI kumenin birlesimi. Ayrinti
+     * api/index.js icindeki ucun basindaki notta.
+     *
+     * endLoadingDatatable `if (response.data.list)` ICINDE DEGIL: istek
+     * basarili ama sonuc bos donerse (hic eslesme yok) sayac dusmezdi ve
+     * yukleme katmani tiklamalari yakaladigi icin ekran kilitli kalirdi.
+     * Ayni hata kardes aksiyonlarda da vardi; finally uc yolda da
+     * (bos liste / hata / basari) kapatir.
+     */
+    filterShipmentMekmer2(filter) {
+      const legacyApi = useLegacyApi()
+      const sharedStore = useSharedStore()
+
+          sharedStore.beginLoadingDatatable();
+
+          legacyApi
+            .post(`/order/shipped/mekmer2/list/filter`, filter)
+            .then((response) => {
+              if (response.data.list) {
+                this.MUT_setOrderList(response.data.list);
+                this.MUT_setOrderProductionTotal(response.data.list);
+              }
+            })
+            .catch((err) => {
+              console.error("filterShipmentMekmer2 basarisiz:", err)
+            })
+            .finally(() => {
+              sharedStore.endLoadingDatatable()
+            });
+    },
     setFilterShipmentGlobal(filter) {
       const legacyApi = useLegacyApi()
       const sharedStore = useSharedStore()
