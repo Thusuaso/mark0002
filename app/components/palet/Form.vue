@@ -15,18 +15,27 @@
       </div>
 
       <!--
-        PALET NO GIRILMIYOR, GOSTERILIYOR.
-        Numara veritabaninda ID'den uretiliyor (api/sql/PaletTB.sql,
-        karar [5]), yani yeni kayitta daha BELLI DEGIL. Alan bu yuzden
-        salt okunur: yeni kayitta BOS, duzenlemede mevcut numara.
+        PALET NO: YENI KAYITTA OTOMATIK, DUZENLEMEDE ELLE DEGISTIRILEBILIR.
+        (istek: "ilk basta normal sekilde otomatik atayacak ama sonra
+        update yapacagim zaman o alani guncelleyebilmek istiyorum")
 
-        [x] "kayıtta verilecek" yazisi KALDIRILDI (istek). Kutu yeni
-        kayitta artik bos duruyor; ustundeki FloatLabel etiketi alanin ne
-        oldugunu zaten soyluyor.
+        Yeni kayitta kutu KAPALI ve BOS: numara ID'den uretildigi icin
+        kayit tamamlanmadan daha belli degil, yani gosterilecek bir deger
+        yok. ("kayıtta verilecek" yazisi istek uzerine kaldirildi;
+        ustundeki FloatLabel etiketi alanin ne oldugunu soyluyor.)
+
+        Duzenlemede kutu ACIK -- yazilan deger /palet/update ile
+        kaydediliyor. Benzersizligi sunucu kontrol ediyor; cakisirsa
+        "baska bir palette kullaniliyor" mesaji donuyor.
       -->
       <div class="col-12 col-md-4">
         <FloatLabel>
-          <InputText :id="ids.paletNo" :value="model.PaletNo || ''" disabled />
+          <InputText
+            :id="ids.paletNo"
+            v-model="model.PaletNo"
+            :disabled="!model.ID"
+            maxlength="20"
+          />
           <label :for="ids.paletNo">Palet No</label>
         </FloatLabel>
       </div>
@@ -502,6 +511,13 @@ export default {
        * hangi alanin eksik oldugu burada belli.
        */
       const eksik = []
+      /*
+       * Palet No yalnizca DUZENLEMEDE kontrol ediliyor: yeni kayitta
+       * numarayi sunucu veriyor, yani forma bos gelmesi normal.
+       */
+      if (this.model.ID && !String(this.model.PaletNo || "").trim()) {
+        eksik.push("Palet No")
+      }
       if (!this.model.FirmaAdi && !this.model.FirmaId) eksik.push("Firma")
       if (!this.model.UrunBilgisi && !this.model.UrunId) eksik.push("Ürün bilgisi")
       if (this.sayi(this.model.En) === null) eksik.push("En")

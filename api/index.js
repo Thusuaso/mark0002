@@ -22132,17 +22132,72 @@ app.post("/palet/save", async (req, res) => {
      * kutu geri eklenirse ya da istek elle atilirsa kural sessizce
      * delinirdi. Durumu degistiren TEK yer /palet/used.
      *
-     * PaletNo da yazilmiyor (hesaplanan kolon), OUTPUT ile geri
-     * okunuyor; ekran "P0007 kaydedildi" diyebilsin.
+     * [!] PaletNo ISTEMCIDEN OKUNMUYOR -- yeni kayitta numara HER ZAMAN
+     * otomatik. Istek boyleydi: "ilk basta normal sekilde otomatik
+     * atayacak ama sonra update yapacagim zaman o alani
+     * guncelleyebilmek istiyorum." Elle verilen numara YALNIZCA
+     * /palet/update uzerinden yaziliyor.
+     *
+     * NUMARAYI ARTIK BU UC YAZIYOR. Eskiden PaletNo hesaplanan bir
+     * kolondu ve OUTPUT ile geri okunuyordu; duzenlenebilmesi icin
+     * yazilabilir kolona cevrildi
+     * (api/sql/PaletTB_PaletNo_Duzenlenebilir.sql).
+     *
+     * YARIS DURUMU YOK: numara hala IDENTITY'den (ID) turetiliyor, yani
+     * ayni anda kaydeden iki kullanici farkli ID, dolayisiyla farkli
+     * numara aliyor -- PaletTB.sql karar [5]'in korudugu garanti bu.
+     *
+     * set xact_abort on: herhangi bir hatada transaction KENDILIGINDEN
+     * geri alinir. Olmasa hata JS'e duser ama transaction havuzdaki
+     * baglantida ACIK kalirdi; o baglantiyi alan sonraki istek bozuk bir
+     * durumla karsilasirdi.
      */
     const ins = await r.query(`
+      set nocount on;
+      set xact_abort on;
+
+      begin transaction;
+
       insert into PaletTB
         (Tarih, FirmaId, EnId, BoyId, KalinlikId, UrunId, Adet, M2,
          KullaniciID)
-      output inserted.ID, inserted.PaletNo
       values
         (@Tarih, @FirmaId, @EnId, @BoyId, @KalinlikId, @UrunId, @Adet, @M2,
-         @KullaniciID)
+         @KullaniciID);
+
+      declare @id int = scope_identity();
+      declare @n  int = @id;
+      declare @no varchar(20) = 'P' + case
+                                        when @n < 10000
+                                          then right('000' + cast(@n as varchar(12)), 4)
+                                        else cast(@n as varchar(12))
+                                      end;
+
+      /*
+       * ID'den uretilen numara ELLE baskasina verilmis olabilir: biri
+       * /palet/update ile bir paleti 'P0050' yaptiysa, siradaki ID 50'ye
+       * geldiginde ayni numara cikar. O durumda ilk BOS numaraya kadar
+       * ilerliyoruz. updlock/holdlock ayni anda kaydeden ikinci bir
+       * istegin ayni bosluga girmesini engelliyor; dongu numara buyudugu
+       * icin kesin sonlanir.
+       */
+      while exists (
+        select 1 from PaletTB with (updlock, holdlock) where PaletNo = @no
+      )
+      begin
+        set @n = @n + 1;
+        set @no = 'P' + case
+                          when @n < 10000
+                            then right('000' + cast(@n as varchar(12)), 4)
+                          else cast(@n as varchar(12))
+                        end;
+      end
+
+      update PaletTB set PaletNo = @no where ID = @id;
+
+      commit transaction;
+
+      select @id as ID, @no as PaletNo;
     `);
 
     res.status(200).json({
@@ -22166,8 +22221,56 @@ app.put("/palet/update", async (req, res) => {
     const v = await paletGovdeCoz(req.body);
     if (v.hata) return res.status(400).json({ status: false, message: v.hata });
 
+    /*
+     * PALET NO ELLE DEGISTIRILEBILIYOR -- yalnizca BURADA.
+     *
+     * Istek: "ilk basta normal sekilde otomatik atayacak ama sonra
+     * update yapacagim zaman o alani guncelleyebilmek istiyorum."
+     * Yeni kayitta numara hep otomatik (/palet/save), duzenlemede
+     * kullanicinin yazdigi deger gecerli.
+     *
+     * Bos birakilamaz: numara paletin kalici kimligi ve liste, Excel,
+     * "P0007 kaydedildi" mesaji hep onu gosteriyor.
+     */
+    const paletNo = String(req.body.PaletNo ?? "").trim();
+    if (!paletNo) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Palet No bos olamaz." });
+    }
+    if (paletNo.length > 20) {
+      return res.status(400).json({
+        status: false,
+        message: "Palet No en fazla 20 karakter olabilir.",
+      });
+    }
+
+    /*
+     * Benzersizlik IKI KATMANDA.
+     *
+     * Burada onden bakiliyor ki kullanici "P0007 baska bir palette
+     * kullaniliyor" gibi ANLASILIR bir mesaj gorsun. Son soz yine
+     * veritabaninda: UX_PaletTB_PaletNo filtreli indeksi. Iki istek ayni
+     * numarayi ayni anda alirsa bu kontrol ikisini de gecirebilir, o
+     * zaman indeks patlatir -- asagidaki catch o hatayi da ayni mesaja
+     * ceviriyor.
+     */
+    const cakisma = new mssql.Request();
+    cakisma.input("ID", mssql.Int, id);
+    cakisma.input("PaletNo", mssql.VarChar(20), paletNo);
+    const varMi = await cakisma.query(`
+      select top 1 PaletNo from PaletTB where PaletNo = @PaletNo and ID <> @ID
+    `);
+    if (varMi.recordset.length) {
+      return res.status(409).json({
+        status: false,
+        message: `Palet No "${paletNo}" baska bir palette kullaniliyor.`,
+      });
+    }
+
     const r = new mssql.Request();
     r.input("ID", mssql.Int, id);
+    r.input("PaletNo", mssql.VarChar(20), paletNo);
     r.input("Tarih", mssql.Date, v.tarih);
     r.input("FirmaId", mssql.Int, v.firmaId);
     r.input("EnId", mssql.Int, v.enId);
@@ -22190,6 +22293,7 @@ app.put("/palet/update", async (req, res) => {
      */
     await r.query(`
       update PaletTB set
+        PaletNo    = @PaletNo,
         Tarih      = @Tarih,
         FirmaId    = @FirmaId,
         EnId       = @EnId,
@@ -22203,6 +22307,17 @@ app.put("/palet/update", async (req, res) => {
 
     res.status(200).json({ status: true });
   } catch (error) {
+    /*
+     * 2601/2627: benzersiz indeks/kisit ihlali. Yukaridaki on kontrol
+     * yarisi kaybettiyse buraya duser; kullaniciya ham SQL metni degil
+     * ayni anlasilir mesaj gidiyor.
+     */
+    if (error && (error.number === 2601 || error.number === 2627)) {
+      return res.status(409).json({
+        status: false,
+        message: "Bu Palet No baska bir palette kullaniliyor.",
+      });
+    }
     console.error("/palet/update API Hatasi:", error);
     res.status(500).json({ status: false, message: error.message });
   }
