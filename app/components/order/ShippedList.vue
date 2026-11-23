@@ -812,8 +812,16 @@ export default {
     ordersFilter(event) {
       this.orderStore.setOrderProductionTotal(event.filteredValue);
     },
+    /*
+     * [!] BURADA useCookie CAGIRILMAZ -- rowClass HER SATIR icin
+     * calisiyor ve Nuxt'un useCookie'si her cagride kapanmayan bir
+     * BroadcastChannel + kalici watcher birakiyor (render sirasinda
+     * aktif scope olmadigi icin temizlenmiyor). Gerekcesinin tamami
+     * order/Table.vue'daki `userId` alaninin ustunde. Deger
+     * created() icinde bir kez okunuyor.
+     */
     rowClass2(event) {
-      const userId = useCookie("userId").value;
+      const userId = this.userId;
       if (event.SiparisSahibi == userId || event.Operasyon == userId)
         return "row-accessories";
       else return "row-accessories-border";

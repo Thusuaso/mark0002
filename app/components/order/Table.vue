@@ -1231,6 +1231,30 @@ export default {
       /* setTimeout kimligi -- filterApplyDebounced kullaniyor. */
       __filterTimer: null,
       /*
+       * Cerez BIR KEZ okunuyor -- rowClass2 icinde OKUNAMAZ.
+       *
+       * rowClass2'de `useCookie("userId")` cagrisi vardi ve PrimeVue
+       * rowClass'i HER SATIR icin calistiriyor (BodyRow.vue rowClasses
+       * computed'i -> this.rowClass(this.rowData)). Nuxt'un useCookie'si
+       * her cagride bir ref + bir deep watch kuruyor; cookieStore
+       * DESTEKLENMEYEN tarayicilarda (Firefox: globalThis.cookieStore YOK)
+       * ustelik `new BroadcastChannel("nuxt:cookies:userId")` aciyor.
+       *
+       * Temizlik `getCurrentScope()` varsa onScopeDispose ile yapiliyor;
+       * ama RENDER sirasinda aktif scope YOK (Vue render'da
+       * setCurrentRenderingInstance kullaniyor, setCurrentInstance DEGIL,
+       * yani instance.scope.on() calismiyor). Sonuc: her render 25 satir
+       * icin 25 KAPANMAYAN BroadcastChannel + 25 kalici watcher birakiyor.
+       * Kanallar hepsi ayni adi dinledigi icin biri mesaj attiginda
+       * digerlerinin TAMAMI isliyor -- yani maliyet kanal sayisinin
+       * KARESIYLE buyuyor ve Firefox'ta BroadcastChannel IPC uzerinden
+       * gittigi icin sekme kilitleniyor.
+       *
+       * created() GUVENLI: orada setCurrentInstance aktif, dolayisiyla
+       * scope var ve kanal bilesen gidince kapatiliyor.
+       */
+      userId: null,
+      /*
        * ESLESME KIPI -- metin alanlari CONTAINS, olcu/tarih STARTS_WITH.
        *
        * Hepsi STARTS_WITH'ti. PrimeVue'nun startsWith'i KESIN ON EK
@@ -1295,6 +1319,10 @@ export default {
       },
     };
   },
+  created() {
+    this.userId = useCookie("userId").value
+  },
+
   beforeUnmount() {
     /* Bekleyen suzme, bilesen gittikten sonra calismasin. */
     clearTimeout(this.__filterTimer)
@@ -1372,7 +1400,7 @@ export default {
      * isaretlenmez -- "renkler kayboldu" diye aranacak bir hata olurdu.
      */
     rowClass2(event) {
-      const userId = useCookie("userId").value
+      const userId = this.userId
       if (event.SiparisSahibi == userId || event.Operasyon == userId) {
         return "row-accessories"
       }
