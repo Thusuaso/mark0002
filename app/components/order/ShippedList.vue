@@ -10,7 +10,7 @@
         rowGroupMode="rowspan"
         :groupRowsBy="['YuklemeTarihi', 'SiparisNo', 'FirmaAdi', 'PI']"
         v-model:selection="selectedProduction"
-        :selectionMode="userId != 48 ? 'multiple' : ''"
+        :selectionMode="satirSecimi"
         @row-click="$emit('production_selected_emit', $event.data)"
         class="p-datatable-sm table-dense"
         :paginator="true"
@@ -343,6 +343,18 @@
 <script>
 import { useOrderStore } from "~/stores/order"
 import { FilterMatchMode } from "@primevue/core/api";
+
+/*
+ * COKLU SATIR SECIMI KAPALI OLAN KULLANICILAR.
+ *
+ * Bu kullanicilar yalnizca OKUYOR: secim coklu islem dugmelerine
+ * acilan kapi, onlarda da o islemler yok. Nuxt 2'de liste tek kimlikti
+ * (48); 56 ayni gorunumu gormeye baslayinca (bkz.
+ * components/home/Dashboard.vue DAR_PANEL_IDS) buraya da eklendi.
+ *
+ * Cerez degeri string oldugu icin liste de string.
+ */
+const SECIM_KAPALI_IDS = ["48", "56"]
 export default {
   /* PI indirme: cerez yerine kisa omurlu bilet kullaniyor
      (gerekcesi app/composables/usePiDownload.ts icinde). */
@@ -459,6 +471,15 @@ export default {
      */
     exportRows() {
       return this.list || [];
+    },
+
+    /*
+     * DataTable'in selectionMode'u: bos string secimi KAPATIR.
+     * Eskiden sablonda `userId != 48 ? 'multiple' : ''` duruyordu;
+     * liste iki kimlige cikinca buraya tasindi.
+     */
+    satirSecimi() {
+      return SECIM_KAPALI_IDS.includes(String(this.userId)) ? "" : "multiple";
     },
   },
   watch: {
