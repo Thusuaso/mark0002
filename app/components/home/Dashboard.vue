@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid dash" v-if="userId != 48">
+  <div class="container-fluid dash" v-if="!darPanel">
     <!--
       SAYFA BASLIGI.
 
@@ -306,12 +306,16 @@
   </div>
 
   <!--
-    userId == 48 icin DAR gorunum: yalnizca uretim tarafi, para birimi
-    iceren hicbir kart/grafik yok. Nuxt 2'de de boyleydi; bu bir
-    yetkilendirme kisitiydi, bicimsel bir tercih degil -- bu yuzden
-    birebir korundu.
+    DAR gorunum (bkz. `darPanel` computed'i): yalnizca uretim tarafi,
+    para birimi iceren hicbir kart/grafik yok. Nuxt 2'de de boyleydi;
+    bu bir yetkilendirme kisitiydi, bicimsel bir tercih degil.
+
+    Kosul artik `userId == 48` DEGIL: ayni dar panel 56 numarali
+    kullaniciya da gosteriliyor (istek: "userid 48 in gordugu navbar ve
+    ana sayfayi ayni sekilde userid 56 da gorsun" -- navbar zaten ayni,
+    ikisi de navbar-control.global.ts'teki kisitli listede).
   -->
-  <div class="container-fluid dash" v-else-if="userId == 48">
+  <div class="container-fluid dash" v-else>
     <!--
       SAYFA BASLIGI.
 
@@ -428,6 +432,18 @@
 import { useAuthStore } from "~/stores/auth"
 
 /*
+ * DAR ANA SAYFA PANELINI GOREN KULLANICILAR.
+ *
+ * Kimlikler app/middleware/navbar-control.global.ts'teki KISITLI
+ * listenin bir ALT KUMESI; o liste navbar'i, bu liste ana sayfayi
+ * belirliyor. Ikisi BILEREK ayri: kisitli navbar'i goren her kullanici
+ * dar paneli gormek zorunda degil (54 ve 62 genis paneli goruyor).
+ *
+ * Cerez degeri string oldugu icin liste de string.
+ */
+const DAR_PANEL_IDS = ["48", "56"]
+
+/*
  * GRAFIK SECENEKLERI VE RENKLERI app/utils/viz.ts ICINDE.
  *
  * Buradaki uc secenek nesnesi (chartOptions / chartOptionsTwo /
@@ -520,6 +536,19 @@ export default {
     },
     userId() {
       return this.authStore.getUserId
+    },
+
+    /*
+     * DAR PANELI GOREN KULLANICILAR.
+     *
+     * Karsilastirma STRING uzerinden: auth store'daki userId bir CEREZ
+     * degeri, yani "48" (bkz. dosya sonundaki not). Eskiden sablonda
+     * gevsek `userId == 48` / `!= 48` duruyordu; liste iki kimlige
+     * cikinca tek yerde toplandi, yoksa ayni kosul uc ayri yerde
+     * tekrar eder ve biri guncellenmeden kalirdi.
+     */
+    darPanel() {
+      return DAR_PANEL_IDS.includes(String(this.userId))
     },
 
     /*
@@ -1078,10 +1107,12 @@ export default {
   ELLE YAPILAN ZORUNLU DEGISIKLIKLER:
 
   [x] mapGetters(["getUserId"]) -> computed authStore / userId
-      Karsilastirma BILEREK `!=` / `==` kaldi (pilot genelindeki kural;
-      bkz. components/order/Table.vue yorumu). auth store'daki userId bir
-      CEREZ degeri, yani STRING "48"; `!==` yazilsa kosul her zaman dogru
-      olur ve 48 numarali kullanici yetkisi olmayan tum kartlari gorurdu.
+      Sablondaki gevsek `userId == 48` / `!= 48` karsilastirmalari
+      `darPanel` computed'ine tasindi (dar paneli artik 48 ILE 56
+      goruyor). Orada karsilastirma String(userId) uzerinden: auth
+      store'daki userId bir CEREZ degeri, yani STRING "48" -- tip
+      donusumu olmadan `=== 48` her zaman yanlis olur ve kisitli
+      kullanici yetkisi olmayan tum kartlari gorurdu.
 
   [x] `mekmer_datas` + created() icindeki this.$axios cagrisi KALDIRILDI
       -> `stocks` prop'u, veri stores/home.ts'ten geliyor.

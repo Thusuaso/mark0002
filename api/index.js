@@ -22189,9 +22189,19 @@ app.post("/palet/save", async (req, res) => {
      * yazilabilir kolona cevrildi
      * (api/sql/PaletTB_PaletNo_Duzenlenebilir.sql).
      *
-     * YARIS DURUMU YOK: numara hala IDENTITY'den (ID) turetiliyor, yani
-     * ayni anda kaydeden iki kullanici farkli ID, dolayisiyla farkli
-     * numara aliyor -- PaletTB.sql karar [5]'in korudugu garanti bu.
+     * NUMARA ARTIK ID'DEN DEGIL, EN BUYUK KAYITLI NUMARADAN ILERLIYOR.
+     * Istek: "kayitli palet varsa oradaki palet numarasinin uzerine
+     * eklenerek ilerlesin". Eskiden numara IDENTITY'den (ID) turetiliyordu;
+     * PaletNo elle duzenlenebilir hale geldikten sonra bu ikisi birbirinden
+     * kopuyordu -- biri numarayi P0500 yaptiginda siradaki kayit ID'ye
+     * bakip P0121 gibi GERIDEN bir numara aliyordu. Simdi mevcut en buyuk
+     * numara + 1 alinıyor; tabloda okunabilir numara yoksa (ilk kayit)
+     * ID'ye dusuluyor.
+     *
+     * YARIS DURUMU: en buyuk numarayi okuyan select updlock/holdlock ile
+     * calisiyor, yani ayni anda kaydeden ikinci istek bu transaction
+     * bitene kadar bekler ve guncellenmis en buyugu gorur. Asagidaki
+     * "bos numaraya kadar ilerle" dongusu de yerinde duruyor.
      *
      * set xact_abort on: herhangi bir hatada transaction KENDILIGINDEN
      * geri alinir. Olmasa hata JS'e duser ama transaction havuzdaki
@@ -22212,7 +22222,20 @@ app.post("/palet/save", async (req, res) => {
          @KullaniciID);
 
       declare @id int = scope_identity();
-      declare @n  int = @id;
+
+      /*
+       * Mevcut en buyuk numara. PaletNo 'P' + rakam bicimindeki
+       * kayitlardan okunuyor; elle baska bir bicim yazilmissa
+       * (try_cast null doner) hesaba katilmiyor. Yeni satirin kendi
+       * PaletNo'su henuz NULL oldugu icin max onu gormez.
+       */
+      declare @maxn int = (
+        select max(try_cast(substring(PaletNo, 2, len(PaletNo)) as int))
+        from PaletTB with (updlock, holdlock)
+        where PaletNo like 'P%'
+      );
+
+      declare @n  int = case when @maxn is null then @id else @maxn + 1 end;
       declare @no varchar(20) = 'P' + case
                                         when @n < 10000
                                           then right('000' + cast(@n as varchar(12)), 4)
@@ -22220,12 +22243,12 @@ app.post("/palet/save", async (req, res) => {
                                       end;
 
       /*
-       * ID'den uretilen numara ELLE baskasina verilmis olabilir: biri
-       * /palet/update ile bir paleti 'P0050' yaptiysa, siradaki ID 50'ye
-       * geldiginde ayni numara cikar. O durumda ilk BOS numaraya kadar
-       * ilerliyoruz. updlock/holdlock ayni anda kaydeden ikinci bir
-       * istegin ayni bosluga girmesini engelliyor; dongu numara buyudugu
-       * icin kesin sonlanir.
+       * Uretilen numara ELLE baskasina verilmis olabilir: tabloda hic
+       * okunabilir numara yokken ID'ye dusuyoruz ve o ID'nin numarasi
+       * baska bir satirda 'P0050' olarak duruyor olabilir. O durumda ilk
+       * BOS numaraya kadar ilerliyoruz. updlock/holdlock ayni anda
+       * kaydeden ikinci bir istegin ayni bosluga girmesini engelliyor;
+       * dongu numara buyudugu icin kesin sonlanir.
        */
       while exists (
         select 1 from PaletTB with (updlock, holdlock) where PaletNo = @no
